@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "finding-objects"
+version = "0.1.0"
+description = "Astronomical image candidate discovery and cataloguing pipeline"
+requires-python = ">=3.11"
+dependencies = [
+  "astropy>=6.0",
+  "astroquery>=0.4.7",
+  "numpy>=1.26",
+  "pandas>=2.1",
+  "photutils>=1.11",
+  "requests>=2.31",
+]
+
+[project.scripts]
+finding-objects = "finding_objects.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
