@@ -23,7 +23,7 @@ def make_dummy_spectrum(z=0.05):
         center = rest * (1 + z)
         flux += amp * np.exp(-0.5 * ((wave-center)/1.3)**2)
     center = 3933.7 * (1 + z)
-    flux -= .8 * np.exp(-0.5 * ((wave-center)/1.0)**2)
+    flux -= 4.0 * np.exp(-0.5 * ((wave-center)/1.0)**2)
     return pd.DataFrame({"wavelength_angstrom": wave, "flux": flux})
 
 
@@ -64,7 +64,7 @@ def test_dummy_lines_produce_conservative_object_class():
 
 
 def test_partial_photometry_adapter_skips_missing_and_invalid_bands():
-    from scripts.real_spectral_test import photometry_from_sdss_row
+    from finding_objects.sdss import photometry_from_sdss_row
     row = pd.Series({"OBJID": 42, "G": 20.4, "r": 19.8, "i": np.nan, "z": 19.3})
     phot = photometry_from_sdss_row(row)
     assert phot["band"].tolist() == ["g", "r", "z"]
