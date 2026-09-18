@@ -8,6 +8,8 @@ import astropy.units as u
 import numpy as np
 import pandas as pd
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from astropy.coordinates import SkyCoord
 from astropy.io import fits
 from astropy.stats import sigma_clipped_stats
@@ -30,6 +32,8 @@ class RunConfig:
     high_snr: float = 10.0
     data_dir: Path = Path("data")
     network_timeout: float = 30.0
+    legacy_retries: int = 5
+    retry_backoff: float = 1.0
 
 
 def download_legacy_cutout(cfg: RunConfig, run_id: str) -> Path:
@@ -38,9 +42,25 @@ def download_legacy_cutout(cfg: RunConfig, run_id: str) -> Path:
     path = out / f"{run_id}_legacy_{cfg.band}.fits"
     params = {"ra": cfg.ra, "dec": cfg.dec, "size": cfg.size,
               "pixscale": cfg.pixscale, "bands": cfg.band}
-    response = requests.get(LEGACY_FITS_URL, params=params, timeout=cfg.network_timeout)
-    response.raise_for_status()
-    path.write_bytes(response.content)
+    # Adaptive policy: baseline is 3 retries after a first-attempt success.
+    # The previous real-data run timed out, so the current retry budget is 5.
+    retry = Retry(
+        total=cfg.legacy_retries,
+        connect=cfg.legacy_retries,
+        read=cfg.legacy_retries,
+        status=cfg.legacy_retries,
+        backoff_factor=cfg.retry_backoff,
+        status_forcelist=(429, 500, 502, 503, 504),
+        allowed_methods=frozenset({"GET"}),
+        raise_on_status=False,
+    )
+    with requests.Session() as session:
+        session.mount("https://", HTTPAdapter(max_retries=retry))
+        response = session.get(
+            LEGACY_FITS_URL, params=params, timeout=cfg.network_timeout
+        )
+        response.raise_for_status()
+        path.write_bytes(response.content)
     return path
 
 
