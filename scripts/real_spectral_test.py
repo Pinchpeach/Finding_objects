@@ -78,8 +78,14 @@ ORDER BY n.distance"""
     coord = SkyCoord(RA * u.deg, DEC * u.deg)
     Vizier.TIMEOUT = TIMEOUT
     survey_specs = {
+        "GALEX": ("II/335/galex_ais", ["FUVmag", "NUVmag"]),
         "Pan-STARRS_DR1": ("II/349/ps1", ["gmag", "rmag", "imag", "zmag", "ymag"]),
+        "2MASS": ("II/246/out", ["Jmag", "Hmag", "Kmag"]),
         "AllWISE": ("II/328/allwise", ["W1mag", "W2mag", "W3mag", "W4mag"]),
+        "NVSS": ("VIII/65/nvss", ["S1.4"]),
+        "FIRST": ("VIII/92/first14", ["Fpeak", "Fint"]),
+        "Planck_PCCS2": ("VIII/100/pcnt", ["S30", "S44", "S70", "S100"]),
+        "XMM_4XMM": ("IX/65/xmm4dr13s", ["Flux1", "Flux2", "Flux3", "Flux4", "Flux5"]),
     }
     survey_status = {}
     survey_match_radius = {}
@@ -87,7 +93,7 @@ ORDER BY n.distance"""
         try:
             tables = None
             matched_radius = None
-            for radius_arcsec in (1.0, 2.0, 5.0):
+            for radius_arcsec in (1.0, 2.0, 5.0, 15.0, 30.0):
                 candidate_tables = Vizier(columns=["*", "+_r"], row_limit=5).query_region(
                     coord, radius=radius_arcsec * u.arcsec, catalog=catalog
                 )
