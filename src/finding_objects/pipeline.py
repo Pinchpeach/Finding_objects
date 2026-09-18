@@ -165,9 +165,19 @@ def crossmatch_vizier(sources: pd.DataFrame, cfg: RunConfig) -> pd.DataFrame:
 
 def label_candidates(sources: pd.DataFrame, cfg: RunConfig) -> pd.DataFrame:
     result = sources.copy()
-    matched = result["gaia_sep_arcsec"].notna()
-    result["candidate_label"] = np.where(matched, "gaia_matched", "unmatched_source")
-    result.loc[(~matched) & (result["snr"] >= cfg.high_snr), "candidate_label"] = "high_snr_unmatched"
+    gaia_matched = result["gaia_sep_arcsec"].notna()
+    catalog_matched = (
+        result["vizier_catalog"].notna()
+        if "vizier_catalog" in result.columns
+        else pd.Series(False, index=result.index)
+    )
+    result["candidate_label"] = "unmatched_source"
+    result.loc[catalog_matched & ~gaia_matched, "candidate_label"] = "catalog_matched"
+    result.loc[gaia_matched, "candidate_label"] = "gaia_matched"
+    result.loc[
+        ~gaia_matched & ~catalog_matched & (result["snr"] >= cfg.high_snr),
+        "candidate_label",
+    ] = "high_snr_unmatched"
     result["survey"] = "DESI Legacy Surveys"
     result["band"] = cfg.band
     return result
