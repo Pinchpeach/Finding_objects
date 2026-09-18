@@ -1,0 +1,25 @@
+name: 1000-object analysis stages
+on:
+  push:
+    paths: ['.github/ANALYSIS_1000_REQUEST']
+jobs:
+  stages:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install -e .
+      - name: Restore completed multiwavelength data
+        run: |
+          mkdir -p data/batch1000_multi
+          gh run download 35382352114 -n batch-1000-multiwavelength -D data/batch1000_multi
+        env: {GH_TOKEN: "${{ github.token }}"}
+      - run: python scripts/stage_association.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stage-02-association
+          path: results/stages/02_association/*
+          retention-days: 30
