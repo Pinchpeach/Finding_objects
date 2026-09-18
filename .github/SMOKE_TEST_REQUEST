@@ -3,3 +3,4 @@ Second authorized real-data validation run.
 Temporary FITS visualization run authorized.
 Authorized PNG visualization validation run.
 Retry with bounded external-service timeouts.
+Retry with adaptive Legacy retry budget: 5 retries after prior failure.
