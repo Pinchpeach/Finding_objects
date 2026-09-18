@@ -1,0 +1,9 @@
+survey: legacy
+ra: 150.116321
+dec: 2.205830
+size: 256
+pixscale: 0.262
+band: r
+detection_sigma: 5.0
+gaia_match_arcsec: 1.0
+high_snr: 10.0
