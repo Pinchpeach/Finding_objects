@@ -10,6 +10,9 @@ import requests
 from finding_objects.catalog import save_classification
 from finding_objects.sed import build_sed
 from finding_objects.sdss import photometry_from_sdss_row
+from astroquery.vizier import Vizier
+from astropy.coordinates import SkyCoord
+import astropy.units as u
 
 RA, DEC = 150.114557, 2.203106
 TIMEOUT = 30
@@ -69,6 +72,44 @@ ORDER BY n.distance"""
     sed = build_sed(phot)
     sed.to_csv(out / "candidate1_sed.csv", index=False)
 
+    # Independent multi-survey photometry check. Failure/no coverage is non-fatal.
+    multi = []
+    coord = SkyCoord(RA * u.deg, DEC * u.deg)
+    Vizier.TIMEOUT = TIMEOUT
+    survey_specs = {
+        "Pan-STARRS_DR1": ("II/349/ps1", ["gmag", "rmag", "imag", "zmag", "ymag"]),
+        "AllWISE": ("II/328/allwise", ["W1mag", "W2mag", "W3mag", "W4mag"]),
+    }
+    survey_status = {}
+    for survey, (catalog, magcols) in survey_specs.items():
+        try:
+            tables = Vizier(columns=["*", "+_r"], row_limit=5).query_region(
+                coord, radius=1.0 * u.arcsec, catalog=catalog
+            )
+            if not tables or len(tables[0]) == 0:
+                survey_status[survey] = "not_observed"
+                continue
+            tab = tables[0]
+            j = int(np.nanargmin(np.asarray(tab["_r"], dtype=float))) if "_r" in tab.colnames else 0
+            used = 0
+            for col in magcols:
+                if col not in tab.colnames:
+                    continue
+                value = tab[col][j]
+                try:
+                    mag = float(value)
+                except (TypeError, ValueError):
+                    continue
+                if not np.isfinite(mag):
+                    continue
+                multi.append({"survey": survey, "band": col.replace("mag", ""), "ab_or_catalog_mag": mag})
+                used += 1
+            survey_status[survey] = "available" if used else "not_observed"
+        except Exception as exc:
+            survey_status[survey] = "no_response"
+            multi.append({"survey": survey, "band": "ERROR", "ab_or_catalog_mag": str(exc)})
+    pd.DataFrame(multi).to_csv(out / "candidate1_multisurvey_photometry.csv", index=False)
+
     spec = pd.DataFrame()
     spec_error = None
     try:
@@ -101,6 +142,7 @@ WHERE s.bestobjid={int(row['objid'])}"""
         "spectrum_status": (
             "available" if has_spec else ("no_response" if spec_error else "not_observed")
         ),
+        "photometry_survey_status": survey_status,
     }
     record["object_tags"].append(f"spectrum:{record['spectrum_status']}")
     if has_spec:
