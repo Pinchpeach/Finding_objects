@@ -1,0 +1,23 @@
+name: Real spectral test
+on:
+  push:
+    paths:
+      - '.github/SPECTRAL_TEST_REQUEST'
+jobs:
+  spectral:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -e .
+      - run: python scripts/real_spectral_test.py
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: spectral-test-output
+          path: results/spectral/*
+          retention-days: 1
