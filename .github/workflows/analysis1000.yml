@@ -11,6 +11,11 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: '3.11', cache: pip}
       - run: pip install -e .
+      - name: Restore base 1000 sample
+        run: |
+          mkdir -p data/batch1000
+          gh run download 35344425464 -n batch-1000-retrieval -D data/batch1000
+        env: {GH_TOKEN: "${{ github.token }}"}
       - name: Restore completed multiwavelength data
         run: |
           mkdir -p data/batch1000_multi
