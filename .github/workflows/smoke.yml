@@ -45,5 +45,6 @@ jobs:
           path: |
             data/candidates/*.csv
             data/raw/*.fits
+            results/visualizations/*.png
           if-no-files-found: warn
           retention-days: 1
