@@ -61,3 +61,11 @@ def test_dummy_lines_produce_conservative_object_class():
     object_type, tags = classify_from_lines(lines)
     assert object_type == "emission_line_object"
     assert "object:emission_line_object" in tags
+
+
+def test_partial_photometry_adapter_skips_missing_and_invalid_bands():
+    from scripts.real_spectral_test import photometry_from_sdss_row
+    row = pd.Series({"OBJID": 42, "G": 20.4, "r": 19.8, "i": np.nan, "z": 19.3})
+    phot = photometry_from_sdss_row(row)
+    assert phot["band"].tolist() == ["g", "r", "z"]
+    assert "u" not in phot["band"].tolist()
