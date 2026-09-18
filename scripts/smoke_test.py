@@ -14,3 +14,7 @@ if __name__ == "__main__":
         band="r",
     ))
     print(output)
+    import pandas as pd
+    df = pd.read_csv(output)
+    print(df[["source_id", "ra", "dec", "snr", "gaia_source_id",
+              "vizier_catalog", "vizier_sep_arcsec", "candidate_label"]].to_string(index=False))
