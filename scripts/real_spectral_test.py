@@ -85,3 +85,4 @@ if spec_error:
 save_classification(record, out / "candidate1_classification.json")
 print(sed.to_string(index=False))
 print(json.dumps(record, indent=2))
+\n\nif __name__ == "__main__":\n    main()\n
