@@ -12,6 +12,7 @@ from astropy.coordinates import SkyCoord
 from astropy.io import fits
 from astropy.stats import sigma_clipped_stats
 from astroquery.gaia import Gaia
+from astroquery.vizier import Vizier
 from photutils.detection import DAOStarFinder
 
 LEGACY_FITS_URL = "https://www.legacysurvey.org/viewer/fits-cutout"
@@ -101,6 +102,44 @@ def crossmatch_gaia(sources: pd.DataFrame, cfg: RunConfig) -> pd.DataFrame:
     return result
 
 
+def crossmatch_vizier(sources: pd.DataFrame, cfg: RunConfig) -> pd.DataFrame:
+    """Cross-match against selected non-Gaia catalogues for candidate triage."""
+    result = sources.copy()
+    result["vizier_catalog"] = pd.Series(index=result.index, dtype="string")
+    result["vizier_sep_arcsec"] = np.nan
+    if result.empty:
+        return result
+
+    catalogs = {
+        "Pan-STARRS_DR1": "II/349/ps1",
+        "SDSS_DR16": "V/154/sdss16",
+        "AllWISE": "II/328/allwise",
+    }
+    vizier = Vizier(columns=["*", "+_r"], row_limit=50)
+    for i, row in result.iterrows():
+        coord = SkyCoord(float(row.ra) * u.deg, float(row.dec) * u.deg)
+        for name, catalog in catalogs.items():
+            try:
+                tables = vizier.query_region(
+                    coord, radius=cfg.gaia_match_arcsec * u.arcsec,
+                    catalog=catalog,
+                )
+            except Exception:
+                continue
+            if not tables or len(tables[0]) == 0:
+                continue
+            table = tables[0]
+            if "_r" in table.colnames:
+                j = int(np.nanargmin(np.asarray(table["_r"], dtype=float)))
+                sep = float(table["_r"][j])
+            else:
+                j, sep = 0, np.nan
+            result.at[i, "vizier_catalog"] = name
+            result.at[i, "vizier_sep_arcsec"] = sep
+            break
+    return result
+
+
 def label_candidates(sources: pd.DataFrame, cfg: RunConfig) -> pd.DataFrame:
     result = sources.copy()
     matched = result["gaia_sep_arcsec"].notna()
@@ -115,7 +154,9 @@ def run_pipeline(cfg: RunConfig) -> Path:
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     run_id = f"{stamp}_ra{cfg.ra:.5f}_dec{cfg.dec:+.5f}"
     sources = detect_sources(download_legacy_cutout(cfg, run_id), cfg)
-    sources = label_candidates(crossmatch_gaia(sources, cfg), cfg)
+    sources = crossmatch_gaia(sources, cfg)
+    sources = crossmatch_vizier(sources, cfg)
+    sources = label_candidates(sources, cfg)
     sources.insert(0, "run_id", run_id)
     out = cfg.data_dir / "candidates"
     out.mkdir(parents=True, exist_ok=True)
