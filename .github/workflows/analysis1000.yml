@@ -17,6 +17,17 @@ jobs:
           gh run download 35382352114 -n batch-1000-multiwavelength -D data/batch1000_multi
         env: {GH_TOKEN: "${{ github.token }}"}
       - run: python scripts/stage_association.py
+      - name: Stage association output for photometry
+        run: |
+          mkdir -p data/stage02
+          cp results/stages/02_association/associations.csv data/stage02/associations.csv
+      - run: python scripts/stage_photometry.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stage-03-photometry
+          path: results/stages/03_photometry/*
+          retention-days: 30
       - uses: actions/upload-artifact@v4
         if: always()
         with:
