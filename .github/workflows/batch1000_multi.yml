@@ -1,11 +1,15 @@
 name: 1000-object multiwavelength retrieval
 on:
+  workflow_dispatch:
   push:
     paths: ['.github/BATCH_MULTI_REQUEST']
 jobs:
   retrieve:
     runs-on: ubuntu-latest
     timeout-minutes: 360
+    permissions:
+      actions: read
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -16,15 +20,20 @@ jobs:
           mkdir -p data/batch1000
           gh run download 35344425464 -n batch-1000-retrieval -D data/batch1000
         env: {GH_TOKEN: "${{ github.token }}"}
-      - name: Restore partial multiwavelength checkpoint
+      - name: Restore newest checkpoint artifact
         run: |
           mkdir -p results/batch1000_multi
-          gh run download 35345663118 -n batch-1000-multiwavelength -D results/batch1000_multi || true
+          RUN_ID=$(gh run list --workflow batch1000_multi.yml --status completed --limit 20 --json databaseId,conclusion --jq '[.[] | select(.databaseId != ${{ github.run_id }})][0].databaseId // empty')
+          if [ -n "$RUN_ID" ]; then
+            echo "Restoring checkpoint from run $RUN_ID"
+            gh run download "$RUN_ID" -n batch-1000-multiwavelength -D results/batch1000_multi || true
+          fi
         env: {GH_TOKEN: "${{ github.token }}"}
-      - run: python scripts/batch_multi_retrieve.py
+      - name: Resume retrieval
+        run: python scripts/batch_multi_retrieve.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: batch-1000-multiwavelength
           path: results/batch1000_multi/*
-          retention-days: 7
+          retention-days: 30
