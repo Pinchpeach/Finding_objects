@@ -2,6 +2,9 @@ name: Real-data smoke test
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - '.github/SMOKE_TEST_REQUEST'
 
 jobs:
   smoke:
