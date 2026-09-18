@@ -1,0 +1,25 @@
+name: 1000-object normalized analysis
+on:
+  push:
+    paths: ['.github/BATCH_ANALYSIS_REQUEST']
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install pandas numpy
+      - name: Download base sample
+        run: |
+          mkdir -p data/base data/photo
+          gh run download 35344425464 -n batch-1000-retrieval -D data/base
+          gh run download 35395034234 -n batch-1000-photometry -D data/photo
+        env: {GH_TOKEN: "${{ github.token }}"}
+      - run: python scripts/analyze_batch1000.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: batch-1000-analysis
+          path: results/batch1000_analysis/*
+          retention-days: 14
