@@ -20,4 +20,4 @@ jobs:
           pip install -e .
           pip install pytest
       - name: Test
-        run: pytest -q
+        run: pytest -q tests
