@@ -10,7 +10,7 @@ import requests
 
 from finding_objects.catalog import save_classification
 from finding_objects.sed import build_sed
-from finding_objects.sdss import photometry_from_sdss_row
+from finding_objects.sdss import photometry_from_sdss_row, read_skyserver_csv
 from astroquery.vizier import Vizier
 from astropy.coordinates import SkyCoord
 import astropy.units as u
@@ -40,7 +40,7 @@ def sdss_sql(sql: str, retries: int = RETRIES) -> pd.DataFrame:
             )
             if header_idx is None:
                 return pd.DataFrame()
-            return pd.read_csv(StringIO("\n".join(lines[header_idx:])))
+            return read_skyserver_csv(text)
         except (requests.RequestException, pd.errors.ParserError) as exc:
             last = exc
             if attempt >= retries:
