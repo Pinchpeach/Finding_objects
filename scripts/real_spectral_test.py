@@ -108,6 +108,7 @@ ORDER BY n.distance"""
             survey_match_radius[survey] = matched_radius
             tab = tables[0]
             j = int(np.nanargmin(np.asarray(tab["_r"], dtype=float))) if "_r" in tab.colnames else 0
+            actual_sep = float(tab["_r"][j]) if "_r" in tab.colnames else None
             used = 0
             for col in magcols:
                 if col not in tab.colnames:
@@ -119,7 +120,7 @@ ORDER BY n.distance"""
                     continue
                 if not np.isfinite(mag):
                     continue
-                multi.append({"survey": survey, "band": col.replace("mag", ""), "ab_or_catalog_mag": mag})
+                multi.append({"survey": survey, "band": col.replace("mag", ""), "ab_or_catalog_mag": mag, "separation_arcsec": actual_sep})
                 used += 1
             survey_status[survey] = "available" if used else "not_observed"
         except Exception as exc:
