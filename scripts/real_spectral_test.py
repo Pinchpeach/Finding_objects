@@ -82,14 +82,24 @@ ORDER BY n.distance"""
         "AllWISE": ("II/328/allwise", ["W1mag", "W2mag", "W3mag", "W4mag"]),
     }
     survey_status = {}
+    survey_match_radius = {}
     for survey, (catalog, magcols) in survey_specs.items():
         try:
-            tables = Vizier(columns=["*", "+_r"], row_limit=5).query_region(
-                coord, radius=1.0 * u.arcsec, catalog=catalog
-            )
+            tables = None
+            matched_radius = None
+            for radius_arcsec in (1.0, 2.0, 5.0):
+                candidate_tables = Vizier(columns=["*", "+_r"], row_limit=5).query_region(
+                    coord, radius=radius_arcsec * u.arcsec, catalog=catalog
+                )
+                if candidate_tables and len(candidate_tables[0]) > 0:
+                    tables = candidate_tables
+                    matched_radius = radius_arcsec
+                    break
             if not tables or len(tables[0]) == 0:
                 survey_status[survey] = "not_observed"
+                survey_match_radius[survey] = None
                 continue
+            survey_match_radius[survey] = matched_radius
             tab = tables[0]
             j = int(np.nanargmin(np.asarray(tab["_r"], dtype=float))) if "_r" in tab.colnames else 0
             used = 0
@@ -144,6 +154,7 @@ WHERE s.bestobjid={int(row['objid'])}"""
             "available" if has_spec else ("no_response" if spec_error else "not_observed")
         ),
         "photometry_survey_status": survey_status,
+        "photometry_match_radius_arcsec": survey_match_radius,
     }
     record["object_tags"].append(f"spectrum:{record['spectrum_status']}")
     if has_spec:
