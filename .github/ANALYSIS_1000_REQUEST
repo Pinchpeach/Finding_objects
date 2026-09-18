@@ -1,3 +1,5 @@
 Authorized staged downstream analysis after complete 8000-query acquisition. 2026-09-19.
 
 Retry stage 2 after association API fix.
+
+Run stage 3 photometry normalization and persist outputs.
