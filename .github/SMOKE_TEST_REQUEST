@@ -2,3 +2,4 @@ Authorized real-data smoke test.
 Second authorized real-data validation run.
 Temporary FITS visualization run authorized.
 Authorized PNG visualization validation run.
+Retry with bounded external-service timeouts.
