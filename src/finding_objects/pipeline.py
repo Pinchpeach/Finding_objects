@@ -29,6 +29,7 @@ class RunConfig:
     gaia_match_arcsec: float = 1.0
     high_snr: float = 10.0
     data_dir: Path = Path("data")
+    network_timeout: float = 30.0
 
 
 def download_legacy_cutout(cfg: RunConfig, run_id: str) -> Path:
@@ -37,7 +38,7 @@ def download_legacy_cutout(cfg: RunConfig, run_id: str) -> Path:
     path = out / f"{run_id}_legacy_{cfg.band}.fits"
     params = {"ra": cfg.ra, "dec": cfg.dec, "size": cfg.size,
               "pixscale": cfg.pixscale, "bands": cfg.band}
-    response = requests.get(LEGACY_FITS_URL, params=params, timeout=120)
+    response = requests.get(LEGACY_FITS_URL, params=params, timeout=cfg.network_timeout)
     response.raise_for_status()
     path.write_bytes(response.content)
     return path
@@ -83,6 +84,7 @@ def detect_sources(path: Path, cfg: RunConfig) -> pd.DataFrame:
 
 
 def crossmatch_gaia(sources: pd.DataFrame, cfg: RunConfig) -> pd.DataFrame:
+    Gaia.TIMEOUT = cfg.network_timeout
     result = sources.copy()
     result["gaia_source_id"] = pd.Series(index=result.index, dtype="string")
     result["gaia_sep_arcsec"] = np.nan
@@ -115,6 +117,7 @@ def crossmatch_vizier(sources: pd.DataFrame, cfg: RunConfig) -> pd.DataFrame:
         "SDSS_DR16": "V/154/sdss16",
         "AllWISE": "II/328/allwise",
     }
+    Vizier.TIMEOUT = cfg.network_timeout
     vizier = Vizier(columns=["*", "+_r"], row_limit=50)
     for i, row in result.iterrows():
         coord = SkyCoord(float(row.ra) * u.deg, float(row.dec) * u.deg)
