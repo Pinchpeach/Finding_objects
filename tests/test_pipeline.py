@@ -13,10 +13,11 @@ def test_label_candidates():
         "source_id": [1, 2, 3],
         "snr": [20.0, 5.0, 15.0],
         "gaia_sep_arcsec": [0.2, np.nan, np.nan],
+        "vizier_catalog": [pd.NA, "SDSS_DR16", pd.NA],
     })
     result = label_candidates(sources, cfg)
     assert result["candidate_label"].tolist() == [
-        "gaia_matched", "unmatched_source", "high_snr_unmatched"
+        "gaia_matched", "catalog_matched", "high_snr_unmatched"
     ]
 
 
