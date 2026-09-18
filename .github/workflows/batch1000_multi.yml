@@ -16,6 +16,11 @@ jobs:
           mkdir -p data/batch1000
           gh run download 35344425464 -n batch-1000-retrieval -D data/batch1000
         env: {GH_TOKEN: "${{ github.token }}"}
+      - name: Restore partial multiwavelength checkpoint
+        run: |
+          mkdir -p results/batch1000_multi
+          gh run download 35345663118 -n batch-1000-multiwavelength -D results/batch1000_multi || true
+        env: {GH_TOKEN: "${{ github.token }}"}
       - run: python scripts/batch_multi_retrieve.py
       - uses: actions/upload-artifact@v4
         if: always()
