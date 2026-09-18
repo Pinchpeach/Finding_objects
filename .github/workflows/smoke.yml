@@ -1,0 +1,45 @@
+name: Real-data smoke test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+      - name: Run real-data pipeline
+        run: python scripts/smoke_test.py
+      - name: Show candidate summary
+        if: success()
+        run: |
+          ls -lh data/raw data/candidates
+          python - <<'PY'
+          from pathlib import Path
+          import pandas as pd
+          files = list(Path("data/candidates").glob("*_candidates.csv"))
+          if not files:
+              raise SystemExit("No candidate CSV produced")
+          df = pd.read_csv(files[-1])
+          print("detections:", len(df))
+          if "candidate_label" in df:
+              print(df["candidate_label"].value_counts(dropna=False).to_string())
+          PY
+      - name: Upload smoke-test outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: real-data-smoke-output
+          path: |
+            data/candidates/*.csv
+          if-no-files-found: warn
+          retention-days: 7
