@@ -74,7 +74,7 @@ record = {
     "redshift": float(spec.iloc[0]["redshift"]) if has_spec and pd.notna(spec.iloc[0]["redshift"]) else None,
     "line_tags": [],
     "object_tags": ["survey:sdss", "object:sdss_spectroscopic_object" if has_spec else "object:photometry_only"],
-    "spectrum_status": "available" if has_spec else ("query_failed" if spec_error else "not_available"),
+    "spectrum_status": "available" if has_spec else ("no_response" if spec_error else "not_observed"),
 }
 if has_spec:
     record["sdss_class"] = str(spec.iloc[0]["class"])
