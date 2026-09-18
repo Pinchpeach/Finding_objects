@@ -69,3 +69,12 @@ def test_partial_photometry_adapter_skips_missing_and_invalid_bands():
     phot = photometry_from_sdss_row(row)
     assert phot["band"].tolist() == ["g", "r", "z"]
     assert "u" not in phot["band"].tolist()
+
+
+def test_skyserver_metadata_preamble_shape_is_not_treated_as_photometry():
+    raw = "#Table1\nobjid,ra,dec,u,g,r,i,z\n42,150.1,2.2,21.0,20.4,19.8,19.5,19.3\n"
+    lines = raw.splitlines()
+    header_idx = next(i for i, line in enumerate(lines)
+                      if "," in line and not line.lstrip().startswith("#"))
+    parsed = pd.read_csv(__import__("io").StringIO("\n".join(lines[header_idx:])))
+    assert list(parsed.columns) == ["objid", "ra", "dec", "u", "g", "r", "i", "z"]
