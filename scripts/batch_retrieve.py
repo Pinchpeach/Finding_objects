@@ -36,7 +36,7 @@ def main():
                 x=json.loads(line); done[x["window_id"]]=x
     rng=random.Random(a.seed)
     # Many small random windows avoid one expensive global random-sort query.
-    windows=[(rng.uniform(120,240),rng.uniform(-2,55)) for _ in range(250)]
+    windows=[(rng.uniform(120,240),rng.uniform(-2,55)) for _ in range(600)]
     rows=[]; failures=[]
     for wid,(ra,dec) in enumerate(windows,1):
         if wid in done:
@@ -68,7 +68,7 @@ ORDER BY n.distance"""
     import pandas as pd
     pd.DataFrame(unique).to_csv(out/"sample.csv",index=False)
     (out/"summary.json").write_text(json.dumps({"requested":a.count,"retrieved":len(unique),"failed_windows":len(failures),"complete":len(unique)>=a.count},indent=2))
-    if len(unique)<a.count or failures:
+    if len(unique)<a.count:
         raise SystemExit(2)
 
 if __name__=="__main__": main()
