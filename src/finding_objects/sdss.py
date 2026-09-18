@@ -26,3 +26,22 @@ def photometry_from_sdss_row(row: pd.Series) -> pd.DataFrame:
             "ab_mag": magnitude,
         })
     return pd.DataFrame(points)
+
+
+def read_skyserver_csv(text: str) -> pd.DataFrame:
+    """Parse SkyServer CSV while preserving identifier columns exactly."""
+    from io import StringIO
+    cleaned = text.lstrip("\ufeff")
+    lines = cleaned.splitlines()
+    header_idx = next(
+        (i for i, line in enumerate(lines)
+         if "," in line and not line.lstrip().startswith("#")),
+        None,
+    )
+    if header_idx is None:
+        return pd.DataFrame()
+    return pd.read_csv(
+        StringIO("\n".join(lines[header_idx:])),
+        dtype=str,
+        keep_default_na=True,
+    )
