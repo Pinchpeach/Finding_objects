@@ -9,14 +9,13 @@ import requests
 
 from finding_objects.catalog import save_classification
 from finding_objects.sed import build_sed
+from finding_objects.sdss import photometry_from_sdss_row
 
 RA, DEC = 150.114557, 2.203106
 TIMEOUT = 30
 RETRIES = 5
 BACKOFF = 1.0
 BASE = "https://skyserver.sdss.org/dr18/SkyServerWS/SearchTools/SqlSearch"
-BANDS = {"u": 3551.0, "g": 4686.0, "r": 6165.0, "i": 7481.0, "z": 8931.0}
-
 
 def sdss_sql(sql: str, retries: int = RETRIES) -> pd.DataFrame:
     """Run one SDSS query with bounded exponential backoff."""
@@ -34,29 +33,6 @@ def sdss_sql(sql: str, retries: int = RETRIES) -> pd.DataFrame:
                 break
             time.sleep(BACKOFF * (2 ** attempt))
     raise RuntimeError(f"SDSS query failed after {retries + 1} attempts") from last
-
-
-def photometry_from_sdss_row(row: pd.Series) -> pd.DataFrame:
-    """Use only bands actually returned by SDSS; missing bands are not failures."""
-    normalized = row.copy()
-    normalized.index = [str(name).strip().lower() for name in row.index]
-    points = []
-    for band, wavelength in BANDS.items():
-        value = normalized.get(band, pd.NA)
-        if pd.isna(value):
-            continue
-        try:
-            magnitude = float(value)
-        except (TypeError, ValueError):
-            continue
-        if not pd.api.types.is_number(magnitude) or not pd.notna(magnitude):
-            continue
-        points.append({
-            "band": band,
-            "effective_wavelength_angstrom": wavelength,
-            "ab_mag": magnitude,
-        })
-    return pd.DataFrame(points)
 
 
 def main() -> None:
