@@ -26,7 +26,17 @@ def sdss_sql(sql: str, retries: int = RETRIES) -> pd.DataFrame:
                 BASE, params={"cmd": sql, "format": "csv"}, timeout=TIMEOUT
             )
             response.raise_for_status()
-            return pd.read_csv(StringIO(response.text))
+            text = response.text.lstrip("\ufeff")
+            lines = text.splitlines()
+            # SkyServer CSV may prepend metadata markers such as "#Table1".
+            header_idx = next(
+                (i for i, line in enumerate(lines)
+                 if "," in line and not line.lstrip().startswith("#")),
+                None,
+            )
+            if header_idx is None:
+                return pd.DataFrame()
+            return pd.read_csv(StringIO("\n".join(lines[header_idx:])))
         except (requests.RequestException, pd.errors.ParserError) as exc:
             last = exc
             if attempt >= retries:
