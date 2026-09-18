@@ -1,0 +1,25 @@
+name: 1000-object multiwavelength retrieval
+on:
+  push:
+    paths: ['.github/BATCH_MULTI_REQUEST']
+jobs:
+  retrieve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install -e .
+      - name: Download base 1000 sample
+        run: |
+          mkdir -p data/batch1000
+          gh run download 35344425464 -n batch-1000-retrieval -D data/batch1000
+        env: {GH_TOKEN: "${{ github.token }}"}
+      - run: python scripts/batch_multi_retrieve.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: batch-1000-multiwavelength
+          path: results/batch1000_multi/*
+          retention-days: 7
