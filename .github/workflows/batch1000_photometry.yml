@@ -1,0 +1,25 @@
+name: 1000-object photometry retrieval
+on:
+  push:
+    paths: ['.github/BATCH_PHOTOMETRY_REQUEST']
+jobs:
+  retrieve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install -e .
+      - name: Download completed multiwavelength status
+        run: |
+          mkdir -p data/multi
+          gh run download 35382352114 -n batch-1000-multiwavelength -D data/multi
+        env: {GH_TOKEN: "${{ github.token }}"}
+      - run: python scripts/batch_photometry_retrieve.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: batch-1000-photometry
+          path: results/batch1000_photometry/*
+          retention-days: 7
