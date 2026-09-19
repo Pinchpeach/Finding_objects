@@ -1,0 +1,21 @@
+name: Method 2 spectroscopy-first 300 pilot
+on:
+  push:
+    paths: ['.github/METHOD2_300_REQUEST']
+jobs:
+  reference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install -e .
+      - run: python scripts/method2_reference300.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: method2-300-reference
+          path: results/method2_300/*
+          retention-days: 90
