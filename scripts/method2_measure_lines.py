@@ -9,7 +9,7 @@ def measure(w,f,iv,center):
     cont=np.nanmedian(f[side]); noise=np.nanmedian(np.where(iv[core]>0,1/np.sqrt(iv[core]),np.nan))
     if not np.isfinite(noise) or noise<=0: noise=np.nanstd(f[side]-cont)
     resid=f[core]-cont; j=np.nanargmax(np.abs(resid)); amp=resid[j]; sig=amp/noise if noise>0 else np.nan
-    ew=np.trapz(1-f[core]/cont,w[core]) if np.isfinite(cont) and cont!=0 else np.nan
+    ew=np.trapezoid(1-f[core]/cont,w[core]) if np.isfinite(cont) and cont!=0 else np.nan
     return float(w[core][j]),float(amp),float(sig),float(ew),("emission" if amp>0 else "absorption")
 def main():
     OUT.mkdir(parents=True,exist_ok=True)
