@@ -1,0 +1,31 @@
+name: Final 1000-object analysis
+on:
+  push:
+    paths: ['.github/FINAL1000_REQUEST']
+jobs:
+  final:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    permissions: {actions: read, contents: read}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install -e .
+      - name: Restore base sample
+        run: |
+          mkdir -p data/batch1000
+          gh run download 35344425464 -n batch-1000-retrieval -D data/batch1000
+        env: {GH_TOKEN: "${{ github.token }}"}
+      - name: Restore external values
+        run: |
+          mkdir -p data/stage04
+          gh run download 35407954084 -n stage-04-external-values -D data/stage04
+        env: {GH_TOKEN: "${{ github.token }}"}
+      - run: python scripts/stage_final_analysis.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: final-1000-analysis
+          path: results/final1000/*
+          retention-days: 30
