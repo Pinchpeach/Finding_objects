@@ -1,0 +1,37 @@
+name: 1000-object external values
+on:
+  push:
+    paths: ['.github/EXTERNAL_VALUES_REQUEST']
+jobs:
+  retrieve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    permissions: {actions: read, contents: read}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install -e .
+      - name: Restore base sample
+        run: |
+          mkdir -p data/batch1000
+          gh run download 35344425464 -n batch-1000-retrieval -D data/batch1000
+        env: {GH_TOKEN: "${{ github.token }}"}
+      - name: Restore stage 3
+        run: |
+          mkdir -p data/stage03
+          gh run download 35405257345 -n stage-03-photometry -D data/stage03
+        env: {GH_TOKEN: "${{ github.token }}"}
+      - name: Restore newest checkpoint
+        run: |
+          mkdir -p results/stages/04_external_values
+          RUN_ID=$(gh run list --workflow external_values.yml --status completed --limit 20 --json databaseId --jq '.[0].databaseId // empty')
+          if [ -n "$RUN_ID" ]; then gh run download "$RUN_ID" -n stage-04-external-values -D results/stages/04_external_values || true; fi
+        env: {GH_TOKEN: "${{ github.token }}"}
+      - run: python scripts/stage_external_values.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stage-04-external-values
+          path: results/stages/04_external_values/*
+          retention-days: 30
