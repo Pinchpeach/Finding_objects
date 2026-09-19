@@ -1,0 +1,26 @@
+name: Method 2 spectrum SED 300
+on:
+  push:
+    paths: ['.github/METHOD2_SPECTRA_REQUEST']
+jobs:
+  spectra:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    permissions: {actions: read, contents: read}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install -e .
+      - name: Restore Method 2 reference sample
+        run: |
+          mkdir -p data/method2
+          gh run download 35418825318 -n method2-300-reference -D data/method2
+        env: {GH_TOKEN: "${{ github.token }}"}
+      - run: python scripts/method2_spectra300.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: method2-300-spectra
+          path: results/method2_300_spectra/*
+          retention-days: 90
