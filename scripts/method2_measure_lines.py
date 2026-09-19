@@ -17,7 +17,7 @@ def main():
     for oid,g in pos.groupby("objid"):
         p=ROOT/"spectra"/f"{oid}.csv"
         if not p.exists(): continue
-        s=pd.read_csv(p); w=s.wavelength_observed_angstrom.to_numpy(float); f=s.flux_1e-17_erg_s_cm2_A.to_numpy(float); iv=s.ivar.to_numpy(float)
+        s=pd.read_csv(p); w=s.wavelength_observed_angstrom.to_numpy(float); f=s["flux_1e-17_erg_s_cm2_A"].to_numpy(float); iv=s.ivar.to_numpy(float)
         for _,r in g.iterrows():
             base=r.to_dict()
             if not bool(r.covered_by_spectrum): base.update(detection_status="not_covered")
