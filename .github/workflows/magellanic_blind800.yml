@@ -1,0 +1,17 @@
+name: Magellanic blind 800
+on:
+  push:
+    paths: ['.github/MAGELLANIC_BLIND800_REQUEST']
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install -e .
+      - run: python scripts/magellanic_blind800.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: magellanic-blind800, path: results/magellanic_blind800, retention-days: 90}
