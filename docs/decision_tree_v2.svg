@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1050" viewBox="0 0 1200 1050">
+<style>text{font-family:Arial,sans-serif;fill:#172033}.t{font-size:32px;font-weight:700}.h{font-size:20px;font-weight:700}.b{font-size:16px}.box{fill:#f7f9fc;stroke:#344766;stroke-width:2;rx:14}.q{fill:#eef4ff;stroke:#315f9b;stroke-width:2;rx:14}.leaf{fill:#f1f8f2;stroke:#39784b;stroke-width:2;rx:14}.u{fill:#fff7e8;stroke:#a86f18;stroke-width:2;rx:14}.ln{stroke:#52657d;stroke-width:2;fill:none;marker-end:url(#a)}</style>
+<defs><marker id="a" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#52657d"/></marker></defs>
+<text x="600" y="48" text-anchor="middle" class="t">Astronomical Object Classification Decision Tree v2</text>
+<text x="600" y="78" text-anchor="middle" class="b">Four-state evidence: TRUE / FALSE / UNKNOWN / CONFLICTING</text>
+<rect x="475" y="105" width="250" height="60" class="box"/><text x="600" y="142" text-anchor="middle" class="h">Observed source</text>
+<path d="M600 165V205" class="ln"/><rect x="430" y="205" width="340" height="70" class="q"/><text x="600" y="235" text-anchor="middle" class="h">Official footprint / usable data?</text><text x="600" y="258" text-anchor="middle" class="b">coverage ≠ non-detection</text>
+<path d="M430 240H245V320" class="ln"/><text x="330" y="230" class="b">NO</text><rect x="115" y="320" width="260" height="60" class="u"/><text x="245" y="357" text-anchor="middle" class="h">NOT OBSERVED</text>
+<path d="M600 275V320" class="ln"/><text x="612" y="304" class="b">YES</text><rect x="430" y="320" width="340" height="70" class="q"/><text x="600" y="350" text-anchor="middle" class="h">Secure spectrum or</text><text x="600" y="374" text-anchor="middle" class="h">calibrated counterpart?</text>
+<path d="M770 355H955V420" class="ln"/><text x="820" y="345" class="b">NO</text><rect x="825" y="420" width="260" height="70" class="u"/><text x="955" y="450" text-anchor="middle" class="h">UNKNOWN /</text><text x="955" y="474" text-anchor="middle" class="h">ASSOCIATION AMBIGUOUS</text>
+<path d="M600 390V435" class="ln"/><rect x="455" y="435" width="290" height="65" class="q"/><text x="600" y="474" text-anchor="middle" class="h">Physical branch</text>
+<path d="M500 500L300 570" class="ln"/><path d="M700 500L900 570" class="ln"/>
+<rect x="165" y="570" width="270" height="80" class="leaf"/><text x="300" y="602" text-anchor="middle" class="h">STAR</text><text x="300" y="628" text-anchor="middle" class="b">parallax / proper motion /</text><text x="300" y="646" text-anchor="middle" class="b">stellar absorption</text>
+<rect x="765" y="570" width="270" height="80" class="box"/><text x="900" y="602" text-anchor="middle" class="h">EXTRAGALACTIC</text><text x="900" y="628" text-anchor="middle" class="b">redshift / extended morphology</text>
+<path d="M900 650V700" class="ln"/><rect x="755" y="700" width="290" height="65" class="q"/><text x="900" y="740" text-anchor="middle" class="h">Broad permitted line state?</text>
+<path d="M800 765L610 825" class="ln"/><text x="685" y="790" class="b">TRUE</text><rect x="485" y="825" width="250" height="60" class="leaf"/><text x="610" y="862" text-anchor="middle" class="h">QSO / AGN</text>
+<path d="M900 765V825" class="ln"/><text x="915" y="797" class="b">UNKNOWN / inadequate test</text><rect x="775" y="825" width="250" height="60" class="q"/><text x="900" y="862" text-anchor="middle" class="h">Independent AGN evidence?</text>
+<path d="M1025 855H1110V925" class="ln"/><rect x="990" y="925" width="200" height="60" class="leaf"/><text x="1090" y="962" text-anchor="middle" class="h">AGN CANDIDATE</text>
+<path d="M835 885L760 925" class="ln"/><rect x="630" y="925" width="260" height="60" class="leaf"/><text x="760" y="962" text-anchor="middle" class="h">GALAXY / BPT subtree</text>
+<path d="M300 650V735" class="ln"/><rect x="150" y="735" width="300" height="95" class="box"/><text x="300" y="768" text-anchor="middle" class="h">Stellar characterization</text><text x="300" y="794" text-anchor="middle" class="b">O/B/A/F/G/K/M · WD · peculiar</text><text x="300" y="816" text-anchor="middle" class="b">luminosity only with reliable distance</text>
+<text x="600" y="1025" text-anchor="middle" class="b">Broad-line non-detection is not absence unless the test is adequate. Independent AGN evidence prevents forced galaxy classification.</text>
+</svg>
