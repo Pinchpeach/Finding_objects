@@ -74,14 +74,27 @@ def identity_tree(f: dict) -> dict:
     if state(f.get("wise_agn_colors"))==EvidenceState.TRUE: agn.append("WISE AGN-like SED")
     if state(f.get("narrow_nebular_lines"))==EvidenceState.TRUE: gal.append("narrow nebular lines")
     if state(f.get("extended_morphology"))==EvidenceState.TRUE: gal.append("extended morphology")
-    if "broad permitted lines" in agn:
+    broad_state=state(f.get("broad_permitted_lines"))
+    # A non-detection is not an absence unless broad-line sensitivity was adequate.
+    broad_tested=bool(f.get("broad_line_test_adequate"))
+    if broad_state==EvidenceState.TRUE:
         path.append(_node("extragalactic_identity","AGN_QSO",agn,gal))
         return _finish("QSO_AGN",path,characterize_agn(f))
-    if gal:
+    # Independent AGN evidence keeps the object out of the galaxy leaf while
+    # broad-line status is UNKNOWN/insufficient.
+    independent=[x for x in agn if x!="broad permitted lines"]
+    if independent and (broad_state==EvidenceState.UNKNOWN or not broad_tested):
+        path.append(_node("extragalactic_identity","AGN_CANDIDATE",independent,gal,
+                          ["quantitative broad-line fit / FWHM"]))
+        return _finish("AGN_CANDIDATE",path,characterize_agn(f))
+    # Enter the galaxy leaf only when galaxy evidence exists and AGN evidence
+    # does not dominate.  BPT/subtype decisions remain in the galaxy subtree.
+    if gal and not independent:
         path.append(_node("extragalactic_identity","GALAXY",gal,agn))
         return _finish("GALAXY",path,characterize_galaxy(f))
     if agn:
-        path.append(_node("extragalactic_identity","AGN_CANDIDATE",agn,m=["broad-line or diagnostic line-ratio evidence"]))
+        path.append(_node("extragalactic_identity","AGN_CANDIDATE",agn,gal,
+                          ["decisive AGN diagnostic"]))
         return _finish("AGN_CANDIDATE",path,characterize_agn(f))
     path.append(_node("extragalactic_identity","UNKNOWN",m=["AGN/galaxy discriminating evidence"],s="UNKNOWN"))
     return _finish("UNKNOWN_EXTRAGALACTIC",path)
