@@ -1,0 +1,48 @@
+name: Method 2 classifier cross-validation
+on:
+  push:
+    paths: ['.github/METHOD2_CV_REQUEST']
+jobs:
+  cv:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install -e .
+      - name: Restore reference and line measurements
+        run: |
+          mkdir -p data/method2ref results/method2_300_lines
+          gh run download 35418825318 -n method2-300-reference -D data/method2ref
+          gh run download 35425076672 -n method2-300-line-measurements -D results/method2_300_lines
+        env: {GH_TOKEN: "${{ github.token }}"}
+      - name: Five-fold stratified CV
+        run: |
+          python - <<'PY'
+          import json, pathlib, numpy as np, pandas as pd
+          from finding_objects.reference_classifier import build_line_features,fit_reference_centroids,predict
+          m=pd.read_csv('results/method2_300_lines/measured_lines.csv',dtype={'objid':str})
+          l=pd.read_csv('data/method2ref/spectroscopic_reference_objects.csv',dtype={'objid':str})
+          f=build_line_features(m); df=f.join(l.set_index('objid')[['class']],how='inner').reset_index()
+          rng=np.random.default_rng(26092026); df['fold']=-1
+          for k,g in df.groupby('class'):
+            ids=g.index.to_numpy(); rng.shuffle(ids)
+            for j,idx in enumerate(ids): df.loc[idx,'fold']=j%5
+          outs=[]
+          for fold in range(5):
+            tr=df[df.fold!=fold]; te=df[df.fold==fold]
+            model=fit_reference_centroids(tr.set_index('objid').drop(columns=['class','fold']),tr[['objid','class']])
+            pr=predict(te.set_index('objid').drop(columns=['class','fold']),model)
+            pr=pr.merge(te[['objid','class']],on='objid'); pr['fold']=fold; pr['correct']=pr.predicted_class==pr['class']; outs.append(pr)
+          p=pd.concat(outs,ignore_index=True)
+          classes=['GALAXY','QSO','STAR']; cm=pd.crosstab(p['class'],p.predicted_class).reindex(index=classes,columns=classes,fill_value=0)
+          metrics={}
+          for k in classes:
+            tp=int(cm.loc[k,k]); fp=int(cm[k].sum()-tp); fn=int(cm.loc[k].sum()-tp)
+            metrics[k]={'precision':tp/(tp+fp) if tp+fp else None,'recall':tp/(tp+fn) if tp+fn else None}
+          o=pathlib.Path('results/method2_classifier_cv'); o.mkdir(parents=True,exist_ok=True)
+          p.to_csv(o/'cv_predictions.csv',index=False); cm.to_csv(o/'confusion_matrix.csv')
+          json.dump({'objects':len(p),'folds':5,'accuracy':float(p.correct.mean()),'mean_top_probability':float(p.class_probability.mean()),'per_class':metrics,'policy':'Diagnostic CV of spectral-line-only classifier. Do not apply probabilities to science candidates until calibrated SED/counterpart features are added.'},open(o/'summary.json','w'),indent=2)
+          PY
+      - uses: actions/upload-artifact@v4
+        with: {name: method2-classifier-cv, path: 'results/method2_classifier_cv/*', retention-days: 90}
