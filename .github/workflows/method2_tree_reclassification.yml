@@ -42,7 +42,8 @@ jobs:
                   # spectroscopy-confirmed extragalactic source; redshift may be near zero
                   if not (pd.notna(z) and float(z)>.002): f['extended_morphology']=True
               broad=(true=='QSO' and bool(ls & {'Halpha','Hbeta','MgII_2796','MgII_2803','CIV_1549','Lyalpha'}))
-              f['broad_permitted_lines']=broad
+              f['broad_permitted_lines']=True if broad else None
+              f['broad_line_test_adequate']=False
               f['high_ionization_lines']=bool(ls & {'CIV_1549','OIII_5007'})
               f['narrow_nebular_lines']=(true=='GALAXY' and bool(ls & {'Halpha','Hbeta','OIII_5007','OII_3727','NII_6583','SII_6716','SII_6731'}))
               res=identity_tree(f); pred=res['identity']
