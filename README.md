@@ -56,6 +56,8 @@ Multi-band photometry, survey mask/quality checks, additional catalogue cross-ma
 
 ## Hierarchical decision-tree classification
 
+![Astronomical Object Classification Decision Tree v2](docs/decision_tree_v2.svg)
+
 The classifier uses separate **identity** and **characterization** trees. Every node records evidence, counter-evidence, missing decisive observations, and supports TRUE/FALSE/UNKNOWN/CONFLICTING states. Missing coverage is never treated as a non-detection.
 
 ```mermaid
