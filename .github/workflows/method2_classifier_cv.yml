@@ -26,7 +26,7 @@ jobs:
           f=build_line_features(m); df=f.join(l.set_index('objid')[['class']],how='inner').reset_index()
           rng=np.random.default_rng(26092026); df['fold']=-1
           for k,g in df.groupby('class'):
-            ids=g.index.to_numpy(); rng.shuffle(ids)
+            ids=g.index.to_numpy(copy=True); rng.shuffle(ids)
             for j,idx in enumerate(ids): df.loc[idx,'fold']=j%5
           outs=[]
           for fold in range(5):
