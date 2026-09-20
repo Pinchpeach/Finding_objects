@@ -53,3 +53,30 @@ The example coordinate is for testing the pipeline only and is not claimed to co
 ## Next milestones
 
 Multi-band photometry, survey mask/quality checks, additional catalogue cross-matches, repeated-epoch searches, candidate thumbnails, SQLite/Parquet storage, and anomaly scoring.
+
+## Hierarchical decision-tree classification
+
+The classifier uses separate **identity** and **characterization** trees. Every node records evidence, counter-evidence, missing decisive observations, and supports TRUE/FALSE/UNKNOWN/CONFLICTING states. Missing coverage is never treated as a non-detection.
+
+```mermaid
+flowchart TD
+ A[Observed source] --> B{Official footprint / usable data?}
+ B -- No --> N[NOT OBSERVED]
+ B -- Yes --> C{Secure spectrum or calibrated counterpart?}
+ C -- No --> U[UNKNOWN / ASSOCIATION AMBIGUOUS]
+ C -- Yes --> D{Physical branch}
+ D -- Parallax / proper motion / stellar absorption --> S[STAR]
+ D -- Redshift / extended morphology --> E[EXTRAGALACTIC]
+ D -- Insufficient or conflicting --> U2[UNKNOWN / CONFLICTING]
+ E --> F{Broad / high-ionization / multi-band AGN evidence?}
+ F -- Broad permitted lines --> Q[QSO / AGN]
+ F -- Narrow nebular + extended --> G[GALAXY]
+ F -- Partial AGN evidence --> AC[AGN CANDIDATE]
+ F -- Insufficient --> UE[UNKNOWN EXTRAGALACTIC]
+ S --> ST[Stellar characterization tree: O/B/A/FGK/M/WD + luminosity]
+ G --> GT[Galaxy characterization tree: morphology + BPT when valid]
+ Q --> AT[AGN tree: broad/narrow + radio/X-ray/IR/variability]
+ AC --> AT
+```
+
+Detailed design: [Decision-tree classification](docs/DECISION_TREE_CLASSIFICATION.md).
