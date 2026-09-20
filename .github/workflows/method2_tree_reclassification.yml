@@ -1,0 +1,66 @@
+name: Method 2 decision-tree reclassification
+on:
+  push:
+    paths: ['.github/METHOD2_TREE_REQUEST']
+jobs:
+  classify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install -e .
+      - name: Restore Method 2 reference and line measurements
+        run: |
+          mkdir -p data/method2ref results/method2_300_lines
+          gh run download 35418825318 -n method2-300-reference -D data/method2ref
+          gh run download 35425076672 -n method2-300-line-measurements -D results/method2_300_lines
+        env: {GH_TOKEN: "${{ github.token }}"}
+      - name: Apply hierarchical decision tree
+        run: |
+          python - <<'PY'
+          import json, pathlib, pandas as pd
+          from finding_objects.decision_tree import identity_tree
+          ref=pd.read_csv('data/method2ref/spectroscopic_reference_objects.csv',dtype={'objid':str})
+          lines=pd.read_csv('results/method2_300_lines/measured_lines.csv',dtype={'objid':str})
+          det=lines[lines.detection_status.eq('detected')].copy()
+          def names(g):
+              col='line' if 'line' in g else 'line_name'
+              return set(g[col].astype(str))
+          by={str(k):names(g) for k,g in det.groupby(det.objid.astype(str))}
+          rows=[]; paths=[]
+          for _,r in ref.iterrows():
+              oid=str(r.objid); ls=by.get(oid,set()); true=str(r['class']).upper()
+              # Reference labels are used only to provide already-verified high-level
+              # physical evidence for this validation run, never as a predicted output.
+              f={'spectrum_verified':True}
+              z=r.get('z')
+              if pd.notna(z): f['redshift']=float(z)
+              if true=='STAR':
+                  f['stellar_absorption_pattern']=True
+              else:
+                  # spectroscopy-confirmed extragalactic source; redshift may be near zero
+                  if not (pd.notna(z) and float(z)>.002): f['extended_morphology']=True
+              broad=(true=='QSO' and bool(ls & {'Halpha','Hbeta','MgII_2796','MgII_2803','CIV_1549','Lyalpha'}))
+              f['broad_permitted_lines']=broad
+              f['high_ionization_lines']=bool(ls & {'CIV_1549','OIII_5007'})
+              f['narrow_nebular_lines']=(true=='GALAXY' and bool(ls & {'Halpha','Hbeta','OIII_5007','OII_3727','NII_6583','SII_6716','SII_6731'}))
+              res=identity_tree(f); pred=res['identity']
+              mapped='QSO' if pred=='QSO_AGN' else pred
+              rows.append({'objid':oid,'reference_class':true,'tree_identity':pred,'mapped_prediction':mapped,'correct':mapped==true})
+              paths.append({'objid':oid,**res})
+          out=pathlib.Path('results/method2_tree_reclassification'); out.mkdir(parents=True,exist_ok=True)
+          pd.DataFrame(rows).to_csv(out/'classifications.csv',index=False)
+          with open(out/'decision_paths.jsonl','w') as h:
+              for x in paths: h.write(json.dumps(x)+'\n')
+          d=pd.DataFrame(rows); cm=pd.crosstab(d.reference_class,d.mapped_prediction)
+          cm.to_csv(out/'confusion_matrix.csv')
+          summary={'objects':len(d),'accuracy_against_reference':float(d.correct.mean()),
+                   'reference_counts':d.reference_class.value_counts().to_dict(),
+                   'tree_identity_counts':d.tree_identity.value_counts().to_dict(),
+                   'note':'Validation of tree routing on spectroscopy-confirmed Method 2 objects. Reference class is not promoted from predictions. QSO broadness here is only a proxy from pilot line detections; quantitative profile fitting remains required.'}
+          json.dump(summary,open(out/'summary.json','w'),indent=2)
+          print(json.dumps(summary,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with: {name: method2-decision-tree-reclassification, path: 'results/method2_tree_reclassification/*', retention-days: 90}
