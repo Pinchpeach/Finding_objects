@@ -68,13 +68,16 @@ flowchart TD
  D -- Parallax / proper motion / stellar absorption --> S[STAR]
  D -- Redshift / extended morphology --> E[EXTRAGALACTIC]
  D -- Insufficient or conflicting --> U2[UNKNOWN / CONFLICTING]
- E --> F{Broad / high-ionization / multi-band AGN evidence?}
- F -- Broad permitted lines --> Q[QSO / AGN]
- F -- Narrow nebular + extended --> G[GALAXY]
- F -- Partial AGN evidence --> AC[AGN CANDIDATE]
- F -- Insufficient --> UE[UNKNOWN EXTRAGALACTIC]
- S --> ST[Stellar characterization tree: O/B/A/FGK/M/WD + luminosity]
- G --> GT[Galaxy characterization tree: morphology + BPT when valid]
+ E --> BL{Broad permitted line state}
+ BL -- TRUE --> Q[QSO / AGN]
+ BL -- UNKNOWN or test inadequate --> IE{Independent AGN evidence?}
+ IE -- High-ionization / X-ray / radio / WISE --> AC[AGN CANDIDATE]
+ IE -- None --> GE{Galaxy evidence?}
+ BL -- FALSE with adequate test --> GE
+ GE -- Narrow nebular / extended --> G[GALAXY]
+ GE -- Insufficient --> UE[UNKNOWN EXTRAGALACTIC]
+ S --> ST[Stellar tree: spectral subtype + luminosity]
+ G --> GT[Galaxy tree: morphology + BPT only with valid coverage/SNR]
  Q --> AT[AGN tree: broad/narrow + radio/X-ray/IR/variability]
  AC --> AT
 ```
