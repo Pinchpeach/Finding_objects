@@ -1,0 +1,34 @@
+name: Method 2 classify objects
+on:
+  push:
+    paths: ['.github/METHOD2_CLASSIFY_REQUEST']
+jobs:
+  classify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install -e .
+      - name: Restore reference and line measurements
+        run: |
+          mkdir -p data/method2ref results/method2_300_lines
+          gh run download 35418825318 -n method2-300-reference -D data/method2ref
+          gh run download 35425076672 -n method2-300-line-measurements -D results/method2_300_lines
+        env: {GH_TOKEN: "${{ github.token }}"}
+      - name: Build reference class model and self-evaluation
+        run: |
+          python - <<'PY'
+          import json,pandas as pd
+          from finding_objects.reference_classifier import build_line_features,fit_reference_centroids,predict
+          m=pd.read_csv('results/method2_300_lines/measured_lines.csv',dtype={'objid':str})
+          l=pd.read_csv('data/method2ref/spectroscopic_reference_objects.csv',dtype={'objid':str})
+          f=build_line_features(m); model=fit_reference_centroids(f,l)
+          pred=predict(f,model).merge(l[['objid','class']],on='objid',how='left')
+          pred['correct']=pred.predicted_class==pred['class']
+          import pathlib; o=pathlib.Path('results/method2_classifier'); o.mkdir(parents=True,exist_ok=True)
+          pred.to_csv(o/'reference_self_evaluation.csv',index=False)
+          json.dump({'objects':len(pred),'accuracy_resubstitution_only':float(pred.correct.mean()),'warning':'Training-set resubstitution is diagnostic only; use held-out/CV calibration before science classification.'},open(o/'summary.json','w'),indent=2)
+          PY
+      - uses: actions/upload-artifact@v4
+        with: {name: method2-classifier-diagnostic, path: 'results/method2_classifier/*', retention-days: 90}
