@@ -1,0 +1,22 @@
+name: Method 2 validate counterparts 300
+on:
+  push:
+    paths: ['.github/METHOD2_VALIDATE_REQUEST']
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install -e .
+      - name: Restore reference sample
+        run: |
+          mkdir -p data/method2ref
+          gh run download 35418825318 -n method2-300-reference -D data/method2ref
+        env: {GH_TOKEN: "${{ github.token }}"}
+      - run: python scripts/method2_validate_counterparts.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: method2-300-counterparts-v2, path: 'results/method2_300_counterparts_v2/*', retention-days: 90}
