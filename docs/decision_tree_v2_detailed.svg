@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="1450" viewBox="0 0 1500 1450">
+<style>text{font-family:Arial,sans-serif;fill:#172033}.T{font-size:34px;font-weight:700}.H{font-size:21px;font-weight:700}.B{font-size:16px}.S{font-size:14px}.box{fill:#f7f9fc;stroke:#344766;stroke-width:2;rx:13}.q{fill:#eef4ff;stroke:#315f9b;stroke-width:2;rx:13}.ok{fill:#eef8f0;stroke:#39784b;stroke-width:2;rx:13}.warn{fill:#fff7e8;stroke:#a86f18;stroke-width:2;rx:13}.ln{stroke:#52657d;stroke-width:2;fill:none;marker-end:url(#a)}</style>
+<defs><marker id="a" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0 0L0 6L9 3z" fill="#52657d"/></marker></defs>
+<text x="750" y="45" text-anchor="middle" class="T">Detailed Characterization Trees — v2</text>
+<text x="750" y="76" text-anchor="middle" class="B">Run after the identity tree · unavailable coverage stays UNKNOWN, never FALSE</text>
+
+<rect x="35" y="110" width="445" height="55" class="box"/><text x="258" y="145" text-anchor="middle" class="H">A. STAR characterization</text>
+<rect x="55" y="195" width="405" height="65" class="q"/><text x="258" y="224" text-anchor="middle" class="H">Usable stellar spectrum?</text><text x="258" y="247" text-anchor="middle" class="S">coverage + S/N + continuum quality</text>
+<path d="M258 260V305" class="ln"/>
+<rect x="55" y="305" width="405" height="115" class="box"/><text x="258" y="335" text-anchor="middle" class="H">Spectral subtype evidence</text><text x="258" y="361" text-anchor="middle" class="B">O: He II · B: He I · A: strong Balmer absorption</text><text x="258" y="386" text-anchor="middle" class="B">F/G/K: Ca II + metal absorption</text><text x="258" y="410" text-anchor="middle" class="B">M: molecular bands · WD: broad stellar absorption</text>
+<path d="M258 420V465" class="ln"/>
+<rect x="55" y="465" width="405" height="90" class="q"/><text x="258" y="495" text-anchor="middle" class="H">Reliable distance/parallax?</text><text x="258" y="520" text-anchor="middle" class="B">quality-controlled astrometry required</text><text x="258" y="543" text-anchor="middle" class="S">YES → absolute magnitude / luminosity class</text>
+<path d="M258 555V600" class="ln"/>
+<rect x="55" y="600" width="405" height="105" class="ok"/><text x="258" y="632" text-anchor="middle" class="H">Special flags</text><text x="258" y="658" text-anchor="middle" class="B">emission-line / YSO · carbon/peculiar · IR excess</text><text x="258" y="683" text-anchor="middle" class="B">X-ray stellar source · variability evidence</text>
+
+<rect x="525" y="110" width="445" height="55" class="box"/><text x="748" y="145" text-anchor="middle" class="H">B. GALAXY characterization</text>
+<rect x="545" y="195" width="405" height="90" class="q"/><text x="748" y="225" text-anchor="middle" class="H">Morphology available?</text><text x="748" y="250" text-anchor="middle" class="B">smooth/early · disk/spiral · irregular · UNKNOWN</text><text x="748" y="273" text-anchor="middle" class="S">do not infer morphology from missing imaging</text>
+<path d="M748 285V330" class="ln"/>
+<rect x="545" y="330" width="405" height="115" class="q"/><text x="748" y="360" text-anchor="middle" class="H">BPT prerequisites satisfied?</text><text x="748" y="386" text-anchor="middle" class="B">Hα, Hβ, [O III]5007, [N II]6583</text><text x="748" y="411" text-anchor="middle" class="B">all covered + significant (target ≥3σ)</text><text x="748" y="434" text-anchor="middle" class="S">NO → BPT = UNKNOWN</text>
+<path d="M748 445V490" class="ln"/>
+<rect x="545" y="490" width="405" height="100" class="ok"/><text x="748" y="522" text-anchor="middle" class="H">BPT branch</text><text x="748" y="550" text-anchor="middle" class="B">star-forming · composite · AGN-like</text><text x="748" y="575" text-anchor="middle" class="B">AGN-like → Seyfert / LINER / uncertain if valid</text>
+<path d="M748 590V635" class="ln"/>
+<rect x="545" y="635" width="405" height="90" class="box"/><text x="748" y="665" text-anchor="middle" class="H">Physical characterization</text><text x="748" y="691" text-anchor="middle" class="B">SED · luminosity if distance/redshift reliable</text><text x="748" y="714" text-anchor="middle" class="S">otherwise report flux / νFν, not luminosity</text>
+
+<rect x="1015" y="110" width="445" height="55" class="box"/><text x="1238" y="145" text-anchor="middle" class="H">C. AGN / QSO characterization</text>
+<rect x="1035" y="195" width="405" height="105" class="q"/><text x="1238" y="225" text-anchor="middle" class="H">Quantitative broad-line fit</text><text x="1238" y="251" text-anchor="middle" class="B">line flux · EW · FWHM / velocity width · S/N</text><text x="1238" y="277" text-anchor="middle" class="S">non-detection = FALSE only if sensitivity adequate</text>
+<path d="M1238 300V345" class="ln"/>
+<rect x="1035" y="345" width="405" height="105" class="ok"/><text x="1238" y="375" text-anchor="middle" class="H">Spectroscopic type</text><text x="1238" y="402" text-anchor="middle" class="B">broad permitted → broad-line / Type-1 candidate</text><text x="1238" y="427" text-anchor="middle" class="B">narrow diagnostics → Type-2 candidate</text>
+<path d="M1238 450V495" class="ln"/>
+<rect x="1035" y="495" width="405" height="135" class="box"/><text x="1238" y="525" text-anchor="middle" class="H">Independent AGN evidence</text><text x="1238" y="552" text-anchor="middle" class="B">high-ionization lines · WISE-like IR SED</text><text x="1238" y="577" text-anchor="middle" class="B">X-ray excess · radio excess/morphology</text><text x="1238" y="602" text-anchor="middle" class="B">variability · host morphology · redshift</text><text x="1238" y="621" text-anchor="middle" class="S">stored independently; evidence can conflict</text>
+<path d="M1238 630V675" class="ln"/>
+<rect x="1035" y="675" width="405" height="80" class="warn"/><text x="1238" y="705" text-anchor="middle" class="H">AGN_CANDIDATE</text><text x="1238" y="731" text-anchor="middle" class="B">when AGN evidence exists but decisive subtype is missing</text>
+
+<rect x="140" y="805" width="1220" height="55" class="box"/><text x="750" y="840" text-anchor="middle" class="H">D. COMPACT / UNUSUAL / ANOMALY characterization</text>
+<rect x="175" y="900" width="250" height="115" class="q"/><text x="300" y="930" text-anchor="middle" class="H">Blue + broad</text><text x="300" y="956" text-anchor="middle" class="B">stellar absorption</text><text x="300" y="985" text-anchor="middle" class="B">→ WD candidate</text>
+<rect x="475" y="900" width="250" height="115" class="q"/><text x="600" y="930" text-anchor="middle" class="H">Strong X-ray +</text><text x="600" y="956" text-anchor="middle" class="B">stellar counterpart</text><text x="600" y="985" text-anchor="middle" class="B">→ X-ray stellar candidate</text>
+<rect x="775" y="900" width="250" height="115" class="q"/><text x="900" y="930" text-anchor="middle" class="H">Strong radio +</text><text x="900" y="956" text-anchor="middle" class="B">weak optical</text><text x="900" y="985" text-anchor="middle" class="B">→ radio-source candidate</text>
+<rect x="1075" y="900" width="250" height="115" class="q"/><text x="1200" y="930" text-anchor="middle" class="H">IR excess +</text><text x="1200" y="956" text-anchor="middle" class="B">stellar evidence</text><text x="1200" y="985" text-anchor="middle" class="B">→ YSO/dusty candidate</text>
+
+<rect x="175" y="1065" width="1150" height="110" class="warn"/><text x="750" y="1098" text-anchor="middle" class="H">Reference-distribution anomaly branch</text><text x="750" y="1126" text-anchor="middle" class="B">large feature distance / unusual line ratios / inconsistent multi-band evidence</text><text x="750" y="1152" text-anchor="middle" class="B">→ ANOMALOUS OBJECT / FOLLOW-UP ONLY — never “new discovery” automatically</text>
+
+<rect x="175" y="1225" width="1150" height="150" class="box"/><text x="750" y="1260" text-anchor="middle" class="H">Every final record stores</text><text x="750" y="1290" text-anchor="middle" class="B">identity hierarchy · characterization · decision path · TRUE/FALSE/UNKNOWN/CONFLICTING states</text><text x="750" y="1318" text-anchor="middle" class="B">evidence · counter-evidence · missing decisive data · provenance · tree/threshold/calibration version</text><text x="750" y="1346" text-anchor="middle" class="B">counterpart status + p_chance/LR/calibrated probability only when calibration is valid</text>
+<text x="750" y="1410" text-anchor="middle" class="S">Finding_objects — detailed tree companion to the top-level identity diagram</text>
+</svg>
