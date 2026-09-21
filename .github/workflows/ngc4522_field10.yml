@@ -1,0 +1,17 @@
+name: NGC4522 field census and classification
+on:
+  push:
+    paths: ['.github/NGC4522_FIELD_REQUEST']
+jobs:
+  classify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: pip install -e .
+      - run: python scripts/ngc4522_field10.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: ngc4522-field10-final, path: results/ngc4522_field10, retention-days: 90, if-no-files-found: warn}
