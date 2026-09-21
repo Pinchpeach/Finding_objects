@@ -16,12 +16,21 @@ OUT=pathlib.Path("results/ngc4522_field10"); OUT.mkdir(parents=True,exist_ok=Tru
 RA0=188.4155; DEC0=9.1751; HALF=10/60
 COS=math.cos(math.radians(DEC0)); RA_HALF=HALF/COS
 SDSS="https://skyserver.sdss.org/dr18/SkyServerWS/SearchTools/SqlSearch"
+SDSS_FALLBACK="https://skyserver.sdss.org/dr18/SearchTools/SqlSearch"
 
 def sql(q,tries=4):
     for k in range(tries):
         try:
-            r=requests.get(SDSS,params={"cmd":q,"format":"csv"},timeout=120); r.raise_for_status()
-            return pd.read_csv(io.StringIO(r.text))
+            r=requests.get(SDSS,params={"cmd":q,"format":"csv"},headers={"User-Agent":"Finding_objects/1.0"},timeout=120); r.raise_for_status()
+            txt=r.text.lstrip()
+            # SkyServer may return VOTable/XML even when CSV is requested; '#Table1' was that parser symptom.
+            if txt.startswith("<?xml") or "<VOTABLE" in txt[:500].upper():
+                from astropy.io.votable import parse_single_table
+                return parse_single_table(io.BytesIO(r.content)).to_table().to_pandas()
+            df=pd.read_csv(io.StringIO(r.text))
+            if list(df.columns)==["#Table1"]:
+                raise ValueError("SkyServer returned non-CSV table marker")
+            return df
         except Exception:
             if k==tries-1: raise
             time.sleep(5*(k+1))
