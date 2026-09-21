@@ -12,7 +12,13 @@ jobs:
         with: {python-version: '3.11'}
       - run: pip install -e .
       - name: Run field classification with checkpoint budget
-        run: timeout --signal=TERM 95m python scripts/ngc4522_field10.py || code=$?; if [ "${code:-0}" -eq 124 ]; then echo "Time budget reached; checkpoint artifact will be preserved."; exit 0; elif [ "${code:-0}" -ne 0 ]; then exit "${code}"; fi
+        run: |
+          set +e
+          timeout --signal=TERM 95m python scripts/ngc4522_field10.py
+          code=$?
+          set -e
+          if [ "$code" -eq 124 ]; then echo "Time budget reached; checkpoint preserved."; exit 2; fi
+          exit "$code"
       - uses: actions/upload-artifact@v4
         if: always()
         with: {name: ngc4522-field10-final, path: results/ngc4522_field10, retention-days: 90, if-no-files-found: warn}
