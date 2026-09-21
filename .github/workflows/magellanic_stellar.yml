@@ -1,0 +1,20 @@
+name: Magellanic stellar characterization
+on:
+  push:
+    paths: ['.github/MAGELLANIC_STELLAR_REQUEST']
+jobs:
+  characterize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: pip install -e .
+      - name: Restore Blind-800 input
+        run: |
+          mkdir -p results/magellanic_blind800
+          gh run download 35565828998 -n magellanic-blind800 -D results/magellanic_blind800
+        env: {GH_TOKEN: "${{ github.token }}"}
+      - run: python scripts/magellanic_stellar_characterization.py
+      - uses: actions/upload-artifact@v4
+        with: {name: magellanic-blind800-stellar-characterization, path: results/magellanic_blind800_stellar, retention-days: 90}
