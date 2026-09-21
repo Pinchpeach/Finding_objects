@@ -46,14 +46,22 @@ def gaia():
     AND dec BETWEEN {DEC0-HALF} AND {DEC0+HALF}"""
     job=Gaia.launch_job_async(q); return job.get_results().to_pandas()
 
+def normalize_cols(df):
+    df=df.copy()
+    df.columns=[str(x).strip().lower() for x in df.columns]
+    return df
+
 def nearest(base,cat,maxarc=1.5):
+    base=normalize_cols(base); cat=normalize_cols(cat)
     if len(cat)==0: return np.full(len(base),-1),np.full(len(base),np.inf)
-    a=SkyCoord(base.ra.values*u.deg,base.dec.values*u.deg); b=SkyCoord(cat.ra.values*u.deg,cat.dec.values*u.deg)
+    if not {"ra","dec"}.issubset(base.columns) or not {"ra","dec"}.issubset(cat.columns):
+        raise ValueError(f"Missing coordinate columns: base={list(base.columns)}, cat={list(cat.columns)}")
+    a=SkyCoord(base["ra"].to_numpy()*u.deg,base["dec"].to_numpy()*u.deg); b=SkyCoord(cat["ra"].to_numpy()*u.deg,cat["dec"].to_numpy()*u.deg)
     idx,sep,_=a.match_to_catalog_sky(b); ok=sep.arcsec<=maxarc
     return np.where(ok,idx,-1),np.where(ok,sep.arcsec,np.inf)
 
 def main():
-    p=sdss_census(); s=spectra(); g=gaia()
+    p=normalize_cols(sdss_census()); s=normalize_cols(spectra()); g=normalize_cols(gaia())
     p.to_csv(OUT/"sdss_optical_census.csv",index=False); s.to_csv(OUT/"sdss_spectroscopy.csv",index=False); g.to_csv(OUT/"gaia_dr3.csv",index=False)
     si,ss=nearest(p,s,1.5); gi,gs=nearest(p,g,1.5)
     rows=[]; paths=[]
