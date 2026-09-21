@@ -18,18 +18,23 @@ FIELDS={"LMC":(80.8939,-69.7561,8.0),"SMC":(13.1867,-72.8286,5.0)}
 def query(name,ra,dec,radius,n):
     # distance-known proxy: positive parallax with S/N>=5; quality cuts reduce
     # pathological astrometry. Randomness is reproducible via random_index.
-    q=f"""SELECT TOP {n*4} source_id,ra,dec,parallax,parallax_error,pmra,pmra_error,
+    # Avoid ORDER BY over the full cone: Gaia TAP can spend hours sorting it.
+    # Deterministic random_index windows provide reproducible pseudo-random sampling.
+    span=1800000000
+    offset=120000000 if name=="LMC" else 980000000
+    q=f"""SELECT TOP {n*3} source_id,ra,dec,parallax,parallax_error,pmra,pmra_error,
     pmdec,pmdec_error,phot_g_mean_mag,bp_rp,ruwe,random_index
     FROM gaiadr3.gaia_source
     WHERE 1=CONTAINS(POINT('ICRS',ra,dec),CIRCLE('ICRS',{ra},{dec},{radius}))
       AND parallax>0 AND parallax_over_error>=5 AND ruwe<1.4
       AND visibility_periods_used>=8 AND phot_g_mean_mag IS NOT NULL
-    ORDER BY random_index"""
+      AND random_index BETWEEN {offset} AND {offset+span}"""
     last=None
     for k in range(3):
         try:
             d=Gaia.launch_job_async(q).get_results().to_pandas()
-            if len(d)>=n: return d.iloc[:n].copy()
+            if len(d)>=n:
+                return d.sample(n=n,random_state=SEED+(0 if name=="LMC" else 1)).copy()
             last=RuntimeError(f"{name}: only {len(d)} rows")
         except Exception as e:
             last=e; time.sleep(5*(k+1))
