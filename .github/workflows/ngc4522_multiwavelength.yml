@@ -1,0 +1,35 @@
+name: NGC4522 multiwavelength stage
+on:
+  push:
+    paths: ['.github/NGC4522_MULTIWAVE_REQUEST']
+jobs:
+  multiwave:
+    runs-on: ubuntu-latest
+    timeout-minutes: 105
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: pip install -e .
+      - name: Download optical census artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ngc4522-field10-final
+          path: results/ngc4522_field10
+          run-id: 35664933689
+          github-token: ${{ github.token }}
+      - name: Run multiwavelength stage
+        run: |
+          set +e
+          timeout --signal=TERM 95m python scripts/ngc4522_multiwavelength.py
+          code=$?
+          set -e
+          if [ "$code" -eq 124 ]; then echo "Time budget reached; checkpoint preserved."; exit 2; fi
+          exit "$code"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ngc4522-multiwavelength
+          path: results/ngc4522_multiwavelength
+          retention-days: 90
+          if-no-files-found: warn
