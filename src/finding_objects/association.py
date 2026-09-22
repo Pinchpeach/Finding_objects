@@ -29,7 +29,7 @@ def posterior_counterpart_probability(lr,prior):
     return odds/(1+odds)
 
 def association_score(evidence: CounterpartEvidence):
-    sigma=max(evidence.beam_fwhm_arcsec/2.355, evidence.positional_error_arcsec, 1e-9)
+    sigma=max(evidence.beam_fwhm_arcsec, evidence.positional_error_arcsec, 1e-9)
     score=math.exp(-.5*(evidence.separation_arcsec/sigma)**2)
     return {"positional_score":score,"positional_likelihood":score,
             "separation_arcsec":evidence.separation_arcsec,
