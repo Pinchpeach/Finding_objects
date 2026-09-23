@@ -1,0 +1,31 @@
+name: Build Catalog Truth Features
+on:
+  workflow_dispatch:
+    inputs:
+      limit_per_class:
+        description: 'Targets per class (blank = 100)'
+        required: false
+        default: ''
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pandas numpy requests astropy astroquery
+      - name: Cross-query catalogs
+        run: |
+          L="${{ github.event.inputs.limit_per_class }}"
+          if [ -n "$L" ]; then
+            python v2/benchmark/collect_catalog_truth.py --limit-per-class "$L"
+          else
+            python v2/benchmark/collect_catalog_truth.py
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: catalog-truth-features
+          path: v2/benchmark/catalog_data/
+          retention-days: 14
