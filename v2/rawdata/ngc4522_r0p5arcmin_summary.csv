@@ -2,7 +2,7 @@ collector,status,rows,max_sep_arcmin,file,error
 gaia_dr3,ok,3,0.44607406034638597,rawdata/gaia_dr3_ngc4522_r0p5arcmin.csv,
 sdss_dr18,ok,16,0.4335197565332262,rawdata/sdss_dr18_ngc4522_r0p5arcmin.csv,
 panstarrs1,ok,157,0.4963486019664869,rawdata/panstarrs1_ngc4522_r0p5arcmin.csv,
-desi_legacy,ok,0,,rawdata/desi_legacy_ngc4522_r0p5arcmin.csv,
+desi_legacy,ok,28,0.498749713164462,rawdata/desi_legacy_ngc4522_r0p5arcmin.csv,
 galex,ok,1,0.05542638021656091,rawdata/galex_ngc4522_r0p5arcmin.csv,
 twomass,ok,6,0.41133383346878627,rawdata/twomass_ngc4522_r0p5arcmin.csv,
 allwise,ok,1,0.037145874308438694,rawdata/allwise_ngc4522_r0p5arcmin.csv,
@@ -17,4 +17,4 @@ sdss_spectroscopy,ok,1,0.00674498165569649,rawdata/sdss_spectroscopy_ngc4522_r0p
 desi_spectroscopy,ok,0,,rawdata/desi_spectroscopy_ngc4522_r0p5arcmin.csv,
 lamost_spectroscopy,ok,0,,rawdata/lamost_spectroscopy_ngc4522_r0p5arcmin.csv,
 simbad,ok,1,0.020701049365056436,rawdata/simbad_ngc4522_r0p5arcmin.csv,
-ned,error,0,,,"ReadTimeout(ReadTimeoutError(""HTTPSConnectionPool(host='ned.ipac.caltech.edu', port=443): Read timed out. (read timeout=60)""))"
+ned,ok,13,0.47688636578212423,rawdata/ned_ngc4522_r0p5arcmin.csv,

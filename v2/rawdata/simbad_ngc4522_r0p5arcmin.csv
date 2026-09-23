@@ -1,2 +1,2 @@
-catalog,catalog_object_id,object_name,main_id,ra,dec,coo_err_maj,coo_err_min,coo_err_angle,coo_wavelength,coo_bibcode,pmdec,rvz_redshift,otype,pmra,sp_qual,sp_type,sp_bibcode,plx_value,ra_raw,dec_raw
-SIMBAD,NGC  4522,NGC  4522,NGC  4522,188.41523750000002,9.174872222222223,,,,I,2006AJ....131.1163S,,0.007718438661551197,GiG,,,,,,188.41523750000002,9.174872222222223
+catalog,catalog_object_id,object_name,main_id,ra,dec,coo_err_maj,coo_err_min,coo_err_angle,coo_wavelength,coo_bibcode,pmdec,pmra,rvz_redshift,otype,sp_bibcode,sp_type,sp_qual,plx_value,ra_raw,dec_raw
+SIMBAD,NGC  4522,NGC  4522,NGC  4522,188.41523750000002,9.174872222222223,,,,I,2006AJ....131.1163S,,,0.007718438661551197,GiG,,,,,188.41523750000002,9.174872222222223
