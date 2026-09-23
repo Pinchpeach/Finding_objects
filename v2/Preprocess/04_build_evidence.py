@@ -55,6 +55,18 @@ def evaluate(rule,row):
         if hit:
             zw=num(row,"zwarning"); score=1.0 if zw in (None,0) else 0.75
             emit(out,rule,target,score,c,"nonzero zwarning downweights spectral label" if zw not in (None,0) else "")
+    elif rid.startswith("PS1-MORPH-"):
+        delta=num(row,"ps1_i_psf_minus_kron"); imag=num(row,"iMeanPSFMag")
+        valid=num(row,"ps1_i_photometry_valid")
+        if None not in (delta,imag,valid) and valid==1 and 14<=imag<=21:
+            if rid=="PS1-MORPH-001" and delta>0.05:
+                # Extended morphology is direct GALAXY support within the documented regime.
+                score=min(0.9,0.55+min(delta-0.05,0.35))
+                emit(out,rule,"GALAXY",score,delta,"PS1 i-band PSF-Kron extended-source evidence")
+            elif rid=="PS1-MORPH-002" and delta<=0.05:
+                # Point-like morphology is deliberately weak STAR evidence: QSOs are unresolved too.
+                score=min(0.65,0.50+min(max(0,0.05-delta),0.15))
+                emit(out,rule,"STAR",score,delta,"weak point-source evidence; unresolved morphology is not STAR-specific")
     elif rid=="DSC-001":
         for cls,col in DSC_MAP.items():
             v=num(row,col)
