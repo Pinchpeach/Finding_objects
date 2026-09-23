@@ -1,0 +1,45 @@
+name: Build Balanced Truth Dataset
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'v2/benchmark/build_truth_sets.py'
+      - '.github/workflows/build-truth-dataset.yml'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pandas
+      - name: Build 300-object balanced truth seeds
+        run: python v2/benchmark/build_truth_sets.py --total 300
+      - name: Validate balance and filenames
+        run: |
+          python - <<'PY'
+          import pandas as pd
+          from pathlib import Path
+          p=Path("v2/benchmark/truth_data")
+          g=pd.read_csv(p/"ground_truth.csv")
+          assert len(g)==300
+          assert g.truth_class.value_counts().to_dict()=={"STAR":100,"GALAXY":100,"QSO":100}
+          fs=list(p.glob("*_trd.csv"))
+          assert len(fs)==14, [x.name for x in fs]
+          for f in fs:
+              d=pd.read_csv(f)
+              assert len(d)==300
+              assert d.truth_class.value_counts().to_dict()=={"STAR":100,"GALAXY":100,"QSO":100}
+          print("validated",len(fs),"catalog seed files")
+          PY
+      - name: Commit truth data
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add v2/benchmark/truth_data
+          git diff --cached --quiet && exit 0
+          git commit -m "Add balanced SDSS ground-truth benchmark seeds"
+          git push
