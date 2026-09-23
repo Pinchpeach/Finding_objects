@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - "v2/Preprocess/**"
+      - "v2/rawdata/**"
       - ".github/workflows/test-preprocess.yml"
 
 permissions:
