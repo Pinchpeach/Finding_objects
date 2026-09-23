@@ -47,11 +47,21 @@ def evaluate(rule,row):
       "WISE-AGN-R90-001":"catalog_confidence_allwise",
     }
     rcol=relmap.get(rid); reliability=num(row,rcol) if rcol else 1.0
-    association_reliability=num(row,"association_confidence_min")
+    # Gate only by the association confidence of the catalog that produced
+    # this evidence. A weak PS1/NED counterpart must not downweight Gaia/SDSS.
+    assoc_prefix={
+      "AST-EXT-001":"gaia_dr3","AST-EXT-002":"gaia_dr3","AST-GAL-001":"gaia_dr3","AST-GAL-002":"gaia_dr3",
+      "DSC-001":"gaia_dr3","VAR-001":"gaia_dr3",
+      "SPC-SDSS-001":"sdss_dr18_spectroscopy","SPC-SDSS-002":"sdss_dr18_spectroscopy","SPC-SDSS-003":"sdss_dr18_spectroscopy",
+      "PS1-MORPH-001":"pan_starrs1_dr2_meanobject","PS1-MORPH-002":"pan_starrs1_dr2_meanobject","PS1-QSO-Z6-001":"pan_starrs1_dr2_meanobject",
+      "WISE-AGN-001":"allwise","WISE-AGN-R90-001":"allwise",
+      "SDSS-PHOTO-001":"sdss_dr18_photoobj","SDSS-PHOTO-002":"sdss_dr18_photoobj",
+      "NED-TYPE-001":"ned","SIMBAD-TYPE-001":"simbad",
+    }
+    ap=assoc_prefix.get(rid)
+    association_reliability=num(row,f"association_confidence__{ap}") if ap else 1.0
     if association_reliability is None: association_reliability=1.0
     if rcol and reliability is None: reliability=0.0
-    # Cross-catalog evidence is downweighted when the source association itself
-    # is uncertain. Single-catalog/new objects have association confidence 1.
     if rid=="AST-EXT-001":
         p,e=num(row,"parallax"),num(row,"parallax_error")
         if p is not None and e and e>0:
