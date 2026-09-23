@@ -35,7 +35,10 @@ def run(evidence,out):
         vectors.append(p); labels.append(label); confidence.append(conf); margins.append(margin); statuses.append(status)
         # Always expose the vector argmax separately from the conservative label.
         # UNKNOWN remains the final label when evidence is insufficient/conflicting.
-        best_candidates.append(order[0]); best_candidate_probs.append(conf)
+        if status=="NO_EVIDENCE":
+            best_candidates.append("UNKNOWN"); best_candidate_probs.append(float("nan"))
+        else:
+            best_candidates.append(order[0]); best_candidate_probs.append(conf)
     result_columns={f"p_{c.lower()}":[v[c] for v in vectors] for c in CLASSES}
     result_columns.update({
         "primary_class":labels,
