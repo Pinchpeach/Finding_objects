@@ -12,7 +12,7 @@ for name in modules:
  try:
   spec=importlib.util.spec_from_file_location(name,GET/f"{name}.py");m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
   df=m.fetch(RA,DEC,RADIUS_ARCMIN);p=OUT/f"{name}_ngc4522_r0p5arcmin.csv";m.save(df,p)
-  summary.append({"collector":name,"status":"ok","rows":len(df),"file":str(p.relative_to(ROOT))})
+  from astropy.coordinates import SkyCoord\n  import astropy.units as u\n  maxsep=None\n  if len(df) and {"ra","dec"}.issubset(df.columns):\n   cc=SkyCoord(pd.to_numeric(df["ra"],errors="coerce").to_numpy()*u.deg,pd.to_numeric(df["dec"],errors="coerce").to_numpy()*u.deg);cen=SkyCoord(RA*u.deg,DEC*u.deg);maxsep=float(cen.separation(cc).arcmin.max())\n  status="ok" if maxsep is None or maxsep <= RADIUS_ARCMIN+1e-6 else "radius_error"\n  summary.append({"collector":name,"status":status,"rows":len(df),"max_sep_arcmin":maxsep,"file":str(p.relative_to(ROOT))})
  except Exception as e:
   summary.append({"collector":name,"status":"error","rows":0,"error":repr(e)})
   traceback.print_exc()
