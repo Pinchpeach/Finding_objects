@@ -5,8 +5,8 @@ import argparse, importlib.util, time, traceback
 from pathlib import Path
 import numpy as np, pandas as pd
 
-ROOT=Path(__file__).resolve().parents[2]
-GET=ROOT/"Get_data"
+V2=Path(__file__).resolve().parents[1]
+GET=V2/"Get_data"
 DEFAULT_TRUTH=Path(__file__).resolve().parent/"truth_data"/"ground_truth.csv"
 DEFAULT_OUT=Path(__file__).resolve().parent/"catalog_data"
 # Catalogs with existing independent collectors. Spectroscopic truth providers are
