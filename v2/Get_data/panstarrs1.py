@@ -1,32 +1,15 @@
-"""Independent v2 catalog adapter skeleton."""
-from __future__ import annotations
-from dataclasses import dataclass
+"""Pan-STARRS1 DR2 independent photometry collector. No cross-match/classification."""
+from io import StringIO
 from pathlib import Path
-import pandas as pd
-
-STANDARD_COLUMNS = ["catalog", "catalog_object_id", "object_name", "ra", "dec"]
-
-@dataclass(frozen=True)
-class QueryRegion:
-    ra: float
-    dec: float
-    radius_arcmin: float
-
-def validate_output(df: pd.DataFrame) -> pd.DataFrame:
-    missing = [c for c in STANDARD_COLUMNS if c not in df.columns]
-    if missing:
-        raise ValueError(f"missing standard columns: {missing}")
-    if df["catalog_object_id"].astype(str).duplicated().any():
-        raise ValueError("catalog_object_id must be unique within one catalog result")
-    return df
-
-
-CATALOG_NAME = "Pan-STARRS1"
-DESCRIPTION = "optical grizy photometry"
-
-def fetch(region: QueryRegion) -> pd.DataFrame:
-    """Fetch sources in region. Query logic belongs only to this adapter."""
-    raise NotImplementedError("Pan-STARRS1 adapter query is not implemented yet")
-
-def save(df: pd.DataFrame, path: str | Path) -> None:
-    validate_output(df).to_csv(path, index=False)
+import pandas as pd, requests
+CATALOG="Pan-STARRS1 DR2 MeanObject"; API="https://catalogs.mast.stsci.edu/api/v0.1/panstarrs/dr2/mean.csv"
+COLUMNS=["objID","objName","raMean","decMean","raMeanErr","decMeanErr","nDetections","ng","nr","ni","nz","ny","gMeanPSFMag","gMeanPSFMagErr","rMeanPSFMag","rMeanPSFMagErr","iMeanPSFMag","iMeanPSFMagErr","zMeanPSFMag","zMeanPSFMagErr","yMeanPSFMag","yMeanPSFMagErr","gMeanKronMag","gMeanKronMagErr","rMeanKronMag","rMeanKronMagErr","iMeanKronMag","iMeanKronMagErr","zMeanKronMag","zMeanKronMagErr","yMeanKronMag","yMeanKronMagErr","gMeanApMag","gMeanApMagErr","rMeanApMag","rMeanApMagErr","iMeanApMag","iMeanApMagErr","zMeanApMag","zMeanApMagErr","yMeanApMag","yMeanApMagErr"]
+def fetch(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
+ p={"ra":ra,"dec":dec,"radius":radius_arcmin/60.0,"columns":"["+",".join(COLUMNS)+"]"};r=requests.get(API,params=p,timeout=120);r.raise_for_status()
+ df=pd.read_csv(StringIO(r.text),dtype={"objID":"string","objName":"string"})
+ if df.empty:return pd.DataFrame(columns=["catalog","catalog_object_id","object_name","ra","dec",*COLUMNS])
+ df.insert(0,"catalog",CATALOG);df.insert(1,"catalog_object_id",df["objID"].astype("string"));df.insert(2,"object_name",df["objName"].fillna("PS1 "+df["objID"].astype("string")));df.insert(3,"ra",df["raMean"]);df.insert(4,"dec",df["decMean"])
+ return df.drop_duplicates("catalog_object_id",keep="last").reset_index(drop=True)
+def save(df:pd.DataFrame,path:str|Path)->None:
+ if not {"catalog","catalog_object_id","object_name","ra","dec"}.issubset(df.columns):raise ValueError("invalid Pan-STARRS output")
+ Path(path).parent.mkdir(parents=True,exist_ok=True);df.drop_duplicates("catalog_object_id",keep="last").to_csv(path,index=False)
