@@ -1,0 +1,2 @@
+catalog,catalog_object_id,object_name,ra,dec,_r,recno,Field,Xpos,Ypos,NVSS,RAJ2000,DEJ2000,e_RAJ2000,e_DEJ2000,S1.4,e_S1.4,l_MajAxis,MajAxis,l_MinAxis,MinAxis,PA,e_MajAxis,e_MinAxis,e_PA,f_resFlux,resFlux,polFlux,polPA,e_polFlux,e_polPA,Image
+NVSS,123339+091030,NVSS 123339+091030,,,0.0697,928634,C1232P08,413.83,795.07,123339+091030,12 33 39.44,+09 10 30.7,0.1,1.4,22.3,1.5,,46.7,,25.6,53.0,4.0,4.3,6.6,,,-0.07,,1.12,,Image

@@ -1,0 +1,20 @@
+collector,status,rows,file,error
+gaia_dr3,ok,3,rawdata/gaia_dr3_ngc4522_r0p5arcmin.csv,
+sdss_dr18,ok,16,rawdata/sdss_dr18_ngc4522_r0p5arcmin.csv,
+panstarrs1,ok,157,rawdata/panstarrs1_ngc4522_r0p5arcmin.csv,
+desi_legacy,ok,0,rawdata/desi_legacy_ngc4522_r0p5arcmin.csv,
+galex,ok,1,rawdata/galex_ngc4522_r0p5arcmin.csv,
+twomass,error,0,,KeyError('catalog identifier column missing')
+allwise,ok,1,rawdata/allwise_ngc4522_r0p5arcmin.csv,
+lotss,ok,0,rawdata/lotss_ngc4522_r0p5arcmin.csv,
+first,ok,0,rawdata/first_ngc4522_r0p5arcmin.csv,
+nvss,ok,1,rawdata/nvss_ngc4522_r0p5arcmin.csv,
+vlass,ok,0,rawdata/vlass_ngc4522_r0p5arcmin.csv,
+xmm,ok,0,rawdata/xmm_ngc4522_r0p5arcmin.csv,
+chandra,ok,0,rawdata/chandra_ngc4522_r0p5arcmin.csv,
+erosita,ok,0,rawdata/erosita_ngc4522_r0p5arcmin.csv,
+sdss_spectroscopy,ok,1,rawdata/sdss_spectroscopy_ngc4522_r0p5arcmin.csv,
+desi_spectroscopy,ok,0,rawdata/desi_spectroscopy_ngc4522_r0p5arcmin.csv,
+lamost_spectroscopy,ok,0,rawdata/lamost_spectroscopy_ngc4522_r0p5arcmin.csv,
+simbad,error,0,,"ValueError('cannot insert ra, already exists')"
+ned,ok,13,rawdata/ned_ngc4522_r0p5arcmin.csv,

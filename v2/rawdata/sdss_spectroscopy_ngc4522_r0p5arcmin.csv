@@ -1,0 +1,2 @@
+catalog,catalog_object_id,object_name,objID,specobjid,bestobjid,ra,dec,plate,mjd,fiberid,class,subclass,z,zerr,zwarning
+SDSS DR18 spectroscopy,1388316819500066816,SDSS spectrum 1388316819500066816,1237658491746123826,1388316819500066816,1237658491746123826,188.41545,9.174999,1233,52734,299,GALAXY,STARFORMING,0.007724506,8.744262e-06,0
