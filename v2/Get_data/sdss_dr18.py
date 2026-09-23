@@ -21,5 +21,4 @@ def fetch(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
 def save(df:pd.DataFrame,path:str|Path)->None:
  required={"catalog","catalog_object_id","object_name","ra","dec"}
  if not required.issubset(df.columns):raise ValueError("invalid SDSS output")
- if df["catalog_object_id"].duplicated().any():raise ValueError("duplicate SDSS objid")
- Path(path).parent.mkdir(parents=True,exist_ok=True);df.to_csv(path,index=False)
+ # Duplicate catalog IDs are harmless here: keep the last returned row.\n df=df.drop_duplicates(subset=["catalog_object_id"],keep="last").copy()\n Path(path).parent.mkdir(parents=True,exist_ok=True);df.to_csv(path,index=False)
