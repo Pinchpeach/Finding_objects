@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+"""Build per-source evidence from an integrated one-object-per-row CSV.
+
+This stage deliberately does NOT fuse evidence into a final class.
+Missing features are skipped and conflicting evidence is preserved.
+"""
+from __future__ import annotations
+import argparse, json, math
+from pathlib import Path
+import pandas as pd
+
+PRIMARY=("STAR","WD","GALAXY","QSO","BINARY")
+
+def num(row,name):
+    try:
+        v=float(row.get(name))
+        return v if math.isfinite(v) else None
+    except (TypeError,ValueError):
+        return None
+
+def add(ev, cls, rule, score, kind, note=""):
+    ev.append({"class":cls,"rule_id":rule,"score":float(max(0,min(1,score))),
+               "kind":kind,"note":note})
+
+def evidence_for(row):
+    ev=[]
+    p,pe=num(row,"parallax"),num(row,"parallax_error")
+    if p is not None and pe and pe>0:
+        corrected=abs((p+0.017)/pe)
+        if corrected<5: add(ev,"EXTRAGALACTIC","AST-EXT-001",1-corrected/5,"support")
+        snr=abs(p/pe)
+        add(ev,"STAR","AST-GAL-001",snr/(snr+5),"support","continuous uncalibrated astrometric evidence")
+    pmra,era=num(row,"pmra"),num(row,"pmra_error")
+    pmdec,edec=num(row,"pmdec"),num(row,"pmdec_error")
+    if None not in (pmra,era,pmdec,edec) and era>0 and edec>0:
+        s=math.sqrt((pmra/era)**2+(pmdec/edec)**2)
+        if s<5: add(ev,"EXTRAGALACTIC","AST-EXT-002",1-s/5,"support","covariance unavailable approximation")
+        add(ev,"STAR","AST-GAL-002",s/(s+5),"support","continuous uncalibrated astrometric evidence")
+    spectral=str(row.get("class","")).strip().upper()
+    if spectral=="STAR": add(ev,"STAR","SPC-SDSS-001",1,"catalog_label")
+    elif spectral=="GALAXY": add(ev,"GALAXY","SPC-SDSS-002",1,"catalog_label")
+    elif spectral in {"QSO","QUASAR"}: add(ev,"QSO","SPC-SDSS-003",1,"catalog_label")
+    aliases={"QSO":["classprob_dsc_combmod_quasar"],"GALAXY":["classprob_dsc_combmod_galaxy"],
+             "STAR":["classprob_dsc_combmod_star"],"WD":["classprob_dsc_combmod_whitedwarf"],
+             "BINARY":["classprob_dsc_combmod_binarystar"]}
+    for cls,names in aliases.items():
+        for name in names:
+            v=num(row,name)
+            if v is not None:
+                add(ev,cls,"DSC-001",v,"catalog_probability"); break
+    return ev
+
+def main():
+    ap=argparse.ArgumentParser()
+    ap.add_argument("input_csv",type=Path)
+    ap.add_argument("-o","--output",type=Path,default=Path("evidence.csv"))
+    args=ap.parse_args()
+    df=pd.read_csv(args.input_csv)
+    out=df.copy()
+    evidence=[]; conflicts=[]; counts=[]
+    for _,row in df.iterrows():
+        ev=evidence_for(row); evidence.append(json.dumps(ev,separators=(",",":")))
+        strong={e["class"] for e in ev if e["score"]>=0.8 and e["class"] in PRIMARY}
+        conflicts.append(int(len(strong)>1)); counts.append(len(ev))
+    out["evidence_json"]=evidence
+    out["evidence_count"]=counts
+    out["evidence_conflict"]=conflicts
+    args.output.parent.mkdir(parents=True,exist_ok=True)
+    out.to_csv(args.output,index=False)
+    print(f"[OK] {len(out)} sources -> {args.output}")
+
+if __name__=="__main__": main()
