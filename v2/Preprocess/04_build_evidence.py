@@ -22,11 +22,14 @@ def num(row,name):
         return v if math.isfinite(v) else None
     except (TypeError,ValueError): return None
 
-def emit(out, rule, cls, score, value=None, note="", reliability=1.0):
+def emit(out, rule, cls, score, value=None, note="", reliability=1.0, association_reliability=1.0):
     raw=float(max(0,min(1,score)))
-    rel=float(max(0,min(1,reliability))) if reliability is not None else 0.0
-    out.append({"class":cls,"rule_id":rule["rule_id"],"score":raw*rel,
-      "raw_score":raw,"reliability":rel,"kind":rule["likelihood_method"],
+    rel=float(max(0,min(1,reliability,association_reliability))) if reliability is not None else 0.0
+    arel=float(max(0,min(1,association_reliability))) if association_reliability is not None else 0.0
+    effective=raw*rel*arel
+    if effective<=0: return
+    out.append({"class":cls,"rule_id":rule["rule_id"],"score":effective,
+      "raw_score":raw,"reliability":rel,"association_reliability":arel,"kind":rule["likelihood_method"],
       "origin":rule["threshold_origin"],"feature_group":rule["feature_group"],
       "value":value,"note":note})
 
@@ -44,22 +47,26 @@ def evaluate(rule,row):
       "WISE-AGN-R90-001":"catalog_confidence_allwise",
     }
     rcol=relmap.get(rid); reliability=num(row,rcol) if rcol else 1.0
+    association_reliability=num(row,"association_confidence_min")
+    if association_reliability is None: association_reliability=1.0
     if rcol and reliability is None: reliability=0.0
+    # Cross-catalog evidence is downweighted when the source association itself
+    # is uncertain. Single-catalog/new objects have association confidence 1.
     if rid=="AST-EXT-001":
         p,e=num(row,"parallax"),num(row,"parallax_error")
         if p is not None and e and e>0:
             x=abs((p+0.017)/e)
-            if x<float(rule["threshold"]): emit(out,rule,"EXTRAGALACTIC",1-x/float(rule["threshold"]),x,reliability=reliability)
+            if x<float(rule["threshold"]): emit(out,rule,"EXTRAGALACTIC",1-x/float(rule["threshold"]),x,reliability=reliability,association_reliability=association_reliability)
     elif rid=="AST-EXT-002":
         a,ae,d,de=(num(row,x) for x in ("pmra","pmra_error","pmdec","pmdec_error"))
         if None not in (a,ae,d,de) and ae>0 and de>0:
             x=math.sqrt((a/ae)**2+(d/de)**2)
             if x<float(rule["threshold"]): emit(out,rule,"EXTRAGALACTIC",1-x/float(rule["threshold"]),x,
-              "diagonal-error approximation; covariance unavailable",reliability)
+              "diagonal-error approximation; covariance unavailable",reliability,association_reliability)
     elif rid=="AST-GAL-001":
         p,e=num(row,"parallax"),num(row,"parallax_error")
         if p is not None and e and e>0:
-            x=abs(p/e); emit(out,rule,"STAR",x/(x+5),x,"uncalibrated physical support",reliability)
+            x=abs(p/e); emit(out,rule,"STAR",x/(x+5),x,"uncalibrated physical support",reliability,association_reliability)
     elif rid=="AST-GAL-002":
         a,ae,d,de=(num(row,x) for x in ("pmra","pmra_error","pmdec","pmdec_error"))
         if None not in (a,ae,d,de) and ae>0 and de>0:
@@ -70,7 +77,7 @@ def evaluate(rule,row):
         hit=(target=="QSO" and c in {"QSO","QUASAR"}) or c==target
         if hit:
             zw=num(row,"zwarning"); score=1.0 if zw in (None,0) else 0.75
-            emit(out,rule,target,score,c,"nonzero zwarning downweights spectral label" if zw not in (None,0) else "",reliability)
+            emit(out,rule,target,score,c,"nonzero zwarning downweights spectral label" if zw not in (None,0) else "",reliability,association_reliability)
     elif rid.startswith("PS1-MORPH-"):
         delta=num(row,"ps1_i_psf_minus_kron"); imag=num(row,"iMeanPSFMag")
         valid=num(row,"ps1_i_photometry_valid")
@@ -78,11 +85,11 @@ def evaluate(rule,row):
             if rid=="PS1-MORPH-001" and delta>0.05:
                 # Extended morphology is direct GALAXY support within the documented regime.
                 score=min(0.9,0.55+min(delta-0.05,0.35))
-                emit(out,rule,"GALAXY",score,delta,"PS1 i-band PSF-Kron extended-source evidence",reliability)
+                emit(out,rule,"GALAXY",score,delta,"PS1 i-band PSF-Kron extended-source evidence",reliability,association_reliability)
             elif rid=="PS1-MORPH-002" and delta<=0.05:
                 # Point-like morphology is deliberately weak STAR evidence: QSOs are unresolved too.
                 score=min(0.65,0.50+min(max(0,0.05-delta),0.15))
-                emit(out,rule,"STAR",score,delta,"weak point-source evidence; unresolved morphology is not STAR-specific",reliability)
+                emit(out,rule,"STAR",score,delta,"weak point-source evidence; unresolved morphology is not STAR-specific",reliability,association_reliability)
     elif rid=="WISE-AGN-R90-001":
         w1,w2,s1,s2=(num(row,x) for x in ("W1mag","W2mag","snr1","snr2"))
         if None not in (w1,w2,s1,s2) and s1>=3 and s2>=3:
@@ -90,7 +97,7 @@ def evaluate(rule,row):
             color=w1-w2
             if color>cut:
                 emit(out,rule,"EXTRAGALACTIC",0.90,color,
-                     f"Assef+2018 AllWISE R90 AGN color selection; boundary={cut:.3f}",reliability)
+                     f"Assef+2018 AllWISE R90 AGN color selection; boundary={cut:.3f}",reliability,association_reliability)
     elif rid=="PS1-QSO-Z6-001":
         iz=num(row,"ps1_i_z_color"); zy=num(row,"ps1_z_y_color")
         ei=num(row,"ps1_i_psf_mag_err"); eg=num(row,"ps1_g_psf_mag_err")
@@ -118,26 +125,26 @@ def evaluate(rule,row):
         w1,w2,s1,s2=(num(row,x) for x in ("W1mag","W2mag","snr1","snr2"))
         if None not in (w1,w2,s1,s2) and w1-w2>=0.8 and w2<=15.05 and s1>=10 and s2>=10:
             emit(out,rule,"EXTRAGALACTIC",0.95,w1-w2,
-                 "Stern+2012 AGN selection; 0.95 is reported sample reliability, not per-source posterior",reliability)
+                 "Stern+2012 AGN selection; 0.95 is reported sample reliability, not per-source posterior",reliability,association_reliability)
     elif rid.startswith("SDSS-PHOTO-"):
         typ=num(row,"type"); clean=num(row,"clean")
         if clean==1 and typ is not None:
             if rid=="SDSS-PHOTO-001" and int(typ)==3:
-                emit(out,rule,"GALAXY",0.8,typ,"SDSS extended morphology",reliability)
+                emit(out,rule,"GALAXY",0.8,typ,"SDSS extended morphology",reliability,association_reliability)
             elif rid=="SDSS-PHOTO-002" and int(typ)==6:
-                emit(out,rule,"STAR",0.55,typ,"weak point-source morphology; QSO contamination possible",reliability)
+                emit(out,rule,"STAR",0.55,typ,"weak point-source morphology; QSO contamination possible",reliability,association_reliability)
     elif rid=="NED-TYPE-001":
         typ=str(row.get("Type","")).strip()
         mp={"G":"GALAXY","QSO":"QSO","*":"STAR","WD*":"WD"}
-        if typ in mp: emit(out,rule,mp[typ],0.85,typ,"curated NED preferred physical type",reliability)
+        if typ in mp: emit(out,rule,mp[typ],0.85,typ,"curated NED preferred physical type",reliability,association_reliability)
     elif rid=="SIMBAD-TYPE-001":
         typ=str(row.get("otype","")).strip()
         mp={"G":"GALAXY","GiG":"GALAXY","QSO":"QSO","AGN":"EXTRAGALACTIC","Star":"STAR","*":"STAR","WD*":"WD"}
-        if typ in mp: emit(out,rule,mp[typ],0.85,typ,"curated SIMBAD hierarchical physical type",reliability)
+        if typ in mp: emit(out,rule,mp[typ],0.85,typ,"curated SIMBAD hierarchical physical type",reliability,association_reliability)
     elif rid=="DSC-001":
         for cls,col in DSC_MAP.items():
             v=num(row,col)
-            if v is not None: emit(out,rule,cls,v,v,reliability=reliability)
+            if v is not None: emit(out,rule,cls,v,v,reliability=reliability,association_reliability=association_reliability)
     elif rid=="VAR-001":
         cls=str(row.get("best_class_name","")).strip()
         score=num(row,"best_class_score")
