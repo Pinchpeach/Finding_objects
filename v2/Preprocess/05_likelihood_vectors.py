@@ -21,7 +21,7 @@ def fuse(items):
     m=max(logp.values()); p={c:math.exp(v-m) for c,v in logp.items()}; z=sum(p.values())
     return {c:p[c]/z for c in CLASSES},used
 def run(evidence,out):
-    df=pd.read_csv(evidence); vectors=[]; labels=[]; confidence=[]; margins=[]; statuses=[]
+    df=pd.read_csv(evidence); vectors=[]; labels=[]; confidence=[]; margins=[]; statuses=[]; best_candidates=[]; best_candidate_probs=[]
     raw_series=df["evidence_json"] if "evidence_json" in df else pd.Series(["[]"]*len(df))
     for raw in raw_series:
         try: items=json.loads(raw) if isinstance(raw,str) else []
@@ -33,12 +33,17 @@ def run(evidence,out):
         elif conf<MIN_CONFIDENCE or margin<MIN_MARGIN: label="UNKNOWN"; status="LOW_CONFIDENCE"
         else: label=order[0]; status="CLASSIFIED"
         vectors.append(p); labels.append(label); confidence.append(conf); margins.append(margin); statuses.append(status)
+        # Always expose the vector argmax separately from the conservative label.
+        # UNKNOWN remains the final label when evidence is insufficient/conflicting.
+        best_candidates.append(order[0]); best_candidate_probs.append(conf)
     result_columns={f"p_{c.lower()}":[v[c] for v in vectors] for c in CLASSES}
     result_columns.update({
         "primary_class":labels,
         "primary_confidence":confidence,
         "primary_margin":margins,
         "classification_status":statuses,
+        "best_candidate_class":best_candidates,
+        "best_candidate_probability":best_candidate_probs,
     })
     df=pd.concat([df,pd.DataFrame(result_columns,index=df.index)],axis=1)
     out.parent.mkdir(parents=True,exist_ok=True); df.to_csv(out,index=False)
