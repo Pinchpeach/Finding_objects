@@ -13,7 +13,9 @@ def run(associations,raw_dir,out):
     rows=[]
     for oid,g in assoc.groupby("object_id",sort=False):
         rec={"object_id":oid,"ra":g["ra"].mean(),"dec":g["dec"].mean(),
-             "association_members":len(g),"association_ambiguous":int((g["association_status"]=="ambiguous_new").any())}
+             "association_members":len(g),"association_ambiguous":int((g["association_status"]=="ambiguous_new").any()),
+             "association_confidence_min":pd.to_numeric(g.get("association_confidence"),errors="coerce").min(),
+             "association_confidence_mean":pd.to_numeric(g.get("association_confidence"),errors="coerce").mean()}
         catalogs=[]
         for _,a in g.iterrows():
             fn=a["input_file"]
