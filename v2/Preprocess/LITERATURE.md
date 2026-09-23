@@ -53,3 +53,65 @@ Implementation policy: extended morphology supplies moderate GALAXY evidence onl
   not a small set of independent scalar colour thresholds. It should be implemented
   as a locus-distance model rather than approximated by ad-hoc cuts.
 
+## Decision-tree architecture
+
+### DT-HIER-001
+The pipeline now uses an interpretable hierarchical decision tree for final
+classification while retaining the evidence probability vector as a fallback.
+The hierarchy is: spectroscopy -> curated physical type -> Gaia DSC ->
+two-indicator Galactic astrometry -> extended morphology -> validated
+class-specific colour selection -> probability-vector consolidation -> UNKNOWN.
+
+This is intentionally not presented as a trained decision tree. Published
+astronomical tree classifiers learn split locations from large labelled
+spectroscopic samples; our current 167-source field is far too small and sparse
+to learn such a tree without severe overfitting. Therefore DT-HIER-001 uses
+evidence precedence and literature-supported catalog semantics, while marking
+the Gaia DSC 0.80 acceptance threshold as PROJECT policy pending calibration.
+
+Key methodological references:
+- Ball, N. M. et al. (2006), ApJ 650, 497, DOI 10.1086/507440,
+  *Robust Machine Learning Applied to Astronomical Data Sets. I. Star-Galaxy
+  Classification of the Sloan Digital Sky Survey DR3 Using Decision Trees*.
+  https://iopscience.iop.org/article/10.1086/507440
+  Decision trees trained on 477,068 spectroscopically labelled SDSS objects;
+  demonstrates probability outputs and explicitly warns about extrapolation
+  beyond the magnitude regime represented by the training set.
+- Suchkov, A. A., Hanisch, R. J. & Margon, B. (2005), AJ 130, 2439,
+  DOI 10.1086/497363, *A Census of Object Types and Redshift Estimates in the
+  SDSS Photometric Catalog from a Trained Decision-Tree Classifier*.
+  https://iopscience.iop.org/article/10.1086/497363
+  ClassX used ten oblique decision trees with weighted voting and returned class
+  probability distributions. Independent validation reported approximately
+  98.1% star, 98.5% galaxy, and 96.5% AGN completeness in its SDSS validation
+  sample, while documenting class overlap and training-set dependence.
+- Vasconcellos, E. C. et al. (2011), AJ 141, 189,
+  DOI 10.1088/0004-6256/141/6/189, *Decision Tree Classifiers for Star/Galaxy
+  Separation*.
+  https://iopscience.iop.org/article/10.1088/0004-6256/141/6/189
+  Compared 13 tree algorithms on spectroscopically labelled SDSS DR7 data.
+  Performance depends strongly on magnitude; the selected Functional Tree kept
+  >80% faint-end completeness with about 2.5% contamination, demonstrating why
+  a tree must be validated in the regime where it is applied.
+- Delchambre, L. et al. (2023), A&A 674, A31,
+  *Gaia DR3 Apsis III: Non-stellar content and source classification*.
+  https://www.aanda.org/articles/aa/full_html/2023/06/aa43423-22/aa43423-22.html
+  Gaia DSC Specmod itself uses an ExtraTrees ensemble over BP/RP spectral
+  samples; Combmod combines it with an independent GMM classifier. Gaia's
+  classlabel_dsc requires maximum Combmod probability >0.5, while the joint
+  label requires independent classifiers to agree and is purer. The paper also
+  cautions that extragalactic purity varies with priors, magnitude and sky
+  position.
+- Clarke, A. O. et al. (2020), A&A 639, A84,
+  *Identifying galaxies, quasars, and stars with machine learning*.
+  https://www.aanda.org/articles/aa/full_html/2020/07/aa36770-19/aa36770-19.html
+  Random-forest classification of SDSS+WISE sources trained on millions of
+  spectroscopic labels illustrates the value of ensembles of decision trees,
+  class probabilities, feature importance, and held-out validation.
+
+Design consequence: the present tree is a conservative expert hierarchy, not a
+claim that literature performance numbers transfer to this NGC 4522 sample.
+A future trained tree/random forest should be learned from a large external
+spectroscopic training set matched to exactly the same Gaia/PS1/WISE/2MASS
+features, with train/validation/test separation and magnitude/sky-domain checks.
+
