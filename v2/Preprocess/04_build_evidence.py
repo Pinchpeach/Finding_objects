@@ -41,6 +41,7 @@ def evaluate(rule,row):
       "WISE-AGN-001":"catalog_confidence_allwise","SDSS-PHOTO-001":"catalog_confidence_sdss_photometry",
       "SDSS-PHOTO-002":"catalog_confidence_sdss_photometry","NED-TYPE-001":"catalog_confidence_ned_type",
       "SIMBAD-TYPE-001":"catalog_confidence_simbad_type",
+      "WISE-AGN-R90-001":"catalog_confidence_allwise",
     }
     rcol=relmap.get(rid); reliability=num(row,rcol) if rcol else 1.0
     if rcol and reliability is None: reliability=0.0
@@ -82,6 +83,37 @@ def evaluate(rule,row):
                 # Point-like morphology is deliberately weak STAR evidence: QSOs are unresolved too.
                 score=min(0.65,0.50+min(max(0,0.05-delta),0.15))
                 emit(out,rule,"STAR",score,delta,"weak point-source evidence; unresolved morphology is not STAR-specific",reliability)
+    elif rid=="WISE-AGN-R90-001":
+        w1,w2,s1,s2=(num(row,x) for x in ("W1mag","W2mag","snr1","snr2"))
+        if None not in (w1,w2,s1,s2) and s1>=3 and s2>=3:
+            cut=0.650 if w2<=13.86 else 0.650*math.exp(0.153*(w2-13.86)**2)
+            color=w1-w2
+            if color>cut:
+                emit(out,rule,"EXTRAGALACTIC",0.90,color,
+                     f"Assef+2018 AllWISE R90 AGN color selection; boundary={cut:.3f}",reliability)
+    elif rid=="PS1-QSO-Z6-001":
+        iz=num(row,"ps1_i_z_color"); zy=num(row,"ps1_z_y_color")
+        ei=num(row,"ps1_i_psf_mag_err"); eg=num(row,"ps1_g_psf_mag_err")
+        er=num(row,"ps1_r_psf_mag_err"); ez=num(row,"ps1_z_psf_mag_err"); ey=num(row,"ps1_y_psf_mag_err")
+        vz=num(row,"ps1_z_photometry_valid"); vy=num(row,"ps1_y_photometry_valid")
+        # S/N from magnitude uncertainty: sigma_mag ~= 1.0857/SNR.
+        sn=lambda e: (1.0857/e if e is not None and e>0 else None)
+        sg,sr,sz,sy=sn(eg),sn(er),sn(ez),sn(ey)
+        rz=None
+        r=num(row,"rMeanPSFMag"); z=num(row,"zMeanPSFMag")
+        if r is not None and z is not None and 0<r<40 and 0<z<40: rz=r-z
+        if None not in (iz,zy,sz,sy,vz,vy) and vz==1 and vy==1 and iz>2.0:
+            gdrop=(sg is None or sg<3)
+            if zy<0.5:
+                rcond=(sr is None or sr<3 or (rz is not None and rz>2.2))
+                hit=gdrop and sz>10 and sy>5 and rcond
+            else:
+                hit=gdrop and sz>7 and sy>7 and (sr is None or sr<3)
+            if hit:
+                # Candidate-selection evidence only. Keep moderate because the
+                # paper explicitly requires follow-up to reject cool dwarfs/artifacts.
+                emit(out,rule,"QSO",0.70,{"i-z":iz,"z-y":zy},
+                     "Bañados+2016 PS1 z~6 quasar color-selection candidate; follow-up required")
     elif rid=="WISE-AGN-001":
         w1,w2,s1,s2=(num(row,x) for x in ("W1mag","W2mag","snr1","snr2"))
         if None not in (w1,w2,s1,s2) and w1-w2>=0.8 and w2<=15.05 and s1>=10 and s2>=10:
