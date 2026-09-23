@@ -82,6 +82,23 @@ def run(objects:Path,rules_path:Path,out:Path)->Path:
         if err is not None and n is not None:
             derived[f"ps1_{b}_photometry_valid"]=(psf_mag[b].notna()&err.notna()&(n>0)).astype("Int64")
 
+    # Colour uncertainties/significances.  These preserve the measurement
+    # uncertainty so colour-selection rules can demand statistically meaningful
+    # separation from their literature boundaries.
+    for b1,b2 in zip(ps1_bands,ps1_bands[1:]):
+        e1=derived.get(f"ps1_{b1}_psf_mag_err"); e2=derived.get(f"ps1_{b2}_psf_mag_err")
+        col=derived.get(f"ps1_{b1}_{b2}_color")
+        if e1 is not None and e2 is not None and col is not None:
+            ce=np.sqrt(e1*e1+e2*e2)
+            derived[f"ps1_{b1}_{b2}_color_err"]=ce
+    # WISE Vega colours and propagated errors.
+    if "W1mag" in df.columns and "W2mag" in df.columns:
+        w1=pd.to_numeric(df["W1mag"],errors="coerce"); w2=pd.to_numeric(df["W2mag"],errors="coerce")
+        derived["wise_w1_w2_color"]=w1-w2
+        if "e_W1mag" in df.columns and "e_W2mag" in df.columns:
+            e1=pd.to_numeric(df["e_W1mag"],errors="coerce"); e2=pd.to_numeric(df["e_W2mag"],errors="coerce")
+            derived["wise_w1_w2_color_err"]=np.sqrt(e1*e1+e2*e2)
+
     # Catalog observation-confidence indices. These are [0,1] project quality
     # indices anchored to published catalog quality diagnostics; they are NOT
     # posterior class probabilities. Missing catalog/quality information stays NaN.
