@@ -29,7 +29,10 @@ def query_sdss(per_class:int)->pd.DataFrame:
  ORDER BY s.specObjID"""
         url=SKY_URL+"?"+urllib.parse.urlencode({"cmd":sql,"format":"csv"})
         with urllib.request.urlopen(url,timeout=90) as resp:
-            d=pd.read_csv(io.BytesIO(resp.read()))
+            raw=resp.read()
+        # SkyServer CSV begins with a '#Table1' marker line.  Skip comment
+        # metadata rather than interpreting it as the CSV header.
+        d=pd.read_csv(io.BytesIO(raw),comment="#")
         # SkyServer column casing can vary by endpoint/release. Canonicalize
         # immediately so all downstream identifiers are deterministic.
         d.columns=[str(x).strip().lower() for x in d.columns]
