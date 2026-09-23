@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - 'v2/benchmark/collect_catalog_truth.py'
+      - 'v2/Get_data/*.py'
       - '.github/workflows/build-catalog-truth-features.yml'
   workflow_dispatch:
     inputs:
