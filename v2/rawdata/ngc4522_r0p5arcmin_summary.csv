@@ -13,7 +13,7 @@ vlass,ok,0,,rawdata/vlass_ngc4522_r0p5arcmin.csv,
 xmm,ok,0,,rawdata/xmm_ngc4522_r0p5arcmin.csv,
 chandra,ok,0,,rawdata/chandra_ngc4522_r0p5arcmin.csv,
 erosita,ok,0,,rawdata/erosita_ngc4522_r0p5arcmin.csv,
-sdss_spectroscopy,ok,1,0.00674498165569649,rawdata/sdss_spectroscopy_ngc4522_r0p5arcmin.csv,
+sdss_spectroscopy,error,0,,,InconsistentTableError('Number of header columns (1) inconsistent with data columns in data line 9')
 desi_spectroscopy,ok,0,,rawdata/desi_spectroscopy_ngc4522_r0p5arcmin.csv,
 lamost_spectroscopy,ok,0,,rawdata/lamost_spectroscopy_ngc4522_r0p5arcmin.csv,
 simbad,ok,1,0.020701049365056436,rawdata/simbad_ngc4522_r0p5arcmin.csv,
