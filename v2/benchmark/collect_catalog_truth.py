@@ -12,9 +12,16 @@ DEFAULT_TRUTH=Path(__file__).resolve().parent/"truth_data"/"ground_truth.csv"
 DEFAULT_OUT=Path(__file__).resolve().parent/"catalog_data"
 COLLECTORS=["gaia_dr3","panstarrs1","allwise","twomass","galex","desi_legacy",
             "nvss","first","lotss","vlass","chandra","xmm","erosita"]
+# Query radii (arcmin) are deliberately wider than the accepted counterpart radii.
 RADII={"gaia_dr3":0.10,"panstarrs1":0.10,"allwise":0.15,"twomass":0.10,
        "galex":0.15,"desi_legacy":0.10,"nvss":0.25,"first":0.10,"lotss":0.15,
        "vlass":0.10,"chandra":0.15,"xmm":0.20,"erosita":0.30}
+# Conservative project crossmatch gates in arcsec. These are engineering gates, not
+# calibrated association probabilities; downstream validation must inspect separation
+# distributions and can tighten them per survey/quality regime.
+MATCH_ARCSEC={"gaia_dr3":2.0,"panstarrs1":2.0,"allwise":3.0,"twomass":2.5,
+              "galex":5.0,"desi_legacy":2.0,"nvss":10.0,"first":3.0,"lotss":5.0,
+              "vlass":3.0,"chandra":5.0,"xmm":8.0,"erosita":10.0}
 
 def load(name):
  p=GET/f"{name}.py"; s=importlib.util.spec_from_file_location("trd_"+name,p)
@@ -30,9 +37,10 @@ def query_one(mod,name,radius,t):
   d=mod.fetch(float(t.ra),float(t.dec),radius)
   if d is None or d.empty: return "empty",None,None
   d=d.copy(); d["_sep_arcsec"]=sep_arcsec(float(t.ra),float(t.dec),pd.to_numeric(d.ra,errors="coerce").to_numpy(),pd.to_numeric(d.dec,errors="coerce").to_numpy())
-  d=d[np.isfinite(d["_sep_arcsec"])].sort_values("_sep_arcsec").head(1)
+  d=d[np.isfinite(d["_sep_arcsec"]) & (d["_sep_arcsec"] <= MATCH_ARCSEC[name])].sort_values("_sep_arcsec").head(1)
   if d.empty: return "empty",None,None
   d.insert(0,"benchmark_id",t.benchmark_id); d.insert(1,"truth_class",t.truth_class); d.insert(2,"truth_source",t.truth_source); d.insert(3,"truth_ra",t.ra); d.insert(4,"truth_dec",t.dec)
+  d.insert(5,"match_threshold_arcsec",MATCH_ARCSEC[name])
   return "matched",d,None
  except Exception as e: return "error",None,repr(e)
 
@@ -52,10 +60,10 @@ def run_gaia(truth,out_dir):
  for _,t in truth.iterrows():
   if allg.empty: continue
   s=sep_arcsec(float(t.ra),float(t.dec),pd.to_numeric(allg.ra,errors="coerce").to_numpy(),pd.to_numeric(allg.dec,errors="coerce").to_numpy())
-  idx=np.where(np.isfinite(s) & (s <= RADII["gaia_dr3"]*60.0))[0]
+  idx=np.where(np.isfinite(s) & (s <= MATCH_ARCSEC["gaia_dr3"]))[0]
   if not len(idx): continue
   k=idx[np.argmin(s[idx])]; d=allg.iloc[[k]].copy(); d["_sep_arcsec"]=float(s[k])
-  d.insert(0,"benchmark_id",t.benchmark_id); d.insert(1,"truth_class",t.truth_class); d.insert(2,"truth_source",t.truth_source); d.insert(3,"truth_ra",t.ra); d.insert(4,"truth_dec",t.dec); rows.append(d)
+  d.insert(0,"benchmark_id",t.benchmark_id); d.insert(1,"truth_class",t.truth_class); d.insert(2,"truth_source",t.truth_source); d.insert(3,"truth_ra",t.ra); d.insert(4,"truth_dec",t.dec); d.insert(5,"match_threshold_arcsec",MATCH_ARCSEC["gaia_dr3"]); rows.append(d)
  out=pd.concat(rows,ignore_index=True) if rows else pd.DataFrame(columns=["benchmark_id","truth_class"]); out.to_csv(out_dir/"gaia_dr3_trd.csv",index=False)
  counts=out.truth_class.value_counts().to_dict() if len(out) else {}; ok=len(out)
  print(f"[gaia_dr3] targets={len(truth)} matched={ok} empty={len(truth)-ok}",flush=True)
