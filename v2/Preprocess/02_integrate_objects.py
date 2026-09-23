@@ -27,6 +27,10 @@ def run(associations,raw_dir,out):
             if idx>=len(src): continue
             r=src.iloc[idx]; cat=str(a["catalog"]); catalogs.append(cat); pre=prefix(cat)
             rec[f"{pre}__catalog_object_id"]=a["catalog_object_id"]
+            # Preserve association quality per contributing catalog.  This must
+            # gate only evidence derived from that counterpart, never unrelated
+            # measurements from the same integrated object.
+            rec[f"association_confidence__{pre}"]=pd.to_numeric(pd.Series([a.get("association_confidence")]),errors="coerce").iloc[0]
             for col,val in r.items():
                 if col in {"catalog","catalog_object_id","object_name","ra","dec"}: continue
                 key=col if col not in rec else f"{pre}__{col}"
