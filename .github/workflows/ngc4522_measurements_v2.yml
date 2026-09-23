@@ -1,0 +1,21 @@
+name: NGC4522 lossless measurement rebuild
+on:
+  push:
+    paths: ['.github/NGC4522_MEASUREMENTS_V2_REQUEST']
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 105
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: pip install -e .
+      - uses: actions/download-artifact@v4
+        with: {name: ngc4522-multiwavelength, path: results/ngc4522_multiwavelength, run-id: 35673099444, github-token: '${{ github.token }}'}
+      - uses: actions/download-artifact@v4
+        with: {name: ngc4522-final-v3, path: results/ngc4522_final, run-id: 35678178462, github-token: '${{ github.token }}'}
+      - run: timeout --signal=TERM 95m python scripts/ngc4522_attach_measurements_v2.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: ngc4522-observed-measurements-v2, path: results/ngc4522_observed_v2, retention-days: 90}
