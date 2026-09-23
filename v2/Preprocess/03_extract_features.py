@@ -29,6 +29,26 @@ def run(objects:Path,rules_path:Path,out:Path)->Path:
     if pm.issubset(df.columns):
         a=safe_div(df["pmra"],df["pmra_error"]); d=safe_div(df["pmdec"],df["pmdec_error"])
         derived["proper_motion_significance"]=np.sqrt(a*a+d*d)
+    # Pan-STARRS photometric colours and PSF-Kron morphology proxies.
+    # These are continuous measurements only; no class threshold is applied here.
+    ps1_bands=("g","r","i","z","y")
+    def ps1_col(name):
+        if name in df.columns:
+            return name
+        pref=f"pan_starrs1_dr2_meanobject__{name}"
+        return pref if pref in df.columns else None
+    psf={b:ps1_col(f"{b}MeanPSFMag") for b in ps1_bands}
+    kron={b:ps1_col(f"{b}MeanKronMag") for b in ps1_bands}
+    for b1,b2 in zip(ps1_bands,ps1_bands[1:]):
+        if psf[b1] and psf[b2]:
+            derived[f"ps1_{b1}_{b2}_color"]=pd.to_numeric(df[psf[b1]],errors="coerce")-pd.to_numeric(df[psf[b2]],errors="coerce")
+    for b in ps1_bands:
+        if psf[b] and kron[b]:
+            derived[f"ps1_{b}_psf_minus_kron"]=pd.to_numeric(df[psf[b]],errors="coerce")-pd.to_numeric(df[kron[b]],errors="coerce")
+    ndet=ps1_col("nDetections")
+    if ndet:
+        derived["ps1_n_detections"]=pd.to_numeric(df[ndet],errors="coerce")
+
     if derived:
         df=pd.concat([df,pd.DataFrame(derived,index=df.index)],axis=1)
 
