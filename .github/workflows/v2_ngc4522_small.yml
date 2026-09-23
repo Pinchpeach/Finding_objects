@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'v2/scripts/collect_ngc4522_small.py'
+      - '.github/workflows/v2_ngc4522_small.yml'
 jobs:
   collect:
     runs-on: ubuntu-latest
