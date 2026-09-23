@@ -30,10 +30,14 @@ def query_sdss(per_class:int)->pd.DataFrame:
         url=SKY_URL+"?"+urllib.parse.urlencode({"cmd":sql,"format":"csv"})
         with urllib.request.urlopen(url,timeout=90) as resp:
             d=pd.read_csv(io.BytesIO(resp.read()))
+        # SkyServer column casing can vary by endpoint/release. Canonicalize
+        # immediately so all downstream identifiers are deterministic.
+        d.columns=[str(x).strip().lower() for x in d.columns]
+        if "specobjid" not in d.columns:
+            raise KeyError(f"SDSS response missing specobjid; got {list(d.columns)}")
         d["truth_class"]=cls; blocks.append(d)
     df=pd.concat(blocks,ignore_index=True)
-    idcol=next((c for c in df if c.lower()=="specobjid"),"specObjID")
-    df=df.drop_duplicates(idcol)
+    df=df.drop_duplicates("specobjid")
     return pd.concat([df[df["truth_class"].eq(c)].head(per_class) for c in CLASSES],ignore_index=True)
 
 def run(out_dir:Path,total:int=300):
@@ -41,7 +45,7 @@ def run(out_dir:Path,total:int=300):
     per=total//len(CLASSES); truth=query_sdss(per)
     if any((truth.truth_class==c).sum()!=per for c in CLASSES):
         raise RuntimeError("SDSS did not return enough clean labels for every class")
-    truth=truth.rename(columns={c:c.lower() for c in truth.columns})
+    truth.columns=[str(c).strip().lower() for c in truth.columns]
     truth["truth_source"]="SDSS_DR18_SPECTROSCOPY"
     truth["truth_quality"]="ZWARNING_0_SCIENCEPRIMARY"
     truth["benchmark_id"]=[f"TRD{i+1:06d}" for i in range(len(truth))]
