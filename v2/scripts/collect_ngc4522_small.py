@@ -1,6 +1,9 @@
 """Small NGC 4522 integration collection test."""
 from pathlib import Path
 import importlib.util, traceback
+import pandas as pd
+from astropy.coordinates import SkyCoord
+import astropy.units as u
 RA=188.4155
 DEC=9.1751
 RADIUS_ARCMIN=0.5
@@ -16,6 +19,5 @@ for name in modules:
  except Exception as e:
   summary.append({"collector":name,"status":"error","rows":0,"error":repr(e)})
   traceback.print_exc()
-import pandas as pd
 pd.DataFrame(summary).to_csv(OUT/"ngc4522_r0p5arcmin_summary.csv",index=False)
 print(pd.DataFrame(summary).to_string(index=False))
