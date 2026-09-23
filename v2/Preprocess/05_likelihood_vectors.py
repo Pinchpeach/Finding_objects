@@ -33,8 +33,14 @@ def run(evidence,out):
         elif conf<MIN_CONFIDENCE or margin<MIN_MARGIN: label="UNKNOWN"; status="LOW_CONFIDENCE"
         else: label=order[0]; status="CLASSIFIED"
         vectors.append(p); labels.append(label); confidence.append(conf); margins.append(margin); statuses.append(status)
-    for c in CLASSES: df[f"p_{c.lower()}"]=[v[c] for v in vectors]
-    df["primary_class"]=labels; df["primary_confidence"]=confidence; df["primary_margin"]=margins; df["classification_status"]=statuses
+    result_columns={f"p_{c.lower()}":[v[c] for v in vectors] for c in CLASSES}
+    result_columns.update({
+        "primary_class":labels,
+        "primary_confidence":confidence,
+        "primary_margin":margins,
+        "classification_status":statuses,
+    })
+    df=pd.concat([df,pd.DataFrame(result_columns,index=df.index)],axis=1)
     out.parent.mkdir(parents=True,exist_ok=True); df.to_csv(out,index=False)
     print(f"[OK] {len(df)} sources -> {out}"); return out
 def main():
