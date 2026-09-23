@@ -13,6 +13,8 @@ def sep_arcsec(ra1,de1,ra2,de2):
     dra=math.radians(ra2-ra1); d1=math.radians(de1); d2=math.radians(de2)
     a=math.sin((d2-d1)/2)**2+math.cos(d1)*math.cos(d2)*math.sin(dra/2)**2
     return math.degrees(2*math.asin(min(1,math.sqrt(a))))*3600
+def efferr(x):
+    return max(x,FLOOR_ARCSEC) if x is not None and x>0 else FLOOR_ARCSEC
 def poserr(row):
     vals=[]
     for a,b in (("ra_error","dec_error"),("raMeanErr","decMeanErr"),("errMaj","errMin")):
@@ -46,22 +48,24 @@ def run(raw_dir,out):
         for gi,g in enumerate(groups):
             if d["catalog"] in g["catalogs"]: continue
             s=sep_arcsec(d["ra"],d["dec"],g["ra"],g["dec"])
-            sigma=math.sqrt((d["poserr_arcsec"] or FLOOR_ARCSEC)**2+(g["err"] or FLOOR_ARCSEC)**2)
+            de=efferr(d["poserr_arcsec"]); ge=efferr(g["err"])
+            sigma=math.sqrt(de**2+ge**2)
             radius=min(MAX_RADIUS_ARCSEC,max(FLOOR_ARCSEC,SIGMA_LIMIT*sigma))
             if s<=radius: candidates.append((s/sigma,s,gi))
         candidates.sort(); ambiguous=len(candidates)>1 and candidates[1][0]<=candidates[0][0]*AMBIG_RATIO
         if candidates and not ambiguous:
             norm,s,gi=candidates[0]; g=groups[gi]; oid=g["id"]; n=g["n"]
             g["ra"]=(g["ra"]*n+d["ra"])/(n+1); g["dec"]=(g["dec"]*n+d["dec"])/(n+1)
-            g["n"]+=1; g["catalogs"].add(d["catalog"]); g["err"]=min(g["err"],d["poserr_arcsec"] or FLOOR_ARCSEC)
+            g["n"]+=1; g["catalogs"].add(d["catalog"]); g["err"]=min(efferr(g["err"]),efferr(d["poserr_arcsec"]))
             status="matched"; sep=s; score=norm
         else:
             oid=f"OBJ{len(groups)+1:06d}"; groups.append({"id":oid,"ra":d["ra"],"dec":d["dec"],"n":1,
-              "catalogs":{d["catalog"]},"err":d["poserr_arcsec"] or FLOOR_ARCSEC})
+              "catalogs":{d["catalog"]},"err":efferr(d["poserr_arcsec"])})
             status="ambiguous_new" if ambiguous else "new"; sep=candidates[0][1] if candidates else None
             score=candidates[0][0] if candidates else None
         records.append({**d,"object_id":oid,"association_status":status,"match_separation_arcsec":sep,
-          "normalized_separation":score,"candidate_count":len(candidates)})
+          "normalized_separation":score,"association_confidence":(math.exp(-0.5*score*score) if status=="matched" and score is not None else (1.0 if status=="new" else 0.0)),
+          "candidate_count":len(candidates)})
     out.parent.mkdir(parents=True,exist_ok=True); pd.DataFrame(records).to_csv(out,index=False)
     print(f"[OK] detections={len(records)} deduplicated={skipped} groups={len(groups)} -> {out}"); return out
 def main():
