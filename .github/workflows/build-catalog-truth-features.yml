@@ -1,5 +1,9 @@
 name: Build Catalog Truth Features
 on:
+  push:
+    paths:
+      - 'v2/benchmark/collect_catalog_truth.py'
+      - '.github/workflows/build-catalog-truth-features.yml'
   workflow_dispatch:
     inputs:
       limit_per_class:
