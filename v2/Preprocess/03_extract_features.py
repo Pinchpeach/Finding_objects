@@ -39,12 +39,18 @@ def run(objects:Path,rules_path:Path,out:Path)->Path:
         return pref if pref in df.columns else None
     psf={b:ps1_col(f"{b}MeanPSFMag") for b in ps1_bands}
     kron={b:ps1_col(f"{b}MeanKronMag") for b in ps1_bands}
+    def valid_ps1_mag(col):
+        s=pd.to_numeric(df[col],errors="coerce")
+        # PS1 uses sentinel/non-physical values (notably -999) for missing photometry.
+        return s.where((s>0)&(s<40))
+    psf_mag={b:(valid_ps1_mag(psf[b]) if psf[b] else None) for b in ps1_bands}
+    kron_mag={b:(valid_ps1_mag(kron[b]) if kron[b] else None) for b in ps1_bands}
     for b1,b2 in zip(ps1_bands,ps1_bands[1:]):
-        if psf[b1] and psf[b2]:
-            derived[f"ps1_{b1}_{b2}_color"]=pd.to_numeric(df[psf[b1]],errors="coerce")-pd.to_numeric(df[psf[b2]],errors="coerce")
+        if psf_mag[b1] is not None and psf_mag[b2] is not None:
+            derived[f"ps1_{b1}_{b2}_color"]=psf_mag[b1]-psf_mag[b2]
     for b in ps1_bands:
-        if psf[b] and kron[b]:
-            derived[f"ps1_{b}_psf_minus_kron"]=pd.to_numeric(df[psf[b]],errors="coerce")-pd.to_numeric(df[kron[b]],errors="coerce")
+        if psf_mag[b] is not None and kron_mag[b] is not None:
+            derived[f"ps1_{b}_psf_minus_kron"]=psf_mag[b]-kron_mag[b]
     ndet=ps1_col("nDetections")
     if ndet:
         derived["ps1_n_detections"]=pd.to_numeric(df[ndet],errors="coerce")
