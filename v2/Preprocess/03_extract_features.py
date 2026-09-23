@@ -19,16 +19,27 @@ def run(objects:Path,rules_path:Path,out:Path)->Path:
     required=set()
     for cell in rules["feature_columns"]:
         required.update(x for x in str(cell).split("|") if x)
-    # Derived quantities explicitly represented by current rules.
+    # Build all derived columns together, then concatenate once. This avoids
+    # repeated DataFrame.insert calls and fragmentation as feature count grows.
+    derived={}
     if {"parallax","parallax_error"}.issubset(df.columns):
-        df["parallax_snr"]=safe_div(df["parallax"].abs(),df["parallax_error"])
-        df["normalized_corrected_parallax"]=safe_div((pd.to_numeric(df["parallax"],errors="coerce")+0.017).abs(),df["parallax_error"])
+        derived["parallax_snr"]=safe_div(df["parallax"].abs(),df["parallax_error"])
+        derived["normalized_corrected_parallax"]=safe_div((pd.to_numeric(df["parallax"],errors="coerce")+0.017).abs(),df["parallax_error"])
     pm={"pmra","pmra_error","pmdec","pmdec_error"}
     if pm.issubset(df.columns):
         a=safe_div(df["pmra"],df["pmra_error"]); d=safe_div(df["pmdec"],df["pmdec_error"])
-        df["proper_motion_significance"]=np.sqrt(a*a+d*d)
-    df["rule_feature_coverage"]=df.apply(lambda r: sum(pd.notna(r.get(c)) for c in required),axis=1)
-    df["rule_feature_total"]=len(required)
+        derived["proper_motion_significance"]=np.sqrt(a*a+d*d)
+    if derived:
+        df=pd.concat([df,pd.DataFrame(derived,index=df.index)],axis=1)
+
+    available=[c for c in required if c in df.columns]
+    coverage=df[available].notna().sum(axis=1) if available else pd.Series(0,index=df.index)
+    metadata=pd.DataFrame({
+        "rule_feature_coverage":coverage.astype(int),
+        "rule_feature_total":len(required),
+    },index=df.index)
+    df=pd.concat([df,metadata],axis=1)
+
     out.parent.mkdir(parents=True,exist_ok=True); df.to_csv(out,index=False)
     print(f"[OK] required_features={len(required)} objects={len(df)} -> {out}"); return out
 
