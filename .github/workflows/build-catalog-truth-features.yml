@@ -12,6 +12,10 @@ on:
         default: ''
 jobs:
   collect:
+    strategy:
+      fail-fast: false
+      matrix:
+        catalog: [gaia_dr3, panstarrs1, allwise, twomass, galex, desi_legacy, nvss, first, lotss, vlass, chandra, xmm, erosita]
     runs-on: ubuntu-latest
     timeout-minutes: 180
     steps:
@@ -20,16 +24,18 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install pandas numpy requests astropy astroquery
-      - name: Cross-query catalogs
+      - name: Cross-query ${{ matrix.catalog }}
         run: |
           L="${{ github.event.inputs.limit_per_class }}"
           if [ -n "$L" ]; then
-            python v2/benchmark/collect_catalog_truth.py --limit-per-class "$L"
+            python v2/benchmark/collect_catalog_truth.py --catalog "${{ matrix.catalog }}" --workers 8 --limit-per-class "$L"
           else
-            python v2/benchmark/collect_catalog_truth.py
+            python v2/benchmark/collect_catalog_truth.py --catalog "${{ matrix.catalog }}" --workers 8
           fi
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: catalog-truth-features
+          name: catalog-truth-${{ matrix.catalog }}
           path: v2/benchmark/catalog_data/
+          if-no-files-found: warn
           retention-days: 14
