@@ -1,0 +1,21 @@
+name: NGC4522 weighted photometry spectroscopy classification
+on:
+  push:
+    paths: ['.github/NGC4522_WEIGHTED_REQUEST']
+jobs:
+  classify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 105
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: pip install -e .
+      - uses: actions/download-artifact@v4
+        with: {name: ngc4522-field10-final, path: results/ngc4522_field10, run-id: 35664933689, github-token: '${{ github.token }}'}
+      - uses: actions/download-artifact@v4
+        with: {name: ngc4522-final-v3, path: results/ngc4522_final, run-id: 35678178462, github-token: '${{ github.token }}'}
+      - run: timeout --signal=TERM 95m python scripts/ngc4522_weighted_fusion.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: ngc4522-weighted-classification, path: results/ngc4522_weighted, retention-days: 90}
