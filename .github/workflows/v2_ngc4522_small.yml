@@ -1,0 +1,31 @@
+name: v2 NGC4522 small collection
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'v2/scripts/collect_ngc4522_small.py'
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install pandas requests astropy astroquery
+      - run: python v2/scripts/collect_ngc4522_small.py
+      - name: Commit raw data
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add v2/rawdata
+          git diff --cached --quiet || git commit -m "Collect NGC4522 small-field raw data"
+          git push
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ngc4522-v2-small-rawdata
+          path: v2/rawdata/
