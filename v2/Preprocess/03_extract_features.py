@@ -51,9 +51,32 @@ def run(objects:Path,rules_path:Path,out:Path)->Path:
     for b in ps1_bands:
         if psf_mag[b] is not None and kron_mag[b] is not None:
             derived[f"ps1_{b}_psf_minus_kron"]=psf_mag[b]-kron_mag[b]
+    # Preserve uncertainty and per-band detection counts so later evidence
+    # rules can gate on measurement quality rather than colour alone.
+    for b in ps1_bands:
+        err_col=ps1_col(f"{b}MeanPSFMagErr")
+        n_col=ps1_col(f"n{b}")
+        if err_col:
+            err=pd.to_numeric(df[err_col],errors="coerce")
+            derived[f"ps1_{b}_psf_mag_err"]=err.where((err>0)&(err<5))
+        if n_col:
+            n=pd.to_numeric(df[n_col],errors="coerce")
+            derived[f"ps1_n_{b}"]=n.where(n>=0)
+
     ndet=ps1_col("nDetections")
     if ndet:
-        derived["ps1_n_detections"]=pd.to_numeric(df[ndet],errors="coerce")
+        n=pd.to_numeric(df[ndet],errors="coerce")
+        derived["ps1_n_detections"]=n.where(n>=0)
+
+    # Data-quality flags only. These do not imply an astronomical class.
+    # A band is usable when it has a physical PSF magnitude, a finite positive
+    # uncertainty, and at least one contributing detection.
+    for b in ps1_bands:
+        if psf_mag[b] is None: continue
+        err=derived.get(f"ps1_{b}_psf_mag_err")
+        n=derived.get(f"ps1_n_{b}")
+        if err is not None and n is not None:
+            derived[f"ps1_{b}_photometry_valid"]=(psf_mag[b].notna()&err.notna()&(n>0)).astype("Int64")
 
     if derived:
         df=pd.concat([df,pd.DataFrame(derived,index=df.index)],axis=1)
