@@ -1,4 +1,4 @@
-"""Small NGC 4522 integration collection test."""
+"""Small NGC 4522 integration collection test. Retriggered after syntax fix."""
 from pathlib import Path
 import importlib.util, traceback
 import pandas as pd
