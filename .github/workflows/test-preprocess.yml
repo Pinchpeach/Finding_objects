@@ -1,0 +1,49 @@
+name: Test Preprocess Pipeline
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "v2/Preprocess/**"
+      - ".github/workflows/test-preprocess.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  preprocess:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: python -m pip install --upgrade pip pandas numpy
+      - name: Run pipeline
+        working-directory: v2/Preprocess
+        run: python control.py
+      - name: Show summary
+        if: always()
+        working-directory: v2/Preprocess
+        run: |
+          echo "=== preprocess_summary.csv ==="
+          cat preprocess_summary.csv || true
+          echo "=== output sizes ==="
+          wc -l source_association.csv integrated_objects.csv features.csv evidence.csv likelihood_vectors.csv 2>/dev/null || true
+      - name: Upload pipeline outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: preprocess-results
+          if-no-files-found: warn
+          path: |
+            v2/Preprocess/preprocess_summary.csv
+            v2/Preprocess/source_association.csv
+            v2/Preprocess/integrated_objects.csv
+            v2/Preprocess/features.csv
+            v2/Preprocess/evidence.csv
+            v2/Preprocess/likelihood_vectors.csv
