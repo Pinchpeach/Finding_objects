@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - 'v2/benchmark/collect_catalog_truth.py'
+      - 'v2/benchmark/validate_catalog_truth.py'
       - 'v2/Get_data/*.py'
       - '.github/workflows/build-catalog-truth-features.yml'
   workflow_dispatch:
@@ -39,4 +40,24 @@ jobs:
           name: catalog-truth-${{ matrix.catalog }}
           path: v2/benchmark/catalog_data/
           if-no-files-found: warn
+          retention-days: 14
+  validate:
+    needs: collect
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pandas numpy
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: catalog-truth-*
+          path: v2/benchmark/downloaded_catalogs
+      - name: Validate catalog truth products
+        run: python v2/benchmark/validate_catalog_truth.py --truth v2/benchmark/truth_data/ground_truth.csv --catalog-root v2/benchmark/downloaded_catalogs --out v2/benchmark/benchmark_ready
+      - uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-ready
+          path: v2/benchmark/benchmark_ready/
           retention-days: 14
