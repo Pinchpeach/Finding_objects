@@ -16,8 +16,8 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install pandas
-      - name: Build 300-object balanced truth seeds
-        run: python v2/benchmark/build_truth_sets.py --total 300
+      - name: Build 999-object balanced truth seeds
+        run: python v2/benchmark/build_truth_sets.py --total 999
       - name: Validate balance and filenames
         run: |
           python - <<'PY'
@@ -25,14 +25,14 @@ jobs:
           from pathlib import Path
           p=Path("v2/benchmark/truth_data")
           g=pd.read_csv(p/"ground_truth.csv")
-          assert len(g)==300
-          assert g.truth_class.value_counts().to_dict()=={"STAR":100,"GALAXY":100,"QSO":100}
+          assert len(g)==999
+          assert g.truth_class.value_counts().to_dict()=={"STAR":333,"GALAXY":333,"QSO":333}
           fs=list(p.glob("*_trd.csv"))
           assert len(fs)==14, [x.name for x in fs]
           for f in fs:
               d=pd.read_csv(f)
-              assert len(d)==300
-              assert d.truth_class.value_counts().to_dict()=={"STAR":100,"GALAXY":100,"QSO":100}
+              assert len(d)==999
+              assert d.truth_class.value_counts().to_dict()=={"STAR":333,"GALAXY":333,"QSO":333}
           print("validated",len(fs),"catalog seed files")
           PY
       - name: Commit truth data
