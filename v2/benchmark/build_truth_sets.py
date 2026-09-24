@@ -43,7 +43,7 @@ def query_sdss(per_class:int)->pd.DataFrame:
     df=df.drop_duplicates("specobjid")
     return pd.concat([df[df["truth_class"].eq(c)].head(per_class) for c in CLASSES],ignore_index=True)
 
-def run(out_dir:Path,total:int=300):
+def run(out_dir:Path,total:int=999):
     if total%len(CLASSES): raise ValueError("total must be divisible by 3")
     per=total//len(CLASSES); truth=query_sdss(per)
     if any((truth.truth_class==c).sum()!=per for c in CLASSES):
@@ -66,5 +66,5 @@ def run(out_dir:Path,total:int=300):
 
 def main():
     p=argparse.ArgumentParser(); p.add_argument("--out-dir",type=Path,default=Path(__file__).resolve().parent/"truth_data")
-    p.add_argument("--total",type=int,default=300); a=p.parse_args(); run(a.out_dir,a.total)
+    p.add_argument("--total",type=int,default=999); a=p.parse_args(); run(a.out_dir,a.total)
 if __name__=="__main__": main()
