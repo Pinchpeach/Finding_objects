@@ -7,7 +7,7 @@ seed independent catalog lookups.  Truth columns must never be passed to the
 classifier as features.
 """
 from __future__ import annotations
-import argparse,io,urllib.parse,urllib.request
+import argparse,io,time,urllib.parse,urllib.request
 from pathlib import Path
 import pandas as pd
 
@@ -16,23 +16,33 @@ CATALOGS=("gaia_dr3","panstarrs1","allwise","twomass","galex","sdss_dr18",
           "desi_legacy","nvss","first","lotss","vlass","chandra","xmm","erosita")
 SKY_URL="https://skyserver.sdss.org/dr18/SkyServerWS/SearchTools/SqlSearch"
 
+def _fetch_csv(sql:str,retries:int=5,timeout:int=180)->pd.DataFrame:
+    url=SKY_URL+"?"+urllib.parse.urlencode({"cmd":sql,"format":"csv"})
+    last=None
+    for attempt in range(retries):
+        try:
+            with urllib.request.urlopen(url,timeout=timeout) as resp:
+                raw=resp.read()
+            return pd.read_csv(io.BytesIO(raw),comment="#")
+        except Exception as e:
+            last=e
+            if attempt+1<retries:
+                time.sleep(min(30,2**attempt*2))
+    raise RuntimeError(f"SDSS query failed after {retries} attempts: {last}")
+
 def query_sdss(per_class:int)->pd.DataFrame:
     blocks=[]
     # Deterministic, spatially spread sample. TOP is deliberately larger than
     # requested so deduplication/quality filtering still leaves the quota.
     for cls in CLASSES:
-        sql=f"""SELECT TOP {per_class*3} s.specObjID,s.bestObjID,s.ra,s.dec,
+        sql=f"""SELECT TOP {per_class+80} s.specObjID,s.bestObjID,s.ra,s.dec,
  s.class,s.subClass,s.z,s.zErr,s.zWarning,s.plate,s.mjd,s.fiberID
  FROM SpecObj AS s
  WHERE s.class='{cls}' AND s.zWarning=0
    AND s.sciencePrimary=1 AND s.ra IS NOT NULL AND s.dec IS NOT NULL
  ORDER BY s.specObjID"""
-        url=SKY_URL+"?"+urllib.parse.urlencode({"cmd":sql,"format":"csv"})
-        with urllib.request.urlopen(url,timeout=90) as resp:
-            raw=resp.read()
-        # SkyServer CSV begins with a '#Table1' marker line.  Skip comment
-        # metadata rather than interpreting it as the CSV header.
-        d=pd.read_csv(io.BytesIO(raw),comment="#")
+        # Retry transient SkyServer timeouts instead of failing the whole build.
+        d=_fetch_csv(sql)
         # SkyServer column casing can vary by endpoint/release. Canonicalize
         # immediately so all downstream identifiers are deterministic.
         d.columns=[str(x).strip().lower() for x in d.columns]
