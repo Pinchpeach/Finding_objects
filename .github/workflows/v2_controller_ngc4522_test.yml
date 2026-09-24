@@ -25,6 +25,8 @@ jobs:
   collect:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      CONTROLLER_OUT: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && 'v2/rawdata' || 'v2/controller_test_output' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -35,29 +37,33 @@ jobs:
       - name: Test chunk coverage and failure isolation
         run: python -m unittest discover -s v2/tests -v
       - name: Collect NGC4522 in chunks
-        run: python -u v2/Get_data/controller.py --ra 188.4155 --dec 9.1751 --radius 0.5 --chunk-radius 0.36 --out-dir v2/controller_test_output
+        run: python -u v2/Get_data/controller.py --ra 188.4155 --dec 9.1751 --radius 0.5 --chunk-radius 0.36 --out-dir "$CONTROLLER_OUT"
       - name: Verify live collection summary
         run: |
           python - <<'PY'
           from pathlib import Path
+          import os
           import pandas as pd
-          summary = pd.read_csv(next(Path('v2/controller_test_output').glob('collection_summary_*.csv')))
+          from astropy.coordinates import SkyCoord
+          import astropy.units as u
+          summary = pd.read_csv(Path(os.environ['CONTROLLER_OUT']) / 'collection_summary_ra188p4155_dec9p1751_r0p5arcmin.csv')
           assert len(summary) == 19
           assert (summary.chunks_planned > 1).all()
           assert (summary.chunks_attempted == summary.chunks_planned).all()
           assert (summary.chunks_succeeded + summary.chunks_failed == summary.chunks_attempted).all()
-          assert summary.status.isin(['ok', 'partial']).any(), summary.to_string()
+          assert (summary.status.isin(['ok', 'partial']) & (summary.rows > 0)).any(), summary.to_string()
           for row in summary.itertuples():
               if pd.notna(row.output_file):
                   data = pd.read_csv(Path('v2') / row.output_file, dtype={'catalog_object_id': str})
                   assert len(data) == row.rows
                   assert not data.dropna(subset=['catalog_object_id']).duplicated(['catalog', 'catalog_object_id']).any()
+                  points = SkyCoord(data.ra.to_numpy() * u.deg, data.dec.to_numpy() * u.deg)
+                  assert (SkyCoord(188.4155 * u.deg, 9.1751 * u.deg).separation(points).arcmin <= 0.5 + 1e-8).all()
           print(summary.to_string(index=False))
           PY
       - name: Commit controller test data
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         run: |
-          cp v2/controller_test_output/*.csv v2/rawdata/
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add v2/rawdata
@@ -70,4 +76,4 @@ jobs:
         if: always()
         with:
           name: v2-controller-ngc4522-test
-          path: v2/controller_test_output/
+          path: ${{ env.CONTROLLER_OUT }}/
