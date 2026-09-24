@@ -13,9 +13,15 @@ def split_for(bid:str)->str:
 def main():
     p=argparse.ArgumentParser(); p.add_argument("--truth",type=Path,required=True); p.add_argument("--catalog-root",type=Path,required=True); p.add_argument("--out",type=Path,required=True); a=p.parse_args()
     truth=pd.read_csv(a.truth); a.out.mkdir(parents=True,exist_ok=True)
-    assert len(truth)==300 and set(truth.truth_class)==set(CLASSES)
+    if len(truth)==0 or set(truth.truth_class)!=set(CLASSES):
+        raise AssertionError("truth set must be non-empty and contain exactly STAR/GALAXY/QSO")
     assert truth.benchmark_id.is_unique
-    assert truth.truth_class.value_counts().to_dict()=={c:100 for c in CLASSES}
+    counts=truth.truth_class.value_counts().to_dict()
+    if len(set(counts.values())) != 1:
+        raise AssertionError(f"truth classes must be balanced; got {counts}")
+    expected_per_class=len(truth)//len(CLASSES)
+    if len(truth)%len(CLASSES) or counts!={c:expected_per_class for c in CLASSES}:
+        raise AssertionError(f"truth set size/classes inconsistent; rows={len(truth)}, counts={counts}")
     manifest=truth[["benchmark_id","truth_class","ra","dec"]].copy(); manifest["split"]=manifest.benchmark_id.map(split_for)
     reports=[]; problems=[]
     files=sorted(a.catalog_root.rglob("*_trd.csv"))
