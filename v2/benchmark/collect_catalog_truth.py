@@ -43,69 +43,64 @@ def query_one(mod,name,radius,t):
  except Exception as e: return "error",None,repr(e)
 
 def run_gaia(truth,out_dir):
- from astroquery.gaia import Gaia
+ from astroquery.xmatch import XMatch
  from astropy.table import Table
+ import astropy.units as u
  mod=load("gaia_dr3")
- # Server-side upload join avoids both ~1000 serial cones and a giant OR clause.
- # First retrieve only source ids/positions, choose the nearest match locally,
- # then fetch the wider Gaia feature payload by source_id in bounded chunks.
+ # Gaia Archive can be unstable during DR4 preparation.  For benchmark
+ # crossmatching use the CDS/VizieR mirror of the Gaia DR3 main-source table,
+ # which supports a single bulk XMatch for all truth coordinates.
  upload=truth[["benchmark_id","ra","dec"]].rename(columns={"ra":"truth_ra","dec":"truth_dec"}).copy()
- ut=Table.from_pandas(upload)
- radius_deg=MATCH_ARCSEC["gaia_dr3"]/3600.0
- q=f"""SELECT t.benchmark_id,t.truth_ra,t.truth_dec,g.source_id,g.ra,g.dec
- FROM tap_upload.truth AS t
- JOIN gaiadr3.gaia_source AS g
- ON 1=CONTAINS(POINT('ICRS',g.ra,g.dec),CIRCLE('ICRS',t.truth_ra,t.truth_dec,{radius_deg}))"""
  try:
-  cand=Gaia.launch_job_async(q,upload_resource=ut,upload_table_name="truth").get_results().to_pandas()
+  xm=XMatch.query(cat1=Table.from_pandas(upload),cat2="vizier:I/355/gaiadr3",
+                  max_distance=MATCH_ARCSEC["gaia_dr3"]*u.arcsec,
+                  colRA1="truth_ra",colDec1="truth_dec").to_pandas()
  except Exception as e:
-  print(f"[gaia_dr3] upload crossmatch ERROR {e!r}",flush=True)
-  cand=pd.DataFrame()
- if cand.empty:
+  print(f"[gaia_dr3] CDS XMatch ERROR {e!r}",flush=True)
   out=pd.DataFrame(columns=["benchmark_id","truth_class"]); out.to_csv(out_dir/"gaia_dr3_trd.csv",index=False)
   return {"catalog":"gaia_dr3","targets":len(truth),"matched":0,"empty":len(truth),"errors":1,"STAR":0,"GALAXY":0,"QSO":0}
-
- cand["_sep_arcsec"]=sep_arcsec(pd.to_numeric(cand["truth_ra"],errors="coerce").to_numpy(),
-   pd.to_numeric(cand["truth_dec"],errors="coerce").to_numpy(),
-   pd.to_numeric(cand["ra"],errors="coerce").to_numpy(),
-   pd.to_numeric(cand["dec"],errors="coerce").to_numpy())
- cand=cand.sort_values(["benchmark_id","_sep_arcsec"]).drop_duplicates("benchmark_id",keep="first")
- ids=[str(int(x)) for x in pd.to_numeric(cand["source_id"],errors="coerce").dropna().astype("int64").unique()]
- select=[f"g.{c}" for c in mod.BASE]+[f"ap.{c}" for c in mod.DSC]+["vc.best_class_name","vc.best_class_score"]
- detail=[]; errors=0
- for i in range(0,len(ids),100):
-  chunk=ids[i:i+100]
-  dq=f"""SELECT {','.join(select)}
-  FROM gaiadr3.gaia_source AS g
-  LEFT OUTER JOIN gaiadr3.astrophysical_parameters AS ap ON g.source_id=ap.source_id
-  LEFT OUTER JOIN gaiadr3.vari_classifier_result AS vc ON g.source_id=vc.source_id
-  WHERE g.source_id IN ({','.join(chunk)})"""
-  got=None
-  for attempt in range(4):
-   try:
-    got=Gaia.launch_job_async(dq).get_results().to_pandas(); break
-   except Exception as e:
-    if attempt==3:
-     errors+=1; print(f"[gaia_dr3] detail chunk {i//100+1} ERROR {e!r}",flush=True)
-    else: time.sleep(2**attempt)
-  if got is not None and len(got): detail.append(got)
- allg=pd.concat(detail,ignore_index=True).drop_duplicates("source_id") if detail else pd.DataFrame()
- if allg.empty:
+ if xm.empty:
   out=pd.DataFrame(columns=["benchmark_id","truth_class"]); out.to_csv(out_dir/"gaia_dr3_trd.csv",index=False)
-  return {"catalog":"gaia_dr3","targets":len(truth),"matched":0,"empty":len(truth),"errors":max(1,errors),"STAR":0,"GALAXY":0,"QSO":0}
+  return {"catalog":"gaia_dr3","targets":len(truth),"matched":0,"empty":len(truth),"errors":0,"STAR":0,"GALAXY":0,"QSO":0}
 
- allg.insert(0,"catalog",mod.CATALOG)
- allg.insert(1,"catalog_object_id",allg["source_id"].astype("Int64").astype(str))
- allg.insert(2,"object_name",allg["designation"].astype(str))
- merged=cand[["benchmark_id","source_id","_sep_arcsec"]].merge(allg,on="source_id",how="inner")
- meta=truth[["benchmark_id","truth_class","truth_source","ra","dec"]].rename(columns={"ra":"truth_ra","dec":"truth_dec"})
- out=meta.merge(merged,on="benchmark_id",how="inner")
- out.insert(5,"match_threshold_arcsec",MATCH_ARCSEC["gaia_dr3"])
+ # Normalize VizieR Gaia DR3 column names to the same schema used by the native
+ # Gaia collector.  Missing optional fields remain NaN rather than being forged.
+ mp={
+  "Source":"source_id","RA_ICRS":"ra","DE_ICRS":"dec","e_RA_ICRS":"ra_error","e_DE_ICRS":"dec_error",
+  "Plx":"parallax","e_Plx":"parallax_error","pmRA":"pmra","e_pmRA":"pmra_error","pmDE":"pmdec","e_pmDE":"pmdec_error",
+  "RUWE":"ruwe","FG":"phot_g_mean_flux","e_FG":"phot_g_mean_flux_error","Gmag":"phot_g_mean_mag",
+  "FBP":"phot_bp_mean_flux","e_FBP":"phot_bp_mean_flux_error","BPmag":"phot_bp_mean_mag",
+  "FRP":"phot_rp_mean_flux","e_FRP":"phot_rp_mean_flux_error","RPmag":"phot_rp_mean_mag","BP-RP":"bp_rp",
+  "RV":"radial_velocity","e_RV":"radial_velocity_error","Teff":"teff_gspphot","logg":"logg_gspphot"
+ }
+ for old,new in mp.items():
+  if old in xm.columns and new not in xm.columns: xm=xm.rename(columns={old:new})
+ if "source_id" not in xm.columns:
+  raise KeyError(f"Gaia VizieR XMatch missing source identifier; columns={list(xm.columns)}")
+ if "ra" not in xm.columns or "dec" not in xm.columns:
+  raise KeyError(f"Gaia VizieR XMatch missing coordinates; columns={list(xm.columns)}")
+ if "angDist" in xm.columns:
+  xm["_sep_arcsec"]=pd.to_numeric(xm["angDist"],errors="coerce")
+ else:
+  xm["_sep_arcsec"]=sep_arcsec(pd.to_numeric(xm["truth_ra"],errors="coerce").to_numpy(),
+    pd.to_numeric(xm["truth_dec"],errors="coerce").to_numpy(),
+    pd.to_numeric(xm["ra"],errors="coerce").to_numpy(),pd.to_numeric(xm["dec"],errors="coerce").to_numpy())
+ xm=xm[np.isfinite(pd.to_numeric(xm["_sep_arcsec"],errors="coerce"))]
+ xm=xm[pd.to_numeric(xm["_sep_arcsec"],errors="coerce")<=MATCH_ARCSEC["gaia_dr3"]]
+ xm=xm.sort_values(["benchmark_id","_sep_arcsec"]).drop_duplicates("benchmark_id",keep="first")
+ xm.insert(0,"catalog",mod.CATALOG)
+ xm.insert(1,"catalog_object_id",pd.to_numeric(xm["source_id"],errors="coerce").astype("Int64").astype(str))
+ xm.insert(2,"object_name","Gaia DR3 "+xm["catalog_object_id"].astype(str))
+ meta=truth[["benchmark_id","truth_class","truth_source","ra","dec"]].rename(columns={"ra":"truth_ra_meta","dec":"truth_dec_meta"})
+ out=meta.merge(xm,on="benchmark_id",how="inner")
+ # Keep the benchmark truth coordinates in canonical columns.
+ out["truth_ra"]=out.pop("truth_ra_meta"); out["truth_dec"]=out.pop("truth_dec_meta")
+ out["match_threshold_arcsec"]=MATCH_ARCSEC["gaia_dr3"]
  out=out.sort_values("benchmark_id")
  out.to_csv(out_dir/"gaia_dr3_trd.csv",index=False)
  counts=out.truth_class.value_counts().to_dict(); ok=len(out)
- print(f"[gaia_dr3] targets={len(truth)} matched={ok} empty={len(truth)-ok} detail_errors={errors}",flush=True)
- return {"catalog":"gaia_dr3","targets":len(truth),"matched":ok,"empty":len(truth)-ok,"errors":errors,
+ print(f"[gaia_dr3] CDS targets={len(truth)} matched={ok} empty={len(truth)-ok}",flush=True)
+ return {"catalog":"gaia_dr3","targets":len(truth),"matched":ok,"empty":len(truth)-ok,"errors":0,
          "STAR":counts.get("STAR",0),"GALAXY":counts.get("GALAXY",0),"QSO":counts.get("QSO",0)}
 
 def run_catalog(name,truth,out_dir,workers):
