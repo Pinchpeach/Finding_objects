@@ -5,6 +5,7 @@ on:
       - 'v2/benchmark/collect_catalog_truth.py'
       - 'v2/benchmark/truth_data/ground_truth.csv'
       - 'v2/benchmark/validate_catalog_truth.py'
+      - 'v2/benchmark/train_validate_classifier.py'
       - 'v2/Get_data/*.py'
       - '.github/workflows/build-catalog-truth-features.yml'
   workflow_dispatch:
@@ -26,7 +27,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install pandas numpy requests astropy astroquery
+      - run: pip install pandas numpy scikit-learn joblib requests astropy astroquery
       - name: Cross-query ${{ matrix.catalog }}
         run: |
           L="${{ github.event.inputs.limit_per_class }}"
@@ -57,6 +58,8 @@ jobs:
           path: v2/benchmark/downloaded_catalogs
       - name: Validate catalog truth products
         run: python v2/benchmark/validate_catalog_truth.py --truth v2/benchmark/truth_data/ground_truth.csv --catalog-root v2/benchmark/downloaded_catalogs --out v2/benchmark/benchmark_ready
+      - name: Train and evaluate calibrated multi-survey classifier
+        run: python v2/benchmark/train_validate_classifier.py --truth v2/benchmark/truth_data/ground_truth.csv --catalog-root v2/benchmark/downloaded_catalogs --manifest v2/benchmark/benchmark_ready/benchmark_manifest.csv --out v2/benchmark/benchmark_ready/model_eval
       - uses: actions/upload-artifact@v4
         with:
           name: benchmark-ready
