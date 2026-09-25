@@ -42,4 +42,6 @@ jobs:
           git add v2/benchmark/truth_data
           git diff --cached --quiet && exit 0
           git commit -m "Add balanced SDSS ground-truth benchmark seeds"
+          git fetch origin main
+          git rebase origin/main
           git push
