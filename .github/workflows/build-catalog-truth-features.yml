@@ -6,6 +6,7 @@ on:
       - 'v2/benchmark/truth_data/ground_truth.csv'
       - 'v2/benchmark/validate_catalog_truth.py'
       - 'v2/benchmark/train_validate_classifier.py'
+      - 'v2/benchmark/evaluate_rule_baseline.py'
       - 'v2/Get_data/*.py'
       - '.github/workflows/build-catalog-truth-features.yml'
   workflow_dispatch:
@@ -58,6 +59,8 @@ jobs:
           path: v2/benchmark/downloaded_catalogs
       - name: Validate catalog truth products
         run: python v2/benchmark/validate_catalog_truth.py --truth v2/benchmark/truth_data/ground_truth.csv --catalog-root v2/benchmark/downloaded_catalogs --out v2/benchmark/benchmark_ready
+      - name: Evaluate current rule classifier baseline
+        run: python v2/benchmark/evaluate_rule_baseline.py --truth v2/benchmark/truth_data/ground_truth.csv --catalog-root v2/benchmark/downloaded_catalogs --manifest v2/benchmark/benchmark_ready/benchmark_manifest.csv --out v2/benchmark/benchmark_ready/model_eval
       - name: Train and evaluate calibrated multi-survey classifier
         run: python v2/benchmark/train_validate_classifier.py --truth v2/benchmark/truth_data/ground_truth.csv --catalog-root v2/benchmark/downloaded_catalogs --manifest v2/benchmark/benchmark_ready/benchmark_manifest.csv --out v2/benchmark/benchmark_ready/model_eval
       - uses: actions/upload-artifact@v4
