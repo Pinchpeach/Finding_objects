@@ -37,9 +37,14 @@ def _normalize_sdss(d:pd.DataFrame)->pd.DataFrame:
     return d
 
 def query_first_radio(per_class:int)->pd.DataFrame:
-    """Return a bounded radio-selected supplement using the SDSS-FIRST match table."""
+    """Return a bounded radio-selected supplement using the SDSS-FIRST match table.
+
+    We request the same cap for STAR/GALAXY/QSO but keep however many clean
+    spectra actually exist; the general SDSS pool fills any shortfall.  This
+    avoids manufacturing radio-detected stars while reducing selection bias.
+    """
     blocks=[]
-    for cls in ("GALAXY","QSO"):
+    for cls in CLASSES:
         sql=f"""SELECT TOP {per_class*3} s.specObjID,s.bestObjID,s.ra,s.dec,
  s.class,s.subClass,s.z,s.zErr,s.zWarning,s.plate,s.mjd,s.fiberID
  FROM SpecObj AS s
@@ -82,7 +87,7 @@ def query_sdss(per_class:int,radio_per_extragalactic:int=50)->pd.DataFrame:
 
 def run(out_dir:Path,total:int=999):
     if total%len(CLASSES): raise ValueError("total must be divisible by 3")
-    per=total//len(CLASSES); truth=query_sdss(per,radio_per_extragalactic=min(50,per//3))
+    per=total//len(CLASSES); truth=query_sdss(per,radio_per_extragalactic=min(30,per//4))
     if any((truth.truth_class==c).sum()!=per for c in CLASSES):
         raise RuntimeError("SDSS did not return enough clean labels for every class")
     truth.columns=[str(c).strip().lower() for c in truth.columns]
