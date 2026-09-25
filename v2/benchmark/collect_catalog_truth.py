@@ -46,20 +46,35 @@ def run_gaia(truth,out_dir):
  from astroquery.gaia import Gaia
  mod=load("gaia_dr3"); radius=RADII["gaia_dr3"]/60.0
  select=[f"g.{c}" for c in mod.BASE]+[f"ap.{c}" for c in mod.DSC]+["vc.best_class_name","vc.best_class_score"]
- cones=[f"1=CONTAINS(POINT('ICRS',g.ra,g.dec),CIRCLE('ICRS',{float(t.ra)},{float(t.dec)},{radius}))" for _,t in truth.iterrows()]
- q=f"SELECT {','.join(select)} FROM gaiadr3.gaia_source AS g LEFT OUTER JOIN gaiadr3.astrophysical_parameters AS ap ON g.source_id=ap.source_id LEFT OUTER JOIN gaiadr3.vari_classifier_result AS vc ON g.source_id=vc.source_id WHERE " + " OR ".join(cones)
- try: allg=Gaia.launch_job_async(q).get_results().to_pandas()
- except Exception as e: print(f"[gaia_dr3] batch ERROR {e!r}",flush=True); allg=pd.DataFrame()
+ # A single OR expression with ~1000 cones is too large/fragile for Gaia TAP.
+ # Query in bounded chunks and merge the results instead.
+ parts=[]; chunk_size=40; batch_errors=0
+ for i in range(0,len(truth),chunk_size):
+  chunk=truth.iloc[i:i+chunk_size]
+  cones=[f"1=CONTAINS(POINT('ICRS',g.ra,g.dec),CIRCLE('ICRS',{float(t.ra)},{float(t.dec)},{radius}))" for _,t in chunk.iterrows()]
+  q=f"SELECT {','.join(select)} FROM gaiadr3.gaia_source AS g LEFT OUTER JOIN gaiadr3.astrophysical_parameters AS ap ON g.source_id=ap.source_id LEFT OUTER JOIN gaiadr3.vari_classifier_result AS vc ON g.source_id=vc.source_id WHERE " + " OR ".join(cones)
+  got=None
+  for attempt in range(4):
+   try:
+    got=Gaia.launch_job_async(q).get_results().to_pandas(); break
+   except Exception as e:
+    if attempt==3:
+     batch_errors+=1; print(f"[gaia_dr3] chunk {i//chunk_size+1} ERROR {e!r}",flush=True)
+    else:
+     time.sleep(2**attempt)
+  if got is not None and len(got): parts.append(got)
+ allg=pd.concat(parts,ignore_index=True).drop_duplicates("source_id") if parts else pd.DataFrame()
  rows=[]
- if len(allg): allg.insert(0,"catalog",mod.CATALOG); allg.insert(1,"catalog_object_id",allg["source_id"].astype("Int64").astype(str)); allg.insert(2,"object_name",allg["designation"].astype(str))
+ if len(allg):
+  allg.insert(0,"catalog",mod.CATALOG); allg.insert(1,"catalog_object_id",allg["source_id"].astype("Int64").astype(str)); allg.insert(2,"object_name",allg["designation"].astype(str))
  for _,t in truth.iterrows():
   if allg.empty: continue
   s=sep_arcsec(float(t.ra),float(t.dec),pd.to_numeric(allg.ra,errors="coerce").to_numpy(),pd.to_numeric(allg.dec,errors="coerce").to_numpy()); idx=np.where(np.isfinite(s) & (s <= MATCH_ARCSEC["gaia_dr3"]))[0]
   if not len(idx): continue
   k=idx[np.argmin(s[idx])]; d=allg.iloc[[k]].copy(); d["_sep_arcsec"]=float(s[k]); d.insert(0,"benchmark_id",t.benchmark_id); d.insert(1,"truth_class",t.truth_class); d.insert(2,"truth_source",t.truth_source); d.insert(3,"truth_ra",t.ra); d.insert(4,"truth_dec",t.dec); d.insert(5,"match_threshold_arcsec",MATCH_ARCSEC["gaia_dr3"]); rows.append(d)
  out=pd.concat(rows,ignore_index=True) if rows else pd.DataFrame(columns=["benchmark_id","truth_class"]); out.to_csv(out_dir/"gaia_dr3_trd.csv",index=False); counts=out.truth_class.value_counts().to_dict() if len(out) else {}; ok=len(out)
- print(f"[gaia_dr3] targets={len(truth)} matched={ok} empty={len(truth)-ok}",flush=True)
- return {"catalog":"gaia_dr3","targets":len(truth),"matched":ok,"empty":len(truth)-ok,"errors":0,"STAR":counts.get("STAR",0),"GALAXY":counts.get("GALAXY",0),"QSO":counts.get("QSO",0)}
+ print(f"[gaia_dr3] targets={len(truth)} matched={ok} empty={len(truth)-ok} chunk_errors={batch_errors}",flush=True)
+ return {"catalog":"gaia_dr3","targets":len(truth),"matched":ok,"empty":len(truth)-ok,"errors":batch_errors,"STAR":counts.get("STAR",0),"GALAXY":counts.get("GALAXY",0),"QSO":counts.get("QSO",0)}
 
 def run_catalog(name,truth,out_dir,workers):
  if name=="gaia_dr3": return run_gaia(truth,out_dir)
