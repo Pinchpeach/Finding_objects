@@ -66,7 +66,7 @@ def run_gaia(truth,out_dir):
  # Normalize VizieR Gaia DR3 column names to the same schema used by the native
  # Gaia collector.  Missing optional fields remain NaN rather than being forged.
  mp={
-  "Source":"source_id","RA_ICRS":"ra","DE_ICRS":"dec","e_RA_ICRS":"ra_error","e_DE_ICRS":"dec_error",
+  "Source":"source_id","RA_ICRS":"ra","DE_ICRS":"dec","RAdeg":"ra","DEdeg":"dec","e_RA_ICRS":"ra_error","e_DE_ICRS":"dec_error",
   "Plx":"parallax","e_Plx":"parallax_error","pmRA":"pmra","e_pmRA":"pmra_error","pmDE":"pmdec","e_pmDE":"pmdec_error",
   "RUWE":"ruwe","FG":"phot_g_mean_flux","e_FG":"phot_g_mean_flux_error","Gmag":"phot_g_mean_mag",
   "FBP":"phot_bp_mean_flux","e_FBP":"phot_bp_mean_flux_error","BPmag":"phot_bp_mean_mag",
