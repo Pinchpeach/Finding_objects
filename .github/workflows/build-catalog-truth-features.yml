@@ -1,6 +1,6 @@
 name: Build Catalog Truth Features
 env:
-  BENCHMARK_TARGET_SIZE: '3000'
+  BENCHMARK_TARGET_SIZE: '9999'
 on:
   push:
     paths:
