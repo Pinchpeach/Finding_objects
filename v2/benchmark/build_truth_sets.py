@@ -85,7 +85,7 @@ def query_sdss(per_class:int,radio_per_extragalactic:int=50)->pd.DataFrame:
     df=pd.concat(blocks,ignore_index=True).drop_duplicates("specobjid")
     return pd.concat([df[df["truth_class"].eq(c)].head(per_class) for c in CLASSES],ignore_index=True)
 
-def run(out_dir:Path,total:int=999):
+def run(out_dir:Path,total:int=3000):
     if total%len(CLASSES): raise ValueError("total must be divisible by 3")
     per=total//len(CLASSES); truth=query_sdss(per,radio_per_extragalactic=min(30,per//4))
     if any((truth.truth_class==c).sum()!=per for c in CLASSES):
@@ -110,5 +110,5 @@ def run(out_dir:Path,total:int=999):
 
 def main():
     p=argparse.ArgumentParser(); p.add_argument("--out-dir",type=Path,default=Path(__file__).resolve().parent/"truth_data")
-    p.add_argument("--total",type=int,default=999); a=p.parse_args(); run(a.out_dir,a.total)
+    p.add_argument("--total",type=int,default=3000); a=p.parse_args(); run(a.out_dir,a.total)
 if __name__=="__main__": main()
