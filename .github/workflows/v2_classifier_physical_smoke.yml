@@ -1,0 +1,24 @@
+name: v2 classifier physical smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'v2/Classifier/axes/physical.py'
+      - 'v2/Classifier/branches/star.py'
+      - 'v2/Classifier/branches/evolved_star.py'
+      - 'v2/Classifier/tests/test_physical_axis.py'
+      - '.github/workflows/v2_classifier_physical_smoke.yml'
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run physical-axis smoke test
+        run: python -u v2/Classifier/tests/test_physical_axis.py
