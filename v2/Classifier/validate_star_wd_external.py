@@ -71,6 +71,13 @@ def main():
     bpred=np.where(usable&(de.absolute_g>6+5*de.bp_rp),"WHITE_DWARF","NORMAL_STAR")
     um=usable.to_numpy()
     hybrid=np.where(um,bpred,pred)
+    conf=np.max(p,axis=1)
+    consensus=np.full(len(y),"UNKNOWN",dtype=object)
+    agree=um & (bpred==pred)
+    consensus[agree]=pred[agree]
+    fallback=(~um) & (conf>=0.90)
+    consensus[fallback]=pred[fallback]
+    classified=consensus!="UNKNOWN"
 
     metrics={
       "sdss_training_rows":int(tr.sum()),
@@ -91,6 +98,15 @@ def main():
           "balanced_accuracy":float(balanced_accuracy_score(y[um],bpred[um])) if um.any() else None,
           "wd_f1":float(f1_score(y[um],bpred[um],pos_label="WHITE_DWARF",zero_division=0)) if um.any() else None,
         }
+      },
+      "consensus":{
+        "policy":"classify when HR baseline and calibrated model agree; if HR unavailable use model only at p>=0.90; otherwise UNKNOWN",
+        "coverage":float(classified.mean()),
+        "classified_rows":int(classified.sum()),
+        "accuracy_when_classified":float(accuracy_score(y[classified],consensus[classified])) if classified.any() else None,
+        "balanced_accuracy_when_classified":float(balanced_accuracy_score(y[classified],consensus[classified])) if classified.any() else None,
+        "macro_f1_when_classified":float(f1_score(y[classified],consensus[classified],average="macro")) if classified.any() else None,
+        "unknown_rows":int((~classified).sum())
       },
       "hybrid":{
         "policy":"literature HR baseline when usable; calibrated SDSS-trained model only as fallback",
@@ -125,7 +141,7 @@ def main():
     pd.DataFrame(confusion_matrix(y,pred,labels=CLASSES),
       index=[f"true_{c}" for c in CLASSES],columns=[f"pred_{c}" for c in CLASSES]).to_csv(a.out/"learned_confusion.csv")
     q=de[["benchmark_id","star_truth_class","truth_source"]].copy()
-    q["baseline_prediction"]=bpred; q["learned_prediction"]=pred; q["hybrid_prediction"]=hybrid; q["p_white_dwarf"]=pwd
+    q["baseline_prediction"]=bpred; q["learned_prediction"]=pred; q["hybrid_prediction"]=hybrid; q["consensus_prediction"]=consensus; q["p_white_dwarf"]=pwd
     q.to_csv(a.out/"external_predictions.csv",index=False)
     (a.out/"metrics.json").write_text(json.dumps(metrics,indent=2)+"\n")
     print(json.dumps(metrics,indent=2))
