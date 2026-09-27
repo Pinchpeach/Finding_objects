@@ -1,0 +1,47 @@
+name: v2 compact SIMBAD smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'v2/Get_data/simbad.py'
+      - 'v2/Classifier/axes/compact.py'
+      - '.github/workflows/v2_compact_simbad_smoke.yml'
+
+concurrency:
+  group: v2-compact-simbad-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install pandas astropy astroquery
+      - name: Query neutron star and validate route
+        run: |
+          python - <<'PY'
+          import importlib.util
+          from pathlib import Path
+
+          def load(path,name):
+              s=importlib.util.spec_from_file_location(name,Path(path))
+              m=importlib.util.module_from_spec(s); s.loader.exec_module(m); return m
+
+          simbad=load("v2/Get_data/simbad.py","simbad")
+          compact=load("v2/Classifier/axes/compact.py","compact")
+          d=simbad.fetch(65.00916666666666,-50.379444444444445,0.3)
+          print(d[["catalog_object_id","ra","dec","otype"]].to_string(index=False))
+          hit=d[d["otype"].astype(str).eq("N*")]
+          assert len(hit)>=1, "expected exact SIMBAD neutron-star type N*"
+          r=compact.classify({"otype":"N*"})
+          print(r)
+          assert r["label"]=="NS"
+          assert r["status"]=="SIMBAD_CURATED_NS"
+          PY
