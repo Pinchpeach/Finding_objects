@@ -10,6 +10,11 @@ on:
       - 'v2/Classifier/axes/compact.py'
       - '.github/workflows/v2_atnf_pulsar_smoke.yml'
 
+
+concurrency:
+  group: v2_atnf_pulsar_smoke-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   smoke:
     runs-on: ubuntu-latest
