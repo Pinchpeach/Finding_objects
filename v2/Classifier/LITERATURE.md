@@ -50,3 +50,39 @@ Implication:
 ## Project rule
 
 No downstream branch may emit a detailed class solely because the object was routed to that branch. Unsupported detailed labels remain `UNRESOLVED`.
+
+
+## Stellar parameters and variability
+
+Gaia DR3 BP/RP processing provides stellar-parameter products through GSP-Phot,
+while Gaia DR3 variability processing publishes roughly ten million classified
+variables across about two dozen variability groups. These products are suitable
+as downstream STAR-branch evidence but should not be confused with the coarse
+STAR routing decision.
+
+References:
+- Andrae et al., "Gaia Data Release 3: Analysis of the Gaia BP/RP spectra using the General Stellar Parameterizer from Photometry", A&A 674, A27 (2023), doi:10.1051/0004-6361/202243462
+- Eyer et al. / Gaia DR3 variability overview, A&A 674, A13 (2023)
+- Rimoldini et al. (2023), Gaia DR3 supervised variability classification
+
+Implication:
+- variability is an orthogonal STAR-branch axis (RR Lyrae, Cepheid, eclipsing,
+  LPV, CV, YSO, etc.), not a replacement for stellar physical subtype
+- GSP-Phot parameters can support temperature/gravity-based refinement after
+  quality validation
+
+## Galaxy activity axis
+
+For galaxies with suitable optical spectroscopy, star-forming versus AGN-like
+activity should use emission-line diagnostics rather than morphology alone. The
+classical BPT family separates star-forming and AGN excitation using ratios such
+as [O III]/H-beta and [N II]/H-alpha, with related [S II] and [O I] diagnostics.
+
+References:
+- Baldwin, Phillips & Terlevich (1981), PASP 93, 5
+- Veilleux & Osterbrock (1987), ApJS 63, 295
+
+Implication:
+- morphology and nuclear activity are separate outputs
+- BPT classification is enabled only when the required emission-line fluxes
+  have sufficient quality; otherwise the activity subtype remains UNRESOLVED
