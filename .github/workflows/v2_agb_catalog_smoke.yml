@@ -1,0 +1,50 @@
+name: v2 AGB catalog smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'v2/Get_data/agb_suh2021.py'
+      - 'v2/Classifier/axes/physical.py'
+      - '.github/workflows/v2_agb_catalog_smoke.yml'
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install pandas astropy astroquery
+      - name: Query Galactic-centre AGB field
+        run: |
+          python - <<'PY'
+          import importlib.util
+          from pathlib import Path
+          p=Path("v2/Get_data/agb_suh2021.py")
+          s=importlib.util.spec_from_file_location("agb",p)
+          m=importlib.util.module_from_spec(s); s.loader.exec_module(m)
+          d=m.fetch(266.41683,-29.00781,5.0)
+          print("rows",len(d))
+          print(d[["catalog_object_id","ra","dec","agb_subclass"]].head(10).to_string(index=False))
+          assert len(d)>0, "Suh AGB catalog returned no sources in Galactic-centre field"
+          assert set(d["agb_subclass"]).issubset({"OAGB_IRAS","CAGB_IRAS","OAGB_WISE","CAGB_WISE"})
+          m.save(d,Path("/tmp/agb_gc.csv"))
+          PY
+      - name: Validate physical route
+        run: |
+          python - <<'PY'
+          import importlib.util
+          from pathlib import Path
+          p=Path("v2/Classifier/axes/physical.py")
+          s=importlib.util.spec_from_file_location("physical",p)
+          m=importlib.util.module_from_spec(s); s.loader.exec_module(m)
+          r=m.classify({"catalogs":"Suh 2021 AGB Catalog","agb_subclass":"OAGB_WISE","association_confidence__suh_2021_agb_catalog":0.9})
+          print(r)
+          assert r["label"]=="AGB"
+          assert r["status"]=="SUH2021_AGB_CATALOG_MATCH"
+          PY
