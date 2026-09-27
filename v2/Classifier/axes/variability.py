@@ -1,14 +1,27 @@
-"""Variability axis using published Gaia DR3 variability candidate classes.
+"""Variability axis using curated SIMBAD types and Gaia DR3 candidates.
 
-best_class_score is retained only as a Gaia catalog score. Gaia documents it as
-a median normalized-rank confidence quantity, not a calibrated class probability.
+Exact SIMBAD main types provide subtype-preserving catalogue evidence. Gaia
+best_class_score is retained only as a catalogue score: Gaia documents it as a
+normalized-rank confidence quantity, not a calibrated class probability.
 """
 from __future__ import annotations
 import math
-AXIS="variability"
-CLASSES=("RR_LYRAE","CEPHEID","LPV","ECLIPSING","ROTATIONAL","ERUPTIVE","PULSATING","OTHER_VARIABLE","UNKNOWN")
 
-MAP={
+AXIS="variability"
+CLASSES=("RR_LYRAE","CEPHEID","MIRA","LPV","ECLIPSING","ROTATIONAL","ERUPTIVE","PULSATING","OTHER_VARIABLE","UNKNOWN")
+
+SIMBAD_MAP={
+    "RR*":"RR_LYRAE",
+    "Ce*":"CEPHEID",
+    "Mi*":"MIRA",
+    "LP*":"LPV",
+    "EB*":"ECLIPSING",
+    "Ro*":"ROTATIONAL",
+    "Er*":"ERUPTIVE",
+    "Pu*":"PULSATING",
+}
+
+GAIA_MAP={
     "RR":"RR_LYRAE",
     "CEP":"CEPHEID",
     "LPV":"LPV",
@@ -46,6 +59,20 @@ def _num(row,key):
     except Exception:return None
 
 def classify(row):
+    simbad=_text(row,"otype")
+    if simbad in SIMBAD_MAP:
+        return {
+            "axis":AXIS,
+            "label":SIMBAD_MAP[simbad],
+            "confidence":None,
+            "status":"SIMBAD_CURATED_VARIABLE_TYPE",
+            "evidence":[{
+                "kind":"simbad_physical_type",
+                "otype":simbad,
+                "note":"Exact SIMBAD main variable-star type; retained as curated catalogue identity evidence.",
+            }],
+        }
+
     raw=_text(row,"best_class_name")
     score=_num(row,"best_class_score")
     evidence=[] if raw is None else [{
@@ -54,8 +81,8 @@ def classify(row):
         "best_class_score":score,
         "score_semantics":"Gaia catalog normalized-rank classification score; not used as calibrated probability",
     }]
-    if raw in MAP:
-        return {"axis":AXIS,"label":MAP[raw],"confidence":None,"status":"GAIA_DR3_VARIABLE_CANDIDATE","evidence":evidence}
+    if raw in GAIA_MAP:
+        return {"axis":AXIS,"label":GAIA_MAP[raw],"confidence":None,"status":"GAIA_DR3_VARIABLE_CANDIDATE","evidence":evidence}
     if raw in EVENT_CLASSES:
         return {"axis":AXIS,"label":"UNKNOWN","confidence":None,"status":"ROUTED_TO_PHENOMENON","evidence":evidence}
     if raw in NON_STELLAR:
