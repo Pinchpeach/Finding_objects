@@ -9,6 +9,7 @@ on:
       - .github/workflows/validate-star-wd-external.yml
 
 jobs:
+  # Uses committed external truth for reproducible cross-domain evaluation.
   validate:
     runs-on: ubuntu-latest
     timeout-minutes: 45
