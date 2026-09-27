@@ -64,6 +64,13 @@ def run(features:Path,out:Path,batch_size:int=40):
 
         for key,tables in (result or {}).items():
             for table in tables:
+                # astroquery versions differ: RAW VOTable products can be
+                # returned as astropy Table or as VOTable TableElement.
+                if not hasattr(table,"colnames") and hasattr(table,"to_table"):
+                    table=table.to_table()
+                if not hasattr(table,"colnames"):
+                    print(f"[XP] skipping unsupported table object {type(table)!r} key={key}",flush=True)
+                    continue
                 sidc=_col(table,"source_id","SOURCE_ID")
                 bpc=_col(table,"bp_coefficients","BP_COEFFICIENTS")
                 rpc=_col(table,"rp_coefficients","RP_COEFFICIENTS")
