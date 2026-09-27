@@ -45,8 +45,10 @@ jobs:
           path: v2/benchmark/radio_xray_downloaded
       - name: Validate products
         run: python v2/benchmark/validate_catalog_truth.py --truth v2/benchmark/radio_xray_truth/ground_truth.csv --catalog-root v2/benchmark/radio_xray_downloaded --out v2/benchmark/radio_xray_ready --allow-unbalanced
-      - name: Evaluate optical/IR baseline model
-        run: python v2/benchmark/train_validate_classifier.py --truth v2/benchmark/radio_xray_truth/ground_truth.csv --catalog-root v2/benchmark/radio_xray_downloaded --manifest v2/benchmark/radio_xray_ready/benchmark_manifest.csv --out v2/benchmark/radio_xray_ready/model_eval_baseline
+      - name: Evaluate optical/IR/UV baseline model
+        run: python v2/benchmark/train_validate_classifier.py --truth v2/benchmark/radio_xray_truth/ground_truth.csv --catalog-root v2/benchmark/radio_xray_downloaded --manifest v2/benchmark/radio_xray_ready/benchmark_manifest.csv --out v2/benchmark/radio_xray_ready/model_eval_baseline --exclude-native-rx
+      - name: Evaluate radio/X-ray enriched model
+        run: python v2/benchmark/train_validate_classifier.py --truth v2/benchmark/radio_xray_truth/ground_truth.csv --catalog-root v2/benchmark/radio_xray_downloaded --manifest v2/benchmark/radio_xray_ready/benchmark_manifest.csv --out v2/benchmark/radio_xray_ready/model_eval_radio_xray
       - uses: actions/upload-artifact@v4
         with:
           name: radio-xray-ready
