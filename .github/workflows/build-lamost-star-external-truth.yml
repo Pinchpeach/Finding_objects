@@ -17,7 +17,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install pandas numpy astropy astroquery
+      - run: pip install pandas numpy scipy astropy astroquery
       - name: Build fixed external truth
         run: python v2/Classifier/build_lamost_star_external_truth.py --total 1000
       - name: Validate external truth
