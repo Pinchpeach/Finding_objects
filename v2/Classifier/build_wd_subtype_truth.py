@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build a conservative LAMOST WD subtype truth set for initial DA vs DB work."""
 from __future__ import annotations
-import argparse
+import argparse, time
 from pathlib import Path
 import numpy as np, pandas as pd
 
@@ -12,8 +12,23 @@ def pick(cols,names):
 
 def run(out:Path,per_class=150):
     from astroquery.vizier import Vizier
-    tabs=Vizier(columns=["**"],row_limit=-1).get_catalogs(CAT)
-    if not tabs: raise RuntimeError("LAMOST WD table3 unavailable")
+    tabs=None; last=None
+    servers=["vizier.cds.unistra.fr","vizier.cfa.harvard.edu","vizier.nao.ac.jp"]
+    for server in servers:
+        try:
+            Vizier.VIZIER_SERVER=server
+        except Exception:
+            pass
+        for attempt in range(3):
+            try:
+                tabs=Vizier(columns=["**"],row_limit=-1).get_catalogs(CAT)
+                if tabs: break
+            except Exception as e:
+                last=e
+                print(f"[VizieR] server={server} attempt={attempt+1} failed: {e!r}",flush=True)
+                time.sleep(2**attempt)
+        if tabs: break
+    if not tabs: raise RuntimeError(f"LAMOST WD table3 unavailable after mirrors: {last!r}")
     d=tabs[0].to_pandas(); d.columns=[str(c).strip() for c in d.columns]
     tcol=pick(d.columns,["SpType","NType","Type","Sp","Class","SubClass"])
     racol=pick(d.columns,["RAJ2000","RAdeg","RA_ICRS","RA"])
