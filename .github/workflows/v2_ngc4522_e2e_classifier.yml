@@ -6,7 +6,11 @@ on:
     branches: [main]
     paths:
       - 'v2/Preprocess/**'
-      - 'v2/Classifier/**'
+      - 'v2/Classifier/control.py'
+      - 'v2/Classifier/control_axes.py'
+      - 'v2/Classifier/01_prepare_input.py'
+      - 'v2/Classifier/axes/**'
+      - 'v2/Classifier/branches/**'
       - 'v2/rawdata/*_ra188p4155_dec9p1751_r0p5arcmin.csv'
       - '.github/workflows/v2_ngc4522_e2e_classifier.yml'
 
