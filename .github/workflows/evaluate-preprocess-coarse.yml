@@ -1,0 +1,38 @@
+name: Evaluate Preprocess Coarse Classifier
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'v2/Preprocess/04_build_evidence.py'
+      - 'v2/Preprocess/05_likelihood_vectors.py'
+      - 'v2/Preprocess/README.md'
+      - 'v2/benchmark/evaluate_rule_baseline.py'
+      - '.github/workflows/evaluate-preprocess-coarse.yml'
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pandas numpy scikit-learn
+      - name: Download validated 9999-object catalog artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: catalog-truth-*
+          path: v2/benchmark/coarse_downloaded
+          run-id: 36279183554
+          github-token: ${{ github.token }}
+      - name: Rebuild manifest
+        run: python v2/benchmark/validate_catalog_truth.py --truth v2/benchmark/truth_data/ground_truth.csv --catalog-root v2/benchmark/coarse_downloaded --out v2/benchmark/coarse_ready
+      - name: Evaluate coarse naive classifier
+        run: python v2/benchmark/evaluate_rule_baseline.py --truth v2/benchmark/truth_data/ground_truth.csv --catalog-root v2/benchmark/coarse_downloaded --manifest v2/benchmark/coarse_ready/benchmark_manifest.csv --out v2/benchmark/coarse_ready/coarse_eval
+      - uses: actions/upload-artifact@v4
+        with:
+          name: preprocess-coarse-eval
+          path: v2/benchmark/coarse_ready/
+          retention-days: 30
