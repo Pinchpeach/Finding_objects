@@ -1,0 +1,74 @@
+name: Build WD Subtype Gaia XP Model
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - v2/Classifier/fit_wd_subtype_xp_model.py
+      - v2/Classifier/apply_wd_subtype_xp.py
+      - v2/Classifier/branches/star.py
+      - .github/workflows/build-wd-subtype-xp-model.yml
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pandas numpy scipy scikit-learn joblib
+      - name: Download validated LAMOST Gaia XP training data
+        uses: actions/download-artifact@v4
+        with:
+          name: wd-subtype-gaia-xp-eval
+          path: /tmp/lamost_xp
+          run-id: 36300795761
+          github-token: ${{ github.token }}
+      - name: Download independent SDSS XP external data
+        uses: actions/download-artifact@v4
+        with:
+          name: wd-subtype-xp-external-eval
+          path: /tmp/sdss_external
+          run-id: 36304882268
+          github-token: ${{ github.token }}
+      - name: Fit deploy model
+        run: |
+          TRAIN="$(find /tmp/lamost_xp -name wd_subtype_xp.csv -print -quit)"
+          test -n "$TRAIN"
+          python v2/Classifier/fit_wd_subtype_xp_model.py \
+            --features "$TRAIN" \
+            --model-out /tmp/model/wd_subtype_xp_model.joblib \
+            --metadata-out /tmp/model/wd_subtype_xp_model.json
+      - name: Validate deploy model on untouched SDSS external data
+        run: |
+          EXT="$(find /tmp/sdss_external -name sdss_wd_subtype_xp.csv -print -quit)"
+          test -n "$EXT"
+          python v2/Classifier/apply_wd_subtype_xp.py \
+            --input "$EXT" \
+            --model /tmp/model/wd_subtype_xp_model.joblib \
+            --out /tmp/model/sdss_external_predictions.csv
+          python - <<'PY'
+          import pandas as pd
+          from sklearn.metrics import accuracy_score, balanced_accuracy_score
+          d=pd.read_csv("/tmp/model/sdss_external_predictions.csv")
+          y=d.star_truth_class.astype(str)
+          p=d.wd_xp_subtype_prediction.astype(str)
+          c=pd.to_numeric(d.wd_xp_subtype_confidence,errors="coerce")
+          print("external rows",len(d))
+          print("ungated accuracy",accuracy_score(y,p))
+          keep=c>=0.90
+          print("p>=0.90 rows",int(keep.sum()),"coverage",float(keep.mean()))
+          print("p>=0.90 accuracy",accuracy_score(y[keep],p[keep]))
+          print("p>=0.90 balanced",balanced_accuracy_score(y[keep],p[keep]))
+          assert keep.sum()>=80
+          assert accuracy_score(y[keep],p[keep])>=0.98
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wd-subtype-xp-deploy-model
+          path: /tmp/model/
+          retention-days: 90
