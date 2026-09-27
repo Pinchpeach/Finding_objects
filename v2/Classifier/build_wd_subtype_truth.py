@@ -15,13 +15,11 @@ def run(out:Path,per_class=150):
     tabs=None; last=None
     servers=["vizier.cds.unistra.fr","vizier.cfa.harvard.edu","vizier.nao.ac.jp"]
     for server in servers:
-        try:
-            Vizier.VIZIER_SERVER=server
-        except Exception:
-            pass
         for attempt in range(3):
             try:
-                tabs=Vizier(columns=["**"],row_limit=-1).get_catalogs(CAT)
+                q=Vizier(columns=["**"],row_limit=-1)
+                q.VIZIER_SERVER=server
+                tabs=q.get_catalogs(CAT)
                 if tabs: break
             except Exception as e:
                 last=e
