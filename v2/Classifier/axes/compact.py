@@ -44,6 +44,12 @@ def classify(row):
         }
 
     simbad=_text(row,"otype")
+    if simbad=="N*":
+        return {
+            "axis":AXIS,"label":"NS","confidence":None,
+            "status":"SIMBAD_CURATED_NS",
+            "evidence":[{"kind":"simbad_physical_type","otype":"N*","note":"Exact SIMBAD Neutron Star physical type."}],
+        }
     if simbad=="Psr":
         return {
             "axis":AXIS,"label":"PULSAR","confidence":None,
