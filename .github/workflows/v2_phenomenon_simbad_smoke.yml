@@ -1,0 +1,50 @@
+name: v2 phenomenon SIMBAD smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'v2/Get_data/simbad.py'
+      - 'v2/Classifier/axes/phenomenon.py'
+      - '.github/workflows/v2_phenomenon_simbad_smoke.yml'
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install pandas astropy astroquery
+      - name: Query confirmed PN and classical nova
+        run: |
+          python - <<'PY'
+          import importlib.util
+          from pathlib import Path
+
+          def load(path,name):
+              s=importlib.util.spec_from_file_location(name,Path(path))
+              m=importlib.util.module_from_spec(s); s.loader.exec_module(m); return m
+
+          simbad=load("v2/Get_data/simbad.py","simbad")
+          phenomenon=load("v2/Classifier/axes/phenomenon.py","phenomenon")
+
+          cases=[
+              ("IC418",81.86752480565,-12.69730063549,"PN","PN","SIMBAD_CURATED_PN"),
+              ("FHSer",277.69600058472,2.61445271165,"No*","NOVA","SIMBAD_CURATED_NOVA"),
+          ]
+          for name,ra,dec,otype,label,status in cases:
+              d=simbad.fetch(ra,dec,0.2)
+              print(name)
+              print(d[["catalog_object_id","ra","dec","otype"]].to_string(index=False))
+              hit=d[d["otype"].astype(str).eq(otype)]
+              assert len(hit)>=1, f"{name}: expected SIMBAD otype {otype}"
+              r=phenomenon.classify({"otype":otype})
+              print(r)
+              assert r["label"]==label
+              assert r["status"]==status
+          PY
