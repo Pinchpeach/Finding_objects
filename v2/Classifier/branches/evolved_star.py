@@ -1,18 +1,12 @@
-"""RGB/AGB refinement branch.
+"""Conservative RGB/AGB refinement from Gaia DR3 FLAME.
 
-This module defines the evidence boundary for evolved stars without inventing
-unvalidated RGB/AGB probabilities. It exposes available stellar parameters and
-returns UNRESOLVED until a literature-backed, externally validated decision model
-is installed.
+Gaia DR3 FLAME evolstage=490 marks the RGB base and 1290 the RGB tip. We apply
+the Gaia validation guardrails used for giant FLAME parameters (logg < 3.5,
+mass < 2 Msun, age > 1 Gyr). FLAME does not provide an AGB stage in this
+published convention, so AGB remains unresolved instead of being guessed.
 """
 from __future__ import annotations
 import math
-
-REQUIRED_FEATURE_GROUPS={
-    "atmosphere":("teff_gspphot","logg_gspphot","mh_gspphot"),
-    "astrometry":("parallax","parallax_error"),
-    "photometry":("phot_g_mean_mag","phot_bp_mean_mag","phot_rp_mean_mag","bp_rp"),
-}
 
 def _num(row,key):
     try:
@@ -22,18 +16,30 @@ def _num(row,key):
         return None
 
 def classify(row):
-    available={}
-    for group,keys in REQUIRED_FEATURE_GROUPS.items():
-        available[group]={key:_num(row,key) for key in keys}
-    present=[key for values in available.values() for key,value in values.items() if value is not None]
+    stage=_num(row,"evolstage_flame")
+    logg=_num(row,"logg_gspphot")
+    mass=_num(row,"mass_flame")
+    age=_num(row,"age_flame")
+    payload={
+        "evolstage_flame":stage,
+        "logg_gspphot":logg,
+        "mass_flame":mass,
+        "age_flame":age,
+    }
+    if None in (stage,logg,mass,age):
+        return {
+            "label":"UNRESOLVED","confidence":None,"status":"MISSING_FLAME_GIANT_QUALITY",
+            "evidence":[{"kind":"gaia_flame","values":payload,
+                         "note":"RGB inference requires FLAME stage plus giant validation guardrails."}],
+        }
+    if 490 <= stage <= 1290 and logg < 3.5 and mass < 2.0 and age > 1.0:
+        return {
+            "label":"RGB","confidence":None,"status":"GAIA_FLAME_RGB",
+            "evidence":[{"kind":"gaia_flame","values":payload,
+                         "note":"Gaia FLAME evolutionary stage lies from RGB base through RGB tip and passes giant validation guardrails."}],
+        }
     return {
-        "label":"UNRESOLVED",
-        "confidence":None,
-        "status":"AWAITING_VALIDATED_MODEL",
-        "evidence":[{
-            "kind":"feature_availability",
-            "present_features":present,
-            "feature_groups":available,
-            "note":"RGB/AGB inference intentionally disabled until literature-backed calibration and external validation are installed.",
-        }],
+        "label":"UNRESOLVED","confidence":None,"status":"NO_VALIDATED_RGB_AGB_LABEL",
+        "evidence":[{"kind":"gaia_flame","values":payload,
+                     "note":"No validated AGB inference is made from FLAME; out-of-guardrail giant stages abstain."}],
     }
