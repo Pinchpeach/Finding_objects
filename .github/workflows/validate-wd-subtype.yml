@@ -1,0 +1,43 @@
+name: Validate WD Subtype DA DB
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - v2/Classifier/build_wd_subtype_truth.py
+      - v2/Classifier/train_validate_wd_subtype.py
+      - v2/Classifier/collect_star_gaia.py
+      - .github/workflows/validate-wd-subtype.yml
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install pandas numpy scipy scikit-learn astropy astroquery
+      - name: Build pure DA DB truth
+        run: python v2/Classifier/build_wd_subtype_truth.py --per-class 150
+      - name: Crossmatch subtype truth to Gaia
+        run: python v2/Classifier/collect_star_gaia.py --truth v2/Classifier/wd_subtype_truth.csv --out v2/Classifier/wd_subtype_gaia.csv --min-matches 180
+      - name: Train and validate Gaia-only subtype models
+        run: python v2/Classifier/train_validate_wd_subtype.py --features v2/Classifier/wd_subtype_gaia.csv --out v2/Classifier/wd_subtype_eval
+      - name: Show metrics
+        run: |
+          cat v2/Classifier/wd_subtype_eval/metrics.json
+          echo "--- logistic confusion ---"
+          cat v2/Classifier/wd_subtype_eval/logistic_confusion.csv
+          echo "--- HGB confusion ---"
+          cat v2/Classifier/wd_subtype_eval/hgb_confusion.csv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wd-subtype-da-db-eval
+          path: |
+            v2/Classifier/wd_subtype_truth.csv
+            v2/Classifier/wd_subtype_gaia.csv
+            v2/Classifier/wd_subtype_eval/
+          retention-days: 30
