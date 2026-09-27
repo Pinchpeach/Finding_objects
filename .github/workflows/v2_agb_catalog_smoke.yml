@@ -9,6 +9,11 @@ on:
       - 'v2/Classifier/axes/physical.py'
       - '.github/workflows/v2_agb_catalog_smoke.yml'
 
+
+concurrency:
+  group: v2_agb_catalog_smoke-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   smoke:
     runs-on: ubuntu-latest
