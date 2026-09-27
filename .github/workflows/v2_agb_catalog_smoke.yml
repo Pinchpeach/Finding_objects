@@ -9,9 +9,8 @@ on:
       - 'v2/Classifier/axes/physical.py'
       - '.github/workflows/v2_agb_catalog_smoke.yml'
 
-
 concurrency:
-  group: v2_agb_catalog_smoke-${{ github.ref }}
+  group: v2-agb-catalog-smoke-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -25,20 +24,30 @@ jobs:
           python-version: '3.11'
       - name: Install dependencies
         run: pip install pandas astropy astroquery
-      - name: Query Galactic-centre AGB field
+      - name: Round-trip a real Suh 2021 AGB catalogue row
         run: |
           python - <<'PY'
           import importlib.util
           from pathlib import Path
+          from astroquery.vizier import Vizier
+
+          # Seed the test from an actual catalogue row instead of assuming a
+          # particular sky field contains an entry.
+          tables=Vizier(columns=["RAJ2000","DEJ2000"],row_limit=1).get_catalogs("J/ApJS/256/43/table9")
+          assert tables and len(tables[0])==1, "could not obtain Suh 2021 table9 seed row"
+          seed=tables[0].to_pandas().iloc[0]
+          ra=float(seed["RAJ2000"]); dec=float(seed["DEJ2000"])
+          print("seed",ra,dec)
+
           p=Path("v2/Get_data/agb_suh2021.py")
           s=importlib.util.spec_from_file_location("agb",p)
           m=importlib.util.module_from_spec(s); s.loader.exec_module(m)
-          d=m.fetch(266.41683,-29.00781,5.0)
+          d=m.fetch(ra,dec,0.5)
           print("rows",len(d))
           print(d[["catalog_object_id","ra","dec","agb_subclass"]].head(10).to_string(index=False))
-          assert len(d)>0, "Suh AGB catalog returned no sources in Galactic-centre field"
+          assert len(d)>0, "Suh AGB cone query failed to recover its own catalogue seed"
           assert set(d["agb_subclass"]).issubset({"OAGB_IRAS","CAGB_IRAS","OAGB_WISE","CAGB_WISE"})
-          m.save(d,Path("/tmp/agb_gc.csv"))
+          m.save(d,Path("/tmp/agb_roundtrip.csv"))
           PY
       - name: Validate physical route
         run: |
