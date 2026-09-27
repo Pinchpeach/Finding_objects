@@ -50,3 +50,40 @@ The benchmark learned classifiers remain reproducible through wrappers in this f
 These wrappers keep the learned models out of `Preprocess` while reusing the validated benchmark implementations during the transition.
 
 See `LITERATURE.md` for the scientific design basis.
+
+
+## Validated STAR path
+
+The current STAR branch has two validated layers:
+
+1. **WHITE_DWARF candidate routing**
+   - literature-backed Gaia HR locus as primary robust evidence
+   - calibrated Gaia astrometry/photometry model as secondary/fallback evidence
+   - conflict -> abstain / `UNRESOLVED`
+   - independently checked on LAMOST spectroscopy
+
+2. **DA / DB spectral subtype**
+   - only for `WHITE_DWARF_CANDIDATE`
+   - Gaia DR3 XP continuous coefficients (55 BP + 55 RP)
+   - calibrated Random Forest
+   - subtype is exposed only at probability >= **0.90**
+   - independently checked across LAMOST-training -> SDSS-DR14-external domain
+   - unsupported WD types remain `UNRESOLVED`
+
+The model binary is produced as a GitHub Actions artifact rather than committed
+to source control. See `WD_SUBTYPE_XP_EXTERNAL_VALIDATION.md`.
+
+Typical subtype inference flow:
+
+```text
+STAR
+  -> WHITE_DWARF_CANDIDATE
+  -> Gaia XP available?
+       no  -> spectral_type = UNRESOLVED
+       yes -> DA/DB model
+                p >= 0.90 -> DA or DB
+                p < 0.90  -> UNRESOLVED
+```
+
+DA/DB support does not imply that DC/DQ/DZ/DO/magnetic/composite white dwarfs
+are safely classifiable yet.
