@@ -23,10 +23,13 @@ def run(inp:Path,model_path:Path,out:Path):
     classes=list(model.classes_)
     pred=np.array(classes)[np.argmax(p,axis=1)]
     conf=np.max(p,axis=1)
-    d["wd_xp_subtype_prediction"]=pred
-    d["wd_xp_subtype_confidence"]=conf
-    for i,c in enumerate(classes):
-        d[f"p_wd_xp_{str(c).lower()}"]=p[:,i]
+    extra={
+        "wd_xp_subtype_prediction":pred,
+        "wd_xp_subtype_confidence":conf,
+    }
+    for i,cls in enumerate(classes):
+        extra[f"p_wd_xp_{str(cls).lower()}"]=p[:,i]
+    d=pd.concat([d,pd.DataFrame(extra,index=d.index)],axis=1)
     out.parent.mkdir(parents=True,exist_ok=True); d.to_csv(out,index=False)
     print(f"[OK] XP subtype predictions rows={len(d)} threshold={pack.get('subtype_confidence_threshold',0.90)} -> {out}")
     print(pd.Series(pred).value_counts().to_string())
