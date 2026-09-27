@@ -1,0 +1,43 @@
+name: Build LAMOST STAR External Truth
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - v2/Classifier/build_lamost_star_external_truth.py
+      - .github/workflows/build-lamost-star-external-truth.yml
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pandas numpy astropy astroquery
+      - name: Build fixed external truth
+        run: python v2/Classifier/build_lamost_star_external_truth.py --total 1000
+      - name: Validate external truth
+        run: |
+          python - <<'PY'
+          import pandas as pd
+          d=pd.read_csv("v2/Classifier/lamost_star_external_truth.csv")
+          assert d.benchmark_id.is_unique
+          assert set(d.star_truth_class)=={"WHITE_DWARF","NORMAL_STAR"}
+          c=d.star_truth_class.value_counts().to_dict()
+          assert c["WHITE_DWARF"]>=450 and c["NORMAL_STAR"]>=450, c
+          print(c)
+          PY
+      - name: Commit fixed external truth
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add v2/Classifier/lamost_star_external_truth.csv
+          git diff --cached --quiet && exit 0
+          git commit -m "Add fixed LAMOST STAR external truth"
+          git fetch origin main
+          git rebase origin/main
+          git push
