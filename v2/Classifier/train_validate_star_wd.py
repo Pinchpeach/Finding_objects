@@ -111,6 +111,13 @@ def main():
     bpred=baseline[te.to_numpy()]
     busable=usable[te].to_numpy()
     hybrid=np.where(busable,bpred,pred)
+    conf=np.max(p,axis=1)
+    consensus=np.full(len(y),"UNKNOWN",dtype=object)
+    agree=busable & (bpred==pred)
+    consensus[agree]=pred[agree]
+    fallback=(~busable) & (conf>=0.90)
+    consensus[fallback]=pred[fallback]
+    classified=consensus!="UNKNOWN"
     metrics={
       "matched_rows":int(len(data)),
       "split_counts":data.split.value_counts().to_dict(),
@@ -130,6 +137,15 @@ def main():
           "balanced_accuracy":float(balanced_accuracy_score(y[busable],bpred[busable])),
           "f1_white_dwarf":float(f1_score(y[busable],bpred[busable],pos_label="WHITE_DWARF")),
         },
+      },
+      "consensus":{
+        "policy":"classify when HR baseline and calibrated model agree; if HR unavailable use model only at p>=0.90; otherwise UNKNOWN",
+        "coverage":float(classified.mean()),
+        "classified_rows":int(classified.sum()),
+        "accuracy_when_classified":float(accuracy_score(y[classified],consensus[classified])) if classified.any() else None,
+        "balanced_accuracy_when_classified":float(balanced_accuracy_score(y[classified],consensus[classified])) if classified.any() else None,
+        "macro_f1_when_classified":float(f1_score(y[classified],consensus[classified],average="macro")) if classified.any() else None,
+        "unknown_rows":int((~classified).sum())
       },
       "hybrid":{
         "policy":"literature HR baseline when usable; calibrated learned model only as fallback",
@@ -164,7 +180,7 @@ def main():
       index=[f"true_{c}" for c in CLASSES],columns=[f"pred_{c}" for c in CLASSES]).to_csv(a.out/"learned_confusion.csv")
     pd.DataFrame(classification_report(y,pred,labels=CLASSES,output_dict=True,zero_division=0)).T.to_csv(a.out/"classification_report.csv")
     po=data.loc[te,["benchmark_id","star_truth_class"]].copy()
-    po["baseline_prediction"]=bpred; po["learned_prediction"]=pred; po["hybrid_prediction"]=hybrid; po["p_white_dwarf"]=pwd
+    po["baseline_prediction"]=bpred; po["learned_prediction"]=pred; po["hybrid_prediction"]=hybrid; po["consensus_prediction"]=consensus; po["p_white_dwarf"]=pwd
     po.to_csv(a.out/"test_predictions.csv",index=False)
     (a.out/"metrics.json").write_text(json.dumps(metrics,indent=2)+"\n")
     joblib.dump({"model":model,"features":feats,"classes":classes},a.out/"star_wd_classifier.joblib")
