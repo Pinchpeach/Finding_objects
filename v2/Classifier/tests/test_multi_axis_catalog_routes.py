@@ -44,8 +44,14 @@ expect(variability,{"best_class_name":"SN","best_class_score":0.93},"UNKNOWN","R
 expect(phenomenon,{"best_class_name":"SN","best_class_score":0.93},"SN","GAIA_DR3_SN_CANDIDATE")
 expect(phenomenon,{"best_class_name":"MICROLENSING","best_class_score":0.90},"MICROLENSING","GAIA_DR3_MICROLENSING_CANDIDATE")
 
+expect(compact,{"otype":"Psr"},"PULSAR","SIMBAD_CURATED_PULSAR")
+expect(compact,{"otype":"XB*"},"XRB","SIMBAD_CURATED_XRB")
 expect(compact,{"in_vari_compact_companion":True},"COMPACT_COMPANION_CANDIDATE","GAIA_DR3_COMPACT_COMPANION_CANDIDATE")
 expect(compact,{},"UNKNOWN","NO_VALIDATED_COMPACT_EVIDENCE")
+
+expect(physical,{"otype":"AGB*","primary_class":"STAR"},"AGB","SIMBAD_CURATED_AGB")
+expect(phenomenon,{"otype":"PN"},"PN","SIMBAD_CURATED_PN")
+expect(phenomenon,{"otype":"No*"},"NOVA","SIMBAD_CURATED_NOVA")
 
 expect(extragalactic,{"best_class_name":"AGN","in_vari_agn":True,"primary_class":"QSO"},"AGN","GAIA_DR3_AGN_CANDIDATE")
 expect(extragalactic,{"primary_class":"QSO"},"QSO","COARSE_QSO_ROUTE")
