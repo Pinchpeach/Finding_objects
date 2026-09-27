@@ -5,10 +5,13 @@ on:
   push:
     branches: [main]
     paths:
+      - 'v2/Classifier/control.py'
+      - 'v2/Classifier/control_axes.py'
       - 'v2/Classifier/axes/**'
       - 'v2/Classifier/branches/evolved_star.py'
       - 'v2/Classifier/branches/star.py'
       - 'v2/Classifier/tests/test_multi_axis_catalog_routes.py'
+      - 'v2/Classifier/tests/test_control_integration.py'
       - '.github/workflows/v2_classifier_multi_axis_smoke.yml'
 
 jobs:
@@ -20,7 +23,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Install smoke-test dependency
+        run: pip install pandas
       - name: Physical route tests
         run: python -u v2/Classifier/tests/test_physical_axis.py
       - name: Multi-axis catalog route tests
         run: python -u v2/Classifier/tests/test_multi_axis_catalog_routes.py
+      - name: Main controller integration test
+        run: python -u v2/Classifier/tests/test_control_integration.py
