@@ -1,0 +1,44 @@
+name: Validate STAR WD External LAMOST
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - v2/Classifier/build_lamost_star_external_truth.py
+      - v2/Classifier/validate_star_wd_external.py
+      - .github/workflows/validate-star-wd-external.yml
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install pandas numpy scikit-learn joblib astropy astroquery
+      - name: Build independent LAMOST truth
+        run: python v2/Classifier/build_lamost_star_external_truth.py --total 1000
+      - name: Crossmatch SDSS training truth to Gaia
+        run: python v2/Classifier/collect_star_gaia.py --truth v2/Classifier/star_truth.csv --out v2/Classifier/star_gaia_features.csv
+      - name: Crossmatch LAMOST external truth to Gaia
+        run: python v2/Classifier/collect_star_gaia.py --truth v2/Classifier/lamost_star_external_truth.csv --out v2/Classifier/lamost_star_gaia_features.csv
+      - name: External validation
+        run: python v2/Classifier/validate_star_wd_external.py --sdss-features v2/Classifier/star_gaia_features.csv --external-features v2/Classifier/lamost_star_gaia_features.csv --out v2/Classifier/star_wd_external_eval
+      - name: Show external metrics
+        run: |
+          cat v2/Classifier/star_wd_external_eval/metrics.json
+          echo "--- baseline confusion ---"
+          cat v2/Classifier/star_wd_external_eval/baseline_confusion.csv
+          echo "--- learned confusion ---"
+          cat v2/Classifier/star_wd_external_eval/learned_confusion.csv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: star-wd-lamost-external-eval
+          path: |
+            v2/Classifier/lamost_star_external_truth.csv
+            v2/Classifier/lamost_star_gaia_features.csv
+            v2/Classifier/star_wd_external_eval/
+          retention-days: 30
