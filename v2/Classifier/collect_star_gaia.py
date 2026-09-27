@@ -6,7 +6,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-def run(truth_path:Path,out:Path,max_sep_arcsec:float=2.0):
+def run(truth_path:Path,out:Path,max_sep_arcsec:float=2.0,min_matches:int=500):
     from astroquery.xmatch import XMatch
     from astropy.table import Table
     import astropy.units as u
@@ -51,8 +51,8 @@ def run(truth_path:Path,out:Path,max_sep_arcsec:float=2.0):
     cov=len(outdf)/len(truth)
     print(f"[OK] truth={len(truth)} Gaia matched={len(outdf)} coverage={cov:.4f} -> {out}")
     print(outdf.star_truth_class.value_counts().to_string())
-    if len(outdf)<500:
-        raise RuntimeError(f"Gaia coverage too low: {len(outdf)}/{len(truth)}")
+    if len(outdf)<min_matches:
+        raise RuntimeError(f"Gaia coverage too low: {len(outdf)}/{len(truth)}; min_matches={min_matches}")
     return out
 
 def main():
@@ -60,5 +60,6 @@ def main():
     root=Path(__file__).resolve().parent
     p.add_argument("--truth",type=Path,default=root/"star_truth.csv")
     p.add_argument("--out",type=Path,default=root/"star_gaia_features.csv")
-    a=p.parse_args(); run(a.truth,a.out)
+    p.add_argument("--min-matches",type=int,default=500)
+    a=p.parse_args(); run(a.truth,a.out,min_matches=a.min_matches)
 if __name__=="__main__": main()
