@@ -11,17 +11,20 @@ def split_for(bid:str)->str:
     return "train" if x<6 else ("calibration" if x<8 else "test")
 
 def main():
-    p=argparse.ArgumentParser(); p.add_argument("--truth",type=Path,required=True); p.add_argument("--catalog-root",type=Path,required=True); p.add_argument("--out",type=Path,required=True); a=p.parse_args()
+    p=argparse.ArgumentParser(); p.add_argument("--truth",type=Path,required=True); p.add_argument("--catalog-root",type=Path,required=True); p.add_argument("--out",type=Path,required=True); p.add_argument("--allow-unbalanced",action="store_true"); a=p.parse_args()
     truth=pd.read_csv(a.truth); a.out.mkdir(parents=True,exist_ok=True)
     if len(truth)==0 or set(truth.truth_class)!=set(CLASSES):
         raise AssertionError("truth set must be non-empty and contain exactly STAR/GALAXY/QSO")
     assert truth.benchmark_id.is_unique
     counts=truth.truth_class.value_counts().to_dict()
-    if len(set(counts.values())) != 1:
-        raise AssertionError(f"truth classes must be balanced; got {counts}")
-    expected_per_class=len(truth)//len(CLASSES)
-    if len(truth)%len(CLASSES) or counts!={c:expected_per_class for c in CLASSES}:
-        raise AssertionError(f"truth set size/classes inconsistent; rows={len(truth)}, counts={counts}")
+    if not a.allow_unbalanced:
+        if len(set(counts.values())) != 1:
+            raise AssertionError(f"truth classes must be balanced; got {counts}")
+        expected_per_class=len(truth)//len(CLASSES)
+        if len(truth)%len(CLASSES) or counts!={c:expected_per_class for c in CLASSES}:
+            raise AssertionError(f"truth set size/classes inconsistent; rows={len(truth)}, counts={counts}")
+    elif any(counts.get(c,0)<20 for c in CLASSES):
+        raise AssertionError(f"unbalanced benchmark still requires >=20 examples per class; got {counts}")
     manifest=truth[["benchmark_id","truth_class","ra","dec"]].copy(); manifest["split"]=manifest.benchmark_id.map(split_for)
     reports=[]; problems=[]; active_catalogs=[]; excluded_catalogs=[]
     files=sorted(a.catalog_root.rglob("*_trd.csv"))
