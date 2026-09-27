@@ -9,6 +9,11 @@ on:
       - 'v2/Classifier/axes/phenomenon.py'
       - '.github/workflows/v2_phenomenon_simbad_smoke.yml'
 
+
+concurrency:
+  group: v2_phenomenon_simbad_smoke-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   smoke:
     runs-on: ubuntu-latest
