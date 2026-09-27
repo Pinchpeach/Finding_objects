@@ -1,10 +1,12 @@
 """Compact-object axis.
 
-Exact curated SIMBAD physical types can identify pulsars and X-ray binaries.
-Gaia DR3 compact-companion evidence remains a candidate-only route and is never
-promoted to NS/PULSAR/XRB by itself.
+Evidence order:
+1. ATNF Pulsar Catalog counterpart: direct PULSAR identification.
+2. Exact curated SIMBAD physical types for pulsars/X-ray binaries.
+3. Gaia compact-companion candidate flag, which is never promoted to NS/PULSAR/XRB.
 """
 from __future__ import annotations
+import math
 AXIS="compact"
 CLASSES=("NS","PULSAR","XRB","COMPACT_COMPANION_CANDIDATE","OTHER_COMPACT","UNKNOWN")
 
@@ -21,7 +23,26 @@ def _text(row,key):
     value=str(value).strip()
     return None if not value or value.lower()=="nan" else value
 
+def _num(row,key):
+    try:
+        value=float(row.get(key))
+        return value if math.isfinite(value) else None
+    except Exception:return None
+
 def classify(row):
+    catalogs=_text(row,"catalogs") or ""
+    if "ATNF Pulsar Catalog" in catalogs:
+        assoc=_num(row,"association_confidence__atnf_pulsar_catalog")
+        return {
+            "axis":AXIS,"label":"PULSAR","confidence":None,
+            "status":"ATNF_CATALOG_MATCH",
+            "evidence":[{
+                "kind":"atnf_pulsar_catalog_counterpart",
+                "association_confidence":assoc,
+                "note":"Counterpart associated with the ATNF Pulsar Catalog; association quality retained separately from class identity.",
+            }],
+        }
+
     simbad=_text(row,"otype")
     if simbad=="Psr":
         return {
