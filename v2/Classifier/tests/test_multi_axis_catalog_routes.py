@@ -44,6 +44,7 @@ expect(variability,{"best_class_name":"SN","best_class_score":0.93},"UNKNOWN","R
 expect(phenomenon,{"best_class_name":"SN","best_class_score":0.93},"SN","GAIA_DR3_SN_CANDIDATE")
 expect(phenomenon,{"best_class_name":"MICROLENSING","best_class_score":0.90},"MICROLENSING","GAIA_DR3_MICROLENSING_CANDIDATE")
 
+expect(compact,{"catalogs":"ATNF Pulsar Catalog","association_confidence__atnf_pulsar_catalog":0.97},"PULSAR","ATNF_CATALOG_MATCH")
 expect(compact,{"otype":"Psr"},"PULSAR","SIMBAD_CURATED_PULSAR")
 expect(compact,{"otype":"XB*"},"XRB","SIMBAD_CURATED_XRB")
 expect(compact,{"in_vari_compact_companion":True},"COMPACT_COMPANION_CANDIDATE","GAIA_DR3_COMPACT_COMPANION_CANDIDATE")
