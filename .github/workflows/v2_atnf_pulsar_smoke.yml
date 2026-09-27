@@ -1,0 +1,51 @@
+name: v2 ATNF pulsar smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'v2/Get_data/atnf_pulsar.py'
+      - 'v2/Get_data/controller.py'
+      - 'v2/Classifier/axes/compact.py'
+      - '.github/workflows/v2_atnf_pulsar_smoke.yml'
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install pandas astropy astroquery
+      - name: Query Crab Pulsar from ATNF HEASARC
+        run: |
+          python - <<'PY'
+          import importlib.util
+          from pathlib import Path
+          p=Path("v2/Get_data/atnf_pulsar.py")
+          s=importlib.util.spec_from_file_location("atnf",p)
+          m=importlib.util.module_from_spec(s); s.loader.exec_module(m)
+          d=m.fetch(83.63311445609,22.01448713834,0.5)
+          print(d[[c for c in ["catalog","catalog_object_id","object_name","ra","dec"] if c in d]].to_string(index=False))
+          assert len(d)>=1, "ATNF did not return Crab Pulsar"
+          assert set(d["catalog"])=={"ATNF Pulsar Catalog"}
+          assert d["catalog_object_id"].notna().all()
+          m.save(d,Path("/tmp/atnf_crab.csv"))
+          PY
+      - name: Validate compact route
+        run: |
+          python - <<'PY'
+          import importlib.util
+          from pathlib import Path
+          p=Path("v2/Classifier/axes/compact.py")
+          s=importlib.util.spec_from_file_location("compact",p)
+          m=importlib.util.module_from_spec(s); s.loader.exec_module(m)
+          r=m.classify({"catalogs":"Gaia DR3|ATNF Pulsar Catalog","association_confidence__atnf_pulsar_catalog":0.95})
+          print(r)
+          assert r["label"]=="PULSAR"
+          assert r["status"]=="ATNF_CATALOG_MATCH"
+          PY
