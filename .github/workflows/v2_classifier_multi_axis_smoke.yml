@@ -14,6 +14,11 @@ on:
       - 'v2/Classifier/tests/test_control_integration.py'
       - '.github/workflows/v2_classifier_multi_axis_smoke.yml'
 
+
+concurrency:
+  group: v2_classifier_multi_axis_smoke-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   smoke:
     runs-on: ubuntu-latest
