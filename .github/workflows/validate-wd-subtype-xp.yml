@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
   push:
     paths:
+      - v2/Classifier/build_wd_subtype_truth.py
       - v2/Classifier/collect_gaia_xp_coefficients.py
       - v2/Classifier/train_validate_wd_subtype_xp.py
       - .github/workflows/validate-wd-subtype-xp.yml
