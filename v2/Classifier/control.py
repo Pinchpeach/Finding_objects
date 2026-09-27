@@ -16,7 +16,7 @@ def load(name):
 def run(inp:Path,out:Path):
     d=pd.read_csv(inp)
     mods={k:load(v) for k,v in BRANCH.items()}
-    payload=[]; labels=[]; conf=[]
+    payload=[]; labels=[]; conf=[]; stellar_family=[]; spectral_type=[]; variability_class=[]
     for _,row in d.iterrows():
         coarse=str(row.get("primary_class","UNKNOWN"))
         if coarse in mods:
@@ -27,8 +27,15 @@ def run(inp:Path,out:Path):
         payload.append(json.dumps(res,separators=(",",":")))
         labels.append(res.get("detailed_class","UNRESOLVED"))
         conf.append(res.get("confidence"))
+        stellar_family.append(res.get("stellar_family"))
+        spectral_type.append(res.get("spectral_type"))
+        var=res.get("variability") if isinstance(res.get("variability"),dict) else {}
+        variability_class.append(var.get("class"))
     d["detailed_class"]=labels
     d["detailed_confidence"]=conf
+    d["stellar_family"]=stellar_family
+    d["spectral_type"]=spectral_type
+    d["variability_class"]=variability_class
     d["detailed_result_json"]=payload
     out.parent.mkdir(parents=True,exist_ok=True); d.to_csv(out,index=False)
     print(f"[OK] detailed routing rows={len(d)} -> {out}")
