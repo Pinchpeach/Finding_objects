@@ -42,9 +42,11 @@ jobs:
           import pandas as pd
           d=pd.read_csv("/tmp/classified.csv")
           assert list(d.detailed_class)==["WHITE_DWARF_CANDIDATE","BINARY_CANDIDATE","WHITE_DWARF_CANDIDATE","UNRESOLVED","UNRESOLVED","UNRESOLVED","UNRESOLVED"]
-          assert d.loc[d.object_id.eq("s1"),"variability_class"].iloc[0]=="RR"
-          assert d.loc[d.object_id.eq("s2"),"variability_class"].iloc[0]=="ECL"
+          assert d.loc[d.object_id.eq("s1"),"variability_class_legacy"].iloc[0]=="RR"
+          assert d.loc[d.object_id.eq("s2"),"variability_class_legacy"].iloc[0]=="ECL"
+          assert d.loc[d.object_id.eq("s1"),"variability_class"].iloc[0]=="RR_LYRAE"
+          assert d.loc[d.object_id.eq("s2"),"variability_class"].iloc[0]=="ECLIPSING"
           assert d.loc[d.object_id.eq("s1"),"spectral_type"].iloc[0]=="DA"
           assert d.loc[d.object_id.eq("s3"),"spectral_type"].iloc[0]=="UNRESOLVED"
-          print(d[["object_id","primary_class","detailed_class","stellar_family","variability_class","spectral_type"]].to_string(index=False))
+          print(d[["object_id","primary_class","detailed_class","stellar_family","variability_class_legacy","variability_class","spectral_type"]].to_string(index=False))
           PY
