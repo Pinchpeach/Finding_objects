@@ -10,6 +10,11 @@ on:
       - 'v2/rawdata/*_ra188p4155_dec9p1751_r0p5arcmin.csv'
       - '.github/workflows/v2_ngc4522_e2e_classifier.yml'
 
+
+concurrency:
+  group: v2_ngc4522_e2e_classifier-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   e2e:
     runs-on: ubuntu-latest
