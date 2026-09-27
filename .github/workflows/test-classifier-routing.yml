@@ -23,6 +23,10 @@ jobs:
              "best_class_name":"RR","best_class_score":0.88,"teff_gspphot":11500,"logg_gspphot":8.0},
             {"object_id":"s2","primary_class":"STAR","classprob_dsc_combmod_whitedwarf":0.02,"classprob_dsc_combmod_binarystar":0.91,
              "best_class_name":"ECL","best_class_score":0.81},
+            {"object_id":"s3","primary_class":"STAR","parallax":10.0,"parallax_error":1.0,
+             "phot_g_mean_mag":15.0,"bp_rp":0.0},
+            {"object_id":"s4","primary_class":"STAR","parallax":10.0,"parallax_error":1.0,
+             "phot_g_mean_mag":15.0,"bp_rp":0.0,"classprob_dsc_combmod_star":0.95},
             {"object_id":"g1","primary_class":"GALAXY"},
             {"object_id":"q1","primary_class":"QSO","rx_radio_peak":2.5},
             {"object_id":"u1","primary_class":"UNKNOWN"},
@@ -35,7 +39,7 @@ jobs:
           python - <<'PY'
           import pandas as pd
           d=pd.read_csv("/tmp/classified.csv")
-          assert list(d.detailed_class)==["WHITE_DWARF_CANDIDATE","BINARY_CANDIDATE","UNRESOLVED","UNRESOLVED","UNRESOLVED"]
+          assert list(d.detailed_class)==["WHITE_DWARF_CANDIDATE","BINARY_CANDIDATE","WHITE_DWARF_CANDIDATE","UNRESOLVED","UNRESOLVED","UNRESOLVED","UNRESOLVED"]
           assert d.loc[d.object_id.eq("s1"),"variability_class"].iloc[0]=="RR"
           assert d.loc[d.object_id.eq("s2"),"variability_class"].iloc[0]=="ECL"
           assert d.loc[d.object_id.eq("s1"),"spectral_type"].iloc[0]=="UNRESOLVED"
