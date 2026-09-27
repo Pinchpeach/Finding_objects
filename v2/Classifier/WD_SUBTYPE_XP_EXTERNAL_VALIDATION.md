@@ -119,3 +119,40 @@ Key code:
 - `collect_gaia_xp_coefficients.py`
 - `validate_wd_subtype_xp_external.py`
 - `.github/workflows/validate-wd-subtype-xp-external.yml`
+
+
+## Reproducible deploy model
+
+A deployable model is generated from the validated LAMOST XP data without
+committing a binary model file into Git.
+
+Workflow:
+- **Build WD Subtype Gaia XP Model**
+- successful run: **36306249028**
+- artifact: `wd-subtype-xp-deploy-model`
+- retention: 90 days
+
+For deployment fitting, the deterministic calibration partition remains held
+out for sigmoid calibration and all other LAMOST XP rows are used to fit the
+Random Forest base model.
+
+Re-evaluation of this deploy artifact on the untouched 213-row SDSS external XP
+set:
+
+- ungated accuracy: **95.77%**
+- p >= 0.90 classified rows: **124 / 213 (58.22%)**
+- p >= 0.90 accuracy: **100.00%**
+- p >= 0.90 balanced accuracy: **100.00%**
+
+The STAR routing branch now accepts DA/DB output only when:
+- the object is independently a `WHITE_DWARF_CANDIDATE`,
+- an externally validated XP model provides `DA` or `DB`, and
+- calibrated subtype confidence is >= **0.90**.
+
+Otherwise `spectral_type` remains `UNRESOLVED`.
+
+Implementation:
+- `fit_wd_subtype_xp_model.py`
+- `apply_wd_subtype_xp.py`
+- `branches/star.py`
+- `.github/workflows/build-wd-subtype-xp-model.yml`
