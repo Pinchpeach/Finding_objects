@@ -23,6 +23,11 @@ def _num(row,key):
 
 def classify(row):
     simbad=_text(row,"otype")
+    if simbad=="SN*":
+        return {
+            "axis":AXIS,"label":"SN","confidence":None,"status":"SIMBAD_CURATED_SN",
+            "evidence":[{"kind":"simbad_physical_type","otype":"SN*","note":"Exact SIMBAD SuperNova physical type."}],
+        }
     if simbad=="PN":
         return {
             "axis":AXIS,"label":"PN","confidence":None,"status":"SIMBAD_CURATED_PN",
