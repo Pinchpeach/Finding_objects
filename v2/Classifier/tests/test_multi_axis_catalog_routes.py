@@ -35,6 +35,10 @@ r=physical.classify({
 })
 assert r["label"]=="OTHER_STELLAR",r
 
+expect(variability,{"otype":"Mi*"},"MIRA","SIMBAD_CURATED_VARIABLE_TYPE")
+expect(variability,{"otype":"RR*"},"RR_LYRAE","SIMBAD_CURATED_VARIABLE_TYPE")
+expect(variability,{"otype":"Ce*"},"CEPHEID","SIMBAD_CURATED_VARIABLE_TYPE")
+expect(variability,{"otype":"EB*"},"ECLIPSING","SIMBAD_CURATED_VARIABLE_TYPE")
 expect(variability,{"best_class_name":"RR","best_class_score":0.91},"RR_LYRAE","GAIA_DR3_VARIABLE_CANDIDATE")
 expect(variability,{"best_class_name":"CEP","best_class_score":0.88},"CEPHEID","GAIA_DR3_VARIABLE_CANDIDATE")
 expect(variability,{"best_class_name":"LPV","best_class_score":0.85},"LPV","GAIA_DR3_VARIABLE_CANDIDATE")
