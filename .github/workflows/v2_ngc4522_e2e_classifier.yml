@@ -1,0 +1,66 @@
+name: v2 NGC4522 preprocess-classifier E2E
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'v2/Preprocess/**'
+      - 'v2/Classifier/**'
+      - 'v2/rawdata/*_ra188p4155_dec9p1751_r0p5arcmin.csv'
+      - '.github/workflows/v2_ngc4522_e2e_classifier.yml'
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install pandas numpy
+      - name: Isolate NGC4522 raw inputs
+        run: |
+          mkdir -p /tmp/ngcraw /tmp/ngcpre /tmp/ngcclass
+          cp v2/rawdata/*_ra188p4155_dec9p1751_r0p5arcmin.csv /tmp/ngcraw/
+          ls -1 /tmp/ngcraw | wc -l
+      - name: Run preprocessing stages
+        run: |
+          python v2/Preprocess/01_source_association.py --raw-dir /tmp/ngcraw --out /tmp/ngcpre/source_association.csv
+          python v2/Preprocess/02_integrate_objects.py --associations /tmp/ngcpre/source_association.csv --raw-dir /tmp/ngcraw --out /tmp/ngcpre/integrated_objects.csv
+          python v2/Preprocess/03_extract_features.py --objects /tmp/ngcpre/integrated_objects.csv --rules v2/Preprocess/classification_rules.csv --out /tmp/ngcpre/features.csv
+          python v2/Preprocess/04_build_evidence.py --features /tmp/ngcpre/features.csv --rules v2/Preprocess/classification_rules.csv --out /tmp/ngcpre/evidence.csv
+          python v2/Preprocess/05_likelihood_vectors.py --evidence /tmp/ngcpre/evidence.csv --out /tmp/ngcpre/likelihood_vectors.csv
+      - name: Run classifier controller
+        run: |
+          python v2/Classifier/01_prepare_input.py --input /tmp/ngcpre/likelihood_vectors.csv --out /tmp/ngcclass/classifier_input.csv
+          python v2/Classifier/control.py --input /tmp/ngcclass/classifier_input.csv --out /tmp/ngcclass/classified_objects.csv
+      - name: Validate output contract
+        run: |
+          python - <<'PY'
+          import pandas as pd
+          p="/tmp/ngcclass/classified_objects.csv"
+          d=pd.read_csv(p)
+          assert len(d)>0, "classifier produced no objects"
+          required=[
+            "primary_class","physical_class","variability_class","compact_class",
+            "extragalactic_class","phenomenon_class",
+            "physical_status","variability_status","compact_status",
+            "extragalactic_status","phenomenon_status",
+          ]
+          missing=[c for c in required if c not in d.columns]
+          assert not missing, f"missing output columns: {missing}"
+          print("rows",len(d))
+          print("primary",d.primary_class.value_counts(dropna=False).to_dict())
+          for c in ["physical_class","variability_class","compact_class","extragalactic_class","phenomenon_class"]:
+              print(c,d[c].value_counts(dropna=False).head(10).to_dict())
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v2-ngc4522-e2e-classifier
+          path: |
+            /tmp/ngcpre/*.csv
+            /tmp/ngcclass/*.csv
