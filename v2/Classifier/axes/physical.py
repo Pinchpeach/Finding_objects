@@ -1,7 +1,10 @@
 """Physical/evolutionary-state axis.
 
-Validated WD routing is reused from branches/star.py. RGB/AGB refinement is kept
-in a separate evolved-star branch and abstains until its model is validated.
+Evidence priority:
+1. Curated SIMBAD physical type when it is an exact supported class.
+2. Validated WD routing from branches/star.py.
+3. Gaia FLAME RGB refinement.
+Unsupported/candidate labels abstain rather than being promoted.
 """
 from __future__ import annotations
 import importlib.util
@@ -20,10 +23,30 @@ def _load_branch(name):
     spec.loader.exec_module(module)
     return module
 
+def _text(row,key):
+    value=row.get(key)
+    if value is None:return None
+    value=str(value).strip()
+    return None if not value or value.lower()=="nan" else value
+
 STAR=_load_branch("star")
 EVOLVED=_load_branch("evolved_star")
 
 def classify(row):
+    simbad=_text(row,"otype")
+    if simbad=="AGB*":
+        return {
+            "axis":AXIS,
+            "label":"AGB",
+            "confidence":None,
+            "status":"SIMBAD_CURATED_AGB",
+            "evidence":[{
+                "kind":"simbad_physical_type",
+                "otype":"AGB*",
+                "note":"Exact SIMBAD Asymptotic Giant Branch Star physical type.",
+            }],
+        }
+
     coarse=str(row.get("primary_class","")).strip().upper()
     if coarse not in {"STAR",""}:
         return {
@@ -47,15 +70,11 @@ def classify(row):
     }]
 
     if family=="WHITE_DWARF_CANDIDATE":
-        confidence=star.get("stellar_family_score")
-        status="CLASSIFIED_WD"
-        # HR-only WD evidence is scientifically useful but not a calibrated
-        # probability, so confidence remains None rather than inventing one.
         return {
             "axis":AXIS,
             "label":"WD",
-            "confidence":confidence,
-            "status":status,
+            "confidence":star.get("stellar_family_score"),
+            "status":"CLASSIFIED_WD",
             "evidence":evidence,
         }
 
