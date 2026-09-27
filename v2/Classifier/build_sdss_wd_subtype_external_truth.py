@@ -67,7 +67,7 @@ def remove_lamost_overlap(d,lamost_truth,max_sep_arcsec=2.0):
 
 def build_one(cls,per_class,min_sn):
     d=query_type(cls)
-    ncol=next((c for c in ("Name","SDSS","name") if c in d.columns),None)
+    ncol=next((c for c in ("Name","SDSSJ","SDSS","name") if c in d.columns),None)
     tcol=next((c for c in ("Type","type") if c in d.columns),None)
     scol=next((c for c in ("S/Ng","SNg","SN","S/N") if c in d.columns),None)
     if not ncol or not tcol:
@@ -77,8 +77,12 @@ def build_one(cls,per_class,min_sn):
     if scol:
         sn=pd.to_numeric(q[scol],errors="coerce")
         q=q.loc[sn>=min_sn].copy()
-    coords=q[ncol].map(parse_sdss_name)
-    q["ra"]=[x[0] for x in coords]; q["dec"]=[x[1] for x in coords]
+    if "_RA" in q.columns and "_DE" in q.columns:
+        q["ra"]=pd.to_numeric(q["_RA"],errors="coerce")
+        q["dec"]=pd.to_numeric(q["_DE"],errors="coerce")
+    else:
+        coords=q[ncol].map(parse_sdss_name)
+        q["ra"]=[x[0] for x in coords]; q["dec"]=[x[1] for x in coords]
     q=q[np.isfinite(q.ra)&np.isfinite(q.dec)].copy()
     q["external_id"]=q[ncol].astype(str)
     q["wd_subtype"]=cls
