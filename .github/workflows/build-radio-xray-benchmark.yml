@@ -15,7 +15,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install pandas
+      - run: pip install pandas astropy astroquery
       - name: Build radio/X-ray selected spectroscopy truth
         run: python v2/benchmark/build_radio_xray_truth.py --total 1000
       - name: Validate truth
