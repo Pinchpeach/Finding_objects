@@ -3,7 +3,13 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - 'v2/Classifier/**'
+      - 'v2/Classifier/control.py'
+      - 'v2/Classifier/control_axes.py'
+      - 'v2/Classifier/01_prepare_input.py'
+      - 'v2/Classifier/axes/**'
+      - 'v2/Classifier/branches/**'
+      - 'v2/Classifier/tests/test_control_integration.py'
+      - 'v2/Classifier/tests/test_multi_axis_catalog_routes.py'
       - '.github/workflows/test-classifier-routing.yml'
 
 concurrency:
