@@ -5,6 +5,11 @@ on:
     paths:
       - 'v2/Classifier/**'
       - '.github/workflows/test-classifier-routing.yml'
+
+concurrency:
+  group: test-classifier-routing-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   smoke:
     runs-on: ubuntu-latest
