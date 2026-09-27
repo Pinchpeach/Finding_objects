@@ -1,0 +1,43 @@
+name: Build STAR Branch Truth
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'v2/Classifier/build_star_truth.py'
+      - '.github/workflows/build-star-branch-truth.yml'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pandas
+      - name: Build spectroscopy STAR truth
+        run: python v2/Classifier/build_star_truth.py --total 1000
+      - name: Validate STAR truth
+        run: |
+          python - <<'PY'
+          import pandas as pd
+          p="v2/Classifier/star_truth.csv"
+          d=pd.read_csv(p)
+          assert d.benchmark_id.is_unique
+          assert set(d.star_truth_class)=={"WHITE_DWARF","NORMAL_STAR"}
+          c=d.star_truth_class.value_counts().to_dict()
+          assert min(c.values())>=100, c
+          assert (d.zwarning==0).all()
+          print(c)
+          PY
+      - name: Commit STAR truth
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add v2/Classifier/star_truth.csv
+          git diff --cached --quiet && exit 0
+          git commit -m "Add STAR spectroscopy truth benchmark"
+          git fetch origin main
+          git rebase origin/main
+          git push
