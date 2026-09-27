@@ -1,0 +1,63 @@
+name: Validate WD Subtype Gaia XP External
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - v2/Classifier/build_sdss_wd_subtype_external_truth.py
+      - v2/Classifier/validate_wd_subtype_xp_external.py
+      - .github/workflows/validate-wd-subtype-xp-external.yml
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install pandas numpy scipy scikit-learn astropy astroquery
+      - name: Download validated LAMOST Gaia XP training artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: wd-subtype-gaia-xp-eval
+          path: /tmp/lamost_xp_seed
+          run-id: 36300795761
+          github-token: ${{ github.token }}
+      - name: Locate LAMOST XP training data
+        run: |
+          XP_FILE="$(find /tmp/lamost_xp_seed -name wd_subtype_xp.csv -print -quit)"
+          test -n "$XP_FILE"
+          cp "$XP_FILE" /tmp/lamost_wd_subtype_xp.csv
+          python - <<'PY'
+          import pandas as pd
+          d=pd.read_csv("/tmp/lamost_wd_subtype_xp.csv")
+          print("LAMOST XP rows",len(d),d.star_truth_class.value_counts().to_dict())
+          PY
+      - name: Build independent SDSS DR14 DA DB truth
+        run: python v2/Classifier/build_sdss_wd_subtype_external_truth.py --per-class 200 --min-sn 10
+      - name: Crossmatch SDSS external truth to Gaia DR3
+        run: python v2/Classifier/collect_star_gaia.py --truth v2/Classifier/sdss_wd_subtype_external_truth.csv --out v2/Classifier/sdss_wd_subtype_gaia.csv --min-matches 180
+      - name: Download Gaia XP for SDSS external truth
+        run: python v2/Classifier/collect_gaia_xp_coefficients.py --features v2/Classifier/sdss_wd_subtype_gaia.csv --out v2/Classifier/sdss_wd_subtype_xp.csv --batch-size 30
+      - name: External DA DB validation
+        run: python v2/Classifier/validate_wd_subtype_xp_external.py --lamost-xp /tmp/lamost_wd_subtype_xp.csv --sdss-xp v2/Classifier/sdss_wd_subtype_xp.csv --out v2/Classifier/wd_subtype_xp_external_eval
+      - name: Show external metrics
+        run: |
+          cat v2/Classifier/wd_subtype_xp_external_eval/metrics.json
+          echo "--- external confusion ---"
+          cat v2/Classifier/wd_subtype_xp_external_eval/external_confusion.csv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wd-subtype-xp-external-eval
+          path: |
+            v2/Classifier/sdss_wd_subtype_external_truth.csv
+            v2/Classifier/sdss_wd_subtype_gaia.csv
+            v2/Classifier/sdss_wd_subtype_xp.csv
+            v2/Classifier/wd_subtype_xp_external_eval/
+          retention-days: 30
