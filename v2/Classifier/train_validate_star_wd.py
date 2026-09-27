@@ -123,6 +123,12 @@ def main():
         "f1_white_dwarf":float(f1_score(y,bpred,pos_label="WHITE_DWARF")),
         "precision_white_dwarf":float(precision_score(y,bpred,pos_label="WHITE_DWARF",zero_division=0)),
         "recall_white_dwarf":float(recall_score(y,bpred,pos_label="WHITE_DWARF",zero_division=0)),
+        "usable_only":{
+          "n":int(busable.sum()),
+          "accuracy":float(accuracy_score(y[busable],bpred[busable])),
+          "balanced_accuracy":float(balanced_accuracy_score(y[busable],bpred[busable])),
+          "f1_white_dwarf":float(f1_score(y[busable],bpred[busable],pos_label="WHITE_DWARF")),
+        },
       },
       "learned":{
         "accuracy":float(accuracy_score(y,pred)),
@@ -133,6 +139,12 @@ def main():
         "recall_white_dwarf":float(recall_score(y,pred,pos_label="WHITE_DWARF",zero_division=0)),
         "log_loss":float(log_loss(y,p,labels=classes)),
         "brier_white_dwarf":brier_binary(y,pwd),
+        "on_baseline_usable_subset":{
+          "n":int(busable.sum()),
+          "accuracy":float(accuracy_score(y[busable],pred[busable])),
+          "balanced_accuracy":float(balanced_accuracy_score(y[busable],pred[busable])),
+          "macro_f1":float(f1_score(y[busable],pred[busable],average="macro")),
+        },
       }
     }
 
