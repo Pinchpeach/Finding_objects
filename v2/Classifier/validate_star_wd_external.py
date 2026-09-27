@@ -45,7 +45,12 @@ def main():
     # External data can have a different missingness pattern. Align columns to
     # the SDSS-trained feature schema without inventing measurements.
     for c in feats:
-        if c not in de.columns: de[c]=np.nan
+        if c not in de.columns:
+            if c.startswith("missing__"):
+                base_name=c[len("missing__"):]
+                de[c]=de[base_name].isna().astype(float) if base_name in de.columns else 1.0
+            else:
+                de[c]=np.nan
     de=de.copy()
 
     base=HistGradientBoostingClassifier(loss="log_loss",learning_rate=0.05,max_iter=300,
