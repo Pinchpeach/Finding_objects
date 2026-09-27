@@ -9,7 +9,7 @@ import argparse,json,math
 from pathlib import Path
 import pandas as pd
 
-PRIMARY=("STAR","WD","GALAXY","QSO","BINARY")
+PRIMARY=("STAR","GALAXY","QSO")
 DSC_MAP={
  "QSO":"classprob_dsc_combmod_quasar","GALAXY":"classprob_dsc_combmod_galaxy",
  "STAR":"classprob_dsc_combmod_star","WD":"classprob_dsc_combmod_whitedwarf",
@@ -145,16 +145,26 @@ def evaluate(rule,row):
                 emit(out,rule,"STAR",0.55,typ,"weak point-source morphology; QSO contamination possible",reliability,association_reliability)
     elif rid=="NED-TYPE-001":
         typ=str(row.get("Type","")).strip()
-        mp={"G":"GALAXY","QSO":"QSO","*":"STAR","WD*":"WD"}
+        mp={"G":"GALAXY","QSO":"QSO","*":"STAR","WD*":"STAR"}
         if typ in mp: emit(out,rule,mp[typ],0.85,typ,"curated NED preferred physical type",reliability,association_reliability)
     elif rid=="SIMBAD-TYPE-001":
         typ=str(row.get("otype","")).strip()
-        mp={"G":"GALAXY","GiG":"GALAXY","QSO":"QSO","AGN":"EXTRAGALACTIC","Star":"STAR","*":"STAR","WD*":"WD"}
+        mp={"G":"GALAXY","GiG":"GALAXY","QSO":"QSO","AGN":"EXTRAGALACTIC","Star":"STAR","*":"STAR","WD*":"STAR"}
         if typ in mp: emit(out,rule,mp[typ],0.85,typ,"curated SIMBAD hierarchical physical type",reliability,association_reliability)
     elif rid=="DSC-001":
-        for cls,col in DSC_MAP.items():
-            v=num(row,col)
-            if v is not None: emit(out,rule,cls,v,v,reliability=reliability,association_reliability=association_reliability)
+        # Preprocess is intentionally coarse. Gaia DSC white-dwarf and
+        # physical-binary posterior mass belongs to the stellar family here;
+        # detailed stellar subclassification is deferred to v2/Classifier.
+        pv={cls:num(row,col) for cls,col in DSC_MAP.items()}
+        stellar=sum(v for cls,v in pv.items() if cls in {"STAR","WD","BINARY"} and v is not None)
+        if stellar>0:
+            emit(out,rule,"STAR",min(1.0,stellar),stellar,
+                 "Gaia DSC STAR+WD+BINARY coarse stellar-family probability",
+                 reliability=reliability,association_reliability=association_reliability)
+        for cls in ("GALAXY","QSO"):
+            v=pv.get(cls)
+            if v is not None:
+                emit(out,rule,cls,v,v,reliability=reliability,association_reliability=association_reliability)
     elif rid=="VAR-001":
         cls=str(row.get("best_class_name","")).strip()
         score=num(row,"best_class_score")
