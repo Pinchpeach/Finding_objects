@@ -1,8 +1,8 @@
-"""Transient/phenomenon axis from validated catalog evidence currently available.
+"""Transient/nebular phenomenon axis.
 
-Gaia DR3 publishes SN and MICROLENSING candidate classes. PN and nova are not
-in Gaia vari_classifier_result, so they remain unresolved until dedicated
-spectroscopic/catalog-independent evidence modules are implemented.
+Uses exact curated SIMBAD physical types for PN/nova and Gaia DR3 variability
+candidate classes for SN/microlensing. Gaia candidate scores are retained as
+catalog evidence, not treated as calibrated probabilities.
 """
 from __future__ import annotations
 import math
@@ -22,6 +22,18 @@ def _num(row,key):
     except Exception:return None
 
 def classify(row):
+    simbad=_text(row,"otype")
+    if simbad=="PN":
+        return {
+            "axis":AXIS,"label":"PN","confidence":None,"status":"SIMBAD_CURATED_PN",
+            "evidence":[{"kind":"simbad_physical_type","otype":"PN","note":"Exact SIMBAD Planetary Nebula physical type."}],
+        }
+    if simbad=="No*":
+        return {
+            "axis":AXIS,"label":"NOVA","confidence":None,"status":"SIMBAD_CURATED_NOVA",
+            "evidence":[{"kind":"simbad_physical_type","otype":"No*","note":"Exact SIMBAD Classical Nova physical type."}],
+        }
+
     raw=_text(row,"best_class_name")
     score=_num(row,"best_class_score")
     evidence=[] if raw is None else [{
