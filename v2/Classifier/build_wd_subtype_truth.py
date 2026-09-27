@@ -15,7 +15,7 @@ def run(out:Path,per_class=150):
     tabs=Vizier(columns=["**"],row_limit=-1).get_catalogs(CAT)
     if not tabs: raise RuntimeError("LAMOST WD table3 unavailable")
     d=tabs[0].to_pandas(); d.columns=[str(c).strip() for c in d.columns]
-    tcol=pick(d.columns,["Type","SpType","Sp","Class","SubClass"])
+    tcol=pick(d.columns,["SpType","NType","Type","Sp","Class","SubClass"])
     racol=pick(d.columns,["RAJ2000","RAdeg","RA_ICRS","RA"])
     deccol=pick(d.columns,["DEJ2000","DEdeg","DE_ICRS","DE","DEC"])
     idcol=pick(d.columns,["Name","ObsID","GroupID"])
