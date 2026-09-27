@@ -123,6 +123,14 @@ def main():
     a=p.parse_args(); a.out.mkdir(parents=True,exist_ok=True)
     truth=pd.read_csv(a.truth); manifest=pd.read_csv(a.manifest)
     cats=read_catalogs(a.catalog_root); x=build_matrix(truth,cats)
+    # Radio/X-ray-selected benchmarks may carry catalog-native measurements
+    # captured at the selection crossmatch. Only rx_* numeric columns are
+    # eligible; truth labels/selection metadata remain excluded from X.
+    native=[c for c in truth.columns if c.startswith("rx_")]
+    if native:
+        q=truth[["benchmark_id"]+native].copy()
+        for col in native: q[col]=pd.to_numeric(q[col],errors="coerce")
+        x=x.merge(q,on="benchmark_id",how="left")
     data=truth[["benchmark_id","truth_class"]+([c for c in ["truth_selection","truth_radio_catalog"] if c in truth.columns])].merge(
         manifest[["benchmark_id","split"]],on="benchmark_id").merge(x,on="benchmark_id")
     feats=[c for c in x.columns if c!="benchmark_id"]
