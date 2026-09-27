@@ -120,16 +120,32 @@ def main():
     p=argparse.ArgumentParser()
     p.add_argument("--truth",type=Path,required=True); p.add_argument("--catalog-root",type=Path,required=True)
     p.add_argument("--manifest",type=Path,required=True); p.add_argument("--out",type=Path,required=True)
+    p.add_argument("--exclude-native-rx",action="store_true",
+                   help="Exclude selection-time radio/X-ray numeric measurements for an optical/IR/UV baseline")
     a=p.parse_args(); a.out.mkdir(parents=True,exist_ok=True)
     truth=pd.read_csv(a.truth); manifest=pd.read_csv(a.manifest)
     cats=read_catalogs(a.catalog_root); x=build_matrix(truth,cats)
     # Radio/X-ray-selected benchmarks may carry catalog-native measurements
     # captured at the selection crossmatch. Only rx_* numeric columns are
     # eligible; truth labels/selection metadata remain excluded from X.
-    native=[c for c in truth.columns if c.startswith("rx_")]
-    if native:
+    native=[c for c in truth.columns if c.startswith("rx_")
+            and not c.startswith("rx_has_") and not c.endswith("_sep_arcsec")]
+    if native and not a.exclude_native_rx:
         q=truth[["benchmark_id"]+native].copy()
         for col in native: q[col]=pd.to_numeric(q[col],errors="coerce")
+        # Physical derived features. Detection-presence flags and separation are
+        # deliberately excluded because this benchmark is selected by detection.
+        if "rx_radio_peak" in q and "rx_radio_integr" in q:
+            peak=q["rx_radio_peak"].where(q["rx_radio_peak"]>0)
+            integ=q["rx_radio_integr"].where(q["rx_radio_integr"]>0)
+            q["rx_radio_log_peak"]=np.log10(peak)
+            q["rx_radio_log_integr"]=np.log10(integ)
+            q["rx_radio_integr_peak_ratio"]=integ/peak
+        for col in list(native):
+            low=col.lower()
+            if any(k in low for k in ("flux","rate","count")):
+                v=q[col].where(q[col]>0)
+                q["log10__"+col]=np.log10(v)
         x=x.merge(q,on="benchmark_id",how="left")
     data=truth[["benchmark_id","truth_class"]+([c for c in ["truth_selection","truth_radio_catalog"] if c in truth.columns])].merge(
         manifest[["benchmark_id","split"]],on="benchmark_id").merge(x,on="benchmark_id")
