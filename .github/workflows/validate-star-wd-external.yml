@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - v2/Classifier/build_lamost_star_external_truth.py
+      - v2/Classifier/lamost_star_external_truth.csv
       - v2/Classifier/validate_star_wd_external.py
       - .github/workflows/validate-star-wd-external.yml
 
@@ -19,8 +19,6 @@ jobs:
           python-version: "3.11"
       - name: Install dependencies
         run: pip install pandas numpy scikit-learn joblib astropy astroquery
-      - name: Build independent LAMOST truth
-        run: python v2/Classifier/build_lamost_star_external_truth.py --total 1000
       - name: Crossmatch SDSS training truth to Gaia
         run: python v2/Classifier/collect_star_gaia.py --truth v2/Classifier/star_truth.csv --out v2/Classifier/star_gaia_features.csv
       - name: Crossmatch LAMOST external truth to Gaia
