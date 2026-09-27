@@ -35,7 +35,7 @@ jobs:
       - name: Crossmatch DA DB truth to Gaia
         run: python v2/Classifier/collect_star_gaia.py --truth v2/Classifier/wd_subtype_truth.csv --out v2/Classifier/wd_subtype_gaia.csv --min-matches 180
       - name: Download Gaia XP continuous coefficients
-        run: python v2/Classifier/collect_gaia_xp_coefficients.py --features v2/Classifier/wd_subtype_gaia.csv --out v2/Classifier/wd_subtype_xp.csv --batch-size 300
+        run: python v2/Classifier/collect_gaia_xp_coefficients.py --features v2/Classifier/wd_subtype_gaia.csv --out v2/Classifier/wd_subtype_xp.csv --batch-size 30
       - name: Train and validate XP subtype model
         run: python v2/Classifier/train_validate_wd_subtype_xp.py --features v2/Classifier/wd_subtype_xp.csv --out v2/Classifier/wd_subtype_xp_eval
       - name: Show XP metrics
