@@ -24,7 +24,14 @@ jobs:
       - name: Train and validate WD classifier
         run: python v2/Classifier/train_validate_star_wd.py --features v2/Classifier/star_gaia_features.csv --out v2/Classifier/star_wd_eval
       - name: Show metrics
-        run: cat v2/Classifier/star_wd_eval/metrics.json
+        run: |
+          cat v2/Classifier/star_wd_eval/metrics.json
+          echo "--- baseline confusion ---"
+          cat v2/Classifier/star_wd_eval/baseline_confusion.csv
+          echo "--- learned confusion ---"
+          cat v2/Classifier/star_wd_eval/learned_confusion.csv
+          echo "--- classification report ---"
+          cat v2/Classifier/star_wd_eval/classification_report.csv
       - uses: actions/upload-artifact@v4
         with:
           name: star-wd-classifier-eval
