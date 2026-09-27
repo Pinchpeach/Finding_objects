@@ -1,0 +1,47 @@
+name: Validate WD Subtype Gaia XP
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - v2/Classifier/collect_gaia_xp_coefficients.py
+      - v2/Classifier/train_validate_wd_subtype_xp.py
+      - .github/workflows/validate-wd-subtype-xp.yml
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install pandas numpy scipy scikit-learn astropy astroquery
+      - name: Build pure DA DB truth
+        run: python v2/Classifier/build_wd_subtype_truth.py --per-class 150
+      - name: Crossmatch DA DB truth to Gaia
+        run: python v2/Classifier/collect_star_gaia.py --truth v2/Classifier/wd_subtype_truth.csv --out v2/Classifier/wd_subtype_gaia.csv --min-matches 180
+      - name: Download Gaia XP continuous coefficients
+        run: python v2/Classifier/collect_gaia_xp_coefficients.py --features v2/Classifier/wd_subtype_gaia.csv --out v2/Classifier/wd_subtype_xp.csv --batch-size 30
+      - name: Train and validate XP subtype model
+        run: python v2/Classifier/train_validate_wd_subtype_xp.py --features v2/Classifier/wd_subtype_xp.csv --out v2/Classifier/wd_subtype_xp_eval
+      - name: Show XP metrics
+        run: |
+          cat v2/Classifier/wd_subtype_xp_eval/metrics.json
+          echo "--- broadband same subset ---"
+          cat v2/Classifier/wd_subtype_xp_eval/broadband_confusion.csv
+          echo "--- XP Random Forest ---"
+          cat v2/Classifier/wd_subtype_xp_eval/xp_rf_confusion.csv
+          echo "--- top XP coefficients ---"
+          head -21 v2/Classifier/wd_subtype_xp_eval/xp_feature_importance.csv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wd-subtype-gaia-xp-eval
+          path: |
+            v2/Classifier/wd_subtype_truth.csv
+            v2/Classifier/wd_subtype_gaia.csv
+            v2/Classifier/wd_subtype_xp.csv
+            v2/Classifier/wd_subtype_xp_eval/
+          retention-days: 30
