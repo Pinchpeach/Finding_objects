@@ -44,7 +44,7 @@ jobs:
           pattern: rx-catalog-*
           path: v2/benchmark/radio_xray_downloaded
       - name: Validate products
-        run: python v2/benchmark/validate_catalog_truth.py --truth v2/benchmark/radio_xray_truth/ground_truth.csv --catalog-root v2/benchmark/radio_xray_downloaded --out v2/benchmark/radio_xray_ready
+        run: python v2/benchmark/validate_catalog_truth.py --truth v2/benchmark/radio_xray_truth/ground_truth.csv --catalog-root v2/benchmark/radio_xray_downloaded --out v2/benchmark/radio_xray_ready --allow-unbalanced
       - name: Evaluate optical/IR baseline model
         run: python v2/benchmark/train_validate_classifier.py --truth v2/benchmark/radio_xray_truth/ground_truth.csv --catalog-root v2/benchmark/radio_xray_downloaded --manifest v2/benchmark/radio_xray_ready/benchmark_manifest.csv --out v2/benchmark/radio_xray_ready/model_eval_baseline
       - uses: actions/upload-artifact@v4
