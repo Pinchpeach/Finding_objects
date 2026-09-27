@@ -47,36 +47,48 @@ def fetch_wd(n):
       "lamost_subclass":d["SpType"].astype(str) if "SpType" in d else "DA",
       "star_truth_class":"WHITE_DWARF",
       "truth_source":"LAMOST_DR5_GUO2022_WD",
+      "truth_quality":"PUBLISHED_DA_WHITE_DWARF_SAMPLE",
     }).dropna(subset=["ra","dec"])
     return out.drop_duplicates(["ra","dec"]).head(n)
 
 def fetch_normal(n):
     from astroquery.vizier import Vizier
-    v=Vizier(columns=["**"],row_limit=-1)
-    tabs=v.get_catalogs(LAMOST_CAT)
-    if not tabs: raise RuntimeError("LAMOST DR5 catalogue unavailable")
-    d=_norm_cols(tabs[0].to_pandas())
-    ra,dec=_coord_cols(d)
-    sub_col=next((c for c in ("SubClass","subclass","SUBCLASS") if c in d.columns),None)
-    if not sub_col: raise KeyError(f"LAMOST subclass missing: {list(d.columns)}")
-    sub=d[sub_col].fillna("").astype(str).str.upper().str.strip()
-    # Only ordinary Morgan-Keenan leading classes; exclude WD/subdwarf/peculiar labels.
-    ordinary=sub.str.match(r"^[OBAFGKM][0-9]?") & ~sub.str.contains(r"WD|SD|CV|D[ABCOQZ]",regex=True)
-    q=d.loc[ordinary].copy()
-    sq=sub.loc[ordinary]
-    out=pd.DataFrame({
-      "external_id":q["ObsID"].astype(str) if "ObsID" in q else np.arange(len(q)).astype(str),
-      "ra":pd.to_numeric(q[ra],errors="coerce"),
-      "dec":pd.to_numeric(q[dec],errors="coerce"),
-      "lamost_subclass":sq.to_numpy(),
-      "star_truth_class":"NORMAL_STAR",
-      "truth_source":"LAMOST_DR5_GENERAL_SPECTROSCOPY",
-    }).dropna(subset=["ra","dec"])
-    # Deterministic spread through catalogue order; do not randomize provenance.
+    # Query subclasses server-side rather than downloading the multi-million-row
+    # LAMOST DR5 table. Sample across ordinary MK leading classes.
+    pieces=[]
+    families=["A","F","G","K","M","B","O"]
+    per=max(25,int(np.ceil(n/len(families))))
+    for fam in families:
+        v=Vizier(columns=["**"],row_limit=per*3)
+        try:
+            tabs=v.query_constraints(catalog=LAMOST_CAT,SubClass=f"{fam}*")
+        except Exception as e:
+            print(f"[LAMOST] subclass {fam} query failed: {e!r}",flush=True)
+            continue
+        if not tabs: continue
+        d=_norm_cols(tabs[0].to_pandas())
+        ra,dec=_coord_cols(d)
+        sub_col=next((x for x in ("SubClass","subclass","SUBCLASS") if x in d.columns),None)
+        if not sub_col: continue
+        sub=d[sub_col].fillna("").astype(str).str.upper().str.strip()
+        ordinary=sub.str.match(r"^[OBAFGKM][0-9]?") & ~sub.str.contains(r"WD|SD|CV|D[ABCOQZ]",regex=True)
+        q=d.loc[ordinary].copy(); sq=sub.loc[ordinary]
+        piece=pd.DataFrame({
+          "external_id":q["ObsID"].astype(str) if "ObsID" in q else [f"{fam}_{i}" for i in range(len(q))],
+          "ra":pd.to_numeric(q[ra],errors="coerce"),
+          "dec":pd.to_numeric(q[dec],errors="coerce"),
+          "lamost_subclass":sq.to_numpy(),
+          "star_truth_class":"NORMAL_STAR",
+          "truth_source":"LAMOST_DR5_GENERAL_SPECTROSCOPY",
+          "truth_quality":"LAMOST_DR5_PIPELINE_SUBCLASS",
+        }).dropna(subset=["ra","dec"]).head(per)
+        pieces.append(piece)
+    if not pieces: return pd.DataFrame()
+    out=pd.concat(pieces,ignore_index=True).drop_duplicates(["ra","dec"])
     if len(out)>n:
         idx=np.linspace(0,len(out)-1,n,dtype=int)
         out=out.iloc[idx]
-    return out.drop_duplicates(["ra","dec"])
+    return out
 
 def run(sdss_truth:Path,out:Path,total=1000):
     sdss=pd.read_csv(sdss_truth)[["ra","dec"]].dropna()
