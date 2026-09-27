@@ -17,7 +17,7 @@ COLLECTORS = [
     "gaia_dr3", "sdss_dr18", "panstarrs1", "desi_legacy", "galex",
     "twomass", "allwise", "lotss", "first", "nvss", "vlass", "xmm",
     "chandra", "erosita", "sdss_spectroscopy", "desi_spectroscopy",
-    "lamost_spectroscopy", "atnf_pulsar", "simbad", "ned",
+    "lamost_spectroscopy", "atnf_pulsar", "agb_suh2021", "simbad", "ned",
 ]
 
 
