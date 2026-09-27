@@ -1,67 +1,34 @@
 name: Validate STAR WD Classifier
+
 on:
   workflow_dispatch:
   push:
     paths:
-      - 'v2/Classifier/collect_star_gaia.py'
-      - 'v2/Classifier/train_validate_star_wd.py'
-      - 'v2/Classifier/star_truth.csv'
-      - '.github/workflows/validate-star-wd-classifier.yml'
+      - v2/Classifier/collect_star_gaia.py
+      - v2/Classifier/train_validate_star_wd.py
+      - v2/Classifier/star_truth.csv
+      - .github/workflows/validate-star-wd-classifier.yml
+
 jobs:
   validate:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-      - run: pip install pandas numpy scikit-learn joblib astropy astroquery
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install pandas numpy scikit-learn joblib astropy astroquery
       - name: Crossmatch STAR truth to Gaia DR3
         run: python v2/Classifier/collect_star_gaia.py
       - name: Train and validate WD classifier
         run: python v2/Classifier/train_validate_star_wd.py --features v2/Classifier/star_gaia_features.csv --out v2/Classifier/star_wd_eval
-      - name: Write markdown summary
-        run: |
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          m=json.load(open("v2/Classifier/star_wd_eval/metrics.json"))
-          b=m["baseline"]; l=m["learned"]
-          s=f"""# STAR white-dwarf classifier validation
-
-Truth is clean SDSS DR18 spectroscopy and model inputs are Gaia DR3 astrometry/photometry only.
-
-- Gaia-matched rows: **{m['matched_rows']}**
-- Test rows: **{m['test_rows']}**
-- Baseline accuracy: **{b['accuracy']:.4f}**
-- Baseline WD precision/recall/F1: **{b['precision_white_dwarf']:.4f} / {b['recall_white_dwarf']:.4f} / {b['f1_white_dwarf']:.4f}**
-- Learned accuracy: **{l['accuracy']:.4f}**
-- Learned balanced accuracy: **{l['balanced_accuracy']:.4f}**
-- Learned macro-F1: **{l['macro_f1']:.4f}**
-- Learned WD precision/recall/F1: **{l['precision_white_dwarf']:.4f} / {l['recall_white_dwarf']:.4f} / {l['f1_white_dwarf']:.4f}**
-- Learned log loss: **{l['log_loss']:.4f}**
-- Learned WD Brier: **{l['brier_white_dwarf']:.4f}**
-
-Baseline is the broad Gentile Fusillo et al. (2021) Gaia HR selection:
-`M_G > 6 + 5(BP-RP)` with parallax_over_error > 1.
-"""
-          Path("v2/Classifier/STAR_WD_VALIDATION.md").write_text(s)
-          print(s)
-          PY
-      - name: Commit reproducible benchmark products
-        run: |
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add v2/Classifier/star_gaia_features.csv v2/Classifier/STAR_WD_VALIDATION.md
-          git diff --cached --quiet && exit 0
-          git commit -m "Add STAR WD classifier validation results"
-          git fetch origin main
-          git rebase origin/main
-          git push
+      - name: Show metrics
+        run: cat v2/Classifier/star_wd_eval/metrics.json
       - uses: actions/upload-artifact@v4
         with:
           name: star-wd-classifier-eval
-          path: v2/Classifier/star_wd_eval/
+          path: |
+            v2/Classifier/star_gaia_features.csv
+            v2/Classifier/star_wd_eval/
           retention-days: 30
