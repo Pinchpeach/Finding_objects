@@ -1,4 +1,6 @@
 .venv/
+.test-deps/
+v2/controller_test_output/
 __pycache__/
 *.py[cod]
 .ipynb_checkpoints/
