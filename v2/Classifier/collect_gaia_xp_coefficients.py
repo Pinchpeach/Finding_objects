@@ -47,7 +47,7 @@ def run(features:Path,out:Path,batch_size:int=40):
                     ids=batch,
                     data_release="Gaia DR3",
                     retrieval_type="XP_CONTINUOUS",
-                    data_structure="DATAMODEL_GAIA",
+                    data_structure="RAW",
                     format="votable",
                     verbose=False,
                 )
