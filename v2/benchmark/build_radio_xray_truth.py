@@ -67,46 +67,63 @@ def _pick(d,names):
     return None
 
 def xray_truth(limit=650):
-    # DR20 SPIDERS/eROSITA VAC. SELECT * makes the builder resilient to
-    # VAC column additions; required fields are identified from documented
-    # semantic names below.
-    d=fetch(DR20,f"SELECT TOP {limit*5} * FROM DL1_eROSITA_eRASS3")
-    class_col=_pick(d,["class","spec_class","class_best","class_sdss","class_boss"])
-    ra_col=_pick(d,["ra","fiber_ra","target_ra","ra_sdss","plug_ra"])
-    dec_col=_pick(d,["dec","fiber_dec","target_dec","dec_sdss","plug_dec"])
-    zw_col=_pick(d,["zwarning","z_warning","zwarn","zwarning_noqso"])
-    z_col=_pick(d,["z","z_best","redshift"])
-    ze_col=_pick(d,["zerr","z_err","redshift_err"])
-    id_col=_pick(d,["catalogid","catalog_id","sdss_id","specobjid","specobj_id"])
-    if not class_col or not ra_col or not dec_col:
-        raise KeyError(f"Cannot identify required SPIDERS columns. columns={list(d.columns)}")
-    cls=d[class_col].astype(str).str.upper().replace({"QUASAR":"QSO"})
-    good=cls.isin(VALID)
-    if zw_col:
-        good &= pd.to_numeric(d[zw_col],errors="coerce").fillna(0).eq(0)
-    out=pd.DataFrame({
-        "specobjid":d[id_col].astype(str) if id_col else ["XRAY_"+str(i) for i in range(len(d))],
-        "bestobjid":"",
-        "ra":pd.to_numeric(d[ra_col],errors="coerce"),
-        "dec":pd.to_numeric(d[dec_col],errors="coerce"),
-        "class":cls,
-        "subclass":"",
-        "z":pd.to_numeric(d[z_col],errors="coerce") if z_col else pd.NA,
-        "zerr":pd.to_numeric(d[ze_col],errors="coerce") if ze_col else pd.NA,
-        "zwarning":pd.to_numeric(d[zw_col],errors="coerce") if zw_col else 0,
-        "plate":pd.NA,"mjd":pd.NA,"fiberid":pd.NA,
-    })
-    out=out[good & out.ra.notna() & out.dec.notna()].copy()
-    out["truth_class"]=out["class"]
-    out["truth_selection"]="XRAY_EROSITA"
-    out["truth_detection_catalog"]="eROSITA"
-    out["truth_source"]="SDSS_DR20_SPIDERS_EROSITA"
-    out["truth_quality"]="SPIDERS_SPECTROSCOPY"
-    # Keep the observed class mixture but cap extreme domination.
-    pieces=[]; cap=max(50,int(limit*0.65))
-    for c in ("STAR","GALAXY","QSO"):
-        pieces.append(out[out.truth_class.eq(c)].head(cap))
-    out=pd.concat(pieces,ignore_index=True).drop_duplicates(["ra","dec"])
+    """Build X-ray-selected truth by bulk CDS crossmatch of clean SDSS spectra."""
+    from astroquery.xmatch import XMatch
+    from astropy.table import Table
+    import astropy.units as u
+
+    # Build a much larger clean spectroscopy pool than the final benchmark.
+    # The query remains class-stratified; X-ray detection is then determined
+    # independently by external X-ray catalogs.
+    pools=[]
+    per_pool=10000
+    for cls in ("STAR","GALAXY","QSO"):
+        sql=f"""SELECT TOP {per_pool} s.specObjID,s.bestObjID,s.ra,s.dec,
+        s.class,s.subClass,s.z,s.zErr,s.zWarning,s.plate,s.mjd,s.fiberID
+        FROM SpecObj AS s
+        WHERE s.class='{cls}' AND s.zWarning=0 AND s.sciencePrimary=1
+          AND s.ra IS NOT NULL AND s.dec IS NOT NULL
+        ORDER BY s.specObjID"""
+        d=fetch(DR18,sql)
+        d["truth_class"]=cls
+        pools.append(d)
+    pool=pd.concat(pools,ignore_index=True).drop_duplicates("specobjid")
+    upload=Table.from_pandas(pool[["specobjid","ra","dec"]].rename(columns={"ra":"truth_ra","dec":"truth_dec"}))
+
+    matches=[]
+    xcats=[
+      ("eROSITA","vizier:J/A+A/682/A34",10.0),
+      ("XMM","vizier:IX/74/4xmmdr13s",8.0),
+      ("Chandra","vizier:IX/57/csc2master",5.0),
+    ]
+    for label,cat,rad in xcats:
+        try:
+            xm=XMatch.query(cat1=upload,cat2=cat,max_distance=rad*u.arcsec,
+                            colRA1="truth_ra",colDec1="truth_dec").to_pandas()
+        except Exception as e:
+            print(f"[xray] {label} XMatch failed: {e!r}",flush=True)
+            continue
+        if xm.empty: continue
+        xm.columns=[str(x).strip() for x in xm.columns]
+        if "angDist" in xm.columns:
+            xm["_sep_arcsec"]=pd.to_numeric(xm["angDist"],errors="coerce")
+            xm=xm[xm["_sep_arcsec"]<=rad]
+        xm["truth_detection_catalog"]=label
+        matches.append(xm[["specobjid","truth_detection_catalog"]].drop_duplicates("specobjid"))
+        print(f"[xray] {label} matched spectra={xm['specobjid'].nunique()}",flush=True)
+
+    if not matches:
+        return pd.DataFrame(columns=list(pool.columns)+["truth_selection","truth_detection_catalog","truth_source","truth_quality"])
+    hit=pd.concat(matches,ignore_index=True).drop_duplicates("specobjid")
+    out=pool.merge(hit,on="specobjid",how="inner")
+    out["truth_selection"]="XRAY_CATALOG"
+    out["truth_source"]="SDSS_DR18_SPECTROSCOPY"
+    out["truth_quality"]="ZWARNING_0_SCIENCEPRIMARY"
+    # Keep all available classes without fabricating balance; cap domination.
+    pieces=[]; cap=max(50,int(limit*0.7))
+    for cls in ("STAR","GALAXY","QSO"):
+        pieces.append(out[out.truth_class.eq(cls)].head(cap))
+    out=pd.concat(pieces,ignore_index=True).drop_duplicates("specobjid")
     return out.head(limit)
 
 def run(out_dir:Path,total=1000):
