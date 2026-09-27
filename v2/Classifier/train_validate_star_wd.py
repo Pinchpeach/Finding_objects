@@ -110,6 +110,7 @@ def main():
 
     bpred=baseline[te.to_numpy()]
     busable=usable[te].to_numpy()
+    hybrid=np.where(busable,bpred,pred)
     metrics={
       "matched_rows":int(len(data)),
       "split_counts":data.split.value_counts().to_dict(),
@@ -129,6 +130,15 @@ def main():
           "balanced_accuracy":float(balanced_accuracy_score(y[busable],bpred[busable])),
           "f1_white_dwarf":float(f1_score(y[busable],bpred[busable],pos_label="WHITE_DWARF")),
         },
+      },
+      "hybrid":{
+        "policy":"literature HR baseline when usable; calibrated learned model only as fallback",
+        "accuracy":float(accuracy_score(y,hybrid)),
+        "balanced_accuracy":float(balanced_accuracy_score(y,hybrid)),
+        "macro_f1":float(f1_score(y,hybrid,average="macro")),
+        "wd_precision":float(precision_score(y,hybrid,pos_label="WHITE_DWARF",zero_division=0)),
+        "wd_recall":float(recall_score(y,hybrid,pos_label="WHITE_DWARF",zero_division=0)),
+        "wd_f1":float(f1_score(y,hybrid,pos_label="WHITE_DWARF",zero_division=0)),
       },
       "learned":{
         "accuracy":float(accuracy_score(y,pred)),
@@ -154,7 +164,7 @@ def main():
       index=[f"true_{c}" for c in CLASSES],columns=[f"pred_{c}" for c in CLASSES]).to_csv(a.out/"learned_confusion.csv")
     pd.DataFrame(classification_report(y,pred,labels=CLASSES,output_dict=True,zero_division=0)).T.to_csv(a.out/"classification_report.csv")
     po=data.loc[te,["benchmark_id","star_truth_class"]].copy()
-    po["baseline_prediction"]=bpred; po["learned_prediction"]=pred; po["p_white_dwarf"]=pwd
+    po["baseline_prediction"]=bpred; po["learned_prediction"]=pred; po["hybrid_prediction"]=hybrid; po["p_white_dwarf"]=pwd
     po.to_csv(a.out/"test_predictions.csv",index=False)
     (a.out/"metrics.json").write_text(json.dumps(metrics,indent=2)+"\n")
     joblib.dump({"model":model,"features":feats,"classes":classes},a.out/"star_wd_classifier.joblib")
