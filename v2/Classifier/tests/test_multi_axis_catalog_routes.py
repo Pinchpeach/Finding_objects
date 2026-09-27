@@ -50,6 +50,7 @@ expect(compact,{"otype":"XB*"},"XRB","SIMBAD_CURATED_XRB")
 expect(compact,{"in_vari_compact_companion":True},"COMPACT_COMPANION_CANDIDATE","GAIA_DR3_COMPACT_COMPANION_CANDIDATE")
 expect(compact,{},"UNKNOWN","NO_VALIDATED_COMPACT_EVIDENCE")
 
+expect(physical,{"catalogs":"Suh 2021 AGB Catalog","agb_subclass":"OAGB_WISE","association_confidence__suh_2021_agb_catalog":0.93},"AGB","SUH2021_AGB_CATALOG_MATCH")
 expect(physical,{"otype":"AGB*","primary_class":"STAR"},"AGB","SIMBAD_CURATED_AGB")
 expect(phenomenon,{"otype":"PN"},"PN","SIMBAD_CURATED_PN")
 expect(phenomenon,{"otype":"No*"},"NOVA","SIMBAD_CURATED_NOVA")
