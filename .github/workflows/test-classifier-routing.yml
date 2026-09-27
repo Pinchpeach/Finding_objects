@@ -1,0 +1,37 @@
+name: Test Classifier Routing
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'v2/Classifier/**'
+      - '.github/workflows/test-classifier-routing.yml'
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pandas
+      - name: Build synthetic coarse input
+        run: |
+          python - <<'PY'
+          import pandas as pd
+          pd.DataFrame([
+            {"object_id":"s1","primary_class":"STAR","classprob_dsc_combmod_whitedwarf":0.92,"classprob_dsc_combmod_binarystar":0.01},
+            {"object_id":"g1","primary_class":"GALAXY"},
+            {"object_id":"q1","primary_class":"QSO","rx_radio_peak":2.5},
+            {"object_id":"u1","primary_class":"UNKNOWN"},
+          ]).to_csv("/tmp/coarse.csv",index=False)
+          PY
+      - name: Validate and route
+        run: |
+          python v2/Classifier/01_prepare_input.py --input /tmp/coarse.csv --out /tmp/prepared.csv
+          python v2/Classifier/control.py --input /tmp/prepared.csv --out /tmp/classified.csv
+          python - <<'PY'
+          import pandas as pd
+          d=pd.read_csv("/tmp/classified.csv")
+          assert list(d.detailed_class)==["WHITE_DWARF_CANDIDATE","UNRESOLVED","UNRESOLVED","UNRESOLVED"]
+          print(d[["object_id","primary_class","detailed_class"]].to_string(index=False))
+          PY
