@@ -4,14 +4,16 @@ from __future__ import annotations
 import argparse,json,math
 from pathlib import Path
 import pandas as pd
-CLASSES=("STAR","WD","GALAXY","QSO","BINARY")
+CLASSES=("STAR","GALAXY","QSO")
 WEIGHT={"direct_probability":1.0,"catalog_label":1.5,"continuous_score":0.35,"binary_evidence":0.35}
 MIN_CONFIDENCE=.50; MIN_MARGIN=.10
 def fuse(items):
     logp={c:math.log(1/len(CLASSES)) for c in CLASSES}
     used=0
     for e in items:
-        c=e.get("class"); targets=("GALAXY","QSO") if c=="EXTRAGALACTIC" else ((c,) if c in CLASSES else ())
+        c=e.get("class")
+        if c in {"WD","BINARY"}: c="STAR"
+        targets=("GALAXY","QSO") if c=="EXTRAGALACTIC" else ((c,) if c in CLASSES else ())
         if not targets: continue
         try: s=min(max(float(e.get("score",0)),.01),.99)
         except (TypeError,ValueError): continue
@@ -27,7 +29,14 @@ def run(evidence,out):
         try: items=json.loads(raw) if isinstance(raw,str) else []
         except (json.JSONDecodeError,TypeError): items=[]
         p,used=fuse(items); order=sorted(p,key=p.get,reverse=True); conf=p[order[0]]; margin=conf-p[order[1]]
-        conflict=bool(items) and len({e.get("class") for e in items if e.get("class") in CLASSES and float(e.get("score",0))>=.8})>1
+        strong=set()
+        for e in items:
+            c=e.get("class")
+            if c in {"WD","BINARY"}: c="STAR"
+            try: s=float(e.get("score",0))
+            except (TypeError,ValueError): s=0
+            if c in CLASSES and s>=.8: strong.add(c)
+        conflict=bool(items) and len(strong)>1
         if used==0: label="UNKNOWN"; status="NO_EVIDENCE"
         elif conflict: label="UNKNOWN"; status="CONFLICT"
         elif conf<MIN_CONFIDENCE or margin<MIN_MARGIN: label="UNKNOWN"; status="LOW_CONFIDENCE"
