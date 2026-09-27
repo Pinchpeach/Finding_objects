@@ -12,6 +12,7 @@ import numpy as np
 import pandas as pd
 
 CAT="J/MNRAS/486/2169/table2"
+_TABLE_CACHE=None
 
 def parse_sdss_name(v):
     s=str(v).strip().upper().replace("SDSS","").replace("J","").replace(" ","")
@@ -25,23 +26,31 @@ def parse_sdss_name(v):
     return ra,dec
 
 def query_type(cls):
-    from astroquery.vizier import Vizier
-    last=None
-    for server in ("vizier.cds.unistra.fr","vizier.cfa.harvard.edu","vizier.nao.ac.jp"):
-        for attempt in range(3):
-            try:
-                q=Vizier(columns=["Name","Type","S/Ng"],row_limit=-1)
-                q.VIZIER_SERVER=server
-                tabs=q.query_constraints(catalog=CAT,Type=cls)
-                if tabs:
-                    d=tabs[0].to_pandas()
-                    d.columns=[str(c).strip() for c in d.columns]
-                    return d
-            except Exception as e:
-                last=e
-                print(f"[VizieR] {cls} server={server} attempt={attempt+1} failed: {e!r}",flush=True)
-                time.sleep(2**attempt)
-    raise RuntimeError(f"SDSS DR14 {cls} table unavailable: {last!r}")
+    global _TABLE_CACHE
+    if _TABLE_CACHE is None:
+        from astroquery.vizier import Vizier
+        last=None
+        for server in ("vizier.cds.unistra.fr","vizier.cfa.harvard.edu","vizier.nao.ac.jp"):
+            for attempt in range(3):
+                try:
+                    q=Vizier(columns=["**"],row_limit=-1)
+                    q.VIZIER_SERVER=server
+                    tabs=q.get_catalogs(CAT)
+                    if tabs:
+                        d=tabs[0].to_pandas()
+                        d.columns=[str(c).strip() for c in d.columns]
+                        _TABLE_CACHE=d
+                        print(f"[VizieR] loaded SDSS DR14 WD table rows={len(d)} server={server}",flush=True)
+                        break
+                except Exception as e:
+                    last=e
+                    print(f"[VizieR] table server={server} attempt={attempt+1} failed: {e!r}",flush=True)
+                    time.sleep(2**attempt)
+            if _TABLE_CACHE is not None:
+                break
+        if _TABLE_CACHE is None:
+            raise RuntimeError(f"SDSS DR14 WD table unavailable: {last!r}")
+    return _TABLE_CACHE.copy()
 
 def remove_lamost_overlap(d,lamost_truth,max_sep_arcsec=2.0):
     from astropy.coordinates import SkyCoord
