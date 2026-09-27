@@ -36,7 +36,7 @@ def radio_truth(limit=650):
     # without fabricating a balanced distribution.
     sql=f"""SELECT TOP {limit*4}
       s.specObjID,s.bestObjID,s.ra,s.dec,s.class,s.subClass,s.z,s.zErr,
-      s.zWarning,s.plate,s.mjd,s.fiberID
+      s.zWarning,s.plate,s.mjd,s.fiberID,f.peak AS rx_radio_peak,f.integr AS rx_radio_integr
       FROM SpecObj AS s
       JOIN First AS f ON f.objID=s.bestObjID
       WHERE s.zWarning=0 AND s.sciencePrimary=1
@@ -109,12 +109,40 @@ def xray_truth(limit=650):
             xm["_sep_arcsec"]=pd.to_numeric(xm["angDist"],errors="coerce")
             xm=xm[xm["_sep_arcsec"]<=rad]
         xm["truth_detection_catalog"]=label
-        matches.append(xm[["specobjid","truth_detection_catalog"]].drop_duplicates("specobjid"))
-        print(f"[xray] {label} matched spectra={xm['specobjid'].nunique()}",flush=True)
+        # Preserve catalog-native numeric high-energy measurements discovered
+        # at selection time. Keep only scientifically relevant flux/rate/
+        # hardness/likelihood/count-like quantities; prefix by catalog so units
+        # from different X-ray surveys are never silently mixed.
+        keep=["specobjid","truth_detection_catalog"]
+        numeric=[]
+        for col in xm.columns:
+            low=str(col).lower()
+            if any(k in low for k in ("flux","rate","hard","hr","lik","count")):
+                s=pd.to_numeric(xm[col],errors="coerce")
+                if s.notna().any():
+                    safe="".join(ch if ch.isalnum() else "_" for ch in low).strip("_")
+                    new=f"rx_{label.lower()}_{safe}"
+                    xm[new]=s
+                    numeric.append(new)
+        xm[f"rx_has_{label.lower()}"]=1.0
+        numeric.append(f"rx_has_{label.lower()}")
+        if "_sep_arcsec" in xm.columns:
+            xm[f"rx_{label.lower()}_sep_arcsec"]=pd.to_numeric(xm["_sep_arcsec"],errors="coerce")
+            numeric.append(f"rx_{label.lower()}_sep_arcsec")
+        matches.append(xm[keep+numeric].drop_duplicates("specobjid"))
+        print(f"[xray] {label} matched spectra={xm['specobjid'].nunique()} native_features={len(numeric)}",flush=True)
 
     if not matches:
         return pd.DataFrame(columns=list(pool.columns)+["truth_selection","truth_detection_catalog","truth_source","truth_quality"])
-    hit=pd.concat(matches,ignore_index=True).drop_duplicates("specobjid")
+    # Outer-merge per-catalog X-ray measurements by spectrum id.
+    hit=matches[0]
+    for q in matches[1:]:
+        q=q.drop(columns=["truth_detection_catalog"],errors="ignore")
+        hit=hit.merge(q,on="specobjid",how="outer")
+    # Record all detection catalogs contributing to each selected source.
+    det=pd.concat([m[["specobjid","truth_detection_catalog"]] for m in matches],ignore_index=True)
+    det=det.groupby("specobjid")["truth_detection_catalog"].agg(lambda s:"|".join(sorted(set(map(str,s))))).reset_index()
+    hit=hit.drop(columns=["truth_detection_catalog"],errors="ignore").merge(det,on="specobjid",how="left")
     out=pool.merge(hit,on="specobjid",how="inner")
     out["truth_selection"]="XRAY_CATALOG"
     out["truth_source"]="SDSS_DR18_SPECTROSCOPY"
