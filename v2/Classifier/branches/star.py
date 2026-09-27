@@ -90,6 +90,20 @@ def classify(row):
         "mh_gspphot":_num(row,"mh_gspphot"),
     }
 
+    # Gaia-XP DA/DB subtype predictions are accepted only after the object is
+    # independently routed as a WD candidate. The 0.90 gate was fixed before
+    # the independent SDSS DR14 external evaluation; unsupported/low-confidence
+    # cases remain UNRESOLVED.
+    xp_subtype=_text(row,"wd_xp_subtype_prediction")
+    xp_conf=_num(row,"wd_xp_subtype_confidence")
+    spectral_type="UNRESOLVED"
+    spectral_type_confidence=None
+    spectral_basis="Gaia XP coefficients or validated optical spectrum model required"
+    if family=="WHITE_DWARF_CANDIDATE" and xp_subtype in {"DA","DB"} and xp_conf is not None and xp_conf>=0.90:
+        spectral_type=xp_subtype
+        spectral_type_confidence=xp_conf
+        spectral_basis="externally validated Gaia-XP DA/DB model; calibrated probability >= 0.90"
+
     return {
         "detailed_class":family,
         "confidence":family_score,
@@ -97,8 +111,9 @@ def classify(row):
         "stellar_family_score":family_score,
         "wd_hr_locus_signal":hr,
         "variability":variability,
-        "spectral_type":"UNRESOLVED",
-        "spectral_type_requirement":"Gaia XP coefficients or validated optical spectrum model",
+        "spectral_type":spectral_type,
+        "spectral_type_confidence":spectral_type_confidence,
+        "spectral_type_requirement":spectral_basis,
         "stellar_parameters":stellar_parameters,
         "basis":family_basis,
     }
