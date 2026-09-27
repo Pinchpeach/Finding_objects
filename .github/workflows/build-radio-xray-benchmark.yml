@@ -1,0 +1,42 @@
+name: Build Radio X-ray Benchmark
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'v2/benchmark/build_radio_xray_truth.py'
+      - '.github/workflows/build-radio-xray-benchmark.yml'
+jobs:
+  truth:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pandas
+      - name: Build radio/X-ray selected spectroscopy truth
+        run: python v2/benchmark/build_radio_xray_truth.py --total 1000
+      - name: Validate truth
+        run: |
+          python - <<'PY'
+          import pandas as pd
+          p="v2/benchmark/radio_xray_truth/ground_truth.csv"
+          d=pd.read_csv(p)
+          assert 800 <= len(d) <= 1000
+          assert set(d.truth_class).issubset({"STAR","GALAXY","QSO"})
+          assert {"RADIO_FIRST","XRAY_EROSITA"}.intersection(set(d.truth_selection))
+          assert d.benchmark_id.is_unique
+          print(d.groupby(["truth_selection","truth_class"]).size())
+          PY
+      - name: Commit radio/X-ray truth
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add v2/benchmark/radio_xray_truth
+          git diff --cached --quiet && exit 0
+          git commit -m "Add radio X-ray selected benchmark truth"
+          git fetch origin main
+          git rebase origin/main
+          git push
