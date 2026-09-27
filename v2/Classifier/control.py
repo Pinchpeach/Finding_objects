@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Route coarse Preprocess classes to detailed classifier branches."""
+"""Main detailed-classifier controller.
+
+Runs legacy coarse-class detail branches for compatibility, then all independent
+multi-axis classifiers (physical, variability, compact, extragalactic,
+phenomenon). One failed/unsupported scientific branch should abstain rather than
+invent a class.
+"""
 from __future__ import annotations
 import argparse, importlib.util, json
 from pathlib import Path
@@ -8,14 +14,22 @@ import pandas as pd
 ROOT=Path(__file__).resolve().parent
 BRANCH={"STAR":"star.py","GALAXY":"galaxy.py","QSO":"qso.py"}
 
-def load(name):
+def load_branch(name):
     p=ROOT/"branches"/name
     s=importlib.util.spec_from_file_location("detail_"+name.replace(".py",""),p)
+    if s is None or s.loader is None:
+        raise ImportError(f"cannot load classifier branch: {p}")
     m=importlib.util.module_from_spec(s); s.loader.exec_module(m); return m
 
-def run(inp:Path,out:Path):
-    d=pd.read_csv(inp)
-    mods={k:load(v) for k,v in BRANCH.items()}
+def load_axes_controller():
+    p=ROOT/"control_axes.py"
+    s=importlib.util.spec_from_file_location("classifier_control_axes",p)
+    if s is None or s.loader is None:
+        raise ImportError(f"cannot load axis controller: {p}")
+    m=importlib.util.module_from_spec(s); s.loader.exec_module(m); return m
+
+def annotate_legacy(d:pd.DataFrame)->pd.DataFrame:
+    mods={k:load_branch(v) for k,v in BRANCH.items()}
     payload=[]; labels=[]; conf=[]; stellar_family=[]; spectral_type=[]; variability_class=[]
     for _,row in d.iterrows():
         coarse=str(row.get("primary_class","UNKNOWN"))
@@ -31,14 +45,23 @@ def run(inp:Path,out:Path):
         spectral_type.append(res.get("spectral_type"))
         var=res.get("variability") if isinstance(res.get("variability"),dict) else {}
         variability_class.append(var.get("class"))
+    d=d.copy()
     d["detailed_class"]=labels
     d["detailed_confidence"]=conf
     d["stellar_family"]=stellar_family
     d["spectral_type"]=spectral_type
-    d["variability_class"]=variability_class
+    d["variability_class_legacy"]=variability_class
     d["detailed_result_json"]=payload
+    return d
+
+def run(inp:Path,out:Path):
+    d=pd.read_csv(inp)
+    if "primary_class" not in d.columns:
+        raise KeyError("primary_class is required from v2/Preprocess")
+    d=annotate_legacy(d)
+    d=load_axes_controller().annotate(d)
     out.parent.mkdir(parents=True,exist_ok=True); d.to_csv(out,index=False)
-    print(f"[OK] detailed routing rows={len(d)} -> {out}")
+    print(f"[OK] full classifier rows={len(d)} axes=5 -> {out}")
     return out
 
 def main():
