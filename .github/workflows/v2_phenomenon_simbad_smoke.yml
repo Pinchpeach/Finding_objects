@@ -7,6 +7,7 @@ on:
     paths:
       - 'v2/Get_data/simbad.py'
       - 'v2/Classifier/axes/phenomenon.py'
+      - 'v2/Classifier/axes/variability.py'
       - '.github/workflows/v2_phenomenon_simbad_smoke.yml'
 
 
@@ -39,6 +40,7 @@ jobs:
           phenomenon=load("v2/Classifier/axes/phenomenon.py","phenomenon")
 
           cases=[
+              ("SN1987A",83.86661833333333,-69.26975372222222,"SN*","SN","SIMBAD_CURATED_SN"),
               ("IC418",81.86752480565,-12.69730063549,"PN","PN","SIMBAD_CURATED_PN"),
               ("FHSer",277.69600058472,2.61445271165,"No*","NOVA","SIMBAD_CURATED_NOVA"),
           ]
