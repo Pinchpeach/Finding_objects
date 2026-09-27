@@ -1,0 +1,54 @@
+name: Validate Radio X-ray Benchmark
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'v2/benchmark/radio_xray_truth/ground_truth.csv'
+      - 'v2/benchmark/collect_catalog_truth.py'
+      - 'v2/benchmark/train_validate_classifier.py'
+      - 'v2/benchmark/validate_catalog_truth.py'
+      - '.github/workflows/validate-radio-xray-benchmark.yml'
+jobs:
+  collect:
+    strategy:
+      fail-fast: false
+      matrix:
+        catalog: [gaia_dr3, panstarrs1, allwise, twomass, galex, desi_legacy, nvss, first, lotss, vlass, chandra, xmm, erosita]
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pandas numpy scikit-learn joblib requests astropy astroquery
+      - name: Cross-query ${{ matrix.catalog }}
+        run: python v2/benchmark/collect_catalog_truth.py --truth v2/benchmark/radio_xray_truth/ground_truth.csv --out-dir v2/benchmark/radio_xray_catalog_data --catalog "${{ matrix.catalog }}" --workers 8
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rx-catalog-${{ matrix.catalog }}
+          path: v2/benchmark/radio_xray_catalog_data/
+          retention-days: 14
+  validate:
+    needs: collect
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pandas numpy scikit-learn joblib
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: rx-catalog-*
+          path: v2/benchmark/radio_xray_downloaded
+      - name: Validate products
+        run: python v2/benchmark/validate_catalog_truth.py --truth v2/benchmark/radio_xray_truth/ground_truth.csv --catalog-root v2/benchmark/radio_xray_downloaded --out v2/benchmark/radio_xray_ready
+      - name: Evaluate optical/IR baseline model
+        run: python v2/benchmark/train_validate_classifier.py --truth v2/benchmark/radio_xray_truth/ground_truth.csv --catalog-root v2/benchmark/radio_xray_downloaded --manifest v2/benchmark/radio_xray_ready/benchmark_manifest.csv --out v2/benchmark/radio_xray_ready/model_eval_baseline
+      - uses: actions/upload-artifact@v4
+        with:
+          name: radio-xray-ready
+          path: v2/benchmark/radio_xray_ready/
+          retention-days: 14
