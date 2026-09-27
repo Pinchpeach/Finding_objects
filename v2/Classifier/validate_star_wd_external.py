@@ -70,6 +70,7 @@ def main():
     usable=(de.parallax_over_error>1)&de.absolute_g.notna()&de.bp_rp.notna()
     bpred=np.where(usable&(de.absolute_g>6+5*de.bp_rp),"WHITE_DWARF","NORMAL_STAR")
     um=usable.to_numpy()
+    hybrid=np.where(um,bpred,pred)
 
     metrics={
       "sdss_training_rows":int(tr.sum()),
@@ -90,6 +91,16 @@ def main():
           "balanced_accuracy":float(balanced_accuracy_score(y[um],bpred[um])) if um.any() else None,
           "wd_f1":float(f1_score(y[um],bpred[um],pos_label="WHITE_DWARF",zero_division=0)) if um.any() else None,
         }
+      },
+      "hybrid":{
+        "policy":"literature HR baseline when usable; calibrated SDSS-trained model only as fallback",
+        "accuracy":float(accuracy_score(y,hybrid)),
+        "balanced_accuracy":float(balanced_accuracy_score(y,hybrid)),
+        "macro_f1":float(f1_score(y,hybrid,average="macro")),
+        "wd_precision":float(precision_score(y,hybrid,pos_label="WHITE_DWARF",zero_division=0)),
+        "wd_recall":float(recall_score(y,hybrid,pos_label="WHITE_DWARF",zero_division=0)),
+        "wd_f1":float(f1_score(y,hybrid,pos_label="WHITE_DWARF",zero_division=0)),
+        "fallback_rows":int((~um).sum())
       },
       "learned":{
         "accuracy":float(accuracy_score(y,pred)),
@@ -114,7 +125,7 @@ def main():
     pd.DataFrame(confusion_matrix(y,pred,labels=CLASSES),
       index=[f"true_{c}" for c in CLASSES],columns=[f"pred_{c}" for c in CLASSES]).to_csv(a.out/"learned_confusion.csv")
     q=de[["benchmark_id","star_truth_class","truth_source"]].copy()
-    q["baseline_prediction"]=bpred; q["learned_prediction"]=pred; q["p_white_dwarf"]=pwd
+    q["baseline_prediction"]=bpred; q["learned_prediction"]=pred; q["hybrid_prediction"]=hybrid; q["p_white_dwarf"]=pwd
     q.to_csv(a.out/"external_predictions.csv",index=False)
     (a.out/"metrics.json").write_text(json.dumps(metrics,indent=2)+"\n")
     print(json.dumps(metrics,indent=2))
