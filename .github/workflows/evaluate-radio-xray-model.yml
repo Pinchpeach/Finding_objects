@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'v2/benchmark/train_validate_classifier.py'
+      - 'v2/benchmark/train_validate_rx_adaptive.py'
       - '.github/workflows/evaluate-radio-xray-model.yml'
 jobs:
   evaluate:
@@ -30,6 +31,8 @@ jobs:
         run: python v2/benchmark/train_validate_classifier.py --truth v2/benchmark/radio_xray_truth/ground_truth.csv --catalog-root v2/benchmark/radio_xray_downloaded --manifest v2/benchmark/radio_xray_ready/benchmark_manifest.csv --out v2/benchmark/radio_xray_ready/model_eval_baseline --exclude-native-rx
       - name: Radio X-ray enriched
         run: python v2/benchmark/train_validate_classifier.py --truth v2/benchmark/radio_xray_truth/ground_truth.csv --catalog-root v2/benchmark/radio_xray_downloaded --manifest v2/benchmark/radio_xray_ready/benchmark_manifest.csv --out v2/benchmark/radio_xray_ready/model_eval_radio_xray
+      - name: Calibration-gated adaptive model
+        run: python v2/benchmark/train_validate_rx_adaptive.py --truth v2/benchmark/radio_xray_truth/ground_truth.csv --catalog-root v2/benchmark/radio_xray_downloaded --manifest v2/benchmark/radio_xray_ready/benchmark_manifest.csv --out v2/benchmark/radio_xray_ready/model_eval_adaptive
       - uses: actions/upload-artifact@v4
         with:
           name: radio-xray-model-comparison
