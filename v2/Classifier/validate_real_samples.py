@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 """Blind-style validation on named real astronomical sources.
 
-SIMBAD resolves coordinates and supplies an external reference type. For blind
-classification, SIMBAD otype is masked before preprocessing. Therefore a blind
-match must come from independent catalog measurements/counterparts.
+SIMBAD is used only to resolve the requested object's coordinates and external reference type. It is not written into the blind raw-data directory, so every blind classification must arise from independent survey/catalog measurements.
 """
 from __future__ import annotations
 
@@ -118,67 +116,54 @@ def run_cmd(args):
 
 def collect(sample, raw: Path, radius_arcmin: float):
     logs = []
-
-    # Keep a target-centred SIMBAD row for identity/coordinates, but deliberately
-    # mask the physical type so the reference label cannot leak into blind inference.
-    try:
-        module = load_module(GET / "simbad.py", "realval_simbad")
-        frame = module.fetch(sample["ra"], sample["dec"], radius_arcmin)
-        if "otype" in frame.columns:
-            frame["otype"] = pd.NA
-        module.save(frame, raw / "simbad_masked.csv")
-        logs.append(
-            {
-                "collector": "simbad_masked",
-                "status": "ok" if len(frame) else "empty",
-                "rows": len(frame),
-                "error": "",
-            }
-        )
-    except Exception as exc:
-        logs.append(
-            {
-                "collector": "simbad_masked",
-                "status": "error",
-                "rows": 0,
-                "error": repr(exc),
-            }
-        )
-
     for name in SAMPLE_COLLECTORS[sample["name"]]:
         module = load_module(GET / f"{name}.py", f"realval_{name}")
         output = raw / f"{name}.csv"
         try:
             frame = module.fetch(sample["ra"], sample["dec"], radius_arcmin)
             module.save(frame, output)
-            logs.append(
-                {
-                    "collector": name,
-                    "status": "ok" if len(frame) else "empty",
-                    "rows": len(frame),
-                    "error": "",
-                }
-            )
+            logs.append({
+                "collector": name,
+                "status": "ok" if len(frame) else "empty",
+                "rows": len(frame),
+                "error": "",
+            })
         except Exception as exc:
-            logs.append(
-                {
-                    "collector": name,
-                    "status": "error",
-                    "rows": 0,
-                    "error": repr(exc),
-                }
-            )
+            logs.append({
+                "collector": name,
+                "status": "error",
+                "rows": 0,
+                "error": repr(exc),
+            })
     return logs
 
 
-def nearest(frame: pd.DataFrame, ra: float, dec: float):
+def select_target(frame: pd.DataFrame, ra: float, dec: float, radius_arcmin: float):
     ras = pd.to_numeric(frame["ra"], errors="coerce")
     decs = pd.to_numeric(frame["dec"], errors="coerce")
     dra = (ras - ra) * math.cos(math.radians(dec))
     dde = decs - dec
     sep = 3600.0 * (dra * dra + dde * dde) ** 0.5
-    index = sep.idxmin()
-    return frame.loc[index], float(sep.loc[index])
+
+    candidates = frame.copy()
+    candidates["_sep_arcsec"] = sep
+    candidates = candidates[candidates["_sep_arcsec"] <= radius_arcmin * 60.0].copy()
+    if candidates.empty:
+        index = sep.idxmin()
+        return frame.loc[index], float(sep.loc[index])
+
+    # Prefer the object supported by the largest number of independent catalog
+    # members; use evidence count and angular separation only as tie breakers.
+    members = pd.to_numeric(candidates.get("association_members"), errors="coerce").fillna(1)
+    evidence = pd.to_numeric(candidates.get("evidence_count"), errors="coerce").fillna(0)
+    candidates["_rank_members"] = members
+    candidates["_rank_evidence"] = evidence
+    candidates = candidates.sort_values(
+        ["_rank_members", "_rank_evidence", "_sep_arcsec"],
+        ascending=[False, False, True],
+    )
+    row = candidates.iloc[0]
+    return row, float(row["_sep_arcsec"])
 
 
 def science_snapshot(row: pd.Series):
@@ -224,13 +209,16 @@ def science_snapshot(row: pd.Series):
     return result
 
 
-def classify_assisted(row: pd.Series, truth_otype):
-    # This is deliberately separated from the blind result. It only verifies
-    # that curated catalog identity routes are wired correctly.
+def classify_assisted(row: pd.Series, truth_otype, axis: str):
+    # Catalog-assisted routing is diagnostic only. Drop pre-existing axis output
+    # columns before re-annotating to avoid duplicate-column ambiguity.
     axes = load_module(CLS / "control_axes.py", "realval_axes")
-    frame = pd.DataFrame([row.to_dict()])
-    frame["otype"] = truth_otype
-    return axes.annotate(frame).iloc[0]
+    payload = row.to_dict()
+    for suffix in ("class","confidence","status","evidence_json"):
+        payload.pop(f"{axis}_{suffix}", None)
+    payload["otype"] = truth_otype
+    annotated = axes.annotate(pd.DataFrame([payload])).iloc[0]
+    return as_text(annotated.get(f"{axis}_class")) or "UNKNOWN"
 
 
 def validate_one(spec, base: Path, radius_arcmin: float):
@@ -243,6 +231,20 @@ def validate_one(spec, base: Path, radius_arcmin: float):
     cls.mkdir(parents=True, exist_ok=True)
 
     collector_logs = collect(sample, raw, radius_arcmin)
+    usable_rows = sum(int(x["rows"]) for x in collector_logs if x["status"] == "ok")
+    if usable_rows == 0:
+        return {
+            **sample,
+            "nearest_sep_arcsec": math.nan,
+            "primary_class": "UNKNOWN",
+            "blind_class": "UNKNOWN",
+            "blind_status": "NO_BLIND_CATALOG_EVIDENCE",
+            "blind_match": False,
+            "catalog_assisted_class": "UNKNOWN",
+            "catalog_assisted_match": False,
+            "science_json": "{}",
+            "collector_json": json.dumps(collector_logs, ensure_ascii=False),
+        }
 
     run_cmd([PRE / "01_source_association.py", "--raw-dir", raw, "--out", pre / "source_association.csv"])
     run_cmd(
@@ -307,13 +309,11 @@ def validate_one(spec, base: Path, radius_arcmin: float):
     )
 
     classified = pd.read_csv(cls / "classified.csv")
-    row, separation = nearest(classified, sample["ra"], sample["dec"])
+    row, separation = select_target(classified, sample["ra"], sample["dec"], radius_arcmin)
     axis = sample["truth_axis"]
     blind_class = as_text(row.get(f"{axis}_class")) or "UNKNOWN"
     blind_status = as_text(row.get(f"{axis}_status"))
-
-    assisted = classify_assisted(row, sample["truth_otype"])
-    assisted_class = as_text(assisted.get(f"{axis}_class")) or "UNKNOWN"
+    assisted_class = classify_assisted(row, sample["truth_otype"], axis)
 
     return {
         **sample,
@@ -358,7 +358,7 @@ def write_report(frame: pd.DataFrame, out_dir: Path):
     lines = [
         "# Real-sample multi-axis validation",
         "",
-        "SIMBAD supplies coordinates and an external reference type. Its otype is masked in the blind pipeline.",
+        "SIMBAD supplies only the validation coordinates and external reference type; no SIMBAD row is passed into the blind pipeline.",
         "Catalog-assisted results are reported separately and are not independent validation.",
         "",
         f"- requested samples: **{len(frame)}**",
