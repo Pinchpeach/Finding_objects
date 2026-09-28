@@ -61,7 +61,9 @@ def classify(row):
         }
 
     coarse=str(row.get("primary_class","")).strip().upper()
-    if coarse not in {"STAR",""}:
+    # A coarse UNKNOWN must not veto stronger stellar-physics evidence.  Only a
+    # positive extragalactic coarse route blocks the stellar physical branch.
+    if coarse in {"GALAXY","QSO"}:
         return {
             "axis":AXIS,"label":"UNKNOWN","confidence":None,"status":"NOT_STELLAR_ROUTE",
             "evidence":[{"kind":"coarse_route","primary_class":coarse}],
