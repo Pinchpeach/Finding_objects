@@ -1,0 +1,26 @@
+object,metric,value,unit,formula_or_note
+GD 71,parallax,19.5638180302,mas,Gaia DR3 blind validation
+GD 71,parallax_error,0.055117156,mas,Gaia DR3 blind validation
+GD 71,distance_inverse_parallax,51.11477,pc,1000/parallax; high-SNR diagnostic
+GD 71,absolute_G,9.45704,mag,G+5log10(parallax_mas)-10
+GD 71,bp_rp,-0.45231247,mag,Gaia DR3
+RR Lyr,parallax,3.9848581783,mas,Gaia DR3 blind validation
+RR Lyr,distance_inverse_parallax,250.94996,pc,1000/parallax; high-SNR diagnostic
+RR Lyr,absolute_G,0.62087,mag,G+5log10(parallax_mas)-10
+RR Lyr,best_class_score,0.5515927,,Gaia catalog score; not calibrated probability
+delta Cep,parallax,3.5550642335,mas,Gaia DR3 blind validation
+delta Cep,distance_inverse_parallax,281.28887,pc,1000/parallax; use with caution because RUWE=2.713
+delta Cep,absolute_G,-3.39516,mag,G+5log10(parallax_mas)-10
+delta Cep,ruwe,2.7130983,,Gaia astrometric fit diagnostic
+Mira,bp_rp,5.59058,mag,Gaia DR3
+Mira,best_class_score,0.6456832,,Gaia LPV catalog score; not calibrated probability
+PSR B0531+21,period,0.0333924123,s,ATNF
+PSR B0531+21,period_dot,4.20972e-13,s/s,ATNF
+PSR B0531+21,characteristic_age,1256.7839,yr,P/(2Pdot)
+PSR B0531+21,dipole_B,3.79403e12,G,3.2e19 sqrt(P Pdot)
+PSR B0531+21,spin_down_power,4.46344e38,erg/s,4pi^2 I Pdot/P^3 assuming I=1e45 g cm^2
+M 57,HASH_match_separation,0.29115,arcsec,blind validation counterpart
+3C 273,parallax,-0.01595029,mas,Gaia DR3
+3C 273,parallax_error,0.020795885,mas,Gaia DR3
+3C 273,parallax_significance,-0.76699,sigma,parallax/parallax_error
+3C 273,proper_motion_magnitude,0.10109,mas/yr,sqrt(pmra^2+pmdec^2)
