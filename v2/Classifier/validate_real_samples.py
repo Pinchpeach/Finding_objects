@@ -32,8 +32,9 @@ SAMPLES = [
     {"name": "Mira", "truth_axis": "physical", "truth_class": "AGB"},
     {"name": "PSR B0531+21", "truth_axis": "compact", "truth_class": "PULSAR"},
     {"name": "M 57", "truth_axis": "phenomenon", "truth_class": "PN"},
+    {"name": "SN 2018oh", "truth_axis": "phenomenon", "truth_class": "SN"},
     {"name": "SN 2011fe", "truth_axis": "phenomenon", "truth_class": "SN"},
-    {"name": "3C 273", "truth_axis": "extragalactic", "truth_class": "QSO"},
+    {"name": "3C 273", "truth_axis": "extragalactic", "truth_class": "AGN"},
 ]
 
 SAMPLE_COLLECTORS = {
@@ -42,7 +43,8 @@ SAMPLE_COLLECTORS = {
     "delta Cep": ("gaia_dr3",),
     "Mira": ("gaia_dr3", "allwise", "twomass", "agb_suh2021"),
     "PSR B0531+21": ("atnf_pulsar",),
-    "M 57": (),
+    "M 57": ("hash_pn",),
+    "SN 2018oh": ("asas_sn_supernova",),
     "SN 2011fe": (),
     "3C 273": ("gaia_dr3", "allwise", "sdss_dr18", "sdss_spectroscopy"),
 }
