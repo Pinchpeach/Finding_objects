@@ -1,0 +1,278 @@
+{
+  "design": "all pure table3 WDs; SHA256 sample within MK-family x RA-quadrant capped candidate pools",
+  "reference_rows": 2300,
+  "coordinate_exclusion_arcsec": 2.0,
+  "queries": [
+    {
+      "family": "O",
+      "ra_min": 0,
+      "ra_max": 90,
+      "returned": 10,
+      "cap_reached": false,
+      "eligible": 10,
+      "selected": 10
+    },
+    {
+      "family": "O",
+      "ra_min": 90,
+      "ra_max": 180,
+      "returned": 26,
+      "cap_reached": false,
+      "eligible": 26,
+      "selected": 26
+    },
+    {
+      "family": "O",
+      "ra_min": 180,
+      "ra_max": 270,
+      "returned": 14,
+      "cap_reached": false,
+      "eligible": 11,
+      "selected": 11
+    },
+    {
+      "family": "O",
+      "ra_min": 270,
+      "ra_max": 360,
+      "returned": 9,
+      "cap_reached": false,
+      "eligible": 9,
+      "selected": 9
+    },
+    {
+      "family": "B",
+      "ra_min": 0,
+      "ra_max": 90,
+      "returned": 2000,
+      "cap_reached": true,
+      "eligible": 1910,
+      "selected": 100
+    },
+    {
+      "family": "B",
+      "ra_min": 90,
+      "ra_max": 180,
+      "returned": 2000,
+      "cap_reached": true,
+      "eligible": 1898,
+      "selected": 100
+    },
+    {
+      "family": "B",
+      "ra_min": 180,
+      "ra_max": 270,
+      "returned": 644,
+      "cap_reached": false,
+      "eligible": 604,
+      "selected": 100
+    },
+    {
+      "family": "B",
+      "ra_min": 270,
+      "ra_max": 360,
+      "returned": 1136,
+      "cap_reached": false,
+      "eligible": 991,
+      "selected": 100
+    },
+    {
+      "family": "A",
+      "ra_min": 0,
+      "ra_max": 90,
+      "returned": 2000,
+      "cap_reached": true,
+      "eligible": 2000,
+      "selected": 100
+    },
+    {
+      "family": "A",
+      "ra_min": 90,
+      "ra_max": 180,
+      "returned": 2000,
+      "cap_reached": true,
+      "eligible": 1989,
+      "selected": 100
+    },
+    {
+      "family": "A",
+      "ra_min": 180,
+      "ra_max": 270,
+      "returned": 2000,
+      "cap_reached": true,
+      "eligible": 1947,
+      "selected": 100
+    },
+    {
+      "family": "A",
+      "ra_min": 270,
+      "ra_max": 360,
+      "returned": 2000,
+      "cap_reached": true,
+      "eligible": 1994,
+      "selected": 100
+    },
+    {
+      "family": "F",
+      "ra_min": 0,
+      "ra_max": 90,
+      "returned": 2000,
+      "cap_reached": true,
+      "eligible": 2000,
+      "selected": 100
+    },
+    {
+      "family": "F",
+      "ra_min": 90,
+      "ra_max": 180,
+      "returned": 2000,
+      "cap_reached": true,
+      "eligible": 2000,
+      "selected": 100
+    },
+    {
+      "family": "F",
+      "ra_min": 180,
+      "ra_max": 270,
+      "returned": 2000,
+      "cap_reached": true,
+      "eligible": 1956,
+      "selected": 100
+    },
+    {
+      "family": "F",
+      "ra_min": 270,
+      "ra_max": 360,
+      "returned": 2000,
+      "cap_reached": true,
+      "eligible": 1991,
+      "selected": 100
+    },
+    {
+      "family": "G",
+      "ra_min": 0,
+      "ra_max": 90,
+      "returned": 2000,
+      "cap_reached": true,
+      "eligible": 1997,
+      "selected": 100
+    },
+    {
+      "family": "G",
+      "ra_min": 90,
+      "ra_max": 180,
+      "returned": 2000,
+      "cap_reached": true,
+      "eligible": 2000,
+      "selected": 100
+    },
+    {
+      "family": "G",
+      "ra_min": 180,
+      "ra_max": 270,
+      "returned": 2000,
+      "cap_reached": true,
+      "eligible": 1566,
+      "selected": 100
+    },
+    {
+      "family": "G",
+      "ra_min": 270,
+      "ra_max": 360,
+      "returned": 2000,
+      "cap_reached": true,
+      "eligible": 1994,
+      "selected": 100
+    },
+    {
+      "family": "K",
+      "ra_min": 0,
+      "ra_max": 90,
+      "returned": 2000,
+      "cap_reached": true,
+      "eligible": 1936,
+      "selected": 100
+    },
+    {
+      "family": "K",
+      "ra_min": 90,
+      "ra_max": 180,
+      "returned": 2000,
+      "cap_reached": true,
+      "eligible": 1914,
+      "selected": 100
+    },
+    {
+      "family": "K",
+      "ra_min": 180,
+      "ra_max": 270,
+      "returned": 2000,
+      "cap_reached": true,
+      "eligible": 1983,
+      "selected": 100
+    },
+    {
+      "family": "K",
+      "ra_min": 270,
+      "ra_max": 360,
+      "returned": 2000,
+      "cap_reached": true,
+      "eligible": 1993,
+      "selected": 100
+    },
+    {
+      "family": "M",
+      "ra_min": 0,
+      "ra_max": 90,
+      "returned": 2000,
+      "cap_reached": true,
+      "eligible": 2000,
+      "selected": 100
+    },
+    {
+      "family": "M",
+      "ra_min": 90,
+      "ra_max": 180,
+      "returned": 2000,
+      "cap_reached": true,
+      "eligible": 1995,
+      "selected": 100
+    },
+    {
+      "family": "M",
+      "ra_min": 180,
+      "ra_max": 270,
+      "returned": 2000,
+      "cap_reached": true,
+      "eligible": 1941,
+      "selected": 100
+    },
+    {
+      "family": "M",
+      "ra_min": 270,
+      "ra_max": 360,
+      "returned": 2000,
+      "cap_reached": true,
+      "eligible": 1977,
+      "selected": 100
+    }
+  ],
+  "wd_raw_rows": 3517,
+  "wd_pure_unique_before_exclusion": 2622,
+  "wd_after_exclusion": 2121,
+  "counts": {
+    "NORMAL_STAR/A": 400,
+    "NORMAL_STAR/B": 400,
+    "NORMAL_STAR/F": 400,
+    "NORMAL_STAR/G": 400,
+    "NORMAL_STAR/K": 400,
+    "NORMAL_STAR/M": 400,
+    "NORMAL_STAR/O": 56,
+    "WHITE_DWARF/DA": 1998,
+    "WHITE_DWARF/DB": 14,
+    "WHITE_DWARF/DC": 54,
+    "WHITE_DWARF/DO": 4,
+    "WHITE_DWARF/DQ": 18,
+    "WHITE_DWARF/DZ": 33
+  },
+  "truth_sha256": "b152ca23a4fc1ffeb35231c5e554d66dccbb7e055eb4898368936023f4439fa0"
+}
