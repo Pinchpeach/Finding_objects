@@ -155,7 +155,7 @@ def write_report(df:pd.DataFrame,out_dir:Path):
         "Catalog-assisted results are shown separately and are not counted as independent validation.","",
         f"- samples: **{len(df)}**",
         f"- blind exact-axis matches: **{int(independent.sum())}/{len(df)} ({independent.mean():.1%})**","",
-        "| sample | SIMBAD reference | axis | expected | blind | status | sep (") | assisted |",
+        "| sample | SIMBAD reference | axis | expected | blind | status | sep_arcsec | assisted |",
         "|---|---|---|---|---|---|---:|---|",
     ]
     for _,r in df.iterrows():
