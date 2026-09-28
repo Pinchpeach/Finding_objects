@@ -22,6 +22,24 @@ def _num(row,key):
     except Exception:return None
 
 def classify(row):
+    catalogs=_text(row,"catalogs") or ""
+    if "HASH PN Catalog" in catalogs:
+        assoc=_num(row,"association_confidence__hash_pn_catalog")
+        return {
+            "axis":AXIS,"label":"PN","confidence":None,"status":"HASH_PN_CATALOG_MATCH",
+            "evidence":[{"kind":"hash_pn_catalog_counterpart","association_confidence":assoc,
+                         "note":"Independent counterpart in the HASH planetary-nebula catalogue."}],
+        }
+    if "ASAS-SN Supernova Catalog" in catalogs:
+        assoc=_num(row,"association_confidence__asas_sn_supernova_catalog")
+        subtype=_text(row,"sn_subtype")
+        return {
+            "axis":AXIS,"label":"SN","confidence":None,"status":"ASASSN_SUPERNOVA_CATALOG_MATCH",
+            "evidence":[{"kind":"asas_sn_supernova_catalog_counterpart","association_confidence":assoc,
+                         "sn_subtype":subtype,
+                         "note":"Independent counterpart in the ASAS-SN bright-supernova catalogue."}],
+        }
+
     simbad=_text(row,"otype")
     if simbad=="SN*":
         return {
