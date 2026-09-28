@@ -17,4 +17,4 @@ sdss_spectroscopy,ok,1,0.00674498165569649,rawdata/sdss_spectroscopy_ngc4522_r0p
 desi_spectroscopy,ok,0,,rawdata/desi_spectroscopy_ngc4522_r0p5arcmin.csv,
 lamost_spectroscopy,ok,0,,rawdata/lamost_spectroscopy_ngc4522_r0p5arcmin.csv,
 simbad,ok,1,0.020701049365056436,rawdata/simbad_ngc4522_r0p5arcmin.csv,
-ned,ok,13,0.47688636578212423,rawdata/ned_ngc4522_r0p5arcmin.csv,
+ned,error,0,,,"ReadTimeout(ReadTimeoutError(""HTTPSConnectionPool(host='ned.ipac.caltech.edu', port=443): Read timed out. (read timeout=60)""))"
