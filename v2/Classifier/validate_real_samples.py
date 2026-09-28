@@ -32,7 +32,7 @@ SAMPLES = [
     {"name": "Mira", "truth_axis": "physical", "truth_class": "AGB"},
     {"name": "PSR B0531+21", "truth_axis": "compact", "truth_class": "PULSAR"},
     {"name": "M 57", "truth_axis": "phenomenon", "truth_class": "PN"},
-    {"name": "SN 2018oh", "truth_axis": "phenomenon", "truth_class": "SN"},
+    {"name": "SN 2018fhw", "truth_axis": "phenomenon", "truth_class": "SN"},
     {"name": "SN 2011fe", "truth_axis": "phenomenon", "truth_class": "SN"},
     {"name": "3C 273", "truth_axis": "extragalactic", "truth_class": "AGN"},
 ]
@@ -44,7 +44,7 @@ SAMPLE_COLLECTORS = {
     "Mira": ("gaia_dr3", "allwise", "twomass", "agb_suh2021"),
     "PSR B0531+21": ("atnf_pulsar",),
     "M 57": ("hash_pn",),
-    "SN 2018oh": ("asas_sn_supernova",),
+    "SN 2018fhw": ("asas_sn_supernova",),
     "SN 2011fe": (),
     "3C 273": ("gaia_dr3", "allwise", "sdss_dr18", "sdss_spectroscopy"),
 }
@@ -169,6 +169,28 @@ def select_target(frame: pd.DataFrame, ra: float, dec: float, radius_arcmin: flo
     return row, float(row["_sep_arcsec"])
 
 
+def candidate_snapshot(frame: pd.DataFrame, ra: float, dec: float, radius_arcmin: float):
+    ras=pd.to_numeric(frame["ra"],errors="coerce")
+    decs=pd.to_numeric(frame["dec"],errors="coerce")
+    dra=(ras-ra)*math.cos(math.radians(dec))
+    dde=decs-dec
+    sep=3600.0*(dra*dra+dde*dde)**0.5
+    out=[]
+    for idx in sep[sep <= radius_arcmin*60.0].sort_values().index[:12]:
+        row=frame.loc[idx]
+        out.append({
+            "object_id":as_text(row.get("object_id")),
+            "sep_arcsec":float(sep.loc[idx]),
+            "catalogs":as_text(row.get("catalogs")),
+            "association_members":as_num(row.get("association_members")),
+            "primary_class":as_text(row.get("primary_class")),
+            "physical_class":as_text(row.get("physical_class")),
+            "variability_class":as_text(row.get("variability_class")),
+            "phenomenon_class":as_text(row.get("phenomenon_class")),
+        })
+    return out
+
+
 def science_snapshot(row: pd.Series):
     columns = [
         "ra",
@@ -247,6 +269,7 @@ def validate_one(spec, base: Path, radius_arcmin: float):
             "catalog_assisted_match": False,
             "science_json": "{}",
             "collector_json": json.dumps(collector_logs, ensure_ascii=False),
+            "candidate_json": "[]",
         }
 
     run_cmd([PRE / "01_source_association.py", "--raw-dir", raw, "--out", pre / "source_association.csv"])
@@ -312,6 +335,7 @@ def validate_one(spec, base: Path, radius_arcmin: float):
     )
 
     classified = pd.read_csv(cls / "classified.csv")
+    candidates = candidate_snapshot(classified, sample["ra"], sample["dec"], radius_arcmin)
     row, separation = select_target(classified, sample["ra"], sample["dec"], radius_arcmin)
     axis = sample["truth_axis"]
     blind_class = as_text(row.get(f"{axis}_class")) or "UNKNOWN"
@@ -329,6 +353,7 @@ def validate_one(spec, base: Path, radius_arcmin: float):
         "catalog_assisted_match": assisted_class == sample["truth_class"],
         "science_json": json.dumps(science_snapshot(row), ensure_ascii=False, default=str),
         "collector_json": json.dumps(collector_logs, ensure_ascii=False),
+        "candidate_json": json.dumps(candidates, ensure_ascii=False),
     }
 
 
@@ -349,6 +374,7 @@ def error_row(spec, exc):
         "catalog_assisted_match": False,
         "science_json": "{}",
         "collector_json": "[]",
+        "candidate_json": "[]",
     }
 
 
@@ -389,6 +415,7 @@ def write_report(frame: pd.DataFrame, out_dir: Path):
         lines.append(f"- reference spectral type: {row['truth_sp']}")
         lines.append(f"- measured fields: {row['science_json']}")
         lines.append(f"- collectors: {row['collector_json']}")
+        lines.append(f"- candidate objects: {row['candidate_json']}")
         lines.append("")
 
     lines += [
