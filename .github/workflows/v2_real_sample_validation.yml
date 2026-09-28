@@ -1,0 +1,47 @@
+name: v2 real sample classifier validation
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'v2/Classifier/validate_real_samples.py'
+      - '.github/workflows/v2_real_sample_validation.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v2-real-sample-validation
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install pandas numpy astropy astroquery requests
+      - name: Run named-source blind validation
+        run: python -u v2/Classifier/validate_real_samples.py --out-dir v2/Classifier/validation
+      - name: Commit validation report
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add v2/Classifier/validation
+          if ! git diff --cached --quiet; then
+            git commit -m "Validate classifier on independent real samples"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: real-sample-validation
+          path: v2/Classifier/validation/
