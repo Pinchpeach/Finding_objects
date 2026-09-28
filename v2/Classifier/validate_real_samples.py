@@ -12,6 +12,7 @@ import math
 import subprocess
 import sys
 import tempfile
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 import astropy.units as u
@@ -403,23 +404,32 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--out-dir", type=Path, default=CLS / "validation")
     parser.add_argument("--radius-arcmin", type=float, default=0.25)
+    parser.add_argument("--max-workers", type=int, default=4)
     args = parser.parse_args()
 
-    rows = []
+    by_name = {}
     with tempfile.TemporaryDirectory() as tmp:
         base = Path(tmp)
-        for spec in SAMPLES:
-            try:
-                result = validate_one(spec, base, args.radius_arcmin)
-            except Exception as exc:
-                result = error_row(spec, exc)
-            rows.append(result)
-            print(
-                f"{spec['name']}: expected={spec['truth_class']} "
-                f"blind={result['blind_class']} status={result['blind_status']}",
-                flush=True,
-            )
+        workers = max(1, min(int(args.max_workers), len(SAMPLES)))
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            futures = {
+                pool.submit(validate_one, spec, base, args.radius_arcmin): spec
+                for spec in SAMPLES
+            }
+            for future in as_completed(futures):
+                spec = futures[future]
+                try:
+                    result = future.result()
+                except Exception as exc:
+                    result = error_row(spec, exc)
+                by_name[spec["name"]] = result
+                print(
+                    f"{spec['name']}: expected={spec['truth_class']} "
+                    f"blind={result['blind_class']} status={result['blind_status']}",
+                    flush=True,
+                )
 
+    rows = [by_name[spec["name"]] for spec in SAMPLES]
     frame = pd.DataFrame(rows)
     write_report(frame, args.out_dir)
     print(frame[["name", "truth_axis", "truth_class", "blind_class", "blind_status", "blind_match"]].to_string(index=False))
