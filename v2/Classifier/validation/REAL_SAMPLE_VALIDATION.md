@@ -3,20 +3,21 @@
 SIMBAD supplies only the validation coordinates and external reference type; no SIMBAD row is passed into the blind pipeline.
 Catalog-assisted results are reported separately and are not independent validation.
 
-- requested samples: **8**
-- successfully executed samples: **8/8**
-- blind exact-axis matches among executed: **3/8 (37.5%)**
+- requested samples: **9**
+- successfully executed samples: **9/9**
+- blind exact-axis matches among executed: **6/9 (66.7%)**
 
 | sample | SIMBAD ref | axis | expected | blind | status | sep_arcsec | assisted |
 |---|---|---|---|---|---|---:|---|
-| GD 71 | WD* | physical | WD | UNKNOWN | NOT_STELLAR_ROUTE | 2.518 | UNKNOWN |
+| GD 71 | WD* | physical | WD | WD | CLASSIFIED_WD | 2.518 | WD |
 | RR Lyr | RR* | variability | RR_LYRAE | RR_LYRAE | GAIA_DR3_VARIABLE_CANDIDATE | 3.591 | RR_LYRAE |
 | delta Cep | cC* | variability | CEPHEID | CEPHEID | GAIA_DR3_VARIABLE_CANDIDATE | 0.239 | CEPHEID |
 | Mira | Mi* | physical | AGB | OTHER_STELLAR | STELLAR_UNREFINED | 3.838 | OTHER_STELLAR |
 | PSR B0531+21 | Psr | compact | PULSAR | PULSAR | ATNF_CATALOG_MATCH | 0.197 | PULSAR |
-| M 57 | PN | phenomenon | PN | UNKNOWN | NO_BLIND_CATALOG_EVIDENCE |  | UNKNOWN |
+| M 57 | PN | phenomenon | PN | PN | HASH_PN_CATALOG_MATCH | 0.291 | PN |
+| SN 2018oh | SN* | phenomenon | SN | UNKNOWN | NO_BLIND_CATALOG_EVIDENCE |  | UNKNOWN |
 | SN 2011fe | SN* | phenomenon | SN | UNKNOWN | NO_BLIND_CATALOG_EVIDENCE |  | UNKNOWN |
-| 3C 273 | BLL | extragalactic | QSO | AGN | GAIA_DR3_AGN_CANDIDATE | 0.019 | AGN |
+| 3C 273 | BLL | extragalactic | AGN | AGN | GAIA_DR3_AGN_CANDIDATE | 0.019 | AGN |
 
 ## Scientific measurements
 
@@ -59,8 +60,15 @@ Catalog-assisted results are reported separately and are not independent validat
 
 - coordinates: RA=283.39623652 deg, Dec=33.02913425 deg
 - reference spectral type: None
+- measured fields: {"ra": 283.39615, "dec": 33.02917}
+- collectors: [{"collector": "hash_pn", "status": "ok", "rows": 1, "error": ""}]
+
+### SN 2018oh
+
+- coordinates: RA=136.66500000 deg, Dec=19.33830000 deg
+- reference spectral type: None
 - measured fields: {}
-- collectors: []
+- collectors: [{"collector": "asas_sn_supernova", "status": "empty", "rows": 0, "error": ""}]
 
 ### SN 2011fe
 
