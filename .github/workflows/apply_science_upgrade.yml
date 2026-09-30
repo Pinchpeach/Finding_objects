@@ -1,0 +1,31 @@
+name: Apply scientific validation upgrade
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'v2/scripts/.science_upgrade_chunk_*'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Expand validated source bundle
+        run: |
+          cat v2/scripts/.science_upgrade_chunk_* | base64 --decode | tar -xzf - -C .
+          rm -f v2/scripts/.science_upgrade_chunk_*
+          rm -f .github/workflows/apply_science_upgrade.yml
+      - name: Commit source upgrade
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Apply epoch-aware scientific validation upgrade"
+          git pull --rebase origin main
+          git push origin HEAD:main
