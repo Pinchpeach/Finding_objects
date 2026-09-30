@@ -1,77 +1,28 @@
-"""Compact-object axis.
-
-Evidence order:
-1. ATNF Pulsar Catalog counterpart: direct PULSAR identification.
-2. Exact curated SIMBAD physical types for pulsars/X-ray binaries.
-3. Gaia compact-companion candidate flag, which is never promoted to NS/PULSAR/XRB.
-"""
+"""Compact-object axis with conservative catalog evidence."""
 from __future__ import annotations
 import math
-AXIS="compact"
-CLASSES=("NS","PULSAR","XRB","COMPACT_COMPANION_CANDIDATE","OTHER_COMPACT","UNKNOWN")
-
+AXIS="compact";CLASSES=("NS","PULSAR","XRB","COMPACT_COMPANION_CANDIDATE","OTHER_COMPACT","UNKNOWN")
 def _bool(row,key):
-    value=row.get(key)
-    if value is None:return False
-    if isinstance(value,bool):return value
-    text=str(value).strip().lower()
-    return text in {"1","1.0","true","t","yes"}
-
+ v=row.get(key)
+ if v is None:return False
+ if isinstance(v,bool):return v
+ return str(v).strip().lower() in {"1","1.0","true","t","yes"}
 def _text(row,key):
-    value=row.get(key)
-    if value is None:return None
-    value=str(value).strip()
-    return None if not value or value.lower()=="nan" else value
-
+ v=row.get(key)
+ if v is None:return None
+ v=str(v).strip();return None if not v or v.lower()=="nan" else v
 def _num(row,key):
-    try:
-        value=float(row.get(key))
-        return value if math.isfinite(value) else None
-    except Exception:return None
-
+ try:
+  v=float(row.get(key));return v if math.isfinite(v) else None
+ except Exception:return None
 def classify(row):
-    catalogs=_text(row,"catalogs") or ""
-    if "ATNF Pulsar Catalog" in catalogs:
-        assoc=_num(row,"association_confidence__atnf_pulsar_catalog")
-        return {
-            "axis":AXIS,"label":"PULSAR","confidence":None,
-            "status":"ATNF_CATALOG_MATCH",
-            "evidence":[{
-                "kind":"atnf_pulsar_catalog_counterpart",
-                "association_confidence":assoc,
-                "note":"Counterpart associated with the ATNF Pulsar Catalog; association quality retained separately from class identity.",
-            }],
-        }
-
-    simbad=_text(row,"otype")
-    if simbad=="N*":
-        return {
-            "axis":AXIS,"label":"NS","confidence":None,
-            "status":"SIMBAD_CURATED_NS",
-            "evidence":[{"kind":"simbad_physical_type","otype":"N*","note":"Exact SIMBAD Neutron Star physical type."}],
-        }
-    if simbad=="Psr":
-        return {
-            "axis":AXIS,"label":"PULSAR","confidence":None,
-            "status":"SIMBAD_CURATED_PULSAR",
-            "evidence":[{"kind":"simbad_physical_type","otype":"Psr","note":"Exact SIMBAD Pulsar physical type."}],
-        }
-    if simbad in {"XB*","LXB","HXB"}:
-        return {
-            "axis":AXIS,"label":"XRB","confidence":None,
-            "status":"SIMBAD_CURATED_XRB",
-            "evidence":[{"kind":"simbad_physical_type","otype":simbad,"note":"Exact SIMBAD X-ray-binary physical type."}],
-        }
-    if _bool(row,"in_vari_compact_companion"):
-        return {
-            "axis":AXIS,
-            "label":"COMPACT_COMPANION_CANDIDATE",
-            "confidence":None,
-            "status":"GAIA_DR3_COMPACT_COMPANION_CANDIDATE",
-            "evidence":[{
-                "kind":"gaia_dr3_vari_summary",
-                "in_vari_compact_companion":True,
-                "note":"Candidate compact companion system; not promoted to NS/PULSAR/XRB.",
-            }],
-        }
-    return {"axis":AXIS,"label":"UNKNOWN","confidence":None,"status":"NO_VALIDATED_COMPACT_EVIDENCE","evidence":[]}
+ catalogs=_text(row,"catalogs") or ""
+ if "ATNF Pulsar Catalog" in catalogs:
+  assoc=_num(row,"association_confidence__atnf_pulsar_catalog")
+  return {"axis":AXIS,"label":"PULSAR","confidence":assoc,"status":"ATNF_CATALOG_MATCH","evidence":[{"kind":"atnf_pulsar_catalog_counterpart","association_confidence":assoc,"score_semantics":"raw association score; not calibrated posterior"}]}
+ simbad=_text(row,"otype")
+ if simbad=="N*":return {"axis":AXIS,"label":"NS","confidence":None,"status":"SIMBAD_CURATED_NS","evidence":[{"kind":"simbad_physical_type","otype":"N*"}]}
+ if simbad=="Psr":return {"axis":AXIS,"label":"PULSAR","confidence":None,"status":"SIMBAD_CURATED_PULSAR","evidence":[{"kind":"simbad_physical_type","otype":"Psr"}]}
+ if simbad in {"XB*","LXB","HXB"}:return {"axis":AXIS,"label":"XRB","confidence":None,"status":"SIMBAD_CURATED_XRB","evidence":[{"kind":"simbad_physical_type","otype":simbad}]}
+ if _bool(row,"in_vari_compact_companion"):return {"axis":AXIS,"label":"COMPACT_COMPANION_CANDIDATE","confidence":None,"status":"GAIA_DR3_COMPACT_COMPANION_CANDIDATE","evidence":[{"kind":"gaia_dr3_vari_summary","in_vari_compact_companion":True}]}
+ return {"axis":AXIS,"label":"UNKNOWN","confidence":None,"status":"NO_VALIDATED_COMPACT_EVIDENCE","evidence":[]}

@@ -1,75 +1,213 @@
 #!/usr/bin/env python3
-"""Stage 1: deduplicate raw detections and conservatively associate counterparts."""
+"""Stage 1: survey-aware, epoch-aware conservative counterpart association."""
 from __future__ import annotations
-import argparse,math
+
+import argparse
+import math
 from pathlib import Path
 import pandas as pd
-FLOOR_ARCSEC=0.15; MAX_RADIUS_ARCSEC=2.0; SIGMA_LIMIT=5.0; AMBIG_RATIO=1.5
-def f(v):
-    try:
-        x=float(v); return x if math.isfinite(x) else None
-    except (TypeError,ValueError): return None
-def sep_arcsec(ra1,de1,ra2,de2):
-    dra=math.radians(ra2-ra1); d1=math.radians(de1); d2=math.radians(de2)
-    a=math.sin((d2-d1)/2)**2+math.cos(d1)*math.cos(d2)*math.sin(dra/2)**2
-    return math.degrees(2*math.asin(min(1,math.sqrt(a))))*3600
-def efferr(x):
-    return max(x,FLOOR_ARCSEC) if x is not None and x>0 else FLOOR_ARCSEC
-def poserr(row):
-    vals=[]
-    for a,b in (("ra_error","dec_error"),("raMeanErr","decMeanErr"),("errMaj","errMin")):
-        x,y=f(row.get(a)),f(row.get(b))
-        if x is not None and y is not None:
-            vals.append(max(x,y)*(.001 if a=="ra_error" else 1.0))
-    return max(vals) if vals else None
-def load(raw):
-    rows=[]; seen=set(); skipped=0
+
+from association_model import (
+    assess_pair,
+    canonical_aliases,
+    infer_entity_kind,
+    infer_epoch,
+    infer_poserr_arcsec,
+    infer_psf_arcsec,
+    num,
+    profile_for,
+)
+
+AMBIG_SCORE_RATIO = 0.67
+
+
+def _density(frame: pd.DataFrame) -> float | None:
+    if frame.empty or len(frame) < 5:
+        # A one/few-row targeted cone is not a reliable local-density estimator.
+        return None
+    radius = None
+    for col in ("query_radius_arcmin", "cone_radius_arcmin"):
+        if col in frame.columns:
+            values = pd.to_numeric(frame[col], errors="coerce").dropna()
+            if len(values):
+                radius = float(values.median()) * 60.0
+                break
+    if radius is None or radius <= 0:
+        return None
+    return float(len(frame)) / (math.pi * radius * radius)
+
+
+def load(raw: Path):
+    rows, seen, skipped = [], set(), 0
     for path in sorted(raw.glob("*.csv")):
-        if path.name.startswith(("collection_summary_","ngc4522_")): continue
-        try: df=pd.read_csv(path)
-        except Exception: continue
-        if not {"ra","dec"}.issubset(df.columns): continue
-        for i,r in df.iterrows():
-            ra,de=f(r.get("ra")),f(r.get("dec"))
-            if ra is None or de is None: continue
-            cat=str(r.get("catalog",path.stem)); cid=str(r.get("catalog_object_id","")).strip()
-            # Prefer stable catalog identity; fall back to catalog + rounded coordinates.
-            key=(cat,"id",cid) if cid and cid.lower() not in {"nan","none"} else (cat,"sky",round(ra,7),round(de,7))
-            if key in seen: skipped+=1; continue
+        if path.name.startswith(("collection_summary_", "ngc4522_")):
+            continue
+        try:
+            df = pd.read_csv(path)
+        except Exception:
+            continue
+        if not {"ra", "dec"}.issubset(df.columns):
+            continue
+        density = _density(df)
+        for i, r in df.iterrows():
+            ra, dec = num(r.get("ra")), num(r.get("dec"))
+            if ra is None or dec is None:
+                continue
+            cat = str(r.get("catalog", path.stem))
+            cid = str(r.get("catalog_object_id", "")).strip()
+            key = (cat, "id", cid) if cid and cid.lower() not in {"nan", "none"} else (cat, "sky", round(ra, 7), round(dec, 7))
+            if key in seen:
+                skipped += 1
+                continue
             seen.add(key)
-            rows.append({"detection_id":f"{path.stem}:{i}","input_file":path.name,"catalog":cat,
-              "catalog_object_id":cid or str(i),"object_name":str(r.get("object_name","")),
-              "ra":ra,"dec":de,"poserr_arcsec":poserr(r),"source_row":int(i)})
-    return rows,skipped
-def run(raw_dir,out):
-    det,skipped=load(raw_dir); groups=[]; records=[]
-    for d in det:
-        candidates=[]
-        for gi,g in enumerate(groups):
-            if d["catalog"] in g["catalogs"]: continue
-            s=sep_arcsec(d["ra"],d["dec"],g["ra"],g["dec"])
-            de=efferr(d["poserr_arcsec"]); ge=efferr(g["err"])
-            sigma=math.sqrt(de**2+ge**2)
-            radius=min(MAX_RADIUS_ARCSEC,max(FLOOR_ARCSEC,SIGMA_LIMIT*sigma))
-            if s<=radius: candidates.append((s/sigma,s,gi))
-        candidates.sort(); ambiguous=len(candidates)>1 and candidates[1][0]<=candidates[0][0]*AMBIG_RATIO
-        if candidates and not ambiguous:
-            norm,s,gi=candidates[0]; g=groups[gi]; oid=g["id"]; n=g["n"]
-            g["ra"]=(g["ra"]*n+d["ra"])/(n+1); g["dec"]=(g["dec"]*n+d["dec"])/(n+1)
-            g["n"]+=1; g["catalogs"].add(d["catalog"]); g["err"]=min(efferr(g["err"]),efferr(d["poserr_arcsec"]))
-            status="matched"; sep=s; score=norm
+            payload = r.to_dict()
+            prof = profile_for(cat, payload)
+            rows.append({
+                "detection_id": f"{path.stem}:{i}",
+                "input_file": path.name,
+                "catalog": cat,
+                "catalog_object_id": cid or str(i),
+                "object_name": str(r.get("object_name", "")),
+                "ra": ra,
+                "dec": dec,
+                "poserr_arcsec": infer_poserr_arcsec(cat, payload),
+                "psf_fwhm_arcsec": infer_psf_arcsec(cat, payload),
+                "ref_epoch": infer_epoch(cat, payload),
+                "entity_kind": infer_entity_kind(cat, payload),
+                "pmra": num(r.get("pmra")),
+                "pmra_error": num(r.get("pmra_error")),
+                "pmdec": num(r.get("pmdec")),
+                "pmdec_error": num(r.get("pmdec_error")),
+                "max_radius_arcsec": prof.max_radius_arcsec,
+                "source_density_arcsec2": density,
+                "association_aliases": canonical_aliases(cat, payload, cid),
+                "source_row": int(i),
+            })
+    return rows, skipped
+
+
+def _anchor_key(det):
+    # Prefer a PM-aware astrometric anchor, then smaller astrometric uncertainty.
+    has_motion = det.get("pmra") is not None and det.get("pmdec") is not None and det.get("ref_epoch") is not None
+    gaia = det.get("catalog") == "Gaia DR3"
+    return (0 if gaia and has_motion else 1 if has_motion else 2, float(det.get("poserr_arcsec") or 99.0))
+
+
+def run(raw_dir: Path, out: Path):
+    detections, skipped = load(raw_dir)
+    # Build groups from the best astrometric anchors first.  This prevents a
+    # coarse IRAS/low-resolution row from becoming the coordinate anchor merely
+    # because its filename sorts earlier.
+    detections.sort(key=lambda d: (*_anchor_key(d), str(d.get("catalog")), str(d.get("detection_id"))))
+    groups, records = [], []
+
+    for det in detections:
+        # Time-domain events remain distinct from persistent host/catalog objects.
+        # Event identity can later be linked to a host in a dedicated event layer.
+        if det["entity_kind"] == "transient_event":
+            candidates = []
         else:
-            oid=f"OBJ{len(groups)+1:06d}"; groups.append({"id":oid,"ra":d["ra"],"dec":d["dec"],"n":1,
-              "catalogs":{d["catalog"]},"err":efferr(d["poserr_arcsec"])})
-            status="ambiguous_new" if ambiguous else "new"; sep=candidates[0][1] if candidates else None
-            score=candidates[0][0] if candidates else None
-        records.append({**d,"object_id":oid,"association_status":status,"match_separation_arcsec":sep,
-          "normalized_separation":score,"association_confidence":(math.exp(-0.5*score*score) if status=="matched" and score is not None else (1.0 if status=="new" else 0.0)),
-          "candidate_count":len(candidates)})
-    out.parent.mkdir(parents=True,exist_ok=True); pd.DataFrame(records).to_csv(out,index=False)
-    print(f"[OK] detections={len(records)} deduplicated={skipped} groups={len(groups)} -> {out}"); return out
+            candidates = []
+            for gi, group in enumerate(groups):
+                if group["entity_kind"] == "transient_event" or det["catalog"] in group["catalogs"]:
+                    continue
+                shared_aliases=set(det.get("association_aliases") or ()) & set(group.get("aliases") or ())
+                if shared_aliases:
+                    result=assess_pair(group["anchor"],det,det.get("source_density_arcsec2"))
+                    result.update({"accepted":True,"association_score":1.0,"association_method":"catalog_alias","shared_aliases":"|".join(sorted(shared_aliases))})
+                    candidates.append((1.0,0.0,gi,result));continue
+                density = det.get("source_density_arcsec2")
+                result = assess_pair(group["anchor"], det, density)
+                result["association_method"]="position_epoch_likelihood";result["shared_aliases"]=""
+                if result["accepted"]:
+                    candidates.append((result["association_score"], result["normalized_separation"], gi, result))
+            candidates.sort(key=lambda x: (-x[0], x[1]))
+
+        ambiguous = (
+            len(candidates) > 1
+            and candidates[1][0] >= candidates[0][0] * AMBIG_SCORE_RATIO
+        )
+
+        if candidates and not ambiguous:
+            _, _, gi, match = candidates[0]
+            group = groups[gi]
+            oid = group["id"]
+            group["catalogs"].add(det["catalog"])
+            group["members"] += 1
+            group["aliases"].update(det.get("association_aliases") or ())
+            if _anchor_key(det) < _anchor_key(group["anchor"]):
+                group["anchor"] = det
+            status = "matched"
+        else:
+            oid = f"OBJ{len(groups)+1:06d}"
+            groups.append({
+                "id": oid,
+                "anchor": det,
+                "catalogs": {det["catalog"]},
+                "members": 1,
+                "entity_kind": det["entity_kind"],
+                "aliases": set(det.get("association_aliases") or ()),
+            })
+            match = candidates[0][3] if candidates else {
+                "separation_arcsec": None,
+                "comparison_epoch": None,
+                "proper_motion_propagated": False,
+                "propagation_direction": "none",
+                "combined_sigma_arcsec": None,
+                "match_radius_arcsec": None,
+                "normalized_separation": None,
+                "positional_likelihood": None,
+                "chance_probability": None,
+                "association_score": 1.0 if not ambiguous else 0.0,
+                "association_method": "new_source",
+                "shared_aliases": "",
+            }
+            status = "ambiguous_new" if ambiguous else ("event_new" if det["entity_kind"] == "transient_event" else "new")
+
+        confidence = match.get("association_score")
+        records.append({
+            **{**det,"association_aliases":"|".join(sorted(det.get("association_aliases") or ()))},
+            "object_id": oid,
+            "association_status": status,
+            "match_separation_arcsec": match.get("separation_arcsec"),
+            "comparison_epoch": match.get("comparison_epoch"),
+            "proper_motion_propagated": bool(match.get("proper_motion_propagated")),
+            "propagation_direction": match.get("propagation_direction"),
+            "combined_sigma_arcsec": match.get("combined_sigma_arcsec"),
+            "match_radius_arcsec": match.get("match_radius_arcsec"),
+            "normalized_separation": match.get("normalized_separation"),
+            "positional_likelihood": match.get("positional_likelihood"),
+            "chance_probability": match.get("chance_probability"),
+            "association_confidence": confidence,
+            "association_probability_calibrated": False,
+            "association_method": match.get("association_method","position_epoch_likelihood"),
+            "shared_aliases": match.get("shared_aliases",""),
+            "candidate_count": len(candidates),
+        })
+
+    group_by_id = {g["id"]: g for g in groups}
+    for rec in records:
+        anchor = group_by_id[rec["object_id"]]["anchor"]
+        rec["object_ra"] = anchor["ra"]
+        rec["object_dec"] = anchor["dec"]
+        rec["object_ref_epoch"] = anchor.get("ref_epoch")
+        rec["object_anchor_catalog"] = anchor.get("catalog")
+        rec["object_entity_kind"] = group_by_id[rec["object_id"]]["entity_kind"]
+
+    out.parent.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(records).to_csv(out, index=False)
+    print(f"[OK] detections={len(records)} deduplicated={skipped} groups={len(groups)} -> {out}")
+    return out
+
+
 def main():
-    root=Path(__file__).resolve().parent; p=argparse.ArgumentParser()
-    p.add_argument("--raw-dir",type=Path,default=root.parent/"rawdata"); p.add_argument("--out",type=Path,default=root/"source_association.csv")
-    a=p.parse_args(); run(a.raw_dir,a.out)
-if __name__=="__main__": main()
+    root = Path(__file__).resolve().parent
+    p = argparse.ArgumentParser()
+    p.add_argument("--raw-dir", type=Path, default=root.parent / "rawdata")
+    p.add_argument("--out", type=Path, default=root / "source_association.csv")
+    a = p.parse_args()
+    run(a.raw_dir, a.out)
+
+
+if __name__ == "__main__":
+    main()

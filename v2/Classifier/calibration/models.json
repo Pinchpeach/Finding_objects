@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "policy": {
+    "method": "platt",
+    "min_samples": 100,
+    "min_positives": 20,
+    "min_negatives": 20,
+    "note": "No axis is promoted to calibrated probability until independent truth support passes these gates."
+  },
+  "axes": {}
+}
