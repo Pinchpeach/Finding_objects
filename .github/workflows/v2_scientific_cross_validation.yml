@@ -35,7 +35,7 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 360
     steps:
       - uses: actions/checkout@v4
         with:
@@ -50,7 +50,7 @@ jobs:
       - name: Build larger independent per-axis truth sets
         run: python -u v2/Classifier/truth/build_independent_truth_sets.py --out-dir v2/Classifier/truth/generated --limit 250
       - name: Run sampled independent truth-set cross-validation
-        run: python -u v2/Classifier/validate_independent_truth_sets.py --truth-dir v2/Classifier/truth/generated --out-dir v2/Classifier/validation/independent_truth --per-class 8 --max-workers 6
+        run: python -u v2/Classifier/validate_independent_truth_sets.py --truth-dir v2/Classifier/truth/generated --out-dir v2/Classifier/validation/independent_truth --per-class 80 --max-workers 6
       - name: Fit supported per-axis probability calibrators
         run: python -u v2/Classifier/calibration/fit_axis_calibration.py --input v2/Classifier/validation/independent_truth/independent_truth_predictions.csv --out v2/Classifier/calibration/models.json
       - name: Run named-source blind validation
