@@ -28,6 +28,7 @@ jobs:
         run: |
           python - <<'PY'
           import importlib.util
+          import sys
           from pathlib import Path
           from astroquery.vizier import Vizier
 
@@ -40,6 +41,7 @@ jobs:
           print("seed",ra,dec)
 
           p=Path("v2/Get_data/agb_suh2021.py")
+          sys.path.insert(0,str(p.parent.resolve()))
           s=importlib.util.spec_from_file_location("agb",p)
           m=importlib.util.module_from_spec(s); s.loader.exec_module(m)
           d=m.fetch(ra,dec,0.5)
