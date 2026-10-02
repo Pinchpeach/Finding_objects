@@ -25,7 +25,7 @@ def fetch(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
     if main.empty:return pd.DataFrame(columns=["catalog","catalog_object_id","object_name","ra","dec",*LINE_MAP.values()])
     pngc=pick(main,["PNG"])
     if pngc is None:raise KeyError(f"V/84 main PNG missing; got {list(main.columns)}")
-    raval,decval=coordinates(main,["RAJ2000","RA_ICRS","_RAJ2000"],["DEJ2000","DE_ICRS","_DEJ2000"])
+    raval,decval=coordinates(main,["RAJ2000","RA_ICRS","_RAJ2000","_RA.icrs","RAB1950"],["DEJ2000","DE_ICRS","_DEJ2000","_DE.icrs","DEB1950"])
     records=[]
     for idx,row in main.iterrows():
         png=str(row[pngc]).strip()
