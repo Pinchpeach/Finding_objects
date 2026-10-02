@@ -1,0 +1,6 @@
+set,rows,status,classes
+rgb_agb,180,ok,AGB|RGB
+variables,1500,ok,CEPHEID|LPV|MIRA|RR_LYRAE
+pulsars,250,ok,PULSAR
+pn,250,ok,PN
+sn,101,ok,SN

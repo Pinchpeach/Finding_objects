@@ -1,0 +1,10 @@
+axis,truth_class,n,classified,coverage,exact_accuracy_all,accuracy_when_classified
+compact,PULSAR,8,0,0.0,0.0,
+phenomenon,PN,8,6,0.75,0.75,1.0
+phenomenon,SN,8,0,0.0,0.0,
+physical,AGB,8,8,1.0,0.0,0.0
+physical,RGB,8,8,1.0,0.125,0.125
+variability,CEPHEID,8,8,1.0,1.0,1.0
+variability,LPV,8,5,0.625,0.625,1.0
+variability,MIRA,8,7,0.875,0.0,0.0
+variability,RR_LYRAE,8,8,1.0,0.75,0.75
