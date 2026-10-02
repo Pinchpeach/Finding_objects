@@ -67,7 +67,9 @@ expect(extragalactic,{"best_class_name":"AGN","in_vari_agn":True,"primary_class"
 expect(extragalactic,{"primary_class":"QSO"},"QSO","COARSE_QSO_ROUTE")
 expect(extragalactic,{"primary_class":"GALAXY"},"GALAXY","COARSE_GALAXY_ROUTE")
 
-assert variability.classify({"best_class_name":"RR","best_class_score":0.99})["confidence"] is None
+vr=variability.classify({"best_class_name":"RR","best_class_score":0.99})
+assert vr["confidence"]==0.99,vr
+assert vr["evidence"][0]["score_semantics"].startswith("raw Gaia"),vr
 assert phenomenon.classify({"best_class_name":"SN","best_class_score":0.99})["confidence"] is None
 assert compact.classify({"in_vari_compact_companion":True})["label"]!="NS"
 
