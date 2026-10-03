@@ -45,12 +45,26 @@ def _coords(df):
  return r,d
 
 def red_giants(limit):
- # Vrard+ 2025 table4: EV=1 certain RGB, EV=2 candidate AGB.
- df=_vizier("J/A+A/697/A165/table4",row_limit=max(limit*3,1000))
- if df.empty:return df
- ev=_pick(df,["EV"]);idc=_pick(df,["KIC"]);ra,dec=_coords(df)
- out=pd.DataFrame({"truth_id":df[idc].astype("string") if idc else df.index.astype(str),"ra":ra,"dec":dec,"truth_axis":"physical","truth_class":df[ev].map({1:"RGB",2:"AGB"})})
- out=out.dropna(subset=["truth_class","ra","dec"]);out["truth_source"]="Vrard+2025 Kepler RGB/AGB";out["excluded_evidence_catalog"]="";return out.groupby("truth_class",group_keys=False).head(limit)
+ # Vrard+2025: EV=1 certain RGB, EV=2 candidate AGB. Supplement with
+ # independently classified M5 giant-branch samples so each class can reach
+ # large validation sizes without duplicating coordinates.
+ parts=[]
+ df=_vizier("J/A+A/697/A165/table4",row_limit=max(limit*4,1200))
+ if not df.empty:
+  ev=_pick(df,["EV"]);idc=_pick(df,["KIC"]);ra,dec=_coords(df)
+  out=pd.DataFrame({"truth_id":"VRARD:"+df[idc].astype("string") if idc else "VRARD:"+df.index.astype(str),"ra":ra,"dec":dec,"truth_axis":"physical","truth_class":df[ev].map({1:"RGB",2:"AGB"})})
+  out=out.dropna(subset=["truth_class","ra","dec"]);out["truth_source"]="Vrard+2025 Kepler RGB/AGB";out["excluded_evidence_catalog"]="";parts.append(out)
+ for table,label in (("J/ApJ/611/323/table1","AGB"),("J/ApJ/611/323/table2","RGB")):
+  try:m=_vizier(table,row_limit=max(limit*2,600))
+  except Exception:continue
+  if m.empty:continue
+  idc=_pick(m,["ID","Name"]);ra,dec=_coords(m)
+  ids=m[idc].astype("string") if idc else m.index.astype(str)
+  q=pd.DataFrame({"truth_id":"M5:"+label+":"+ids,"ra":ra,"dec":dec,"truth_axis":"physical","truth_class":label})
+  q=q.dropna(subset=["ra","dec"]);q["truth_source"]="Sandquist+2004 M5 "+label;q["excluded_evidence_catalog"]="";parts.append(q)
+ if not parts:return pd.DataFrame()
+ out=pd.concat(parts,ignore_index=True).drop_duplicates(["truth_class","ra","dec"])
+ return out.groupby("truth_class",group_keys=False).head(limit)
 
 def variables(limit):
  specs=[("RRAB","RR_LYRAE"),("RRC","RR_LYRAE"),("DCEP","CEPHEID"),("DCEPS","CEPHEID"),("M","MIRA"),("SR","LPV")];parts=[]
@@ -76,10 +90,14 @@ def pns(limit):
  out["truth_source"]="Acker V/84 PN catalogue";out["excluded_evidence_catalog"]="Acker PN Spectroscopy";return out.dropna(subset=["ra","dec"])
 
 def supernovae(limit):
- df=_vizier("B/sn/sncat",row_limit=limit)
+ # B/sn is chronological; fetching only the first N strongly biases toward old
+ # events and loses many rows without precise coordinates. Fetch the catalogue
+ # broadly, require coordinates, then take a deterministic sky/time-mixed sample.
+ df=_vizier("B/sn/sncat",row_limit=max(7000,limit*20))
  if df.empty:return df
- idc=_pick(df,["SN"]);typec=_pick(df,["Type"]);ra,dec=_coords(df);out=pd.DataFrame({"truth_id":df[idc].astype("string"),"ra":ra,"dec":dec,"truth_axis":"phenomenon","truth_class":"SN","truth_subtype":df[typec].astype("string") if typec else pd.NA})
- out["truth_source"]="Asiago B/sn";out["excluded_evidence_catalog"]="Asiago Supernova Catalog";return out.dropna(subset=["ra","dec"])
+ idc=_pick(df,["SN"]);typec=_pick(df,["Type"]);ra,dec=_coords(df);out=pd.DataFrame({"truth_id":"ASIAGO:"+df[idc].astype("string"),"ra":ra,"dec":dec,"truth_axis":"phenomenon","truth_class":"SN","truth_subtype":df[typec].astype("string") if typec else pd.NA})
+ out["truth_source"]="Asiago B/sn";out["excluded_evidence_catalog"]="Asiago Supernova Catalog";out=out.dropna(subset=["ra","dec"]).drop_duplicates("truth_id")
+ return out.sample(n=min(limit,len(out)),random_state=42).reset_index(drop=True)
 
 def build(out_dir:Path,limit:int):
  out_dir.mkdir(parents=True,exist_ok=True);builders={"rgb_agb":red_giants,"variables":variables,"pulsars":pulsars,"pn":pns,"sn":supernovae};summary=[]
