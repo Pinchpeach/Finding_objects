@@ -42,6 +42,7 @@ PROFILES = {
     "XMM 4XMM-DR13": SurveyProfile(None, 1.5, 6.0, 10.0),
     "eROSITA eRASS1": SurveyProfile(2020.5, 4.0, 26.0, 20.0),
     "ATNF Pulsar Catalog": SurveyProfile(None, 0.5, None, 5.0),
+    "Fermi 4FGL Pulsar Catalog": SurveyProfile(2012.0, 300.0, None, 900.0),
     "HASH PN Catalog": SurveyProfile(None, 1.0, None, 8.0),
     "ASAS-SN Supernova Catalog": SurveyProfile(2000.0, 1.0, None, 5.0, "transient_event"),
     "Asiago Supernova Catalog": SurveyProfile(2000.0, 1.0, None, 5.0, "transient_event"),
