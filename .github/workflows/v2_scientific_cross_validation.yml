@@ -26,9 +26,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
+  prepare:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
@@ -39,9 +39,16 @@ jobs:
       - run: pip install pandas numpy astropy astroquery requests scikit-learn
       - name: Unit tests
         run: python -m unittest discover -s v2/Classifier/tests -v
+      - name: Build truth sets once
+        run: python -u v2/Classifier/truth/build_independent_truth_sets.py --out-dir v2/Classifier/truth/generated --limit 250
+      - uses: actions/upload-artifact@v4
+        with:
+          name: independent-truth-sets
+          path: v2/Classifier/truth/generated/
+          retention-days: 7
 
   validate-shard:
-    needs: test
+    needs: prepare
     strategy:
       fail-fast: false
       max-parallel: 9
@@ -66,8 +73,10 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install pandas numpy astropy astroquery requests scikit-learn
-      - name: Build truth sets
-        run: python -u v2/Classifier/truth/build_independent_truth_sets.py --out-dir v2/Classifier/truth/generated --limit 250
+      - uses: actions/download-artifact@v4
+        with:
+          name: independent-truth-sets
+          path: v2/Classifier/truth/generated
       - name: Validate shard
         run: python -u v2/Classifier/validate_independent_truth_sets.py --truth-dir v2/Classifier/truth/generated --out-dir v2/Classifier/validation/shards/${{ matrix.key }} --per-class 80 --axis ${{ matrix.axis }} --truth-class ${{ matrix.class }} --max-workers 6
       - uses: actions/upload-artifact@v4
