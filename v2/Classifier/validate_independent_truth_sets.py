@@ -104,8 +104,8 @@ def write_report(rows,out):
  return s
 
 def main():
- p=argparse.ArgumentParser();p.add_argument("--truth-dir",type=Path,default=CLS/"truth"/"generated");p.add_argument("--out-dir",type=Path,default=CLS/"validation"/"independent_truth");p.add_argument("--per-class",type=int,default=8);p.add_argument("--radius-arcmin",type=float,default=.5);p.add_argument("--max-workers",type=int,default=6);a=p.parse_args();truth=sample_truth(a.truth_dir,a.per_class)
- if truth.empty:raise RuntimeError("no independent truth rows available")
+ p=argparse.ArgumentParser();p.add_argument("--truth-dir",type=Path,default=CLS/"truth"/"generated");p.add_argument("--out-dir",type=Path,default=CLS/"validation"/"independent_truth");p.add_argument("--per-class",type=int,default=8);p.add_argument("--axis");p.add_argument("--truth-class");p.add_argument("--radius-arcmin",type=float,default=.5);p.add_argument("--max-workers",type=int,default=6);a=p.parse_args();truth=sample_truth(a.truth_dir,a.per_class)
+ if a.axis:truth=truth[truth.truth_axis.astype(str)==a.axis]\n if a.truth_class:truth=truth[truth.truth_class.astype(str)==a.truth_class]\n if truth.empty:raise RuntimeError("no independent truth rows available")
  a.out_dir.mkdir(parents=True,exist_ok=True);checkpoint=a.out_dir/"independent_truth_checkpoint.csv"
  rows=[]
  if checkpoint.exists():
