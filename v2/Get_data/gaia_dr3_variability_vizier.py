@@ -33,6 +33,23 @@ def fetch(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
         "best_class_name":df[cl].astype("string") if cl else pd.NA,
         "best_class_score":pd.to_numeric(df[sc],errors="coerce") if sc else pd.NA,
     })
+    # SOS LPV detail carries the period and Fourier semi-amplitude needed to
+    # separate high-amplitude Mira candidates from the broader LPV class.
+    try:
+        lp=Vizier(columns=["Source","Freq","e_Freq","Amp","isCstar","RA_ICRS","DE_ICRS"],row_limit=-1).query_region(
+            SkyCoord(float(ra)*u.deg,float(dec)*u.deg,frame="icrs"),
+            radius=float(radius_arcmin)*u.arcmin,catalog="I/358/vlpv")
+        ldf=lp[0].to_pandas() if lp else pd.DataFrame()
+        if not ldf.empty:
+            ls=pick(ldf,["Source"]); lf=pick(ldf,["Freq"]); le=pick(ldf,["e_Freq"]); la=pick(ldf,["Amp"]); lc=pick(ldf,["isCstar"])
+            detail=pd.DataFrame({"catalog_object_id":ldf[ls].astype("string"),
+                "lpv_frequency":pd.to_numeric(ldf[lf],errors="coerce") if lf else pd.NA,
+                "lpv_frequency_error":pd.to_numeric(ldf[le],errors="coerce") if le else pd.NA,
+                "lpv_amplitude":pd.to_numeric(ldf[la],errors="coerce") if la else pd.NA,
+                "lpv_is_cstar":ldf[lc] if lc else pd.NA})
+            out=out.merge(detail.drop_duplicates("catalog_object_id"),on="catalog_object_id",how="left")
+    except Exception:
+        pass
     out=add_standard_metadata(out,radius_arcmin=radius_arcmin,ref_epoch=2016.0,poserr_arcsec=0.1,psf_fwhm_arcsec=0.18)
     return out.dropna(subset=["ra","dec"]).drop_duplicates("catalog_object_id",keep="last").reset_index(drop=True)
 
