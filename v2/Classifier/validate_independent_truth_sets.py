@@ -106,14 +106,24 @@ def write_report(rows,out):
 def main():
  p=argparse.ArgumentParser();p.add_argument("--truth-dir",type=Path,default=CLS/"truth"/"generated");p.add_argument("--out-dir",type=Path,default=CLS/"validation"/"independent_truth");p.add_argument("--per-class",type=int,default=8);p.add_argument("--radius-arcmin",type=float,default=.5);p.add_argument("--max-workers",type=int,default=6);a=p.parse_args();truth=sample_truth(a.truth_dir,a.per_class)
  if truth.empty:raise RuntimeError("no independent truth rows available")
+ a.out_dir.mkdir(parents=True,exist_ok=True);checkpoint=a.out_dir/"independent_truth_checkpoint.csv"
  rows=[]
+ if checkpoint.exists():
+  try:
+   prior=pd.read_csv(checkpoint);rows=prior.to_dict("records")
+  except Exception:rows=[]
+ done={(str(x.get("axis")),str(x.get("truth_class")),str(x.get("truth_id"))) for x in rows}
+ pending=[r for _,r in truth.iterrows() if (str(r.truth_axis),str(r.truth_class),str(r.truth_id)) not in done]
+ print(f"resume: {len(rows)} completed, {len(pending)} pending of {len(truth)}",flush=True)
  with tempfile.TemporaryDirectory() as tmp:
   base=Path(tmp)
-  with ThreadPoolExecutor(max_workers=max(1,min(a.max_workers,len(truth)))) as pool:
-   fs={pool.submit(evaluate_one,r,base,a.radius_arcmin):r for _,r in truth.iterrows()}
+  with ThreadPoolExecutor(max_workers=max(1,min(a.max_workers,len(pending) or 1))) as pool:
+   fs={pool.submit(evaluate_one,r,base,a.radius_arcmin):r for r in pending}
    for f in as_completed(fs):
     try:rows.append(f.result())
     except Exception as exc:
      r=fs[f];rows.append({"truth_id":r.truth_id,"axis":r.truth_axis,"truth_class":r.truth_class,"predicted_class":"ERROR","status":repr(exc),"raw_score":math.nan,"match":False,"classified":False,"sep_arcsec":math.nan,"collectors":"[]"})
- result=pd.DataFrame(rows);write_report(result,a.out_dir);print(result.groupby(["axis","truth_class"])[["classified","match"]].mean())
+    pd.DataFrame(rows).to_csv(checkpoint,index=False)
+    if len(rows)%10==0:print(f"checkpoint: {len(rows)}/{len(truth)}",flush=True)
+ result=pd.DataFrame(rows);write_report(result,a.out_dir);checkpoint.unlink(missing_ok=True);print(result.groupby(["axis","truth_class"])[["classified","match"]].mean())
 if __name__=="__main__":main()
