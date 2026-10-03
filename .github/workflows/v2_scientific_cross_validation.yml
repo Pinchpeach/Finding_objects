@@ -40,7 +40,7 @@ jobs:
       - name: Unit tests
         run: python -m unittest discover -s v2/Classifier/tests -v
       - name: Build truth sets once
-        run: python -u v2/Classifier/truth/build_independent_truth_sets.py --out-dir v2/Classifier/truth/generated --limit 250
+        run: python -u v2/Classifier/truth/build_independent_truth_sets.py --out-dir v2/Classifier/truth/generated --limit 350
       - uses: actions/upload-artifact@v4
         with:
           name: independent-truth-sets
@@ -51,7 +51,7 @@ jobs:
     needs: prepare
     strategy:
       fail-fast: false
-      max-parallel: 9
+      max-parallel: 5
       matrix:
         include:
           - {key: physical-rgb, axis: physical, class: RGB}
@@ -78,7 +78,7 @@ jobs:
           name: independent-truth-sets
           path: v2/Classifier/truth/generated
       - name: Validate shard
-        run: python -u v2/Classifier/validate_independent_truth_sets.py --truth-dir v2/Classifier/truth/generated --out-dir v2/Classifier/validation/shards/${{ matrix.key }} --per-class 80 --axis ${{ matrix.axis }} --truth-class ${{ matrix.class }} --max-workers 6
+        run: python -u v2/Classifier/validate_independent_truth_sets.py --truth-dir v2/Classifier/truth/generated --out-dir v2/Classifier/validation/shards/${{ matrix.key }} --per-class 250 --axis ${{ matrix.axis }} --truth-class ${{ matrix.class }} --max-workers 3
       - uses: actions/upload-artifact@v4
         if: always()
         with:
