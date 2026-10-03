@@ -16,12 +16,12 @@ ROOT=Path(__file__).resolve().parents[1];GET=ROOT/"Get_data";PRE=ROOT/"Preproces
 if str(GET) not in sys.path:sys.path.insert(0,str(GET))
 
 COLLECTORS={
- ("physical","RGB"):("gaia_dr3",),
- ("physical","AGB"):("gaia_dr3","allwise","twomass","agb_suh2021"),
- ("variability","RR_LYRAE"):("gaia_dr3",),
- ("variability","CEPHEID"):("gaia_dr3",),
- ("variability","MIRA"):("gaia_dr3",),
- ("variability","LPV"):("gaia_dr3",),
+ ("physical","RGB"):("gaia_dr3_physical_vizier",),
+ ("physical","AGB"):("gaia_dr3_physical_vizier","allwise","twomass","agb_suh2021"),
+ ("variability","RR_LYRAE"):("gaia_dr3_variability_vizier",),
+ ("variability","CEPHEID"):("gaia_dr3_variability_vizier",),
+ ("variability","MIRA"):("gaia_dr3_variability_vizier",),
+ ("variability","LPV"):("gaia_dr3_variability_vizier",),
  # ATNF is truth here and is deliberately excluded from evidence.
  ("compact","PULSAR"):("gaia_dr3","chandra","xmm","first","nvss"),
  # Acker V/84 is truth; HASH is independent production evidence.
