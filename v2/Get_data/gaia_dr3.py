@@ -101,6 +101,9 @@ def fetch(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
             df=_merge_optional(df,"gaiadr3.astrophysical_parameters",AP,"gaia_ap_query_status")
             df=_merge_optional(df,"gaiadr3.vari_classifier_result",["best_class_name","best_class_score"],"gaia_vari_classifier_query_status")
             df=_merge_optional(df,"gaiadr3.vari_summary",VAR_SUMMARY,"gaia_vari_summary_query_status")
+            if "best_class_name" in df.columns and df["best_class_name"].astype("string").eq("LPV").any():
+                df=_merge_optional(df,"gaiadr3.vari_long_period_variable",["frequency","frequency_error","amplitude","median_delta_wl_rp","is_cstar"],"gaia_lpv_query_status")
+                df=df.rename(columns={"frequency":"lpv_frequency","frequency_error":"lpv_frequency_error","amplitude":"lpv_amplitude","median_delta_wl_rp":"lpv_median_delta_wl_rp","is_cstar":"lpv_is_cstar"})
     except Exception:
         df=_vizier_fallback(ra,dec,radius_arcmin)
     if df.empty:return pd.DataFrame(columns=["catalog","catalog_object_id","object_name","ra","dec"]+SOURCE[2:]+AP+["best_class_name","best_class_score"]+VAR_SUMMARY)
