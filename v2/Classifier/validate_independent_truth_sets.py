@@ -23,7 +23,7 @@ COLLECTORS={
  ("variability","MIRA"):("gaia_dr3_variability_vizier",),
  ("variability","LPV"):("gaia_dr3_variability_vizier",),
  # ATNF is truth here and is deliberately excluded from evidence.
- ("compact","PULSAR"):("gaia_dr3","chandra","xmm","first","nvss"),
+ ("compact","PULSAR"):("gaia_dr3","chandra","xmm","first","nvss","fermi_4fgl_pulsar"),
  # Acker V/84 is truth; HASH is independent production evidence.
  ("phenomenon","PN"):("hash_pn",),
  # Asiago is truth; ASAS-SN is independent, but only covers a limited epoch.
@@ -59,7 +59,7 @@ def select(frame,ra,dec,radius,entity=None):
   if not sub.empty:cand=sub
  if cand.empty:
   if frame.empty:return None,math.nan
-  i=sep.idxmin();return frame.loc[i],float(sep.loc[i])
+  return None,float(sep.min())
  cand["_members"]=pd.to_numeric(cand.get("association_members"),errors="coerce").fillna(1);cand=cand.sort_values(["_members","_sep"],ascending=[False,True]);r=cand.iloc[0];return r,float(r._sep)
 
 def evaluate_one(rec,base,radius):
