@@ -9,17 +9,10 @@ on:
       - 'v2/Preprocess/01_source_association.py'
       - 'v2/Preprocess/02_integrate_objects.py'
       - 'v2/Preprocess/05_likelihood_vectors.py'
-      - 'v2/Get_data/gaia_dr3.py'
-      - 'v2/Get_data/agb_suh2021.py'
-      - 'v2/Get_data/asas_sn_supernova.py'
-      - 'v2/Get_data/asiago_supernova.py'
-      - 'v2/Get_data/hash_pn.py'
-      - 'v2/Get_data/pn_spectroscopy.py'
-      - 'v2/Get_data/_catalog_utils.py'
+      - 'v2/Get_data/**'
       - 'v2/Classifier/axes/**'
-      - 'v2/Classifier/calibration/per_axis.py'
-      - 'v2/Classifier/calibration/fit_axis_calibration.py'
-      - 'v2/Classifier/truth/build_independent_truth_sets.py'
+      - 'v2/Classifier/calibration/**'
+      - 'v2/Classifier/truth/**'
       - 'v2/Classifier/validate_real_samples.py'
       - 'v2/Classifier/validate_independent_truth_sets.py'
       - 'v2/Classifier/tests/**'
@@ -33,9 +26,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  validate:
+  test:
     runs-on: ubuntu-latest
-    timeout-minutes: 360
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
@@ -43,14 +36,79 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Install dependencies
-        run: pip install pandas numpy astropy astroquery requests scikit-learn
-      - name: Unit tests for association and calibration safeguards
+      - run: pip install pandas numpy astropy astroquery requests scikit-learn
+      - name: Unit tests
         run: python -m unittest discover -s v2/Classifier/tests -v
-      - name: Build larger independent per-axis truth sets
+
+  validate-shard:
+    needs: test
+    strategy:
+      fail-fast: false
+      max-parallel: 9
+      matrix:
+        include:
+          - {key: physical-rgb, axis: physical, class: RGB}
+          - {key: physical-agb, axis: physical, class: AGB}
+          - {key: variability-rr, axis: variability, class: RR_LYRAE}
+          - {key: variability-cepheid, axis: variability, class: CEPHEID}
+          - {key: variability-mira, axis: variability, class: MIRA}
+          - {key: variability-lpv, axis: variability, class: LPV}
+          - {key: compact-pulsar, axis: compact, class: PULSAR}
+          - {key: phenomenon-pn, axis: phenomenon, class: PN}
+          - {key: phenomenon-sn, axis: phenomenon, class: SN}
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pandas numpy astropy astroquery requests scikit-learn
+      - name: Build truth sets
         run: python -u v2/Classifier/truth/build_independent_truth_sets.py --out-dir v2/Classifier/truth/generated --limit 250
-      - name: Run sampled independent truth-set cross-validation
-        run: python -u v2/Classifier/validate_independent_truth_sets.py --truth-dir v2/Classifier/truth/generated --out-dir v2/Classifier/validation/independent_truth --per-class 80 --max-workers 6
+      - name: Validate shard
+        run: python -u v2/Classifier/validate_independent_truth_sets.py --truth-dir v2/Classifier/truth/generated --out-dir v2/Classifier/validation/shards/${{ matrix.key }} --per-class 80 --axis ${{ matrix.axis }} --truth-class ${{ matrix.class }} --max-workers 6
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: truth-shard-${{ matrix.key }}
+          path: v2/Classifier/validation/shards/${{ matrix.key }}/
+          retention-days: 7
+
+  aggregate:
+    needs: validate-shard
+    if: always() && needs.validate-shard.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pandas numpy astropy astroquery requests scikit-learn
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: truth-shard-*
+          path: v2/Classifier/validation/shards
+      - name: Merge shard predictions
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import importlib.util, pandas as pd
+          root=Path("v2/Classifier/validation")
+          files=list((root/"shards").glob("**/independent_truth_predictions.csv"))
+          if not files:
+              raise SystemExit("no shard predictions")
+          rows=pd.concat([pd.read_csv(p) for p in files],ignore_index=True)
+          spec=importlib.util.spec_from_file_location("val","v2/Classifier/validate_independent_truth_sets.py")
+          m=importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+          m.write_report(rows,root/"independent_truth")
+          print(rows.groupby(["axis","truth_class"])[["classified","match"]].mean())
+          PY
       - name: Fit supported per-axis probability calibrators
         run: python -u v2/Classifier/calibration/fit_axis_calibration.py --input v2/Classifier/validation/independent_truth/independent_truth_predictions.csv --out v2/Classifier/calibration/models.json
       - name: Run named-source blind validation
@@ -59,17 +117,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add v2/Classifier/validation v2/Classifier/truth/generated v2/Classifier/calibration/models.json
+          git add v2/Classifier/validation/independent_truth v2/Classifier/validation/REAL_SAMPLE_VALIDATION.md v2/Classifier/validation/real_sample_validation.csv v2/Classifier/calibration/models.json
           if ! git diff --cached --quiet; then
-            git commit -m "Update independent scientific validation products"
+            git commit -m "Update sharded scientific validation products"
             git pull --rebase origin main
             git push origin HEAD:main
           fi
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: v2-scientific-cross-validation
-          path: |
-            v2/Classifier/validation/
-            v2/Classifier/truth/generated/
-            v2/Classifier/calibration/models.json
