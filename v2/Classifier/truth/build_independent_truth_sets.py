@@ -46,7 +46,7 @@ def _coords(df):
 
 def red_giants(limit):
  # Vrard+ 2025 table4: EV=1 certain RGB, EV=2 candidate AGB.
- df=_vizier("J/A+A/697/A165/table4",row_limit=max(limit*3,1000))
+ df=_vizier("J/A+A/697/A165/table4",row_limit=max(limit*10,5000))
  if df.empty:return df
  ev=_pick(df,["EV"]);idc=_pick(df,["KIC"]);ra,dec=_coords(df)
  out=pd.DataFrame({"truth_id":df[idc].astype("string") if idc else df.index.astype(str),"ra":ra,"dec":dec,"truth_axis":"physical","truth_class":df[ev].map({1:"RGB",2:"AGB"})})
