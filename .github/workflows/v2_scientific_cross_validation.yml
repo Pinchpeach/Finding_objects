@@ -64,7 +64,7 @@ jobs:
           - {key: phenomenon-pn, axis: phenomenon, class: PN}
           - {key: phenomenon-sn, axis: phenomenon, class: SN}
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 360
     steps:
       - uses: actions/checkout@v4
         with:
@@ -78,7 +78,7 @@ jobs:
           name: independent-truth-sets
           path: v2/Classifier/truth/generated
       - name: Validate shard
-        run: python -u v2/Classifier/validate_independent_truth_sets.py --truth-dir v2/Classifier/truth/generated --out-dir v2/Classifier/validation/shards/${{ matrix.key }} --per-class 80 --axis ${{ matrix.axis }} --truth-class ${{ matrix.class }} --max-workers 6
+        run: python -u v2/Classifier/validate_independent_truth_sets.py --truth-dir v2/Classifier/truth/generated --out-dir v2/Classifier/validation/shards/${{ matrix.key }} --per-class 250 --axis ${{ matrix.axis }} --truth-class ${{ matrix.class }} --max-workers 6
       - uses: actions/upload-artifact@v4
         if: always()
         with:
