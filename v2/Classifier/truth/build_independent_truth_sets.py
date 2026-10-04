@@ -76,10 +76,10 @@ def pns(limit):
  out["truth_source"]="Acker V/84 PN catalogue";out["excluded_evidence_catalog"]="Acker PN Spectroscopy";return out.dropna(subset=["ra","dec"])
 
 def supernovae(limit):
- df=_vizier("B/sn/sncat",row_limit=limit)
+ df=_vizier("B/sn/sncat",row_limit=max(limit*5,1250))
  if df.empty:return df
  idc=_pick(df,["SN"]);typec=_pick(df,["Type"]);ra,dec=_coords(df);out=pd.DataFrame({"truth_id":df[idc].astype("string"),"ra":ra,"dec":dec,"truth_axis":"phenomenon","truth_class":"SN","truth_subtype":df[typec].astype("string") if typec else pd.NA})
- out["truth_source"]="Asiago B/sn";out["excluded_evidence_catalog"]="Asiago Supernova Catalog";return out.dropna(subset=["ra","dec"])
+ out["truth_source"]="Asiago B/sn";out["excluded_evidence_catalog"]="Asiago Supernova Catalog";return out.dropna(subset=["ra","dec"]).head(limit)
 
 def build(out_dir:Path,limit:int):
  out_dir.mkdir(parents=True,exist_ok=True);builders={"rgb_agb":red_giants,"variables":variables,"pulsars":pulsars,"pn":pns,"sn":supernovae};summary=[]
