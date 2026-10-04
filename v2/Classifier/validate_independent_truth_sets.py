@@ -77,7 +77,9 @@ def evaluate_one(rec,base,radius):
  df=pd.read_csv(cls/"classified.csv");entity="transient_event" if rec.truth_class=="SN" else None;row,sep=select(df,float(rec.ra),float(rec.dec),radius,entity)
  if row is None:return {"truth_id":rec.truth_id,"axis":rec.truth_axis,"truth_class":rec.truth_class,"predicted_class":"UNKNOWN","status":"NO_OBJECT","raw_score":math.nan,"match":False,"classified":False,"sep_arcsec":math.nan,"collectors":json.dumps(logs)}
  axis=str(rec.truth_axis);pred=str(row.get(f"{axis}_class","UNKNOWN"));status=str(row.get(f"{axis}_status",""));score=pd.to_numeric(pd.Series([row.get(f"{axis}_confidence")]),errors="coerce").iloc[0]
- classified=pred not in {"UNKNOWN","nan","ERROR"}\n family_match=(pred==rec.truth_class) or (str(rec.truth_class)=="MIRA" and pred=="LPV")\n return {"truth_id":rec.truth_id,"axis":axis,"truth_class":rec.truth_class,"predicted_class":pred,"status":status,"raw_score":score,"match":pred==rec.truth_class,"family_match":family_match,"classified":classified,"sep_arcsec":sep,"collectors":json.dumps(logs)}
+ classified=pred not in {"UNKNOWN","nan","ERROR"}
+ family_match=(pred==rec.truth_class) or (str(rec.truth_class)=="MIRA" and pred=="LPV")
+ return {"truth_id":rec.truth_id,"axis":axis,"truth_class":rec.truth_class,"predicted_class":pred,"status":status,"raw_score":score,"match":pred==rec.truth_class,"family_match":family_match,"classified":classified,"sep_arcsec":sep,"collectors":json.dumps(logs)}
 
 def sample_truth(truth_dir,per_class):
  parts=[]
