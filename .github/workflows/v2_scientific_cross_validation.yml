@@ -37,6 +37,8 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install pandas numpy astropy astroquery requests scikit-learn
+      - name: Compile validation harness
+        run: python -m py_compile v2/Classifier/validate_independent_truth_sets.py v2/Classifier/validate_real_samples.py
       - name: Unit tests
         run: python -m unittest discover -s v2/Classifier/tests -v
       - name: Build truth sets once
