@@ -61,6 +61,14 @@ jobs:
                     "| host_r",r.get("host_elliptical_radius"))
           a=pd.read_csv("/tmp/field/source_association.csv",low_memory=False)
           print("\n== association status by catalog"); print(pd.crosstab(a.catalog,a.association_status).to_string())
+          import glob, numpy as np
+          ls=pd.read_csv(glob.glob("/tmp/field/raw/desi_legacy_*.csv")[0],low_memory=False)
+          ds=pd.read_csv(glob.glob("/tmp/field/raw/desi_spectroscopy_*.csv")[0],low_memory=False)
+          print("\nLS rows",len(ls),"DESI rows",len(ds), "LS release values", ls.get("release",pd.Series()).value_counts().head().to_dict())
+          cosd=np.cos(np.radians(43.0))
+          sep=[np.min(np.hypot((ls.ra-r)*cosd,ls.dec-d))*3600 for r,d in zip(ds.ra,ds.dec)]
+          print("nearest-LS separation for DESI rows (arcsec):", np.percentile(sep,[10,50,90,100]).round(2), "n>2arcsec:", int((np.array(sep)>2).sum()))
+          print("LS ra/dec span", ls.ra.min(), ls.ra.max(), ls.dec.min(), ls.dec.max())
           PY
       - uses: actions/upload-artifact@v4
         if: always()
