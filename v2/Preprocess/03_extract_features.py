@@ -151,7 +151,8 @@ def run(objects:Path,rules_path:Path,out:Path)->Path:
     if wise("snr1") and wise("snr2"):
         s1=ncol("snr1","allwise"); s2=ncol("snr2","allwise")
         q=np.minimum(1.0,np.minimum(s1,s2)/10.0).clip(lower=0)
-        if wise("nb"): q=q.where(ncol("nb","allwise")<=2,0.0)
+        if wise("nb"):
+            nb=ncol("nb","allwise"); q=q.where(nb.isna()|(nb<=2),0.0)  # missing nb is unknown, not blended
         if wise("ccf"):
             cc=df[wise("ccf")].fillna("").astype(str).str.replace(".0","",regex=False).str.zfill(4)
             q=q.where(cc.str[:2].eq("00"),0.0)

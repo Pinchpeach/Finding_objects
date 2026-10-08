@@ -17,7 +17,7 @@ def _first_valid(series):
 
 
 def run(associations, raw_dir, out):
-    assoc = pd.read_csv(associations)
+    assoc = pd.read_csv(associations, dtype={"catalog_object_id": "string"}, low_memory=False)
     raw_cache = {}
     rows = []
     for oid, g in assoc.groupby("object_id", sort=False):
@@ -40,7 +40,7 @@ def run(associations, raw_dir, out):
             fn = a["input_file"]
             if fn not in raw_cache:
                 try:
-                    raw_cache[fn] = pd.read_csv(raw_dir / fn)
+                    raw_cache[fn] = pd.read_csv(raw_dir / fn, dtype={"catalog_object_id": "string"}, low_memory=False)
                 except Exception:
                     continue
             src = raw_cache[fn]
@@ -69,7 +69,7 @@ def run(associations, raw_dir, out):
                 "parallax", "parallax_error", "pmra", "pmra_error", "pmdec", "pmdec_error", "class", "zwarning",
                 "classprob_dsc_combmod_quasar", "classprob_dsc_combmod_galaxy", "classprob_dsc_combmod_star",
                 "classprob_dsc_combmod_whitedwarf", "classprob_dsc_combmod_binarystar", "best_class_name", "best_class_score",
-                "event_time_mjd", "event_discovery_date", "sn_subtype", "pn_spectroscopic_score", "pn_spectroscopic_basis",
+                "event_mjd", "event_discovery_date", "sn_subtype", "pn_spectroscopic_score", "pn_spectroscopic_basis",
             ):
                 if col in r and pd.notna(r[col]) and (col not in rec or pd.isna(rec[col])):
                     rec[col] = r[col]

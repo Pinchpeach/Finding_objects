@@ -34,7 +34,9 @@ def fetch(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
         out=df.copy(); out["ra"]=raval; out["dec"]=decval
         out["sn_subtype"]=out[typec].astype("string") if typec else pd.NA
         out["event_time_raw"]=out[datec].astype("string") if datec else pd.NA
-        if datec:
+        if datec and datec.upper()=="MJD":
+            out["event_mjd"]=pd.to_numeric(out[datec],errors="coerce")
+        elif datec:
             parsed=pd.to_datetime(out[datec],errors="coerce",utc=True)
             out["event_mjd"]=parsed.map(lambda x: (x.timestamp()/86400.0+40587.0) if pd.notna(x) else pd.NA)
         else:out["event_mjd"]=pd.NA

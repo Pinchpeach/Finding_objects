@@ -93,3 +93,19 @@ def test_same_named_fields_do_not_cross_catalogs(tmp_path):
     _load("04_build_evidence").run(f, RULES, e)
     ev = json.loads(pd.read_csv(e).loc[0, "evidence_json"])
     assert any(x["rule_id"] == "SDSS-PHOTO-001" and x["class"] == "GALAXY" for x in ev)
+
+
+def test_64bit_identifiers_survive_association(tmp_path):
+    raw = tmp_path / "raw"
+    raw.mkdir()
+    # A missing ID in the column would make pandas parse the rest as float64.
+    pd.DataFrame([
+        {"catalog": "Gaia DR3", "catalog_object_id": "3796442680948579328", "object_name": "a", "ra": 10.0, "dec": 1.0},
+        {"catalog": "Gaia DR3", "catalog_object_id": "3796442680948579329", "object_name": "b", "ra": 11.0, "dec": 1.0},
+        {"catalog": "Gaia DR3", "catalog_object_id": None, "object_name": "c", "ra": 12.0, "dec": 1.0},
+    ]).to_csv(raw / "gaia_t.csv", index=False)
+    a = tmp_path / "a.csv"
+    _load("01_source_association").run(raw, a)
+    ids = set(pd.read_csv(a, dtype={"catalog_object_id": str}).catalog_object_id)
+    assert {"3796442680948579328", "3796442680948579329"} <= ids
+    assert "nan" not in ids

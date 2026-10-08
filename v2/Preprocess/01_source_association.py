@@ -43,7 +43,8 @@ def load(raw: Path):
         if path.name.startswith(("collection_summary_", "ngc4522_")):
             continue
         try:
-            df = pd.read_csv(path)
+            # Identifiers are text: 64-bit Gaia/PS1/SDSS IDs lose precision as float64.
+            df = pd.read_csv(path, dtype={"catalog_object_id": "string", "catalog": "string"}, low_memory=False)
         except Exception:
             continue
         if not {"ra", "dec"}.issubset(df.columns):
@@ -53,8 +54,10 @@ def load(raw: Path):
             ra, dec = num(r.get("ra")), num(r.get("dec"))
             if ra is None or dec is None:
                 continue
-            cat = str(r.get("catalog", path.stem))
-            cid = str(r.get("catalog_object_id", "")).strip()
+            cat = r.get("catalog")
+            cat = path.stem if pd.isna(cat) or not str(cat).strip() else str(cat)
+            cid = r.get("catalog_object_id")
+            cid = "" if pd.isna(cid) else str(cid).strip()
             key = (cat, "id", cid) if cid and cid.lower() not in {"nan", "none"} else (cat, "sky", round(ra, 7), round(dec, 7))
             if key in seen:
                 skipped += 1
