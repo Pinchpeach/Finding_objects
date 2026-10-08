@@ -301,12 +301,15 @@ Fit: `fit_fusion_weights.py --augment-drop LS-MORPH,PS1-MORPH,SDSS-PHOTO LS-
 
 ### Real fields after these changes (DESI DR1 spectra as truth, `v2_field_validation.yml`)
 
-| field (radius) | morning: accuracy / coverage | evening: accuracy / coverage |
+| field (radius) | morning: accuracy / coverage | evening (commit e58bee3): accuracy / coverage |
 |---|---:|---:|
-| RA 245, Dec +43 (3′), n = 42 | 86.5% / 88.1% | **94.6% / 88.1%** |
-| RA 250, Dec +30 (4′), n = 40 | 61.5% / 97.5% | **94.1% / 85.0%** |
-| RA 20, Dec 0 (4′), n = 35 | 72.7% / 94.3% | **100% / 77.1%** |
-| pooled | ≈ 73% / 93% | **≈ 96% / 84%** |
+| RA 245, Dec +43 (3′), n = 42 | 86.5% / 88.1% | **94.9% / 92.9%** |
+| RA 250, Dec +30 (4′), n = 40 | 61.5% / 97.5% | **94.3% / 87.5%** |
+| RA 20, Dec 0 (4′), n = 35 | 72.7% / 94.3% | **100% / 82.9%** |
+| pooled | 73.4% (80/109) / 93.2% | **96.1% (99/103) / 88.0%** |
+
+The last step (association posterior, below) raised coverage by 2–6 points
+per field at unchanged accuracy.
 
 Also fixed while validating: Stage 5 discounted unreliable evidence as
 `logit(raw × reliability)`, which turns a resolved-galaxy claim with
