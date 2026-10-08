@@ -459,5 +459,10 @@
   "train_rows": 5920
  },
  "semantics": "multinomial-logistic probability fitted on a class-balanced SDSS spectroscopic benchmark (equal priors); evidence keys without training support use prior weights",
+ "training_prior": {
+  "GALAXY": 0.33327702702702705,
+  "QSO": 0.3347972972972973,
+  "STAR": 0.33192567567567566
+ },
  "version": 1
 }

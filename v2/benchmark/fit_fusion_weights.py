@@ -86,6 +86,7 @@ def main():
     model={"version":1,"classes":CLASSES,
       "intercept":{c:float(m.intercept_[order[i]]) for i,c in enumerate(CLASSES)},
       "coef":coef,"min_margin":0.0,
+      "training_prior":{c:float((y[fit_rows]==c).mean()) for c in CLASSES},
       "semantics":"multinomial-logistic probability fitted on a class-balanced SDSS spectroscopic benchmark (equal priors); evidence keys without training support use prior weights",
       "provenance":{"benchmark":str(a.truth.relative_to(V2.parent)) if a.truth.is_absolute() and a.truth.is_relative_to(V2.parent) else str(a.truth),
         "train_rows":int(fit_rows.sum()),"calibration_rows":int((ca&used).sum()),"C":C,"calibration_log_loss":float(ll),

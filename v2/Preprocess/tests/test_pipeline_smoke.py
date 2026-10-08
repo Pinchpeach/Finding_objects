@@ -140,3 +140,16 @@ def test_detections_inside_large_galaxy_abstain(tmp_path):
     host = pd.read_csv(l)
     host = host[host.catalogs.str.contains("SGA-2020", regex=False)].iloc[0]
     assert host.primary_class == "GALAXY"
+
+
+def test_field_prior_em_recovers_class_mix():
+    import numpy as np
+    mod = _load("05_likelihood_vectors")
+    rng = np.random.default_rng(1)
+    # Calibrated under equal priors: draw posteriors, then labels from them.
+    P = rng.dirichlet([0.4, 0.4, 0.4], size=60000)
+    y = np.array([rng.choice(3, p=p) for p in P])
+    # Label shift to a 70/20/10 field: subsample each class.
+    keep = np.concatenate([rng.choice(np.where(y == c)[0], n, replace=False) for c, n in enumerate((7000, 2000, 1000))])
+    pi = mod.estimate_field_prior(P[keep], [1 / 3, 1 / 3, 1 / 3])
+    assert np.allclose(pi, [0.7, 0.2, 0.1], atol=0.03)

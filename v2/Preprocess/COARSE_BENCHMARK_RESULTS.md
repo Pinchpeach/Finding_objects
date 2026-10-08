@@ -81,3 +81,23 @@ field, and the benchmark is class-balanced (equal priors), so field accuracy
 will be lower and the probabilities assume equal priors. Gaia DSC is absent
 from this benchmark (Gaia features come from the VizieR main table), so its
 prior weight is untested here.
+
+### Field class priors (label shift)
+
+The fitted weights assume the benchmark's equal class priors. Stage 5 now
+re-estimates each field's class mix with the EM procedure of Saerens, Latinne
+& Decaestecker (2002, Neural Computation 14, 21) when a fitted model is present
+and at least 50 objects have evidence outside large-galaxy hosts, and
+rescales the posteriors accordingly (`field_prior_*`, `p_*_training_prior`,
+`coarse_prior_adjusted`). Simulated label shift on the test split (600
+objects per draw, 20 draws):
+
+| field mix STAR/GAL/QSO | accuracy before → after | log-loss before → after | estimated prior |
+|---|---|---|---|
+| 0.33/0.33/0.33 | 0.974 → 0.974 | 0.092 → 0.092 | 0.33/0.32/0.34 |
+| 0.70/0.20/0.10 | 0.979 → 0.984 | 0.070 → 0.056 | 0.70/0.20/0.10 |
+| 0.10/0.80/0.10 | 0.977 → 0.987 | 0.095 → 0.050 | 0.10/0.79/0.11 |
+| 0.85/0.10/0.05 | 0.986 → 0.992 | 0.045 → 0.029 | 0.85/0.10/0.05 |
+
+This corrects class-mix shift only; a field that is also fainter than the
+SDSS spectroscopic benchmark (covariate shift) is not corrected by it.
