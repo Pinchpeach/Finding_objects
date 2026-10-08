@@ -37,6 +37,17 @@ class CatalogFields:
         key=f"{self.prefix}__{name}" if self.prefix else name
         return self.row.get(key,default)
 
+# Survey-native fields read by evaluate() (bare or ``<catalog>__`` namespaced).
+# Rows are materialized with only these plus derived/confidence columns, so a
+# rule reading a new raw field must list it here.
+RAW_FIELDS={"parallax","parallax_error","pmra","pmra_error","pmdec","pmdec_error",
+  "class","zwarning","iMeanPSFMag","rMeanPSFMag","zMeanPSFMag","W1mag","W2mag","snr1","snr2",
+  "type","clean","Type","otype","best_class_name","best_class_score",*DSC_MAP.values()}
+DERIVED_PREFIXES=("association_confidence__","catalog_confidence_","ps1_")
+
+def _rule_columns(columns):
+    return [c for c in columns if c.startswith(DERIVED_PREFIXES) or c.split("__",1)[-1] in RAW_FIELDS]
+
 def emit(out, rule, cls, score, value=None, note="", reliability=1.0, association_reliability=1.0):
     raw=float(max(0,min(1,score)))
     # Catalog-quality and association reliabilities are independent factors;
@@ -194,9 +205,11 @@ def run(features:Path,rules_path:Path,out:Path)->Path:
     df=pd.read_csv(features); rules=pd.read_csv(rules_path,keep_default_na=False)
     result=df.copy(); payload=[]; counts=[]; conflicts=[]
     namespaced=frozenset(c.split("__",1)[0] for c in df.columns if "__" in c)
-    for _,row in df.iterrows():
+    # Plain dicts: building a pandas Series per row/rule dominated runtime.
+    rule_list=rules.to_dict("records")
+    for row in df[_rule_columns(df.columns)].to_dict("records"):
         ev=[]
-        for _,rule in rules.iterrows(): ev.extend(evaluate(rule,row,namespaced))
+        for rule in rule_list: ev.extend(evaluate(rule,row,namespaced))
         payload.append(json.dumps(ev,separators=(",",":")))
         counts.append(len(ev))
         strong={e["class"] for e in ev if e["class"] in PRIMARY and e["score"]>=.8}

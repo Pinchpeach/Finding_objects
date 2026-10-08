@@ -31,10 +31,10 @@ def load_axes_controller():
 def annotate_legacy(d:pd.DataFrame)->pd.DataFrame:
     mods={k:load_branch(v) for k,v in BRANCH.items()}
     payload=[]; labels=[]; conf=[]; stellar_family=[]; spectral_type=[]; variability_class=[]
-    for _,row in d.iterrows():
+    for row in d.to_dict("records"):
         coarse=str(row.get("primary_class","UNKNOWN"))
         if coarse in mods:
-            res=mods[coarse].classify(row.to_dict())
+            res=mods[coarse].classify(row)
         else:
             res={"detailed_class":"UNRESOLVED","confidence":None,
                  "basis":"coarse class UNKNOWN; detailed classification skipped"}

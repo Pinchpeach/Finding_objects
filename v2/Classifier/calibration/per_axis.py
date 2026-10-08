@@ -37,8 +37,9 @@ def annotate(df:pd.DataFrame,model_path:Path,axes=("physical","variability","com
     for axis in axes:
         axis_models=models.get("axes",{}).get(axis,{})
         probs=[];statuses=[];methods=[]
-        for _,row in out.iterrows():
-            label=str(row.get(f"{axis}_class","UNKNOWN"));score=row.get(f"{axis}_confidence")
+        labels=out[f"{axis}_class"] if f"{axis}_class" in out else pd.Series("UNKNOWN",index=out.index)
+        scores=out[f"{axis}_confidence"] if f"{axis}_confidence" in out else pd.Series(None,index=out.index)
+        for label,score in zip(labels.astype(str),scores):
             model=axis_models.get(label)
             p=calibrate_score(score,model)
             probs.append(p)
