@@ -88,6 +88,19 @@ def run_gaia(truth,out_dir):
  xm=xm[np.isfinite(pd.to_numeric(xm["_sep_arcsec"],errors="coerce"))]
  xm=xm[pd.to_numeric(xm["_sep_arcsec"],errors="coerce")<=MATCH_ARCSEC["gaia_dr3"]]
  xm=xm.sort_values(["benchmark_id","_sep_arcsec"]).drop_duplicates("benchmark_id",keep="first")
+ # Gaia DSC-Combmod class probabilities live in the astrophysical-parameter
+ # table (I/355/paramp); join them by source_id when available.
+ try:
+  ap=XMatch.query(cat1=Table.from_pandas(upload),cat2="vizier:I/355/paramp",
+                  max_distance=MATCH_ARCSEC["gaia_dr3"]*u.arcsec,colRA1="truth_ra",colDec1="truth_dec").to_pandas()
+  dsc={"PQSO":"classprob_dsc_combmod_quasar","PGal":"classprob_dsc_combmod_galaxy","Pstar":"classprob_dsc_combmod_star",
+       "PWD":"classprob_dsc_combmod_whitedwarf","Pbin":"classprob_dsc_combmod_binarystar"}
+  if "Source" in ap.columns and set(dsc)<=set(ap.columns):
+   ap=ap[["Source",*dsc]].rename(columns={"Source":"source_id",**dsc}).drop_duplicates("source_id")
+   xm=xm.merge(ap,on="source_id",how="left")
+   print(f"[gaia_dr3] DSC joined for {int(xm['classprob_dsc_combmod_star'].notna().sum())} sources",flush=True)
+ except Exception as e:
+  print(f"[gaia_dr3] DSC XMatch skipped: {e!r}",flush=True)
  xm.insert(0,"catalog",mod.CATALOG)
  xm.insert(1,"catalog_object_id",pd.to_numeric(xm["source_id"],errors="coerce").astype("Int64").astype(str))
  xm.insert(2,"object_name","Gaia DR3 "+xm["catalog_object_id"].astype(str))

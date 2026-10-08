@@ -2,7 +2,8 @@ name: v2 DESI DR1 external coarse validation
 
 # Independent, deeper (r <= 23) external check of the coarse classifier,
 # which was fitted on SDSS spectroscopy. Truth and catalog features are
-# committed under v2/benchmark/desi_external/ for reproducibility.
+# committed under v2/benchmark/desi_external/ for reproducibility. Gaia features
+# include DSC-Combmod probabilities (an SDSS-independent test of DSC).
 on:
   workflow_dispatch:
   push:
