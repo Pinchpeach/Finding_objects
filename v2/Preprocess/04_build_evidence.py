@@ -24,7 +24,9 @@ def num(row,name):
 
 def emit(out, rule, cls, score, value=None, note="", reliability=1.0, association_reliability=1.0):
     raw=float(max(0,min(1,score)))
-    rel=float(max(0,min(1,reliability,association_reliability))) if reliability is not None else 0.0
+    # Catalog-quality and association reliabilities are independent factors;
+    # each is applied exactly once.
+    rel=float(max(0,min(1,reliability))) if reliability is not None else 0.0
     arel=float(max(0,min(1,association_reliability))) if association_reliability is not None else 0.0
     effective=raw*rel*arel
     if effective<=0: return
@@ -80,7 +82,7 @@ def evaluate(rule,row):
     elif rid=="AST-GAL-002":
         a,ae,d,de=(num(row,x) for x in ("pmra","pmra_error","pmdec","pmdec_error"))
         if None not in (a,ae,d,de) and ae>0 and de>0:
-            x=math.sqrt((a/ae)**2+(d/de)**2); emit(out,rule,"STAR",x/(x+5),x,"uncalibrated physical support")
+            x=math.sqrt((a/ae)**2+(d/de)**2); emit(out,rule,"STAR",x/(x+5),x,"uncalibrated physical support",reliability,association_reliability)
     elif rid.startswith("SPC-SDSS-"):
         c=str(row.get("class","")).strip().upper()
         target=rule["target_class"]
@@ -130,7 +132,8 @@ def evaluate(rule,row):
                 # Candidate-selection evidence only. Keep moderate because the
                 # paper explicitly requires follow-up to reject cool dwarfs/artifacts.
                 emit(out,rule,"QSO",0.70,{"i-z":iz,"z-y":zy},
-                     "Bañados+2016 PS1 z~6 quasar color-selection candidate; follow-up required")
+                     "Bañados+2016 PS1 z~6 quasar color-selection candidate; follow-up required",
+                     reliability,association_reliability)
     elif rid=="WISE-AGN-001":
         w1,w2,s1,s2=(num(row,x) for x in ("W1mag","W2mag","snr1","snr2"))
         if None not in (w1,w2,s1,s2) and w1-w2>=0.8 and w2<=15.05 and s1>=10 and s2>=10:
@@ -168,7 +171,7 @@ def evaluate(rule,row):
     elif rid=="VAR-001":
         cls=str(row.get("best_class_name","")).strip()
         score=num(row,"best_class_score")
-        if cls and score is not None: emit(out,rule,f"VAR:{cls}",score,score)
+        if cls and score is not None: emit(out,rule,f"VAR:{cls}",score,score,reliability=reliability,association_reliability=association_reliability)
     return out
 
 def run(features:Path,rules_path:Path,out:Path)->Path:

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import importlib.util
+import sys
 import time
 import traceback
 from pathlib import Path
@@ -12,6 +13,10 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 GET_DATA = Path(__file__).resolve().parent
 DEFAULT_OUT = ROOT / "rawdata"
+# Collectors import shared helpers such as ``_catalog_utils`` by bare name;
+# make that work when this module is imported from elsewhere.
+if str(GET_DATA) not in sys.path:
+    sys.path.insert(0, str(GET_DATA))
 
 COLLECTORS = [
     "gaia_dr3", "gaia_dr3_variability_sos_vizier", "sdss_dr18", "panstarrs1", "desi_legacy", "galex",
@@ -64,6 +69,8 @@ def collect_all(
                 df = pd.DataFrame(df)
 
             module.save(df, output)
+            if not output.exists():
+                raise RuntimeError(f"{name}.save() returned without writing {output}")
             status = "ok" if len(df) else "empty"
             error = ""
             rows = len(df)
