@@ -1,0 +1,33 @@
+name: v2 DESI DR1 truth probe
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/v2_desi_truth_probe.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pandas astropy astroquery
+      - name: Find DESI DR1 spectroscopic catalogs in VizieR
+        run: |
+          python - <<'PY'
+          from astroquery.vizier import Vizier
+          cats=Vizier.find_catalogs("DESI DR1")
+          for k,v in list(cats.items())[:20]: print(k,"|",v.description)
+          for cid in ("VII/294","VII/294/desi-dr1"):
+              try:
+                  v=Vizier(columns=["**"],row_limit=3)
+                  t=v.get_catalogs(cid)
+                  for tab in t: print(cid, tab.meta.get("name"), len(tab), tab.colnames)
+              except Exception as e: print(cid,"ERR",repr(e))
+          PY
