@@ -23,13 +23,14 @@ check("dsc_wd",{
     "classprob_dsc_combmod_star":0.02,
 },"WD","CLASSIFIED_WD")
 
-# A secure stellar posterior is retained as stellar but not fabricated into RGB/AGB.
+# A secure stellar posterior is retained as evidence but does not fabricate a
+# physical/evolutionary state.
 check("ordinary_star",{
     "primary_class":"STAR",
     "classprob_dsc_combmod_star":0.96,
     "teff_gspphot":4800,
     "logg_gspphot":2.2,
-},"OTHER_STELLAR","STELLAR_UNREFINED")
+},"UNKNOWN","STAR_LIKE_NO_VALIDATED_PHYSICAL_STATE")
 
 # Non-stellar coarse classes must not enter the stellar physical branch.
 check("qso_route",{"primary_class":"QSO"},"UNKNOWN","NOT_STELLAR_ROUTE")

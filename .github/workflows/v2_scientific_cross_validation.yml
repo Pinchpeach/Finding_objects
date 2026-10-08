@@ -23,7 +23,9 @@ permissions:
 
 concurrency:
   group: v2-scientific-cross-validation
-  cancel-in-progress: true
+  # The independent runs can take hours. Preserve a started validation run so
+  # a documentation or harness-only follow-up cannot erase its evidence.
+  cancel-in-progress: false
 
 jobs:
   prepare:

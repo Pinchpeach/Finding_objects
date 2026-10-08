@@ -33,7 +33,8 @@ r=physical.classify({
     "primary_class":"STAR","classprob_dsc_combmod_star":0.96,
     "evolstage_flame":700,"logg_gspphot":2.4,"mass_flame":2.5,"age_flame":1.5,
 })
-assert r["label"]=="OTHER_STELLAR",r
+assert r["label"]=="UNKNOWN",r
+assert r["status"]=="STAR_LIKE_NO_VALIDATED_PHYSICAL_STATE",r
 
 expect(variability,{"otype":"Mi*"},"MIRA","SIMBAD_CURATED_VARIABLE_TYPE")
 expect(variability,{"otype":"RR*"},"RR_LYRAE","SIMBAD_CURATED_VARIABLE_TYPE")

@@ -66,7 +66,7 @@ def evaluate_one(rec,base,radius):
  safe=str(rec.truth_id).replace("/","_").replace(" ","_");work=base/f"{rec.truth_axis}_{rec.truth_class}_{safe}";raw=work/"raw";pre=work/"pre";cls=work/"cls"
  for d in (raw,pre,cls):d.mkdir(parents=True,exist_ok=True)
  logs=collect(rec,raw,radius);usable=sum(x.get("rows",0) for x in logs if x.get("status")=="ok")
- if not usable:return {"truth_id":rec.truth_id,"axis":rec.truth_axis,"truth_class":rec.truth_class,"predicted_class":"UNKNOWN","status":"NO_EVIDENCE","raw_score":math.nan,"match":False,"classified":False,"sep_arcsec":math.nan,"collectors":json.dumps(logs)}
+ if not usable:return {"truth_id":rec.truth_id,"axis":rec.truth_axis,"truth_class":rec.truth_class,"predicted_class":"UNKNOWN","status":"NO_EVIDENCE","raw_score":math.nan,"match":False,"family_match":False,"classified":False,"sep_arcsec":math.nan,"collectors":json.dumps(logs)}
  run_cmd([PRE/"01_source_association.py","--raw-dir",raw,"--out",pre/"source_association.csv"])
  run_cmd([PRE/"02_integrate_objects.py","--associations",pre/"source_association.csv","--raw-dir",raw,"--out",pre/"integrated_objects.csv"])
  run_cmd([PRE/"03_extract_features.py","--objects",pre/"integrated_objects.csv","--rules",PRE/"classification_rules.csv","--out",pre/"features.csv"])
@@ -75,7 +75,7 @@ def evaluate_one(rec,base,radius):
  run_cmd([CLS/"01_prepare_input.py","--input",pre/"likelihood_vectors.csv","--out",cls/"input.csv"])
  run_cmd([CLS/"control.py","--input",cls/"input.csv","--out",cls/"classified.csv"])
  df=pd.read_csv(cls/"classified.csv");entity="transient_event" if rec.truth_class=="SN" else None;row,sep=select(df,float(rec.ra),float(rec.dec),radius,entity)
- if row is None:return {"truth_id":rec.truth_id,"axis":rec.truth_axis,"truth_class":rec.truth_class,"predicted_class":"UNKNOWN","status":"NO_OBJECT","raw_score":math.nan,"match":False,"classified":False,"sep_arcsec":math.nan,"collectors":json.dumps(logs)}
+ if row is None:return {"truth_id":rec.truth_id,"axis":rec.truth_axis,"truth_class":rec.truth_class,"predicted_class":"UNKNOWN","status":"NO_OBJECT","raw_score":math.nan,"match":False,"family_match":False,"classified":False,"sep_arcsec":math.nan,"collectors":json.dumps(logs)}
  axis=str(rec.truth_axis);pred=str(row.get(f"{axis}_class","UNKNOWN"));status=str(row.get(f"{axis}_status",""));score=pd.to_numeric(pd.Series([row.get(f"{axis}_confidence")]),errors="coerce").iloc[0]
  classified=pred not in {"UNKNOWN","nan","ERROR"}
  family_match=(pred==rec.truth_class) or (str(rec.truth_class)=="MIRA" and pred=="LPV")
@@ -97,11 +97,15 @@ def write_report(rows,out):
  if not rows.empty:
   for (axis,label),g in rows.groupby(["axis","truth_class"]):
    classified=g.classified.astype(bool);matches=g.match.astype(bool)
-   summary.append({"axis":axis,"truth_class":label,"n":len(g),"classified":int(classified.sum()),"coverage":float(classified.mean()),"exact_accuracy_all":float(matches.mean()),"accuracy_when_classified":float(matches[classified].mean()) if classified.any() else math.nan})
+   family=g["family_match"].fillna(False).astype(bool) if "family_match" in g else matches
+   summary.append({"axis":axis,"truth_class":label,"n":len(g),"classified":int(classified.sum()),"coverage":float(classified.mean()),"exact_accuracy_all":float(matches.mean()),"accuracy_when_classified":float(matches[classified].mean()) if classified.any() else math.nan,"family_accuracy_all":float(family.mean()),"family_accuracy_when_classified":float(family[classified].mean()) if classified.any() else math.nan})
  s=pd.DataFrame(summary);s.to_csv(out/"independent_truth_summary.csv",index=False)
- lines=["# Independent truth-set cross-validation","","Truth-catalog rows are used only as coordinates/labels. The same catalog is excluded from production evidence for that validation family.","","| axis | class | n | classified | coverage | accuracy all | accuracy classified |","|---|---|---:|---:|---:|---:|---:|"]
- for _,r in s.iterrows():lines.append(f"| {r.axis} | {r.truth_class} | {int(r.n)} | {int(r.classified)} | {r.coverage:.1%} | {r.exact_accuracy_all:.1%} | {r.accuracy_when_classified:.1%} |" if pd.notna(r.accuracy_when_classified) else f"| {r.axis} | {r.truth_class} | {int(r.n)} | {int(r.classified)} | {r.coverage:.1%} | {r.exact_accuracy_all:.1%} | n/a |")
- lines += ["","UNKNOWN is abstention. Low coverage is therefore reported separately from errors. Pulsar truth explicitly excludes ATNF evidence, and SN truth excludes Asiago evidence; those rows test whether another evidence family can independently recover the identity."]
+ lines=["# Independent truth-set cross-validation","","Truth-catalog rows are used only as coordinates/labels. The same catalog is excluded from production evidence for that validation family.","","| axis | class | n | classified | coverage | exact all | exact classified | family all | family classified |","|---|---|---:|---:|---:|---:|---:|---:|---:|"]
+ for _,r in s.iterrows():
+  exact=f"{r.accuracy_when_classified:.1%}" if pd.notna(r.accuracy_when_classified) else "n/a"
+  fam=f"{r.family_accuracy_when_classified:.1%}" if pd.notna(r.family_accuracy_when_classified) else "n/a"
+  lines.append(f"| {r.axis} | {r.truth_class} | {int(r.n)} | {int(r.classified)} | {r.coverage:.1%} | {r.exact_accuracy_all:.1%} | {exact} | {r.family_accuracy_all:.1%} | {fam} |")
+ lines += ["","Exact accuracy requires the requested leaf label. Family accuracy additionally credits a Mira truth object classified as the broader Gaia LPV family; it is reported separately and never substituted for the exact value. UNKNOWN is abstention. Low coverage is therefore reported separately from errors. Pulsar truth explicitly excludes ATNF evidence, and SN truth excludes Asiago evidence; those rows test whether another evidence family can independently recover the identity."]
  (out/"INDEPENDENT_TRUTH_VALIDATION.md").write_text("\n".join(lines)+"\n",encoding="utf-8")
  return s
 
@@ -128,7 +132,7 @@ def main():
    for f in as_completed(fs):
     try:rows.append(f.result())
     except Exception as exc:
-     r=fs[f];rows.append({"truth_id":r.truth_id,"axis":r.truth_axis,"truth_class":r.truth_class,"predicted_class":"ERROR","status":repr(exc),"raw_score":math.nan,"match":False,"classified":False,"sep_arcsec":math.nan,"collectors":"[]"})
+     r=fs[f];rows.append({"truth_id":r.truth_id,"axis":r.truth_axis,"truth_class":r.truth_class,"predicted_class":"ERROR","status":repr(exc),"raw_score":math.nan,"match":False,"family_match":False,"classified":False,"sep_arcsec":math.nan,"collectors":"[]"})
     pd.DataFrame(rows).to_csv(checkpoint,index=False)
     if len(rows)%10==0:print(f"checkpoint: {len(rows)}/{len(truth)}",flush=True)
  result=pd.DataFrame(rows);write_report(result,a.out_dir);checkpoint.unlink(missing_ok=True);print(result.groupby(["axis","truth_class"])[["classified","match"]].mean())

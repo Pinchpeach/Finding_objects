@@ -10,6 +10,7 @@ def load(path,name):
 ASSOC=load(PRE/"association_model.py","assoc_model_test")
 PHEN=load(CLS/"axes"/"phenomenon.py","phenomenon_test")
 CAL=load(CLS/"calibration"/"per_axis.py","calibration_test")
+VALIDATOR=load(CLS/"validate_independent_truth_sets.py","independent_truth_validator_test")
 
 class ScienceCrossmatchTests(unittest.TestCase):
  def test_high_pm_epoch_propagation(self):
@@ -42,5 +43,19 @@ class ScienceCrossmatchTests(unittest.TestCase):
    p=Path(d)/"models.json";p.write_text('{"axes":{}}')
    out=CAL.annotate(frame,p,axes=("physical",))
    self.assertTrue(pd.isna(out.loc[0,"physical_calibrated_probability"]));self.assertEqual(out.loc[0,"physical_calibration_status"],"UNCALIBRATED_NO_MODEL")
+
+ def test_hierarchical_mira_metric_never_overwrites_exact_metric(self):
+  rows=pd.DataFrame([{
+   "truth_id":"mira-1","axis":"variability","truth_class":"MIRA",
+   "predicted_class":"LPV","match":False,"family_match":True,
+   "classified":True,"raw_score":0.9,
+  }])
+  with tempfile.TemporaryDirectory() as d:
+   summary=VALIDATOR.write_report(rows,Path(d))
+   r=summary.iloc[0]
+   self.assertEqual(r.exact_accuracy_all,0.0)
+   self.assertEqual(r.family_accuracy_all,1.0)
+   report=(Path(d)/"INDEPENDENT_TRUTH_VALIDATION.md").read_text()
+   self.assertIn("family",report.lower())
 
 if __name__=="__main__":unittest.main()

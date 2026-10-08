@@ -36,6 +36,9 @@ Classifier/
 
 - AGB: Gaia FLAME's published evolutionary-stage convention ends at the RGB tip and does
   not by itself identify AGB. LPV is not automatically converted to AGB or Mira.
+- A generic stellar-family result is not emitted as an `OTHER_STELLAR` physical
+  class. Without WD, RGB, AGB, or other validated physical evidence, the
+  physical axis returns `UNKNOWN` while preserving the stellar-family evidence.
 - NS/Pulsar/XRB: radio/X-ray detection alone is insufficient. The existing radio/X-ray
   benchmark is validated for STAR/GALAXY/QSO, not for compact-object identity.
 - PN/Nova: no dedicated spectral-line or transient model is yet available in the current
