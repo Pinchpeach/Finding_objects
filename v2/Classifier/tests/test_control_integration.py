@@ -36,6 +36,7 @@ with tempfile.TemporaryDirectory() as td:
     assert d.loc["wd1","physical_class"]=="WD",d.loc["wd1"].to_dict()
     assert d.loc["rgb_rr","physical_class"]=="RGB",d.loc["rgb_rr"].to_dict()
     assert d.loc["rgb_rr","variability_class"]=="RR_LYRAE",d.loc["rgb_rr"].to_dict()
+    assert "variability_subtype" in d.columns
     assert d.loc["sn1","phenomenon_class"]=="SN",d.loc["sn1"].to_dict()
     assert "compact_status" in d.columns
     assert "extragalactic_status" in d.columns
