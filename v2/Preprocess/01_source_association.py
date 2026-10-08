@@ -161,7 +161,9 @@ def run(raw_dir: Path, out: Path):
         else:
             fast_movers.discard(gi)
 
+    dets_in_order = []
     for det in detections:
+        dets_in_order.append(det)
         # Time-domain events remain distinct from persistent host/catalog objects.
         # Event identity can later be linked to a host in a dedicated event layer.
         if det["entity_kind"] == "transient_event":
@@ -263,8 +265,16 @@ def run(raw_dir: Path, out: Path):
         })
 
     group_by_id = {g["id"]: g for g in groups}
-    for rec in records:
+    for rec, det in zip(records, dets_in_order):
         anchor = group_by_id[rec["object_id"]]["anchor"]
+        # Membership confidence is judged against the object's final anchor
+        # (its most precise position).  The score computed at match time used
+        # whatever anchor the group had then (e.g. an offset NED position),
+        # which left faint Legacy Surveys/DESI members with ~0 confidence.
+        if rec["association_method"] == "position_epoch_likelihood" and anchor is not det:
+            final = assess_pair(anchor, det, det.get("source_density_arcsec2"))
+            rec["association_confidence"] = max(rec["association_confidence"] or 0.0, final["association_score"])
+            rec["final_anchor_separation_arcsec"] = final["separation_arcsec"]
         rec["object_ra"] = anchor["ra"]
         rec["object_dec"] = anchor["dec"]
         rec["object_ref_epoch"] = anchor.get("ref_epoch")
