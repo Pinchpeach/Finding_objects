@@ -39,6 +39,9 @@ def read_catalogs(root):
  for f in sorted([*root.rglob("*_trd.csv"),*root.rglob("*_trd.csv.gz")]):
   cat=f.name.split("_trd.csv")[0]
   d=pd.read_csv(f,low_memory=False)
+  # Mirror collector-side quality cuts so benchmark features match production.
+  if cat=="panstarrs1" and "nDetections" in d.columns:
+   d=d[pd.to_numeric(d["nDetections"],errors="coerce")>=2]
   if cat not in out or len(d)>len(out[cat]): out[cat]=d
  return out
 
