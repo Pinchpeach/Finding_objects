@@ -45,7 +45,6 @@ jobs:
         run: |
           python v2/Classifier/evaluate_wd_hr_gates.py --out /tmp/wd_hr_gates.json \
             --features sdss_star=/tmp/sdss_star.csv lamost_external=/tmp/lamost_star.csv sdss_mixed_classes=/tmp/mixed.csv
-          cat /tmp/wd_hr_gates.json
       - uses: actions/upload-artifact@v4
         with:
           name: wd-hr-gates

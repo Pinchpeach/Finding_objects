@@ -51,7 +51,9 @@ HR_GATES={
     "plx4_or_pm10":{"min_parallax_over_error":1.0,"strong_parallax_over_error":4.0,"min_pm_significance":10.0},
     "plx4_or_pm10_cstar5":{"min_parallax_over_error":1.0,"strong_parallax_over_error":4.0,"min_pm_significance":10.0,"max_cstar_sigma":5.0},
 }
-DEFAULT_HR_GATE="broad"
+# Chosen on independent truth (WD_HR_GATE_EVALUATION.md): best F1 on a mixed
+# SDSS STAR/GALAXY/QSO sample, QSO false WDs 52 -> 6, LAMOST unchanged.
+DEFAULT_HR_GATE="plx4_or_pm10"
 
 def _wd_hr_signal(row,gate=None):
     """Gaia HR WD-locus signal: M_G > 6 + 5(BP-RP) (Gentile Fusillo+2021).
