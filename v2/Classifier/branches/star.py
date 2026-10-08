@@ -45,6 +45,11 @@ HR_GATES={
     "plx4_cstar3":{"min_parallax_over_error":4.0,"max_cstar_sigma":3.0},
     "plx4_cstar5":{"min_parallax_over_error":4.0,"max_cstar_sigma":5.0},
     "plx4_cstar5_ruwe":{"min_parallax_over_error":4.0,"max_cstar_sigma":5.0,"max_ruwe":1.4},
+    # GF21 alternative significance branch: a weaker parallax is accepted when
+    # the total proper motion is significant (pm/pm_err > 10), which nearby
+    # WDs satisfy and extragalactic sources (pm ~ 0) do not.
+    "plx4_or_pm10":{"min_parallax_over_error":1.0,"strong_parallax_over_error":4.0,"min_pm_significance":10.0},
+    "plx4_or_pm10_cstar5":{"min_parallax_over_error":1.0,"strong_parallax_over_error":4.0,"min_pm_significance":10.0,"max_cstar_sigma":5.0},
 }
 DEFAULT_HR_GATE="broad"
 
@@ -63,6 +68,13 @@ def _wd_hr_signal(row,gate=None):
         if bp is not None and rp is not None: color=bp-rp
     if None in (p,pe,g,color) or p<=0 or pe<=0 or p/pe<=cfg["min_parallax_over_error"]:
         return None
+    if "strong_parallax_over_error" in cfg and p/pe<cfg["strong_parallax_over_error"]:
+        pmra,epmra=_num(row,"pmra"),_num(row,"pmra_error")
+        pmdec,epmdec=_num(row,"pmdec"),_num(row,"pmdec_error")
+        if None in (pmra,epmra,pmdec,epmdec) or epmra<=0 or epmdec<=0:
+            return None
+        if math.hypot(pmra/epmra,pmdec/epmdec)<=cfg["min_pm_significance"]:
+            return None
     if "max_cstar_sigma" in cfg:
         c=_num(row,"phot_bp_rp_excess_factor")
         if c is None or abs(corrected_excess_factor(c,color))>cfg["max_cstar_sigma"]*sigma_corrected_excess(g):
