@@ -65,7 +65,9 @@ def wide(truth,cats):
 def main():
  p=argparse.ArgumentParser(); p.add_argument("--truth",type=Path,required=True)
  p.add_argument("--catalog-root",type=Path,required=True); p.add_argument("--manifest",type=Path,required=True)
- p.add_argument("--out",type=Path,required=True); a=p.parse_args(); a.out.mkdir(parents=True,exist_ok=True)
+ p.add_argument("--out",type=Path,required=True)
+ p.add_argument("--split",default="test",help="manifest split to report, or 'all' for an external truth set")
+ a=p.parse_args(); a.out.mkdir(parents=True,exist_ok=True)
  truth=pd.read_csv(a.truth); manifest=pd.read_csv(a.manifest); cats=read_catalogs(a.catalog_root)
  global pre
  pre=load_script("02_integrate_objects.py")
@@ -80,7 +82,7 @@ def main():
   pred=pd.read_csv(p5)
  data=truth[["benchmark_id","truth_class"]].merge(manifest[["benchmark_id","split"]],on="benchmark_id").merge(
      pred[["benchmark_id","primary_class","classification_status","primary_confidence","primary_margin"]],on="benchmark_id")
- te=data[data.split.eq("test")].copy(); classified=te.primary_class.ne("UNKNOWN")
+ te=(data if a.split=="all" else data[data.split.eq(a.split)]).copy(); classified=te.primary_class.ne("UNKNOWN")
  metrics={"test_rows":len(te),"classified_rows":int(classified.sum()),"abstention_rate":float(1-classified.mean())}
  metrics["accuracy_all_unknown_wrong"]=float((te.primary_class==te.truth_class).mean())
  if classified.any():

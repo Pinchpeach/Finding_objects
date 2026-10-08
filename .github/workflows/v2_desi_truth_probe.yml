@@ -18,16 +18,17 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install pandas astropy astroquery
-      - name: Find DESI DR1 spectroscopic catalogs in VizieR
+      - name: Inspect V/161 (DESI DR1 redshift catalog)
         run: |
           python - <<'PY'
           from astroquery.vizier import Vizier
-          cats=Vizier.find_catalogs("DESI DR1")
-          for k,v in list(cats.items())[:20]: print(k,"|",v.description)
-          for cid in ("VII/294","VII/294/desi-dr1"):
-              try:
-                  v=Vizier(columns=["**"],row_limit=3)
-                  t=v.get_catalogs(cid)
-                  for tab in t: print(cid, tab.meta.get("name"), len(tab), tab.colnames)
-              except Exception as e: print(cid,"ERR",repr(e))
+          from astropy.coordinates import SkyCoord
+          import astropy.units as u
+          t=Vizier(columns=["**"],row_limit=5).get_catalogs("V/161")
+          for tab in t:
+              print(tab.meta.get("name"), len(tab)); print(tab.colnames)
+              for c in tab.colnames: print("  ",c,tab[c].unit,"|",tab[c].description)
+              print(tab[:3])
+          r=Vizier(columns=["**"],row_limit=20).query_region(SkyCoord(150.1*u.deg,2.2*u.deg),radius=2*u.arcmin,catalog="V/161")
+          print(r)
           PY
