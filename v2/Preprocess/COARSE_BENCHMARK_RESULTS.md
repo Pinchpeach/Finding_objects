@@ -162,3 +162,11 @@ Caveats: DESI targets were themselves selected with grz/W1/W2 colours and
 QSO targets with PSF morphology, which favours these features on DESI; faint
 STAR spectra in DESI are rare and partly mis-targeted. The DESI test split is
 small; a larger set is the next step.
+
+Fitted weights are physically sensible: W1−W2 and z−W1 favour QSO, red g−r
+favours STAR, Legacy Surveys PSF morphology strongly disfavours GALAXY,
+significant proper motion favours STAR. Gaia DSC-Combmod evidence, which
+previously had an untested prior weight of 1.0 per logit, is now fitted on
+the SDSS-independent DESI rows only (DSC was trained on SDSS labels) and
+receives weights of ~0.1–0.2: given astrometry, morphology and colours it
+adds little.
