@@ -170,3 +170,29 @@ previously had an untested prior weight of 1.0 per logit, is now fitted on
 the SDSS-independent DESI rows only (DSC was trained on SDSS labels) and
 receives weights of ~0.1–0.2: given astrometry, morphology and colours it
 adds little.
+
+### Refit on the enlarged DESI set (current weights)
+
+The DESI external set was enlarged to 4,795 spectra (~400 per class per r
+bin); the fusion was refitted on the SDSS and DESI train splits (threshold
+from both calibration splits, `min_confidence` = 0.53).
+
+| test split | n | coverage | accuracy when classified | log-loss | ECE |
+|---|---:|---:|---:|---:|---:|
+| SDSS | 1,991 | 98.4% | **97.9%** | 0.080 | 0.010 |
+| DESI (r 18–23) | 962 | 93.8% | **87.9%** | 0.393 | 0.029 |
+
+DESI test accuracy by magnitude (70–91 objects per cell):
+
+| r | GALAXY | QSO | STAR |
+|---|---:|---:|---:|
+| 18–20 | 0.86 | 0.83 | 0.96 |
+| 20–21 | 0.95 | 0.90 | 0.76 |
+| 21–22 | 0.92 | 0.81 | 0.49 |
+| 22–23 | 0.83 | 0.82 | 0.73 |
+
+DESI coverage/accuracy by threshold: 0.7 → 83% / 92.7%, 0.8 → 73% / 94.2%,
+0.9 → 55% / 95.8%. The main remaining error is faint stars called QSO
+(50 of 318): at r ≈ 21–22 blue stars (e.g. white dwarfs, hot subdwarfs) share
+quasars' optical colours and lack Gaia astrometry. Variability or deeper
+UV/IR data would be needed to separate them.
