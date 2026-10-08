@@ -10,6 +10,8 @@ from pathlib import Path
 import pandas as pd
 
 PRIMARY=("STAR","GALAXY","QSO")
+# Unresolved morphology cannot separate stars from quasars (both are point
+# sources); it is emitted as POINT_SOURCE and fused onto STAR and QSO alike.
 DSC_MAP={
  "QSO":"classprob_dsc_combmod_quasar","GALAXY":"classprob_dsc_combmod_galaxy",
  "STAR":"classprob_dsc_combmod_star","WD":"classprob_dsc_combmod_whitedwarf",
@@ -42,7 +44,8 @@ class CatalogFields:
 # rule reading a new raw field must list it here.
 RAW_FIELDS={"parallax","parallax_error","pmra","pmra_error","pmdec","pmdec_error",
   "class","zwarning","iMeanPSFMag","rMeanPSFMag","zMeanPSFMag","W1mag","W2mag","snr1","snr2",
-  "type","clean","Type","otype","best_class_name","best_class_score",*DSC_MAP.values()}
+  "type","clean","Type","otype","best_class_name","best_class_score",*DSC_MAP.values(),
+  "flux_r","flux_ivar_r","flux_z","flux_ivar_z"}
 DERIVED_PREFIXES=("association_confidence__","catalog_confidence_","ps1_")
 
 def _rule_columns(columns):
@@ -85,6 +88,7 @@ def evaluate(rule,row,namespaced=frozenset()):
       "WISE-AGN-001":"allwise","WISE-AGN-R90-001":"allwise",
       "SDSS-PHOTO-001":"sdss_dr18_photoobj","SDSS-PHOTO-002":"sdss_dr18_photoobj",
       "NED-TYPE-001":"ned","SIMBAD-TYPE-001":"simbad",
+      "LS-MORPH-001":"desi_legacy_surveys_dr10","LS-MORPH-002":"desi_legacy_surveys_dr10",
     }
     ap=assoc_prefix.get(rid)
     association_reliability=num(row,f"association_confidence__{ap}") if ap else 1.0
@@ -128,7 +132,7 @@ def evaluate(rule,row,namespaced=frozenset()):
             elif rid=="PS1-MORPH-002" and delta<=0.05:
                 # Point-like morphology is deliberately weak STAR evidence: QSOs are unresolved too.
                 score=min(0.65,0.50+min(max(0,0.05-delta),0.15))
-                emit(out,rule,"STAR",score,delta,"weak point-source evidence; unresolved morphology is not STAR-specific",reliability,association_reliability)
+                emit(out,rule,"POINT_SOURCE",score,delta,"weak point-source evidence; unresolved morphology is not STAR-specific",reliability,association_reliability)
     elif rid=="WISE-AGN-R90-001":
         w1,w2,s1,s2=(num(src,x) for x in ("W1mag","W2mag","snr1","snr2"))
         if None not in (w1,w2,s1,s2) and s1>=3 and s2>=3:
@@ -172,7 +176,18 @@ def evaluate(rule,row,namespaced=frozenset()):
             if rid=="SDSS-PHOTO-001" and int(typ)==3:
                 emit(out,rule,"GALAXY",0.8,typ,"SDSS extended morphology",reliability,association_reliability)
             elif rid=="SDSS-PHOTO-002" and int(typ)==6:
-                emit(out,rule,"STAR",0.55,typ,"weak point-source morphology; QSO contamination possible",reliability,association_reliability)
+                emit(out,rule,"POINT_SOURCE",0.55,typ,"weak point-source morphology; stars and quasars both unresolved",reliability,association_reliability)
+    elif rid.startswith("LS-MORPH-"):
+        # Legacy Surveys Tractor model choice (Dey+2019). Below S/N~10 a PSF
+        # fit is preferred by default, so morphology is used only above it.
+        typ=str(src.get("type","")).strip().upper()
+        snr=[f*math.sqrt(iv) for f,iv in ((num(src,"flux_r"),num(src,"flux_ivar_r")),(num(src,"flux_z"),num(src,"flux_ivar_z")))
+             if f is not None and iv is not None and iv>0]
+        if snr and max(snr)>=float(rule["threshold"]):
+            if rid=="LS-MORPH-001" and typ in {"REX","EXP","DEV","SER"}:
+                emit(out,rule,"GALAXY",0.75,typ,"Legacy Surveys resolved Tractor model",reliability,association_reliability)
+            elif rid=="LS-MORPH-002" and typ=="PSF":
+                emit(out,rule,"POINT_SOURCE",0.60,typ,"Legacy Surveys PSF model; stars and quasars both unresolved",reliability,association_reliability)
     elif rid=="NED-TYPE-001":
         typ=str(src.get("Type","")).strip()
         mp={"G":"GALAXY","QSO":"QSO","*":"STAR","WD*":"STAR"}
