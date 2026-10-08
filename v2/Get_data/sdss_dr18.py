@@ -14,6 +14,9 @@ def fetch(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
  t=SDSS.query_region(pos,radius=radius_arcmin*u.arcmin,photoobj_fields=COLUMNS,data_release=18)
  if t is None:return pd.DataFrame(columns=["catalog","catalog_object_id","object_name",*COLUMNS])
  df=t.to_pandas()
+ # PhotoPrimary (mode == 1): secondary detections from overlapping scans
+ # duplicate the same objects and would make Stage-1 association ambiguous.
+ if "mode" in df.columns: df=df[pd.to_numeric(df["mode"],errors="coerce").eq(1)].copy()
  # Preserve SDSS's 64-bit identifier as text before CSV serialization.
  df["objid"]=df["objid"].astype("uint64").astype(str)
  df.insert(0,"catalog",CATALOG);df.insert(1,"catalog_object_id",df["objid"]);df.insert(2,"object_name","SDSS J"+df["ra"].map(lambda x:f"{x:.6f}")+df["dec"].map(lambda x:f"{x:+.6f}"))
