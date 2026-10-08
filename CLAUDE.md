@@ -9,3 +9,12 @@
 3. **v2 기준**: 전체 작업은 `v2/`를 기준으로 한다. `legacy/`는 참고용이다.
 4. **수정·확장 우선**: v2를 수정·확장하는 것이 기본이며, 필요하면 구조를 갈아엎는 것도 허용한다.
 5. **Standalone 앱은 허락 필수**: 분류기 알고리즘이 완성되면 PC에서 구동하는 standalone 앱으로 만든다. 앱 작업을 **처음 시작할 때는 반드시 사용자 허락을 먼저 받는다.**
+
+## 작업 메모 (개발 환경)
+- 테스트: `cd v2 && python -m pytest -q Preprocess/tests Classifier/tests`
+- Coarse 벤치마크(로컬, 네트워크 불필요): 보존된 특징 `v2/benchmark/catalog_features/*.gz` 사용
+  - `python v2/benchmark/validate_catalog_truth.py --truth v2/benchmark/truth_data/ground_truth.csv --catalog-root v2/benchmark/catalog_features --out /tmp/ready`
+  - `python v2/benchmark/evaluate_rule_baseline.py --truth v2/benchmark/truth_data/ground_truth.csv --catalog-root v2/benchmark/catalog_features --manifest /tmp/ready/benchmark_manifest.csv --out /tmp/eval`
+  - 융합 가중치 재학습: `python v2/benchmark/fit_fusion_weights.py ...` (train split만 사용, test는 보고용)
+- 클라우드 세션 컨테이너는 천문 데이터 서비스(Gaia/VizieR/MAST 등)에 직접 접속할 수 없을 수 있음 → 데이터가 필요한 검증은 GitHub Actions 워크플로로 실행하고 로그/커밋으로 결과를 받는다.
+- `v2/Get_data/*.py`를 바꾸면 `Build Catalog Truth Features`(13 jobs, 수 시간)가 자동 실행된다. 벤치마크 재수집이 필요 없으면 취소한다.
