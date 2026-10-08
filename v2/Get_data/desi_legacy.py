@@ -16,13 +16,18 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     radius_deg = float(radius_arcmin) / 60.0
     # Keep the feature set compact and purely photometric/morphological.  In
     # particular, do not join spectroscopy or any truth/classification table.
+    # W1/W2 are unWISE forced photometry at the optical positions (Dey+2019),
+    # far deeper than AllWISE; quasars' mid-IR excess separates them from
+    # stars where astrometry is unavailable (Chaussidon+2023).
     query = f"""
         SELECT ls_id, ra, dec, type, release, brickid, objid,
                flux_g, flux_r, flux_i, flux_z,
                flux_ivar_g, flux_ivar_r, flux_ivar_i, flux_ivar_z,
                mw_transmission_g, mw_transmission_r,
                mw_transmission_i, mw_transmission_z,
-               nobs_g, nobs_r, nobs_i, nobs_z, maskbits
+               nobs_g, nobs_r, nobs_i, nobs_z, maskbits,
+               flux_w1, flux_w2, flux_ivar_w1, flux_ivar_w2,
+               mw_transmission_w1, mw_transmission_w2
         FROM {TABLE}
         WHERE 't' = Q3C_RADIAL_QUERY(
             ra, dec, {float(ra):.10f}, {float(dec):.10f}, {radius_deg:.10f}
