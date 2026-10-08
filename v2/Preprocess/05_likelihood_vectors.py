@@ -125,13 +125,15 @@ def run(evidence,out,model_path=MODEL_PATH,min_confidence=None):
     labels=[]; confidence=[]; margins=[]; statuses=[]; best_candidates=[]; best_candidate_scores=[]
     for q,(_,used,conflict,in_host) in zip(Q,rows):
         order=np.argsort(-q); conf=float(q[order[0]]); margin=conf-float(q[order[1]]); top=CLASSES[order[0]]
-        if used==0: label="UNKNOWN"; status="NO_EVIDENCE"
+        # Inside a large galaxy the host status is the most informative one,
+        # with or without evidence (e.g. Legacy Surveys DUP sources there).
+        if in_host: label="UNKNOWN"; status="WITHIN_LARGE_GALAXY"
+        elif used==0: label="UNKNOWN"; status="NO_EVIDENCE"
         elif conflict: label="UNKNOWN"; status="CONFLICT"
         elif conf<min_conf or margin<min_margin: label="UNKNOWN"; status="LOW_CONFIDENCE"
-        elif in_host: label="UNKNOWN"; status="WITHIN_LARGE_GALAXY"
         else: label=top; status="CLASSIFIED"
         labels.append(label); confidence.append(conf); margins.append(margin); statuses.append(status)
-        if status=="NO_EVIDENCE": best_candidates.append("UNKNOWN"); best_candidate_scores.append(float("nan"))
+        if used==0: best_candidates.append("UNKNOWN"); best_candidate_scores.append(float("nan"))
         else: best_candidates.append(top); best_candidate_scores.append(conf)
     result_columns={}
     for i,c in enumerate(CLASSES):

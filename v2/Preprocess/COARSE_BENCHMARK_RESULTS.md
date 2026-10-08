@@ -226,3 +226,9 @@ the DESI, LS and PS1 detections of one object apart.
 
 Remaining unclassified DESI objects are r ≈ 24 sources below the colour
 (S/N ≥ 3) and morphology (S/N ≥ 10) limits.
+
+NGC 4522 field (r = 1′, collected live): 127 of 233 detections fall inside the
+SGA-2020 D26 ellipse and are reported as `WITHIN_LARGE_GALAXY` (disk
+fragments are not classified as independent objects); the galaxy itself is
+the SGA-2020 object, classified GALAXY. Host status now takes precedence over
+`NO_EVIDENCE` (e.g. Legacy Surveys `DUP` sources inside the galaxy).
