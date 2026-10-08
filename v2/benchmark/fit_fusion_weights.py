@@ -66,8 +66,9 @@ def main():
     ap.add_argument("--manifest",type=Path,nargs="+",required=True); ap.add_argument("--out",type=Path,default=PRE/"fusion_weights.json")
     ap.add_argument("--drop-keys",nargs="*",default=[],help="evidence-key prefixes to exclude (ablation)")
     ap.add_argument("--augment-drop",nargs="*",default=[],
-                    help="evidence-key prefixes (e.g. morphology rules) to drop in an extra copy of every train row "
-                         "that has them, so the remaining weights also learn the case where they are missing")
+                    help="augmentation groups, each a comma-separated list of evidence-key prefixes dropped together "
+                         "in an extra copy of every train row that has them (e.g. 'LS-MORPH,PS1-MORPH,SDSS-PHOTO' 'LS-'), "
+                         "so the remaining weights also learn the case where they are missing")
     ap.add_argument("--target-scope",choices=("pooled","each"),default="pooled",
                     help="'each': the abstention threshold must reach --target-accuracy on every dataset's calibration split")
     ap.add_argument("--augment-weight",type=float,default=1.0,help="sample weight of the augmented copies")
@@ -100,12 +101,18 @@ def main():
         # object has.  Without this the colour weights learn only the
         # conditional "given morphology" separation (red point source = star)
         # and send faint red galaxies to STAR.
-        aug=np.array([any(k.startswith(p) for p in a.augment_drop) for k in kept])
+        # Each argument is one augmentation group: comma-separated prefixes
+        # dropped together in one extra copy (e.g. all morphology; or every
+        # Legacy Surveys rule, as when that archive is unavailable).
+        groups=[[p for p in g.split(",") if p] for g in a.augment_drop]
         def augment(Xs,ys):
-            has=(Xs[:,aug]!=0).any(axis=1); Xa=Xs[has].copy(); Xa[:,aug]=0.0
-            keep_row=(Xa!=0).any(axis=1)
-            w=np.concatenate([np.ones(len(ys)),np.full(int(keep_row.sum()),a.augment_weight)])
-            return np.vstack([Xs,Xa[keep_row]]),np.concatenate([ys,ys[has][keep_row]]),w
+            Xo,yo,wo=[Xs],[ys],[np.ones(len(ys))]
+            for g in groups:
+                aug=np.array([any(k.startswith(p) for p in g) for k in kept])
+                has=(Xs[:,aug]!=0).any(axis=1); Xa=Xs[has].copy(); Xa[:,aug]=0.0
+                keep_row=(Xa!=0).any(axis=1)
+                Xo.append(Xa[keep_row]); yo.append(ys[has][keep_row]); wo.append(np.full(int(keep_row.sum()),a.augment_weight))
+            return np.vstack(Xo),np.concatenate(yo),np.concatenate(wo)
         Xfit,yfit,wfit=augment(Xfit,yfit); Xcal,ycal,wcal=augment(Xcal,ycal)
     else:
         wfit=np.ones(len(yfit)); wcal=np.ones(len(ycal))
@@ -163,11 +170,12 @@ def main():
           "expected_calibration_error":ece(pte[ute],yte[ute]),
           "accuracy_by_threshold":coverage_curve(pte,yte,ute,(0.5,0.6,0.7,0.8,0.9,0.95))}
         rdrop=a.augment_drop if a.report_drop is None else a.report_drop
-        if rdrop:
-            # Same test rows with the augmented evidence removed: how the model
+        for g in rdrop:
+            # Same test rows with a group of evidence removed: how the model
             # behaves on objects that lack it (e.g. faint, unresolved fits).
-            pd_=probs(mask,rdrop); pr=np.array(CLASSES)[pd_.argmax(axis=1)]
-            test[name]["without_"+"+".join(rdrop)]={"argmax_accuracy":float((pr==yte).mean()),
+            g=[p for p in g.split(",") if p]
+            pd_=probs(mask,g); pr=np.array(CLASSES)[pd_.argmax(axis=1)]
+            test[name]["without_"+"+".join(g)]={"argmax_accuracy":float((pr==yte).mean()),
               "recall":{c:float((pr[yte==c]==c).mean()) for c in CLASSES}}
     model["provenance"]["test"]=test
     a.out.write_text(json.dumps(model,indent=1,sort_keys=True)+"\n",encoding="utf-8")

@@ -21,6 +21,13 @@ import numpy as np
 import pandas as pd
 
 COLORS = ("ls_g_r_color", "ls_r_z_color", "ls_z_w1_color", "ls_w1_w2_color")
+# Pan-STARRS1 PSF colours cover the whole sky north of Dec -30 (also where the
+# Legacy Surveys are missing or unavailable).  Not dereddened: PS1 rows carry
+# no extinction, so this set is less reliable at low Galactic latitude.
+PS1_COLORS = ("ps1_g_r_color", "ps1_r_i_color", "ps1_i_z_color", "ps1_z_y_color")
+COLOR_SETS = {"LS-CKNN-001": COLORS, "PS1-CKNN-001": PS1_COLORS}
+# A colour enters only if its propagated error (``<colour>_err``) is at most this.
+MAX_COLOR_ERR = 0.2
 CLASSES = ("STAR", "GALAXY", "QSO")
 REFERENCE_PATH = Path(__file__).with_name("color_reference.csv.gz")
 K = 31
@@ -33,18 +40,30 @@ def load_reference(path=REFERENCE_PATH):
     if not path.exists():
         return None
     ref = pd.read_csv(path)
-    return ref if {"truth_class", *COLORS} <= set(ref.columns) else None
+    return ref if "truth_class" in ref.columns else None
 
 
-def class_fractions(df: pd.DataFrame, ref: pd.DataFrame, k: int = K, ids=None):
+def color_matrix(df: pd.DataFrame, colors) -> np.ndarray:
+    """Colours as floats; NaN where missing or where ``<colour>_err`` > MAX_COLOR_ERR."""
+    cols = []
+    for c in colors:
+        v = pd.to_numeric(df[c], errors="coerce") if c in df else pd.Series(np.nan, index=df.index)
+        if f"{c}_err" in df:
+            v = v.where(pd.to_numeric(df[f"{c}_err"], errors="coerce") <= MAX_COLOR_ERR)
+        cols.append(v.to_numpy(float))
+    return np.column_stack(cols)
+
+
+def class_fractions(df: pd.DataFrame, ref: pd.DataFrame, k: int = K, ids=None, colors=COLORS):
     """Return (n, 3) smoothed STAR/GALAXY/QSO fractions; NaN rows lack colours.
 
     ``ids`` (optional, aligned with ``df``) are matched against ``ref.id`` so a
     reference object never counts itself (leave-one-out on the train split).
     """
-    X = np.column_stack([pd.to_numeric(df[c], errors="coerce").to_numpy(float) if c in df else np.full(len(df), np.nan)
-                         for c in COLORS])
-    R = ref[list(COLORS)].to_numpy(float)
+    X = color_matrix(df, colors)
+    if not all(c in ref for c in colors):
+        return np.full((len(df), len(CLASSES)), np.nan)
+    R = ref[list(colors)].to_numpy(float)
     y = ref["truth_class"].map({c: i for i, c in enumerate(CLASSES)}).to_numpy()
     rid = ref["id"].astype(str).to_numpy() if ids is not None and "id" in ref else None
     out = np.full((len(df), len(CLASSES)), np.nan)

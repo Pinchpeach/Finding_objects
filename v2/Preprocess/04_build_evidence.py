@@ -234,22 +234,24 @@ def evaluate(rule,row,namespaced=frozenset()):
     return out
 
 def _color_knn_evidence(df,rule_list):
-    """LS-CKNN-001: colour-space kNN class fractions, computed for all rows at once."""
+    """LS-CKNN-001 / PS1-CKNN-001: colour-space kNN class fractions, computed for all rows at once."""
     empty=[[] for _ in range(len(df))]
-    rule=next((r for r in rule_list if r["rule_id"]=="LS-CKNN-001"),None)
-    if rule is None: return empty
     import sys
     here=str(Path(__file__).resolve().parent)
     if here not in sys.path: sys.path.insert(0,here)
     import color_knn
-    ref=color_knn.load_reference()
-    if ref is None or not any(c in df for c in color_knn.COLORS): return empty
+    rules={r["rule_id"]:r for r in rule_list if r["rule_id"] in color_knn.COLOR_SETS}
+    ref=color_knn.load_reference() if rules else None
+    if ref is None: return empty
     ids=df["benchmark_id"].astype(str).to_numpy() if "benchmark_id" in df else None
-    frac=color_knn.class_fractions(df,ref,ids=ids)
-    for i,f in enumerate(frac):
-        if f[0]==f[0]:
-            for cls,v in zip(color_knn.CLASSES,f):
-                emit(empty[i],rule,cls,float(v),round(float(v),4),"colour-space kNN class fraction")
+    for rid,rule in rules.items():
+        colors=color_knn.COLOR_SETS[rid]
+        if not any(c in df for c in colors): continue
+        frac=color_knn.class_fractions(df,ref,ids=ids,colors=colors)
+        for i,f in enumerate(frac):
+            if f[0]==f[0]:
+                for cls,v in zip(color_knn.CLASSES,f):
+                    emit(empty[i],rule,cls,float(v),round(float(v),4),"colour-space kNN class fraction")
     return empty
 
 def run(features:Path,rules_path:Path,out:Path)->Path:
@@ -267,7 +269,7 @@ def run(features:Path,rules_path:Path,out:Path)->Path:
         counts.append(len(ev))
         # kNN class fractions are soft statistical evidence, weighed by the
         # fitted fusion; they are not independent hard claims that can conflict.
-        strong={e["class"] for e in ev if e["class"] in PRIMARY and e["score"]>=.8 and e["rule_id"]!="LS-CKNN-001"}
+        strong={e["class"] for e in ev if e["class"] in PRIMARY and e["score"]>=.8 and not e["rule_id"].endswith("-CKNN-001")}
         conflicts.append(int(len(strong)>1))
     result["evidence_json"]=payload; result["evidence_count"]=counts; result["evidence_conflict"]=conflicts
     out.parent.mkdir(parents=True,exist_ok=True); result.to_csv(out,index=False)

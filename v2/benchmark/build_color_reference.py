@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Build the Stage-4 colour-kNN reference set (``LS-CKNN-001``).
+"""Build the Stage-4 colour-kNN reference set (``LS-CKNN-001``, ``PS1-CKNN-001``).
 
 Runs the benchmark catalog features through Stage 3 exactly as the pipeline
-does and keeps the dereddened Legacy Surveys colours of **train-split**
+does and keeps the colours (Legacy Surveys dereddened; PS1 PSF) of **train-split**
 objects only, so calibration/test objects never appear in the reference.
 
     python v2/benchmark/build_color_reference.py \\
@@ -40,19 +40,22 @@ def main():
             td = Path(td); raw.to_csv(td / "o.csv", index=False)
             s3.run(td / "o.csv", PRE / "classification_rules.csv", td / "f.csv")
             f = pd.read_csv(td / "f.csv", low_memory=False)
-        cols = [c for c in color_knn.COLORS if c in f]
         m = pd.read_csv(man)[["benchmark_id", "truth_class", "split"]]
-        f = f[["benchmark_id", *cols]].merge(m, on="benchmark_id")
+        allc = [c for cs in color_knn.COLOR_SETS.values() for c in cs]
+        # Same error cut as at classification time; store clean colours only.
+        colours = pd.DataFrame(color_knn.color_matrix(f, allc), columns=allc, index=f.index)
+        f = pd.concat([f[["benchmark_id"]], colours], axis=1).merge(m, on="benchmark_id")
         f = f[f.split.eq("train")]
-        f = f[f[cols].notna().sum(axis=1) >= color_knn.MIN_COLORS]
+        usable = pd.concat([f[list(cs)].notna().sum(axis=1) >= color_knn.MIN_COLORS
+                            for cs in color_knn.COLOR_SETS.values()], axis=1).any(axis=1)
+        f = f[usable]
         f["dataset"] = t.parent.name
         parts.append(f.drop(columns="split"))
     ref = pd.concat(parts, ignore_index=True).rename(columns={"benchmark_id": "id"})
-    for c in color_knn.COLORS:
-        if c not in ref:
-            ref[c] = float("nan")
+    allc = [c for cs in color_knn.COLOR_SETS.values() for c in cs]
+    for c in allc:
         ref[c] = ref[c].round(4)
-    ref = ref[["id", "truth_class", "dataset", *color_knn.COLORS]]
+    ref = ref[["id", "truth_class", "dataset", *allc]]
     a.out.parent.mkdir(parents=True, exist_ok=True)
     ref.to_csv(a.out, index=False, compression="gzip")
     print(ref.groupby(["dataset", "truth_class"]).size().to_string())
