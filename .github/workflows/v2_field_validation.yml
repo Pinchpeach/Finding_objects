@@ -1,0 +1,59 @@
+name: v2 real-field end-to-end validation
+
+# Runs v2/pipeline.py (collection + association + classification) on a sky
+# field and compares coarse classes with DESI DR1 spectroscopic classes found
+# in the same field. DESI spectra are not used as classification evidence, so
+# they are an independent check of the whole chain, including association.
+# Default field (RA 245, Dec +43) lies outside the RA windows used to build the
+# DESI truth set that the fusion weights were trained on.
+on:
+  workflow_dispatch:
+    inputs:
+      ra: {description: "RA (deg)", default: "245.0"}
+      dec: {description: "Dec (deg)", default: "43.0"}
+      radius: {description: "radius (arcmin)", default: "3"}
+  push:
+    paths:
+      - .github/workflows/v2_field_validation.yml
+
+permissions:
+  contents: read
+
+jobs:
+  field:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      RA: ${{ github.event.inputs.ra || '245.0' }}
+      DEC: ${{ github.event.inputs.dec || '43.0' }}
+      RADIUS: ${{ github.event.inputs.radius || '3' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pandas numpy requests astropy astroquery pyvo
+      - name: Pipeline
+        run: python -u v2/pipeline.py --ra $RA --dec $DEC --radius $RADIUS --work /tmp/field
+      - name: Compare with DESI DR1 spectroscopy in the field
+        run: |
+          python - <<'PY'
+          import pandas as pd
+          d=pd.read_csv("/tmp/field/classified_objects.csv",low_memory=False)
+          print(pd.read_csv("/tmp/field/pipeline_summary.csv").to_string(index=False))
+          print("objects",len(d)); print(d.classification_status.value_counts().to_string())
+          col="desi_dr1_spectroscopy__OType"
+          if col not in d.columns: raise SystemExit("no DESI spectra in this field")
+          s=d[d[col].notna()].copy(); s["truth"]=s[col].astype(str).str.strip()
+          s=s[s.truth.isin(["STAR","GALAXY","QSO"])]
+          print("objects with DESI spectra:",len(s))
+          print(pd.crosstab(s.truth,s.primary_class,margins=True).to_string())
+          c=s.primary_class.ne("UNKNOWN")
+          print(f"coverage={c.mean():.3f} accuracy_when_classified={(s.primary_class==s.truth)[c].mean():.3f}")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: field-validation
+          path: /tmp/field/*.csv
+          retention-days: 7
