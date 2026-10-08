@@ -315,3 +315,10 @@ near-zero association reliability into strong evidence *against* GALAXY
 against a stale anchor; Gaia TAP never answered from CI within 120 s
 (budget now 30 s, VizieR fallback with DSC), so collection dropped from
 ~130 s to ~45–50 s per field.
+
+Legacy Surveys outage runs (NOIRLab Data Lab TAP down on 2026-10-08
+17:00–17:30 UTC; PS1/SDSS/Gaia/WISE evidence only, latest code incl. the
+association posterior): RA 245/+43 **97.2% / 85.7%**, RA 20/0 **100% / 60.0%**
+(the earlier LS-less run of RA 20/0 gave 83.3% / 51.4%). Faint DESI galaxies
+seen only by PS1 at S/N < 5 stay `NO_EVIDENCE`, which is the intended
+abstention.
