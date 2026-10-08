@@ -204,3 +204,16 @@ def test_unreliable_evidence_is_weak_not_contrary():
     assert abs(p["STAR"] - p["GALAXY"]) < 0.01      # ~no evidence, not "not a galaxy"
     p, _ = mod.fuse([dict(item, association_reliability=1.0, score=0.75)], model)
     assert p["GALAXY"] > 0.8
+
+
+def test_association_posterior_sparse_vs_dense():
+    import sys
+    sys.path.insert(0, str(ROOT))
+    from association_model import assess_pair
+    a = {"ra": 150.0, "dec": 2.0, "poserr_arcsec": 0.3, "catalog": "X"}
+    b = {"ra": 150.0, "dec": 2.0 + 1.27 / 3600, "poserr_arcsec": 0.3, "catalog": "Y"}   # ~3 sigma
+    sparse = assess_pair(a, b, 1e-4)      # one source per 10^4 arcsec^2
+    dense = assess_pair(a, b, 0.2)
+    assert sparse["positional_likelihood"] < 0.02
+    assert sparse["association_posterior"] > 0.8         # unique counterpart, sparse field
+    assert dense["association_posterior"] < sparse["association_posterior"]
