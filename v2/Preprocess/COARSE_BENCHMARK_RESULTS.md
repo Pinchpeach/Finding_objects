@@ -116,3 +116,49 @@ SDSS spectroscopic benchmark (covariate shift) is not corrected by it.
 The SDSS benchmark validates the coarse classifier only to r ≈ 20; accuracy
 starts to drop at 20–21 and fainter sources are untested. A deeper,
 SDSS-independent truth set (DESI DR1) is the next validation step.
+
+## 2026-10-08 (later): DESI DR1 external validation, colours, combined training
+
+**External truth** (`v2/benchmark/desi_external/`): 1,797 DESI DR1 spectra
+(Redrock SPECTYPE, ZWARN=0, DELTACHI2>25), ~150 per class in each of
+r = 18–20, 20–21, 21–22, 22–23, from eight sky windows, none within 2″ of the
+SDSS benchmark. Built by `build_desi_truth.py`; features collected and
+evaluated by `.github/workflows/v2_desi_external_validation.yml`.
+
+**Finding.** The SDSS-fitted model generalised to bright DESI objects but
+failed for faint quasars: QSO accuracy 90% (r 18–20) → 13% (21–22) → 3%
+(22–23), almost all called STAR. Without Gaia astrometry (G ≲ 21) or AllWISE
+detections only point-source morphology remains, which cannot separate stars
+from quasars.
+
+**Changes.** (1) Legacy Surveys collector adds unWISE forced W1/W2; benchmark
+LS features re-collected. (2) `LS-COLOR-001`: dereddened g−r, r−z, z−W1, W1−W2
+(S/N ≥ 3) as continuous features — quasars' mid-IR excess and blue optical
+colours (Chaussidon+2023). (3) Fitting on SDSS alone made colours *hurt*
+faint DESI galaxies (covariate shift), so the fusion is now fitted on the
+SDSS **and** DESI train splits; the threshold on both calibration splits;
+each test split reported separately.
+
+| test split | metric | previous (SDSS fit, no colours) | combined fit + colours |
+|---|---|---:|---:|
+| SDSS (1,991) | accuracy when classified | 97.5% | **97.9%** |
+| SDSS | log-loss | 0.091 | **0.075** |
+| DESI (353) | accuracy when classified | 78.3% | **83.3%** |
+| DESI | QSO recall | ~0.44 | **0.88** |
+
+DESI test accuracy by magnitude (combined fit; 24–38 objects per cell):
+
+| r | GALAXY | QSO | STAR |
+|---|---:|---:|---:|
+| 18–20 | 0.92 | 0.83 | 1.00 |
+| 20–21 | 1.00 | 0.93 | 0.74 |
+| 21–22 | 0.89 | 0.76 | 0.55 |
+| 22–23 | 0.61 | 0.92 | 0.75 |
+
+DESI coverage/accuracy by confidence threshold: 0.7 → 83% / 90.1%,
+0.8 → 74% / 93.5%, 0.9 → 50% / 98.3%.
+
+Caveats: DESI targets were themselves selected with grz/W1/W2 colours and
+QSO targets with PSF morphology, which favours these features on DESI; faint
+STAR spectra in DESI are rare and partly mis-targeted. The DESI test split is
+small; a larger set is the next step.
