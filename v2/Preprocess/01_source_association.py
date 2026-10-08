@@ -78,7 +78,18 @@ def _density(frame: pd.DataFrame) -> float | None:
                 radius = float(values.median()) * 60.0
                 break
     if radius is None or radius <= 0:
-        return None
+        # No recorded cone radius: use the rows' own footprint (distance of
+        # the outermost source from the median position; cone searches are
+        # circular, so this recovers the query radius to within a few %).
+        ra = pd.to_numeric(frame.get("ra"), errors="coerce"); dec = pd.to_numeric(frame.get("dec"), errors="coerce")
+        ok = ra.notna() & dec.notna()
+        if ok.sum() < 5:
+            return None
+        r0, d0 = float(ra[ok].median()), float(dec[ok].median())
+        dx = (ra[ok] - r0) * math.cos(math.radians(d0)); dy = dec[ok] - d0
+        radius = float((dx * dx + dy * dy).pow(0.5).max()) * 3600.0
+        if radius <= 0:
+            return None
     return float(len(frame)) / (math.pi * radius * radius)
 
 
@@ -243,7 +254,7 @@ def run(raw_dir: Path, out: Path):
                 }
             status = "ambiguous_new" if ambiguous else ("event_new" if det["entity_kind"] == "transient_event" else "new")
 
-        confidence = match.get("association_score")
+        confidence = match.get("association_posterior", match.get("association_score"))
         records.append({
             **{**det,"association_aliases":"|".join(sorted(det.get("association_aliases") or ()))},
             "object_id": oid,
@@ -273,7 +284,7 @@ def run(raw_dir: Path, out: Path):
         # which left faint Legacy Surveys/DESI members with ~0 confidence.
         if rec["association_method"] == "position_epoch_likelihood" and anchor is not det:
             final = assess_pair(anchor, det, det.get("source_density_arcsec2"))
-            rec["association_confidence"] = max(rec["association_confidence"] or 0.0, final["association_score"])
+            rec["association_confidence"] = max(rec["association_confidence"] or 0.0, final["association_posterior"])
             rec["final_anchor_separation_arcsec"] = final["separation_arcsec"]
         rec["object_ra"] = anchor["ra"]
         rec["object_dec"] = anchor["dec"]

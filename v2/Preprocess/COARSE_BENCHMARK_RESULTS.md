@@ -298,3 +298,20 @@ Fit: `fit_fusion_weights.py --augment-drop LS-MORPH,PS1-MORPH,SDSS-PHOTO LS-
 --augment-weight 0.3 --target-scope each --target-accuracy 0.925`
 (`min_confidence` 0.60). Without Legacy Surveys the faint DESI objects
 (r ≈ 22–23) are near the PS1 detection limit, hence the lower 64%.
+
+### Real fields after these changes (DESI DR1 spectra as truth, `v2_field_validation.yml`)
+
+| field (radius) | morning: accuracy / coverage | evening: accuracy / coverage |
+|---|---:|---:|
+| RA 245, Dec +43 (3′), n = 42 | 86.5% / 88.1% | **94.6% / 88.1%** |
+| RA 250, Dec +30 (4′), n = 40 | 61.5% / 97.5% | **94.1% / 85.0%** |
+| RA 20, Dec 0 (4′), n = 35 | 72.7% / 94.3% | **100% / 77.1%** |
+| pooled | ≈ 73% / 93% | **≈ 96% / 84%** |
+
+Also fixed while validating: Stage 5 discounted unreliable evidence as
+`logit(raw × reliability)`, which turns a resolved-galaxy claim with
+near-zero association reliability into strong evidence *against* GALAXY
+(now `reliability × logit(raw)`); Stage 1 judged membership confidence
+against a stale anchor; Gaia TAP never answered from CI within 120 s
+(budget now 30 s, VizieR fallback with DSC), so collection dropped from
+~130 s to ~45–50 s per field.

@@ -239,7 +239,15 @@ def assess_pair(a: Mapping[str, Any], b: Mapping[str, Any], density_arcsec2: flo
     pchance = chance_probability(sep, density_arcsec2)
     score = positional * (1.0 - pchance) if pchance is not None else positional
     accepted = sep <= radius and (pchance is None or pchance <= 0.25) and score >= 1e-5
+    # Membership posterior (Budavari & Szalay 2008, ApJ 679, 301): the
+    # positional likelihood density of a true counterpart against the
+    # background density of unrelated sources.  ``score`` keeps ranking
+    # candidates; the posterior is what downstream evidence is weighted by
+    # (a unique 3-sigma match is not 1% reliable in a sparse field).
+    density_l = positional / (2.0 * math.pi * sigma * sigma)
+    posterior = density_l / (density_l + density_arcsec2) if density_arcsec2 is not None and density_arcsec2 > 0 else positional
     return {
+        "association_posterior": posterior,
         "accepted": accepted,
         "separation_arcsec": sep,
         "comparison_epoch": epoch,
