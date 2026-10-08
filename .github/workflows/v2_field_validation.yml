@@ -59,7 +59,14 @@ jobs:
               ok=s.classification_status.isin(["CLASSIFIED","LOW_CONFIDENCE"]).to_numpy()
               print("training-prior argmax on the same objects:"); print(pd.crosstab(s.truth[ok],pred[ok]).to_string())
               print(f"training-prior accuracy={(pred[ok]==s.truth.to_numpy()[ok]).mean():.3f}")
-          import json
+          import json, numpy as np
+          print("\n== GALAXY/QSO truth predicted STAR: evidence")
+          for _,r in s[s.truth.ne("STAR")&s.primary_class.eq("STAR")].iterrows():
+              ev=json.loads(r.evidence_json) if isinstance(r.evidence_json,str) else []
+              lsr=r.get("desi_legacy_surveys_dr10__flux_r")
+              print(r.truth, f"p_star={r.get('p_star',float('nan')):.2f}", "z",r.get("desi_dr1_spectroscopy__z"), "| ls_type",r.get("desi_legacy_surveys_dr10__type"),
+                    "| r_mag", round(22.5-2.5*np.log10(lsr),2) if pd.notna(lsr) and lsr>0 else None, "| cats",r.catalogs)
+              print("    ", [(e.get("rule_id"),e.get("class"),round(float(e.get("score") or 0),2),e.get("value")) for e in ev])
           print("\n== catalogs of NO_EVIDENCE objects"); print(d[d.classification_status.eq("NO_EVIDENCE")].catalogs.value_counts().head(12).to_string())
           print("\n== DESI-spectra objects left UNKNOWN")
           u=s[s.primary_class.eq("UNKNOWN")]
