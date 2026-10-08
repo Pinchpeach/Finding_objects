@@ -9,6 +9,8 @@ on:
       - 'v2/Preprocess/05_likelihood_vectors.py'
       - 'v2/Preprocess/classification_rules.csv'
       - 'v2/Preprocess/fusion_weights.json'
+      - 'v2/Preprocess/color_knn.py'
+      - 'v2/Preprocess/color_reference.csv.gz'
       - 'v2/benchmark/catalog_features/**'
       - 'v2/benchmark/desi_external/**'
       - 'v2/benchmark/fit_fusion_weights.py'

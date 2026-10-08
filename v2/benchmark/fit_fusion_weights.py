@@ -65,6 +65,13 @@ def main():
     ap.add_argument("--truth",type=Path,nargs="+",required=True); ap.add_argument("--catalog-root",type=Path,nargs="+",required=True)
     ap.add_argument("--manifest",type=Path,nargs="+",required=True); ap.add_argument("--out",type=Path,default=PRE/"fusion_weights.json")
     ap.add_argument("--drop-keys",nargs="*",default=[],help="evidence-key prefixes to exclude (ablation)")
+    ap.add_argument("--augment-drop",nargs="*",default=[],
+                    help="evidence-key prefixes (e.g. morphology rules) to drop in an extra copy of every train row "
+                         "that has them, so the remaining weights also learn the case where they are missing")
+    ap.add_argument("--target-scope",choices=("pooled","each"),default="pooled",
+                    help="'each': the abstention threshold must reach --target-accuracy on every dataset's calibration split")
+    ap.add_argument("--augment-weight",type=float,default=1.0,help="sample weight of the augmented copies")
+    ap.add_argument("--report-drop",nargs="*",default=None,help="also report test accuracy with these evidence prefixes removed (default: --augment-drop)")
     ap.add_argument("--min-support",type=int,default=30)
     ap.add_argument("--target-accuracy",type=float,default=0.95,help="calibration-split accuracy the abstention threshold must reach")
     a=ap.parse_args()
@@ -85,10 +92,27 @@ def main():
     support=(X[tr]!=0).sum(axis=0); keep=support>=a.min_support
     Xk=X[:,keep]; kept=[k for k,m in zip(keys,keep) if m]
     fit_rows=tr&used
+    Xfit,yfit=Xk[fit_rows],y[fit_rows]
+    Xcal,ycal=Xk[ca&used],y[ca&used]
+    if a.augment_drop:
+        # Missing-feature augmentation: faint objects in real fields often lack
+        # e.g. a resolved-morphology measurement that nearly every benchmark
+        # object has.  Without this the colour weights learn only the
+        # conditional "given morphology" separation (red point source = star)
+        # and send faint red galaxies to STAR.
+        aug=np.array([any(k.startswith(p) for p in a.augment_drop) for k in kept])
+        def augment(Xs,ys):
+            has=(Xs[:,aug]!=0).any(axis=1); Xa=Xs[has].copy(); Xa[:,aug]=0.0
+            keep_row=(Xa!=0).any(axis=1)
+            w=np.concatenate([np.ones(len(ys)),np.full(int(keep_row.sum()),a.augment_weight)])
+            return np.vstack([Xs,Xa[keep_row]]),np.concatenate([ys,ys[has][keep_row]]),w
+        Xfit,yfit,wfit=augment(Xfit,yfit); Xcal,ycal,wcal=augment(Xcal,ycal)
+    else:
+        wfit=np.ones(len(yfit)); wcal=np.ones(len(ycal))
     best=None
     for C in (0.01,0.03,0.1,0.3,1.0,3.0):
-        m=LogisticRegression(C=C,max_iter=2000).fit(Xk[fit_rows],y[fit_rows])
-        ll=log_loss(y[ca&used],m.predict_proba(Xk[ca&used]),labels=list(m.classes_))
+        m=LogisticRegression(C=C,max_iter=2000).fit(Xfit,yfit,sample_weight=wfit)
+        ll=log_loss(ycal,m.predict_proba(Xcal),labels=list(m.classes_),sample_weight=wcal)
         if best is None or ll<best[0]: best=(ll,C,m)
     ll,C,m=best
     order=[list(m.classes_).index(c) for c in CLASSES]
@@ -99,21 +123,33 @@ def main():
       "training_prior":{c:float((y[fit_rows]==c).mean()) for c in CLASSES},
       "semantics":"multinomial-logistic probability fitted on class-balanced spectroscopic benchmarks (equal priors); evidence keys without training support use prior weights",
       "provenance":{"benchmarks":[str(t) for t in a.truth],"dropped_keys":a.drop_keys,
-        "train_rows":int(fit_rows.sum()),"calibration_rows":int((ca&used).sum()),"C":C,"calibration_log_loss":float(ll),
+        "train_rows":int(fit_rows.sum()),"augment_drop":a.augment_drop,"augment_weight":a.augment_weight,"augmented_train_rows":int(len(yfit)),"calibration_rows":int((ca&used).sum()),"C":C,"calibration_log_loss":float(ll),
         "min_support":a.min_support,"support":{k:int(s) for k,s in zip(keys,support)},
         "prior_weight_keys":[k for k,mk in zip(keys,keep) if not mk]}}
     # Probabilities exactly as Stage 5 will compute them.
-    def probs(mask):
+    def probs(mask,drop=()):
         P=[]
         for raw in ev.evidence_json[mask]:
-            p,_=s5.fuse(json.loads(raw) if isinstance(raw,str) else [],model); P.append([p[c] for c in CLASSES])
+            items=json.loads(raw) if isinstance(raw,str) else []
+            if drop: items=[i for i in items if not str(i.get("rule_id","")).startswith(tuple(drop))]
+            p,_=s5.fuse(items,model); P.append([p[c] for c in CLASSES])
         return np.array(P)
     grid=np.round(np.arange(0.34,0.991,0.01),2)
     pca=probs(ca); curve=coverage_curve(pca,y[ca],used[ca],grid)
-    ok=[r for r in curve if r["accuracy"] is not None and r["accuracy"]>=a.target_accuracy]
+    if a.target_scope=="each":
+        # Faint objects (e.g. DESI) are harder than bright ones (SDSS); a pooled
+        # target lets the larger bright set hide the faint set's errors.
+        curves=[]
+        for name in ev.dataset.unique():
+            mk=ca&ev.dataset.eq(name).to_numpy()
+            curves.append(coverage_curve(probs(mk),y[mk],used[mk],grid))
+        ok=[r for r,*rest in zip(curve,*curves) if all(c["accuracy"] is not None and c["accuracy"]>=a.target_accuracy for c in rest)]
+    else:
+        ok=[r for r in curve if r["accuracy"] is not None and r["accuracy"]>=a.target_accuracy]
     model["min_confidence"]=ok[0]["threshold"] if ok else 0.9
     model["provenance"]["calibration_curve"]=curve
     model["provenance"]["target_calibration_accuracy"]=a.target_accuracy
+    model["provenance"]["target_scope"]=a.target_scope
     test={}
     for name in ev.dataset.unique():
         mask=te&ev.dataset.eq(name).to_numpy()
@@ -126,6 +162,13 @@ def main():
           "log_loss_used":float(log_loss(yte[ute],pte[ute][:,np.argsort(CLASSES)],labels=sorted(CLASSES))),
           "expected_calibration_error":ece(pte[ute],yte[ute]),
           "accuracy_by_threshold":coverage_curve(pte,yte,ute,(0.5,0.6,0.7,0.8,0.9,0.95))}
+        rdrop=a.augment_drop if a.report_drop is None else a.report_drop
+        if rdrop:
+            # Same test rows with the augmented evidence removed: how the model
+            # behaves on objects that lack it (e.g. faint, unresolved fits).
+            pd_=probs(mask,rdrop); pr=np.array(CLASSES)[pd_.argmax(axis=1)]
+            test[name]["without_"+"+".join(rdrop)]={"argmax_accuracy":float((pr==yte).mean()),
+              "recall":{c:float((pr[yte==c]==c).mean()) for c in CLASSES}}
     model["provenance"]["test"]=test
     a.out.write_text(json.dumps(model,indent=1,sort_keys=True)+"\n",encoding="utf-8")
     print(json.dumps({"C":C,"kept_keys":len(kept),"prior_keys":model["provenance"]["prior_weight_keys"],

@@ -138,7 +138,10 @@ def test_detections_inside_large_galaxy_abstain(tmp_path):
     assert math.isclose(out.loc["in", "host_elliptical_radius"], 0.75, rel_tol=1e-3)
     assert math.isclose(out.loc["out", "host_elliptical_radius"], 1.5, rel_tol=1e-3)
     assert out.loc["in", "classification_status"] == "WITHIN_LARGE_GALAXY"
-    assert out.loc["out", "primary_class"] == "STAR"
+    # Outside the ellipse the object is classified normally (a lone SIMBAD
+    # label may still fall below the abstention threshold).
+    assert out.loc["out", "classification_status"] != "WITHIN_LARGE_GALAXY"
+    assert out.loc["out", "p_star"] > max(out.loc["out", "p_galaxy"], out.loc["out", "p_qso"])
     host = pd.read_csv(l)
     host = host[host.catalogs.str.contains("SGA-2020", regex=False)].iloc[0]
     assert host.primary_class == "GALAXY"
@@ -170,3 +173,22 @@ def test_one_command_pipeline_on_committed_field(tmp_path):
     assert len(out) > 0
     assert {"primary_class", "physical_class", "variability_class", "classification_status"} <= set(out.columns)
     assert (tmp_path / "work" / "pipeline_summary.csv").exists()
+
+
+def test_color_knn_same_colour_subset_and_leave_one_out():
+    import sys
+    import numpy as np
+    sys.path.insert(0, str(ROOT))
+    import color_knn
+    ref = pd.DataFrame({"id": ["a", "b", "c", "d"], "truth_class": ["STAR", "STAR", "GALAXY", "GALAXY"],
+                        "ls_g_r_color": [0.5, 0.52, 1.5, 1.52], "ls_r_z_color": [0.2, 0.21, 0.9, 0.91],
+                        "ls_z_w1_color": [-1.0, np.nan, 1.0, np.nan], "ls_w1_w2_color": np.nan})
+    obj = pd.DataFrame({"ls_g_r_color": [0.5, 1.5, 0.5], "ls_r_z_color": [0.2, 0.9, np.nan],
+                        "ls_z_w1_color": [np.nan, 1.0, np.nan]})
+    f = color_knn.class_fractions(obj, ref, k=1)
+    assert f[0].argmax() == 0 and f[1].argmax() == 1   # nearest in the colours both have
+    assert np.isnan(f[2]).all()                         # fewer than two colours: no evidence
+    # Leave-one-out: "a" may not vote for itself; its only same-subset
+    # neighbour with z-W1 is "c" (GALAXY).
+    g = color_knn.class_fractions(obj.iloc[[0]].assign(ls_z_w1_color=-1.0), ref, k=1, ids=["a"])
+    assert g[0].argmax() == 1

@@ -204,7 +204,10 @@ def evaluate(rule,row,namespaced=frozenset()):
             emit(out,rule,"GALAXY",0.95,src.get("catalog_object_id"),"Siena Galaxy Atlas 2020 large galaxy",reliability,association_reliability)
     elif rid=="NED-TYPE-001":
         typ=str(src.get("Type","")).strip()
-        mp={"G":"GALAXY","QSO":"QSO","*":"STAR","WD*":"STAR"}
+        # NED "*" for faint sources is mostly inherited from photometric
+        # catalogues' unresolved morphology, which quasars and compact
+        # galaxies share; it is used as point-source evidence only.
+        mp={"G":"GALAXY","QSO":"QSO","*":"POINT_SOURCE","WD*":"STAR"}
         if typ in mp: emit(out,rule,mp[typ],0.85,typ,"curated NED preferred physical type",reliability,association_reliability)
     elif rid=="SIMBAD-TYPE-001":
         typ=str(src.get("otype","")).strip()
@@ -230,18 +233,41 @@ def evaluate(rule,row,namespaced=frozenset()):
         if cls and score is not None: emit(out,rule,f"VAR:{cls}",score,score,reliability=reliability,association_reliability=association_reliability)
     return out
 
+def _color_knn_evidence(df,rule_list):
+    """LS-CKNN-001: colour-space kNN class fractions, computed for all rows at once."""
+    empty=[[] for _ in range(len(df))]
+    rule=next((r for r in rule_list if r["rule_id"]=="LS-CKNN-001"),None)
+    if rule is None: return empty
+    import sys
+    here=str(Path(__file__).resolve().parent)
+    if here not in sys.path: sys.path.insert(0,here)
+    import color_knn
+    ref=color_knn.load_reference()
+    if ref is None or not any(c in df for c in color_knn.COLORS): return empty
+    ids=df["benchmark_id"].astype(str).to_numpy() if "benchmark_id" in df else None
+    frac=color_knn.class_fractions(df,ref,ids=ids)
+    for i,f in enumerate(frac):
+        if f[0]==f[0]:
+            for cls,v in zip(color_knn.CLASSES,f):
+                emit(empty[i],rule,cls,float(v),round(float(v),4),"colour-space kNN class fraction")
+    return empty
+
 def run(features:Path,rules_path:Path,out:Path)->Path:
     df=pd.read_csv(features); rules=pd.read_csv(rules_path,keep_default_na=False)
     result=df.copy(); payload=[]; counts=[]; conflicts=[]
     namespaced=frozenset(c.split("__",1)[0] for c in df.columns if "__" in c)
     # Plain dicts: building a pandas Series per row/rule dominated runtime.
     rule_list=rules.to_dict("records")
-    for row in df[_rule_columns(df.columns)].to_dict("records"):
+    knn=_color_knn_evidence(df,rule_list)
+    for i,row in enumerate(df[_rule_columns(df.columns)].to_dict("records")):
         ev=[]
         for rule in rule_list: ev.extend(evaluate(rule,row,namespaced))
+        ev.extend(knn[i])
         payload.append(json.dumps(ev,separators=(",",":")))
         counts.append(len(ev))
-        strong={e["class"] for e in ev if e["class"] in PRIMARY and e["score"]>=.8}
+        # kNN class fractions are soft statistical evidence, weighed by the
+        # fitted fusion; they are not independent hard claims that can conflict.
+        strong={e["class"] for e in ev if e["class"] in PRIMARY and e["score"]>=.8 and e["rule_id"]!="LS-CKNN-001"}
         conflicts.append(int(len(strong)>1))
     result["evidence_json"]=payload; result["evidence_count"]=counts; result["evidence_conflict"]=conflicts
     out.parent.mkdir(parents=True,exist_ok=True); result.to_csv(out,index=False)

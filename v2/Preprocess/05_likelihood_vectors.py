@@ -63,7 +63,11 @@ def load_model(path=MODEL_PATH):
 def fuse(items,model=None):
     x,kinds=evidence_features(items)
     coef=(model or {}).get("coef",{})
-    logit={c:float((model or {}).get("intercept",{}).get(c,0.0)) for c in CLASSES}
+    # The fitted intercept is the baseline of the fitted feature set; with
+    # none of those features present (e.g. only SIMBAD/NED labels, which use
+    # prior weights) it would be an extrapolation, so equal odds are used.
+    fitted=any(k in coef for k in x)
+    logit={c:float((model or {}).get("intercept",{}).get(c,0.0)) if fitted else 0.0 for c in CLASSES}
     used=0
     for key,v in x.items():
         w=coef.get(key) or prior_coef(key,kinds[key])
