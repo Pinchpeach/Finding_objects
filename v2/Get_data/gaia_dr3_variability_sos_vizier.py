@@ -89,14 +89,25 @@ def _lpv(df: pd.DataFrame, radius_arcmin: float) -> pd.DataFrame:
 PARSERS = {"rr": _rr, "cep": _cep, "lpv": _lpv}
 
 
-def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
+def fetch(ra: float, dec: float, radius_arcmin: float, kinds: tuple[str, ...] | None = None) -> pd.DataFrame:
+    """Fetch the requested SOS products.
+
+    ``kinds`` is an internal efficiency option for validation jobs.  Normal
+    collection omits it and gathers all three products; a class-specific
+    validation query can request only its relevant SOS table.
+    """
     from astroquery.vizier import Vizier
     from astropy.coordinates import SkyCoord
     import astropy.units as u
 
     centre = SkyCoord(float(ra) * u.deg, float(dec) * u.deg, frame="icrs")
     pieces: list[pd.DataFrame] = []
-    for key, (table, columns) in TABLES.items():
+    requested = TABLES.keys() if kinds is None else tuple(kinds)
+    unknown = set(requested) - set(TABLES)
+    if unknown:
+        raise ValueError(f"unknown Gaia SOS product(s): {sorted(unknown)}")
+    for key in requested:
+        table, columns = TABLES[key]
         tabs = Vizier(columns=columns, row_limit=-1).query_region(
             centre, radius=float(radius_arcmin) * u.arcmin, catalog=table
         )

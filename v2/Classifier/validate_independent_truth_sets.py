@@ -29,6 +29,7 @@ COLLECTORS={
  # Asiago is truth; ASAS-SN is independent, but only covers a limited epoch.
  ("phenomenon","SN"):("asas_sn_supernova",),
 }
+SOS_KIND={"RR_LYRAE":("rr",),"CEPHEID":("cep",),"MIRA":("lpv",),"LPV":("lpv",)}
 
 def load_module(path,name):
  s=importlib.util.spec_from_file_location(name,path)
@@ -45,7 +46,8 @@ def collect(row,raw,radius):
  for name in names:
   try:
    mod=load_module(GET/f"{name}.py",f"truthval_{name}_{abs(hash(str(row.truth_id)))%1000000}")
-   frame=mod.fetch(float(row.ra),float(row.dec),radius);mod.save(frame,raw/f"{name}.csv")
+   kwargs={"kinds":SOS_KIND[str(row.truth_class)]} if name=="gaia_dr3_variability_sos_vizier" else {}
+   frame=mod.fetch(float(row.ra),float(row.dec),radius,**kwargs);mod.save(frame,raw/f"{name}.csv")
    logs.append({"collector":name,"status":"ok" if len(frame) else "empty","rows":len(frame)})
   except Exception as exc:logs.append({"collector":name,"status":"error","rows":0,"error":repr(exc)})
  return logs
