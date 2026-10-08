@@ -46,59 +46,74 @@ def _tag(ra: float, dec: float, radius_arcmin: float) -> str:
     return f"ra{clean(ra)}_dec{clean(dec)}_r{clean(radius_arcmin)}arcmin"
 
 
+def _collect_one(name: str, ra: float, dec: float, radius_arcmin: float, out_dir: Path, tag: str) -> dict:
+    started = time.monotonic()
+    output = out_dir / f"{name}_{tag}.csv"
+    try:
+        module = _load_collector(name)
+        df = module.fetch(ra, dec, radius_arcmin)
+        if df is None:
+            df = pd.DataFrame()
+        if not isinstance(df, pd.DataFrame):
+            df = pd.DataFrame(df)
+
+        module.save(df, output)
+        if not output.exists():
+            raise RuntimeError(f"{name}.save() returned without writing {output}")
+        status = "ok" if len(df) else "empty"
+        error = ""
+        rows = len(df)
+        output_file = str(output.relative_to(ROOT)) if output.is_relative_to(ROOT) else str(output)
+    except TimeoutError as exc:
+        status, rows, output_file, error = "timeout", 0, "", repr(exc)
+        traceback.print_exc()
+    except Exception as exc:
+        # Network libraries often wrap timeouts in package-specific exceptions.
+        message = repr(exc)
+        status = "timeout" if "timeout" in message.lower() or "timed out" in message.lower() else "error"
+        rows, output_file, error = 0, "", message
+        traceback.print_exc()
+    result = {
+        "collector": name,
+        "status": status,
+        "rows": rows,
+        "elapsed_seconds": round(time.monotonic() - started, 3),
+        "output_file": output_file,
+        "error": error,
+    }
+    print(f"[{name}] {status}: {rows} rows ({result['elapsed_seconds']} s)", flush=True)
+    return result
+
+
 def collect_all(
     ra: float,
     dec: float,
     radius_arcmin: float,
     out_dir: Path = DEFAULT_OUT,
+    workers: int = 1,
 ) -> pd.DataFrame:
+    """Run every collector; ``workers`` > 1 queries archives concurrently.
+
+    Collection is network-bound and the collectors mostly hit different
+    services, so concurrent queries cut wall time; each collector still
+    fails independently and the summary keeps COLLECTORS order.
+    """
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     tag = _tag(ra, dec, radius_arcmin)
-    results = []
-
-    for name in COLLECTORS:
-        started = time.monotonic()
-        output = out_dir / f"{name}_{tag}.csv"
-        try:
-            module = _load_collector(name)
-            df = module.fetch(ra, dec, radius_arcmin)
-            if df is None:
-                df = pd.DataFrame()
-            if not isinstance(df, pd.DataFrame):
-                df = pd.DataFrame(df)
-
-            module.save(df, output)
-            if not output.exists():
-                raise RuntimeError(f"{name}.save() returned without writing {output}")
-            status = "ok" if len(df) else "empty"
-            error = ""
-            rows = len(df)
-            output_file = str(output.relative_to(ROOT)) if output.is_relative_to(ROOT) else str(output)
-        except TimeoutError as exc:
-            status, rows, output_file, error = "timeout", 0, "", repr(exc)
-            traceback.print_exc()
-        except Exception as exc:
-            # Network libraries often wrap timeouts in package-specific exceptions.
-            message = repr(exc)
-            status = "timeout" if "timeout" in message.lower() or "timed out" in message.lower() else "error"
-            rows, output_file, error = 0, "", message
-            traceback.print_exc()
-
-        results.append({
-            "collector": name,
-            "status": status,
-            "rows": rows,
-            "elapsed_seconds": round(time.monotonic() - started, 3),
-            "output_file": output_file,
-            "error": error,
-        })
-        print(f"[{name}] {status}: {rows} rows ({results[-1]['elapsed_seconds']} s)", flush=True)
+    started = time.monotonic()
+    if workers <= 1:
+        results = [_collect_one(name, ra, dec, radius_arcmin, out_dir, tag) for name in COLLECTORS]
+    else:
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            results = list(pool.map(lambda n: _collect_one(n, ra, dec, radius_arcmin, out_dir, tag), COLLECTORS))
 
     summary = pd.DataFrame(results)
     summary_path = out_dir / f"collection_summary_{tag}.csv"
     summary.to_csv(summary_path, index=False)
-    print(f"Completed: {len(summary)}/{len(COLLECTORS)} collectors attempted", flush=True)
+    print(f"Completed: {len(summary)}/{len(COLLECTORS)} collectors attempted in "
+          f"{time.monotonic() - started:.1f} s (workers={workers})", flush=True)
     print(f"Summary: {summary_path}", flush=True)
     return summary
 
@@ -109,10 +124,11 @@ def main() -> int:
     parser.add_argument("--dec", type=float, required=True, help="ICRS Dec in degrees")
     parser.add_argument("--radius", type=float, required=True, help="Cone radius in arcminutes")
     parser.add_argument("--out-dir", type=Path, default=DEFAULT_OUT)
+    parser.add_argument("--workers", type=int, default=6, help="concurrent archive queries")
     args = parser.parse_args()
     if args.radius <= 0:
         parser.error("--radius must be > 0")
-    collect_all(args.ra, args.dec, args.radius, args.out_dir)
+    collect_all(args.ra, args.dec, args.radius, args.out_dir, max(1, args.workers))
     return 0
 
 

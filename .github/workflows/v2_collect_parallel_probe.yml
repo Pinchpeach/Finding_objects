@@ -1,0 +1,41 @@
+name: v2 collector parallelism probe
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - v2/Get_data/controller.py
+      - .github/workflows/v2_collect_parallel_probe.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v2-collect-parallel-probe-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pandas numpy requests astropy astroquery pyvo
+      - name: Sequential
+        run: python -u v2/Get_data/controller.py --ra 188.4155 --dec 9.1751 --radius 0.5 --out-dir /tmp/seq --workers 1
+      - name: Parallel (6)
+        run: python -u v2/Get_data/controller.py --ra 188.4155 --dec 9.1751 --radius 0.5 --out-dir /tmp/par --workers 6
+      - name: Compare
+        run: |
+          python - <<'PY'
+          import pandas as pd, glob
+          a=pd.read_csv(glob.glob("/tmp/seq/collection_summary_*.csv")[0]); b=pd.read_csv(glob.glob("/tmp/par/collection_summary_*.csv")[0])
+          m=a.merge(b,on="collector",suffixes=("_seq","_par"))
+          print(m[["collector","status_seq","rows_seq","elapsed_seconds_seq","status_par","rows_par","elapsed_seconds_par"]].to_string(index=False))
+          print("sum of per-collector time: seq",a.elapsed_seconds.sum().round(1),"par",b.elapsed_seconds.sum().round(1))
+          diff=m[(m.rows_seq!=m.rows_par)|(m.status_seq!=m.status_par)]
+          print("mismatches:\n",diff[["collector","status_seq","rows_seq","status_par","rows_par"]].to_string(index=False))
+          PY

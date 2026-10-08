@@ -91,9 +91,10 @@ def estimate_field_prior(P,train_prior,iters=200,tol=1e-7):
         if done: break
     return pi
 
-def run(evidence,out,model_path=MODEL_PATH):
+def run(evidence,out,model_path=MODEL_PATH,min_confidence=None):
     model=load_model(model_path)
     min_conf=float(model.get("min_confidence",MIN_CONFIDENCE)) if model else MIN_CONFIDENCE
+    if min_confidence is not None: min_conf=float(min_confidence)  # caller trades coverage for precision
     min_margin=float(model.get("min_margin",MIN_MARGIN)) if model else MIN_MARGIN
     df=pd.read_csv(evidence,low_memory=False)
     raw_series=df["evidence_json"] if "evidence_json" in df else pd.Series(["[]"]*len(df))
@@ -157,5 +158,6 @@ def run(evidence,out,model_path=MODEL_PATH):
 def main():
     root=Path(__file__).resolve().parent; p=argparse.ArgumentParser()
     p.add_argument("--evidence",type=Path,default=root/"evidence.csv"); p.add_argument("--out",type=Path,default=root/"likelihood_vectors.csv")
-    a=p.parse_args(); run(a.evidence,a.out)
+    p.add_argument("--min-confidence",type=float,help="override the abstention threshold (see COARSE_BENCHMARK_RESULTS.md for coverage/accuracy)")
+    a=p.parse_args(); run(a.evidence,a.out,min_confidence=a.min_confidence)
 if __name__=="__main__": main()
