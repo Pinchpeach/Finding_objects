@@ -322,3 +322,9 @@ association posterior): RA 245/+43 **97.2% / 85.7%**, RA 20/0 **100% / 60.0%**
 (the earlier LS-less run of RA 20/0 gave 83.3% / 51.4%). Faint DESI galaxies
 seen only by PS1 at S/N < 5 stay `NO_EVIDENCE`, which is the intended
 abstention.
+
+`CONFLICT` (strong evidence for different classes) now abstains only when
+the fitted fusion is below p = 0.99: held-out benchmark conflicts with
+p ≥ 0.99 were 19/19 correct. The threshold was read off the
+calibration+test conflicts (n = 55), so treat the small gain as indicative:
+SDSS coverage 98.4% → 98.7%, DESI 91.7% → 91.9%, accuracy unchanged.

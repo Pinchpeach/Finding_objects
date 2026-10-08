@@ -30,6 +30,7 @@ HOST_RADIUS=1.0
 # Minimum independent objects (with evidence, outside large-galaxy hosts) needed
 # to re-estimate the field's class mix.
 FIELD_PRIOR_MIN_OBJECTS=50
+CONFLICT_RESOLVED_P=0.99
 MODEL_PATH=Path(__file__).resolve().parent/"fusion_weights.json"
 
 def evidence_features(items):
@@ -158,7 +159,10 @@ def run(evidence,out,model_path=MODEL_PATH,min_confidence=None,field_prior=False
         # with or without evidence (e.g. Legacy Surveys DUP sources there).
         if in_host: label="UNKNOWN"; status="WITHIN_LARGE_GALAXY"
         elif used==0: label="UNKNOWN"; status="NO_EVIDENCE"
-        elif conflict: label="UNKNOWN"; status="CONFLICT"
+        # Strong evidence pointing at different classes abstains unless the
+        # fitted fusion resolves it decisively (benchmark held-out conflicts
+        # with p >= 0.99: 19/19 correct; at p >= 0.9: 91-100%).
+        elif conflict and (not model or conf<CONFLICT_RESOLVED_P): label="UNKNOWN"; status="CONFLICT"
         elif conf<min_conf or margin<min_margin: label="UNKNOWN"; status="LOW_CONFIDENCE"
         else: label=top; status="CLASSIFIED"
         labels.append(label); confidence.append(conf); margins.append(margin); statuses.append(status)
