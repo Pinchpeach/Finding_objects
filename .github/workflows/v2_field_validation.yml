@@ -74,7 +74,8 @@ jobs:
               ev=json.loads(r.evidence_json) if isinstance(r.evidence_json,str) else []
               print(r.truth, r.classification_status, r.catalogs, "| n_ev",len(ev), "| assoc_status",r.get("association_ambiguous"),
                     "| ls_type",r.get("desi_legacy_surveys_dr10__type"), "| ls_r_flux",r.get("desi_legacy_surveys_dr10__flux_r"),
-                    "| host_r",r.get("host_elliptical_radius"))
+                    "| host_r",r.get("host_elliptical_radius"), "| ls_assoc_conf",r.get("association_confidence__desi_legacy_surveys_dr10"),
+                    "| p",round(r.get("p_star",float("nan")),2),round(r.get("p_galaxy",float("nan")),2),round(r.get("p_qso",float("nan")),2))
           a=pd.read_csv("/tmp/field/source_association.csv",low_memory=False)
           print("\n== association status by catalog"); print(pd.crosstab(a.catalog,a.association_status).to_string())
           import glob, numpy as np
