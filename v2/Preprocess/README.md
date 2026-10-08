@@ -42,7 +42,10 @@ v2/Classifier/
 - **Stage 2**: SGA-2020 큰 은하 타원(D26, PA, b/a) 안에 있는 검출은 `host_large_galaxy`, `host_elliptical_radius`(D26 장반경 단위)로 표시합니다.
 - **Stage 4**: 점광원 형태(PS1 PSF−Kron, SDSS `type=6`, Legacy Surveys `PSF`)는 `POINT_SOURCE` evidence이며 STAR와 QSO를 똑같이 지지합니다. 외부은하 evidence(`EXTRAGALACTIC`)는 GALAXY와 QSO를 지지합니다.
 - **Stage 5**: 선형 log-odds 융합입니다. `fusion_weights.json`이 있으면 벤치마크 **train** split에서 학습한 규칙별 가중치와, **calibration** split에서 정한 abstention 임계값을 씁니다. 학습 데이터가 없는 evidence(Gaia DSC, SIMBAD, NED 등)는 기존 prior 가중치를 그대로 씁니다. 큰 은하 타원 안(`host_elliptical_radius < 1`)에서는 Gaia 시차/고유운동으로 확인된 전경 별이 아니면 `WITHIN_LARGE_GALAXY`로 abstain합니다.
-- 가중치 재학습: `python v2/benchmark/fit_fusion_weights.py --truth v2/benchmark/truth_data/ground_truth.csv --catalog-root v2/benchmark/catalog_features --manifest <benchmark_manifest.csv>`. 결과와 한계는 `COARSE_BENCHMARK_RESULTS.md`에 있습니다.
+- **색 공간 kNN** (`color_knn.py`, 규칙 `LS-CKNN-001`/`PS1-CKNN-001`): 같은 색 조합으로 측정된 train split 벤치마크 천체 중 가장 가까운 31개의 클래스 비율을 증거로 씁니다. 참조 집합은 `color_reference.csv.gz`이고 `v2/benchmark/build_color_reference.py`로 다시 만듭니다.
+- 증거 신뢰도(카탈로그 품질 × 연관 사후확률)는 `신뢰도 × logit(점수)`로 반영합니다. 신뢰도가 낮으면 증거가 약해질 뿐 반대 방향 증거가 되지는 않습니다. 학습 가중치가 없는 규칙은 지지 방향으로만 반영합니다.
+- 필드 클래스 사전확률 EM 보정은 추정치만 기록하고, 적용은 `--field-prior`를 줄 때만 합니다(근거: `COARSE_BENCHMARK_RESULTS.md`).
+- 가중치 재학습(현재 설정): `python v2/benchmark/fit_fusion_weights.py --truth v2/benchmark/truth_data/ground_truth.csv v2/benchmark/desi_external/truth.csv --catalog-root v2/benchmark/catalog_features v2/benchmark/desi_external/catalog_features --manifest <sdss manifest> <desi manifest> --augment-drop LS-MORPH,PS1-MORPH,SDSS-PHOTO LS- --augment-weight 0.3 --target-scope each --target-accuracy 0.925`. 결과와 한계는 `COARSE_BENCHMARK_RESULTS.md`에 있습니다.
 
 ## Controller
 
