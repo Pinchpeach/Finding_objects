@@ -50,6 +50,17 @@ jobs:
           print(pd.crosstab(s.truth,s.primary_class,margins=True).to_string())
           c=s.primary_class.ne("UNKNOWN")
           print(f"coverage={c.mean():.3f} accuracy_when_classified={(s.primary_class==s.truth)[c].mean():.3f}")
+          import json
+          print("\n== catalogs of NO_EVIDENCE objects"); print(d[d.classification_status.eq("NO_EVIDENCE")].catalogs.value_counts().head(12).to_string())
+          print("\n== DESI-spectra objects left UNKNOWN")
+          u=s[s.primary_class.eq("UNKNOWN")]
+          for _,r in u.head(15).iterrows():
+              ev=json.loads(r.evidence_json) if isinstance(r.evidence_json,str) else []
+              print(r.truth, r.classification_status, r.catalogs, "| n_ev",len(ev), "| assoc_status",r.get("association_ambiguous"),
+                    "| ls_type",r.get("desi_legacy_surveys_dr10__type"), "| ls_r_flux",r.get("desi_legacy_surveys_dr10__flux_r"),
+                    "| host_r",r.get("host_elliptical_radius"))
+          a=pd.read_csv("/tmp/field/source_association.csv",low_memory=False)
+          print("\n== association status by catalog"); print(pd.crosstab(a.catalog,a.association_status).to_string())
           PY
       - uses: actions/upload-artifact@v4
         if: always()
