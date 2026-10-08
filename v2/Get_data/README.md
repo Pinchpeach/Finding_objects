@@ -16,3 +16,9 @@
 데이터 흐름:
 
 `Catalog / Survey -> Get_data -> raw catalog data -> Preprocess`
+
+`gaia_dr3_variability_sos_vizier.py` is a supplemental Gaia DR3 collector. It
+preserves published SOS variable-star details (RR Lyrae subtype, Cepheid
+type/mode, LPV C-star candidate) separately from the broad Gaia variability
+classifier.  Missing SOS products remain missing, and it does not infer Mira
+from an LPV period or amplitude.

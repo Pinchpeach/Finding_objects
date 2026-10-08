@@ -45,6 +45,13 @@ expect(variability,{"best_class_name":"CEP","best_class_score":0.88},"CEPHEID","
 expect(variability,{"best_class_name":"LPV","best_class_score":0.85},"LPV","GAIA_DR3_VARIABLE_CANDIDATE")
 expect(variability,{"best_class_name":"ECL","best_class_score":0.82},"ECLIPSING","GAIA_DR3_VARIABLE_CANDIDATE")
 
+rr_sos=expect(variability,{"gaia_rrlyrae_best_classification":"RRab","gaia_rrlyrae_pf":0.57},"RR_LYRAE","GAIA_DR3_SOS_RRLYRAE")
+assert rr_sos["subtype"]=="RRAB",rr_sos
+cep_sos=expect(variability,{"gaia_cepheid_best_classification":"DCEP","gaia_cepheid_subclassification":"F","gaia_cepheid_pf":5.4},"CEPHEID","GAIA_DR3_SOS_CEPHEID")
+assert cep_sos["subtype"]=="DCEP_F",cep_sos
+lpv_sos=expect(variability,{"gaia_lpv_is_cstar":1,"gaia_lpv_frequency":0.004},"LPV","GAIA_DR3_SOS_LPV_CSTAR_CANDIDATE")
+assert lpv_sos["subtype"]=="C_STAR_CANDIDATE",lpv_sos
+
 expect(variability,{"best_class_name":"SN","best_class_score":0.93},"UNKNOWN","ROUTED_TO_PHENOMENON")
 expect(phenomenon,{"best_class_name":"SN","best_class_score":0.93},"SN","GAIA_DR3_SN_CANDIDATE")
 expect(phenomenon,{"best_class_name":"MICROLENSING","best_class_score":0.90},"MICROLENSING","GAIA_DR3_MICROLENSING_CANDIDATE")

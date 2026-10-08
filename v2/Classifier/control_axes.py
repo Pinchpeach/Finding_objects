@@ -13,7 +13,7 @@ def annotate(df:pd.DataFrame)->pd.DataFrame:
  modules={name:load_module(ROOT/"axes"/f"{name}.py",f"classifier_axis_{name}") for name in AXES};additions={}
  for name,module in modules.items():
   results=[module.classify(row) for _,row in df.iterrows()]
-  additions[f"{name}_class"]=[r["label"] for r in results];additions[f"{name}_confidence"]=[r["confidence"] for r in results];additions[f"{name}_status"]=[r["status"] for r in results];additions[f"{name}_evidence_json"]=[json.dumps(r["evidence"],ensure_ascii=False,separators=(",",":")) for r in results]
+  additions[f"{name}_class"]=[r["label"] for r in results];additions[f"{name}_subtype"]=[r.get("subtype") for r in results];additions[f"{name}_confidence"]=[r["confidence"] for r in results];additions[f"{name}_status"]=[r["status"] for r in results];additions[f"{name}_evidence_json"]=[json.dumps(r["evidence"],ensure_ascii=False,separators=(",",":")) for r in results]
  result=pd.concat([df.reset_index(drop=True),pd.DataFrame(additions)],axis=1)
  cal=load_module(ROOT/"calibration"/"per_axis.py","classifier_per_axis_calibration")
  return cal.annotate(result,ROOT/"calibration"/"models.json",AXES)

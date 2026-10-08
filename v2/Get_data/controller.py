@@ -14,7 +14,7 @@ GET_DATA = Path(__file__).resolve().parent
 DEFAULT_OUT = ROOT / "rawdata"
 
 COLLECTORS = [
-    "gaia_dr3", "sdss_dr18", "panstarrs1", "desi_legacy", "galex",
+    "gaia_dr3", "gaia_dr3_variability_sos_vizier", "sdss_dr18", "panstarrs1", "desi_legacy", "galex",
     "twomass", "allwise", "lotss", "first", "nvss", "vlass", "xmm",
     "chandra", "erosita", "sdss_spectroscopy", "desi_spectroscopy",
     "lamost_spectroscopy", "atnf_pulsar", "agb_suh2021", "simbad", "ned",
