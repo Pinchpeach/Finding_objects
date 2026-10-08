@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import importlib
 import importlib.util
 import sys
 import time
@@ -85,6 +86,28 @@ def _collect_one(name: str, ra: float, dec: float, radius_arcmin: float, out_dir
     return result
 
 
+# Imported once in the main thread before parallel collection: concurrent
+# first imports of astropy/astroquery fail ("partially initialized module").
+_SHARED_IMPORTS = (
+    "astropy", "astropy.units", "astropy.coordinates", "astropy.table", "requests", "pyvo",
+    "astroquery.vizier", "astroquery.gaia", "astroquery.sdss", "astroquery.simbad",
+    "astroquery.ipac.ned", "astroquery.heasarc", "astroquery.xmatch",
+)
+
+
+def _preload() -> None:
+    for name in _SHARED_IMPORTS:
+        try:
+            importlib.import_module(name)
+        except Exception as exc:  # a missing optional package only affects its collector
+            print(f"[preload] {name}: {exc!r}", flush=True)
+    for name in COLLECTORS:
+        try:
+            _load_collector(name)
+        except Exception as exc:
+            print(f"[preload] collector {name}: {exc!r}", flush=True)
+
+
 def collect_all(
     ra: float,
     dec: float,
@@ -106,6 +129,7 @@ def collect_all(
         results = [_collect_one(name, ra, dec, radius_arcmin, out_dir, tag) for name in COLLECTORS]
     else:
         from concurrent.futures import ThreadPoolExecutor
+        _preload()
         with ThreadPoolExecutor(max_workers=workers) as pool:
             results = list(pool.map(lambda n: _collect_one(n, ra, dec, radius_arcmin, out_dir, tag), COLLECTORS))
 

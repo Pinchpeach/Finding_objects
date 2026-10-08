@@ -15,6 +15,18 @@ SOURCE=["source_id","designation","ra","dec","ra_error","dec_error","parallax","
 AP=["teff_gspphot","logg_gspphot","mh_gspphot","distance_gspphot","ag_gspphot","ebpminrp_gspphot","mass_flame","age_flame","evolstage_flame","flags_flame","classprob_dsc_combmod_quasar","classprob_dsc_combmod_galaxy","classprob_dsc_combmod_star","classprob_dsc_combmod_whitedwarf","classprob_dsc_combmod_binarystar"]
 VAR_SUMMARY=["in_vari_classification_result","in_vari_rrlyrae","in_vari_cepheid","in_vari_long_period_variable","in_vari_eclipsing_binary","in_vari_rotation_modulation","in_vari_agn","in_vari_microlensing","in_vari_compact_companion"]
 
+# Wall-clock budgets: a slow Gaia archive previously held a field for ~26 min
+# in retries; past the budget the VizieR mirror fallback is used instead.
+BASE_TAP_BUDGET_S=120.0
+OPTIONAL_TAP_BUDGET_S=60.0
+
+def _bounded(fn,budget_s,*args):
+    from concurrent.futures import ThreadPoolExecutor,TimeoutError as _Timeout
+    ex=ThreadPoolExecutor(max_workers=1)
+    try:return ex.submit(fn,*args).result(timeout=budget_s)
+    except _Timeout as exc:raise TimeoutError(f"Gaia TAP exceeded {budget_s:.0f} s") from exc
+    finally:ex.shutdown(wait=False)
+
 def _tap(query:str,retries:int=4)->pd.DataFrame:
     from astroquery.gaia import Gaia
     last=None
@@ -34,7 +46,7 @@ def _merge_optional(base:pd.DataFrame,table:str,columns:list[str],status_name:st
     try:
         for start in range(0,len(ids),500):
             chunk=ids[start:start+500];select="source_id,"+",".join(columns)
-            pieces.append(_tap(f"SELECT {select} FROM {table} WHERE source_id IN ({','.join(chunk)})"))
+            pieces.append(_bounded(_tap,OPTIONAL_TAP_BUDGET_S,f"SELECT {select} FROM {table} WHERE source_id IN ({','.join(chunk)})"))
         opt=pd.concat(pieces,ignore_index=True,sort=False) if pieces else pd.DataFrame()
         if not opt.empty:
             opt["source_id"]=pd.to_numeric(opt["source_id"],errors="coerce").astype("Int64");base["source_id"]=pd.to_numeric(base["source_id"],errors="coerce").astype("Int64")
@@ -96,7 +108,7 @@ def fetch(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
     select=",".join(SOURCE)
     q=f"""SELECT {select} FROM gaiadr3.gaia_source WHERE 1=CONTAINS(POINT('ICRS',ra,dec),CIRCLE('ICRS',{float(ra)},{float(dec)},{float(radius_arcmin)/60.0}))"""
     try:
-        df=_tap(q);df["gaia_base_query_status"]="tap"
+        df=_bounded(_tap,BASE_TAP_BUDGET_S,q);df["gaia_base_query_status"]="tap"
         if not df.empty:
             df=_merge_optional(df,"gaiadr3.astrophysical_parameters",AP,"gaia_ap_query_status")
             df=_merge_optional(df,"gaiadr3.vari_classifier_result",["best_class_name","best_class_score"],"gaia_vari_classifier_query_status")
