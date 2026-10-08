@@ -25,7 +25,7 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install pandas numpy astropy astroquery
-      - run: python -u v2/benchmark/build_desi_truth.py --per-cell 150 --out /tmp/desi_truth.csv
+      - run: python -u v2/benchmark/build_desi_truth.py --per-cell 400 --out /tmp/desi_truth.csv
       - uses: actions/upload-artifact@v4
         with:
           name: desi-truth
@@ -39,7 +39,7 @@ jobs:
       matrix:
         catalog: [gaia_dr3, panstarrs1, allwise, twomass, galex, desi_legacy]
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 300
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
