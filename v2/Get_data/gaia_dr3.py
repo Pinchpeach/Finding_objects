@@ -21,11 +21,16 @@ BASE_TAP_BUDGET_S=120.0
 OPTIONAL_TAP_BUDGET_S=60.0
 
 def _bounded(fn,budget_s,*args):
-    from concurrent.futures import ThreadPoolExecutor,TimeoutError as _Timeout
-    ex=ThreadPoolExecutor(max_workers=1)
-    try:return ex.submit(fn,*args).result(timeout=budget_s)
-    except _Timeout as exc:raise TimeoutError(f"Gaia TAP exceeded {budget_s:.0f} s") from exc
-    finally:ex.shutdown(wait=False)
+    # Daemon thread: an abandoned slow query must not block interpreter exit.
+    import threading
+    box={}
+    def target():
+        try:box["value"]=fn(*args)
+        except BaseException as exc:box["error"]=exc
+    t=threading.Thread(target=target,daemon=True);t.start();t.join(budget_s)
+    if t.is_alive():raise TimeoutError(f"Gaia TAP exceeded {budget_s:.0f} s")
+    if "error" in box:raise box["error"]
+    return box["value"]
 
 def _tap(query:str,retries:int=4)->pd.DataFrame:
     from astroquery.gaia import Gaia
