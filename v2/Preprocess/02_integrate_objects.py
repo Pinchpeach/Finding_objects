@@ -3,17 +3,13 @@
 from __future__ import annotations
 import argparse, math, re
 from pathlib import Path
+import numpy as np
 import pandas as pd
 
 
 def prefix(catalog):
     s = re.sub(r"[^a-z0-9]+", "_", str(catalog).lower()).strip("_")
     return s[:32] or "catalog"
-
-
-def _first_valid(series):
-    values = series.dropna()
-    return values.iloc[0] if len(values) else pd.NA
 
 
 def elliptical_radius(ra, dec, ra0, dec0, d26_arcmin, pa_deg=None, ba=None):
@@ -59,45 +55,66 @@ def flag_large_galaxy_hosts(rows):
         r["host_large_galaxy"], r["host_elliptical_radius"] = best
 
 
+def _float(v):
+    try:
+        x = float(v)
+    except (TypeError, ValueError):
+        return float("nan")
+    return x
+
+
+def _first_valid_value(values):
+    for v in values:
+        if not pd.isna(v):
+            return v
+    return pd.NA
+
+
 def run(associations, raw_dir, out):
     assoc = pd.read_csv(associations, dtype={"catalog_object_id": "string"}, low_memory=False)
+    # Plain dict records: per-row pandas Series construction dominated runtime.
     raw_cache = {}
+    groups = {}
+    for a in assoc.to_dict("records"):
+        groups.setdefault(a["object_id"], []).append(a)
     rows = []
-    for oid, g in assoc.groupby("object_id", sort=False):
+    for oid, g in groups.items():
+        conf = [_float(a.get("association_confidence")) for a in g]
+        finite = [c for c in conf if c == c]
         rec = {
             "object_id": oid,
-            "ra": _first_valid(g["object_ra"]) if "object_ra" in g else g["ra"].mean(),
-            "dec": _first_valid(g["object_dec"]) if "object_dec" in g else g["dec"].mean(),
-            "ref_epoch": _first_valid(g["object_ref_epoch"]) if "object_ref_epoch" in g else pd.NA,
-            "anchor_catalog": _first_valid(g["object_anchor_catalog"]) if "object_anchor_catalog" in g else pd.NA,
-            "entity_kind": _first_valid(g["object_entity_kind"]) if "object_entity_kind" in g else "persistent_source",
+            "ra": _first_valid_value(a.get("object_ra") for a in g) if "object_ra" in assoc else sum(a["ra"] for a in g) / len(g),
+            "dec": _first_valid_value(a.get("object_dec") for a in g) if "object_dec" in assoc else sum(a["dec"] for a in g) / len(g),
+            "ref_epoch": _first_valid_value(a.get("object_ref_epoch") for a in g) if "object_ref_epoch" in assoc else pd.NA,
+            "anchor_catalog": _first_valid_value(a.get("object_anchor_catalog") for a in g) if "object_anchor_catalog" in assoc else pd.NA,
+            "entity_kind": _first_valid_value(a.get("object_entity_kind") for a in g) if "object_entity_kind" in assoc else "persistent_source",
             "association_members": len(g),
-            "association_ambiguous": int((g["association_status"] == "ambiguous_new").any()),
-            "association_confidence_min": pd.to_numeric(g.get("association_confidence"), errors="coerce").min(),
-            "association_confidence_mean": pd.to_numeric(g.get("association_confidence"), errors="coerce").mean(),
+            "association_ambiguous": int(any(a["association_status"] == "ambiguous_new" for a in g)),
+            "association_confidence_min": min(finite) if finite else float("nan"),
+            "association_confidence_mean": float(np.mean(finite)) if finite else float("nan"),
             "association_probability_calibrated": False,
-            "proper_motion_propagated_any": bool(g.get("proper_motion_propagated", pd.Series(False, index=g.index)).astype(bool).any()),
+            "proper_motion_propagated_any": any(bool(a.get("proper_motion_propagated", False)) for a in g),
         }
         catalogs = []
-        for _, a in g.iterrows():
+        for a in g:
             fn = a["input_file"]
             if fn not in raw_cache:
                 try:
-                    raw_cache[fn] = pd.read_csv(raw_dir / fn, dtype={"catalog_object_id": "string"}, low_memory=False)
+                    raw_cache[fn] = pd.read_csv(raw_dir / fn, dtype={"catalog_object_id": "string"}, low_memory=False).to_dict("records")
                 except Exception:
                     continue
             src = raw_cache[fn]
             idx = int(a["source_row"])
             if idx >= len(src):
                 continue
-            r = src.iloc[idx]
+            r = src[idx]
             cat = str(a["catalog"])
             catalogs.append(cat)
             pre = prefix(cat)
             rec[f"{pre}__catalog_object_id"] = a["catalog_object_id"]
-            rec[f"association_confidence__{pre}"] = pd.to_numeric(pd.Series([a.get("association_confidence")]), errors="coerce").iloc[0]
-            rec[f"association_separation_arcsec__{pre}"] = pd.to_numeric(pd.Series([a.get("match_separation_arcsec")]), errors="coerce").iloc[0]
-            rec[f"association_chance_probability__{pre}"] = pd.to_numeric(pd.Series([a.get("chance_probability")]), errors="coerce").iloc[0]
+            rec[f"association_confidence__{pre}"] = _float(a.get("association_confidence"))
+            rec[f"association_separation_arcsec__{pre}"] = _float(a.get("match_separation_arcsec"))
+            rec[f"association_chance_probability__{pre}"] = _float(a.get("chance_probability"))
             for col, val in r.items():
                 if col in {"catalog", "catalog_object_id", "object_name", "ra", "dec"}:
                     continue

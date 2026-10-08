@@ -61,11 +61,19 @@ def num(value: Any) -> float | None:
 
 
 def _first(row: Mapping[str, Any], keys: tuple[str, ...]) -> float | None:
-    low = {str(k).lower(): k for k in row.keys()}
+    """First finite value among ``keys`` (case-insensitive), in ``keys`` order."""
+    low = None
     for key in keys:
-        actual = low.get(key.lower())
-        if actual is None:
-            continue
+        if key in row:
+            actual = key
+        else:
+            # Built lazily: Stage-1 detection records use canonical keys, and
+            # rebuilding this map per call dominated association runtime.
+            if low is None:
+                low = {str(k).lower(): k for k in row.keys()}
+            actual = low.get(key.lower())
+            if actual is None:
+                continue
         value = num(row.get(actual))
         if value is not None:
             return value

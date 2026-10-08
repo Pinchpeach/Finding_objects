@@ -19,6 +19,51 @@ from association_model import (
 )
 
 AMBIG_SCORE_RATIO = 0.67
+# Spatial pre-selection.  Any accepted pair is within the larger profile cap
+# (<= 45 arcsec) after proper-motion propagation; the index searches that cap
+# plus PM_MARGIN_ARCSEC, and anchors that can move further than the margin
+# over MAX_EPOCH_SPAN_YR are always checked, so results equal a full scan.
+PM_MARGIN_ARCSEC = 10.0
+MAX_EPOCH_SPAN_YR = 45.0
+
+
+def _pm_shift_arcsec(det):
+    pmra, pmdec = det.get("pmra"), det.get("pmdec")
+    if pmra is None or pmdec is None or det.get("ref_epoch") is None:
+        return 0.0
+    return math.hypot(pmra, pmdec) * MAX_EPOCH_SPAN_YR / 1000.0
+
+
+class _SkyIndex:
+    """Uniform grid on unit-sphere Cartesian coordinates (no RA wrap/pole cases)."""
+
+    def __init__(self, cell_arcsec: float):
+        self.cell = math.radians(cell_arcsec / 3600.0)
+        self.cells: dict[tuple[int, int, int], set[int]] = {}
+        self.where: dict[int, tuple[int, int, int]] = {}
+
+    def _key(self, ra, dec):
+        r, d = math.radians(ra), math.radians(dec)
+        x, y, z = math.cos(d) * math.cos(r), math.cos(d) * math.sin(r), math.sin(d)
+        return (math.floor(x / self.cell), math.floor(y / self.cell), math.floor(z / self.cell))
+
+    def put(self, gi, ra, dec):
+        old = self.where.get(gi)
+        if old is not None:
+            self.cells[old].discard(gi)
+        key = self._key(ra, dec)
+        self.cells.setdefault(key, set()).add(gi)
+        self.where[gi] = key
+
+    def near(self, ra, dec, radius_arcsec):
+        n = max(1, math.ceil(math.radians(radius_arcsec / 3600.0) / self.cell))
+        kx, ky, kz = self._key(ra, dec)
+        out = set()
+        for i in range(kx - n, kx + n + 1):
+            for j in range(ky - n, ky + n + 1):
+                for k in range(kz - n, kz + n + 1):
+                    out |= self.cells.get((i, j, k), set())
+        return out
 
 
 def _density(frame: pd.DataFrame) -> float | None:
@@ -103,6 +148,18 @@ def run(raw_dir: Path, out: Path):
     # because its filename sorts earlier.
     detections.sort(key=lambda d: (*_anchor_key(d), str(d.get("catalog")), str(d.get("detection_id"))))
     groups, records = [], []
+    reach = max([float(d.get("max_radius_arcsec") or 5.0) for d in detections] + [5.0]) + PM_MARGIN_ARCSEC
+    index = _SkyIndex(reach)
+    fast_movers: set[int] = set()
+    alias_groups: dict[str, set[int]] = {}
+
+    def place(gi):
+        anchor = groups[gi]["anchor"]
+        index.put(gi, anchor["ra"], anchor["dec"])
+        if _pm_shift_arcsec(anchor) > PM_MARGIN_ARCSEC:
+            fast_movers.add(gi)
+        else:
+            fast_movers.discard(gi)
 
     for det in detections:
         # Time-domain events remain distinct from persistent host/catalog objects.
@@ -111,7 +168,12 @@ def run(raw_dir: Path, out: Path):
             candidates = []
         else:
             candidates = []
-            for gi, group in enumerate(groups):
+            nearby = index.near(det["ra"], det["dec"], reach + _pm_shift_arcsec(det))
+            nearby |= fast_movers
+            for alias in det.get("association_aliases") or ():
+                nearby |= alias_groups.get(alias, set())
+            for gi in sorted(nearby):
+                group = groups[gi]
                 if group["entity_kind"] == "transient_event" or det["catalog"] in group["catalogs"]:
                     continue
                 shared_aliases=set(det.get("association_aliases") or ()) & set(group.get("aliases") or ())
@@ -138,8 +200,11 @@ def run(raw_dir: Path, out: Path):
             group["catalogs"].add(det["catalog"])
             group["members"] += 1
             group["aliases"].update(det.get("association_aliases") or ())
+            for alias in det.get("association_aliases") or ():
+                alias_groups.setdefault(alias, set()).add(gi)
             if _anchor_key(det) < _anchor_key(group["anchor"]):
                 group["anchor"] = det
+                place(gi)
             status = "matched"
         else:
             oid = f"OBJ{len(groups)+1:06d}"
@@ -151,6 +216,9 @@ def run(raw_dir: Path, out: Path):
                 "entity_kind": det["entity_kind"],
                 "aliases": set(det.get("association_aliases") or ()),
             })
+            place(len(groups) - 1)
+            for alias in det.get("association_aliases") or ():
+                alias_groups.setdefault(alias, set()).add(len(groups) - 1)
             if candidates:
                 # Keep the best competing candidate's diagnostics, but the
                 # detection anchors its own object, so its own catalog evidence
