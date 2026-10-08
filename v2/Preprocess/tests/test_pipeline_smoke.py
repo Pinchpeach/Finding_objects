@@ -47,6 +47,8 @@ def test_evidence_applies_each_reliability_once(tmp_path):
     out = _run_pipeline(tmp_path)
     for raw in out.evidence_json:
         for ev in json.loads(raw):
+            if ev.get("kind") == "linear_feature":
+                continue
             expected = ev["raw_score"] * ev["reliability"] * ev["association_reliability"]
             assert math.isclose(ev["score"], expected, rel_tol=1e-9)
             assert ev["reliability"] <= 1.0 and ev["association_reliability"] <= 1.0

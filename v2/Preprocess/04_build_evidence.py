@@ -46,7 +46,7 @@ RAW_FIELDS={"parallax","parallax_error","pmra","pmra_error","pmdec","pmdec_error
   "class","zwarning","iMeanPSFMag","rMeanPSFMag","zMeanPSFMag","W1mag","W2mag","snr1","snr2",
   "type","clean","Type","otype","best_class_name","best_class_score",*DSC_MAP.values(),
   "flux_r","flux_ivar_r","flux_z","flux_ivar_z","catalog_object_id"}
-DERIVED_PREFIXES=("association_confidence__","catalog_confidence_","ps1_","catalogs")
+DERIVED_PREFIXES=("association_confidence__","catalog_confidence_","ps1_","ls_","catalogs")
 
 def _rule_columns(columns):
     return [c for c in columns if c.startswith(DERIVED_PREFIXES) or c.split("__",1)[-1] in RAW_FIELDS]
@@ -189,6 +189,16 @@ def evaluate(rule,row,namespaced=frozenset()):
                 emit(out,rule,"GALAXY",0.75,typ,"Legacy Surveys resolved Tractor model",reliability,association_reliability)
             elif rid=="LS-MORPH-002" and typ=="PSF":
                 emit(out,rule,"POINT_SOURCE",0.60,typ,"Legacy Surveys PSF model; stars and quasars both unresolved",reliability,association_reliability)
+    elif rid=="LS-COLOR-001":
+        # Continuous colour features for the fitted linear fusion; each colour
+        # comes with a presence indicator so a missing colour is not read as 0.
+        for name in ("g_r","r_z","z_w1","w1_w2"):
+            v=num(row,f"ls_{name}_color")
+            if v is not None:
+                out.append({"class":f"FEATURE:{name}","rule_id":rid,"value":max(-3.0,min(6.0,v)),"kind":"linear_feature",
+                            "origin":rule["threshold_origin"],"feature_group":rule["feature_group"],"note":"dereddened AB colour"})
+                out.append({"class":f"FEATURE:{name}_present","rule_id":rid,"value":1.0,"kind":"linear_feature",
+                            "origin":rule["threshold_origin"],"feature_group":rule["feature_group"],"note":"colour available"})
     elif rid=="SGA-001":
         if "SGA-2020" in str(row.get("catalogs","")).split("|"):
             emit(out,rule,"GALAXY",0.95,src.get("catalog_object_id"),"Siena Galaxy Atlas 2020 large galaxy",reliability,association_reliability)

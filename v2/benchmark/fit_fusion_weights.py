@@ -60,17 +60,27 @@ def ece(p,y,bins=10):
 
 def main():
     ap=argparse.ArgumentParser()
-    ap.add_argument("--truth",type=Path,required=True); ap.add_argument("--catalog-root",type=Path,required=True)
-    ap.add_argument("--manifest",type=Path,required=True); ap.add_argument("--out",type=Path,default=PRE/"fusion_weights.json")
+    # Several truth sets may be combined (same order in each list); each keeps
+    # its own deterministic train/calibration/test split and is reported apart.
+    ap.add_argument("--truth",type=Path,nargs="+",required=True); ap.add_argument("--catalog-root",type=Path,nargs="+",required=True)
+    ap.add_argument("--manifest",type=Path,nargs="+",required=True); ap.add_argument("--out",type=Path,default=PRE/"fusion_weights.json")
+    ap.add_argument("--drop-keys",nargs="*",default=[],help="evidence-key prefixes to exclude (ablation)")
     ap.add_argument("--min-support",type=int,default=30)
     ap.add_argument("--target-accuracy",type=float,default=0.95,help="calibration-split accuracy the abstention threshold must reach")
     a=ap.parse_args()
     from sklearn.linear_model import LogisticRegression
     from sklearn.metrics import log_loss
     s5=load(PRE/"05_likelihood_vectors.py","s5")
-    truth=pd.read_csv(a.truth); manifest=pd.read_csv(a.manifest)
-    ev=evidence_table(truth,a.catalog_root).merge(manifest[["benchmark_id","truth_class","split"]],on="benchmark_id")
+    if not len(a.truth)==len(a.catalog_root)==len(a.manifest): ap.error("--truth/--catalog-root/--manifest counts differ")
+    parts=[]
+    for t,root,man in zip(a.truth,a.catalog_root,a.manifest):
+        e=evidence_table(pd.read_csv(t),root).merge(pd.read_csv(man)[["benchmark_id","truth_class","split"]],on="benchmark_id")
+        e["dataset"]=t.parent.name; parts.append(e)
+    ev=pd.concat(parts,ignore_index=True)
     X,keys,kinds,used=design(ev,s5); y=ev.truth_class.to_numpy()
+    if a.drop_keys:
+        dropped=np.array([any(k.startswith(p) for p in a.drop_keys) for k in keys])
+        X[:,dropped]=0.0
     tr=ev.split.eq("train").to_numpy(); ca=ev.split.eq("calibration").to_numpy(); te=ev.split.eq("test").to_numpy()
     support=(X[tr]!=0).sum(axis=0); keep=support>=a.min_support
     Xk=X[:,keep]; kept=[k for k,m in zip(keys,keep) if m]
@@ -87,8 +97,8 @@ def main():
       "intercept":{c:float(m.intercept_[order[i]]) for i,c in enumerate(CLASSES)},
       "coef":coef,"min_margin":0.0,
       "training_prior":{c:float((y[fit_rows]==c).mean()) for c in CLASSES},
-      "semantics":"multinomial-logistic probability fitted on a class-balanced SDSS spectroscopic benchmark (equal priors); evidence keys without training support use prior weights",
-      "provenance":{"benchmark":str(a.truth.relative_to(V2.parent)) if a.truth.is_absolute() and a.truth.is_relative_to(V2.parent) else str(a.truth),
+      "semantics":"multinomial-logistic probability fitted on class-balanced spectroscopic benchmarks (equal priors); evidence keys without training support use prior weights",
+      "provenance":{"benchmarks":[str(t) for t in a.truth],"dropped_keys":a.drop_keys,
         "train_rows":int(fit_rows.sum()),"calibration_rows":int((ca&used).sum()),"C":C,"calibration_log_loss":float(ll),
         "min_support":a.min_support,"support":{k:int(s) for k,s in zip(keys,support)},
         "prior_weight_keys":[k for k,mk in zip(keys,keep) if not mk]}}
@@ -104,11 +114,15 @@ def main():
     model["min_confidence"]=ok[0]["threshold"] if ok else 0.9
     model["provenance"]["calibration_curve"]=curve
     model["provenance"]["target_calibration_accuracy"]=a.target_accuracy
-    pte=probs(te); yte=y[te]; ute=used[te]
-    conf=pte.max(axis=1); pred=np.array(CLASSES)[pte.argmax(axis=1)]; cl=ute&(conf>=model["min_confidence"])
-    test={"rows":int(te.sum()),"classified":int(cl.sum()),"coverage":float(cl.mean()),
+    test={}
+    for name in ev.dataset.unique():
+        mask=te&ev.dataset.eq(name).to_numpy()
+        pte=probs(mask); yte=y[mask]; ute=used[mask]
+        conf=pte.max(axis=1); pred=np.array(CLASSES)[pte.argmax(axis=1)]; cl=ute&(conf>=model["min_confidence"])
+        test[name]={"rows":int(mask.sum()),"classified":int(cl.sum()),"coverage":float(cl.mean()),
           "accuracy_when_classified":float((pred[cl]==yte[cl]).mean()),
           "accuracy_all_unknown_wrong":float((np.where(cl,pred,"UNKNOWN")==yte).mean()),
+          "recall":{c:float((pred[yte==c]==c).mean()) for c in CLASSES},
           "log_loss_used":float(log_loss(yte[ute],pte[ute][:,np.argsort(CLASSES)],labels=sorted(CLASSES))),
           "expected_calibration_error":ece(pte[ute],yte[ute]),
           "accuracy_by_threshold":coverage_curve(pte,yte,ute,(0.5,0.6,0.7,0.8,0.9,0.95))}
