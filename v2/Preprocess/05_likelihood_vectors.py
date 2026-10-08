@@ -45,10 +45,22 @@ def evidence_features(items):
             continue
         if c in {"WD","BINARY"}: c="STAR"
         if c not in GROUPS and c not in CLASSES: continue
-        try: s=min(max(float(e.get("score",0)),.01),.99)
+        # Reliability discounts the evidence in log-odds space: weight x
+        # logit(raw score).  Folding it into the score instead (logit of
+        # raw x reliability) turns an unreliable claim into strong evidence
+        # *against* the class (a resolved Tractor model with near-zero
+        # association reliability gave p_star = 1.00 for galaxies).
+        try:
+            raw=e.get("raw_score")
+            if raw is not None:
+                r=min(max(float(raw),.01),.99)
+                rel=float(e.get("reliability",1.0) if e.get("reliability") is not None else 1.0)*float(e.get("association_reliability",1.0) if e.get("association_reliability") is not None else 1.0)
+                v=max(0.0,min(1.0,rel))*math.log(r/(1-r))
+            else:
+                s=min(max(float(e.get("score",0)),.01),.99); v=math.log(s/(1-s))
         except (TypeError,ValueError): continue
         key=f"{e.get('rule_id')}:{c}"
-        x[key]=x.get(key,0.0)+math.log(s/(1-s)); kinds[key]=e.get("kind")
+        x[key]=x.get(key,0.0)+v; kinds[key]=e.get("kind")
     return x,kinds
 
 def prior_coef(key,kind):

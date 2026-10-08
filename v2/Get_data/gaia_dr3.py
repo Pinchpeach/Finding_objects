@@ -17,7 +17,9 @@ VAR_SUMMARY=["in_vari_classification_result","in_vari_rrlyrae","in_vari_cepheid"
 
 # Wall-clock budgets: a slow Gaia archive previously held a field for ~26 min
 # in retries; past the budget the VizieR mirror fallback is used instead.
-BASE_TAP_BUDGET_S=120.0
+# From CI runners the ESA TAP rarely answers a cone search within 2 min while
+# VizieR answers in seconds, so the base budget is short.
+BASE_TAP_BUDGET_S=30.0
 OPTIONAL_TAP_BUDGET_S=60.0
 
 def _bounded(fn,budget_s,*args):
@@ -93,6 +95,18 @@ def _vizier_fallback(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
         out[new]=src[col] if col is not None else pd.NA
     out["source_id"]=pd.to_numeric(out["source_id"],errors="coerce").astype("Int64")
     out["designation"]="Gaia DR3 "+out["source_id"].astype("string")
+    # Gaia DSC-Combmod class probabilities (astrophysical-parameter table).
+    try:
+        dsc={"PQSO":"classprob_dsc_combmod_quasar","PGal":"classprob_dsc_combmod_galaxy","Pstar":"classprob_dsc_combmod_star",
+             "PWD":"classprob_dsc_combmod_whitedwarf","Pbin":"classprob_dsc_combmod_binarystar"}
+        pt=Vizier(columns=["Source",*dsc],row_limit=-1).query_region(c,radius=float(radius_arcmin)*u.arcmin,catalog="I/355/paramp")
+        ap=pt[0].to_pandas() if pt else pd.DataFrame()
+        if not ap.empty and "Source" in ap.columns:
+            ap=ap[["Source",*[k for k in dsc if k in ap.columns]]].rename(columns={"Source":"source_id",**dsc})
+            ap["source_id"]=pd.to_numeric(ap["source_id"],errors="coerce").astype("Int64")
+            out=out.merge(ap.drop_duplicates("source_id"),on="source_id",how="left")
+    except Exception:
+        pass
     # Independent variability table fallback. A cone query is cheap for named-source validation.
     try:
         vt=Vizier(columns=["**"],row_limit=-1).query_region(c,radius=float(radius_arcmin)*u.arcmin,catalog="I/358/vclassre")

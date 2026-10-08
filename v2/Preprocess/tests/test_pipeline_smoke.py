@@ -192,3 +192,15 @@ def test_color_knn_same_colour_subset_and_leave_one_out():
     # neighbour with z-W1 is "c" (GALAXY).
     g = color_knn.class_fractions(obj.iloc[[0]].assign(ls_z_w1_color=-1.0), ref, k=1, ids=["a"])
     assert g[0].argmax() == 1
+
+
+def test_unreliable_evidence_is_weak_not_contrary():
+    mod = _load("05_likelihood_vectors")
+    model = {"classes": ["STAR", "GALAXY", "QSO"], "intercept": {"STAR": 0, "GALAXY": 0, "QSO": 0},
+             "coef": {"LS-MORPH-001:GALAXY": {"STAR": -2.0, "GALAXY": 2.0, "QSO": 0.0}}}
+    item = {"rule_id": "LS-MORPH-001", "class": "GALAXY", "kind": "binary_evidence", "raw_score": 0.75,
+            "reliability": 1.0, "association_reliability": 0.001, "score": 0.00075}
+    p, _ = mod.fuse([item], model)
+    assert abs(p["STAR"] - p["GALAXY"]) < 0.01      # ~no evidence, not "not a galaxy"
+    p, _ = mod.fuse([dict(item, association_reliability=1.0, score=0.75)], model)
+    assert p["GALAXY"] > 0.8
