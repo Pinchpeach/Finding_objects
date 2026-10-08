@@ -18,17 +18,14 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install pandas astropy astroquery
-      - name: Inspect V/161 (DESI DR1 redshift catalog)
+      - name: Inspect Gaia DR3 DSC columns (I/355/paramp)
         run: |
           python - <<'PY'
           from astroquery.vizier import Vizier
-          from astropy.coordinates import SkyCoord
-          import astropy.units as u
-          t=Vizier(columns=["**"],row_limit=5).get_catalogs("V/161")
+          t=Vizier(columns=["**"],row_limit=3).get_catalogs("I/355/paramp")
           for tab in t:
-              print(tab.meta.get("name"), len(tab)); print(tab.colnames)
-              for c in tab.colnames: print("  ",c,tab[c].unit,"|",tab[c].description)
-              print(tab[:3])
-          r=Vizier(columns=["**"],row_limit=20).query_region(SkyCoord(150.1*u.deg,2.2*u.deg),radius=2*u.arcmin,catalog="V/161")
-          print(r)
+              print(tab.meta.get("name"), tab.colnames)
+              for c in tab.colnames:
+                  if c.startswith("P") or "DSC" in (tab[c].description or "") or c in ("Source","RA_ICRS","DE_ICRS"):
+                      print("  ",c,"|",tab[c].description)
           PY
