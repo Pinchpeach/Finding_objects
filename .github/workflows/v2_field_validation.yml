@@ -48,6 +48,14 @@ jobs:
           # Standard DESI good-redshift cuts for the comparison truth.
           s=s[pd.to_numeric(s.get("desi_dr1_spectroscopy__ZWARN"),errors="coerce").eq(0)&(pd.to_numeric(s.get("desi_dr1_spectroscopy__delChi2"),errors="coerce")>25)]
           s=s[s.truth.isin(["STAR","GALAXY","QSO"])]
+          # Never score objects that are in the benchmark truth sets: they may
+          # be in the colour-kNN reference or the fusion training split.
+          import numpy as np
+          bench=pd.concat([pd.read_csv(f)[["ra","dec"]] for f in ("v2/benchmark/desi_external/truth.csv","v2/benchmark/truth_data/ground_truth.csv")])
+          ora=pd.to_numeric(s.get("object_ra",s.get("ra")),errors="coerce").to_numpy(); ode=pd.to_numeric(s.get("object_dec",s.get("dec")),errors="coerce").to_numpy()
+          near=bench[(abs(bench.dec-np.nanmedian(ode))<0.2)]
+          inb=np.array([((np.hypot((near.ra-r)*np.cos(np.radians(d)),near.dec-d)*3600)<1.5).any() if np.isfinite(r) else False for r,d in zip(ora,ode)])
+          print("benchmark objects excluded from scoring:",int(inb.sum())); s=s[~inb]
           print("objects with DESI spectra:",len(s))
           print(pd.crosstab(s.truth,s.primary_class,margins=True).to_string())
           c=s.primary_class.ne("UNKNOWN")
