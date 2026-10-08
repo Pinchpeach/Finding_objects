@@ -232,3 +232,47 @@ SGA-2020 D26 ellipse and are reported as `WITHIN_LARGE_GALAXY` (disk
 fragments are not classified as independent objects); the galaxy itself is
 the SGA-2020 object, classified GALAXY. Host status now takes precedence over
 `NO_EVIDENCE` (e.g. Legacy Surveys `DUP` sources inside the galaxy).
+
+## Faint galaxies without morphology: colour-space kNN + missing-feature training
+
+Three more real fields (RA 245/+43, 250/+30, 20/0) showed GALAXY→STAR errors
+that the benchmarks did not: 7, 9 and 7 objects respectively, **before** the
+field-prior EM step too (EM was not the cause). Their evidence: faint
+(r ≈ 22.8–24.3) emission-line galaxies, below the S/N 10 Tractor morphology
+cut, carrying only Legacy Surveys colours (g−r ≈ 0–0.3, r−z ≈ 0.6–0.8).
+
+Cause: in both benchmarks almost every galaxy has a morphology measurement,
+so the linear colour terms were fitted *given* morphology and learned
+"red point source = star". With morphology evidence removed from the test
+split the previous model recalled **8% (SDSS) / 2% (DESI) of galaxies**.
+
+Changes:
+
+1. `LS-CKNN-001` (Stage 4, `color_knn.py`): Laplace-smoothed STAR/GALAXY/QSO
+   fractions among the k = 31 nearest **train-split** benchmark objects measured
+   in the same (≥ 2) dereddened Legacy Surveys colours — kNN classification in
+   colour space (Ball et al. 2006) follows the curved stellar locus (Covey et
+   al. 2007) and the galaxy/QSO mid-IR excess (Zhou et al. 2023; Chaussidon et
+   al. 2023) that a linear model cannot. Missing colours are never imputed;
+   fitting uses leave-one-out. Reference: `color_reference.csv.gz`
+   (8,651 objects; `v2/benchmark/build_color_reference.py`).
+2. Missing-feature augmentation in `fit_fusion_weights.py`
+   (`--augment-drop LS-MORPH PS1-MORPH SDSS-PHOTO --augment-weight 0.3`): every
+   train object with morphology also appears (weight 0.3) without it.
+3. Abstention threshold chosen so that **each** dataset's calibration split
+   reaches 92.5% (`--target-scope each`); the pooled target let the large
+   bright SDSS set hide faint-object errors. `min_confidence` = 0.63.
+4. Stage 5 applies the fitted intercept only when a fitted feature is present;
+   NED `*` is used as POINT_SOURCE evidence (photometric, unresolved label).
+
+| test split (CI evaluator, incl. CONFLICT abstention) | before | after |
+|---|---:|---:|
+| SDSS accuracy / coverage | 97.9% / 99% | 98.6% / 96.4% |
+| DESI (r ≤ 23) accuracy / coverage | 87.8% / 93.9% | 92.8% / 86.6% |
+| DESI log-loss (fit report) | 0.391 | 0.29 |
+| DESI argmax accuracy **without morphology** | 54% | 86% |
+| SDSS argmax accuracy **without morphology** | 66% | 94% |
+
+At matched coverage (90%) the new model is 90.8% vs ≈ 89.9% accurate on DESI;
+the larger gain is robustness for objects lacking morphology, which dominate
+faint real fields.
