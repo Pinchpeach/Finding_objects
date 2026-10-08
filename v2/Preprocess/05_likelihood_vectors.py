@@ -70,7 +70,12 @@ def fuse(items,model=None):
     logit={c:float((model or {}).get("intercept",{}).get(c,0.0)) if fitted else 0.0 for c in CLASSES}
     used=0
     for key,v in x.items():
-        w=coef.get(key) or prior_coef(key,kinds[key])
+        w=coef.get(key)
+        if w is None:
+            # Unfitted rules are one-sided support: a low-confidence claim
+            # (e.g. a catalogue label with poor association reliability) is
+            # weak support, not evidence against the class.
+            w=prior_coef(key,kinds[key]); v=max(v,0.0)
         for t in CLASSES: logit[t]+=w.get(t,0.0)*v
         # A continuous feature without a fitted weight carries no evidence.
         used+=int(kinds[key]!="linear_feature" or key in coef)

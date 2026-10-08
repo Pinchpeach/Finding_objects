@@ -78,6 +78,8 @@ jobs:
           a=pd.read_csv("/tmp/field/source_association.csv",low_memory=False)
           print("\n== association status by catalog"); print(pd.crosstab(a.catalog,a.association_status).to_string())
           import glob, numpy as np
+          print(pd.read_csv(glob.glob("/tmp/field/raw/collection_summary_*.csv")[0])[["collector","status","rows","elapsed_seconds"]].to_string(index=False))
+          if not glob.glob("/tmp/field/raw/desi_legacy_*.csv"): raise SystemExit("Legacy Surveys collection failed in this run")
           ls=pd.read_csv(glob.glob("/tmp/field/raw/desi_legacy_*.csv")[0],low_memory=False)
           ds=pd.read_csv(glob.glob("/tmp/field/raw/desi_spectroscopy_*.csv")[0],low_memory=False)
           print("\nLS rows",len(ls),"DESI rows",len(ds), "LS release values", ls.get("release",pd.Series()).value_counts().head().to_dict())

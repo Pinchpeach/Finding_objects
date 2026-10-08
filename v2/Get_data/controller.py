@@ -47,7 +47,13 @@ def _tag(ra: float, dec: float, radius_arcmin: float) -> str:
     return f"ra{clean(ra)}_dec{clean(dec)}_r{clean(radius_arcmin)}arcmin"
 
 
-def _collect_one(name: str, ra: float, dec: float, radius_arcmin: float, out_dir: Path, tag: str) -> dict:
+# Wall-time budget per archive.  Several services (TAP in particular) can
+# hang without a socket timeout; one stuck archive must not stall the run.
+COLLECTOR_BUDGET_S = 300.0
+
+
+def _collect_one(name: str, ra: float, dec: float, radius_arcmin: float, out_dir: Path, tag: str,
+                 cancelled=None) -> dict:
     started = time.monotonic()
     output = out_dir / f"{name}_{tag}.csv"
     try:
@@ -57,6 +63,8 @@ def _collect_one(name: str, ra: float, dec: float, radius_arcmin: float, out_dir
             df = pd.DataFrame()
         if not isinstance(df, pd.DataFrame):
             df = pd.DataFrame(df)
+        if cancelled is not None and cancelled.is_set():
+            raise TimeoutError(f"{name} finished after the {COLLECTOR_BUDGET_S:.0f} s budget; result discarded")
 
         module.save(df, output)
         if not output.exists():
@@ -108,12 +116,49 @@ def _preload() -> None:
             print(f"[preload] collector {name}: {exc!r}", flush=True)
 
 
+def _run_bounded(job, names, workers: int, budget_s: float) -> list[dict]:
+    """Run ``job(name, cancelled_event)`` for each name on at most ``workers``
+    daemon threads; a job over ``budget_s`` is reported as a timeout and its
+    slot reused (the thread cannot be killed, but its late result is dropped)."""
+    import threading
+    results: dict[str, dict] = {}
+    pending = list(names)
+    running: dict[str, tuple[threading.Thread, float, threading.Event]] = {}
+
+    def target(name, event):
+        out = job(name, event)
+        results.setdefault(name, out)  # a late result never replaces the timeout record
+
+    while pending or running:
+        while pending and len(running) < max(1, workers):
+            name = pending.pop(0)
+            event = threading.Event()
+            thread = threading.Thread(target=target, args=(name, event), daemon=True)
+            running[name] = (thread, time.monotonic(), event)
+            thread.start()
+        now = time.monotonic()
+        for name, (thread, t0, event) in list(running.items()):
+            if not thread.is_alive():
+                del running[name]
+            elif now - t0 > budget_s:
+                event.set()
+                del running[name]
+                results[name] = {"collector": name, "status": "timeout", "rows": 0,
+                                 "elapsed_seconds": round(now - t0, 3), "output_file": "",
+                                 "error": f"exceeded {budget_s:.0f} s collector budget"}
+                print(f"[{name}] timeout: abandoned after {budget_s:.0f} s", flush=True)
+        if running:
+            time.sleep(0.2)
+    return [results[n] for n in names]
+
+
 def collect_all(
     ra: float,
     dec: float,
     radius_arcmin: float,
     out_dir: Path = DEFAULT_OUT,
     workers: int = 1,
+    budget_s: float = COLLECTOR_BUDGET_S,
 ) -> pd.DataFrame:
     """Run every collector; ``workers`` > 1 queries archives concurrently.
 
@@ -125,13 +170,10 @@ def collect_all(
     out_dir.mkdir(parents=True, exist_ok=True)
     tag = _tag(ra, dec, radius_arcmin)
     started = time.monotonic()
-    if workers <= 1:
-        results = [_collect_one(name, ra, dec, radius_arcmin, out_dir, tag) for name in COLLECTORS]
-    else:
-        from concurrent.futures import ThreadPoolExecutor
+    if workers > 1:
         _preload()
-        with ThreadPoolExecutor(max_workers=workers) as pool:
-            results = list(pool.map(lambda n: _collect_one(n, ra, dec, radius_arcmin, out_dir, tag), COLLECTORS))
+    results = _run_bounded(lambda n, c: _collect_one(n, ra, dec, radius_arcmin, out_dir, tag, c),
+                           COLLECTORS, workers, budget_s)
 
     summary = pd.DataFrame(results)
     summary_path = out_dir / f"collection_summary_{tag}.csv"
