@@ -45,6 +45,8 @@ jobs:
           col="desi_dr1_spectroscopy__OType"
           if col not in d.columns: raise SystemExit("no DESI spectra in this field")
           s=d[d[col].notna()].copy(); s["truth"]=s[col].astype(str).str.strip()
+          # Standard DESI good-redshift cuts for the comparison truth.
+          s=s[pd.to_numeric(s.get("desi_dr1_spectroscopy__ZWARN"),errors="coerce").eq(0)&(pd.to_numeric(s.get("desi_dr1_spectroscopy__delChi2"),errors="coerce")>25)]
           s=s[s.truth.isin(["STAR","GALAXY","QSO"])]
           print("objects with DESI spectra:",len(s))
           print(pd.crosstab(s.truth,s.primary_class,margins=True).to_string())

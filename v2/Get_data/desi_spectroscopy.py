@@ -15,6 +15,8 @@ def fetch(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
  idc="TargetID";rac="RAICRS";dcc="DEICRS"
  if idc not in df.columns:raise KeyError("identifier column missing: "+idc)
  if "ZCAT_PRIM" in df.columns: df=df[pd.to_numeric(df["ZCAT_PRIM"],errors="coerce").eq(1)]
+ # OBJTYPE: keep science targets; SKY/BAD fibres sample blank sky, not objects.
+ if "Type" in df.columns: df=df[df["Type"].astype(str).str.strip().eq("TGT")]
  df=df.copy()
  df.insert(0,"catalog",CATALOG);df.insert(1,"catalog_object_id",df[idc].astype("string"));df.insert(2,"object_name",CATALOG+" "+df["catalog_object_id"].astype("string"))
  df.insert(3,"ra",pd.to_numeric(df[rac],errors="coerce"));df.insert(4,"dec",pd.to_numeric(df[dcc],errors="coerce"))
