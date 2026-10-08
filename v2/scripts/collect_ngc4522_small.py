@@ -23,7 +23,7 @@ modules = [
     "gaia_dr3", "sdss_dr18", "panstarrs1", "desi_legacy", "galex",
     "twomass", "allwise", "lotss", "first", "nvss", "vlass", "xmm",
     "chandra", "erosita", "sdss_spectroscopy", "desi_spectroscopy",
-    "lamost_spectroscopy", "simbad", "ned",
+    "lamost_spectroscopy", "sga2020", "simbad", "ned",
 ]
 
 summary = []

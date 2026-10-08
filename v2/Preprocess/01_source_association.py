@@ -151,20 +151,26 @@ def run(raw_dir: Path, out: Path):
                 "entity_kind": det["entity_kind"],
                 "aliases": set(det.get("association_aliases") or ()),
             })
-            match = candidates[0][3] if candidates else {
-                "separation_arcsec": None,
-                "comparison_epoch": None,
-                "proper_motion_propagated": False,
-                "propagation_direction": "none",
-                "combined_sigma_arcsec": None,
-                "match_radius_arcsec": None,
-                "normalized_separation": None,
-                "positional_likelihood": None,
-                "chance_probability": None,
-                "association_score": 1.0 if not ambiguous else 0.0,
-                "association_method": "new_source",
-                "shared_aliases": "",
-            }
+            if candidates:
+                # Keep the best competing candidate's diagnostics, but the
+                # detection anchors its own object, so its own catalog evidence
+                # is fully its own; the ambiguity is recorded in the status.
+                match = {**candidates[0][3], "association_score": 1.0, "association_method": "new_source_ambiguous"}
+            else:
+                match = {
+                    "separation_arcsec": None,
+                    "comparison_epoch": None,
+                    "proper_motion_propagated": False,
+                    "propagation_direction": "none",
+                    "combined_sigma_arcsec": None,
+                    "match_radius_arcsec": None,
+                    "normalized_separation": None,
+                    "positional_likelihood": None,
+                    "chance_probability": None,
+                    "association_score": 1.0,
+                    "association_method": "new_source",
+                    "shared_aliases": "",
+                }
             status = "ambiguous_new" if ambiguous else ("event_new" if det["entity_kind"] == "transient_event" else "new")
 
         confidence = match.get("association_score")
