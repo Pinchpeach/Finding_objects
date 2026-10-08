@@ -265,14 +265,26 @@ Changes:
 4. Stage 5 applies the fitted intercept only when a fitted feature is present;
    NED `*` is used as POINT_SOURCE evidence (photometric, unresolved label).
 
-| test split (CI evaluator, incl. CONFLICT abstention) | before | after |
-|---|---:|---:|
-| SDSS accuracy / coverage | 97.9% / 99% | 98.6% / 96.4% |
-| DESI (r ≤ 23) accuracy / coverage | 87.8% / 93.9% | 92.8% / 86.6% |
-| DESI log-loss (fit report) | 0.391 | 0.29 |
-| DESI argmax accuracy **without morphology** | 54% | 86% |
-| SDSS argmax accuracy **without morphology** | 66% | 94% |
+5. `PS1-CKNN-001`: the same kNN on Pan-STARRS1 PSF colours (g−r, r−i, i−z,
+   z−y; each colour only at error ≤ 0.2 mag). PS1 covers Dec > −30°, including
+   fields outside the Legacy Surveys footprint and runs where the Data Lab TAP
+   service fails (it did for every field run on the afternoon of 2026-10-08).
+   A second augmentation group drops all `LS-` evidence. kNN fractions are
+   soft evidence and never trigger `CONFLICT` (Stage 4 and Stage 5).
+6. Evidence keys without fitted weights (SIMBAD/NED labels, …) are one-sided
+   support in Stage 5: a low-confidence label is weak support, not evidence
+   against its class (a NED "G" at score 0.03 had produced p_star = 0.99).
 
-At matched coverage (90%) the new model is 90.8% vs ≈ 89.9% accurate on DESI;
-the larger gain is robustness for objects lacking morphology, which dominate
-faint real fields.
+| test split (CI evaluator, incl. CONFLICT abstention) | before (morning) | after |
+|---|---:|---:|
+| SDSS accuracy / coverage | 97.9% / 99% | **99.0% / 98.2%** |
+| DESI (r ≤ 23) accuracy / coverage | 87.8% / 93.9% | **92.3% / 91.5%** |
+| DESI log-loss (fit report) | 0.391 | 0.288 |
+| DESI argmax accuracy **without morphology** | 54% | 86% |
+| SDSS argmax accuracy **without morphology** | 66% | 98% |
+| SDSS / DESI argmax accuracy **without any Legacy Surveys evidence** | – | 98% / 64% |
+
+Fit: `fit_fusion_weights.py --augment-drop LS-MORPH,PS1-MORPH,SDSS-PHOTO LS-
+--augment-weight 0.3 --target-scope each --target-accuracy 0.925`
+(`min_confidence` 0.60). Without Legacy Surveys the faint DESI objects
+(r ≈ 22–23) are near the PS1 detection limit, hence the lower 64%.
