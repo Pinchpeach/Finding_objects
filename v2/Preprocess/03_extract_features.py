@@ -97,6 +97,23 @@ def run(objects:Path,rules_path:Path,out:Path)->Path:
         if e1 is not None and e2 is not None and col is not None:
             ce=np.sqrt(e1*e1+e2*e2)
             derived[f"ps1_{b1}_{b2}_color_err"]=ce
+    # Legacy Surveys DR10 dereddened AB colours (Dey+2019): grz Tractor fluxes
+    # and unWISE forced W1/W2, in nanomaggies (m = 22.5 - 2.5 log10 f).  Quasars
+    # are separated from stars by their mid-IR excess (z-W1, W1-W2) and blue
+    # optical colours (Chaussidon+2023).  A band enters a colour only at S/N>=3.
+    ls=lambda n: field("desi_legacy_surveys_dr10",n)
+    def ls_mag(band):
+        f,iv,t=ls(f"flux_{band}"),ls(f"flux_ivar_{band}"),ls(f"mw_transmission_{band}")
+        if not f or not iv: return None
+        flux=pd.to_numeric(df[f],errors="coerce"); ivar=pd.to_numeric(df[iv],errors="coerce")
+        trans=pd.to_numeric(df[t],errors="coerce").where(lambda x:x>0) if t else 1.0
+        ok=(flux>0)&(flux*np.sqrt(ivar.clip(lower=0))>=3)
+        return (22.5-2.5*np.log10((flux/trans).where(ok))).where(ok)
+    ls_mags={b:ls_mag(b) for b in ("g","r","z","w1","w2")}
+    for b1,b2 in (("g","r"),("r","z"),("z","w1"),("w1","w2")):
+        if ls_mags[b1] is not None and ls_mags[b2] is not None:
+            derived[f"ls_{b1}_{b2}_color"]=ls_mags[b1]-ls_mags[b2]
+
     # WISE Vega colours and propagated errors.
     wise=lambda n: field("allwise",n)
     if wise("W1mag") and wise("W2mag"):

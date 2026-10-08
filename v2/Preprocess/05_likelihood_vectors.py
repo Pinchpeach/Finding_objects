@@ -37,6 +37,12 @@ def evidence_features(items):
     x={}; kinds={}
     for e in items:
         c=e.get("class")
+        if e.get("kind")=="linear_feature":
+            # Continuous feature (e.g. a colour): enters the model linearly and
+            # carries weight only when a fitted model provides one.
+            try: x[f"{e.get('rule_id')}:{c}"]=float(e.get("value")); kinds[f"{e.get('rule_id')}:{c}"]="linear_feature"
+            except (TypeError,ValueError): pass
+            continue
         if c in {"WD","BINARY"}: c="STAR"
         if c not in GROUPS and c not in CLASSES: continue
         try: s=min(max(float(e.get("score",0)),.01),.99)
@@ -46,6 +52,7 @@ def evidence_features(items):
     return x,kinds
 
 def prior_coef(key,kind):
+    if kind=="linear_feature": return {t:0.0 for t in CLASSES}
     c=key.rsplit(":",1)[1]; w=WEIGHT.get(kind,.25)
     return {t:(w if t in GROUPS.get(c,(c,)) else 0.0) for t in CLASSES}
 
@@ -57,11 +64,14 @@ def fuse(items,model=None):
     x,kinds=evidence_features(items)
     coef=(model or {}).get("coef",{})
     logit={c:float((model or {}).get("intercept",{}).get(c,0.0)) for c in CLASSES}
+    used=0
     for key,v in x.items():
         w=coef.get(key) or prior_coef(key,kinds[key])
         for t in CLASSES: logit[t]+=w.get(t,0.0)*v
+        # A continuous feature without a fitted weight carries no evidence.
+        used+=int(kinds[key]!="linear_feature" or key in coef)
     m=max(logit.values()); p={c:math.exp(v-m) for c,v in logit.items()}; z=sum(p.values())
-    return {c:p[c]/z for c in CLASSES},len(x)
+    return {c:p[c]/z for c in CLASSES},used
 
 def _gaia_foreground_star(items):
     """Significant Gaia parallax or proper motion (S/N >= 5; Stage-4 score >= 0.5)."""
