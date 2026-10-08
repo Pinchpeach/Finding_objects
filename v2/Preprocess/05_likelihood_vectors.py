@@ -22,6 +22,10 @@ MIN_CONFIDENCE=.50; MIN_MARGIN=.10
 # galaxies from quasars; POINT_SOURCE (unresolved morphology) cannot separate
 # stars from quasars. Together they single out QSO.
 GROUPS={"EXTRAGALACTIC":("GALAXY","QSO"),"POINT_SOURCE":("STAR","QSO")}
+# Inside a large galaxy's D26 ellipse, survey detections are mostly pieces of
+# that galaxy (HII regions, arms) rather than independent objects; only a
+# Gaia-confirmed foreground star is classified there.
+HOST_RADIUS=1.0
 MODEL_PATH=Path(__file__).resolve().parent/"fusion_weights.json"
 
 def evidence_features(items):
@@ -55,13 +59,18 @@ def fuse(items,model=None):
     m=max(logit.values()); p={c:math.exp(v-m) for c,v in logit.items()}; z=sum(p.values())
     return {c:p[c]/z for c in CLASSES},len(x)
 
+def _gaia_foreground_star(items):
+    """Significant Gaia parallax or proper motion (S/N >= 5; Stage-4 score >= 0.5)."""
+    return any(e.get("rule_id") in {"AST-GAL-001","AST-GAL-002"} and float(e.get("raw_score",0))>=0.5 for e in items)
+
 def run(evidence,out,model_path=MODEL_PATH):
     model=load_model(model_path)
     min_conf=float(model.get("min_confidence",MIN_CONFIDENCE)) if model else MIN_CONFIDENCE
     min_margin=float(model.get("min_margin",MIN_MARGIN)) if model else MIN_MARGIN
     df=pd.read_csv(evidence,low_memory=False); vectors=[]; labels=[]; confidence=[]; margins=[]; statuses=[]; best_candidates=[]; best_candidate_scores=[]
     raw_series=df["evidence_json"] if "evidence_json" in df else pd.Series(["[]"]*len(df))
-    for raw in raw_series:
+    host_r=pd.to_numeric(df["host_elliptical_radius"],errors="coerce") if "host_elliptical_radius" in df else pd.Series(float("nan"),index=df.index)
+    for raw,hr in zip(raw_series,host_r):
         try: items=json.loads(raw) if isinstance(raw,str) else []
         except (json.JSONDecodeError,TypeError): items=[]
         p,used=fuse(items,model); order=sorted(p,key=p.get,reverse=True); conf=p[order[0]]; margin=conf-p[order[1]]
@@ -76,6 +85,7 @@ def run(evidence,out,model_path=MODEL_PATH):
         if used==0: label="UNKNOWN"; status="NO_EVIDENCE"
         elif conflict: label="UNKNOWN"; status="CONFLICT"
         elif conf<min_conf or margin<min_margin: label="UNKNOWN"; status="LOW_CONFIDENCE"
+        elif hr<HOST_RADIUS and not _gaia_foreground_star(items): label="UNKNOWN"; status="WITHIN_LARGE_GALAXY"
         else: label=order[0]; status="CLASSIFIED"
         vectors.append(p); labels.append(label); confidence.append(conf); margins.append(margin); statuses.append(status)
         if status=="NO_EVIDENCE": best_candidates.append("UNKNOWN"); best_candidate_scores.append(float("nan"))

@@ -8,7 +8,6 @@ on:
       - 'v2/benchmark/truth_data/ground_truth.csv'
       - 'v2/benchmark/validate_catalog_truth.py'
       - 'v2/benchmark/train_validate_classifier.py'
-      - 'v2/benchmark/evaluate_rule_baseline.py'
       - 'v2/Get_data/*.py'
       - '.github/workflows/build-catalog-truth-features.yml'
   workflow_dispatch:
@@ -17,6 +16,10 @@ on:
         description: 'Targets per class (blank = all truth objects)'
         required: false
         default: ''
+concurrency:
+  group: build-catalog-truth-features-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   collect:
     strategy:

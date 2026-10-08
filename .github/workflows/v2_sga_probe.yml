@@ -28,7 +28,9 @@ jobs:
           import astropy.units as u
           t=Vizier(columns=["**"],row_limit=5).query_region(SkyCoord(188.4155*u.deg,9.1751*u.deg),radius=3*u.arcmin,catalog="J/ApJS/269/3")
           print(t)
-          for tab in t: print(tab.colnames); print(tab[:3])
+          for tab in t:
+              print(tab["Name","D25-LEDA","D26","r_D26","PA","b/a","SMA-Moment","SMASB25","SMASB26"])
+              for c in ("D25-LEDA","D26","SMA-Moment","SMASB26"): print(c, tab[c].unit, tab[c].description)
           PY
       - name: Collector on NGC 4522 field
         working-directory: v2/Get_data

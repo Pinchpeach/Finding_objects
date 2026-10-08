@@ -46,6 +46,8 @@ PROFILES = {
     "ASAS-SN Supernova Catalog": SurveyProfile(2000.0, 1.0, None, 5.0, "transient_event"),
     "Asiago Supernova Catalog": SurveyProfile(2000.0, 1.0, None, 5.0, "transient_event"),
     "Acker PN Spectroscopy": SurveyProfile(2000.0, 2.0, None, 8.0),
+    # SGA-2020 centres come from Legacy Surveys ellipse fits of large galaxies.
+    "SGA-2020": SurveyProfile(None, 1.0, None, 5.0),
 }
 DEFAULT_PROFILE = SurveyProfile(None, 0.6, None, 5.0)
 

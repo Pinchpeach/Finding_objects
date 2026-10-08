@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Stage 2: build one-row-per-object records from Stage-1 associations."""
 from __future__ import annotations
-import argparse, re
+import argparse, math, re
 from pathlib import Path
 import pandas as pd
 
@@ -14,6 +14,49 @@ def prefix(catalog):
 def _first_valid(series):
     values = series.dropna()
     return values.iloc[0] if len(values) else pd.NA
+
+
+def elliptical_radius(ra, dec, ra0, dec0, d26_arcmin, pa_deg=None, ba=None):
+    """Distance from a galaxy centre in units of its D26 semi-major axis.
+
+    PA is measured from North through East (SGA-2020 convention); a missing
+    PA or axis ratio falls back to a circle.
+    """
+    dx = ((ra - ra0 + 180.0) % 360.0 - 180.0) * math.cos(math.radians(dec0)) * 60.0  # arcmin, East
+    dy = (dec - dec0) * 60.0  # arcmin, North
+    a = d26_arcmin / 2.0
+    if a <= 0:
+        return float("inf")
+    if pa_deg is None or ba is None or not (0 < ba <= 1):
+        return math.hypot(dx, dy) / a
+    t = math.radians(pa_deg)
+    major = dx * math.sin(t) + dy * math.cos(t)
+    minor = dx * math.cos(t) - dy * math.sin(t)
+    return math.hypot(major / a, minor / (a * ba))
+
+
+def _num(v):
+    try:
+        x = float(v)
+        return x if math.isfinite(x) else None
+    except (TypeError, ValueError):
+        return None
+
+
+def flag_large_galaxy_hosts(rows):
+    """Mark objects inside an SGA-2020 D26 ellipse that are not that galaxy."""
+    hosts = [(r["object_id"], r["ra"], r["dec"], _num(r.get("sga_d26_arcmin")), _num(r.get("sga_pa_deg")),
+              _num(r.get("sga_ba")), r.get("sga_2020__catalog_object_id"))
+             for r in rows if "SGA-2020" in str(r.get("catalogs", "")).split("|")]
+    for r in rows:
+        best = (None, None)
+        for oid, ra0, dec0, d26, pa, ba, name in hosts:
+            if oid == r["object_id"] or d26 is None or _num(r["ra"]) is None:
+                continue
+            q = elliptical_radius(float(r["ra"]), float(r["dec"]), float(ra0), float(dec0), d26, pa, ba)
+            if best[1] is None or q < best[1]:
+                best = (name, q)
+        r["host_large_galaxy"], r["host_elliptical_radius"] = best
 
 
 def run(associations, raw_dir, out):
@@ -75,6 +118,7 @@ def run(associations, raw_dir, out):
                     rec[col] = r[col]
         rec["catalogs"] = "|".join(sorted(set(catalogs)))
         rows.append(rec)
+    flag_large_galaxy_hosts(rows)
     df = pd.DataFrame(rows)
     out.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(out, index=False)

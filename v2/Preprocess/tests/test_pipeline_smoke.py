@@ -109,3 +109,34 @@ def test_64bit_identifiers_survive_association(tmp_path):
     ids = set(pd.read_csv(a, dtype={"catalog_object_id": str}).catalog_object_id)
     assert {"3796442680948579328", "3796442680948579329"} <= ids
     assert "nan" not in ids
+
+
+def test_detections_inside_large_galaxy_abstain(tmp_path):
+    import sys
+    sys.path.insert(0, str(ROOT))
+    raw = tmp_path / "raw"
+    raw.mkdir()
+    ra0, dec0 = 150.0, 2.0
+    # SGA galaxy: D26 = 4 arcmin, major axis North-South (PA 0), b/a = 0.5.
+    pd.DataFrame([{"catalog": "SGA-2020", "catalog_object_id": "SGA1", "object_name": "NGC X", "ra": ra0, "dec": dec0,
+                   "sga_d26_arcmin": 4.0, "sga_pa_deg": 0.0, "sga_ba": 0.5}]).to_csv(raw / "sga.csv", index=False)
+    east = lambda arcmin: ra0 + arcmin / 60.0 / math.cos(math.radians(dec0))
+    pd.DataFrame([
+        # 1.5' North: inside (major semi-axis 2').  1.5' East: outside (minor semi-axis 1').
+        {"catalog": "SIMBAD", "catalog_object_id": "in", "object_name": "in", "ra": ra0, "dec": dec0 + 1.5 / 60, "otype": "*"},
+        {"catalog": "SIMBAD", "catalog_object_id": "out", "object_name": "out", "ra": east(1.5), "dec": dec0, "otype": "*"},
+    ]).to_csv(raw / "simbad.csv", index=False)
+    a, i, f, e, l = (tmp_path / n for n in ("a.csv", "i.csv", "f.csv", "e.csv", "l.csv"))
+    _load("01_source_association").run(raw, a)
+    _load("02_integrate_objects").run(a, raw, i)
+    _load("03_extract_features").run(i, RULES, f)
+    _load("04_build_evidence").run(f, RULES, e)
+    _load("05_likelihood_vectors").run(e, l)
+    out = pd.read_csv(l).set_index("simbad__catalog_object_id", drop=False)
+    assert math.isclose(out.loc["in", "host_elliptical_radius"], 0.75, rel_tol=1e-3)
+    assert math.isclose(out.loc["out", "host_elliptical_radius"], 1.5, rel_tol=1e-3)
+    assert out.loc["in", "classification_status"] == "WITHIN_LARGE_GALAXY"
+    assert out.loc["out", "primary_class"] == "STAR"
+    host = pd.read_csv(l)
+    host = host[host.catalogs.str.contains("SGA-2020", regex=False)].iloc[0]
+    assert host.primary_class == "GALAXY"
