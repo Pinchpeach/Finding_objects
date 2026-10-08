@@ -52,6 +52,13 @@ jobs:
           print(pd.crosstab(s.truth,s.primary_class,margins=True).to_string())
           c=s.primary_class.ne("UNKNOWN")
           print(f"coverage={c.mean():.3f} accuracy_when_classified={(s.primary_class==s.truth)[c].mean():.3f}")
+          if "field_prior_star" in d.columns:
+              print("field prior (EM):", {k:round(float(d[f"field_prior_{k}"].iloc[0]),3) for k in ("star","galaxy","qso")}, "adjusted:", bool(d.coarse_prior_adjusted.iloc[0]))
+              P=s[["p_star_training_prior","p_galaxy_training_prior","p_qso_training_prior"]].to_numpy()
+              pred=pd.Series(["STAR","GALAXY","QSO"]).iloc[P.argmax(1)].to_numpy()
+              ok=s.classification_status.isin(["CLASSIFIED","LOW_CONFIDENCE"]).to_numpy()
+              print("training-prior argmax on the same objects:"); print(pd.crosstab(s.truth[ok],pred[ok]).to_string())
+              print(f"training-prior accuracy={(pred[ok]==s.truth.to_numpy()[ok]).mean():.3f}")
           import json
           print("\n== catalogs of NO_EVIDENCE objects"); print(d[d.classification_status.eq("NO_EVIDENCE")].catalogs.value_counts().head(12).to_string())
           print("\n== DESI-spectra objects left UNKNOWN")
