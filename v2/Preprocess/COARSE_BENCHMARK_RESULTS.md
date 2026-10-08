@@ -331,3 +331,23 @@ the fitted fusion is below p = 0.99: held-out benchmark conflicts with
 p ≥ 0.99 were 19/19 correct. The threshold was read off the
 calibration+test conflicts (n = 55), so treat the small gain as indicative:
 SDSS coverage 98.4% → 98.7%, DESI 91.7% → 91.9%, accuracy unchanged.
+
+### Independent check on fields not used for any tuning
+
+All fixes above were driven by errors in the three fields of the previous
+table, so three further fields were run afterwards with no changes
+(objects in the benchmark truth sets excluded from scoring):
+
+| field (radius) | DESI objects | accuracy when classified | coverage |
+|---|---:|---:|---:|
+| RA 150, Dec +2 (COSMOS, 3′) | 76 | **98.4%** (61/62) | 81.6% |
+| RA 35, Dec −5 (4′) | 46 | **97.6%** (41/42) | 91.3% |
+| RA 185, Dec +30 (4′) | 0 | (no DESI spectra in the field) | – |
+| pooled | 122 | **98.1%** (102/104) | 85.2% |
+
+The COSMOS error is a z = 1.5 DESI "galaxy" at r = 24.4 coincident with a
+Gaia source of 73σ proper motion (Gaia DSC star 1.0, NED WD*): a blend
+where the classifier follows the dominant star. Most unscored objects are
+DESI spectra that Stage 1 could not attach unambiguously in crowded fields
+(`ambiguous_new`, no photometric evidence) — a coverage, not accuracy,
+limitation.
