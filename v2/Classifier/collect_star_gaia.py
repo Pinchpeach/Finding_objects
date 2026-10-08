@@ -45,7 +45,7 @@ def run(truth_path:Path,out:Path,max_sep_arcsec:float=2.0,min_matches:int=500):
                               pd.to_numeric(xm.dec,errors="coerce"))
     xm=xm[pd.to_numeric(xm["_sep_arcsec"],errors="coerce")<=max_sep_arcsec]
     xm=xm.sort_values(["benchmark_id","_sep_arcsec"]).drop_duplicates("benchmark_id")
-    meta=truth[["benchmark_id","star_truth_class","truth_source","truth_quality"]]
+    meta=truth[[c for c in ("benchmark_id","star_truth_class","truth_source","truth_quality","origin_class") if c in truth.columns]]
     outdf=meta.merge(xm,on="benchmark_id",how="inner")
     out.parent.mkdir(parents=True,exist_ok=True); outdf.to_csv(out,index=False)
     cov=len(outdf)/len(truth)

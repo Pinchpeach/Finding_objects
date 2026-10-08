@@ -22,20 +22,55 @@ def _text(row,key):
     s=str(v).strip()
     return None if not s or s.lower()=="nan" else s
 
-def _wd_hr_signal(row):
-    """Gentile Fusillo+2021 broad Gaia WD-locus signal.
+def corrected_excess_factor(c,bp_rp):
+    """Riello+2021 (A&A 649, A3) Eq. 6 / Table 2: C* = C - f(BP-RP)."""
+    x=bp_rp
+    if x<0.5: f=1.154360+0.033772*x+0.032277*x*x
+    elif x<4.0: f=1.162004+0.011464*x+0.049255*x*x-0.005879*x**3
+    else: f=1.057572+0.140537*x
+    return c-f
 
-    Returns True/False only when the literature cut is directly usable;
-    otherwise returns None. This is candidate evidence, not a subtype.
+def sigma_corrected_excess(g):
+    """Riello+2021 Eq. 18: 1-sigma C* scatter of well-behaved isolated sources."""
+    return 0.0059898+8.817481e-12*g**7.618399
+
+# HR-locus quality gates.  "broad" is the Gentile Fusillo+2021 (MNRAS 508,
+# 3877) first-stage preselection (parallax_over_error > 1), which they follow
+# with quality cuts and a probability map; it is not itself a WD selection.
+# The stricter gates add their parallax-significance branch
+# (parallax_over_error >= 4) and Riello+2021 photometric consistency |C*|.
+HR_GATES={
+    "broad":{"min_parallax_over_error":1.0},
+    "plx4":{"min_parallax_over_error":4.0},
+    "plx4_cstar3":{"min_parallax_over_error":4.0,"max_cstar_sigma":3.0},
+    "plx4_cstar5":{"min_parallax_over_error":4.0,"max_cstar_sigma":5.0},
+    "plx4_cstar5_ruwe":{"min_parallax_over_error":4.0,"max_cstar_sigma":5.0,"max_ruwe":1.4},
+}
+DEFAULT_HR_GATE="broad"
+
+def _wd_hr_signal(row,gate=None):
+    """Gaia HR WD-locus signal: M_G > 6 + 5(BP-RP) (Gentile Fusillo+2021).
+
+    Returns True/False only when the cut is usable under the quality gate;
+    otherwise None (abstain).  This is candidate evidence, not a subtype.
     """
+    cfg=HR_GATES[gate or DEFAULT_HR_GATE]
     p=_num(row,"parallax"); pe=_num(row,"parallax_error")
     g=_num(row,"phot_g_mean_mag")
     color=_num(row,"bp_rp")
     if color is None:
         bp=_num(row,"phot_bp_mean_mag"); rp=_num(row,"phot_rp_mean_mag")
         if bp is not None and rp is not None: color=bp-rp
-    if None in (p,pe,g,color) or p<=0 or pe<=0 or p/pe<=1:
+    if None in (p,pe,g,color) or p<=0 or pe<=0 or p/pe<=cfg["min_parallax_over_error"]:
         return None
+    if "max_cstar_sigma" in cfg:
+        c=_num(row,"phot_bp_rp_excess_factor")
+        if c is None or abs(corrected_excess_factor(c,color))>cfg["max_cstar_sigma"]*sigma_corrected_excess(g):
+            return None
+    if "max_ruwe" in cfg:
+        ruwe=_num(row,"ruwe")
+        if ruwe is None or ruwe>cfg["max_ruwe"]:
+            return None
     abs_g=g+5*math.log10(p)-10
     return bool(abs_g > 6 + 5*color)
 

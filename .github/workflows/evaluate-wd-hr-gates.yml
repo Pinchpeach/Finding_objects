@@ -1,0 +1,55 @@
+name: Evaluate WD HR-locus gates
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - v2/Classifier/branches/star.py
+      - v2/Classifier/evaluate_wd_hr_gates.py
+      - .github/workflows/evaluate-wd-hr-gates.yml
+
+concurrency:
+  group: evaluate-wd-hr-gates-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pandas numpy astropy astroquery
+      - name: Build mixed-class contamination truth (SDSS STAR/GALAXY/QSO)
+        run: |
+          python - <<'PY'
+          import pandas as pd
+          d=pd.read_csv("v2/benchmark/truth_data/ground_truth.csv")
+          wd=d["class"].eq("STAR")&d.subclass.fillna("").str.startswith("WD")
+          d["star_truth_class"]=wd.map({True:"WHITE_DWARF",False:"NON_WD"})
+          d["origin_class"]=d["class"]
+          d.to_csv("/tmp/mixed_truth.csv",index=False)
+          print(d.star_truth_class.value_counts().to_string())
+          PY
+      - name: Crossmatch truth sets to Gaia DR3
+        run: |
+          python v2/Classifier/collect_star_gaia.py --truth v2/Classifier/star_truth.csv --out /tmp/sdss_star.csv
+          python v2/Classifier/collect_star_gaia.py --truth v2/Classifier/lamost_star_external_truth.csv --out /tmp/lamost_star.csv
+          python v2/Classifier/collect_star_gaia.py --truth /tmp/mixed_truth.csv --out /tmp/mixed.csv --min-matches 100
+      - name: Evaluate gates
+        run: |
+          python v2/Classifier/evaluate_wd_hr_gates.py --out /tmp/wd_hr_gates.json \
+            --features sdss_star=/tmp/sdss_star.csv lamost_external=/tmp/lamost_star.csv sdss_mixed_classes=/tmp/mixed.csv
+          cat /tmp/wd_hr_gates.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wd-hr-gates
+          path: |
+            /tmp/wd_hr_gates.json
+            /tmp/mixed.csv
+          retention-days: 30
