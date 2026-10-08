@@ -84,8 +84,18 @@ prior weight is untested here.
 
 ### Field class priors (label shift)
 
-The fitted weights assume the benchmark's equal class priors. Stage 5 now
-re-estimates each field's class mix with the EM procedure of Saerens, Latinne
+> **Update (2026-10-08 evening): the adjustment is now opt-in**
+> (`--field-prior` in Stage 5 / `v2/pipeline.py`); the estimate is still
+> reported in `field_prior_*`. EM assumes pure label shift with calibrated
+> posteriors, but real fields also shift *which evidence exists* (depth,
+> footprint, archive outages). On five DESI-checked real fields the adjusted
+> labels were less accurate than the training-prior ones in four (e.g.
+> 0.833 vs 0.947 at RA 20°, Dec 0° without Legacy Surveys, where the estimate
+> was dominated by bright PS1 stars). The simulation below holds only under
+> pure label shift.
+
+The fitted weights assume the benchmark's equal class priors. Stage 5 can
+re-estimate each field's class mix with the EM procedure of Saerens, Latinne
 & Decaestecker (2002, Neural Computation 14, 21) when a fitted model is present
 and at least 50 objects have evidence outside large-galaxy hosts, and
 rescales the posteriors accordingly (`field_prior_*`, `p_*_training_prior`,
