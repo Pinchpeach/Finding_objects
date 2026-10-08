@@ -35,7 +35,8 @@ def _load(path: Path, name: str):
 
 
 def run(work: Path, raw_dir: Path | None = None, ra: float | None = None, dec: float | None = None,
-        radius: float | None = None, min_confidence: float | None = None, workers: int = 6) -> pd.DataFrame:
+        radius: float | None = None, min_confidence: float | None = None, workers: int = 6,
+        field_prior: bool = False) -> pd.DataFrame:
     work = Path(work)
     work.mkdir(parents=True, exist_ok=True)
     timings = []
@@ -66,7 +67,7 @@ def run(work: Path, raw_dir: Path | None = None, ra: float | None = None, dec: f
     step("2_integrate", s2.run, work / "source_association.csv", Path(raw_dir), work / "integrated_objects.csv")
     step("3_features", s3.run, work / "integrated_objects.csv", rules, work / "features.csv")
     step("4_evidence", s4.run, work / "features.csv", rules, work / "evidence.csv")
-    step("5_coarse", s5.run, work / "evidence.csv", work / "likelihood_vectors.csv", s5.MODEL_PATH, min_confidence)
+    step("5_coarse", s5.run, work / "evidence.csv", work / "likelihood_vectors.csv", s5.MODEL_PATH, min_confidence, field_prior)
     step("6_prepare", prep.run, work / "likelihood_vectors.csv", work / "classifier_input.csv")
     step("7_classify", control.run, work / "classifier_input.csv", work / "classified_objects.csv")
 
@@ -89,12 +90,14 @@ def main():
                    help="coarse abstention threshold; higher = fewer but more reliable labels "
                         "(e.g. 0.8: ~94%% accuracy at ~73%% coverage on faint DESI objects)")
     p.add_argument("--workers", type=int, default=6, help="parallel archive queries during collection")
+    p.add_argument("--field-prior", action="store_true",
+                   help="re-weight coarse classes by this field's EM-estimated class mix (off by default)")
     a = p.parse_args()
     if a.raw_dir is None and None in (a.ra, a.dec, a.radius):
         p.error("give --raw-dir, or all of --ra/--dec/--radius")
     if a.radius is not None and a.radius <= 0:
         p.error("--radius must be > 0")
-    run(a.work, a.raw_dir, a.ra, a.dec, a.radius, a.min_confidence, max(1, a.workers))
+    run(a.work, a.raw_dir, a.ra, a.dec, a.radius, a.min_confidence, max(1, a.workers), a.field_prior)
 
 
 if __name__ == "__main__":

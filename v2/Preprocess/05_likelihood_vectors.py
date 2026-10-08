@@ -100,7 +100,7 @@ def estimate_field_prior(P,train_prior,iters=200,tol=1e-7):
         if done: break
     return pi
 
-def run(evidence,out,model_path=MODEL_PATH,min_confidence=None):
+def run(evidence,out,model_path=MODEL_PATH,min_confidence=None,field_prior=False):
     model=load_model(model_path)
     min_conf=float(model.get("min_confidence",MIN_CONFIDENCE)) if model else MIN_CONFIDENCE
     if min_confidence is not None: min_conf=float(min_confidence)  # caller trades coverage for precision
@@ -130,9 +130,15 @@ def run(evidence,out,model_path=MODEL_PATH,min_confidence=None):
     # enough independent objects in the field to estimate the class mix.
     eligible=np.array([used>0 and not conflict and not in_host for _,used,conflict,in_host in rows],dtype=bool)
     train_prior=[float((model or {}).get("training_prior",{}).get(c,1/len(CLASSES))) for c in CLASSES]
-    adjust=bool(model) and int(eligible.sum())>=FIELD_PRIOR_MIN_OBJECTS
-    prior=estimate_field_prior(P[eligible],train_prior) if adjust else np.array(train_prior)
-    Q=P*prior/np.array(train_prior); Q=Q/Q.sum(axis=1,keepdims=True) if len(Q) else Q
+    # The EM estimate assumes pure label shift with calibrated posteriors.
+    # Real fields also shift which evidence exists (depth, footprint, archive
+    # outages), and on five DESI-checked fields applying it lowered accuracy
+    # in four; it is therefore estimated and reported, but applied only on
+    # request (``field_prior=True``).
+    estimable=bool(model) and int(eligible.sum())>=FIELD_PRIOR_MIN_OBJECTS
+    prior=estimate_field_prior(P[eligible],train_prior) if estimable else np.array(train_prior)
+    adjust=estimable and bool(field_prior)
+    Q=P*(prior if adjust else np.array(train_prior))/np.array(train_prior); Q=Q/Q.sum(axis=1,keepdims=True) if len(Q) else Q
     labels=[]; confidence=[]; margins=[]; statuses=[]; best_candidates=[]; best_candidate_scores=[]
     for q,(_,used,conflict,in_host) in zip(Q,rows):
         order=np.argsort(-q); conf=float(q[order[0]]); margin=conf-float(q[order[1]]); top=CLASSES[order[0]]
@@ -166,11 +172,13 @@ def run(evidence,out,model_path=MODEL_PATH,min_confidence=None):
     })
     df=pd.concat([df,pd.DataFrame(result_columns,index=df.index)],axis=1)
     out.parent.mkdir(parents=True,exist_ok=True); df.to_csv(out,index=False)
-    print(f"[OK] {len(df)} sources -> {out}"+(f"; field prior {dict(zip(CLASSES,(round(float(x),3) for x in prior)))}" if adjust else "")); return out
+    print(f"[OK] {len(df)} sources -> {out}"+(f"; field prior estimate {dict(zip(CLASSES,(round(float(x),3) for x in prior)))}"
+          +(" (applied)" if adjust else " (not applied)") if estimable else "")); return out
 
 def main():
     root=Path(__file__).resolve().parent; p=argparse.ArgumentParser()
     p.add_argument("--evidence",type=Path,default=root/"evidence.csv"); p.add_argument("--out",type=Path,default=root/"likelihood_vectors.csv")
     p.add_argument("--min-confidence",type=float,help="override the abstention threshold (see COARSE_BENCHMARK_RESULTS.md for coverage/accuracy)")
-    a=p.parse_args(); run(a.evidence,a.out,min_confidence=a.min_confidence)
+    p.add_argument("--field-prior",action="store_true",help="apply the EM field class-prior re-estimate (Saerens+2002) to the labels")
+    a=p.parse_args(); run(a.evidence,a.out,min_confidence=a.min_confidence,field_prior=a.field_prior)
 if __name__=="__main__": main()
