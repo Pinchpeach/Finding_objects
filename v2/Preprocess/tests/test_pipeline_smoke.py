@@ -155,3 +155,18 @@ def test_field_prior_em_recovers_class_mix():
     keep = np.concatenate([rng.choice(np.where(y == c)[0], n, replace=False) for c, n in enumerate((7000, 2000, 1000))])
     pi = mod.estimate_field_prior(P[keep], [1 / 3, 1 / 3, 1 / 3])
     assert np.allclose(pi, [0.7, 0.2, 0.1], atol=0.03)
+
+
+def test_one_command_pipeline_on_committed_field(tmp_path):
+    import shutil
+    raw = tmp_path / "raw"
+    raw.mkdir()
+    for f in RAW.glob("*_ra188p4155_dec9p1751_r0p5arcmin.csv"):
+        shutil.copy(f, raw / f.name)
+    spec = importlib.util.spec_from_file_location("v2_pipeline", ROOT.parent / "pipeline.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    out = mod.run(tmp_path / "work", raw_dir=raw)
+    assert len(out) > 0
+    assert {"primary_class", "physical_class", "variability_class", "classification_status"} <= set(out.columns)
+    assert (tmp_path / "work" / "pipeline_summary.csv").exists()
