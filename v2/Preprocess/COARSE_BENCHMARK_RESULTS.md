@@ -101,3 +101,18 @@ objects per draw, 20 draws):
 
 This corrects class-mix shift only; a field that is also fainter than the
 SDSS spectroscopic benchmark (covariate shift) is not corrected by it.
+
+### Accuracy by magnitude (test split, PS1 Kron r)
+
+| r | n | coverage | accuracy when classified |
+|---|---:|---:|---:|
+| < 17 | 372 | 99.5% | 97.8% |
+| 17–18 | 686 | 98.8% | 97.8% |
+| 18–19 | 430 | 99.3% | 97.4% |
+| 19–20 | 378 | 100% | 98.4% |
+| 20–21 | 96 | 100% | 91.7% |
+| > 21 | 9 | – | too few to measure |
+
+The SDSS benchmark validates the coarse classifier only to r ≈ 20; accuracy
+starts to drop at 20–21 and fainter sources are untested. A deeper,
+SDSS-independent truth set (DESI DR1) is the next validation step.
