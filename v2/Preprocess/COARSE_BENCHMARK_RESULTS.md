@@ -196,3 +196,33 @@ DESI coverage/accuracy by threshold: 0.7 → 83% / 92.7%, 0.8 → 73% / 94.2%,
 (50 of 318): at r ≈ 21–22 blue stars (e.g. white dwarfs, hot subdwarfs) share
 quasars' optical colours and lack Gaia astrometry. Variability or deeper
 UV/IR data would be needed to separate them.
+
+## Real-field end-to-end check (collection + association + classification)
+
+`.github/workflows/v2_field_validation.yml` runs `v2/pipeline.py` on a field
+outside the DESI truth-set sky windows (RA 245°, Dec +43°, r = 3′) and compares
+coarse classes with the DESI DR1 spectra found in the field (DESI spectra are
+not classification evidence). The benchmarks never exercised field-wide
+association; this check exposed three catalog-hygiene problems:
+
+1. DESI DR1 rows included **sky fibres** (OBJTYPE=SKY) at blank positions.
+2. **Pan-STARRS1** MeanObject returned ~4× more rows than the deeper Legacy
+   Surveys catalog; single-detection rows (spurious/moving; STScI recommends
+   nDetections ≥ 2) duplicated real sources.
+3. **Catalog-internal duplicates** (several DESI TARGETIDs per object; SDSS
+   secondary detections, mode 2).
+
+Because one object can hold only one row per catalog, duplicates either
+became evidence-less objects or made Stage-1 matches "ambiguous", splitting
+the DESI, LS and PS1 detections of one object apart.
+
+| | before | after collector fixes |
+|---|---:|---:|
+| objects in field | 2,516 | 723 |
+| NO_EVIDENCE | 72% | 25% |
+| coverage of DESI-spectroscopic objects | 57% | 88% |
+| accuracy when classified (n = 42) | 84% | 86.5% |
+| wall time (collect / classify) | 127 s / 13 s | 130 s / 4 s |
+
+Remaining unclassified DESI objects are r ≈ 24 sources below the colour
+(S/N ≥ 3) and morphology (S/N ≥ 10) limits.
