@@ -71,3 +71,25 @@ def test_proper_motion_star_rule_is_quality_gated():
     })
     (ev,) = mod.evaluate(rule, row)
     assert math.isclose(ev["score"], ev["raw_score"] * 0.25)
+
+
+def test_same_named_fields_do_not_cross_catalogs(tmp_path):
+    """DESI Legacy and SDSS PhotoObj both publish ``type``; rules must read SDSS's."""
+    import sys
+    sys.path.insert(0, str(ROOT))
+    raw = tmp_path / "raw"
+    raw.mkdir()
+    base = {"ra": 150.0, "dec": 2.0}
+    pd.DataFrame([{**base, "catalog": "DESI Legacy Surveys DR10", "catalog_object_id": "ls1",
+                   "object_name": "ls1", "type": "PSF"}]).to_csv(raw / "desi_legacy_t.csv", index=False)
+    pd.DataFrame([{**base, "catalog": "SDSS DR18 PhotoObj", "catalog_object_id": "1237", "object_name": "s1",
+                   "type": 3, "clean": 1}]).to_csv(raw / "sdss_dr18_t.csv", index=False)
+    a, i, f, e = (tmp_path / n for n in ("a.csv", "i.csv", "f.csv", "e.csv"))
+    _load("01_source_association").run(raw, a)
+    _load("02_integrate_objects").run(a, raw, i)
+    integrated = pd.read_csv(i)
+    assert len(integrated) == 1 and integrated.loc[0, "type"] == "PSF"  # legacy bare name: first wins
+    _load("03_extract_features").run(i, RULES, f)
+    _load("04_build_evidence").run(f, RULES, e)
+    ev = json.loads(pd.read_csv(e).loc[0, "evidence_json"])
+    assert any(x["rule_id"] == "SDSS-PHOTO-001" and x["class"] == "GALAXY" for x in ev)

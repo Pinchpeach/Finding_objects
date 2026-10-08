@@ -41,3 +41,15 @@ with tempfile.TemporaryDirectory() as td:
     assert "compact_status" in d.columns
     assert "extragalactic_status" in d.columns
 print("[OK] main classifier controller integration")
+
+
+def test_qso_branch_uses_catalog_membership_for_detections():
+    import importlib.util
+    from pathlib import Path
+    p=Path(__file__).resolve().parents[1]/"branches"/"qso.py"
+    s=importlib.util.spec_from_file_location("qso_branch",p); m=importlib.util.module_from_spec(s); s.loader.exec_module(m)
+    r=m.classify({"catalogs":"Gaia DR3|NVSS","first__catalog_object_id":"J1"})
+    assert r["radio_detected"] is True and r["xray_detected"] is False
+    r=m.classify({"catalogs":"Gaia DR3","nvss__RAJ2000":188.4})
+    assert r["radio_detected"] is False
+    assert m.classify({"rx_radio_peak":2.5})["radio_detected"] is True

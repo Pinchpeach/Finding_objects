@@ -58,9 +58,13 @@ def run(associations, raw_dir, out):
             for col, val in r.items():
                 if col in {"catalog", "catalog_object_id", "object_name", "ra", "dec"}:
                     continue
-                key = col if col not in rec else f"{pre}__{col}"
-                if key not in rec or pd.isna(rec[key]):
-                    rec[key] = val
+                # Every field is kept under its catalog namespace so rules can
+                # read the value of the catalog they are about.  The bare name
+                # is a legacy first-valid convenience shared by many catalogs
+                # (e.g. ``type`` exists in both SDSS PhotoObj and DESI Legacy).
+                rec[f"{pre}__{col}"] = val
+                if col not in rec or pd.isna(rec[col]):
+                    rec[col] = val
             for col in (
                 "parallax", "parallax_error", "pmra", "pmra_error", "pmdec", "pmdec_error", "class", "zwarning",
                 "classprob_dsc_combmod_quasar", "classprob_dsc_combmod_galaxy", "classprob_dsc_combmod_star",
