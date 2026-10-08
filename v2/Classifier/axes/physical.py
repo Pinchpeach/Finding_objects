@@ -2,7 +2,7 @@
 from __future__ import annotations
 import importlib.util,math
 from pathlib import Path
-AXIS="physical";CLASSES=("WD","RGB","AGB","OTHER_STELLAR","UNKNOWN");ROOT=Path(__file__).resolve().parents[1]
+AXIS="physical";CLASSES=("WD","RGB","AGB","UNKNOWN");ROOT=Path(__file__).resolve().parents[1]
 def _load_branch(name):
  p=ROOT/"branches"/f"{name}.py";s=importlib.util.spec_from_file_location(f"classifier_branch_{name}",p)
  if s is None or s.loader is None:raise ImportError(p)
@@ -30,5 +30,9 @@ def classify(row):
  if family=="WHITE_DWARF_CANDIDATE":return {"axis":AXIS,"label":"WD","confidence":star.get("stellar_family_score"),"status":"CLASSIFIED_WD","evidence":evidence}
  evolved=EVOLVED.classify(row);evidence.extend(evolved.get("evidence",[]))
  if evolved.get("label") in {"RGB","AGB"}:return {"axis":AXIS,"label":evolved["label"],"confidence":evolved.get("confidence"),"status":evolved.get("status","CLASSIFIED"),"evidence":evidence}
- if family in {"STAR_LIKE","BINARY_CANDIDATE"}:return {"axis":AXIS,"label":"OTHER_STELLAR","confidence":star.get("stellar_family_score"),"status":"STELLAR_UNREFINED","evidence":evidence}
+ # A stellar-family route establishes only that the object is stellar.  It is
+ # not evidence for a physical/evolutionary state, and must not become a
+ # catch-all physical class.  In particular, doing so turns missing RGB/AGB
+ # evidence into a confident but wrong label in independent truth tests.
+ if family in {"STAR_LIKE","BINARY_CANDIDATE"}:return {"axis":AXIS,"label":"UNKNOWN","confidence":None,"status":"STAR_LIKE_NO_VALIDATED_PHYSICAL_STATE","evidence":evidence}
  return {"axis":AXIS,"label":"UNKNOWN","confidence":None,"status":"INSUFFICIENT_PHYSICAL_EVIDENCE","evidence":evidence}
