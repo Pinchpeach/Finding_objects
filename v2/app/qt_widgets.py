@@ -37,12 +37,13 @@ class SkyMap(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setMinimumSize(260, 260)
-        self.setMouseTracking(False)
+        self.setMouseTracking(True)            # hover tooltips
         self.setFocusPolicy(Qt.StrongFocus)
         self._x = self._y = None
         self._ra = self._dec = None
         self._kinds: list[dict] = []
         self._names: list[str] = []
+        self._subs: list[str] = []
         self._hosts: list[tuple[int, float, float, float]] = []   # (row, d26 arcmin, pa, b/a)
         self._visible = None
         self._selected: int | None = None
@@ -53,8 +54,7 @@ class SkyMap(QWidget):
         self._pan = [0.0, 0.0]
         self._press = None
         self._dragging = False
-        self.setToolTip("Wheel: zoom · Drag: pan · Right-click: reset view\n"
-                        "Click: select object · Double-click: set search centre here")
+        # Help text lives in SkyView's bar: a widget tooltip would hide the per-object hover tips.
 
     # ---------------------------------------------------------------- data
     def set_frame(self, df: pd.DataFrame) -> None:
@@ -66,6 +66,7 @@ class SkyMap(QWidget):
         self._kinds = [kind_of(r) for r in rows]
         name_col = "designation" if "designation" in df else "object_id" if "object_id" in df else None
         self._names = df[name_col].astype(str).tolist() if name_col else [""] * len(df)
+        self._subs = df["subclass"].fillna("").astype(str).tolist() if "subclass" in df else [""] * len(df)
         self._hosts = []
         for i, r in enumerate(rows):
             d26 = _num(r.get("sga_d26_arcmin", r.get("sga_2020__sga_d26_arcmin")))
@@ -232,8 +233,31 @@ class SkyMap(QWidget):
             self.reset_view(); return
         self._press = event.position(); self._dragging = False
 
+    def _nearest(self, pos, radius=12.0):
+        best, best_d = None, radius ** 2
+        for i in range(len(self._kinds)):
+            if not self._shown(i):
+                continue
+            sx, sy = self._to_screen(self._x[i], self._y[i])
+            d = (sx - pos.x()) ** 2 + (sy - pos.y()) ** 2
+            if d < best_d:
+                best, best_d = i, d
+        return best
+
     def mouseMoveEvent(self, event):
-        if self._press is None or self._c0 is None:
+        if self._press is None:
+            if self._x is not None:
+                from PySide6.QtWidgets import QToolTip
+                i = self._nearest(event.position(), 10.0)
+                if i is None:
+                    QToolTip.hideText()
+                else:
+                    k = self._kinds[i]
+                    sub = self._subs[i] if i < len(self._subs) else ""
+                    QToolTip.showText(event.globalPosition().toPoint(),
+                                      f"{self._names[i]}\n{k.get('cls')}" + (f" — {sub}" if sub else ""), self)
+            return
+        if self._c0 is None:
             return
         d = event.position() - self._press
         if not self._dragging and abs(d.x()) + abs(d.y()) < 4:
@@ -250,15 +274,7 @@ class SkyMap(QWidget):
         self.unsetCursor()
         if was_drag or event.button() != Qt.LeftButton or self._x is None:
             return
-        pos = event.position()
-        best, best_d = None, 14.0 ** 2
-        for i in range(len(self._kinds)):
-            if not self._shown(i):
-                continue
-            sx, sy = self._to_screen(self._x[i], self._y[i])
-            d = (sx - pos.x()) ** 2 + (sy - pos.y()) ** 2
-            if d < best_d:
-                best, best_d = i, d
+        best = self._nearest(event.position(), 14.0)
         if best is not None:
             self.objectClicked.emit(best)
 
@@ -307,6 +323,9 @@ class SkyView(QWidget):
         self.chk_labels.toggled.connect(lambda on: (setattr(self.map, "LABEL_LIMIT", 40 if on else -1), self.map.update()))
         bar.addWidget(self.chk_labels)
         bar.addStretch(1)
+        hint = QLabel("wheel: zoom · drag: pan · right-click: reset · double-click: set centre")
+        hint.setStyleSheet("color: gray; font-size: 10px;")
+        bar.addWidget(hint)
         lay.addLayout(bar)
         lay.addWidget(self.map, 1)
         lay.addWidget(SkyLegend())
