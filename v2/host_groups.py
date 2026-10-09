@@ -157,8 +157,31 @@ def consolidate(df: pd.DataFrame, priority=()) -> pd.DataFrame:
     counts = pd.Series([p for p in parent if p]).value_counts()
     out["n_components"] = out.object_id.map(counts).fillna(0).astype(int)
     out["host_redshift"] = [host_z.get(i) for i in range(n)]
+    _inherit(out)
     _attach_identity(out, priority)
     return out
+
+
+# Spectroscopic/curated fields a host inherits from its identity and nucleus
+# entries when it has none of its own (the nucleus fibre measures the galaxy).
+INHERITED = ("sdss_dr18_spectroscopy__subclass", "sdss_dr18_spectroscopy__class", "sdss_dr18_spectroscopy__z",
+             "desi_dr1_spectroscopy__z", "simbad__otype", "ned__Type")
+
+
+def _inherit(out: pd.DataFrame) -> None:
+    cols = [c for c in INHERITED if c in out]
+    if not cols:
+        return
+    src = out[out.component_role.isin(["identity", "nucleus"])]
+    for host_id, g in src.groupby("parent_object_id"):
+        h = out.index[out.object_id.eq(host_id)]
+        if not len(h):
+            continue
+        for c in cols:
+            if pd.isna(out.at[h[0], c]):
+                vals = g[c].dropna()
+                if len(vals):
+                    out.at[h[0], c] = vals.iloc[0]
 
 
 def _attach_identity(out: pd.DataFrame, priority) -> None:

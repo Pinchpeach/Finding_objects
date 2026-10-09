@@ -83,6 +83,8 @@ def run(work: Path, raw_dir: Path | None = None, ra: float | None = None, dec: f
     assoc = pd.read_csv(work / "source_association.csv", low_memory=False, dtype={"catalog_object_id": "string"})
     out = names.annotate(pd.read_csv(work / "classified_objects.csv", low_memory=False), assoc)
     out = hosts.consolidate(out, names.PRIORITY)
+    if out.n_components.gt(0).any():        # hosts may have inherited a nucleus spectrum
+        out = _load(CLS / "subclass.py", "v2_subclass").annotate(out)
     out = names.annotate(out, assoc, None if None in (ra, dec) else (ra, dec), None if collect else radius)
     out.to_csv(work / "classified_objects.csv", index=False)
 
