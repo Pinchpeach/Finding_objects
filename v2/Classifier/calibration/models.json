@@ -21,69 +21,69 @@
     "variability": {
       "CEPHEID": {
         "method": "withheld",
-        "n": 463,
-        "negative": 448,
-        "positive": 15,
+        "n": 460,
+        "negative": 441,
+        "positive": 19,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "ECLIPSING": {
         "method": "withheld",
-        "n": 463,
-        "negative": 463,
+        "n": 460,
+        "negative": 460,
         "positive": 0,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "LPV": {
-        "coef": 0.3976114881969909,
-        "intercept": -0.83962279109616,
+        "coef": 0.5445689765640671,
+        "intercept": -0.9807815366581608,
         "method": "platt",
-        "n": 463,
-        "negative": 290,
-        "positive": 173,
+        "n": 460,
+        "negative": 291,
+        "positive": 169,
         "truth_independent": true
       },
       "MIRA": {
         "coef": 0.0,
-        "intercept": 0.07346544635595043,
+        "intercept": 0.04348472124441546,
         "method": "platt",
-        "n": 463,
-        "negative": 223,
-        "positive": 240,
+        "n": 460,
+        "negative": 225,
+        "positive": 235,
         "truth_independent": true
       },
       "OTHER_VARIABLE": {
         "method": "withheld",
-        "n": 463,
-        "negative": 463,
+        "n": 460,
+        "negative": 460,
         "positive": 0,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "PULSATING": {
         "method": "withheld",
-        "n": 463,
-        "negative": 463,
+        "n": 460,
+        "negative": 460,
         "positive": 0,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "ROTATIONAL": {
         "method": "withheld",
-        "n": 463,
-        "negative": 463,
+        "n": 460,
+        "negative": 460,
         "positive": 0,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "RR_LYRAE": {
-        "coef": 2.618138500047478,
-        "intercept": -2.5661982222451276,
+        "coef": 3.423044439451205,
+        "intercept": -2.581695076447825,
         "method": "platt",
-        "n": 463,
-        "negative": 428,
-        "positive": 35,
+        "n": 460,
+        "negative": 423,
+        "positive": 37,
         "truth_independent": true
       }
     }
