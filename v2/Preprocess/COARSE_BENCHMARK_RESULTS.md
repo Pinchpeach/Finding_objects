@@ -359,3 +359,11 @@ collector now keeps one row per 0.5″ (most detections). COSMOS: coverage
 81.6% → **88.2%**, accuracy 98.4% → **98.5%** (66/67); ambiguous DESI
 attachments 10 → 5. (RA 35/−5 in the same round lost NED to an archive
 timeout, so its 97.5% / 87.0% is not comparable.)
+
+**DESI ↔ Legacy Surveys by TARGETID (2026-10-09).** DESI TARGETIDs encode
+the Legacy Surveys RELEASE/BRICKID/OBJID of the target (desitarget
+`encode_targetid`), so both catalogs now carry an `LSID` alias and an exact
+alias match is decisive in Stage 1. Exact links exist where DR10 keeps the
+DR9 IDs (north, release 9011). RA 245/+43: DESI attached 27 → 28,
+`ambiguous_new` 2 → 1; accuracy 97.1% (that run lost NED to an archive
+timeout, so its coverage of 83% is not comparable with earlier runs).
