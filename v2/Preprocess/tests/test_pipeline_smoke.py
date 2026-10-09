@@ -217,3 +217,23 @@ def test_association_posterior_sparse_vs_dense():
     assert sparse["positional_likelihood"] < 0.02
     assert sparse["association_posterior"] > 0.8         # unique counterpart, sparse field
     assert dense["association_posterior"] < sparse["association_posterior"]
+
+
+def test_desi_targetid_links_to_legacy_surveys_source(tmp_path):
+    raw = tmp_path / "raw"; raw.mkdir()
+    rel, bid, oid = 9011, 123456, 789
+    tid = (rel << 42) | (bid << 22) | oid
+    ra0, dec0 = 245.0, 43.0
+    # Two Legacy Surveys sources 0.15" apart (one the DESI target); DESI at the target.
+    pd.DataFrame([{"catalog": "DESI Legacy Surveys DR10", "catalog_object_id": "a", "ra": ra0, "dec": dec0,
+                   "release": rel, "brickid": bid, "objid": oid},
+                  {"catalog": "DESI Legacy Surveys DR10", "catalog_object_id": "b", "ra": ra0, "dec": dec0 + 0.15 / 3600,
+                   "release": rel, "brickid": bid, "objid": oid + 1}]).to_csv(raw / "ls.csv", index=False)
+    pd.DataFrame([{"catalog": "DESI DR1 spectroscopy", "catalog_object_id": str(tid), "ra": ra0, "dec": dec0 + 0.07 / 3600}]
+                 ).to_csv(raw / "desi.csv", index=False)
+    out = tmp_path / "a.csv"
+    _load("01_source_association").run(raw, out)
+    a = pd.read_csv(out, dtype={"catalog_object_id": str})
+    desi = a[a.catalog == "DESI DR1 spectroscopy"].iloc[0]
+    target = a[a.catalog_object_id == "a"].iloc[0]
+    assert desi.object_id == target.object_id and desi.association_status != "ambiguous_new"

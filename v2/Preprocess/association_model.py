@@ -100,7 +100,29 @@ def canonical_aliases(catalog: str, row: Mapping[str, Any], catalog_object_id: s
         if key in low:add("WISE",row.get(low[key]))
     for key in ("_2mass","2mass","2mass_name","tmass"):
         if key in low:add("2MASS",row.get(low[key]))
+    # Legacy Surveys source identity.  DESI TARGETIDs pack RELEASE, BRICKID and
+    # OBJID of the Legacy Surveys target (desitarget.targets.encode_targetid),
+    # so a DESI spectrum links to its photometric source exactly where the two
+    # releases agree (DR10 keeps the DR9 IDs in the north; release 9011).
+    # Bit layout: OBJID 0-21, BRICKID 22-41, RELEASE 42-57,
+    # MOCK 58, SKY 59; e.g. 39627887455767055 -> release 9010 (LS DR9 south).
+    if catalog=="DESI Legacy Surveys DR10":
+        rel,bid,oid=(_int(row.get(low[k])) if k in low else None for k in ("release","brickid","objid"))
+        if None not in (rel,bid,oid):add("LSID",f"{rel}_{bid}_{oid}")
+    if catalog=="DESI DR1 spectroscopy":
+        tid=_int(catalog_object_id if catalog_object_id is not None else row.get(low.get("targetid","TargetID")))
+        if tid is not None and tid>0 and not (tid>>58)&0x3:   # skip mock / sky targets
+            add("LSID",f"{(tid>>42)&0xFFFF}_{(tid>>22)&0xFFFFF}_{tid&0x3FFFFF}")
     return aliases
+
+def _int(v):
+    """Exact integer (64-bit IDs must not pass through float)."""
+    if v is None: return None
+    try: x=int(str(v).strip())
+    except (TypeError,ValueError):
+        try: x=int(float(v))
+        except (TypeError,ValueError,OverflowError): return None
+    return x if x>=0 else None
 
 def profile_for(catalog: str, row: Mapping[str, Any] | None = None) -> SurveyProfile:
     row = row or {}

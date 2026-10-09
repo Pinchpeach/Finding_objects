@@ -201,6 +201,11 @@ def run(raw_dir: Path, out: Path):
                     candidates.append((result["association_score"], result["normalized_separation"], gi, result))
             candidates.sort(key=lambda x: (-x[0], x[1]))
 
+        # An exact shared identifier is decisive: positional neighbours (e.g.
+        # catalogue duplicates in crowded fields) cannot make it ambiguous.
+        alias_hits = [c for c in candidates if c[3].get("association_method") == "catalog_alias"]
+        if len(alias_hits) == 1:
+            candidates = alias_hits
         ambiguous = (
             len(candidates) > 1
             and candidates[1][0] >= candidates[0][0] * AMBIG_SCORE_RATIO
