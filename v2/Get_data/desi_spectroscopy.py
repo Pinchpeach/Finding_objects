@@ -1,7 +1,10 @@
-"""Independent DESI spectroscopy cone-search collector. No cross-match/classification."""
+"""DESI DR1 redshift catalog cone-search collector (DESI Collaboration 2025; VizieR V/161).
+
+No cross-match/classification.  ``OType`` is Redrock's SPECTYPE.
+"""
 from pathlib import Path
 import pandas as pd
-CATALOG="DESI spectroscopy"; VIZIER_CATALOG="VII/294/desi-dr1"
+CATALOG="DESI DR1 spectroscopy"; VIZIER_CATALOG="V/161/zcatdr1"
 def fetch(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
  from astroquery.vizier import Vizier
  from astropy.coordinates import SkyCoord
@@ -9,10 +12,21 @@ def fetch(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
  tabs=Vizier(columns=["**"],row_limit=-1).query_region(SkyCoord(ra*u.deg,dec*u.deg),radius=radius_arcmin*u.arcmin,catalog=VIZIER_CATALOG)
  if not tabs:return pd.DataFrame(columns=["catalog","catalog_object_id","object_name","ra","dec"])
  df=tabs[0].to_pandas()
- idc="TARGETID";rac="RAJ2000";dcc="DEJ2000"
+ idc="TargetID";rac="RAICRS";dcc="DEICRS"
  if idc not in df.columns:raise KeyError("identifier column missing: "+idc)
+ if "ZCAT_PRIM" in df.columns: df=df[pd.to_numeric(df["ZCAT_PRIM"],errors="coerce").eq(1)]
+ # OBJTYPE: keep science targets; SKY/BAD fibres sample blank sky, not objects.
+ if "Type" in df.columns: df=df[df["Type"].astype(str).str.strip().eq("TGT")]
+ df=df.copy()
  df.insert(0,"catalog",CATALOG);df.insert(1,"catalog_object_id",df[idc].astype("string"));df.insert(2,"object_name",CATALOG+" "+df["catalog_object_id"].astype("string"))
  df.insert(3,"ra",pd.to_numeric(df[rac],errors="coerce"));df.insert(4,"dec",pd.to_numeric(df[dcc],errors="coerce"))
- return df.drop_duplicates("catalog_object_id",keep="last").reset_index(drop=True)
+ df=df.drop_duplicates("catalog_object_id",keep="last")
+ # One sky object can carry several TARGETIDs (different programs); keep the
+ # most confident spectrum per 0.5-arcsec position so one object stays one row.
+ import numpy as np
+ key=list(zip(np.round(df["ra"]*np.cos(np.radians(df["dec"]))*7200),np.round(df["dec"]*7200)))
+ order=pd.to_numeric(df["delChi2"],errors="coerce").fillna(-1) if "delChi2" in df.columns else pd.Series(0,index=df.index)
+ df=df.assign(_pos=key,_q=order).sort_values("_q",ascending=False).drop_duplicates("_pos").drop(columns=["_pos","_q"])
+ return df.reset_index(drop=True)
 def save(df:pd.DataFrame,path:str|Path)->None:
  Path(path).parent.mkdir(parents=True,exist_ok=True);df.drop_duplicates("catalog_object_id",keep="last").to_csv(path,index=False)

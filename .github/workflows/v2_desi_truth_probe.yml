@@ -1,0 +1,31 @@
+name: v2 DESI DR1 truth probe
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/v2_desi_truth_probe.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pandas astropy astroquery
+      - name: Inspect Gaia DR3 DSC columns (I/355/paramp)
+        run: |
+          python - <<'PY'
+          from astroquery.vizier import Vizier
+          t=Vizier(columns=["**"],row_limit=3).get_catalogs("I/355/paramp")
+          for tab in t:
+              print(tab.meta.get("name"), tab.colnames)
+              for c in tab.colnames:
+                  if c.startswith("P") or "DSC" in (tab[c].description or "") or c in ("Source","RA_ICRS","DE_ICRS"):
+                      print("  ",c,"|",tab[c].description)
+          PY

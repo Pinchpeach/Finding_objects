@@ -46,6 +46,8 @@ PROFILES = {
     "ASAS-SN Supernova Catalog": SurveyProfile(2000.0, 1.0, None, 5.0, "transient_event"),
     "Asiago Supernova Catalog": SurveyProfile(2000.0, 1.0, None, 5.0, "transient_event"),
     "Acker PN Spectroscopy": SurveyProfile(2000.0, 2.0, None, 8.0),
+    # SGA-2020 centres come from Legacy Surveys ellipse fits of large galaxies.
+    "SGA-2020": SurveyProfile(None, 1.0, None, 5.0),
 }
 DEFAULT_PROFILE = SurveyProfile(None, 0.6, None, 5.0)
 
@@ -59,11 +61,19 @@ def num(value: Any) -> float | None:
 
 
 def _first(row: Mapping[str, Any], keys: tuple[str, ...]) -> float | None:
-    low = {str(k).lower(): k for k in row.keys()}
+    """First finite value among ``keys`` (case-insensitive), in ``keys`` order."""
+    low = None
     for key in keys:
-        actual = low.get(key.lower())
-        if actual is None:
-            continue
+        if key in row:
+            actual = key
+        else:
+            # Built lazily: Stage-1 detection records use canonical keys, and
+            # rebuilding this map per call dominated association runtime.
+            if low is None:
+                low = {str(k).lower(): k for k in row.keys()}
+            actual = low.get(key.lower())
+            if actual is None:
+                continue
         value = num(row.get(actual))
         if value is not None:
             return value
@@ -90,7 +100,29 @@ def canonical_aliases(catalog: str, row: Mapping[str, Any], catalog_object_id: s
         if key in low:add("WISE",row.get(low[key]))
     for key in ("_2mass","2mass","2mass_name","tmass"):
         if key in low:add("2MASS",row.get(low[key]))
+    # Legacy Surveys source identity.  DESI TARGETIDs pack RELEASE, BRICKID and
+    # OBJID of the Legacy Surveys target (desitarget.targets.encode_targetid),
+    # so a DESI spectrum links to its photometric source exactly where the two
+    # releases agree (DR10 keeps the DR9 IDs in the north; release 9011).
+    # Bit layout: OBJID 0-21, BRICKID 22-41, RELEASE 42-57,
+    # MOCK 58, SKY 59; e.g. 39627887455767055 -> release 9010 (LS DR9 south).
+    if catalog=="DESI Legacy Surveys DR10":
+        rel,bid,oid=(_int(row.get(low[k])) if k in low else None for k in ("release","brickid","objid"))
+        if None not in (rel,bid,oid):add("LSID",f"{rel}_{bid}_{oid}")
+    if catalog=="DESI DR1 spectroscopy":
+        tid=_int(catalog_object_id if catalog_object_id is not None else row.get(low.get("targetid","TargetID")))
+        if tid is not None and tid>0 and not (tid>>58)&0x3:   # skip mock / sky targets
+            add("LSID",f"{(tid>>42)&0xFFFF}_{(tid>>22)&0xFFFFF}_{tid&0x3FFFFF}")
     return aliases
+
+def _int(v):
+    """Exact integer (64-bit IDs must not pass through float)."""
+    if v is None: return None
+    try: x=int(str(v).strip())
+    except (TypeError,ValueError):
+        try: x=int(float(v))
+        except (TypeError,ValueError,OverflowError): return None
+    return x if x>=0 else None
 
 def profile_for(catalog: str, row: Mapping[str, Any] | None = None) -> SurveyProfile:
     row = row or {}
@@ -229,7 +261,15 @@ def assess_pair(a: Mapping[str, Any], b: Mapping[str, Any], density_arcsec2: flo
     pchance = chance_probability(sep, density_arcsec2)
     score = positional * (1.0 - pchance) if pchance is not None else positional
     accepted = sep <= radius and (pchance is None or pchance <= 0.25) and score >= 1e-5
+    # Membership posterior (Budavari & Szalay 2008, ApJ 679, 301): the
+    # positional likelihood density of a true counterpart against the
+    # background density of unrelated sources.  ``score`` keeps ranking
+    # candidates; the posterior is what downstream evidence is weighted by
+    # (a unique 3-sigma match is not 1% reliable in a sparse field).
+    density_l = positional / (2.0 * math.pi * sigma * sigma)
+    posterior = density_l / (density_l + density_arcsec2) if density_arcsec2 is not None and density_arcsec2 > 0 else positional
     return {
+        "association_posterior": posterior,
         "accepted": accepted,
         "separation_arcsec": sep,
         "comparison_epoch": epoch,

@@ -11,25 +11,55 @@ TAP_URL = "https://datalab.noirlab.edu/tap"
 TABLE = "ls_dr10.tractor"
 
 
+# The Data Lab TAP service intermittently stalls for minutes and then
+# errors; short bounded attempts recover far more often than one long wait.
+ATTEMPT_BUDGET_S = 80.0
+ATTEMPTS = 3
+
+
+def _query_with_retries(run):
+    import threading, time
+    last = None
+    for attempt in range(ATTEMPTS):
+        box = {}
+        def target():
+            try:
+                box["value"] = run()
+            except BaseException as exc:  # reported below
+                box["error"] = exc
+        t = threading.Thread(target=target, daemon=True)
+        t.start(); t.join(ATTEMPT_BUDGET_S)
+        if "value" in box:
+            return box["value"]
+        last = box.get("error") or TimeoutError(f"Data Lab TAP exceeded {ATTEMPT_BUDGET_S:.0f} s")
+        if attempt + 1 < ATTEMPTS:
+            time.sleep(2.0 * (attempt + 1))
+    raise RuntimeError(f"Legacy Surveys TAP failed after {ATTEMPTS} attempts: {last!r}")
+
+
 def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     import pyvo
     radius_deg = float(radius_arcmin) / 60.0
     # Keep the feature set compact and purely photometric/morphological.  In
     # particular, do not join spectroscopy or any truth/classification table.
+    # W1/W2 are unWISE forced photometry at the optical positions (Dey+2019),
+    # far deeper than AllWISE; quasars' mid-IR excess separates them from
+    # stars where astrometry is unavailable (Chaussidon+2023).
     query = f"""
         SELECT ls_id, ra, dec, type, release, brickid, objid,
                flux_g, flux_r, flux_i, flux_z,
                flux_ivar_g, flux_ivar_r, flux_ivar_i, flux_ivar_z,
                mw_transmission_g, mw_transmission_r,
                mw_transmission_i, mw_transmission_z,
-               nobs_g, nobs_r, nobs_i, nobs_z, maskbits
+               nobs_g, nobs_r, nobs_i, nobs_z, maskbits,
+               flux_w1, flux_w2, flux_ivar_w1, flux_ivar_w2,
+               mw_transmission_w1, mw_transmission_w2
         FROM {TABLE}
         WHERE 't' = Q3C_RADIAL_QUERY(
             ra, dec, {float(ra):.10f}, {float(dec):.10f}, {radius_deg:.10f}
         )
     """
-    result = pyvo.dal.TAPService(TAP_URL).search(query)
-    df = result.to_table().to_pandas()
+    df = _query_with_retries(lambda: pyvo.dal.TAPService(TAP_URL).search(query).to_table().to_pandas())
     if df.empty:
         return pd.DataFrame(columns=["catalog", "catalog_object_id", "object_name", "ra", "dec"])
     df.columns = [str(c).strip() for c in df.columns]

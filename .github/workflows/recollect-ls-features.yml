@@ -1,0 +1,67 @@
+name: Re-collect Legacy Surveys benchmark features
+
+# Re-queries DESI Legacy Surveys DR10 (now with unWISE W1/W2) for the SDSS
+# coarse benchmark and the DESI DR1 external truth set, and commits the gzip
+# features next to the other preserved catalog features.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/recollect-ls-features.yml
+
+concurrency:
+  group: recollect-ls-features-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  collect:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: sdss
+            truth: v2/benchmark/truth_data/ground_truth.csv
+            dest: v2/benchmark/catalog_features
+          - name: desi
+            truth: v2/benchmark/desi_external/truth.csv
+            dest: v2/benchmark/desi_external/catalog_features
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pandas numpy requests astropy astroquery pyvo
+      - run: python -u v2/benchmark/collect_catalog_truth.py --truth ${{ matrix.truth }} --out-dir /tmp/out --catalog desi_legacy --workers 8
+      - run: |
+          python - <<'PY'
+          import pandas as pd
+          d=pd.read_csv("/tmp/out/desi_legacy_trd.csv"); print(len(d), "rows; W1 present:", "flux_w1" in d.columns, d.get("flux_w1",pd.Series()).notna().sum())
+          assert "flux_w1" in d.columns and len(d)>0
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ls-${{ matrix.name }}
+          path: /tmp/out/desi_legacy_trd.csv
+          retention-days: 7
+  commit:
+    needs: collect
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: /tmp/art
+      - run: |
+          set -euo pipefail
+          gzip -9 -n -c /tmp/art/ls-sdss/desi_legacy_trd.csv > v2/benchmark/catalog_features/desi_legacy_trd.csv.gz
+          gzip -9 -n -c /tmp/art/ls-desi/desi_legacy_trd.csv > v2/benchmark/desi_external/catalog_features/desi_legacy_trd.csv.gz
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add v2/benchmark/catalog_features v2/benchmark/desi_external/catalog_features
+          git diff --cached --quiet && exit 0
+          git commit -m "Re-collect Legacy Surveys benchmark features with unWISE W1/W2"
+          for i in 1 2 3; do git pull --no-rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep 5; done

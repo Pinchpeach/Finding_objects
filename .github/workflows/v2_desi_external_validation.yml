@@ -1,0 +1,110 @@
+name: v2 DESI DR1 external coarse validation
+
+# Independent, deeper (r <= 23) external check of the coarse classifier,
+# which was fitted on SDSS spectroscopy. Truth and catalog features are
+# committed under v2/benchmark/desi_external/ for reproducibility. Gaia features
+# include DSC-Combmod probabilities (an SDSS-independent test of DSC).
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - v2/benchmark/build_desi_truth.py
+      - .github/workflows/v2_desi_external_validation.yml
+
+concurrency:
+  group: v2-desi-external-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  truth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pandas numpy astropy astroquery
+      - run: python -u v2/benchmark/build_desi_truth.py --per-cell 400 --out /tmp/desi_truth.csv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desi-truth
+          path: /tmp/desi_truth.csv
+          retention-days: 7
+
+  collect:
+    needs: truth
+    strategy:
+      fail-fast: false
+      matrix:
+        catalog: [gaia_dr3, panstarrs1, allwise, twomass, galex, desi_legacy]
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pandas numpy requests astropy astroquery pyvo
+      - uses: actions/download-artifact@v4
+        with:
+          name: desi-truth
+          path: /tmp
+      - run: python -u v2/benchmark/collect_catalog_truth.py --truth /tmp/desi_truth.csv --out-dir /tmp/out --catalog ${{ matrix.catalog }} --workers 8
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desi-features-${{ matrix.catalog }}
+          path: /tmp/out/${{ matrix.catalog }}_trd.csv
+          retention-days: 7
+
+  evaluate:
+    needs: collect
+    if: always() && needs.truth.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pandas numpy
+      - uses: actions/download-artifact@v4
+        with:
+          path: /tmp/art
+      - name: Assemble
+        run: |
+          set -euo pipefail
+          d=v2/benchmark/desi_external; mkdir -p $d/catalog_features
+          cp /tmp/art/desi-truth/desi_truth.csv $d/truth.csv
+          for f in /tmp/art/desi-features-*/*_trd.csv; do gzip -9 -n -c "$f" > "$d/catalog_features/$(basename "$f").gz"; done
+          ls -la $d $d/catalog_features
+      - name: Evaluate
+        run: |
+          set -euo pipefail
+          d=v2/benchmark/desi_external
+          python v2/benchmark/validate_catalog_truth.py --truth $d/truth.csv --catalog-root $d/catalog_features --out /tmp/ready --allow-unbalanced
+          python v2/benchmark/evaluate_rule_baseline.py --truth $d/truth.csv --catalog-root $d/catalog_features --manifest /tmp/ready/benchmark_manifest.csv --out /tmp/eval --split all
+          cp /tmp/eval/rule_baseline_metrics.json $d/coarse_metrics.json
+          python - <<'PY'
+          import pandas as pd
+          d="v2/benchmark/desi_external"
+          p=pd.read_csv("/tmp/eval/rule_baseline_test_predictions.csv").merge(pd.read_csv(f"{d}/truth.csv")[["benchmark_id","r_bin"]],on="benchmark_id")
+          rows=[]
+          for (b,t),g in p.groupby(["r_bin","truth_class"]):
+              c=g.primary_class.ne("UNKNOWN")
+              rows.append({"r_bin":b,"truth_class":t,"n":len(g),"coverage":c.mean(),
+                           "accuracy_when_classified":(g.primary_class==g.truth_class)[c].mean() if c.any() else None,
+                           **{f"pred_{k}":int((g.primary_class==k).sum()) for k in ("STAR","GALAXY","QSO","UNKNOWN")}})
+          out=pd.DataFrame(rows); out.to_csv(f"{d}/coarse_by_magnitude.csv",index=False); print(out.round(3).to_string(index=False))
+          PY
+      - name: Commit
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add v2/benchmark/desi_external
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "DESI DR1 external coarse validation results"
+          for i in 1 2 3; do git pull --no-rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep 5; done

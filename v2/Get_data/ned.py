@@ -12,7 +12,8 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
 
     center = SkyCoord(ra * u.deg, dec * u.deg)
     last_error = None
-    for attempt in range(4):
+    attempts = 2  # each attempt already has astroquery's 60 s read timeout
+    for attempt in range(attempts):
         try:
             t = Ned.query_region(center, radius=radius_arcmin * u.arcmin)
             if t is None:
@@ -27,7 +28,7 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
             return df.drop_duplicates("catalog_object_id", keep="last").reset_index(drop=True)
         except Exception as exc:
             last_error = exc
-            if attempt == 3:
+            if attempt == attempts - 1:
                 raise
             time.sleep(2 ** attempt)
     raise last_error

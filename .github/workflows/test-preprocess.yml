@@ -23,7 +23,9 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install dependencies
-        run: python -m pip install --upgrade pip pandas numpy
+        run: python -m pip install --upgrade pip pandas numpy pytest
+      - name: Unit and smoke tests
+        run: python -m pytest -q v2/Preprocess/tests
       - name: Run pipeline
         working-directory: v2/Preprocess
         run: python control.py

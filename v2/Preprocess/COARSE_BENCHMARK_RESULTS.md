@@ -41,3 +41,329 @@ target rather than solved by moving a black-box model into Preprocess.
 GitHub Actions validation:
 - Evaluate Preprocess Coarse Classifier run 36294866251: success
 - Test Preprocess Pipeline after coarse changes: success
+
+## 2026-10-08: point-source grouping, Legacy Surveys morphology, fitted fusion
+
+Same 9,999-object benchmark and deterministic split (test: 1,991). Catalog
+features are now preserved in `v2/benchmark/catalog_features/` because the
+original Actions artifacts expire on 2026-10-10.
+
+Changes, each with a literature basis:
+
+1. Unresolved morphology (PS1 PSF-Kron, SDSS `type=6`) is emitted as
+   `POINT_SOURCE` and supports STAR and QSO equally; quasars are point
+   sources too (DESI QSO targeting requires PSF morphology, Chaussidon+2023).
+   Previously it supported STAR only, so "point-like + extragalactic" could
+   never single out QSO.
+2. New `LS-MORPH-001/002`: Legacy Surveys DR10 Tractor model choice (Dey+2019),
+   used only at r- or z-band S/N >= 10.
+3. Stage 5 is a linear log-odds model. Per-evidence-key weights are fitted
+   (multinomial logistic regression) on the **train** split only; the
+   regularization and abstention threshold are chosen on the **calibration**
+   split (threshold rule fixed beforehand: calibration accuracy >= 0.95); the
+   test split is reported once. Keys with no training support (Gaia DSC,
+   SIMBAD, NED, SDSS photometry, PS1 z~6 QSO, variability) keep their prior
+   weights. Weights: `fusion_weights.json`; fit: `v2/benchmark/fit_fusion_weights.py`.
+
+| test split | main (before) | rules 1-2 only | rules 1-2 + fitted fusion |
+|---|---:|---:|---:|
+| classified | 673 (33.8%) | 1,373 (69.0%) | **1,983 (99.6%)** |
+| accuracy when classified | 88.4% | 88.7% | **97.4%** |
+| macro-F1 when classified | 0.747 | 0.872 | **0.974** |
+| accuracy, UNKNOWN counted wrong | 29.9% | 61.2% | **97.0%** |
+
+Fitted-fusion test detail: log-loss 0.091, expected calibration error 0.015;
+precision STAR 98.9% / GALAXY 97.0% / QSO 96.7%. Raising `min_confidence` to
+0.9 gives 93.8% coverage at 99.1% accuracy.
+
+Limits: SDSS spectroscopic targets are brighter and cleaner than a typical
+field, and the benchmark is class-balanced (equal priors), so field accuracy
+will be lower and the probabilities assume equal priors. Gaia DSC is absent
+from this benchmark (Gaia features come from the VizieR main table), so its
+prior weight is untested here.
+
+### Field class priors (label shift)
+
+> **Update (2026-10-08 evening): the adjustment is now opt-in**
+> (`--field-prior` in Stage 5 / `v2/pipeline.py`); the estimate is still
+> reported in `field_prior_*`. EM assumes pure label shift with calibrated
+> posteriors, but real fields also shift *which evidence exists* (depth,
+> footprint, archive outages). On five DESI-checked real fields the adjusted
+> labels were less accurate than the training-prior ones in four (e.g.
+> 0.833 vs 0.947 at RA 20°, Dec 0° without Legacy Surveys, where the estimate
+> was dominated by bright PS1 stars). The simulation below holds only under
+> pure label shift.
+
+The fitted weights assume the benchmark's equal class priors. Stage 5 can
+re-estimate each field's class mix with the EM procedure of Saerens, Latinne
+& Decaestecker (2002, Neural Computation 14, 21) when a fitted model is present
+and at least 50 objects have evidence outside large-galaxy hosts, and
+rescales the posteriors accordingly (`field_prior_*`, `p_*_training_prior`,
+`coarse_prior_adjusted`). Simulated label shift on the test split (600
+objects per draw, 20 draws):
+
+| field mix STAR/GAL/QSO | accuracy before → after | log-loss before → after | estimated prior |
+|---|---|---|---|
+| 0.33/0.33/0.33 | 0.974 → 0.974 | 0.092 → 0.092 | 0.33/0.32/0.34 |
+| 0.70/0.20/0.10 | 0.979 → 0.984 | 0.070 → 0.056 | 0.70/0.20/0.10 |
+| 0.10/0.80/0.10 | 0.977 → 0.987 | 0.095 → 0.050 | 0.10/0.79/0.11 |
+| 0.85/0.10/0.05 | 0.986 → 0.992 | 0.045 → 0.029 | 0.85/0.10/0.05 |
+
+This corrects class-mix shift only; a field that is also fainter than the
+SDSS spectroscopic benchmark (covariate shift) is not corrected by it.
+
+### Accuracy by magnitude (test split, PS1 Kron r)
+
+| r | n | coverage | accuracy when classified |
+|---|---:|---:|---:|
+| < 17 | 372 | 99.5% | 97.8% |
+| 17–18 | 686 | 98.8% | 97.8% |
+| 18–19 | 430 | 99.3% | 97.4% |
+| 19–20 | 378 | 100% | 98.4% |
+| 20–21 | 96 | 100% | 91.7% |
+| > 21 | 9 | – | too few to measure |
+
+The SDSS benchmark validates the coarse classifier only to r ≈ 20; accuracy
+starts to drop at 20–21 and fainter sources are untested. A deeper,
+SDSS-independent truth set (DESI DR1) is the next validation step.
+
+## 2026-10-08 (later): DESI DR1 external validation, colours, combined training
+
+**External truth** (`v2/benchmark/desi_external/`): 1,797 DESI DR1 spectra
+(Redrock SPECTYPE, ZWARN=0, DELTACHI2>25), ~150 per class in each of
+r = 18–20, 20–21, 21–22, 22–23, from eight sky windows, none within 2″ of the
+SDSS benchmark. Built by `build_desi_truth.py`; features collected and
+evaluated by `.github/workflows/v2_desi_external_validation.yml`.
+
+**Finding.** The SDSS-fitted model generalised to bright DESI objects but
+failed for faint quasars: QSO accuracy 90% (r 18–20) → 13% (21–22) → 3%
+(22–23), almost all called STAR. Without Gaia astrometry (G ≲ 21) or AllWISE
+detections only point-source morphology remains, which cannot separate stars
+from quasars.
+
+**Changes.** (1) Legacy Surveys collector adds unWISE forced W1/W2; benchmark
+LS features re-collected. (2) `LS-COLOR-001`: dereddened g−r, r−z, z−W1, W1−W2
+(S/N ≥ 3) as continuous features — quasars' mid-IR excess and blue optical
+colours (Chaussidon+2023). (3) Fitting on SDSS alone made colours *hurt*
+faint DESI galaxies (covariate shift), so the fusion is now fitted on the
+SDSS **and** DESI train splits; the threshold on both calibration splits;
+each test split reported separately.
+
+| test split | metric | previous (SDSS fit, no colours) | combined fit + colours |
+|---|---|---:|---:|
+| SDSS (1,991) | accuracy when classified | 97.5% | **97.9%** |
+| SDSS | log-loss | 0.091 | **0.075** |
+| DESI (353) | accuracy when classified | 78.3% | **83.3%** |
+| DESI | QSO recall | ~0.44 | **0.88** |
+
+DESI test accuracy by magnitude (combined fit; 24–38 objects per cell):
+
+| r | GALAXY | QSO | STAR |
+|---|---:|---:|---:|
+| 18–20 | 0.92 | 0.83 | 1.00 |
+| 20–21 | 1.00 | 0.93 | 0.74 |
+| 21–22 | 0.89 | 0.76 | 0.55 |
+| 22–23 | 0.61 | 0.92 | 0.75 |
+
+DESI coverage/accuracy by confidence threshold: 0.7 → 83% / 90.1%,
+0.8 → 74% / 93.5%, 0.9 → 50% / 98.3%.
+
+Caveats: DESI targets were themselves selected with grz/W1/W2 colours and
+QSO targets with PSF morphology, which favours these features on DESI; faint
+STAR spectra in DESI are rare and partly mis-targeted. The DESI test split is
+small; a larger set is the next step.
+
+Fitted weights are physically sensible: W1−W2 and z−W1 favour QSO, red g−r
+favours STAR, Legacy Surveys PSF morphology strongly disfavours GALAXY,
+significant proper motion favours STAR. Gaia DSC-Combmod evidence, which
+previously had an untested prior weight of 1.0 per logit, is now fitted on
+the SDSS-independent DESI rows only (DSC was trained on SDSS labels) and
+receives weights of ~0.1–0.2: given astrometry, morphology and colours it
+adds little.
+
+### Refit on the enlarged DESI set (current weights)
+
+The DESI external set was enlarged to 4,795 spectra (~400 per class per r
+bin); the fusion was refitted on the SDSS and DESI train splits (threshold
+from both calibration splits, `min_confidence` = 0.53).
+
+| test split | n | coverage | accuracy when classified | log-loss | ECE |
+|---|---:|---:|---:|---:|---:|
+| SDSS | 1,991 | 98.4% | **97.9%** | 0.080 | 0.010 |
+| DESI (r 18–23) | 962 | 93.8% | **87.9%** | 0.393 | 0.029 |
+
+DESI test accuracy by magnitude (70–91 objects per cell):
+
+| r | GALAXY | QSO | STAR |
+|---|---:|---:|---:|
+| 18–20 | 0.86 | 0.83 | 0.96 |
+| 20–21 | 0.95 | 0.90 | 0.76 |
+| 21–22 | 0.92 | 0.81 | 0.49 |
+| 22–23 | 0.83 | 0.82 | 0.73 |
+
+DESI coverage/accuracy by threshold: 0.7 → 83% / 92.7%, 0.8 → 73% / 94.2%,
+0.9 → 55% / 95.8%. The main remaining error is faint stars called QSO
+(50 of 318): at r ≈ 21–22 blue stars (e.g. white dwarfs, hot subdwarfs) share
+quasars' optical colours and lack Gaia astrometry. Variability or deeper
+UV/IR data would be needed to separate them.
+
+## Real-field end-to-end check (collection + association + classification)
+
+`.github/workflows/v2_field_validation.yml` runs `v2/pipeline.py` on a field
+outside the DESI truth-set sky windows (RA 245°, Dec +43°, r = 3′) and compares
+coarse classes with the DESI DR1 spectra found in the field (DESI spectra are
+not classification evidence). The benchmarks never exercised field-wide
+association; this check exposed three catalog-hygiene problems:
+
+1. DESI DR1 rows included **sky fibres** (OBJTYPE=SKY) at blank positions.
+2. **Pan-STARRS1** MeanObject returned ~4× more rows than the deeper Legacy
+   Surveys catalog; single-detection rows (spurious/moving; STScI recommends
+   nDetections ≥ 2) duplicated real sources.
+3. **Catalog-internal duplicates** (several DESI TARGETIDs per object; SDSS
+   secondary detections, mode 2).
+
+Because one object can hold only one row per catalog, duplicates either
+became evidence-less objects or made Stage-1 matches "ambiguous", splitting
+the DESI, LS and PS1 detections of one object apart.
+
+| | before | after collector fixes |
+|---|---:|---:|
+| objects in field | 2,516 | 723 |
+| NO_EVIDENCE | 72% | 25% |
+| coverage of DESI-spectroscopic objects | 57% | 88% |
+| accuracy when classified (n = 42) | 84% | 86.5% |
+| wall time (collect / classify) | 127 s / 13 s | 130 s / 4 s |
+
+Remaining unclassified DESI objects are r ≈ 24 sources below the colour
+(S/N ≥ 3) and morphology (S/N ≥ 10) limits.
+
+NGC 4522 field (r = 1′, collected live): 127 of 233 detections fall inside the
+SGA-2020 D26 ellipse and are reported as `WITHIN_LARGE_GALAXY` (disk
+fragments are not classified as independent objects); the galaxy itself is
+the SGA-2020 object, classified GALAXY. Host status now takes precedence over
+`NO_EVIDENCE` (e.g. Legacy Surveys `DUP` sources inside the galaxy).
+
+## Faint galaxies without morphology: colour-space kNN + missing-feature training
+
+Three more real fields (RA 245/+43, 250/+30, 20/0) showed GALAXY→STAR errors
+that the benchmarks did not: 7, 9 and 7 objects respectively, **before** the
+field-prior EM step too (EM was not the cause). Their evidence: faint
+(r ≈ 22.8–24.3) emission-line galaxies, below the S/N 10 Tractor morphology
+cut, carrying only Legacy Surveys colours (g−r ≈ 0–0.3, r−z ≈ 0.6–0.8).
+
+Cause: in both benchmarks almost every galaxy has a morphology measurement,
+so the linear colour terms were fitted *given* morphology and learned
+"red point source = star". With morphology evidence removed from the test
+split the previous model recalled **8% (SDSS) / 2% (DESI) of galaxies**.
+
+Changes:
+
+1. `LS-CKNN-001` (Stage 4, `color_knn.py`): Laplace-smoothed STAR/GALAXY/QSO
+   fractions among the k = 31 nearest **train-split** benchmark objects measured
+   in the same (≥ 2) dereddened Legacy Surveys colours — kNN classification in
+   colour space (Ball et al. 2006) follows the curved stellar locus (Covey et
+   al. 2007) and the galaxy/QSO mid-IR excess (Zhou et al. 2023; Chaussidon et
+   al. 2023) that a linear model cannot. Missing colours are never imputed;
+   fitting uses leave-one-out. Reference: `color_reference.csv.gz`
+   (8,651 objects; `v2/benchmark/build_color_reference.py`).
+2. Missing-feature augmentation in `fit_fusion_weights.py`
+   (`--augment-drop LS-MORPH PS1-MORPH SDSS-PHOTO --augment-weight 0.3`): every
+   train object with morphology also appears (weight 0.3) without it.
+3. Abstention threshold chosen so that **each** dataset's calibration split
+   reaches 92.5% (`--target-scope each`); the pooled target let the large
+   bright SDSS set hide faint-object errors. `min_confidence` = 0.63.
+4. Stage 5 applies the fitted intercept only when a fitted feature is present;
+   NED `*` is used as POINT_SOURCE evidence (photometric, unresolved label).
+
+5. `PS1-CKNN-001`: the same kNN on Pan-STARRS1 PSF colours (g−r, r−i, i−z,
+   z−y; each colour only at error ≤ 0.2 mag). PS1 covers Dec > −30°, including
+   fields outside the Legacy Surveys footprint and runs where the Data Lab TAP
+   service fails (it did for every field run on the afternoon of 2026-10-08).
+   A second augmentation group drops all `LS-` evidence. kNN fractions are
+   soft evidence and never trigger `CONFLICT` (Stage 4 and Stage 5).
+6. Evidence keys without fitted weights (SIMBAD/NED labels, …) are one-sided
+   support in Stage 5: a low-confidence label is weak support, not evidence
+   against its class (a NED "G" at score 0.03 had produced p_star = 0.99).
+
+| test split (CI evaluator, incl. CONFLICT abstention) | before (morning) | after |
+|---|---:|---:|
+| SDSS accuracy / coverage | 97.9% / 99% | **99.0% / 98.2%** |
+| DESI (r ≤ 23) accuracy / coverage | 87.8% / 93.9% | **92.3% / 91.5%** |
+| DESI log-loss (fit report) | 0.391 | 0.288 |
+| DESI argmax accuracy **without morphology** | 54% | 86% |
+| SDSS argmax accuracy **without morphology** | 66% | 98% |
+| SDSS / DESI argmax accuracy **without any Legacy Surveys evidence** | – | 98% / 64% |
+
+Fit: `fit_fusion_weights.py --augment-drop LS-MORPH,PS1-MORPH,SDSS-PHOTO LS-
+--augment-weight 0.3 --target-scope each --target-accuracy 0.925`
+(`min_confidence` 0.60). Without Legacy Surveys the faint DESI objects
+(r ≈ 22–23) are near the PS1 detection limit, hence the lower 64%.
+
+### Real fields after these changes (DESI DR1 spectra as truth, `v2_field_validation.yml`)
+
+| field (radius) | morning: accuracy / coverage | evening (commit e58bee3): accuracy / coverage |
+|---|---:|---:|
+| RA 245, Dec +43 (3′), n = 42 | 86.5% / 88.1% | **94.9% / 92.9%** |
+| RA 250, Dec +30 (4′), n = 40 | 61.5% / 97.5% | **94.3% / 87.5%** |
+| RA 20, Dec 0 (4′), n = 35 | 72.7% / 94.3% | **100% / 82.9%** |
+| pooled | 73.4% (80/109) / 93.2% | **96.1% (99/103) / 88.0%** |
+
+The last step (association posterior, below) raised coverage by 2–6 points
+per field at unchanged accuracy.
+
+Also fixed while validating: Stage 5 discounted unreliable evidence as
+`logit(raw × reliability)`, which turns a resolved-galaxy claim with
+near-zero association reliability into strong evidence *against* GALAXY
+(now `reliability × logit(raw)`); Stage 1 judged membership confidence
+against a stale anchor; Gaia TAP never answered from CI within 120 s
+(budget now 30 s, VizieR fallback with DSC), so collection dropped from
+~130 s to ~45–50 s per field.
+
+Legacy Surveys outage runs (NOIRLab Data Lab TAP down on 2026-10-08
+17:00–17:30 UTC; PS1/SDSS/Gaia/WISE evidence only, latest code incl. the
+association posterior): RA 245/+43 **97.2% / 85.7%**, RA 20/0 **100% / 60.0%**
+(the earlier LS-less run of RA 20/0 gave 83.3% / 51.4%). Faint DESI galaxies
+seen only by PS1 at S/N < 5 stay `NO_EVIDENCE`, which is the intended
+abstention.
+
+`CONFLICT` (strong evidence for different classes) now abstains only when
+the fitted fusion is below p = 0.99: held-out benchmark conflicts with
+p ≥ 0.99 were 19/19 correct. The threshold was read off the
+calibration+test conflicts (n = 55), so treat the small gain as indicative:
+SDSS coverage 98.4% → 98.7%, DESI 91.7% → 91.9%, accuracy unchanged.
+
+### Independent check on fields not used for any tuning
+
+All fixes above were driven by errors in the three fields of the previous
+table, so three further fields were run afterwards with no changes
+(objects in the benchmark truth sets excluded from scoring):
+
+| field (radius) | DESI objects | accuracy when classified | coverage |
+|---|---:|---:|---:|
+| RA 150, Dec +2 (COSMOS, 3′) | 76 | **98.4%** (61/62) | 81.6% |
+| RA 35, Dec −5 (4′) | 46 | **97.6%** (41/42) | 91.3% |
+| RA 185, Dec +30 (4′) | 0 | (no DESI spectra in the field) | – |
+| pooled | 122 | **98.1%** (102/104) | 85.2% |
+
+The COSMOS error is a z = 1.5 DESI "galaxy" at r = 24.4 coincident with a
+Gaia source of 73σ proper motion (Gaia DSC star 1.0, NED WD*): a blend
+where the classifier follows the dominant star. Most unscored objects are
+DESI spectra that Stage 1 could not attach unambiguously in crowded fields
+(`ambiguous_new`, no photometric evidence) — a coverage, not accuracy,
+limitation.
+
+**PS1 duplicates (2026-10-09).** The unscored COSMOS DESI spectra sat
+0.01–0.1″ from *two* Pan-STARRS1 objIDs of the same source (0.05–0.2″ apart,
+far below PS1's ~1″ seeing), so Stage 1 could not attach them. The PS1
+collector now keeps one row per 0.5″ (most detections). COSMOS: coverage
+81.6% → **88.2%**, accuracy 98.4% → **98.5%** (66/67); ambiguous DESI
+attachments 10 → 5. (RA 35/−5 in the same round lost NED to an archive
+timeout, so its 97.5% / 87.0% is not comparable.)
+
+**DESI ↔ Legacy Surveys by TARGETID (2026-10-09).** DESI TARGETIDs encode
+the Legacy Surveys RELEASE/BRICKID/OBJID of the target (desitarget
+`encode_targetid`), so both catalogs now carry an `LSID` alias and an exact
+alias match is decisive in Stage 1. Exact links exist where DR10 keeps the
+DR9 IDs (north, release 9011). RA 245/+43: DESI attached 27 → 28,
+`ambiguous_new` 2 → 1; accuracy 97.1% (that run lost NED to an archive
+timeout, so its coverage of 83% is not comparable with earlier runs).

@@ -1,0 +1,49 @@
+name: Preserve benchmark catalog features
+
+# The validated 9,999-object coarse benchmark features live only as Actions
+# artifacts of run 36279183554, which expire on 2026-10-10/11.  This copies
+# them into the repository (gzip) so the benchmark stays reproducible.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/preserve-benchmark-catalog-features.yml
+
+concurrency:
+  group: preserve-benchmark-catalog-features-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  preserve:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download validated catalog artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: catalog-truth-*
+          path: /tmp/catalog_truth
+          run-id: 36279183554
+          github-token: ${{ github.token }}
+      - name: Gzip into repository
+        run: |
+          set -euo pipefail
+          dest=v2/benchmark/catalog_features
+          mkdir -p "$dest"
+          find /tmp/catalog_truth -name '*_trd.csv' | while read -r f; do
+            gzip -9 -n -c "$f" > "$dest/$(basename "$f").gz"
+          done
+          ls -la "$dest"
+          du -sh "$dest"
+      - name: Commit
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add v2/benchmark/catalog_features
+          if git diff --cached --quiet; then echo "nothing to commit"; exit 0; fi
+          git commit -m "Preserve coarse benchmark catalog features (run 36279183554)"
+          for i in 1 2 3; do git pull --no-rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep 5; done

@@ -19,3 +19,13 @@
 ## Goals
 - Fully automated astronomical object detectors
 - Find out my objects and its counterparts for my research area
+
+## Run the v2 pipeline
+```bash
+# collect all surveys around a position, then classify (needs network access to the archives)
+python v2/pipeline.py --ra 188.4155 --dec 9.1751 --radius 0.5 --work runs/ngc4522
+# or classify already-collected raw catalogs
+python v2/pipeline.py --raw-dir v2/rawdata --work runs/ngc4522
+```
+Outputs (one CSV per stage, plus `pipeline_summary.csv` with per-stage time) go to `--work`.
+Benchmarks and current accuracy: `v2/Preprocess/COARSE_BENCHMARK_RESULTS.md`; change log: `v2/WORK_LOG_2026-10-08.md`.

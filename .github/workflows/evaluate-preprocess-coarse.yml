@@ -3,8 +3,17 @@ on:
   workflow_dispatch:
   push:
     paths:
+      - 'v2/Preprocess/02_integrate_objects.py'
+      - 'v2/Preprocess/03_extract_features.py'
       - 'v2/Preprocess/04_build_evidence.py'
       - 'v2/Preprocess/05_likelihood_vectors.py'
+      - 'v2/Preprocess/classification_rules.csv'
+      - 'v2/Preprocess/fusion_weights.json'
+      - 'v2/Preprocess/color_knn.py'
+      - 'v2/Preprocess/color_reference.csv.gz'
+      - 'v2/benchmark/catalog_features/**'
+      - 'v2/benchmark/desi_external/**'
+      - 'v2/benchmark/fit_fusion_weights.py'
       - 'v2/Preprocess/README.md'
       - 'v2/benchmark/evaluate_rule_baseline.py'
       - '.github/workflows/evaluate-preprocess-coarse.yml'
@@ -20,17 +29,32 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install pandas numpy scikit-learn
-      - name: Download validated 9999-object catalog artifacts
-        uses: actions/download-artifact@v4
-        with:
-          pattern: catalog-truth-*
-          path: v2/benchmark/coarse_downloaded
-          run-id: 36279183554
-          github-token: ${{ github.token }}
       - name: Rebuild manifest
-        run: python v2/benchmark/validate_catalog_truth.py --truth v2/benchmark/truth_data/ground_truth.csv --catalog-root v2/benchmark/coarse_downloaded --out v2/benchmark/coarse_ready
+        run: python v2/benchmark/validate_catalog_truth.py --truth v2/benchmark/truth_data/ground_truth.csv --catalog-root v2/benchmark/catalog_features --out v2/benchmark/coarse_ready
       - name: Evaluate coarse naive classifier
-        run: python v2/benchmark/evaluate_rule_baseline.py --truth v2/benchmark/truth_data/ground_truth.csv --catalog-root v2/benchmark/coarse_downloaded --manifest v2/benchmark/coarse_ready/benchmark_manifest.csv --out v2/benchmark/coarse_ready/coarse_eval
+        run: python v2/benchmark/evaluate_rule_baseline.py --truth v2/benchmark/truth_data/ground_truth.csv --catalog-root v2/benchmark/catalog_features --manifest v2/benchmark/coarse_ready/benchmark_manifest.csv --out v2/benchmark/coarse_ready/coarse_eval
+      - name: Evaluate on DESI DR1 external test split
+        run: |
+          python v2/benchmark/validate_catalog_truth.py --truth v2/benchmark/desi_external/truth.csv --catalog-root v2/benchmark/desi_external/catalog_features --out /tmp/desi_ready --allow-unbalanced
+          python v2/benchmark/evaluate_rule_baseline.py --truth v2/benchmark/desi_external/truth.csv --catalog-root v2/benchmark/desi_external/catalog_features --manifest /tmp/desi_ready/benchmark_manifest.csv --out /tmp/desi_eval --split test
+      - name: Regression gate (DESI test split)
+        run: |
+          python - <<'PY'
+          import json
+          m=json.load(open("/tmp/desi_eval/rule_baseline_metrics.json"))
+          cov=m["classified_rows"]/m["test_rows"]; acc=m["accuracy_when_classified"]
+          print(f"DESI coverage={cov:.4f} accuracy_when_classified={acc:.4f}")
+          assert acc>=0.85 and cov>=0.85, "faint-object (DESI) coarse performance regressed"
+          PY
+      - name: Regression gate (test split)
+        run: |
+          python - <<'PY'
+          import json
+          m=json.load(open("v2/benchmark/coarse_ready/coarse_eval/rule_baseline_metrics.json"))
+          cov=m["classified_rows"]/m["test_rows"]; acc=m["accuracy_when_classified"]
+          print(f"coverage={cov:.4f} accuracy_when_classified={acc:.4f}")
+          assert acc>=0.95 and cov>=0.90, "coarse classifier regressed below the fitted-fusion baseline"
+          PY
       - uses: actions/upload-artifact@v4
         with:
           name: preprocess-coarse-eval

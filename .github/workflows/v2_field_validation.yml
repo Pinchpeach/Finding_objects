@@ -1,0 +1,113 @@
+name: v2 real-field end-to-end validation
+
+# Runs v2/pipeline.py (collection + association + classification) on a sky
+# field and compares coarse classes with DESI DR1 spectroscopic classes found
+# in the same field. DESI spectra are not used as classification evidence, so
+# they are an independent check of the whole chain, including association.
+# Default field (RA 245, Dec +43) lies outside the RA windows used to build the
+# DESI truth set that the fusion weights were trained on.
+on:
+  workflow_dispatch:
+    inputs:
+      ra: {description: "RA (deg)", default: "245.0"}
+      dec: {description: "Dec (deg)", default: "43.0"}
+      radius: {description: "radius (arcmin)", default: "3"}
+  push:
+    paths:
+      - .github/workflows/v2_field_validation.yml
+
+permissions:
+  contents: read
+
+jobs:
+  field:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      RA: ${{ github.event.inputs.ra || '245.0' }}
+      DEC: ${{ github.event.inputs.dec || '43.0' }}
+      RADIUS: ${{ github.event.inputs.radius || '3' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pandas numpy requests astropy astroquery pyvo
+      - name: Pipeline
+        run: python -u v2/pipeline.py --ra $RA --dec $DEC --radius $RADIUS --work /tmp/field
+      - name: Compare with DESI DR1 spectroscopy in the field
+        run: |
+          python - <<'PY'
+          import pandas as pd
+          d=pd.read_csv("/tmp/field/classified_objects.csv",low_memory=False)
+          print(pd.read_csv("/tmp/field/pipeline_summary.csv").to_string(index=False))
+          print("objects",len(d)); print(d.classification_status.value_counts().to_string())
+          col="desi_dr1_spectroscopy__OType"
+          if col not in d.columns: raise SystemExit("no DESI spectra in this field")
+          s=d[d[col].notna()].copy(); s["truth"]=s[col].astype(str).str.strip()
+          # Standard DESI good-redshift cuts for the comparison truth.
+          s=s[pd.to_numeric(s.get("desi_dr1_spectroscopy__ZWARN"),errors="coerce").eq(0)&(pd.to_numeric(s.get("desi_dr1_spectroscopy__delChi2"),errors="coerce")>25)]
+          s=s[s.truth.isin(["STAR","GALAXY","QSO"])]
+          # Never score objects that are in the benchmark truth sets: they may
+          # be in the colour-kNN reference or the fusion training split.
+          import numpy as np
+          bench=pd.concat([pd.read_csv(f)[["ra","dec"]] for f in ("v2/benchmark/desi_external/truth.csv","v2/benchmark/truth_data/ground_truth.csv")])
+          ora=pd.to_numeric(s.get("object_ra",s.get("ra")),errors="coerce").to_numpy(); ode=pd.to_numeric(s.get("object_dec",s.get("dec")),errors="coerce").to_numpy()
+          near=bench[(abs(bench.dec-np.nanmedian(ode))<0.2)]
+          inb=np.array([((np.hypot((near.ra-r)*np.cos(np.radians(d)),near.dec-d)*3600)<1.5).any() if np.isfinite(r) else False for r,d in zip(ora,ode)])
+          print("benchmark objects excluded from scoring:",int(inb.sum())); s=s[~inb]
+          print("objects with DESI spectra:",len(s))
+          print(pd.crosstab(s.truth,s.primary_class,margins=True).to_string())
+          c=s.primary_class.ne("UNKNOWN")
+          print(f"coverage={c.mean():.3f} accuracy_when_classified={(s.primary_class==s.truth)[c].mean():.3f}")
+          if "field_prior_star" in d.columns:
+              print("field prior (EM):", {k:round(float(d[f"field_prior_{k}"].iloc[0]),3) for k in ("star","galaxy","qso")}, "adjusted:", bool(d.coarse_prior_adjusted.iloc[0]))
+              P=s[["p_star_training_prior","p_galaxy_training_prior","p_qso_training_prior"]].to_numpy()
+              pred=pd.Series(["STAR","GALAXY","QSO"]).iloc[P.argmax(1)].to_numpy()
+              ok=s.classification_status.isin(["CLASSIFIED","LOW_CONFIDENCE"]).to_numpy()
+              print("training-prior argmax on the same objects:"); print(pd.crosstab(s.truth[ok],pred[ok]).to_string())
+              print(f"training-prior accuracy={(pred[ok]==s.truth.to_numpy()[ok]).mean():.3f}")
+          import json, numpy as np
+          print("\n== GALAXY/QSO truth predicted STAR: evidence")
+          for _,r in s[s.truth.ne("STAR")&s.primary_class.eq("STAR")].iterrows():
+              ev=json.loads(r.evidence_json) if isinstance(r.evidence_json,str) else []
+              lsr=r.get("desi_legacy_surveys_dr10__flux_r")
+              print(r.truth, f"p_star={r.get('p_star',float('nan')):.2f}", "z",r.get("desi_dr1_spectroscopy__z"), "| ls_type",r.get("desi_legacy_surveys_dr10__type"),
+                    "| r_mag", round(22.5-2.5*np.log10(lsr),2) if pd.notna(lsr) and lsr>0 else None, "| cats",r.catalogs)
+              print("    ", [(e.get("rule_id"),e.get("class"),round(float(e.get("score") or 0),2),e.get("value")) for e in ev])
+          print("\n== catalogs of NO_EVIDENCE objects"); print(d[d.classification_status.eq("NO_EVIDENCE")].catalogs.value_counts().head(12).to_string())
+          print("\n== DESI-spectra objects left UNKNOWN")
+          u=s[s.primary_class.eq("UNKNOWN")]
+          for _,r in u.head(15).iterrows():
+              ev=json.loads(r.evidence_json) if isinstance(r.evidence_json,str) else []
+              print(r.truth, r.classification_status, r.catalogs, "| n_ev",len(ev), "| assoc_status",r.get("association_ambiguous"),
+                    "| ls_type",r.get("desi_legacy_surveys_dr10__type"), "| ls_r_flux",r.get("desi_legacy_surveys_dr10__flux_r"),
+                    "| host_r",r.get("host_elliptical_radius"), "| ls_assoc_conf",r.get("association_confidence__desi_legacy_surveys_dr10"),
+                    "| p",round(r.get("p_star",float("nan")),2),round(r.get("p_galaxy",float("nan")),2),round(r.get("p_qso",float("nan")),2))
+          a=pd.read_csv("/tmp/field/source_association.csv",low_memory=False)
+          print("\n== association status by catalog"); print(pd.crosstab(a.catalog,a.association_status).to_string())
+          print("\n== ambiguous DESI detections: neighbours within 2 arcsec (catalog, object, sep)")
+          amb=a[(a.catalog=="DESI DR1 spectroscopy")&(a.association_status=="ambiguous_new")]
+          cosd=np.cos(np.radians(float(a.dec.median())))
+          for _,r in amb.head(12).iterrows():
+              sep=np.hypot((a.ra-r.ra)*cosd,a.dec-r.dec)*3600
+              nb=a[(sep<2.0)&(a.object_id!=r.object_id)].assign(sep=sep)
+              print(round(float(r.get("match_separation_arcsec") or float("nan")),2), round(float(r.get("combined_sigma_arcsec") or float("nan")),2),
+                    "|", sorted({(c,o,round(x,2)) for c,o,x in zip(nb.catalog,nb.object_id,nb.sep)}, key=lambda t:t[2])[:6])
+          import glob, numpy as np
+          print(pd.read_csv(glob.glob("/tmp/field/raw/collection_summary_*.csv")[0])[["collector","status","rows","elapsed_seconds"]].to_string(index=False))
+          if not glob.glob("/tmp/field/raw/desi_legacy_*.csv"): raise SystemExit("Legacy Surveys collection failed in this run")
+          ls=pd.read_csv(glob.glob("/tmp/field/raw/desi_legacy_*.csv")[0],low_memory=False)
+          ds=pd.read_csv(glob.glob("/tmp/field/raw/desi_spectroscopy_*.csv")[0],low_memory=False)
+          print("\nLS rows",len(ls),"DESI rows",len(ds), "LS release values", ls.get("release",pd.Series()).value_counts().head().to_dict())
+          cosd=np.cos(np.radians(43.0))
+          sep=[np.min(np.hypot((ls.ra-r)*cosd,ls.dec-d))*3600 for r,d in zip(ds.ra,ds.dec)]
+          print("nearest-LS separation for DESI rows (arcsec):", np.percentile(sep,[10,50,90,100]).round(2), "n>2arcsec:", int((np.array(sep)>2).sum()))
+          print("LS ra/dec span", ls.ra.min(), ls.ra.max(), ls.dec.min(), ls.dec.max())
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: field-validation
+          path: /tmp/field/*.csv
+          retention-days: 7

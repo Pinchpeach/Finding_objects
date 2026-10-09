@@ -15,6 +15,25 @@ SOURCE=["source_id","designation","ra","dec","ra_error","dec_error","parallax","
 AP=["teff_gspphot","logg_gspphot","mh_gspphot","distance_gspphot","ag_gspphot","ebpminrp_gspphot","mass_flame","age_flame","evolstage_flame","flags_flame","classprob_dsc_combmod_quasar","classprob_dsc_combmod_galaxy","classprob_dsc_combmod_star","classprob_dsc_combmod_whitedwarf","classprob_dsc_combmod_binarystar"]
 VAR_SUMMARY=["in_vari_classification_result","in_vari_rrlyrae","in_vari_cepheid","in_vari_long_period_variable","in_vari_eclipsing_binary","in_vari_rotation_modulation","in_vari_agn","in_vari_microlensing","in_vari_compact_companion"]
 
+# Wall-clock budgets: a slow Gaia archive previously held a field for ~26 min
+# in retries; past the budget the VizieR mirror fallback is used instead.
+# From CI runners the ESA TAP rarely answers a cone search within 2 min while
+# VizieR answers in seconds, so the base budget is short.
+BASE_TAP_BUDGET_S=30.0
+OPTIONAL_TAP_BUDGET_S=60.0
+
+def _bounded(fn,budget_s,*args):
+    # Daemon thread: an abandoned slow query must not block interpreter exit.
+    import threading
+    box={}
+    def target():
+        try:box["value"]=fn(*args)
+        except BaseException as exc:box["error"]=exc
+    t=threading.Thread(target=target,daemon=True);t.start();t.join(budget_s)
+    if t.is_alive():raise TimeoutError(f"Gaia TAP exceeded {budget_s:.0f} s")
+    if "error" in box:raise box["error"]
+    return box["value"]
+
 def _tap(query:str,retries:int=4)->pd.DataFrame:
     from astroquery.gaia import Gaia
     last=None
@@ -34,7 +53,7 @@ def _merge_optional(base:pd.DataFrame,table:str,columns:list[str],status_name:st
     try:
         for start in range(0,len(ids),500):
             chunk=ids[start:start+500];select="source_id,"+",".join(columns)
-            pieces.append(_tap(f"SELECT {select} FROM {table} WHERE source_id IN ({','.join(chunk)})"))
+            pieces.append(_bounded(_tap,OPTIONAL_TAP_BUDGET_S,f"SELECT {select} FROM {table} WHERE source_id IN ({','.join(chunk)})"))
         opt=pd.concat(pieces,ignore_index=True,sort=False) if pieces else pd.DataFrame()
         if not opt.empty:
             opt["source_id"]=pd.to_numeric(opt["source_id"],errors="coerce").astype("Int64");base["source_id"]=pd.to_numeric(base["source_id"],errors="coerce").astype("Int64")
@@ -76,6 +95,18 @@ def _vizier_fallback(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
         out[new]=src[col] if col is not None else pd.NA
     out["source_id"]=pd.to_numeric(out["source_id"],errors="coerce").astype("Int64")
     out["designation"]="Gaia DR3 "+out["source_id"].astype("string")
+    # Gaia DSC-Combmod class probabilities (astrophysical-parameter table).
+    try:
+        dsc={"PQSO":"classprob_dsc_combmod_quasar","PGal":"classprob_dsc_combmod_galaxy","Pstar":"classprob_dsc_combmod_star",
+             "PWD":"classprob_dsc_combmod_whitedwarf","Pbin":"classprob_dsc_combmod_binarystar"}
+        pt=Vizier(columns=["Source",*dsc],row_limit=-1).query_region(c,radius=float(radius_arcmin)*u.arcmin,catalog="I/355/paramp")
+        ap=pt[0].to_pandas() if pt else pd.DataFrame()
+        if not ap.empty and "Source" in ap.columns:
+            ap=ap[["Source",*[k for k in dsc if k in ap.columns]]].rename(columns={"Source":"source_id",**dsc})
+            ap["source_id"]=pd.to_numeric(ap["source_id"],errors="coerce").astype("Int64")
+            out=out.merge(ap.drop_duplicates("source_id"),on="source_id",how="left")
+    except Exception:
+        pass
     # Independent variability table fallback. A cone query is cheap for named-source validation.
     try:
         vt=Vizier(columns=["**"],row_limit=-1).query_region(c,radius=float(radius_arcmin)*u.arcmin,catalog="I/358/vclassre")
@@ -96,7 +127,7 @@ def fetch(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
     select=",".join(SOURCE)
     q=f"""SELECT {select} FROM gaiadr3.gaia_source WHERE 1=CONTAINS(POINT('ICRS',ra,dec),CIRCLE('ICRS',{float(ra)},{float(dec)},{float(radius_arcmin)/60.0}))"""
     try:
-        df=_tap(q);df["gaia_base_query_status"]="tap"
+        df=_bounded(_tap,BASE_TAP_BUDGET_S,q);df["gaia_base_query_status"]="tap"
         if not df.empty:
             df=_merge_optional(df,"gaiadr3.astrophysical_parameters",AP,"gaia_ap_query_status")
             df=_merge_optional(df,"gaiadr3.vari_classifier_result",["best_class_name","best_class_score"],"gaia_vari_classifier_query_status")

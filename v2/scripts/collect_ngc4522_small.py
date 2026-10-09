@@ -1,6 +1,7 @@
 """Small NGC 4522 integration collection test."""
 from pathlib import Path
 import importlib.util
+import sys
 import traceback
 
 import pandas as pd
@@ -13,6 +14,8 @@ RADIUS_ARCMIN = 0.5
 
 ROOT = Path(__file__).resolve().parents[1]
 GET = ROOT / "Get_data"
+# Collectors import shared helpers such as ``_catalog_utils`` by bare name.
+sys.path.insert(0, str(GET))
 OUT = ROOT / "rawdata"
 OUT.mkdir(exist_ok=True)
 
@@ -20,7 +23,7 @@ modules = [
     "gaia_dr3", "sdss_dr18", "panstarrs1", "desi_legacy", "galex",
     "twomass", "allwise", "lotss", "first", "nvss", "vlass", "xmm",
     "chandra", "erosita", "sdss_spectroscopy", "desi_spectroscopy",
-    "lamost_spectroscopy", "simbad", "ned",
+    "lamost_spectroscopy", "sga2020", "simbad", "ned",
 ]
 
 summary = []
@@ -35,6 +38,8 @@ for name in modules:
         df = module.fetch(RA, DEC, RADIUS_ARCMIN)
         path = OUT / f"{name}_ngc4522_r0p5arcmin.csv"
         module.save(df, path)
+        if not path.exists():
+            raise RuntimeError(f"{name}.save() returned without writing {path}")
 
         maxsep = None
         if len(df) and {"ra", "dec"}.issubset(df.columns):

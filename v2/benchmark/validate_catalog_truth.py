@@ -27,10 +27,10 @@ def main():
         raise AssertionError(f"unbalanced benchmark still requires >=20 examples per class; got {counts}")
     manifest=truth[["benchmark_id","truth_class","ra","dec"]].copy(); manifest["split"]=manifest.benchmark_id.map(split_for)
     reports=[]; problems=[]; active_catalogs=[]; excluded_catalogs=[]
-    files=sorted(a.catalog_root.rglob("*_trd.csv"))
+    files=sorted([*a.catalog_root.rglob("*_trd.csv"),*a.catalog_root.rglob("*_trd.csv.gz")])
     for f in files:
-        cat=f.stem[:-4] if f.stem.endswith("_trd") else f.stem
-        d=pd.read_csv(f)
+        cat=f.name.split("_trd.csv")[0]
+        d=pd.read_csv(f,low_memory=False)
         present=set(d.benchmark_id.astype(str)) if len(d) else set()
         manifest[f"has_{cat}"]=manifest.benchmark_id.astype(str).isin(present)
         dup=int(d.benchmark_id.duplicated().sum()) if len(d) else 0
