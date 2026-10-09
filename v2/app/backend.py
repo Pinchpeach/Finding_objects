@@ -7,7 +7,10 @@ from dataclasses import dataclass
 from pathlib import Path
 import pandas as pd
 
-V2 = Path(__file__).resolve().parents[1]
+import sys as _sys
+_sys.path.insert(0, str(Path(__file__).resolve().parent))
+from app_paths import v2_root  # noqa: E402
+V2 = v2_root()
 SUMMARY_COLUMNS = ["object_id", "catalogs", "primary_class", "primary_confidence",
                    "classification_status", "p_star", "p_galaxy", "p_qso"]
 
