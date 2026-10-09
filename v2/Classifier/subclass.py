@@ -349,6 +349,11 @@ def galaxy_profile(row):
         return "EARLY_TYPE", "LS_DEV", "Legacy Surveys de Vaucouleurs profile"
     if t == "EXP":
         return "DISK", "LS_EXP", "Legacy Surveys exponential profile"
+    n = _num(row, "desi_legacy_surveys_dr10__sersic")
+    if t == "SER" and n is not None and n > 0:
+        # Sersic n = 2.5 separates early (bulge-dominated) from late (disc)
+        # types (Shen et al. 2003, MNRAS 343, 978; Blanton et al. 2003).
+        return ("EARLY_TYPE" if n >= 2.5 else "DISK"), "LS_SERSIC", f"Legacy Surveys Sersic n = {n:.2f} (early type if >= 2.5)"
     u, r = _num(row, "sdss_dr18_photoobj__modelMag_u"), _num(row, "sdss_dr18_photoobj__modelMag_r")
     if u is not None and r is not None:
         ur = u - r - (R_SDSS_U - R_SDSS_R) * (_ebv(row) or 0.0)

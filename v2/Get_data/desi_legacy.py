@@ -44,7 +44,8 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     # particular, do not join spectroscopy or any truth/classification table.
     # W1/W2 are unWISE forced photometry at the optical positions (Dey+2019),
     # far deeper than AllWISE; quasars' mid-IR excess separates them from
-    # stars where astrometry is unavailable (Chaussidon+2023).
+    # stars where astrometry is unavailable (Chaussidon+2023).  The Tractor
+    # Sersic index and half-light radius give the galaxy light profile.
     query = f"""
         SELECT ls_id, ra, dec, type, release, brickid, objid,
                flux_g, flux_r, flux_i, flux_z,
@@ -53,7 +54,8 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
                mw_transmission_i, mw_transmission_z,
                nobs_g, nobs_r, nobs_i, nobs_z, maskbits,
                flux_w1, flux_w2, flux_ivar_w1, flux_ivar_w2,
-               mw_transmission_w1, mw_transmission_w2
+               mw_transmission_w1, mw_transmission_w2,
+               sersic, shape_r
         FROM {TABLE}
         WHERE 't' = Q3C_RADIAL_QUERY(
             ra, dec, {float(ra):.10f}, {float(dec):.10f}, {radius_deg:.10f}

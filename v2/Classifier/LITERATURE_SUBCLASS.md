@@ -101,7 +101,8 @@ coarse class given:
 
 ### Light profile
 * Legacy Surveys DEV (de Vaucouleurs) → early-type-like; EXP → disc
-  (Dey et al. 2019 Tractor models).
+  (Dey et al. 2019 Tractor models). SER models: Sérsic n ≥ 2.5 → early type,
+  n < 2.5 → disc (Shen et al. 2003, MNRAS 343, 978; Blanton et al. 2003).
 * Otherwise SDSS (u−r)₀ ≥ 2.22 → early type, < 2.22 → late type
   (Strateva et al. 2001, AJ 122, 1861).
 
