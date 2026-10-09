@@ -75,13 +75,15 @@ def run(work: Path, raw_dir: Path | None = None, ra: float | None = None, dec: f
     step("6_prepare", prep.run, work / "likelihood_vectors.csv", work / "classifier_input.csv")
     step("7_classify", control.run, work / "classifier_input.csv", work / "classified_objects.csv")
 
-    # Real catalogue designations instead of the run-local OBJ ids; with a
-    # centre, distance from it (and, for already-collected data, the cone cut).
+    # Real catalogue designations instead of the run-local OBJ ids; fragments
+    # of one large galaxy grouped under it; with a centre, distance from it
+    # (and, for already-collected data, the cone cut).
     names = _load(V2 / "designations.py", "v2_designations")
-    out = names.annotate(pd.read_csv(work / "classified_objects.csv", low_memory=False),
-                         pd.read_csv(work / "source_association.csv", low_memory=False,
-                                     dtype={"catalog_object_id": "string"}),
-                         None if None in (ra, dec) else (ra, dec), None if collect else radius)
+    hosts = _load(V2 / "host_groups.py", "v2_host_groups")
+    assoc = pd.read_csv(work / "source_association.csv", low_memory=False, dtype={"catalog_object_id": "string"})
+    out = names.annotate(pd.read_csv(work / "classified_objects.csv", low_memory=False), assoc)
+    out = hosts.consolidate(out, names.PRIORITY)
+    out = names.annotate(out, assoc, None if None in (ra, dec) else (ra, dec), None if collect else radius)
     out.to_csv(work / "classified_objects.csv", index=False)
 
     summary = pd.DataFrame(timings)

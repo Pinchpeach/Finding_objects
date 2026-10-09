@@ -78,14 +78,23 @@ def angular_sep_arcmin(ra, dec, ra0: float, dec0: float) -> np.ndarray:
 def annotate(classified: pd.DataFrame, association: pd.DataFrame,
              center: tuple[float, float] | None = None, radius_arcmin: float | None = None) -> pd.DataFrame:
     """Add designation columns; with a centre, add separation_arcmin, keep only
-    objects inside the radius (if given) and sort by distance from the centre."""
-    out = classified.drop(columns=[c for c in ("designation", "designation_catalog", "catalog_designations")
-                                   if c in classified.columns])
-    out = out.merge(designations(association), on="object_id", how="left").copy()
-    out["designation"] = out.designation.fillna(out.object_id)
+    objects inside the radius (if given) and sort by distance from the centre.
+    A kept component keeps its host galaxy (``parent_object_id``) even when
+    the host centre lies outside the cone."""
+    if "designation" in classified.columns and "catalog_designations" in classified.columns:
+        out = classified.copy()            # already named (e.g. host-consolidated)
+    else:
+        out = classified.drop(columns=[c for c in ("designation", "designation_catalog", "catalog_designations")
+                                       if c in classified.columns])
+        out = out.merge(designations(association), on="object_id", how="left").copy()
+        out["designation"] = out.designation.fillna(out.object_id)
     if center is not None:
         out["separation_arcmin"] = angular_sep_arcmin(out.ra, out.dec, *center)
         if radius_arcmin is not None:
-            out = out[out.separation_arcmin <= radius_arcmin]
+            inside = out.separation_arcmin <= radius_arcmin
+            if "parent_object_id" in out:
+                hosts = set(out.loc[inside, "parent_object_id"].dropna())
+                inside |= out.object_id.isin(hosts)
+            out = out[inside]
         out = out.sort_values("separation_arcmin", kind="stable").reset_index(drop=True)
     return out
