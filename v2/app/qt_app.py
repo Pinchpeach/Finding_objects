@@ -43,7 +43,7 @@ from PySide6.QtWidgets import (QApplication, QComboBox, QDoubleSpinBox, QFileDia
 
 from progress import ProgressTracker  # noqa: E402
 from qt_models import DataFrameModel, ResultsFilter  # noqa: E402
-from qt_widgets import DetailPanel, SkyMap  # noqa: E402
+from qt_widgets import DetailPanel, SkyView  # noqa: E402
 
 APP_NAME = "Finding Objects"
 RESULT_FILE = "classified_objects.csv"
@@ -149,7 +149,10 @@ class MainWindow(QMainWindow):
                                                                  "CONFLICT", "WITHIN_LARGE_GALAXY"])
         self.txt_search = QLineEdit(); self.txt_search.setPlaceholderText("Search name / catalog…")
         self.lbl_counts = QLabel("")
-        for w in (QLabel("Class"), self.cmb_class, QLabel("Status"), self.cmb_status, self.txt_search):
+        self.chk_parts = QCheckBox("Show galaxy parts")
+        self.chk_parts.setToolTip("Catalogue entries that are pieces of a large galaxy (HII regions, nucleus, shreds)\n"
+                                  "are grouped under the galaxy and hidden unless this is on.")
+        for w in (QLabel("Class"), self.cmb_class, QLabel("Status"), self.cmb_status, self.txt_search, self.chk_parts):
             bar.addWidget(w)
         bar.addStretch(1); bar.addWidget(self.lbl_counts)
         tl.addLayout(bar)
@@ -166,8 +169,9 @@ class MainWindow(QMainWindow):
         root.addWidget(center)
 
         tabs = QTabWidget()
-        self.detail = DetailPanel(); self.sky = SkyMap()
-        tabs.addTab(self.detail, "Object"); tabs.addTab(self.sky, "Sky map")
+        self.detail = DetailPanel(); self.sky_view = SkyView(); self.sky = self.sky_view.map
+        tabs.addTab(self.detail, "Object"); tabs.addTab(self.sky_view, "Sky map")
+        self.tabs = tabs
         root.addWidget(tabs)
         root.setStretchFactor(0, 0); root.setStretchFactor(1, 3); root.setStretchFactor(2, 2)
         root.setSizes([330, 700, 420])
@@ -175,6 +179,7 @@ class MainWindow(QMainWindow):
         self.cmb_class.currentTextChanged.connect(self._filters_changed)
         self.cmb_status.currentTextChanged.connect(self._filters_changed)
         self.txt_search.textChanged.connect(self._filters_changed)
+        self.chk_parts.toggled.connect(self._filters_changed)
         self.table.selectionModel().currentRowChanged.connect(self._row_changed)
         self.sky.objectClicked.connect(self._select_source_row)
         self.sky.centerPicked.connect(self._center_from_map)
@@ -411,13 +416,17 @@ class MainWindow(QMainWindow):
         self.proxy.set_class(self.cmb_class.currentText())
         self.proxy.set_status(self.cmb_status.currentText())
         self.proxy.set_text(self.txt_search.text())
+        self.proxy.set_show_components(self.chk_parts.isChecked())
         rows = [self.proxy.mapToSource(self.proxy.index(i, 0)).row() for i in range(self.proxy.rowCount())]
         self.sky.set_visible_rows(rows)
         df = self.model.frame()
         if not df.empty and "primary_class" in df:
-            counts = df.primary_class.value_counts()
-            self.lbl_counts.setText(f"{self.proxy.rowCount()} shown / {len(df)} · " +
-                                    " · ".join(f"{k} {v}" for k, v in counts.items()))
+            top = df[df.parent_object_id.isna()] if "parent_object_id" in df else df
+            counts = top.primary_class.value_counts()
+            parts = len(df) - len(top)
+            self.lbl_counts.setText(f"{self.proxy.rowCount()} shown / {len(top)} objects"
+                                    + (f" (+{parts} galaxy parts)" if parts else "") + " · "
+                                    + " · ".join(f"{k} {v}" for k, v in counts.items()))
 
     def _row_changed(self, current: QModelIndex, _prev):
         if not current.isValid():

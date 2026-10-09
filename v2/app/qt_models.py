@@ -7,9 +7,9 @@ from PySide6.QtCore import QAbstractTableModel, QModelIndex, QSortFilterProxyMod
 from PySide6.QtGui import QColor
 
 CLASS_COLORS = {"STAR": "#d9822b", "GALAXY": "#2b6cb0", "QSO": "#7b3fb5", "UNKNOWN": "#8a8f98"}
-TABLE_COLUMNS = ["designation", "primary_class", "primary_confidence", "classification_status",
-                 "p_star", "p_galaxy", "p_qso", "separation_arcmin", "ra", "dec", "designation_catalog", "catalogs"]
-HEADERS = {"designation": "Name", "designation_catalog": "Name from", "separation_arcmin": "Dist (′)", "primary_class": "Class", "primary_confidence": "Confidence",
+TABLE_COLUMNS = ["designation", "primary_class", "subclass", "primary_confidence", "classification_status",
+                 "p_star", "p_galaxy", "p_qso", "separation_arcmin", "n_components", "ra", "dec", "designation_catalog", "catalogs"]
+HEADERS = {"designation": "Name", "subclass": "Sub-class", "n_components": "Parts", "designation_catalog": "Name from", "separation_arcmin": "Dist (′)", "primary_class": "Class", "primary_confidence": "Confidence",
            "classification_status": "Status", "p_star": "P(star)", "p_galaxy": "P(galaxy)",
            "p_qso": "P(QSO)", "ra": "RA", "dec": "Dec", "catalogs": "Catalogs"}
 SORT_ROLE = Qt.UserRole + 1
@@ -33,6 +33,7 @@ class DataFrameModel(QAbstractTableModel):
     def set_frame(self, df: pd.DataFrame) -> None:
         self.beginResetModel()
         self._df = df.reset_index(drop=True)
+        self._icons = None
         cols = [c for c in TABLE_COLUMNS if c in self._df.columns]
         if "designation" not in cols and "object_id" in self._df.columns:   # very old results only
             cols.insert(0, "object_id")
@@ -41,6 +42,19 @@ class DataFrameModel(QAbstractTableModel):
 
     def frame(self) -> pd.DataFrame:
         return self._df
+
+    def _icon(self, row: int):
+        if getattr(self, "_icons", None) is None:
+            from qt_icons import icon, kind_of
+            cache, icons = {}, []
+            for r in self._df.to_dict("records"):
+                k = kind_of(r)
+                key = repr(sorted(k.items()))
+                if key not in cache:
+                    cache[key] = icon(k, 16)
+                icons.append(cache[key])
+            self._icons = icons
+        return self._icons[row] if row < len(self._icons) else None
 
     def column_name(self, col: int) -> str:
         return self._cols[col]
@@ -77,6 +91,11 @@ class DataFrameModel(QAbstractTableModel):
             return value
         if role == Qt.ForegroundRole and col == "primary_class":
             return class_color(value)
+        if role == Qt.DecorationRole and index.column() == 0:
+            return self._icon(index.row())
+        if role == Qt.ToolTipRole and col in ("subclass", "designation"):
+            basis = self._df.iat[index.row(), self._df.columns.get_loc("subclass_basis")] if "subclass_basis" in self._df else None
+            return None if basis is None or (isinstance(basis, float) and basis != basis) else str(basis)
         if role == Qt.TextAlignmentRole and isinstance(value, float):
             return int(Qt.AlignRight | Qt.AlignVCenter)
         return None
@@ -92,16 +111,28 @@ class ResultsFilter(QSortFilterProxyModel):
         self._cls = "ALL"
         self._status = "ALL"
         self._text = ""
+        self._components = False
         self._a_cls = self._a_status = self._a_text = None
 
+    def _refilter(self, apply):
+        # Qt >= 6.10 replaces invalidateFilter() with begin/endFilterChange().
+        if hasattr(self, "beginFilterChange"):
+            self.beginFilterChange(); apply(); self.endFilterChange()
+        else:
+            apply(); self.invalidateFilter()
+
     def set_class(self, cls: str):
-        self._cls = cls; self.invalidateFilter()
+        self._refilter(lambda: setattr(self, "_cls", cls))
 
     def set_status(self, status: str):
-        self._status = status; self.invalidateFilter()
+        self._refilter(lambda: setattr(self, "_status", status))
 
     def set_text(self, text: str):
-        self._text = text.strip().lower(); self.invalidateFilter()
+        self._refilter(lambda: setattr(self, "_text", text.strip().lower()))
+
+    def set_show_components(self, on: bool):
+        """Show the parts of large galaxies (hidden by default: they are listed under their host)."""
+        self._refilter(lambda: setattr(self, "_components", bool(on)))
 
     def setSourceModel(self, model):
         super().setSourceModel(model)
@@ -112,12 +143,16 @@ class ResultsFilter(QSortFilterProxyModel):
         # Column arrays once per result set: filtering thousands of rows must
         # not go through per-row pandas indexing.
         df = self.sourceModel().frame()
-        col = lambda c: df[c].astype(str).to_numpy() if c in df else None
+        # fillna first: with pandas' string dtype astype(str) keeps missing values as NaN
+        col = lambda c: df[c].fillna("").astype(str).to_numpy(dtype=object) if c in df else None
         self._a_cls, self._a_status = col("primary_class"), col("classification_status")
-        parts = [a for a in (col("designation"), col("catalog_designations"), col("catalogs"), col("object_id")) if a is not None]
+        self._a_part = df["parent_object_id"].notna().to_numpy() if "parent_object_id" in df else None
+        parts = [a for a in (col("designation"), col("subclass"), col("catalog_designations"), col("catalogs"), col("object_id")) if a is not None]
         self._a_text = [" ".join(t).lower() for t in zip(*parts)] if parts else None
 
     def filterAcceptsRow(self, row, parent):
+        if not self._components and self._a_part is not None and self._a_part[row]:
+            return False
         if self._cls != "ALL" and self._a_cls is not None and self._a_cls[row] != self._cls:
             return False
         if self._status != "ALL" and self._a_status is not None and self._a_status[row] != self._status:

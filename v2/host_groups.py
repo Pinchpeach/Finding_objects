@@ -31,6 +31,10 @@ Rule, applied after classification (``pipeline.py``):
   Identity names are attached to the host, which is then named by the usual
   designation priority (SIMBAD first); the host redshift comes from the host,
   an identity entry or a nucleus spectrum, in that order.
+* Independent objects inside the ellipse are kept as top-level objects with
+  ``component_role`` foreground_star / background_source /
+  foreground_source / transient, so the reason they were not merged stays
+  visible.
 
 DV_MAX_KMS = 1500 km/s is wider than the rotation/velocity dispersion of
 any single galaxy (<~ 600 km/s even for massive ellipticals and the widest
@@ -145,11 +149,14 @@ def consolidate(df: pd.DataFrame, priority=()) -> pd.DataFrame:
         for i in ms:
             r = rows[i]
             cats = str(r.get("catalogs", ""))
-            if _foreground_star(r) or any(c in cats for c in EVENT_CATALOGS):
-                continue
+            # Independent objects seen through the galaxy keep a role that says why.
+            if _foreground_star(r):
+                role[i] = "foreground_star"; continue
+            if any(c in cats for c in EVENT_CATALOGS):
+                role[i] = "transient"; continue
             zi = _redshift(r, SPEC_Z_COLUMNS) or _redshift(r)
             if zi is not None and host_z[h] is not None and abs(zi - host_z[h]) * C_KMS > DV_MAX_KMS:
-                continue
+                role[i] = "background_source" if zi > host_z[h] else "foreground_source"; continue
             parent[i] = rows[h]["object_id"]
             role[i] = "identity" if identity(h, i) else "nucleus" if near_centre(h, i) else "component"
     out["parent_object_id"] = parent

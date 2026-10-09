@@ -56,6 +56,7 @@ def test_large_galaxy_fragments_join_their_host():
     for independent in ("F", "Q", "O", "H"):
         assert pd.isna(out.loc[independent, "parent_object_id"]), independent
     assert out.loc["H", "n_components"] == 3
+    assert out.loc["F", "component_role"] == "foreground_star" and out.loc["Q", "component_role"] == "background_source"
     assert out.loc["H", "designation"] == "NGC 4522" and out.loc["H", "designation_catalog"] == "SIMBAD"
     assert "SIMBAD" in out.loc["H", "catalogs"] and abs(out.loc["H", "host_redshift"] - 0.00777) < 1e-9
     assert out.loc["S", "designation"] == "NGC 4522 (SIMBAD entry)"
