@@ -3,35 +3,17 @@
     "phenomenon": {
       "PN": {
         "method": "withheld",
-        "n": 6,
-        "negative": 0,
-        "positive": 6,
-        "reason": "insufficient independent truth support",
-        "truth_independent": true
-      }
-    },
-    "physical": {
-      "AGB": {
-        "method": "withheld",
-        "n": 15,
-        "negative": 7,
-        "positive": 8,
+        "n": 235,
+        "negative": 2,
+        "positive": 233,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
-      "OTHER_STELLAR": {
+      "SN": {
         "method": "withheld",
-        "n": 15,
-        "negative": 15,
-        "positive": 0,
-        "reason": "insufficient independent truth support",
-        "truth_independent": true
-      },
-      "RGB": {
-        "method": "withheld",
-        "n": 15,
-        "negative": 8,
-        "positive": 7,
+        "n": 235,
+        "negative": 233,
+        "positive": 2,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       }
@@ -39,42 +21,69 @@
     "variability": {
       "CEPHEID": {
         "method": "withheld",
-        "n": 28,
-        "negative": 20,
-        "positive": 8,
+        "n": 463,
+        "negative": 448,
+        "positive": 15,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "ECLIPSING": {
         "method": "withheld",
-        "n": 28,
-        "negative": 28,
+        "n": 463,
+        "negative": 463,
         "positive": 0,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "LPV": {
-        "method": "withheld",
-        "n": 28,
-        "negative": 23,
-        "positive": 5,
-        "reason": "insufficient independent truth support",
+        "coef": 0.3976114881969909,
+        "intercept": -0.83962279109616,
+        "method": "platt",
+        "n": 463,
+        "negative": 290,
+        "positive": 173,
         "truth_independent": true
       },
       "MIRA": {
+        "coef": 0.0,
+        "intercept": 0.07346544635595043,
+        "method": "platt",
+        "n": 463,
+        "negative": 223,
+        "positive": 240,
+        "truth_independent": true
+      },
+      "OTHER_VARIABLE": {
         "method": "withheld",
-        "n": 28,
-        "negative": 21,
-        "positive": 7,
+        "n": 463,
+        "negative": 463,
+        "positive": 0,
+        "reason": "insufficient independent truth support",
+        "truth_independent": true
+      },
+      "PULSATING": {
+        "method": "withheld",
+        "n": 463,
+        "negative": 463,
+        "positive": 0,
+        "reason": "insufficient independent truth support",
+        "truth_independent": true
+      },
+      "ROTATIONAL": {
+        "method": "withheld",
+        "n": 463,
+        "negative": 463,
+        "positive": 0,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "RR_LYRAE": {
-        "method": "withheld",
-        "n": 28,
-        "negative": 20,
-        "positive": 8,
-        "reason": "insufficient independent truth support",
+        "coef": 2.618138500047478,
+        "intercept": -2.5661982222451276,
+        "method": "platt",
+        "n": 463,
+        "negative": 428,
+        "positive": 35,
         "truth_independent": true
       }
     }
