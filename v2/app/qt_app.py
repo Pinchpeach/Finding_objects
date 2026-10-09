@@ -47,6 +47,56 @@ from qt_widgets import DetailPanel, SkyMap  # noqa: E402
 
 APP_NAME = "Finding Objects"
 RESULT_FILE = "classified_objects.csv"
+RADIUS_UNITS = {"arcsec": 1 / 60.0, "arcmin": 1.0, "deg": 60.0}   # -> arcmin
+RADIUS_DECIMALS = {"arcsec": 1, "arcmin": 3, "deg": 5}
+RADIUS_RANGE_ARCMIN = (0.1 / 60.0, 180.0)                           # 0.1 arcsec .. 3 deg
+MAX_QUERY_ARCMIN = 30.0      # largest cone the archive collectors were exercised with
+
+
+def parse_coordinates(text: str) -> tuple[float, float] | None:
+    """ICRS (ra, dec) in degrees from typed coordinates, or None if the text is
+    not a coordinate (then it is treated as an object name).  Accepts decimal
+    degrees ("188.4155 +9.1751") and sexagesimal with RA in hours
+    ("12:33:39.7 +09:10:30", "12 33 39.7 +09 10 30", "12h33m39.7s +9d10m30s")."""
+    import re
+    t = text.strip().replace(",", " ")
+    t = re.sub(r"[hHdD°:mM'′sS\"″]", " ", t)          # unit marks -> separators
+    if not t or not re.fullmatch(r"[0-9+\-. ]+", t):
+        return None
+    m = re.fullmatch(r"\s*(\S+(?:\s+\S+)*?)\s+([+-]\S*(?:\s+\S+)*)\s*", t)
+    parts = t.split()
+    if len(parts) == 2:
+        ra_f, dec_f = [parts[0]], [parts[1]]
+    elif m:                                               # split at the signed Dec
+        ra_f, dec_f = m.group(1).split(), m.group(2).split()
+    elif len(parts) == 6:
+        ra_f, dec_f = parts[:3], parts[3:]
+    else:
+        return None
+    try:
+        nums_ra = [float(x) for x in ra_f]; nums_dec = [abs(float(x)) for x in dec_f]
+    except ValueError:
+        return None
+    if not (1 <= len(nums_ra) <= 3 and 1 <= len(nums_dec) <= 3):
+        return None
+    sexa = lambda v: v[0] + sum(x / 60 ** (i + 1) for i, x in enumerate(v[1:]))
+    if len(nums_ra) == 1 and len(nums_dec) == 1:          # decimal degrees
+        ra = nums_ra[0]
+    else:
+        if any(x >= 60 for x in nums_ra[1:] + nums_dec[1:]):
+            return None
+        ra = sexa(nums_ra) * 15.0
+    dec = sexa(nums_dec) * (-1 if dec_f[0].startswith("-") else 1)
+    if not (0 <= ra < 360 and -90 <= dec <= 90):
+        return None
+    return ra, dec
+
+
+def _designations():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("v2_designations", V2 / "designations.py")
+    mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod)
+    return mod
 
 
 class _NameResolver(QRunnable):
@@ -97,7 +147,7 @@ class MainWindow(QMainWindow):
         self.cmb_class = QComboBox(); self.cmb_class.addItems(["ALL", "STAR", "GALAXY", "QSO", "UNKNOWN"])
         self.cmb_status = QComboBox(); self.cmb_status.addItems(["ALL", "CLASSIFIED", "LOW_CONFIDENCE", "NO_EVIDENCE",
                                                                  "CONFLICT", "WITHIN_LARGE_GALAXY"])
-        self.txt_search = QLineEdit(); self.txt_search.setPlaceholderText("Search object id / catalog…")
+        self.txt_search = QLineEdit(); self.txt_search.setPlaceholderText("Search name / catalog…")
         self.lbl_counts = QLabel("")
         for w in (QLabel("Class"), self.cmb_class, QLabel("Status"), self.cmb_status, self.txt_search):
             bar.addWidget(w)
@@ -127,27 +177,44 @@ class MainWindow(QMainWindow):
         self.txt_search.textChanged.connect(self._filters_changed)
         self.table.selectionModel().currentRowChanged.connect(self._row_changed)
         self.sky.objectClicked.connect(self._select_source_row)
+        self.sky.centerPicked.connect(self._center_from_map)
 
         self.progress = QProgressBar(); self.progress.setMaximumWidth(260); self.progress.setVisible(False)
         self.statusBar().addPermanentWidget(self.progress)
 
     def _build_controls(self) -> QWidget:
-        box = QWidget(); box.setMinimumWidth(320); lay = QVBoxLayout(box)
-        tgt = QGroupBox("Target"); f = QFormLayout(tgt)
-        self.rb_sky = QRadioButton("Query archives"); self.rb_raw = QRadioButton("Use collected catalogs")
+        box = QWidget(); box.setMinimumWidth(340); lay = QVBoxLayout(box)
+        area = QGroupBox("Search area"); f = QFormLayout(area)
+        tgt_row = QHBoxLayout()
+        self.txt_name = QLineEdit()
+        self.txt_name.setPlaceholderText("NGC 4522  ·  188.4155 +9.1751  ·  12:33:39.7 +09:10:30")
+        self.txt_name.setToolTip("Object name (resolved with CDS Sesame) or coordinates:\n"
+                                 "decimal degrees, hh:mm:ss ±dd:mm:ss, or 12h33m39.7s +9d10m30s")
+        self.btn_resolve = QPushButton("Set"); tgt_row.addWidget(self.txt_name); tgt_row.addWidget(self.btn_resolve)
+        f.addRow("Centre", tgt_row)
+        self.sp_ra = _spin(0, 360, 6, " °"); self.sp_dec = _spin(-90, 90, 6, " °")
+        self.sp_ra.setWrapping(True)
+        f.addRow("RA", self.sp_ra); f.addRow("Dec", self.sp_dec)
+        rad_row = QHBoxLayout()
+        self.sp_rad = _spin(0.001, 180, 3, ""); self.cmb_rad_unit = QComboBox(); self.cmb_rad_unit.addItems(list(RADIUS_UNITS))
+        rad_row.addWidget(self.sp_rad, 1); rad_row.addWidget(self.cmb_rad_unit)
+        f.addRow("Radius", rad_row)
+        self.lbl_area = QLabel(""); self.lbl_area.setStyleSheet("color: gray;"); self.lbl_area.setWordWrap(True)
+        f.addRow(self.lbl_area)
+        lay.addWidget(area)
+
+        src = QGroupBox("Data source"); fs = QFormLayout(src)
+        self.rb_sky = QRadioButton("Query archives for the search area")
+        self.rb_raw = QRadioButton("Use collected catalogs")
         self.rb_sky.setChecked(True)
-        f.addRow(self.rb_sky)
-        name_row = QHBoxLayout()
-        self.txt_name = QLineEdit(); self.txt_name.setPlaceholderText("e.g. NGC 4522")
-        self.btn_resolve = QPushButton("Resolve"); name_row.addWidget(self.txt_name); name_row.addWidget(self.btn_resolve)
-        f.addRow("Name", name_row)
-        self.sp_ra = _spin(0, 360, 6, " °"); self.sp_dec = _spin(-90, 90, 6, " °"); self.sp_rad = _spin(0.05, 30, 2, " ′")
-        f.addRow("RA", self.sp_ra); f.addRow("Dec", self.sp_dec); f.addRow("Radius", self.sp_rad)
-        f.addRow(self.rb_raw)
+        fs.addRow(self.rb_sky); fs.addRow(self.rb_raw)
         raw_row = QHBoxLayout(); self.txt_raw = QLineEdit(); b = QPushButton("…")
         b.clicked.connect(lambda: self._pick_dir(self.txt_raw)); raw_row.addWidget(self.txt_raw); raw_row.addWidget(b)
-        f.addRow("Folder", raw_row)
-        lay.addWidget(tgt)
+        fs.addRow("Folder", raw_row)
+        self.chk_area = QCheckBox("Keep only objects inside the search area")
+        self.chk_area.setChecked(True)
+        fs.addRow(self.chk_area)
+        lay.addWidget(src)
 
         opt = QGroupBox("Options"); fo = QFormLayout(opt)
         out_row = QHBoxLayout(); self.txt_work = QLineEdit(); b2 = QPushButton("…")
@@ -176,6 +243,11 @@ class MainWindow(QMainWindow):
         self.btn_resolve.clicked.connect(self._resolve_name)
         self.txt_name.returnPressed.connect(self._resolve_name)
         self.rb_sky.toggled.connect(self._mode_changed)
+        self.chk_area.toggled.connect(self._area_changed)
+        self.cmb_rad_unit.currentTextChanged.connect(self._unit_changed)
+        for w in (self.sp_ra, self.sp_dec, self.sp_rad):
+            w.valueChanged.connect(self._area_changed)
+        self._rad_unit = self.cmb_rad_unit.currentText()
         self._mode_changed()
         return box
 
@@ -193,9 +265,41 @@ class MainWindow(QMainWindow):
     # ----------------------------------------------------------- inputs
     def _mode_changed(self):
         sky = self.rb_sky.isChecked()
-        for w in (self.txt_name, self.btn_resolve, self.sp_ra, self.sp_dec, self.sp_rad, self.sp_workers):
-            w.setEnabled(sky)
-        self.txt_raw.setEnabled(not sky)
+        self.sp_workers.setEnabled(sky)
+        self.txt_raw.setEnabled(not sky); self.chk_area.setEnabled(not sky)
+        self._area_changed()
+
+    def _area_used(self) -> bool:
+        return self.rb_sky.isChecked() or self.chk_area.isChecked()
+
+    def radius_arcmin(self) -> float:
+        return self.sp_rad.value() * RADIUS_UNITS[self.cmb_rad_unit.currentText()]
+
+    def _unit_changed(self, unit: str):
+        """Keep the same angle when the unit changes."""
+        arcmin = self.sp_rad.value() * RADIUS_UNITS[self._rad_unit]
+        self._rad_unit = unit
+        self._apply_unit_range(unit)
+        self.sp_rad.setValue(arcmin / RADIUS_UNITS[unit])
+
+    def _apply_unit_range(self, unit: str):
+        k = RADIUS_UNITS[unit]
+        self.sp_rad.setDecimals(RADIUS_DECIMALS[unit])
+        self.sp_rad.setRange(RADIUS_RANGE_ARCMIN[0] / k, RADIUS_RANGE_ARCMIN[1] / k)
+        self.sp_rad.setSingleStep(10 ** -max(RADIUS_DECIMALS[unit] - 1, 0))
+
+    def _area_changed(self, *_):
+        used = self._area_used()
+        for w in (self.txt_name, self.btn_resolve, self.sp_ra, self.sp_dec, self.sp_rad, self.cmb_rad_unit):
+            w.setEnabled(used)
+        r = self.radius_arcmin()
+        text = (f"Cone r = {r * 60:.1f}″ = {r:.3f}′ = {r / 60:.4f}° around RA {self.sp_ra.value():.5f}, "
+                f"Dec {self.sp_dec.value():+.5f}")
+        if self.rb_sky.isChecked() and r > MAX_QUERY_ARCMIN:
+            text += f"  ⚠ above {MAX_QUERY_ARCMIN:g}′ archive queries get slow and may time out"
+        self.lbl_area.setText(text if used else "Whole folder (no area cut)")
+        if hasattr(self, "sky"):
+            self.sky.set_area((self.sp_ra.value(), self.sp_dec.value(), r) if used else None)
 
     def _pick_dir(self, edit: QLineEdit):
         d = QFileDialog.getExistingDirectory(self, "Choose folder", edit.text() or str(Path.home()))
@@ -206,11 +310,19 @@ class MainWindow(QMainWindow):
         name = self.txt_name.text().strip()
         if not name:
             return
+        coords = parse_coordinates(name)
+        if coords is not None:                     # typed coordinates: no network needed
+            self._resolved(*coords, name); return
         self.btn_resolve.setEnabled(False); self._status(f"Resolving {name}…")
         job = _NameResolver(name)
         job.signals.done.connect(self._resolved)
         job.signals.failed.connect(lambda msg: (self.btn_resolve.setEnabled(True), self._status(f"Could not resolve {msg}")))
         QThreadPool.globalInstance().start(job)
+
+    def _center_from_map(self, ra, dec):
+        if self._area_used():
+            self.sp_ra.setValue(ra); self.sp_dec.setValue(dec)
+            self._status(f"Centre set from map: RA {ra:.6f}, Dec {dec:+.6f}")
 
     def _resolved(self, ra, dec, name):
         self.sp_ra.setValue(ra); self.sp_dec.setValue(dec); self.btn_resolve.setEnabled(True)
@@ -219,14 +331,15 @@ class MainWindow(QMainWindow):
     def pipeline_args(self) -> list[str]:
         work = Path(self.txt_work.text().strip() or Path.home() / "finding_objects_runs" / "run")
         args = ["--work", str(work)]
+        area = ["--ra", f"{self.sp_ra.value():.7f}", "--dec", f"{self.sp_dec.value():.7f}",
+                "--radius", f"{self.radius_arcmin():.6f}"]
         if self.rb_sky.isChecked():
-            args += ["--ra", f"{self.sp_ra.value():.7f}", "--dec", f"{self.sp_dec.value():.7f}",
-                     "--radius", f"{self.sp_rad.value():.4f}", "--workers", str(int(self.sp_workers.value()))]
+            args += area + ["--workers", str(int(self.sp_workers.value()))]
         else:
             raw = self.txt_raw.text().strip()
             if not raw or not Path(raw).is_dir():
                 raise ValueError("Choose a folder of collected catalog CSV files.")
-            args += ["--raw-dir", raw]
+            args += ["--raw-dir", raw] + (area if self.chk_area.isChecked() else [])
         if self.sp_minconf.value() > 0:
             args += ["--min-confidence", f"{self.sp_minconf.value():.2f}"]
         if self.chk_prior.isChecked():
@@ -281,8 +394,14 @@ class MainWindow(QMainWindow):
     # ---------------------------------------------------------- results
     def load_results(self, path: Path):
         df = pd.read_csv(path, low_memory=False)
+        assoc = path.parent / "source_association.csv"
+        if "designation" not in df.columns and assoc.exists():   # results written before designations existed
+            df = _designations().annotate(df, pd.read_csv(assoc, low_memory=False, dtype={"catalog_object_id": "string"}))
         self.model.set_frame(df)
         self.sky.set_frame(self.model.frame())
+        cols = [self.model.column_name(i) for i in range(self.model.columnCount())]
+        if "separation_arcmin" in cols:              # nearest to the search centre first
+            self.table.sortByColumn(cols.index("separation_arcmin"), Qt.AscendingOrder)
         self.table.resizeColumnsToContents()
         self.detail.show_object(None)
         self._filters_changed()
@@ -345,11 +464,18 @@ class MainWindow(QMainWindow):
         s = self.settings
         for k, w in (("ra", self.sp_ra), ("dec", self.sp_dec), ("radius", self.sp_rad), ("minconf", self.sp_minconf), ("workers", self.sp_workers)):
             s.setValue(k, w.value())
+        s.setValue("radius_unit", self.cmb_rad_unit.currentText()); s.setValue("area_cut", self.chk_area.isChecked())
         s.setValue("work", self.txt_work.text()); s.setValue("raw", self.txt_raw.text()); s.setValue("name", self.txt_name.text())
         s.setValue("mode_raw", self.rb_raw.isChecked()); s.setValue("field_prior", self.chk_prior.isChecked())
 
     def _restore(self):
         s = self.settings
+        unit = str(s.value("radius_unit", "arcmin"))
+        if unit in RADIUS_UNITS:
+            self.cmb_rad_unit.blockSignals(True); self.cmb_rad_unit.setCurrentText(unit); self.cmb_rad_unit.blockSignals(False)
+            self._rad_unit = unit
+        self._apply_unit_range(self._rad_unit)
+        self.chk_area.setChecked(str(s.value("area_cut", "true")).lower() == "true")
         for k, w, d in (("ra", self.sp_ra, 245.0), ("dec", self.sp_dec, 43.0), ("radius", self.sp_rad, 3.0),
                         ("minconf", self.sp_minconf, 0.0), ("workers", self.sp_workers, 6)):
             w.setValue(float(s.value(k, d)))
@@ -357,6 +483,7 @@ class MainWindow(QMainWindow):
         self.txt_raw.setText(str(s.value("raw", ""))); self.txt_name.setText(str(s.value("name", "")))
         (self.rb_raw if str(s.value("mode_raw", "false")).lower() == "true" else self.rb_sky).setChecked(True)
         self.chk_prior.setChecked(str(s.value("field_prior", "false")).lower() == "true")
+        self._mode_changed()
 
     def closeEvent(self, event):
         self._save()

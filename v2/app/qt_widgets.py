@@ -16,6 +16,7 @@ class SkyMap(QWidget):
     """Tangent-plane scatter of the field (east to the left, as on the sky).
     Points are coloured by coarse class; clicking selects the nearest object."""
     objectClicked = Signal(int)          # row in the results DataFrame
+    centerPicked = Signal(float, float)  # double-click: (ra, dec) for a new search centre
 
     MARGIN = 28
     LEGEND_H = 24
@@ -28,24 +29,54 @@ class SkyMap(QWidget):
         self._visible = None
         self._selected: int | None = None
         self._extent = 1.0
+        self._ra = self._dec = None
+        self._area: tuple[float, float, float] | None = None    # (ra, dec, radius arcmin)
+        self._c0: tuple[float, float] | None = None              # projection centre
+        self.setToolTip("Click: select object · Double-click: set search centre here")
 
     def set_frame(self, df: pd.DataFrame) -> None:
-        ra = pd.to_numeric(df.get("ra"), errors="coerce").to_numpy(float) if "ra" in df else None
-        dec = pd.to_numeric(df.get("dec"), errors="coerce").to_numpy(float) if "dec" in df else None
-        if ra is None or dec is None or not len(ra):
-            self._x = self._y = None; self.update(); return
         import numpy as np
-        ok = np.isfinite(ra) & np.isfinite(dec)
-        ra0, dec0 = float(np.nanmedian(ra)), float(np.nanmedian(dec))
-        # Offsets in arcmin; RA wrap handled by taking the signed difference.
-        dra = ((ra - ra0 + 180.0) % 360.0) - 180.0
-        self._x = np.where(ok, dra * math.cos(math.radians(dec0)) * 60.0, np.nan)
-        self._y = np.where(ok, (dec - dec0) * 60.0, np.nan)
-        self._extent = max(float(np.nanmax(np.abs(np.r_[self._x, self._y]))) if ok.any() else 1.0, 1e-3)
-        self._cls = df.get("primary_class", pd.Series(["UNKNOWN"] * len(df))).astype(str).tolist()
+        ra = pd.to_numeric(df["ra"], errors="coerce").to_numpy(float) if "ra" in df else None
+        dec = pd.to_numeric(df["dec"], errors="coerce").to_numpy(float) if "dec" in df else None
+        if ra is None or dec is None or not len(ra):
+            self._ra = self._dec = None
+        else:
+            self._ra, self._dec = ra, dec
+        self._cls = df["primary_class"].astype(str).tolist() if "primary_class" in df else ["UNKNOWN"] * len(df)
         self._visible = None
         self._selected = None
+        self._project()
+
+    def set_area(self, area: tuple[float, float, float] | None) -> None:
+        """Search cone drawn on the map; the map is centred on it."""
+        self._area = area
+        self._project()
+
+    def _project(self) -> None:
+        import numpy as np
+        if self._area is not None:
+            self._c0 = (self._area[0], self._area[1])
+        elif self._ra is not None and np.isfinite(self._ra).any():
+            self._c0 = (float(np.nanmedian(self._ra)), float(np.nanmedian(self._dec)))
+        else:
+            self._c0 = None
+        self._x = self._y = None
+        extent = self._area[2] if self._area is not None else 0.0
+        if self._c0 is not None and self._ra is not None:
+            ok = np.isfinite(self._ra) & np.isfinite(self._dec)
+            self._x, self._y = self._offsets(self._ra, self._dec)
+            self._x = np.where(ok, self._x, np.nan); self._y = np.where(ok, self._y, np.nan)
+            if ok.any():
+                extent = max(extent, float(np.nanmax(np.abs(np.r_[self._x, self._y]))))
+        self._extent = max(extent, 1e-3)
         self.update()
+
+    def _offsets(self, ra, dec):
+        """Offsets from the centre in arcmin (RA wrap via the signed difference)."""
+        import numpy as np
+        ra0, dec0 = self._c0
+        dra = ((np.asarray(ra, float) - ra0 + 180.0) % 360.0) - 180.0
+        return dra * math.cos(math.radians(dec0)) * 60.0, (np.asarray(dec, float) - dec0) * 60.0
 
     def set_visible_rows(self, rows) -> None:
         self._visible = None if rows is None else set(rows)
@@ -55,17 +86,26 @@ class SkyMap(QWidget):
         self._selected = row
         self.update()
 
-    def _to_screen(self, x, y):
+    def _scale(self):
         side = min(self.width(), self.height() - self.LEGEND_H) - 2 * self.MARGIN
-        cx, cy = self.width() / 2, (self.height() - self.LEGEND_H) / 2
-        s = side / (2 * self._extent * 1.05)
+        return self.width() / 2, (self.height() - self.LEGEND_H) / 2, side / (2 * self._extent * 1.05)
+
+    def _to_screen(self, x, y):
+        cx, cy, s = self._scale()
         return cx - x * s, cy - y * s           # east (+RA) to the left, north up
+
+    def _to_sky(self, sx, sy):
+        cx, cy, s = self._scale()
+        x, y = (cx - sx) / s, (cy - sy) / s
+        dec = max(-90.0, min(90.0, self._c0[1] + y / 60.0))
+        ra = (self._c0[0] + x / 60.0 / max(math.cos(math.radians(self._c0[1])), 1e-6)) % 360.0
+        return ra, dec
 
     def paintEvent(self, event):
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing)
         p.fillRect(self.rect(), self.palette().base())
-        if self._x is None:
+        if self._c0 is None:
             p.setPen(self.palette().text().color())
             p.drawText(self.rect(), Qt.AlignCenter, "No results yet")
             return
@@ -74,7 +114,16 @@ class SkyMap(QWidget):
         p.setPen(QPen(self.palette().mid().color(), 1))
         p.drawRect(frame)
         p.drawText(frame.adjusted(4, 2, 0, 0), Qt.AlignLeft | Qt.AlignTop, "N↑  E←")
-        p.drawText(frame.adjusted(0, 0, -4, -2), Qt.AlignRight | Qt.AlignBottom, f"±{self._extent:.1f}′")
+        p.drawText(frame.adjusted(0, 0, -4, -2), Qt.AlignRight | Qt.AlignBottom, _angle(self._extent))
+        if self._area is not None:              # search cone + centre cross
+            cx, cy, s = self._scale()
+            pen = QPen(QColor("#2f9e44"), 1.5, Qt.DashLine); p.setPen(pen); p.setBrush(Qt.NoBrush)
+            r = self._area[2] * s
+            p.drawEllipse(QPointF(cx, cy), r, r)
+            p.setPen(QPen(QColor("#2f9e44"), 1.5))
+            p.drawLine(QPointF(cx - 7, cy), QPointF(cx + 7, cy)); p.drawLine(QPointF(cx, cy - 7), QPointF(cx, cy + 7))
+        if self._x is None:
+            return
         for i, (x, y) in enumerate(zip(self._x, self._y)):
             if x != x or (self._visible is not None and i not in self._visible):
                 continue
@@ -95,6 +144,11 @@ class SkyMap(QWidget):
             p.setPen(Qt.NoPen); p.setBrush(QColor(col)); p.drawEllipse(QPointF(lx + 4, ly - 4), 4, 4)
             p.setPen(self.palette().text().color()); p.drawText(QPointF(lx + 12, ly), name)
             lx += 18 + p.fontMetrics().horizontalAdvance(name)
+
+    def mouseDoubleClickEvent(self, event):
+        if self._c0 is not None:
+            pos = event.position()
+            self.centerPicked.emit(*self._to_sky(pos.x(), pos.y()))
 
     def mousePressEvent(self, event):
         if self._x is None:
@@ -124,8 +178,10 @@ class DetailPanel(QWidget):
         lay.addWidget(self.title)
         info = QFormLayout()
         self.lbl_pos, self.lbl_status, self.lbl_cats = QLabel("–"), QLabel("–"), QLabel("–")
-        self.lbl_cats.setWordWrap(True)
-        for k, w in (("Position", self.lbl_pos), ("Status", self.lbl_status), ("Catalogs", self.lbl_cats)):
+        self.lbl_names = QLabel("–")
+        self.lbl_cats.setWordWrap(True); self.lbl_names.setWordWrap(True)
+        for k, w in (("Position", self.lbl_pos), ("Status", self.lbl_status), ("Catalog IDs", self.lbl_names),
+                     ("Catalogs", self.lbl_cats)):
             w.setTextInteractionFlags(Qt.TextSelectableByMouse); info.addRow(k, w)
         lay.addLayout(info)
 
@@ -167,15 +223,21 @@ class DetailPanel(QWidget):
         if row is None:
             self.title.setText("Select an object")
             self.title.setStyleSheet("font-weight: 600; font-size: 14px;")
-            for w in (self.lbl_pos, self.lbl_status, self.lbl_cats):
+            for w in (self.lbl_pos, self.lbl_status, self.lbl_cats, self.lbl_names):
                 w.setText("–")
             for bar in self.bars.values():
                 bar.setValue(0)
             return
         cls = str(row.get("primary_class", "UNKNOWN"))
-        self.title.setText(f"{row.get('object_id', '')} — {cls}")
+        name = row.get("designation")
+        name = row.get("object_id", "") if name is None or (isinstance(name, float) and name != name) else name
+        self.title.setText(f"{name} — {cls}")
         self.title.setStyleSheet(f"font-weight: 600; font-size: 14px; color: {class_color(cls).name()};")
-        self.lbl_pos.setText(f"{_f(row.get('ra'), 6)}, {_f(row.get('dec'), 6)}")
+        sep = _num(row.get("separation_arcmin"))
+        self.lbl_pos.setText(f"{_f(row.get('ra'), 6)}, {_f(row.get('dec'), 6)}"
+                             + ("" if sep is None else f"   ({sep * 60:.1f}″ from centre)"))
+        names = row.get("catalog_designations")
+        self.lbl_names.setText(str(names).replace("; ", "\n") if isinstance(names, str) and names else "–")
         self.lbl_status.setText(f"{row.get('classification_status', '')}  (confidence {_f(row.get('primary_confidence'), 3)})")
         self.lbl_cats.setText(str(row.get("catalogs", "")).replace("|", ", "))
         for c, bar in self.bars.items():
@@ -209,6 +271,12 @@ class DetailPanel(QWidget):
     def _copy(self):
         if self._row is not None:
             QGuiApplication.clipboard().setText(f"{_f(self._row.get('ra'), 6)} {_f(self._row.get('dec'), 6)}")
+
+
+def _angle(arcmin: float) -> str:
+    if arcmin < 1.0:
+        return f"±{arcmin * 60:.1f}″"
+    return f"±{arcmin:.1f}′" if arcmin < 60 else f"±{arcmin / 60:.2f}°"
 
 
 def _num(v):

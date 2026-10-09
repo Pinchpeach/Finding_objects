@@ -7,9 +7,9 @@ from PySide6.QtCore import QAbstractTableModel, QModelIndex, QSortFilterProxyMod
 from PySide6.QtGui import QColor
 
 CLASS_COLORS = {"STAR": "#d9822b", "GALAXY": "#2b6cb0", "QSO": "#7b3fb5", "UNKNOWN": "#8a8f98"}
-TABLE_COLUMNS = ["object_id", "primary_class", "primary_confidence", "classification_status",
-                 "p_star", "p_galaxy", "p_qso", "ra", "dec", "catalogs"]
-HEADERS = {"object_id": "Object", "primary_class": "Class", "primary_confidence": "Confidence",
+TABLE_COLUMNS = ["designation", "primary_class", "primary_confidence", "classification_status",
+                 "p_star", "p_galaxy", "p_qso", "separation_arcmin", "ra", "dec", "designation_catalog", "catalogs"]
+HEADERS = {"designation": "Name", "designation_catalog": "Name from", "separation_arcmin": "Dist (′)", "primary_class": "Class", "primary_confidence": "Confidence",
            "classification_status": "Status", "p_star": "P(star)", "p_galaxy": "P(galaxy)",
            "p_qso": "P(QSO)", "ra": "RA", "dec": "Dec", "catalogs": "Catalogs"}
 SORT_ROLE = Qt.UserRole + 1
@@ -33,7 +33,10 @@ class DataFrameModel(QAbstractTableModel):
     def set_frame(self, df: pd.DataFrame) -> None:
         self.beginResetModel()
         self._df = df.reset_index(drop=True)
-        self._cols = [c for c in TABLE_COLUMNS if c in self._df.columns]
+        cols = [c for c in TABLE_COLUMNS if c in self._df.columns]
+        if "designation" not in cols and "object_id" in self._df.columns:   # very old results only
+            cols.insert(0, "object_id")
+        self._cols = cols
         self.endResetModel()
 
     def frame(self) -> pd.DataFrame:
@@ -81,7 +84,7 @@ class DataFrameModel(QAbstractTableModel):
 
 class ResultsFilter(QSortFilterProxyModel):
     """Filters rows by class, status and a case-insensitive text match on the
-    object id and catalogue list."""
+    catalogue designations and catalogue list."""
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -111,8 +114,8 @@ class ResultsFilter(QSortFilterProxyModel):
         df = self.sourceModel().frame()
         col = lambda c: df[c].astype(str).to_numpy() if c in df else None
         self._a_cls, self._a_status = col("primary_class"), col("classification_status")
-        ids, cats = col("object_id"), col("catalogs")
-        self._a_text = None if ids is None else [f"{i} {c}".lower() for i, c in zip(ids, cats if cats is not None else [""] * len(ids))]
+        parts = [a for a in (col("designation"), col("catalog_designations"), col("catalogs"), col("object_id")) if a is not None]
+        self._a_text = [" ".join(t).lower() for t in zip(*parts)] if parts else None
 
     def filterAcceptsRow(self, row, parent):
         if self._cls != "ALL" and self._a_cls is not None and self._a_cls[row] != self._cls:

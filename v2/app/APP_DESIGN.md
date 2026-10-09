@@ -61,3 +61,18 @@ pip install -r v2/app/requirements.txt
 python v2/app/qt_app.py
 ```
 
+
+## 7. 검색 영역 입력과 카탈로그 명칭 (2026-10-09)
+- **Search area**:
+  - **Centre** 칸에는 천체 이름이나 좌표를 넣습니다. 이름은 CDS Sesame으로 해석합니다. 좌표는 십진 도(`188.4155 +9.1751`), `12:33:39.7 +09:10:30`, `12h33m39.7s +9d10m30s` 형식을 받으며, 네트워크 없이 바로 해석합니다.
+  - RA/Dec는 직접 고칠 수 있습니다.
+  - **Radius**는 단위(arcsec / arcmin / deg)를 고를 수 있습니다. 단위를 바꿔도 같은 각도가 유지됩니다.
+  - 하늘 지도에 탐색 원(초록 점선)과 중심이 표시되고, 지도를 더블클릭하면 그 위치가 새 중심이 됩니다.
+- **Data source**:
+  - 아카이브 조회: 검색 영역으로 콘 검색을 합니다.
+  - 수집된 폴더: "Keep only objects inside the search area"를 켜면 영역 안의 천체만 남깁니다(`pipeline.py --raw-dir ... --ra --dec --radius`).
+- **이름**:
+  - 내부 키 `object_id`(OBJ000001…)는 화면에 내보내지 않습니다. 대신 `v2/designations.py`가 실제 카탈로그 명칭을 붙입니다.
+  - 우선순위: SIMBAD 주 식별자 → NED → SGA-2020 → Gaia DR3 → SDSS → Pan-STARRS1 → LS DR10 → 2MASS → AllWISE → …
+  - 상세 패널의 "Catalog IDs"에는 연관된 모든 카탈로그 명칭이 나열됩니다.
+  - 중심이 주어지면 `separation_arcmin`(중심까지 거리)이 추가되고, 결과는 거리순으로 정렬됩니다.
