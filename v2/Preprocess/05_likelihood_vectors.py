@@ -99,6 +99,13 @@ def _gaia_foreground_star(items):
     """Significant Gaia parallax or proper motion (S/N >= 5; Stage-4 score >= 0.5)."""
     return any(e.get("rule_id") in {"AST-GAL-001","AST-GAL-002"} and float(e.get("raw_score",0))>=0.5 for e in items)
 
+def _spectroscopic(items):
+    """Pipeline spectral class of this position (SPC-* rules, e.g. SDSS
+    CLASS with ZWARNING == 0; Bolton et al. 2012, AJ 144, 144).  A spectrum
+    classifies the light in its own fibre, so it stays valid inside a large
+    galaxy: the nucleus or an HII region gives GALAXY, a foreground star STAR."""
+    return any(str(e.get("rule_id","")).startswith("SPC-") and float(e.get("raw_score",0) or 0)>=0.5 for e in items)
+
 def estimate_field_prior(P,train_prior,iters=200,tol=1e-7):
     """EM re-estimation of class priors under label shift.
 
@@ -136,7 +143,7 @@ def run(evidence,out,model_path=MODEL_PATH,min_confidence=None,field_prior=False
             # not hard claims (same rule as Stage 4's evidence_conflict).
             if c in CLASSES and s>=.8 and not str(e.get("rule_id","")).endswith("-CKNN-001"): strong.add(c)
         conflict=bool(items) and len(strong)>1
-        in_host=hr<HOST_RADIUS and not _gaia_foreground_star(items)
+        in_host=hr<HOST_RADIUS and not _gaia_foreground_star(items) and not _spectroscopic(items)
         rows.append((np.array([p[c] for c in CLASSES]),used,conflict,in_host))
     P=np.array([r[0] for r in rows]).reshape(len(rows),len(CLASSES))
     # Field-prior adjustment needs calibrated posteriors (fitted model) and
