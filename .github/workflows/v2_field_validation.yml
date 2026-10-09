@@ -60,6 +60,32 @@ jobs:
           print(pd.crosstab(s.truth,s.primary_class,margins=True).to_string())
           c=s.primary_class.ne("UNKNOWN")
           print(f"coverage={c.mean():.3f} accuracy_when_classified={(s.primary_class==s.truth)[c].mean():.3f}")
+          if "parent_object_id" in s.columns and s.parent_object_id.notna().any():
+              # A part of a large galaxy (e.g. a nucleus fibre) is that galaxy: score it with its host's class.
+              host_cls=d.set_index("object_id").primary_class
+              eff=s.primary_class.where(s.parent_object_id.isna(), s.parent_object_id.map(host_cls))
+              ce=eff.ne("UNKNOWN")
+              print(f"parts scored by their host ({int(s.parent_object_id.notna().sum())}): coverage={ce.mean():.3f} accuracy_when_classified={(eff==s.truth)[ce].mean():.3f}")
+          print("\n== second-stage sub-class")
+          print(d.subclass_status.value_counts().to_string())
+          top=d[d.parent_object_id.isna()] if "parent_object_id" in d.columns else d
+          print("objects", len(d), "top-level", len(top), "large-galaxy hosts", int((d.get("n_components",0)>0).sum()),
+                "| roles", d.get("component_role",pd.Series()).value_counts().to_dict())
+          print(top.groupby("primary_class").subclass.apply(lambda x: round(float(x.notna().mean()),3)).to_string())
+          print(top.subclass_rule.value_counts().to_string())
+          st=s[s.truth.eq("STAR")&s.primary_class.eq("STAR")].copy()
+          st["desi_type"]=st.get("desi_dr1_spectroscopy__SubType",pd.Series(index=st.index,dtype=object)).astype(str).str.strip().str.upper()
+          st["pred"]=st.subclass_code.astype(str).str.split(":").str[1]
+          mk=st[st.desi_type.str.fullmatch(r"[OBAFGKML]")&st.pred.str.fullmatch(r"[OBAFGKML]")]
+          L="OBAFGKML"
+          if len(mk):
+              dl=mk.desi_type.map(L.index)-mk.pred.map(L.index)
+              print(f"STAR letter vs DESI SubType: n={len(mk)} exact={float((dl==0).mean()):.3f} within1={float((dl.abs()<=1).mean()):.3f}")
+              print(pd.crosstab(mk.desi_type,mk.pred).to_string())
+              print(mk.groupby("subclass_rule").apply(lambda g: round(float((g.desi_type==g.pred).mean()),3)).to_string())
+          wd=st[st.desi_type.eq("WD")]
+          if len(wd): print("DESI WD typed STAR:WD:", int(wd.subclass_code.eq("STAR:WD").sum()), "/", len(wd))
+          print(top[top.subclass.notna()][["designation","primary_class","subclass","subclass_rule"]].head(25).to_string(index=False))
           if "field_prior_star" in d.columns:
               print("field prior (EM):", {k:round(float(d[f"field_prior_{k}"].iloc[0]),3) for k in ("star","galaxy","qso")}, "adjusted:", bool(d.coarse_prior_adjusted.iloc[0]))
               P=s[["p_star_training_prior","p_galaxy_training_prior","p_qso_training_prior"]].to_numpy()

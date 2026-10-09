@@ -88,6 +88,8 @@ def _vizier_fallback(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
         "Plx":"parallax","e_Plx":"parallax_error","pmRA":"pmra","e_pmRA":"pmra_error","pmDE":"pmdec","e_pmDE":"pmdec_error",
         "RUWE":"ruwe","Gmag":"phot_g_mean_mag","BPmag":"phot_bp_mean_mag","RPmag":"phot_rp_mean_mag","BP-RP":"bp_rp",
         "RV":"radial_velocity","e_RV":"radial_velocity_error","Teff":"teff_gspphot","logg":"logg_gspphot","[Fe/H]":"mh_gspphot","Dist":"distance_gspphot",
+        # GSP-Phot extinction (used to deredden colours and absolute magnitudes downstream).
+        "AG":"ag_gspphot","E(BP-RP)":"ebpminrp_gspphot",
     }
     low={str(x).lower():x for x in src.columns}; out=pd.DataFrame(index=src.index)
     for old,new in mapping.items():
