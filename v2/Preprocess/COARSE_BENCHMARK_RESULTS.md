@@ -351,3 +351,11 @@ where the classifier follows the dominant star. Most unscored objects are
 DESI spectra that Stage 1 could not attach unambiguously in crowded fields
 (`ambiguous_new`, no photometric evidence) — a coverage, not accuracy,
 limitation.
+
+**PS1 duplicates (2026-10-09).** The unscored COSMOS DESI spectra sat
+0.01–0.1″ from *two* Pan-STARRS1 objIDs of the same source (0.05–0.2″ apart,
+far below PS1's ~1″ seeing), so Stage 1 could not attach them. The PS1
+collector now keeps one row per 0.5″ (most detections). COSMOS: coverage
+81.6% → **88.2%**, accuracy 98.4% → **98.5%** (66/67); ambiguous DESI
+attachments 10 → 5. (RA 35/−5 in the same round lost NED to an archive
+timeout, so its 97.5% / 87.0% is not comparable.)
