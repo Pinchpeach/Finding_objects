@@ -102,7 +102,7 @@ def draw(p: QPainter, k: dict, c: QPointF, size: float = 9.0, selected: bool = F
         act, prof = k.get("activity"), k.get("profile")
         disk = act in ("STAR_FORMING", "STARBURST") or prof in ("DISK", "LATE_TYPE")
         early = act == "QUIESCENT" or prof == "EARLY_TYPE"
-        col = QColor(GAL_AGN if act == "AGN" else GAL_GV if act == "GREEN_VALLEY" else GAL_DISK if disk
+        col = QColor(GAL_AGN if act in ("AGN", "COMPOSITE") else GAL_GV if act == "GREEN_VALLEY" else GAL_DISK if disk
                      else GAL_EARLY if early else GAL_UNK)
         p.translate(c); p.rotate(-30)
         sz = size * (0.7 if k.get("dwarf") else 1.0)

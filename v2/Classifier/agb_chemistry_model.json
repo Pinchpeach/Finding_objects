@@ -7,11 +7,11 @@
     "cst"
    ],
    "coef": [
-    0.4878,
-    -2.9735,
-    3.8919
+    0.4997,
+    -3.0538,
+    3.8895
    ],
-   "intercept": 1.2244
+   "intercept": 1.3533
   },
   "GAIA_2MASS_WISE": {
    "features": [
@@ -19,10 +19,10 @@
     "kw3"
    ],
    "coef": [
-    0.7245,
-    -2.5973
+    0.8415,
+    -2.9509
    ],
-   "intercept": 2.8785
+   "intercept": 3.1575
   },
   "NIR_MIR": {
    "features": [
@@ -32,42 +32,45 @@
     "w34"
    ],
    "coef": [
-    0.5416,
-    -2.403,
-    -3.0082,
-    0.6784
+    0.8725,
+    -2.5713,
+    -3.0041,
+    0.3284
    ],
-   "intercept": 2.082
+   "intercept": 1.8996
   }
  },
  "abstain_band": 0.15,
  "test": {
-  "test_n": 4417,
+  "test_n": 4286,
   "coverage": 0.913,
-  "accuracy": 0.922,
-  "C_precision": 0.954,
-  "C_recall": 0.842,
-  "O_precision": 0.904,
+  "accuracy": 0.929,
+  "C_precision": 0.95,
+  "C_recall": 0.855,
+  "O_precision": 0.918,
   "O_recall": 0.973,
   "per_model": {
    "GAIA_2MASS_WISE_CSTAR": {
-    "n": 3079,
-    "decided": 2962,
+    "n": 3060,
+    "decided": 2943,
     "accuracy": 0.955
    },
    "GAIA_2MASS_WISE": {
-    "n": 968,
-    "decided": 874,
-    "accuracy": 0.81
+    "n": 843,
+    "decided": 771,
+    "accuracy": 0.834
    },
    "NIR_MIR": {
-    "n": 215,
-    "decided": 198,
-    "accuracy": 0.909
+    "n": 220,
+    "decided": 200,
+    "accuracy": 0.915
    }
   },
   "O_rich_Ks_W3_gt_1": 0.984
  },
  "split": "50/50 random (seed 42); fitted on train half, metrics on test half",
+ "excluded_sub_red_clump": {
+  "C": 263
+ },
  "truth": "benchmark/agb_truth/agb_chemistry_truth.csv.gz (Suh 2021 O-AGB 5301, C-AGB 3576)"
 }

@@ -34,7 +34,10 @@ def test_star_type_and_luminosity_from_gaia():
 def test_spectroscopic_labels_outrank_photometry():
     sc = _sc()
     assert sc.classify({"primary_class": "STAR", "simbad__sp_type": "K2III", "gaia_dr3__bp_rp": 0.5})["code"] == "STAR:K:III"
-    assert sc.classify({"primary_class": "STAR", "sdss_dr18_spectroscopy__subclass": "CarbonWD"})["code"] == "STAR:C"
+    # SDSS "CarbonWD" is the DQ white-dwarf template, "Carbon" a carbon star.
+    assert sc.classify({"primary_class": "STAR", "sdss_dr18_spectroscopy__subclass": "CarbonWD"})["code"] == "STAR:WD"
+    r = sc.classify({"primary_class": "STAR", "sdss_dr18_spectroscopy__subclass": "Carbon"})
+    assert r["code"] == "STAR:C:?" and r["rule"] == "SDSS_CSTAR"
     assert sc.classify({"primary_class": "STAR", "physical_class": "WD", "gaia_dr3__bp_rp": 0.0})["code"] == "STAR:WD"
 
 
@@ -202,6 +205,46 @@ def test_agb_chemistry_rules():
     assert sc.classify(dict(base, simbad__sp_type="S4/3"))["code"] == "STAR:S:AGB"
     # A carbon dwarf / CH star from SIMBAD without AGB evidence is not called AGB.
     assert sc.classify({"primary_class": "STAR", "simbad__sp_type": "C-H4"})["code"] == "STAR:C:?"
+    # Luminosity veto: with a good parallax, fainter than the red clump is not AGB.
+    near = {"gaia_dr3__parallax": 2.0, "gaia_dr3__parallax_error": 0.05, "gaia_dr3__ruwe": 1.0}   # DM = 8.49
+    assert sc.classify(dict(c, **near))["code"] == "STAR:C:AGB"             # M_Ks = 5.5 - 8.49 = -2.99
+    assert sc.agb_chemistry(dict(c, **near, **{"2mass_psc__Kmag": 8.0, "2mass_psc__Jmag": 9.0})) is None   # M_Ks = -0.49
+    dwarf = dict(base, **near, simbad__otype="C*", **{"2mass_psc__Kmag": 10.0, "gaia_dr3__phot_g_mean_mag": 14.0})
+    r = sc.classify(dwarf)                                                   # M_Ks = +1.5, M_G = +5.5
+    assert r["code"] == "STAR:C:V" and r["subclass"] == "Dwarf carbon star (dC)"
+    giant = dict(dwarf, **{"gaia_dr3__phot_g_mean_mag": 12.0})               # M_G = +3.5: CH / subgiant carbon star
+    assert sc.classify(giant)["code"] == "STAR:C:?"
+    bright = dict(dwarf, **{"2mass_psc__Kmag": 5.0})                         # M_Ks = -3.5: AGB allowed
+    assert sc.classify(bright)["code"] == "STAR:C:AGB"
     # WISE colours alone were 47 % correct on the Suh (2021) stars: not used.
     w = dict(base, **{"allwise__W1mag": 6.0, "allwise__W2mag": 4.6, "allwise__W3mag": 3.5, "allwise__W4mag": 3.2})
     assert sc.agb_chemistry(w) is None
+
+
+def test_galaxy_emission_line_rules():
+    sc = _sc()
+    P = "sdss_dr18_spectroscopy__"
+    def g(ha, hb, o3, n2, ew_ha, ew_n2=-1.0, d4=None, err=1.0):
+        r = {"primary_class": "GALAXY", P + "h_alpha_flux": ha, P + "h_beta_flux": hb, P + "oiii_5007_flux": o3,
+             P + "nii_6584_flux": n2, P + "h_alpha_eqw": ew_ha, P + "nii_6584_eqw": ew_n2}
+        for k in ("h_alpha", "h_beta", "oiii_5007", "nii_6584"):
+            r[P + k + "_flux_err"] = err
+        if d4 is not None:
+            r[P + "d4000_n"] = d4
+        return r
+    # MPA-JHU equivalent widths are negative in emission.
+    assert sc.galaxy_lines(g(100, 30, 15, 30, -20.0))[0] == "STAR_FORMING"      # x = -0.52, y = -0.30
+    assert sc.galaxy_lines(g(100, 30, 150, 120, -20.0))[0] == "AGN"             # x = 0.08, y = 0.70 (Seyfert)
+    assert sc.galaxy_lines(g(100, 30, 25, 60, -20.0))[0] == "COMPOSITE"         # x = -0.22, y = -0.08
+    # LINER-like ratios with EW(Ha) < 3 A: retired, not AGN (WHAN).
+    r = sc.galaxy_lines(g(100, 30, 60, 150, -2.0))
+    assert r[0] == "QUIESCENT" and "retired" in r[2]
+    assert "passive" in sc.galaxy_lines(g(1, 1, 1, 1, -0.2, -0.3, err=10))[2]
+    # Weak H-beta / [O III]: WHAN on [N II]/Ha.
+    assert sc.galaxy_lines(g(100, 1, 1, 20, -12.0, err=5))[0] == "STAR_FORMING"
+    assert sc.galaxy_lines(g(100, 1, 1, 80, -4.0, err=5))[1] == "SDSS_WHAN"
+    # The SDSS pipeline subclass keeps precedence.
+    row = dict(g(100, 30, 150, 120, -20.0), **{P + "subclass": "STARFORMING"})
+    assert sc.classify(row)["activity"] == "STAR_FORMING"
+    # Dn4000 alone (no line measurement).
+    assert sc.galaxy_lines({P + "d4000_n": 1.8})[1] == "SDSS_D4000"
