@@ -15,7 +15,7 @@ from pathlib import Path
 
 APP_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(APP_DIR))
-from app_paths import v2_root  # noqa: E402
+from app_paths import v2_root, version  # noqa: E402
 V2 = v2_root()
 
 
@@ -45,7 +45,7 @@ from progress import ProgressTracker  # noqa: E402
 from qt_models import DataFrameModel, ResultsFilter  # noqa: E402
 from qt_widgets import DetailPanel, SkyView  # noqa: E402
 
-APP_NAME = "Finding Objects"
+APP_NAME = f"Finding Objects {version()}"
 RESULT_FILE = "classified_objects.csv"
 RADIUS_UNITS = {"arcsec": 1 / 60.0, "arcmin": 1.0, "deg": 60.0}   # -> arcmin
 RADIUS_DECIMALS = {"arcsec": 1, "arcmin": 3, "deg": 5}
