@@ -54,6 +54,13 @@ def annotate_legacy(d:pd.DataFrame,rows=None)->pd.DataFrame:
     d["detailed_result_json"]=payload
     return d
 
+def load_subclass():
+    p=ROOT/"subclass.py"
+    s=importlib.util.spec_from_file_location("classifier_subclass",p)
+    if s is None or s.loader is None:
+        raise ImportError(f"cannot load sub-class classifier: {p}")
+    m=importlib.util.module_from_spec(s); s.loader.exec_module(m); return m
+
 def run(inp:Path,out:Path):
     d=pd.read_csv(inp)
     if "primary_class" not in d.columns:
@@ -63,6 +70,8 @@ def run(inp:Path,out:Path):
     rows=d.to_dict("records")
     d=annotate_legacy(d,rows)
     d=load_axes_controller().annotate(d,rows)
+    # Second stage: literature sub-class per coarse class (needs the physical axis).
+    d=load_subclass().annotate(d,rows)
     out.parent.mkdir(parents=True,exist_ok=True); d.to_csv(out,index=False)
     print(f"[OK] full classifier rows={len(d)} axes=5 -> {out}")
     return out

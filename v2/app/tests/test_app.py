@@ -50,14 +50,21 @@ def test_gui_runs_pipeline_and_shows_results(tmp_path):
     names = w.model.frame().designation
     assert not names.str.match(r"OBJ\d+$").any() and names.is_unique      # real catalogue names only
     assert w.model.headerData(0, qt_app.Qt.Horizontal) == "Name"
-    assert n > 0 and w.proxy.rowCount() == n and w.tracker.fraction == 1.0
+    df = w.model.frame()
+    top = int(df.parent_object_id.isna().sum())
+    assert n > 0 and top < n and w.proxy.rowCount() == top and w.tracker.fraction == 1.0   # galaxy parts hidden
+    w.chk_parts.setChecked(True); assert w.proxy.rowCount() == n
+    w.chk_parts.setChecked(False)
+    host = df[df.n_components.gt(0)].iloc[0]
+    assert host.designation == "NGC 4522" and isinstance(host.subclass, str) and "galaxy" in host.subclass.lower()
     w.cmb_class.setCurrentText("GALAXY")
     assert 0 < w.proxy.rowCount() < n
     w.table.selectRow(0); app.processEvents()
     assert "GALAXY" in w.detail.title.text() and w.detail.evidence.topLevelItemCount() > 0
     w.cmb_class.setCurrentText("ALL")
-    w.table.sortByColumn(2, qt_app.Qt.DescendingOrder)            # confidence, numeric sort
-    top, bottom = float(w.proxy.index(0, 2).data()), float(w.proxy.index(w.proxy.rowCount() - 1, 2).data() or 0)
+    ci = [w.model.column_name(i) for i in range(w.model.columnCount())].index("primary_confidence")
+    w.table.sortByColumn(ci, qt_app.Qt.DescendingOrder)            # confidence, numeric sort
+    top, bottom = float(w.proxy.index(0, ci).data()), float(w.proxy.index(w.proxy.rowCount() - 1, ci).data() or 0)
     assert top >= bottom
     w.close()
 
@@ -103,3 +110,29 @@ def test_designations_priority_and_area_cut():
     assert out.loc["OBJ1", "catalog_designations"].split("; ")[0] == "Some Galaxy"
     cut = d.annotate(cls, assoc, center=(10.0, 0.0), radius_arcmin=2.0)
     assert list(cut.object_id) == ["OBJ1", "OBJ2"] and abs(cut.separation_arcmin.iloc[1] - 1.0) < 1e-6
+
+
+def test_sky_map_zoom_pan_and_icons():
+    pytest.importorskip("PySide6")
+    import pandas as pd
+    from PySide6.QtCore import QPointF
+    from PySide6.QtWidgets import QApplication
+    import qt_widgets, qt_icons
+    app = QApplication.instance() or QApplication([])
+    df = pd.DataFrame({"ra": [10.0, 10.01, 9.99], "dec": [0.0, 0.01, -0.01], "designation": ["A", "B", "C"],
+                       "primary_class": ["STAR", "GALAXY", "QSO"],
+                       "subclass_code": ["STAR:K:V", "GALAXY:STAR_FORMING:?", "QSO:RADIO_LOUD:HIGH_Z:X"]})
+    v = qt_widgets.SkyView(); v.resize(500, 500); v.show(); app.processEvents()
+    m = v.map
+    m.set_frame(df); app.processEvents()
+    sx0, sy0 = m._to_screen(m._x[1], m._y[1])
+    m.zoom_by(4.0, QPointF(sx0, sy0))                     # zoom about object B: it stays under the cursor
+    sx1, sy1 = m._to_screen(m._x[1], m._y[1])
+    assert m.zoom == 4.0 and abs(sx1 - sx0) < 1e-6 and abs(sy1 - sy0) < 1e-6
+    ra, dec = m._to_sky(sx1, sy1)
+    assert abs(ra - 10.01) < 1e-6 and abs(dec - 0.01) < 1e-6
+    m.reset_view(); assert m.zoom == 1.0
+    kinds = [qt_icons.kind_of(r) for r in df.to_dict("records")]
+    assert kinds[0]["letter"] == "K" and kinds[1]["activity"] == "STAR_FORMING" and kinds[2]["radio"] == "RADIO_LOUD" and kinds[2]["xray"]
+    img = v.grab().toImage(); assert not img.isNull()
+    v.close()
