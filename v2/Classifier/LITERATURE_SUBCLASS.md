@@ -173,6 +173,13 @@ Physical checks (no truth labels exist for these):
 | radio-loud AGN candidate | radio detection in a quiescent galaxy | Best & Heckman 2012 |
 | X-ray source | Chandra / XMM / eROSITA counterpart | |
 
+Redshifts for luminosities come only from spectra: SDSS, DESI and LAMOST,
+or an NED redshift not flagged photometric. SIMBAD rvz_redshift is not used,
+because its source is unknown. In the first COSMOS run it produced 30
+"dwarf galaxies" with M_B ≈ −4 to −6. A value M_B > −10 (fainter than any
+galaxy seen beyond the Local Group) means a wrong redshift or association,
+and no luminosity label is given.
+
 On the SDSS test split, green-valley galaxies are 30 with no strong lines,
 5 AGN and 2 star-forming. This matches the green valley's transitional,
 AGN-rich nature (Salim 2014), so the label is reported but not scored.

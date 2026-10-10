@@ -100,3 +100,11 @@ def test_qso_luminosity_and_distance():
     assert any(t["tag"] == "QUASAR_LUMINOSITY" for t in bright["tags"])
     faint = sc.classify({"primary_class": "QSO", "pan_starrs1_dr2_meanobject__iMeanPSFMag": 19.0, "sdss_dr18_spectroscopy__z": 0.05})
     assert any(t["tag"] == "SEYFERT_LUMINOSITY" for t in faint["tags"])
+
+
+def test_luminosity_needs_a_spectroscopic_redshift_and_a_physical_value():
+    sc = _sc()
+    f = lambda m: 10 ** ((22.5 - m) / 2.5)
+    row = {"primary_class": "GALAXY", "desi_legacy_surveys_dr10__flux_g": f(24.0), "desi_legacy_surveys_dr10__flux_r": f(23.6)}
+    assert not sc.classify(dict(row, simbad__rvz_redshift=0.01))["tags"]          # SIMBAD z: source unknown
+    assert not sc.classify(dict(row, sdss_dr18_spectroscopy__z=0.01))["tags"]     # M_B ~ -8.8: inconsistent, no label

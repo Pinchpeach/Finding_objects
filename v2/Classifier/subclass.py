@@ -456,7 +456,11 @@ def galaxy_tags(row, activity):
     g, r = _optical_gr(row)
     if z is not None and 0.003 < z < 0.1 and g is not None and r is not None:
         mb = g + 0.313 * (g - r) + 0.227 - distance_modulus(z)
-        if mb > -16.0:
+        if mb > -10.0:
+            # Fainter than any galaxy seen beyond the Local Group: the
+            # redshift or the association is wrong, so no luminosity label.
+            pass
+        elif mb > -16.0:
             tags.append({"tag": "DWARF", "label": f"dwarf galaxy (M_B = {mb:.1f})", "rule": "ABS_MAG_TAMMANN",
                          "basis": f"M_B = {mb:.2f} > -16 at z = {z:.4f} (Tammann 1994)"})
         elif mb < -21.0:
@@ -534,8 +538,17 @@ def qso_i_mag(row):
 
 
 def spectroscopic_z(row):
-    return _num(row, "sdss_dr18_spectroscopy__z", "desi_dr1_spectroscopy__z", "lamost_dr_catalog__z",
-                "host_redshift", "simbad__rvz_redshift", "ned__Redshift")
+    """Redshift measured from a spectrum: SDSS / DESI / LAMOST, or an NED
+    redshift not flagged photometric.  SIMBAD rvz_redshift is not used: its
+    source (spectroscopic or photometric) is not carried by the collector,
+    and in COSMOS it produced impossible luminosities (M_B ~ -5)."""
+    z = _num(row, "sdss_dr18_spectroscopy__z", "desi_dr1_spectroscopy__z", "lamost_dr_catalog__z")
+    if z is not None:
+        return z
+    flag = str(row.get("ned__Redshift Flag") or "").upper()
+    if "PHOT" not in flag and "PZ" not in flag:
+        return _num(row, "ned__Redshift")
+    return None
 
 
 def classify_qso(row):
