@@ -43,12 +43,20 @@ unrelated background sources; it is the same order as the linking velocity
 used for galaxy groups (e.g. Tago et al. 2010 use ~ 250-1000 km/s), so
 it errs on the side of keeping the host together.
 """
+
 from __future__ import annotations
 import json
 import math
 import re
+import sys
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
+
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+from common import num as _num, records  # noqa: E402
 
 C_KMS = 299792.458
 DV_MAX_KMS = 1500.0
@@ -56,17 +64,14 @@ NUCLEUS_ARCSEC = 5.0
 FOREGROUND_RULES = {"AST-GAL-001", "AST-GAL-002"}
 NAME_CATALOGS = ("SIMBAD", "NED")
 EVENT_CATALOGS = ("ASAS-SN Supernova Catalog", "Asiago Supernova Catalog")
-Z_COLUMNS = ("sdss_dr18_spectroscopy__z", "desi_dr1_spectroscopy__z", "lamost_dr10_spectroscopy__z",
-             "ned__Redshift", "simbad__rvz_redshift")
+Z_COLUMNS = (
+    "sdss_dr18_spectroscopy__z",
+    "desi_dr1_spectroscopy__z",
+    "lamost_dr10_spectroscopy__z",
+    "ned__Redshift",
+    "simbad__rvz_redshift",
+)
 SPEC_Z_COLUMNS = Z_COLUMNS[:3]
-
-
-def _num(v):
-    try:
-        x = float(v)
-        return x if math.isfinite(x) else None
-    except (TypeError, ValueError):
-        return None
 
 
 def _norm_name(s) -> str:
@@ -102,20 +107,29 @@ def consolidate(df: pd.DataFrame, priority=()) -> pd.DataFrame:
     parent = [None] * n
     role = [""] * n
     if n == 0 or "host_large_galaxy" not in out:
-        out["parent_object_id"] = parent; out["component_role"] = role; out["n_components"] = 0
+        out["parent_object_id"] = parent
+        out["component_role"] = role
+        out["n_components"] = 0
         return out
-    rows = out.to_dict("records")
+    rows = records(out)
     host_index = {}
     for i, r in enumerate(rows):
         k = _num(r.get("sga_2020__catalog_object_id"))
         if k is not None:
             host_index[int(k)] = i
-    named = {i: {_norm_name(x) for x in str(rows[i].get("catalog_designations") or rows[i].get("designation", "")).split("; ") if x}
-             for i in host_index.values()}
+    named = {
+        i: {
+            _norm_name(x)
+            for x in str(rows[i].get("catalog_designations") or rows[i].get("designation", "")).split("; ")
+            if x
+        }
+        for i in host_index.values()
+    }
     # Host redshift: own value, else from an identity member (pass 1).
     members: dict[int, list[int]] = {}
     for i, r in enumerate(rows):
-        hk = _num(r.get("host_large_galaxy")); q = _num(r.get("host_elliptical_radius"))
+        hk = _num(r.get("host_large_galaxy"))
+        q = _num(r.get("host_elliptical_radius"))
         if hk is None or q is None or q >= 1.0 or int(hk) not in host_index:
             continue
         h = host_index[int(hk)]
@@ -151,12 +165,15 @@ def consolidate(df: pd.DataFrame, priority=()) -> pd.DataFrame:
             cats = str(r.get("catalogs", ""))
             # Independent objects seen through the galaxy keep a role that says why.
             if _foreground_star(r):
-                role[i] = "foreground_star"; continue
+                role[i] = "foreground_star"
+                continue
             if any(c in cats for c in EVENT_CATALOGS):
-                role[i] = "transient"; continue
+                role[i] = "transient"
+                continue
             zi = _redshift(r, SPEC_Z_COLUMNS) or _redshift(r)
             if zi is not None and host_z[h] is not None and abs(zi - host_z[h]) * C_KMS > DV_MAX_KMS:
-                role[i] = "background_source" if zi > host_z[h] else "foreground_source"; continue
+                role[i] = "background_source" if zi > host_z[h] else "foreground_source"
+                continue
             parent[i] = rows[h]["object_id"]
             role[i] = "identity" if identity(h, i) else "nucleus" if near_centre(h, i) else "component"
     out["parent_object_id"] = parent
@@ -171,8 +188,14 @@ def consolidate(df: pd.DataFrame, priority=()) -> pd.DataFrame:
 
 # Spectroscopic/curated fields a host inherits from its identity and nucleus
 # entries when it has none of its own (the nucleus fibre measures the galaxy).
-INHERITED = ("sdss_dr18_spectroscopy__subclass", "sdss_dr18_spectroscopy__class", "sdss_dr18_spectroscopy__z",
-             "desi_dr1_spectroscopy__z", "simbad__otype", "ned__Type")
+INHERITED = (
+    "sdss_dr18_spectroscopy__subclass",
+    "sdss_dr18_spectroscopy__class",
+    "sdss_dr18_spectroscopy__z",
+    "desi_dr1_spectroscopy__z",
+    "simbad__otype",
+    "ned__Type",
+)
 
 
 def _inherit(out: pd.DataFrame) -> None:

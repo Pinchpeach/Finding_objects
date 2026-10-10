@@ -1,0 +1,3 @@
+[tool.black]
+# v2 code style (2.5.0): `python -m black v2`
+line-length = 120

@@ -11,11 +11,18 @@ is adequate for the decade-scale catalog matching performed here; the pipeline
 records when this approximation is used so a future full covariance propagation
 can replace it without changing the Stage-1 interface.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
 import math
+from pathlib import Path
+import sys
 from typing import Mapping, Any
+
+if str(Path(__file__).resolve().parents[1]) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from common import num  # noqa: E402,F401  (also re-exported for Stage 1)
 
 
 @dataclass(frozen=True)
@@ -52,14 +59,6 @@ PROFILES = {
 DEFAULT_PROFILE = SurveyProfile(None, 0.6, None, 5.0)
 
 
-def num(value: Any) -> float | None:
-    try:
-        x = float(value)
-        return x if math.isfinite(x) else None
-    except (TypeError, ValueError):
-        return None
-
-
 def _first(row: Mapping[str, Any], keys: tuple[str, ...]) -> float | None:
     """First finite value among ``keys`` (case-insensitive), in ``keys`` order."""
     low = None
@@ -80,49 +79,63 @@ def _first(row: Mapping[str, Any], keys: tuple[str, ...]) -> float | None:
     return None
 
 
-
 def canonical_aliases(catalog: str, row: Mapping[str, Any], catalog_object_id: str | None = None) -> set[str]:
     """Return namespaced cross-catalog identifiers safe for direct association.
 
     Only identifiers with an explicit survey namespace are compared.  Generic
     source names are intentionally excluded to avoid accidental merges.
     """
-    aliases=set()
-    low={str(k).lower():k for k in row.keys()}
+    aliases = set()
+    low = {str(k).lower(): k for k in row.keys()}
+
     def add(ns, value):
-        if value is None:return
-        v=str(value).strip().upper().replace(" ","")
-        if not v or v in {"NAN","NONE","--"}:return
+        if value is None:
+            return
+        v = str(value).strip().upper().replace(" ", "")
+        if not v or v in {"NAN", "NONE", "--"}:
+            return
         aliases.add(f"{ns}:{v}")
-    if catalog=="AllWISE":add("WISE",catalog_object_id)
-    if catalog=="2MASS PSC":add("2MASS",catalog_object_id)
-    for key in ("wisea","allwise","wise","wise_id"):
-        if key in low:add("WISE",row.get(low[key]))
-    for key in ("_2mass","2mass","2mass_name","tmass"):
-        if key in low:add("2MASS",row.get(low[key]))
+
+    if catalog == "AllWISE":
+        add("WISE", catalog_object_id)
+    if catalog == "2MASS PSC":
+        add("2MASS", catalog_object_id)
+    for key in ("wisea", "allwise", "wise", "wise_id"):
+        if key in low:
+            add("WISE", row.get(low[key]))
+    for key in ("_2mass", "2mass", "2mass_name", "tmass"):
+        if key in low:
+            add("2MASS", row.get(low[key]))
     # Legacy Surveys source identity.  DESI TARGETIDs pack RELEASE, BRICKID and
     # OBJID of the Legacy Surveys target (desitarget.targets.encode_targetid),
     # so a DESI spectrum links to its photometric source exactly where the two
     # releases agree (DR10 keeps the DR9 IDs in the north; release 9011).
     # Bit layout: OBJID 0-21, BRICKID 22-41, RELEASE 42-57,
     # MOCK 58, SKY 59; e.g. 39627887455767055 -> release 9010 (LS DR9 south).
-    if catalog=="DESI Legacy Surveys DR10":
-        rel,bid,oid=(_int(row.get(low[k])) if k in low else None for k in ("release","brickid","objid"))
-        if None not in (rel,bid,oid):add("LSID",f"{rel}_{bid}_{oid}")
-    if catalog=="DESI DR1 spectroscopy":
-        tid=_int(catalog_object_id if catalog_object_id is not None else row.get(low.get("targetid","TargetID")))
-        if tid is not None and tid>0 and not (tid>>58)&0x3:   # skip mock / sky targets
-            add("LSID",f"{(tid>>42)&0xFFFF}_{(tid>>22)&0xFFFFF}_{tid&0x3FFFFF}")
+    if catalog == "DESI Legacy Surveys DR10":
+        rel, bid, oid = (_int(row.get(low[k])) if k in low else None for k in ("release", "brickid", "objid"))
+        if None not in (rel, bid, oid):
+            add("LSID", f"{rel}_{bid}_{oid}")
+    if catalog == "DESI DR1 spectroscopy":
+        tid = _int(catalog_object_id if catalog_object_id is not None else row.get(low.get("targetid", "TargetID")))
+        if tid is not None and tid > 0 and not (tid >> 58) & 0x3:  # skip mock / sky targets
+            add("LSID", f"{(tid>>42)&0xFFFF}_{(tid>>22)&0xFFFFF}_{tid&0x3FFFFF}")
     return aliases
+
 
 def _int(v):
     """Exact integer (64-bit IDs must not pass through float)."""
-    if v is None: return None
-    try: x=int(str(v).strip())
-    except (TypeError,ValueError):
-        try: x=int(float(v))
-        except (TypeError,ValueError,OverflowError): return None
-    return x if x>=0 else None
+    if v is None:
+        return None
+    try:
+        x = int(str(v).strip())
+    except (TypeError, ValueError):
+        try:
+            x = int(float(v))
+        except (TypeError, ValueError, OverflowError):
+            return None
+    return x if x >= 0 else None
+
 
 def profile_for(catalog: str, row: Mapping[str, Any] | None = None) -> SurveyProfile:
     row = row or {}
@@ -193,8 +206,9 @@ def _pm(row: Mapping[str, Any]) -> tuple[float | None, float | None, float | Non
     )
 
 
-def propagate_linear(ra_deg: float, dec_deg: float, pmra_masyr: float, pmdec_masyr: float,
-                     from_epoch: float, to_epoch: float) -> tuple[float, float]:
+def propagate_linear(
+    ra_deg: float, dec_deg: float, pmra_masyr: float, pmdec_masyr: float, from_epoch: float, to_epoch: float
+) -> tuple[float, float]:
     """Propagate ICRS coordinates with the tangent-plane proper-motion model."""
     dt = to_epoch - from_epoch
     cosd = max(abs(math.cos(math.radians(dec_deg))), 1e-8)
@@ -267,7 +281,9 @@ def assess_pair(a: Mapping[str, Any], b: Mapping[str, Any], density_arcsec2: flo
     # candidates; the posterior is what downstream evidence is weighted by
     # (a unique 3-sigma match is not 1% reliable in a sparse field).
     density_l = positional / (2.0 * math.pi * sigma * sigma)
-    posterior = density_l / (density_l + density_arcsec2) if density_arcsec2 is not None and density_arcsec2 > 0 else positional
+    posterior = (
+        density_l / (density_l + density_arcsec2) if density_arcsec2 is not None and density_arcsec2 > 0 else positional
+    )
     return {
         "association_posterior": posterior,
         "accepted": accepted,

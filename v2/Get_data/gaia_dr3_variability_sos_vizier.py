@@ -13,13 +13,13 @@ Mira is deliberately not inferred from LPV period or amplitude.  Gaia DR3
 publishes LPV candidates and their measurements, but not a validated Mira leaf
 label in this product.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
 import pandas as pd
 
 from _catalog_utils import add_standard_metadata, coordinates, pick
-
 
 CATALOG = "Gaia DR3 variability SOS"
 TABLES = {
@@ -47,15 +47,19 @@ def _source_id(df: pd.DataFrame) -> pd.Series:
 def _standard(df: pd.DataFrame, kind: str, radius_arcmin: float) -> pd.DataFrame:
     source = _source_id(df)
     ra, dec = coordinates(df, ["RA_ICRS", "RAJ2000", "_RAJ2000"], ["DE_ICRS", "DEJ2000", "_DEJ2000"])
-    out = pd.DataFrame({
-        "catalog": CATALOG,
-        "catalog_object_id": source,
-        "object_name": "Gaia DR3 " + source,
-        "ra": ra,
-        "dec": dec,
-        "gaia_variability_sos_kind": kind,
-    })
-    return add_standard_metadata(out, radius_arcmin=radius_arcmin, ref_epoch=2016.0, poserr_arcsec=0.1, psf_fwhm_arcsec=0.18)
+    out = pd.DataFrame(
+        {
+            "catalog": CATALOG,
+            "catalog_object_id": source,
+            "object_name": "Gaia DR3 " + source,
+            "ra": ra,
+            "dec": dec,
+            "gaia_variability_sos_kind": kind,
+        }
+    )
+    return add_standard_metadata(
+        out, radius_arcmin=radius_arcmin, ref_epoch=2016.0, poserr_arcsec=0.1, psf_fwhm_arcsec=0.18
+    )
 
 
 def _rr(df: pd.DataFrame, radius_arcmin: float) -> pd.DataFrame:
@@ -118,9 +122,11 @@ def fetch(ra: float, dec: float, radius_arcmin: float, kinds: tuple[str, ...] | 
     if not pieces:
         return pd.DataFrame(columns=["catalog", "catalog_object_id", "object_name", "ra", "dec"])
     out = pd.concat(pieces, ignore_index=True, sort=False)
-    return out.dropna(subset=["catalog_object_id", "ra", "dec"]).drop_duplicates(
-        ["catalog_object_id", "gaia_variability_sos_kind"], keep="last"
-    ).reset_index(drop=True)
+    return (
+        out.dropna(subset=["catalog_object_id", "ra", "dec"])
+        .drop_duplicates(["catalog_object_id", "gaia_variability_sos_kind"], keep="last")
+        .reset_index(drop=True)
+    )
 
 
 def save(df: pd.DataFrame, path: str | Path) -> None:

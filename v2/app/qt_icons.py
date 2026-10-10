@@ -16,6 +16,7 @@ One glyph family per coarse class, varied by the sub-class:
           X-ray detected: small cross badge.
 * UNKNOWN hollow grey circle.
 """
+
 from __future__ import annotations
 import math
 
@@ -24,8 +25,18 @@ from PySide6.QtGui import QBrush, QColor, QIcon, QPainter, QPainterPath, QPen, Q
 
 # Representative stellar colours by spectral letter (sRGB, approximate
 # blackbody colours at the dwarf-scale Teff of each class).
-STAR_COLORS = {"O": "#9bb0ff", "B": "#aabfff", "A": "#cad7ff", "F": "#f8f7ff", "G": "#fff4ea",
-               "K": "#ffd2a1", "M": "#ffb46c", "L": "#ff8a4c", "T": "#e0603a", "Y": "#b04020"}
+STAR_COLORS = {
+    "O": "#9bb0ff",
+    "B": "#aabfff",
+    "A": "#cad7ff",
+    "F": "#f8f7ff",
+    "G": "#fff4ea",
+    "K": "#ffd2a1",
+    "M": "#ffb46c",
+    "L": "#ff8a4c",
+    "T": "#e0603a",
+    "Y": "#b04020",
+}
 OUTLINE = QColor("#3b3f45")
 GAL_EARLY, GAL_DISK, GAL_AGN, GAL_UNK, GAL_GV = "#e8a85a", "#4f8fdc", "#d64f9a", "#8fa3c8", "#4caf50"
 QSO_COLOR = "#7b3fb5"
@@ -76,87 +87,121 @@ def draw(p: QPainter, k: dict, c: QPointF, size: float = 9.0, selected: bool = F
     if cls == "STAR":
         code = k.get("code", "")
         if code == "STAR:WD":
-            p.setPen(QPen(QColor("#5b7bd5"), 1.2)); p.setBrush(QColor("white"))
+            p.setPen(QPen(QColor("#5b7bd5"), 1.2))
+            p.setBrush(QColor("white"))
             p.drawEllipse(c, size * 0.45, size * 0.45)
-            p.setBrush(Qt.NoBrush); p.drawEllipse(c, size * 0.8, size * 0.8)
+            p.setBrush(Qt.NoBrush)
+            p.drawEllipse(c, size * 0.8, size * 0.8)
         else:
             col = QColor("#b3261e") if code == "STAR:C" else QColor(STAR_COLORS.get(k.get("letter") or "", "#d8d8d8"))
             r = size * (1.35 if k.get("lum") in ("III", "II", "Ib", "Ia") else 1.0)
             if k.get("lum") in ("III", "II", "Ib", "Ia"):
-                halo = QColor(col); halo.setAlpha(70)
-                p.setPen(Qt.NoPen); p.setBrush(halo); p.drawEllipse(c, r * 1.15, r * 1.15)
-            p.setPen(QPen(OUTLINE, 1.0, Qt.DashLine if k.get("halo") else Qt.SolidLine)); p.setBrush(col)
+                halo = QColor(col)
+                halo.setAlpha(70)
+                p.setPen(Qt.NoPen)
+                p.setBrush(halo)
+                p.drawEllipse(c, r * 1.15, r * 1.15)
+            p.setPen(QPen(OUTLINE, 1.0, Qt.DashLine if k.get("halo") else Qt.SolidLine))
+            p.setBrush(col)
             p.drawPolygon(_star_path(c, r))
-            if k.get("binary"):                      # unresolved companion
-                p.setPen(QPen(OUTLINE, 0.8)); p.setBrush(col.darker(130))
+            if k.get("binary"):  # unresolved companion
+                p.setPen(QPen(OUTLINE, 0.8))
+                p.setBrush(col.darker(130))
                 p.drawEllipse(QPointF(c.x() + r * 0.95, c.y() - r * 0.75), r * 0.32, r * 0.32)
             if code == "STAR:CV":
                 p.setPen(QPen(QColor("#e0a000"), 1.2))
                 for i in range(8):
                     a = i * math.pi / 4
-                    p.drawLine(QPointF(c.x() + r * 1.1 * math.cos(a), c.y() + r * 1.1 * math.sin(a)),
-                               QPointF(c.x() + r * 1.5 * math.cos(a), c.y() + r * 1.5 * math.sin(a)))
+                    p.drawLine(
+                        QPointF(c.x() + r * 1.1 * math.cos(a), c.y() + r * 1.1 * math.sin(a)),
+                        QPointF(c.x() + r * 1.5 * math.cos(a), c.y() + r * 1.5 * math.sin(a)),
+                    )
     elif cls == "GALAXY":
         act, prof = k.get("activity"), k.get("profile")
         disk = act in ("STAR_FORMING", "STARBURST") or prof in ("DISK", "LATE_TYPE")
         early = act == "QUIESCENT" or prof == "EARLY_TYPE"
-        col = QColor(GAL_AGN if act == "AGN" else GAL_GV if act == "GREEN_VALLEY" else GAL_DISK if disk
-                     else GAL_EARLY if early else GAL_UNK)
-        p.translate(c); p.rotate(-30)
+        col = QColor(
+            GAL_AGN
+            if act == "AGN"
+            else GAL_GV if act == "GREEN_VALLEY" else GAL_DISK if disk else GAL_EARLY if early else GAL_UNK
+        )
+        p.translate(c)
+        p.rotate(-30)
         sz = size * (0.7 if k.get("dwarf") else 1.0)
         rx, ry = sz * 1.25, sz * (0.55 if disk else 0.8)
-        fill = QColor(col); fill.setAlpha(170)
-        p.setPen(QPen(col.darker(150), 1.0)); p.setBrush(fill)
+        fill = QColor(col)
+        fill.setAlpha(170)
+        p.setPen(QPen(col.darker(150), 1.0))
+        p.setBrush(fill)
         p.drawEllipse(QPointF(0, 0), rx, ry)
-        if disk:                                     # two spiral arms
-            p.setPen(QPen(QColor("white"), 1.1)); p.setBrush(Qt.NoBrush)
-            path = QPainterPath(); path.moveTo(0, 0)
+        if disk:  # two spiral arms
+            p.setPen(QPen(QColor("white"), 1.1))
+            p.setBrush(Qt.NoBrush)
+            path = QPainterPath()
+            path.moveTo(0, 0)
             path.cubicTo(rx * 0.5, -ry * 0.9, rx * 0.95, -ry * 0.2, rx * 0.8, ry * 0.35)
             path.moveTo(0, 0)
             path.cubicTo(-rx * 0.5, ry * 0.9, -rx * 0.95, ry * 0.2, -rx * 0.8, -ry * 0.35)
             p.drawPath(path)
         core = QColor("white") if act == "AGN" else col.lighter(160)
-        p.setPen(Qt.NoPen); p.setBrush(core); p.drawEllipse(QPointF(0, 0), size * 0.25, size * 0.25)
+        p.setPen(Qt.NoPen)
+        p.setBrush(core)
+        p.drawEllipse(QPointF(0, 0), size * 0.25, size * 0.25)
         if act == "AGN":
             p.setPen(QPen(QColor("white"), 1.0))
             for a in (0, 90, 180, 270):
                 t = math.radians(a)
-                p.drawLine(QPointF(size * 0.3 * math.cos(t), size * 0.3 * math.sin(t)),
-                           QPointF(size * 0.6 * math.cos(t), size * 0.6 * math.sin(t)))
-        if k.get("host"):                            # large resolved galaxy: double outline
-            p.setPen(QPen(col.darker(170), 1.2)); p.setBrush(Qt.NoBrush)
+                p.drawLine(
+                    QPointF(size * 0.3 * math.cos(t), size * 0.3 * math.sin(t)),
+                    QPointF(size * 0.6 * math.cos(t), size * 0.6 * math.sin(t)),
+                )
+        if k.get("host"):  # large resolved galaxy: double outline
+            p.setPen(QPen(col.darker(170), 1.2))
+            p.setBrush(Qt.NoBrush)
             p.drawEllipse(QPointF(0, 0), rx * 1.25, ry * 1.25)
     elif cls == "QSO":
         col = QColor(QSO_COLOR)
         r = size * 0.85
-        if k.get("radio") == "RADIO_LOUD":           # jets
+        if k.get("radio") == "RADIO_LOUD":  # jets
             p.setPen(QPen(QColor("#c0392b"), 1.6))
             p.drawLine(QPointF(c.x() - r * 2.0, c.y() + r * 0.9), QPointF(c.x() + r * 2.0, c.y() - r * 0.9))
         p.setPen(QPen(col, 1.0))
         for a in (0, 90, 180, 270):
             t = math.radians(a + 45)
-            p.drawLine(QPointF(c.x() + r * 0.7 * math.cos(t), c.y() + r * 0.7 * math.sin(t)),
-                       QPointF(c.x() + r * 1.45 * math.cos(t), c.y() + r * 1.45 * math.sin(t)))
-        diamond = QPolygonF([QPointF(c.x(), c.y() - r), QPointF(c.x() + r, c.y()), QPointF(c.x(), c.y() + r), QPointF(c.x() - r, c.y())])
-        p.setPen(QPen(col.darker(140), 1.0)); p.setBrush(col); p.drawPolygon(diamond)
-        p.setPen(Qt.NoPen); p.setBrush(QColor("white")); p.drawEllipse(c, r * 0.28, r * 0.28)
+            p.drawLine(
+                QPointF(c.x() + r * 0.7 * math.cos(t), c.y() + r * 0.7 * math.sin(t)),
+                QPointF(c.x() + r * 1.45 * math.cos(t), c.y() + r * 1.45 * math.sin(t)),
+            )
+        diamond = QPolygonF(
+            [QPointF(c.x(), c.y() - r), QPointF(c.x() + r, c.y()), QPointF(c.x(), c.y() + r), QPointF(c.x() - r, c.y())]
+        )
+        p.setPen(QPen(col.darker(140), 1.0))
+        p.setBrush(col)
+        p.drawPolygon(diamond)
+        p.setPen(Qt.NoPen)
+        p.setBrush(QColor("white"))
+        p.drawEllipse(c, r * 0.28, r * 0.28)
         if k.get("xray"):
             p.setPen(QPen(QColor("#0b7a3b"), 1.6))
             bx, by = c.x() + r * 1.1, c.y() - r * 1.1
-            p.drawLine(QPointF(bx - 3, by - 3), QPointF(bx + 3, by + 3)); p.drawLine(QPointF(bx - 3, by + 3), QPointF(bx + 3, by - 3))
+            p.drawLine(QPointF(bx - 3, by - 3), QPointF(bx + 3, by + 3))
+            p.drawLine(QPointF(bx - 3, by + 3), QPointF(bx + 3, by - 3))
     else:
         col = QColor(UNKNOWN_COLOR)
-        p.setPen(QPen(col, 1.2)); p.setBrush(Qt.NoBrush)
+        p.setPen(QPen(col, 1.2))
+        p.setBrush(Qt.NoBrush)
         p.drawEllipse(c, size * 0.45, size * 0.45)
     if selected:
         p.resetTransform()
-        p.setPen(QPen(QColor("#111111"), 2)); p.setBrush(Qt.NoBrush)
+        p.setPen(QPen(QColor("#111111"), 2))
+        p.setBrush(Qt.NoBrush)
         p.drawEllipse(c, size * 1.9, size * 1.9)
     p.restore()
 
 
 def icon(k: dict, px: int = 18) -> QIcon:
-    pm = QPixmap(px, px); pm.fill(Qt.transparent)
+    pm = QPixmap(px, px)
+    pm.fill(Qt.transparent)
     p = QPainter(pm)
     draw(p, k, QPointF(px / 2, px / 2), px * 0.36)
     p.end()

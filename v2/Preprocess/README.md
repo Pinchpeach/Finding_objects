@@ -34,6 +34,8 @@ v2/rawdata/
 v2/Classifier/
 ```
 
+각 단계 스크립트를 따로 실행하면 위 파일을 씁니다. `v2/pipeline.py`는 2.5.0부터 단계 사이 표를 메모리로 넘기고, 중간 파일은 `--keep-intermediate`일 때만 씁니다(`v2/CHANGELOG.md`).
+
 `classification_rules.csv`는 Gaia astrometry, Gaia DSC, morphology, WISE colours, catalog labels 등 설명 가능한 evidence의 근거와 provenance를 관리합니다. Missing feature는 neutral/skip이며, 충돌하거나 confidence/margin이 부족하면 `UNKNOWN`으로 abstain합니다.
 
 ### Stage 동작 요약 (2026-10-08 갱신)

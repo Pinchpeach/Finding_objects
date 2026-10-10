@@ -4,6 +4,7 @@ The pipeline prints one line per finished archive query
 (``[gaia_dr3] ok: 114 rows (33.2 s)``) and one per finished stage
 (``[pipeline] 3_features: 0.81 s``); progress is the fraction of those done.
 """
+
 from __future__ import annotations
 import re
 
@@ -14,14 +15,9 @@ _STAGE = re.compile(r"^\[pipeline\] (?P<stage>[0-9a-z_]+): (?P<sec>[0-9.]+) s")
 
 def collector_count() -> int:
     try:
-        import importlib.util, sys
-        from pathlib import Path
-        from app_paths import v2_root
-        p = v2_root() / "Get_data" / "controller.py"
-        sys.path.insert(0, str(p.parent))
-        spec = importlib.util.spec_from_file_location("v2_controller_for_count", p)
-        m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
-        return len(m.COLLECTORS)
+        from app_paths import load_v2
+
+        return len(load_v2("Get_data/controller.py").COLLECTORS)
     except Exception:
         return 23
 

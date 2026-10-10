@@ -15,6 +15,7 @@ reference objects measured in the same colours (at least two), so a missing
 colour is never imputed.  Output is the Laplace-smoothed class fraction among
 the k nearest neighbours; Stage 5 learns how much to trust it.
 """
+
 from __future__ import annotations
 from pathlib import Path
 import numpy as np
@@ -32,7 +33,9 @@ CLASSES = ("STAR", "GALAXY", "QSO")
 REFERENCE_PATH = Path(__file__).with_name("color_reference.csv.gz")
 K = 31
 MIN_COLORS = 2
-CHUNK = 1024
+# Objects per distance block: each block holds CHUNK x n_reference float64 (256 x 8820
+# = 18 MB) plus temporaries. 1024 peaked at 137 MB and ran 4x slower (cache misses).
+CHUNK = 256
 
 
 def load_reference(path=REFERENCE_PATH):
@@ -78,11 +81,13 @@ def class_fractions(df: pd.DataFrame, ref: pd.DataFrame, k: int = K, ids=None, c
         kk = min(k, len(cand) - 1)
         if kk < 1:
             continue
-        Rc = R[np.ix_(cand, cols)]; yc = y[cand]; rn = (Rc * Rc).sum(axis=1)
+        Rc = R[np.ix_(cand, cols)]
+        yc = y[cand]
+        rn = (Rc * Rc).sum(axis=1)
         pos = {v: j for j, v in enumerate(rid[cand])} if rid is not None else {}
         rows = np.array(rows)
         for s in range(0, len(rows), CHUNK):
-            r = rows[s:s + CHUNK]
+            r = rows[s : s + CHUNK]
             Xr = X[np.ix_(r, cols)]
             D = (Xr * Xr).sum(axis=1)[:, None] + rn[None, :] - 2.0 * Xr @ Rc.T
             if pos:

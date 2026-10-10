@@ -43,6 +43,7 @@ Photometric systems (AB offsets m_AB = m_native + offset):
 * 2MASS J H Ks (2MASS PSC or the AllWISE 2MASS columns): Vega,
   +0.91 / +1.39 / +1.85 (Blanton & Roweis 2007).
 """
+
 from __future__ import annotations
 import math
 import numpy as np
@@ -129,7 +130,9 @@ def harmonize(df: pd.DataFrame) -> pd.DataFrame:
     new["std_ebv"] = (-2.5 * np.log10(t.where((t > 0) & (t <= 1))) / R_DECAM_G).fillna(_col(df, f"{GALEX}E(B-V)"))
     # Radio flux densities (mJy)
     first, nvss = _col(df, "first__Fint"), _col(df, "nvss__S1.4")
-    lotss = _col(df, "lotss_dr2__Stotal").fillna(_col(df, "lotss_dr2__SpeakTot")).fillna(_col(df, "lotss_dr2__Total_flux"))
+    lotss = (
+        _col(df, "lotss_dr2__Stotal").fillna(_col(df, "lotss_dr2__SpeakTot")).fillna(_col(df, "lotss_dr2__Total_flux"))
+    )
     vlass = _col(df, "vlass__Ftot").fillna(_col(df, "vlass__Total_flux"))
     new["std_radio_first_mjy"], new["std_radio_nvss_mjy"] = first, nvss
     new["std_radio_lotss_144mhz_mjy"], new["std_radio_vlass_3ghz_mjy"] = lotss, vlass
@@ -139,12 +142,19 @@ def harmonize(df: pd.DataFrame) -> pd.DataFrame:
     # Redshifts
     zspec = pd.Series(np.nan, index=df.index, dtype=float)
     src = pd.Series(None, index=df.index, dtype=object)
-    for name, col in (("SDSS", "sdss_dr18_spectroscopy__z"), ("DESI", "desi_dr1_spectroscopy__z"),
-                      ("LAMOST", "lamost_dr_catalog__z")):
+    for name, col in (
+        ("SDSS", "sdss_dr18_spectroscopy__z"),
+        ("DESI", "desi_dr1_spectroscopy__z"),
+        ("LAMOST", "lamost_dr_catalog__z"),
+    ):
         v = _col(df, col)
         take = zspec.isna() & v.notna()
         zspec[take], src[take] = v[take], name
-    flag = df["ned__Redshift Flag"].astype(str).str.upper() if "ned__Redshift Flag" in df else pd.Series("", index=df.index)
+    flag = (
+        df["ned__Redshift Flag"].astype(str).str.upper()
+        if "ned__Redshift Flag" in df
+        else pd.Series("", index=df.index)
+    )
     nedz = _col(df, "ned__Redshift").fillna(_col(df, "ned__Velocity") / C_KMS)
     ok = zspec.isna() & nedz.notna() & ~flag.str.contains("PHOT|PZ", regex=True)
     zspec[ok], src[ok] = nedz[ok], "NED"
@@ -157,14 +167,22 @@ def consistency(df: pd.DataFrame, min_n: int = 5) -> dict:
     """Median differences between catalogues that measure the same band, after
     harmonisation (a wrong unit or zero point shows up as an offset)."""
     h = df if "std_mag__ls_w1" in df else harmonize(df)
-    pairs = {"W1 LS-AllWISE": ("std_mag__ls_w1", "std_mag__wise_w1"), "W2 LS-AllWISE": ("std_mag__ls_w2", "std_mag__wise_w2"),
-             "r LS-PS1": ("std_mag__ls_r", "std_mag__ps1_r"), "r SDSS-PS1": ("std_mag__sdsspsf_r", "std_mag__ps1_r"),
-             "g LS-PS1": ("std_mag__ls_g", "std_mag__ps1_g"), "z LS-PS1": ("std_mag__ls_z", "std_mag__ps1_z")}
+    pairs = {
+        "W1 LS-AllWISE": ("std_mag__ls_w1", "std_mag__wise_w1"),
+        "W2 LS-AllWISE": ("std_mag__ls_w2", "std_mag__wise_w2"),
+        "r LS-PS1": ("std_mag__ls_r", "std_mag__ps1_r"),
+        "r SDSS-PS1": ("std_mag__sdsspsf_r", "std_mag__ps1_r"),
+        "g LS-PS1": ("std_mag__ls_g", "std_mag__ps1_g"),
+        "z LS-PS1": ("std_mag__ls_z", "std_mag__ps1_z"),
+    }
     out = {}
     for name, (a, b) in pairs.items():
         d = (h[a] - h[b]).dropna()
-        d = d[d.abs() < 2.0] if len(d) else d                      # drop gross mismatches (blends)
+        d = d[d.abs() < 2.0] if len(d) else d  # drop gross mismatches (blends)
         if len(d) >= min_n:
-            out[name] = {"n": int(len(d)), "median": round(float(d.median()), 3),
-                         "nmad": round(float(1.4826 * (d - d.median()).abs().median()), 3)}
+            out[name] = {
+                "n": int(len(d)),
+                "median": round(float(d.median()), 3),
+                "nmad": round(float(1.4826 * (d - d.median()).abs().median()), 3),
+            }
     return out

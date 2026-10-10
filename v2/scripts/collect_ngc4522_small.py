@@ -1,4 +1,5 @@
 """Small NGC 4522 integration collection test."""
+
 from pathlib import Path
 import importlib.util
 import sys
@@ -20,10 +21,26 @@ OUT = ROOT / "rawdata"
 OUT.mkdir(exist_ok=True)
 
 modules = [
-    "gaia_dr3", "sdss_dr18", "panstarrs1", "desi_legacy", "galex",
-    "twomass", "allwise", "lotss", "first", "nvss", "vlass", "xmm",
-    "chandra", "erosita", "sdss_spectroscopy", "desi_spectroscopy",
-    "lamost_spectroscopy", "sga2020", "simbad", "ned",
+    "gaia_dr3",
+    "sdss_dr18",
+    "panstarrs1",
+    "desi_legacy",
+    "galex",
+    "twomass",
+    "allwise",
+    "lotss",
+    "first",
+    "nvss",
+    "vlass",
+    "xmm",
+    "chandra",
+    "erosita",
+    "sdss_spectroscopy",
+    "desi_spectroscopy",
+    "lamost_spectroscopy",
+    "sga2020",
+    "simbad",
+    "ned",
 ]
 
 summary = []
@@ -53,28 +70,28 @@ for name in modules:
                 )
                 maxsep = float(center.separation(coords).arcmin.max())
 
-        status = (
-            "ok"
-            if maxsep is None or maxsep <= RADIUS_ARCMIN + 1e-6
-            else "radius_error"
+        status = "ok" if maxsep is None or maxsep <= RADIUS_ARCMIN + 1e-6 else "radius_error"
+        summary.append(
+            {
+                "collector": name,
+                "status": status,
+                "rows": len(df),
+                "max_sep_arcmin": maxsep,
+                "file": str(path.relative_to(ROOT)),
+                "error": "",
+            }
         )
-        summary.append({
-            "collector": name,
-            "status": status,
-            "rows": len(df),
-            "max_sep_arcmin": maxsep,
-            "file": str(path.relative_to(ROOT)),
-            "error": "",
-        })
     except Exception as exc:
-        summary.append({
-            "collector": name,
-            "status": "error",
-            "rows": 0,
-            "max_sep_arcmin": None,
-            "file": "",
-            "error": repr(exc),
-        })
+        summary.append(
+            {
+                "collector": name,
+                "status": "error",
+                "rows": 0,
+                "max_sep_arcmin": None,
+                "file": "",
+                "error": repr(exc),
+            }
+        )
         traceback.print_exc()
 
 summary_df = pd.DataFrame(summary)

@@ -1,5 +1,6 @@
 """Qt models for the Finding Objects desktop app: a pandas-backed table model
 and a sort/filter proxy (class, status and free-text filters)."""
+
 from __future__ import annotations
 import math
 import pandas as pd
@@ -7,11 +8,40 @@ from PySide6.QtCore import QAbstractTableModel, QModelIndex, QSortFilterProxyMod
 from PySide6.QtGui import QColor
 
 CLASS_COLORS = {"STAR": "#d9822b", "GALAXY": "#2b6cb0", "QSO": "#7b3fb5", "UNKNOWN": "#8a8f98"}
-TABLE_COLUMNS = ["designation", "primary_class", "subclass", "subclass_tags", "primary_confidence", "classification_status",
-                 "p_star", "p_galaxy", "p_qso", "separation_arcmin", "n_components", "ra", "dec", "designation_catalog", "catalogs"]
-HEADERS = {"designation": "Name", "subclass": "Sub-class", "subclass_tags": "Attributes", "n_components": "Parts", "designation_catalog": "Name from", "separation_arcmin": "Dist (′)", "primary_class": "Class", "primary_confidence": "Confidence",
-           "classification_status": "Status", "p_star": "P(star)", "p_galaxy": "P(galaxy)",
-           "p_qso": "P(QSO)", "ra": "RA", "dec": "Dec", "catalogs": "Catalogs"}
+TABLE_COLUMNS = [
+    "designation",
+    "primary_class",
+    "subclass",
+    "subclass_tags",
+    "primary_confidence",
+    "classification_status",
+    "p_star",
+    "p_galaxy",
+    "p_qso",
+    "separation_arcmin",
+    "n_components",
+    "ra",
+    "dec",
+    "designation_catalog",
+    "catalogs",
+]
+HEADERS = {
+    "designation": "Name",
+    "subclass": "Sub-class",
+    "subclass_tags": "Attributes",
+    "n_components": "Parts",
+    "designation_catalog": "Name from",
+    "separation_arcmin": "Dist (′)",
+    "primary_class": "Class",
+    "primary_confidence": "Confidence",
+    "classification_status": "Status",
+    "p_star": "P(star)",
+    "p_galaxy": "P(galaxy)",
+    "p_qso": "P(QSO)",
+    "ra": "RA",
+    "dec": "Dec",
+    "catalogs": "Catalogs",
+}
 SORT_ROLE = Qt.UserRole + 1
 
 
@@ -35,7 +65,7 @@ class DataFrameModel(QAbstractTableModel):
         self._df = df.reset_index(drop=True)
         self._icons = None
         cols = [c for c in TABLE_COLUMNS if c in self._df.columns]
-        if "designation" not in cols and "object_id" in self._df.columns:   # very old results only
+        if "designation" not in cols and "object_id" in self._df.columns:  # very old results only
             cols.insert(0, "object_id")
         self._cols = cols
         self.endResetModel()
@@ -46,6 +76,7 @@ class DataFrameModel(QAbstractTableModel):
     def _icon(self, row: int):
         if getattr(self, "_icons", None) is None:
             from qt_icons import icon, kind_of
+
             cache, icons = {}, []
             for r in self._df.to_dict("records"):
                 k = kind_of(r)
@@ -77,7 +108,7 @@ class DataFrameModel(QAbstractTableModel):
             return None
         col = self._cols[index.column()]
         value = self._df.iat[index.row(), self._df.columns.get_loc(col)]
-        if hasattr(value, "item"):          # numpy scalar -> Python (Qt cannot take numpy types)
+        if hasattr(value, "item"):  # numpy scalar -> Python (Qt cannot take numpy types)
             value = value.item()
         if role == Qt.DisplayRole:
             if isinstance(value, float):
@@ -94,7 +125,11 @@ class DataFrameModel(QAbstractTableModel):
         if role == Qt.DecorationRole and index.column() == 0:
             return self._icon(index.row())
         if role == Qt.ToolTipRole and col in ("subclass", "designation"):
-            basis = self._df.iat[index.row(), self._df.columns.get_loc("subclass_basis")] if "subclass_basis" in self._df else None
+            basis = (
+                self._df.iat[index.row(), self._df.columns.get_loc("subclass_basis")]
+                if "subclass_basis" in self._df
+                else None
+            )
             return None if basis is None or (isinstance(basis, float) and basis != basis) else str(basis)
         if role == Qt.TextAlignmentRole and isinstance(value, float):
             return int(Qt.AlignRight | Qt.AlignVCenter)
@@ -117,9 +152,12 @@ class ResultsFilter(QSortFilterProxyModel):
     def _refilter(self, apply):
         # Qt >= 6.10 replaces invalidateFilter() with begin/endFilterChange().
         if hasattr(self, "beginFilterChange"):
-            self.beginFilterChange(); apply(); self.endFilterChange()
+            self.beginFilterChange()
+            apply()
+            self.endFilterChange()
         else:
-            apply(); self.invalidateFilter()
+            apply()
+            self.invalidateFilter()
 
     def set_class(self, cls: str):
         self._refilter(lambda: setattr(self, "_cls", cls))
@@ -147,7 +185,18 @@ class ResultsFilter(QSortFilterProxyModel):
         col = lambda c: df[c].fillna("").astype(str).to_numpy(dtype=object) if c in df else None
         self._a_cls, self._a_status = col("primary_class"), col("classification_status")
         self._a_part = df["parent_object_id"].notna().to_numpy() if "parent_object_id" in df else None
-        parts = [a for a in (col("designation"), col("subclass"), col("subclass_tags"), col("catalog_designations"), col("catalogs"), col("object_id")) if a is not None]
+        parts = [
+            a
+            for a in (
+                col("designation"),
+                col("subclass"),
+                col("subclass_tags"),
+                col("catalog_designations"),
+                col("catalogs"),
+                col("object_id"),
+            )
+            if a is not None
+        ]
         self._a_text = [" ".join(t).lower() for t in zip(*parts)] if parts else None
 
     def filterAcceptsRow(self, row, parent):

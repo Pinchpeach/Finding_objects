@@ -1,4 +1,5 @@
 """End-to-end Preprocess smoke test on the committed NGC 4522 raw data."""
+
 from __future__ import annotations
 
 import importlib.util
@@ -22,6 +23,7 @@ def _load(name):
 
 def _run_pipeline(tmp_path: Path) -> pd.DataFrame:
     import sys
+
     sys.path.insert(0, str(ROOT))
     a, i, f, e, l = (tmp_path / n for n in ("a.csv", "i.csv", "f.csv", "e.csv", "l.csv"))
     _load("01_source_association").run(RAW, a)
@@ -66,11 +68,16 @@ def test_proper_motion_star_rule_is_quality_gated():
     mod = _load("04_build_evidence")
     rules = pd.read_csv(RULES, keep_default_na=False)
     rule = rules[rules.rule_id == "AST-GAL-002"].iloc[0]
-    row = pd.Series({
-        "pmra": 50.0, "pmra_error": 1.0, "pmdec": 0.0, "pmdec_error": 1.0,
-        "catalog_confidence_gaia_astrometry": 0.5,
-        "association_confidence__gaia_dr3": 0.5,
-    })
+    row = pd.Series(
+        {
+            "pmra": 50.0,
+            "pmra_error": 1.0,
+            "pmdec": 0.0,
+            "pmdec_error": 1.0,
+            "catalog_confidence_gaia_astrometry": 0.5,
+            "association_confidence__gaia_dr3": 0.5,
+        }
+    )
     (ev,) = mod.evaluate(rule, row)
     assert math.isclose(ev["score"], ev["raw_score"] * 0.25)
 
@@ -78,14 +85,34 @@ def test_proper_motion_star_rule_is_quality_gated():
 def test_same_named_fields_do_not_cross_catalogs(tmp_path):
     """DESI Legacy and SDSS PhotoObj both publish ``type``; rules must read SDSS's."""
     import sys
+
     sys.path.insert(0, str(ROOT))
     raw = tmp_path / "raw"
     raw.mkdir()
     base = {"ra": 150.0, "dec": 2.0}
-    pd.DataFrame([{**base, "catalog": "DESI Legacy Surveys DR10", "catalog_object_id": "ls1",
-                   "object_name": "ls1", "type": "PSF"}]).to_csv(raw / "desi_legacy_t.csv", index=False)
-    pd.DataFrame([{**base, "catalog": "SDSS DR18 PhotoObj", "catalog_object_id": "1237", "object_name": "s1",
-                   "type": 3, "clean": 1}]).to_csv(raw / "sdss_dr18_t.csv", index=False)
+    pd.DataFrame(
+        [
+            {
+                **base,
+                "catalog": "DESI Legacy Surveys DR10",
+                "catalog_object_id": "ls1",
+                "object_name": "ls1",
+                "type": "PSF",
+            }
+        ]
+    ).to_csv(raw / "desi_legacy_t.csv", index=False)
+    pd.DataFrame(
+        [
+            {
+                **base,
+                "catalog": "SDSS DR18 PhotoObj",
+                "catalog_object_id": "1237",
+                "object_name": "s1",
+                "type": 3,
+                "clean": 1,
+            }
+        ]
+    ).to_csv(raw / "sdss_dr18_t.csv", index=False)
     a, i, f, e = (tmp_path / n for n in ("a.csv", "i.csv", "f.csv", "e.csv"))
     _load("01_source_association").run(raw, a)
     _load("02_integrate_objects").run(a, raw, i)
@@ -101,11 +128,25 @@ def test_64bit_identifiers_survive_association(tmp_path):
     raw = tmp_path / "raw"
     raw.mkdir()
     # A missing ID in the column would make pandas parse the rest as float64.
-    pd.DataFrame([
-        {"catalog": "Gaia DR3", "catalog_object_id": "3796442680948579328", "object_name": "a", "ra": 10.0, "dec": 1.0},
-        {"catalog": "Gaia DR3", "catalog_object_id": "3796442680948579329", "object_name": "b", "ra": 11.0, "dec": 1.0},
-        {"catalog": "Gaia DR3", "catalog_object_id": None, "object_name": "c", "ra": 12.0, "dec": 1.0},
-    ]).to_csv(raw / "gaia_t.csv", index=False)
+    pd.DataFrame(
+        [
+            {
+                "catalog": "Gaia DR3",
+                "catalog_object_id": "3796442680948579328",
+                "object_name": "a",
+                "ra": 10.0,
+                "dec": 1.0,
+            },
+            {
+                "catalog": "Gaia DR3",
+                "catalog_object_id": "3796442680948579329",
+                "object_name": "b",
+                "ra": 11.0,
+                "dec": 1.0,
+            },
+            {"catalog": "Gaia DR3", "catalog_object_id": None, "object_name": "c", "ra": 12.0, "dec": 1.0},
+        ]
+    ).to_csv(raw / "gaia_t.csv", index=False)
     a = tmp_path / "a.csv"
     _load("01_source_association").run(raw, a)
     ids = set(pd.read_csv(a, dtype={"catalog_object_id": str}).catalog_object_id)
@@ -115,19 +156,48 @@ def test_64bit_identifiers_survive_association(tmp_path):
 
 def test_detections_inside_large_galaxy_abstain(tmp_path):
     import sys
+
     sys.path.insert(0, str(ROOT))
     raw = tmp_path / "raw"
     raw.mkdir()
     ra0, dec0 = 150.0, 2.0
     # SGA galaxy: D26 = 4 arcmin, major axis North-South (PA 0), b/a = 0.5.
-    pd.DataFrame([{"catalog": "SGA-2020", "catalog_object_id": "SGA1", "object_name": "NGC X", "ra": ra0, "dec": dec0,
-                   "sga_d26_arcmin": 4.0, "sga_pa_deg": 0.0, "sga_ba": 0.5}]).to_csv(raw / "sga.csv", index=False)
+    pd.DataFrame(
+        [
+            {
+                "catalog": "SGA-2020",
+                "catalog_object_id": "SGA1",
+                "object_name": "NGC X",
+                "ra": ra0,
+                "dec": dec0,
+                "sga_d26_arcmin": 4.0,
+                "sga_pa_deg": 0.0,
+                "sga_ba": 0.5,
+            }
+        ]
+    ).to_csv(raw / "sga.csv", index=False)
     east = lambda arcmin: ra0 + arcmin / 60.0 / math.cos(math.radians(dec0))
-    pd.DataFrame([
-        # 1.5' North: inside (major semi-axis 2').  1.5' East: outside (minor semi-axis 1').
-        {"catalog": "SIMBAD", "catalog_object_id": "in", "object_name": "in", "ra": ra0, "dec": dec0 + 1.5 / 60, "otype": "*"},
-        {"catalog": "SIMBAD", "catalog_object_id": "out", "object_name": "out", "ra": east(1.5), "dec": dec0, "otype": "*"},
-    ]).to_csv(raw / "simbad.csv", index=False)
+    pd.DataFrame(
+        [
+            # 1.5' North: inside (major semi-axis 2').  1.5' East: outside (minor semi-axis 1').
+            {
+                "catalog": "SIMBAD",
+                "catalog_object_id": "in",
+                "object_name": "in",
+                "ra": ra0,
+                "dec": dec0 + 1.5 / 60,
+                "otype": "*",
+            },
+            {
+                "catalog": "SIMBAD",
+                "catalog_object_id": "out",
+                "object_name": "out",
+                "ra": east(1.5),
+                "dec": dec0,
+                "otype": "*",
+            },
+        ]
+    ).to_csv(raw / "simbad.csv", index=False)
     a, i, f, e, l = (tmp_path / n for n in ("a.csv", "i.csv", "f.csv", "e.csv", "l.csv"))
     _load("01_source_association").run(raw, a)
     _load("02_integrate_objects").run(a, raw, i)
@@ -149,6 +219,7 @@ def test_detections_inside_large_galaxy_abstain(tmp_path):
 
 def test_field_prior_em_recovers_class_mix():
     import numpy as np
+
     mod = _load("05_likelihood_vectors")
     rng = np.random.default_rng(1)
     # Calibrated under equal priors: draw posteriors, then labels from them.
@@ -162,6 +233,7 @@ def test_field_prior_em_recovers_class_mix():
 
 def test_one_command_pipeline_on_committed_field(tmp_path):
     import shutil
+
     raw = tmp_path / "raw"
     raw.mkdir()
     for f in RAW.glob("*_ra188p4155_dec9p1751_r0p5arcmin.csv"):
@@ -178,16 +250,26 @@ def test_one_command_pipeline_on_committed_field(tmp_path):
 def test_color_knn_same_colour_subset_and_leave_one_out():
     import sys
     import numpy as np
+
     sys.path.insert(0, str(ROOT))
     import color_knn
-    ref = pd.DataFrame({"id": ["a", "b", "c", "d"], "truth_class": ["STAR", "STAR", "GALAXY", "GALAXY"],
-                        "ls_g_r_color": [0.5, 0.52, 1.5, 1.52], "ls_r_z_color": [0.2, 0.21, 0.9, 0.91],
-                        "ls_z_w1_color": [-1.0, np.nan, 1.0, np.nan], "ls_w1_w2_color": np.nan})
-    obj = pd.DataFrame({"ls_g_r_color": [0.5, 1.5, 0.5], "ls_r_z_color": [0.2, 0.9, np.nan],
-                        "ls_z_w1_color": [np.nan, 1.0, np.nan]})
+
+    ref = pd.DataFrame(
+        {
+            "id": ["a", "b", "c", "d"],
+            "truth_class": ["STAR", "STAR", "GALAXY", "GALAXY"],
+            "ls_g_r_color": [0.5, 0.52, 1.5, 1.52],
+            "ls_r_z_color": [0.2, 0.21, 0.9, 0.91],
+            "ls_z_w1_color": [-1.0, np.nan, 1.0, np.nan],
+            "ls_w1_w2_color": np.nan,
+        }
+    )
+    obj = pd.DataFrame(
+        {"ls_g_r_color": [0.5, 1.5, 0.5], "ls_r_z_color": [0.2, 0.9, np.nan], "ls_z_w1_color": [np.nan, 1.0, np.nan]}
+    )
     f = color_knn.class_fractions(obj, ref, k=1)
-    assert f[0].argmax() == 0 and f[1].argmax() == 1   # nearest in the colours both have
-    assert np.isnan(f[2]).all()                         # fewer than two colours: no evidence
+    assert f[0].argmax() == 0 and f[1].argmax() == 1  # nearest in the colours both have
+    assert np.isnan(f[2]).all()  # fewer than two colours: no evidence
     # Leave-one-out: "a" may not vote for itself; its only same-subset
     # neighbour with z-W1 is "c" (GALAXY).
     g = color_knn.class_fractions(obj.iloc[[0]].assign(ls_z_w1_color=-1.0), ref, k=1, ids=["a"])
@@ -196,41 +278,73 @@ def test_color_knn_same_colour_subset_and_leave_one_out():
 
 def test_unreliable_evidence_is_weak_not_contrary():
     mod = _load("05_likelihood_vectors")
-    model = {"classes": ["STAR", "GALAXY", "QSO"], "intercept": {"STAR": 0, "GALAXY": 0, "QSO": 0},
-             "coef": {"LS-MORPH-001:GALAXY": {"STAR": -2.0, "GALAXY": 2.0, "QSO": 0.0}}}
-    item = {"rule_id": "LS-MORPH-001", "class": "GALAXY", "kind": "binary_evidence", "raw_score": 0.75,
-            "reliability": 1.0, "association_reliability": 0.001, "score": 0.00075}
+    model = {
+        "classes": ["STAR", "GALAXY", "QSO"],
+        "intercept": {"STAR": 0, "GALAXY": 0, "QSO": 0},
+        "coef": {"LS-MORPH-001:GALAXY": {"STAR": -2.0, "GALAXY": 2.0, "QSO": 0.0}},
+    }
+    item = {
+        "rule_id": "LS-MORPH-001",
+        "class": "GALAXY",
+        "kind": "binary_evidence",
+        "raw_score": 0.75,
+        "reliability": 1.0,
+        "association_reliability": 0.001,
+        "score": 0.00075,
+    }
     p, _ = mod.fuse([item], model)
-    assert abs(p["STAR"] - p["GALAXY"]) < 0.01      # ~no evidence, not "not a galaxy"
+    assert abs(p["STAR"] - p["GALAXY"]) < 0.01  # ~no evidence, not "not a galaxy"
     p, _ = mod.fuse([dict(item, association_reliability=1.0, score=0.75)], model)
     assert p["GALAXY"] > 0.8
 
 
 def test_association_posterior_sparse_vs_dense():
     import sys
+
     sys.path.insert(0, str(ROOT))
     from association_model import assess_pair
+
     a = {"ra": 150.0, "dec": 2.0, "poserr_arcsec": 0.3, "catalog": "X"}
-    b = {"ra": 150.0, "dec": 2.0 + 1.27 / 3600, "poserr_arcsec": 0.3, "catalog": "Y"}   # ~3 sigma
-    sparse = assess_pair(a, b, 1e-4)      # one source per 10^4 arcsec^2
+    b = {"ra": 150.0, "dec": 2.0 + 1.27 / 3600, "poserr_arcsec": 0.3, "catalog": "Y"}  # ~3 sigma
+    sparse = assess_pair(a, b, 1e-4)  # one source per 10^4 arcsec^2
     dense = assess_pair(a, b, 0.2)
     assert sparse["positional_likelihood"] < 0.02
-    assert sparse["association_posterior"] > 0.8         # unique counterpart, sparse field
+    assert sparse["association_posterior"] > 0.8  # unique counterpart, sparse field
     assert dense["association_posterior"] < sparse["association_posterior"]
 
 
 def test_desi_targetid_links_to_legacy_surveys_source(tmp_path):
-    raw = tmp_path / "raw"; raw.mkdir()
+    raw = tmp_path / "raw"
+    raw.mkdir()
     rel, bid, oid = 9011, 123456, 789
     tid = (rel << 42) | (bid << 22) | oid
     ra0, dec0 = 245.0, 43.0
     # Two Legacy Surveys sources 0.15" apart (one the DESI target); DESI at the target.
-    pd.DataFrame([{"catalog": "DESI Legacy Surveys DR10", "catalog_object_id": "a", "ra": ra0, "dec": dec0,
-                   "release": rel, "brickid": bid, "objid": oid},
-                  {"catalog": "DESI Legacy Surveys DR10", "catalog_object_id": "b", "ra": ra0, "dec": dec0 + 0.15 / 3600,
-                   "release": rel, "brickid": bid, "objid": oid + 1}]).to_csv(raw / "ls.csv", index=False)
-    pd.DataFrame([{"catalog": "DESI DR1 spectroscopy", "catalog_object_id": str(tid), "ra": ra0, "dec": dec0 + 0.07 / 3600}]
-                 ).to_csv(raw / "desi.csv", index=False)
+    pd.DataFrame(
+        [
+            {
+                "catalog": "DESI Legacy Surveys DR10",
+                "catalog_object_id": "a",
+                "ra": ra0,
+                "dec": dec0,
+                "release": rel,
+                "brickid": bid,
+                "objid": oid,
+            },
+            {
+                "catalog": "DESI Legacy Surveys DR10",
+                "catalog_object_id": "b",
+                "ra": ra0,
+                "dec": dec0 + 0.15 / 3600,
+                "release": rel,
+                "brickid": bid,
+                "objid": oid + 1,
+            },
+        ]
+    ).to_csv(raw / "ls.csv", index=False)
+    pd.DataFrame(
+        [{"catalog": "DESI DR1 spectroscopy", "catalog_object_id": str(tid), "ra": ra0, "dec": dec0 + 0.07 / 3600}]
+    ).to_csv(raw / "desi.csv", index=False)
     out = tmp_path / "a.csv"
     _load("01_source_association").run(raw, out)
     a = pd.read_csv(out, dtype={"catalog_object_id": str})
@@ -241,14 +355,30 @@ def test_desi_targetid_links_to_legacy_surveys_source(tmp_path):
 
 def test_decisive_gaia_motion_classifies_star_despite_conflict(tmp_path):
     import json
+
     mod = _load("05_likelihood_vectors")
-    gal = {"rule_id": "LS-MORPH-001", "class": "GALAXY", "kind": "binary_evidence", "raw_score": 0.9,
-           "reliability": 1.0, "association_reliability": 1.0, "score": 0.9}
-    pm = lambda sig, rel=1.0: {"rule_id": "AST-GAL-002", "class": "STAR", "kind": "continuous_score", "value": sig,
-                               "raw_score": sig / (sig + 5), "reliability": rel, "association_reliability": 1.0,
-                               "score": rel * sig / (sig + 5)}
-    rows = [[gal, pm(40.0)], [gal, pm(4.0)], [gal, pm(40.0, rel=0.5)]]   # decisive / weak / poor RUWE
-    ev = tmp_path / "ev.csv"; out = tmp_path / "lk.csv"
+    gal = {
+        "rule_id": "LS-MORPH-001",
+        "class": "GALAXY",
+        "kind": "binary_evidence",
+        "raw_score": 0.9,
+        "reliability": 1.0,
+        "association_reliability": 1.0,
+        "score": 0.9,
+    }
+    pm = lambda sig, rel=1.0: {
+        "rule_id": "AST-GAL-002",
+        "class": "STAR",
+        "kind": "continuous_score",
+        "value": sig,
+        "raw_score": sig / (sig + 5),
+        "reliability": rel,
+        "association_reliability": 1.0,
+        "score": rel * sig / (sig + 5),
+    }
+    rows = [[gal, pm(40.0)], [gal, pm(4.0)], [gal, pm(40.0, rel=0.5)]]  # decisive / weak / poor RUWE
+    ev = tmp_path / "ev.csv"
+    out = tmp_path / "lk.csv"
     pd.DataFrame({"object_id": ["a", "b", "c"], "evidence_json": [json.dumps(r) for r in rows]}).to_csv(ev, index=False)
     mod.run(ev, out)
     res = pd.read_csv(out)
@@ -259,9 +389,14 @@ def test_decisive_gaia_motion_classifies_star_despite_conflict(tmp_path):
 
 def test_units_drop_missing_value_sentinels():
     mod = _load("units")
-    df = pd.DataFrame({"pan_starrs1_dr2_meanobject__rMeanPSFMag": [-999.0, 20.5],
-                       "pan_starrs1_dr2_meanobject__rMeanPSFMagErr": [-999.0, 0.05],
-                       "sdss_dr18_photoobj__modelMag_u": [-9999.0, 21.0], "allwise__W1mag": [None, 15.0]})
+    df = pd.DataFrame(
+        {
+            "pan_starrs1_dr2_meanobject__rMeanPSFMag": [-999.0, 20.5],
+            "pan_starrs1_dr2_meanobject__rMeanPSFMagErr": [-999.0, 0.05],
+            "sdss_dr18_photoobj__modelMag_u": [-9999.0, 21.0],
+            "allwise__W1mag": [None, 15.0],
+        }
+    )
     h = mod.harmonize(df)
     assert h["std_mag__ps1_r"].isna()[0] and h["std_mag__ps1_r"][1] == 20.5 and h["std_magerr__ps1_r"].isna()[0]
     assert h["std_mag__sdss_u"].isna()[0] and abs(h["std_mag__sdss_u"][1] - 20.96) < 1e-9

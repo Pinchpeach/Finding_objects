@@ -1,12 +1,24 @@
 """Custom widgets: a sky map of the classified objects and an object detail panel."""
+
 from __future__ import annotations
 import html, json, math
 from urllib.parse import quote
 import pandas as pd
 from PySide6.QtCore import QPointF, QRectF, Qt, QUrl, Signal
 from PySide6.QtGui import QBrush, QColor, QDesktopServices, QGuiApplication, QPainter, QPen
-from PySide6.QtWidgets import (QCheckBox, QFormLayout, QGroupBox, QHBoxLayout, QLabel, QProgressBar, QPushButton,
-                               QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (
+    QCheckBox,
+    QFormLayout,
+    QGroupBox,
+    QHBoxLayout,
+    QLabel,
+    QProgressBar,
+    QPushButton,
+    QTreeWidget,
+    QTreeWidgetItem,
+    QVBoxLayout,
+    QWidget,
+)
 
 from qt_models import CLASS_COLORS, class_color
 
@@ -27,25 +39,26 @@ class SkyMap(QWidget):
     about the cursor, dragging pans, right-click (or Home) resets the view,
     a click selects the nearest object and a double-click sets the search
     centre there."""
-    objectClicked = Signal(int)          # row in the results DataFrame
+
+    objectClicked = Signal(int)  # row in the results DataFrame
     centerPicked = Signal(float, float)  # double-click: (ra, dec) for a new search centre
     viewChanged = Signal()
 
     MARGIN = 24
     ICON = 7.5
-    LABEL_LIMIT = 40                     # draw names when at most this many objects are in view
+    LABEL_LIMIT = 40  # draw names when at most this many objects are in view
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setMinimumSize(260, 260)
-        self.setMouseTracking(True)            # hover tooltips
+        self.setMouseTracking(True)  # hover tooltips
         self.setFocusPolicy(Qt.StrongFocus)
         self._x = self._y = None
         self._ra = self._dec = None
         self._kinds: list[dict] = []
         self._names: list[str] = []
         self._subs: list[str] = []
-        self._hosts: list[tuple[int, float, float, float]] = []   # (row, d26 arcmin, pa, b/a)
+        self._hosts: list[tuple[int, float, float, float]] = []  # (row, d26 arcmin, pa, b/a)
         self._visible = None
         self._selected: int | None = None
         self._extent = 1.0
@@ -60,6 +73,7 @@ class SkyMap(QWidget):
     # ---------------------------------------------------------------- data
     def set_frame(self, df: pd.DataFrame) -> None:
         from qt_icons import kind_of
+
         ra = pd.to_numeric(df["ra"], errors="coerce").to_numpy(float) if "ra" in df else None
         dec = pd.to_numeric(df["dec"], errors="coerce").to_numpy(float) if "dec" in df else None
         self._ra, self._dec = (ra, dec) if ra is not None and dec is not None and len(ra) else (None, None)
@@ -74,8 +88,14 @@ class SkyMap(QWidget):
         for i, r in enumerate(rows):
             d26 = _num(r.get("sga_d26_arcmin", r.get("sga_2020__sga_d26_arcmin")))
             if d26 and _num(r.get("sga_2020__catalog_object_id")) is not None:
-                self._hosts.append((i, d26, _num(r.get("sga_pa_deg", r.get("sga_2020__sga_pa_deg"))) or 0.0,
-                                    _num(r.get("sga_ba", r.get("sga_2020__sga_ba"))) or 1.0))
+                self._hosts.append(
+                    (
+                        i,
+                        d26,
+                        _num(r.get("sga_pa_deg", r.get("sga_2020__sga_pa_deg"))) or 0.0,
+                        _num(r.get("sga_ba", r.get("sga_2020__sga_ba"))) or 1.0,
+                    )
+                )
         self._visible = None
         self._selected = None
         self._project(reset=True)
@@ -95,7 +115,8 @@ class SkyMap(QWidget):
 
     def reset_view(self) -> None:
         self._zoom, self._pan = 1.0, [0.0, 0.0]
-        self.update(); self.viewChanged.emit()
+        self.update()
+        self.viewChanged.emit()
 
     def zoom_by(self, factor: float, anchor: QPointF | None = None) -> None:
         if self._c0 is None:
@@ -105,7 +126,8 @@ class SkyMap(QWidget):
         self._zoom = min(max(self._zoom * factor, 0.5), 5000.0)
         cx, cy, s = self._scale()
         self._pan = [x - (cx - anchor.x()) / s, y - (cy - anchor.y()) / s]
-        self.update(); self.viewChanged.emit()
+        self.update()
+        self.viewChanged.emit()
 
     @property
     def zoom(self) -> float:
@@ -113,6 +135,7 @@ class SkyMap(QWidget):
 
     def _project(self, reset=False) -> None:
         import numpy as np
+
         if self._area is not None:
             self._c0 = (self._area[0], self._area[1])
         elif self._ra is not None and np.isfinite(self._ra).any():
@@ -135,6 +158,7 @@ class SkyMap(QWidget):
     def _offsets(self, ra, dec):
         """Offsets from the centre in arcmin (RA wrap via the signed difference)."""
         import numpy as np
+
         ra0, dec0 = self._c0
         dra = ((np.asarray(ra, float) - ra0 + 180.0) % 360.0) - 180.0
         return dra * math.cos(math.radians(dec0)) * 60.0, (np.asarray(dec, float) - dec0) * 60.0
@@ -146,7 +170,7 @@ class SkyMap(QWidget):
 
     def _to_screen(self, x, y):
         cx, cy, s = self._scale()
-        return cx - (x - self._pan[0]) * s, cy - (y - self._pan[1]) * s   # east (+RA) to the left, north up
+        return cx - (x - self._pan[0]) * s, cy - (y - self._pan[1]) * s  # east (+RA) to the left, north up
 
     def _to_offsets(self, sx, sy):
         cx, cy, s = self._scale()
@@ -164,6 +188,7 @@ class SkyMap(QWidget):
     # ------------------------------------------------------------- painting
     def paintEvent(self, event):
         from qt_icons import draw
+
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing)
         p.fillRect(self.rect(), self.palette().base())
@@ -173,13 +198,16 @@ class SkyMap(QWidget):
             return
         cx, cy, s = self._scale()
         text = self.palette().text().color()
-        if self._area is not None:              # search cone + centre cross
+        if self._area is not None:  # search cone + centre cross
             ox, oy = self._to_screen(0.0, 0.0)
-            pen = QPen(QColor("#2f9e44"), 1.5, Qt.DashLine); p.setPen(pen); p.setBrush(Qt.NoBrush)
+            pen = QPen(QColor("#2f9e44"), 1.5, Qt.DashLine)
+            p.setPen(pen)
+            p.setBrush(Qt.NoBrush)
             r = self._area[2] * s
             p.drawEllipse(QPointF(ox, oy), r, r)
             p.setPen(QPen(QColor("#2f9e44"), 1.5))
-            p.drawLine(QPointF(ox - 7, oy), QPointF(ox + 7, oy)); p.drawLine(QPointF(ox, oy - 7), QPointF(ox, oy + 7))
+            p.drawLine(QPointF(ox - 7, oy), QPointF(ox + 7, oy))
+            p.drawLine(QPointF(ox, oy - 7), QPointF(ox, oy + 7))
         # true extent of large galaxies (SGA D26 ellipse; PA from north through east)
         for i, d26, pa, ba in self._hosts:
             if not self._shown(i):
@@ -188,8 +216,11 @@ class SkyMap(QWidget):
             a = d26 / 2 * s
             if a < 4:
                 continue
-            p.save(); p.translate(sx, sy); p.rotate(-pa)          # screen y is down, east is left
-            p.setPen(QPen(QColor("#4f8fdc"), 1.2, Qt.DashDotLine)); p.setBrush(QColor(79, 143, 220, 25))
+            p.save()
+            p.translate(sx, sy)
+            p.rotate(-pa)  # screen y is down, east is left
+            p.setPen(QPen(QColor("#4f8fdc"), 1.2, Qt.DashDotLine))
+            p.setBrush(QColor(79, 143, 220, 25))
             p.drawEllipse(QPointF(0, 0), a * ba, a)
             p.restore()
         in_view = []
@@ -204,7 +235,9 @@ class SkyMap(QWidget):
             draw(p, self._kinds[i], QPointF(sx, sy), self.ICON, selected=(i == self._selected))
         if len(in_view) <= self.LABEL_LIMIT:
             p.setPen(text)
-            f = p.font(); f.setPointSizeF(max(f.pointSizeF() - 1, 7)); p.setFont(f)
+            f = p.font()
+            f.setPointSizeF(max(f.pointSizeF() - 1, 7))
+            p.setFont(f)
             for i, sx, sy in in_view:
                 if self._kinds[i].get("cls") != "UNKNOWN" or i == self._selected:
                     p.drawText(QPointF(sx + self.ICON * 1.6, sy - self.ICON * 0.6), self._names[i])
@@ -215,7 +248,7 @@ class SkyMap(QWidget):
         p.drawText(QRectF(self.width() - 126, 4, 120, 16), Qt.AlignRight | Qt.AlignTop, f"zoom ×{self._zoom:.3g}")
 
     def _scale_bar(self, p, s):
-        target = 80 / s                                   # arcmin per ~80 px
+        target = 80 / s  # arcmin per ~80 px
         steps = [x / 60 for x in (0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 30)] + [1, 2, 5, 10, 20, 30, 60, 120, 300, 600]
         length = min(steps, key=lambda v: abs(math.log(v / target)))
         px = length * s
@@ -228,16 +261,18 @@ class SkyMap(QWidget):
     def wheelEvent(self, event):
         steps = event.angleDelta().y() / 120.0
         if steps:
-            self.zoom_by(1.25 ** steps, event.position())
+            self.zoom_by(1.25**steps, event.position())
         event.accept()
 
     def mousePressEvent(self, event):
         if event.button() == Qt.RightButton:
-            self.reset_view(); return
-        self._press = event.position(); self._dragging = False
+            self.reset_view()
+            return
+        self._press = event.position()
+        self._dragging = False
 
     def _nearest(self, pos, radius=12.0):
-        best, best_d = None, radius ** 2
+        best, best_d = None, radius**2
         for i in range(len(self._kinds)):
             if not self._shown(i):
                 continue
@@ -251,14 +286,18 @@ class SkyMap(QWidget):
         if self._press is None:
             if self._x is not None:
                 from PySide6.QtWidgets import QToolTip
+
                 i = self._nearest(event.position(), 10.0)
                 if i is None:
                     QToolTip.hideText()
                 else:
                     k = self._kinds[i]
                     sub = self._subs[i] if i < len(self._subs) else ""
-                    QToolTip.showText(event.globalPosition().toPoint(),
-                                      f"{self._names[i]}\n{k.get('cls')}" + (f" — {sub}" if sub else ""), self)
+                    QToolTip.showText(
+                        event.globalPosition().toPoint(),
+                        f"{self._names[i]}\n{k.get('cls')}" + (f" — {sub}" if sub else ""),
+                        self,
+                    )
             return
         if self._c0 is None:
             return
@@ -267,10 +306,12 @@ class SkyMap(QWidget):
             return
         self._dragging = True
         _, _, s = self._scale()
-        self._pan[0] += d.x() / s; self._pan[1] += d.y() / s
+        self._pan[0] += d.x() / s
+        self._pan[1] += d.y() / s
         self._press = event.position()
         self.setCursor(Qt.ClosedHandCursor)
-        self.update(); self.viewChanged.emit()
+        self.update()
+        self.viewChanged.emit()
 
     def mouseReleaseEvent(self, event):
         was_drag, self._press, self._dragging = self._dragging, None, False
@@ -304,11 +345,18 @@ class SkyLegend(QWidget):
         super().__init__(parent)
         from qt_icons import LEGEND, icon
         from PySide6.QtWidgets import QGridLayout
-        grid = QGridLayout(self); grid.setContentsMargins(6, 2, 6, 2); grid.setHorizontalSpacing(10); grid.setVerticalSpacing(1)
+
+        grid = QGridLayout(self)
+        grid.setContentsMargins(6, 2, 6, 2)
+        grid.setHorizontalSpacing(10)
+        grid.setVerticalSpacing(1)
         for n, (label, kind) in enumerate(LEGEND):
-            w = QLabel(); w.setPixmap(icon(kind, 18).pixmap(18, 18))
-            t = QLabel(label); t.setStyleSheet("font-size: 11px;")
-            grid.addWidget(w, n // 3, (n % 3) * 2); grid.addWidget(t, n // 3, (n % 3) * 2 + 1)
+            w = QLabel()
+            w.setPixmap(icon(kind, 18).pixmap(18, 18))
+            t = QLabel(label)
+            t.setStyleSheet("font-size: 11px;")
+            grid.addWidget(w, n // 3, (n % 3) * 2)
+            grid.addWidget(t, n // 3, (n % 3) * 2 + 1)
 
 
 class SkyView(QWidget):
@@ -316,14 +364,27 @@ class SkyView(QWidget):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        lay = QVBoxLayout(self); lay.setContentsMargins(0, 0, 0, 0); lay.setSpacing(2)
-        bar = QHBoxLayout(); bar.setContentsMargins(4, 2, 4, 0)
+        lay = QVBoxLayout(self)
+        lay.setContentsMargins(0, 0, 0, 0)
+        lay.setSpacing(2)
+        bar = QHBoxLayout()
+        bar.setContentsMargins(4, 2, 4, 0)
         self.map = SkyMap()
-        for text, tip, fn in (("+", "Zoom in", lambda: self.map.zoom_by(1.5)), ("−", "Zoom out", lambda: self.map.zoom_by(1 / 1.5)),
-                              ("Fit", "Reset view (right-click / Home)", self.map.reset_view)):
-            b = QPushButton(text); b.setToolTip(tip); b.setFixedWidth(44 if text == "Fit" else 30); b.clicked.connect(fn); bar.addWidget(b)
-        self.chk_labels = QCheckBox("Names"); self.chk_labels.setChecked(True)
-        self.chk_labels.toggled.connect(lambda on: (setattr(self.map, "LABEL_LIMIT", 40 if on else -1), self.map.update()))
+        for text, tip, fn in (
+            ("+", "Zoom in", lambda: self.map.zoom_by(1.5)),
+            ("−", "Zoom out", lambda: self.map.zoom_by(1 / 1.5)),
+            ("Fit", "Reset view (right-click / Home)", self.map.reset_view),
+        ):
+            b = QPushButton(text)
+            b.setToolTip(tip)
+            b.setFixedWidth(44 if text == "Fit" else 30)
+            b.clicked.connect(fn)
+            bar.addWidget(b)
+        self.chk_labels = QCheckBox("Names")
+        self.chk_labels.setChecked(True)
+        self.chk_labels.toggled.connect(
+            lambda on: (setattr(self.map, "LABEL_LIMIT", 40 if on else -1), self.map.update())
+        )
         bar.addWidget(self.chk_labels)
         bar.addStretch(1)
         hint = QLabel("wheel: zoom · drag: pan · right-click: reset · double-click: set centre")
@@ -342,17 +403,37 @@ class DetailPanel(QWidget):
         super().__init__(parent)
         self._row: pd.Series | None = None
         lay = QVBoxLayout(self)
-        self.title = QLabel("Select an object"); self.title.setStyleSheet("font-weight: 600; font-size: 14px;")
+        self.title = QLabel("Select an object")
+        self.title.setStyleSheet("font-weight: 600; font-size: 14px;")
         lay.addWidget(self.title)
         info = QFormLayout()
         self.lbl_pos, self.lbl_status, self.lbl_cats = QLabel("–"), QLabel("–"), QLabel("–")
-        self.lbl_names = QLabel("–"); self.lbl_sub = QLabel("–"); self.lbl_parts = QLabel("–"); self.lbl_tags = QLabel("–")
-        self.lbl_paper = QLabel("–"); self.lbl_paper.setOpenExternalLinks(True)
-        for w in (self.lbl_cats, self.lbl_names, self.lbl_sub, self.lbl_parts, self.lbl_tags, self.lbl_paper, self.lbl_status):
+        self.lbl_names = QLabel("–")
+        self.lbl_sub = QLabel("–")
+        self.lbl_parts = QLabel("–")
+        self.lbl_tags = QLabel("–")
+        self.lbl_paper = QLabel("–")
+        self.lbl_paper.setOpenExternalLinks(True)
+        for w in (
+            self.lbl_cats,
+            self.lbl_names,
+            self.lbl_sub,
+            self.lbl_parts,
+            self.lbl_tags,
+            self.lbl_paper,
+            self.lbl_status,
+        ):
             w.setWordWrap(True)
-        for k, w in (("Sub-class", self.lbl_sub), ("Attributes", self.lbl_tags), ("Literature", self.lbl_paper),
-                     ("Position", self.lbl_pos), ("Status", self.lbl_status),
-                     ("Structure", self.lbl_parts), ("Catalog IDs", self.lbl_names), ("Catalogs", self.lbl_cats)):
+        for k, w in (
+            ("Sub-class", self.lbl_sub),
+            ("Attributes", self.lbl_tags),
+            ("Literature", self.lbl_paper),
+            ("Position", self.lbl_pos),
+            ("Status", self.lbl_status),
+            ("Structure", self.lbl_parts),
+            ("Catalog IDs", self.lbl_names),
+            ("Catalogs", self.lbl_cats),
+        ):
             w.setTextInteractionFlags(Qt.TextBrowserInteraction if w is self.lbl_paper else Qt.TextSelectableByMouse)
             info.addRow(k, w)
         lay.addLayout(info)
@@ -361,26 +442,36 @@ class DetailPanel(QWidget):
         pl = QFormLayout(probs)
         self.bars = {}
         for cls in ("STAR", "GALAXY", "QSO"):
-            bar = QProgressBar(); bar.setRange(0, 1000); bar.setFormat("%p%")
+            bar = QProgressBar()
+            bar.setRange(0, 1000)
+            bar.setFormat("%p%")
             bar.setStyleSheet(f"QProgressBar::chunk {{ background: {CLASS_COLORS[cls]}; }}")
-            self.bars[cls] = bar; pl.addRow(cls, bar)
+            self.bars[cls] = bar
+            pl.addRow(cls, bar)
         lay.addWidget(probs)
 
-        self.evidence = QTreeWidget(); self.evidence.setHeaderLabels(["Rule", "Class", "Score", "Value", "Note"])
-        self.evidence.setRootIsDecorated(False); self.evidence.setAlternatingRowColors(True)
-        ev = QGroupBox("Evidence"); QVBoxLayout(ev).addWidget(self.evidence)
+        self.evidence = QTreeWidget()
+        self.evidence.setHeaderLabels(["Rule", "Class", "Score", "Value", "Note"])
+        self.evidence.setRootIsDecorated(False)
+        self.evidence.setAlternatingRowColors(True)
+        ev = QGroupBox("Evidence")
+        QVBoxLayout(ev).addWidget(self.evidence)
         lay.addWidget(ev, 1)
 
-        self.axes = QTreeWidget(); self.axes.setHeaderLabels(["Axis", "Class", "Subtype", "Confidence", "Status"])
+        self.axes = QTreeWidget()
+        self.axes.setHeaderLabels(["Axis", "Class", "Subtype", "Confidence", "Status"])
         self.axes.setRootIsDecorated(False)
-        ax = QGroupBox("Detailed classification"); QVBoxLayout(ax).addWidget(self.axes)
+        ax = QGroupBox("Detailed classification")
+        QVBoxLayout(ax).addWidget(self.axes)
         lay.addWidget(ax)
 
         links = QHBoxLayout()
-        self.btn_ls = QPushButton("Legacy Surveys viewer"); self.btn_simbad = QPushButton("SIMBAD")
+        self.btn_ls = QPushButton("Legacy Surveys viewer")
+        self.btn_simbad = QPushButton("SIMBAD")
         self.btn_copy = QPushButton("Copy coordinates")
         for b in (self.btn_ls, self.btn_simbad, self.btn_copy):
-            b.setEnabled(False); links.addWidget(b)
+            b.setEnabled(False)
+            links.addWidget(b)
         self.btn_ls.clicked.connect(lambda: self._open("ls"))
         self.btn_simbad.clicked.connect(lambda: self._open("simbad"))
         self.btn_copy.clicked.connect(self._copy)
@@ -388,15 +479,24 @@ class DetailPanel(QWidget):
 
     def show_object(self, row: pd.Series | None) -> None:
         self._row = row
-        self.evidence.clear(); self.axes.clear()
+        self.evidence.clear()
+        self.axes.clear()
         enabled = row is not None
         for b in (self.btn_ls, self.btn_simbad, self.btn_copy):
             b.setEnabled(enabled)
         if row is None:
             self.title.setText("Select an object")
             self.title.setStyleSheet("font-weight: 600; font-size: 14px;")
-            for w in (self.lbl_pos, self.lbl_status, self.lbl_cats, self.lbl_names, self.lbl_sub, self.lbl_parts, self.lbl_tags,
-                      self.lbl_paper):
+            for w in (
+                self.lbl_pos,
+                self.lbl_status,
+                self.lbl_cats,
+                self.lbl_names,
+                self.lbl_sub,
+                self.lbl_parts,
+                self.lbl_tags,
+                self.lbl_paper,
+            ):
                 w.setText("–")
             for bar in self.bars.values():
                 bar.setValue(0)
@@ -407,14 +507,19 @@ class DetailPanel(QWidget):
         self.title.setText(f"{name} — {cls}")
         self.title.setStyleSheet(f"font-weight: 600; font-size: 14px; color: {class_color(cls).name()};")
         sep = _num(row.get("separation_arcmin"))
-        self.lbl_pos.setText(f"{_f(row.get('ra'), 6)}, {_f(row.get('dec'), 6)}"
-                             + ("" if sep is None else f"   ({sep * 60:.1f}″ from centre)"))
+        self.lbl_pos.setText(
+            f"{_f(row.get('ra'), 6)}, {_f(row.get('dec'), 6)}"
+            + ("" if sep is None else f"   ({sep * 60:.1f}″ from centre)")
+        )
         sub = row.get("subclass")
         if isinstance(sub, str) and sub:
             conf = _num(row.get("subclass_confidence"))
             basis = row.get("subclass_basis")
-            self.lbl_sub.setText(f"<b>{sub}</b>" + (f"  (rule precision {conf:.2f})" if conf is not None else "")
-                                 + (f"<br><span style='color:gray'>{basis}</span>" if isinstance(basis, str) else ""))
+            self.lbl_sub.setText(
+                f"<b>{sub}</b>"
+                + (f"  (rule precision {conf:.2f})" if conf is not None else "")
+                + (f"<br><span style='color:gray'>{basis}</span>" if isinstance(basis, str) else "")
+            )
             self.title.setText(f"{name} — {sub}")
         else:
             status = row.get("subclass_status")
@@ -425,8 +530,10 @@ class DetailPanel(QWidget):
         parent = row.get("parent_object_id")
         if ncomp:
             z = _num(row.get("host_redshift"))
-            self.lbl_parts.setText(f"Large galaxy: {ncomp} catalogue entries grouped as its parts"
-                                   + (f", z = {z:.4f}" if z is not None else ""))
+            self.lbl_parts.setText(
+                f"Large galaxy: {ncomp} catalogue entries grouped as its parts"
+                + (f", z = {z:.4f}" if z is not None else "")
+            )
         elif isinstance(parent, str) and parent:
             self.lbl_parts.setText(f"Part of a large galaxy ({row.get('component_role', 'component')})")
         elif row.get("component_role") in RELATION_TEXT:
@@ -436,22 +543,44 @@ class DetailPanel(QWidget):
         names = row.get("catalog_designations")
         self.lbl_names.setText(str(names).replace("; ", "\n") if isinstance(names, str) and names else "–")
         why = row.get("unknown_reason")
-        self.lbl_status.setText(f"{row.get('classification_status', '')}  (confidence {_f(row.get('primary_confidence'), 3)})"
-                                + (f"<br><span style='color:gray'>why UNKNOWN: {html.escape(why)}</span>" if isinstance(why, str) and why else ""))
+        self.lbl_status.setText(
+            f"{row.get('classification_status', '')}  (confidence {_f(row.get('primary_confidence'), 3)})"
+            + (
+                f"<br><span style='color:gray'>why UNKNOWN: {html.escape(why)}</span>"
+                if isinstance(why, str) and why
+                else ""
+            )
+        )
         self.lbl_cats.setText(str(row.get("catalogs", "")).replace("|", ", "))
         for c, bar in self.bars.items():
             v = _num(row.get(f"p_{c.lower()}"))
             bar.setValue(0 if v is None else int(round(v * 1000)))
         for e in _json(row.get("evidence_json")):
-            item = QTreeWidgetItem([str(e.get("rule_id", "")), str(e.get("class", "")),
-                                    _f(e.get("score"), 2), _short(e.get("value")), str(e.get("note", ""))])
+            item = QTreeWidgetItem(
+                [
+                    str(e.get("rule_id", "")),
+                    str(e.get("class", "")),
+                    _f(e.get("score"), 2),
+                    _short(e.get("value")),
+                    str(e.get("note", "")),
+                ]
+            )
             self.evidence.addTopLevelItem(item)
         for axis in AXES:
             label = row.get(f"{axis}_class")
             if label is None or (isinstance(label, float) and label != label):
                 continue
-            self.axes.addTopLevelItem(QTreeWidgetItem([axis, str(label), _short(row.get(f"{axis}_subtype")),
-                                                       _f(row.get(f"{axis}_confidence"), 2), str(row.get(f"{axis}_status", ""))]))
+            self.axes.addTopLevelItem(
+                QTreeWidgetItem(
+                    [
+                        axis,
+                        str(label),
+                        _short(row.get(f"{axis}_subtype")),
+                        _f(row.get(f"{axis}_confidence"), 2),
+                        str(row.get(f"{axis}_status", "")),
+                    ]
+                )
+            )
         for t in (self.evidence, self.axes):
             for i in range(t.columnCount()):
                 t.resizeColumnToContents(i)
@@ -462,9 +591,11 @@ class DetailPanel(QWidget):
         ra, dec = _num(self._row.get("ra")), _num(self._row.get("dec"))
         if ra is None or dec is None:
             return
-        url = (f"https://www.legacysurvey.org/viewer?ra={ra:.6f}&dec={dec:.6f}&layer=ls-dr10&zoom=16&mark={ra:.6f},{dec:.6f}"
-               if which == "ls" else
-               f"https://simbad.cds.unistra.fr/simbad/sim-coo?Coord={ra:.6f}%20{dec:+.6f}&Radius=5&Radius.unit=arcsec")
+        url = (
+            f"https://www.legacysurvey.org/viewer?ra={ra:.6f}&dec={dec:.6f}&layer=ls-dr10&zoom=16&mark={ra:.6f},{dec:.6f}"
+            if which == "ls"
+            else f"https://simbad.cds.unistra.fr/simbad/sim-coo?Coord={ra:.6f}%20{dec:+.6f}&Radius=5&Radius.unit=arcsec"
+        )
         QDesktopServices.openUrl(QUrl(url))
 
     def _copy(self):
@@ -494,8 +625,10 @@ def _paper_html(row) -> str:
     refs = refs.split("|") if isinstance(refs, str) and refs else []
     for ref in refs:
         bib = ref.split(" ", 1)[0]
-        lines.append(f"<a href='https://ui.adsabs.harvard.edu/abs/{quote(bib, safe='')}'>{html.escape(bib)}</a>"
-                     f"{html.escape(ref[len(bib):])}")
+        lines.append(
+            f"<a href='https://ui.adsabs.harvard.edu/abs/{quote(bib, safe='')}'>{html.escape(bib)}</a>"
+            f"{html.escape(ref[len(bib):])}"
+        )
     return "<br>".join(lines)
 
 

@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
 """Stage 2: build one-row-per-object records from Stage-1 associations."""
+
 from __future__ import annotations
-import argparse, math, re
+import argparse, math, re, sys
 from pathlib import Path
 import numpy as np
 import pandas as pd
+
+V2 = Path(__file__).resolve().parents[1]
+if str(V2) not in sys.path:
+    sys.path.insert(0, str(V2))
+from common import load_module, num as _num, read_table, records, write_table  # noqa: E402
 
 
 def prefix(catalog):
@@ -31,25 +37,24 @@ def elliptical_radius(ra, dec, ra0, dec0, d26_arcmin, pa_deg=None, ba=None):
     return math.hypot(major / a, minor / (a * ba))
 
 
-def _num(v):
-    try:
-        x = float(v)
-        return x if math.isfinite(x) else None
-    except (TypeError, ValueError):
-        return None
-
-
-def _units():
-    import importlib.util
-    spec = importlib.util.spec_from_file_location("v2_preprocess_units", Path(__file__).resolve().parent / "units.py")
-    m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m); return m
+SKIP = {"catalog", "catalog_object_id", "object_name", "ra", "dec"}  # kept per object, not per catalogue field
 
 
 def flag_large_galaxy_hosts(rows):
     """Mark objects inside an SGA-2020 D26 ellipse that are not that galaxy."""
-    hosts = [(r["object_id"], r["ra"], r["dec"], _num(r.get("sga_d26_arcmin")), _num(r.get("sga_pa_deg")),
-              _num(r.get("sga_ba")), r.get("sga_2020__catalog_object_id"))
-             for r in rows if "SGA-2020" in str(r.get("catalogs", "")).split("|")]
+    hosts = [
+        (
+            r["object_id"],
+            r["ra"],
+            r["dec"],
+            _num(r.get("sga_d26_arcmin")),
+            _num(r.get("sga_pa_deg")),
+            _num(r.get("sga_ba")),
+            r.get("sga_2020__catalog_object_id"),
+        )
+        for r in rows
+        if "SGA-2020" in str(r.get("catalogs", "")).split("|")
+    ]
     for r in rows:
         best = (None, None)
         for oid, ra0, dec0, d26, pa, ba, name in hosts:
@@ -76,10 +81,30 @@ def _first_valid_value(values):
     return pd.NA
 
 
-def run(associations, raw_dir, out):
-    assoc = pd.read_csv(associations, dtype={"catalog_object_id": "string"}, low_memory=False)
-    # Plain dict records: per-row pandas Series construction dominated runtime.
-    raw_cache = {}
+def integrate(assoc: pd.DataFrame, raw_dir) -> pd.DataFrame:
+    """One row per Stage-1 object with every member catalogue's fields."""
+    raw_dir = Path(raw_dir)
+    # Raw rows as dicts of their non-empty cells (common.records): objects are
+    # built from a few catalogues each, so most fields are empty. ``columns``
+    # keeps every field name in first-seen order, so the table has the same
+    # columns (also all-empty ones) as when empty cells were copied.
+    raw_cache, raw_columns = {}, {}
+    columns = dict.fromkeys(
+        [
+            "object_id",
+            "ra",
+            "dec",
+            "ref_epoch",
+            "anchor_catalog",
+            "entity_kind",
+            "association_members",
+            "association_ambiguous",
+            "association_confidence_min",
+            "association_confidence_mean",
+            "association_probability_calibrated",
+            "proper_motion_propagated_any",
+        ]
+    )
     groups = {}
     for a in assoc.to_dict("records"):
         groups.setdefault(a["object_id"], []).append(a)
@@ -89,11 +114,29 @@ def run(associations, raw_dir, out):
         finite = [c for c in conf if c == c]
         rec = {
             "object_id": oid,
-            "ra": _first_valid_value(a.get("object_ra") for a in g) if "object_ra" in assoc else sum(a["ra"] for a in g) / len(g),
-            "dec": _first_valid_value(a.get("object_dec") for a in g) if "object_dec" in assoc else sum(a["dec"] for a in g) / len(g),
-            "ref_epoch": _first_valid_value(a.get("object_ref_epoch") for a in g) if "object_ref_epoch" in assoc else pd.NA,
-            "anchor_catalog": _first_valid_value(a.get("object_anchor_catalog") for a in g) if "object_anchor_catalog" in assoc else pd.NA,
-            "entity_kind": _first_valid_value(a.get("object_entity_kind") for a in g) if "object_entity_kind" in assoc else "persistent_source",
+            "ra": (
+                _first_valid_value(a.get("object_ra") for a in g)
+                if "object_ra" in assoc
+                else sum(a["ra"] for a in g) / len(g)
+            ),
+            "dec": (
+                _first_valid_value(a.get("object_dec") for a in g)
+                if "object_dec" in assoc
+                else sum(a["dec"] for a in g) / len(g)
+            ),
+            "ref_epoch": (
+                _first_valid_value(a.get("object_ref_epoch") for a in g) if "object_ref_epoch" in assoc else pd.NA
+            ),
+            "anchor_catalog": (
+                _first_valid_value(a.get("object_anchor_catalog") for a in g)
+                if "object_anchor_catalog" in assoc
+                else pd.NA
+            ),
+            "entity_kind": (
+                _first_valid_value(a.get("object_entity_kind") for a in g)
+                if "object_entity_kind" in assoc
+                else "persistent_source"
+            ),
             "association_members": len(g),
             "association_ambiguous": int(any(a["association_status"] == "ambiguous_new" for a in g)),
             "association_confidence_min": min(finite) if finite else float("nan"),
@@ -106,9 +149,10 @@ def run(associations, raw_dir, out):
             fn = a["input_file"]
             if fn not in raw_cache:
                 try:
-                    raw_cache[fn] = pd.read_csv(raw_dir / fn, dtype={"catalog_object_id": "string"}, low_memory=False).to_dict("records")
+                    raw = pd.read_csv(raw_dir / fn, dtype={"catalog_object_id": "string"}, low_memory=False)
                 except Exception:
                     continue
+                raw_cache[fn], raw_columns[fn] = records(raw), [c for c in raw.columns if c not in SKIP]
             src = raw_cache[fn]
             idx = int(a["source_row"])
             if idx >= len(src):
@@ -121,8 +165,18 @@ def run(associations, raw_dir, out):
             rec[f"association_confidence__{pre}"] = _float(a.get("association_confidence"))
             rec[f"association_separation_arcsec__{pre}"] = _float(a.get("match_separation_arcsec"))
             rec[f"association_chance_probability__{pre}"] = _float(a.get("chance_probability"))
+            for key in (
+                f"{pre}__catalog_object_id",
+                f"association_confidence__{pre}",
+                f"association_separation_arcsec__{pre}",
+                f"association_chance_probability__{pre}",
+            ):
+                columns.setdefault(key)
+            for col in raw_columns[fn]:
+                columns.setdefault(f"{pre}__{col}")
+                columns.setdefault(col)
             for col, val in r.items():
-                if col in {"catalog", "catalog_object_id", "object_name", "ra", "dec"}:
+                if col in SKIP:
                     continue
                 # Every field is kept under its catalog namespace so rules can
                 # read the value of the catalog they are about.  The bare name
@@ -132,24 +186,44 @@ def run(associations, raw_dir, out):
                 if col not in rec or pd.isna(rec[col]):
                     rec[col] = val
             for col in (
-                "parallax", "parallax_error", "pmra", "pmra_error", "pmdec", "pmdec_error", "class", "zwarning",
-                "classprob_dsc_combmod_quasar", "classprob_dsc_combmod_galaxy", "classprob_dsc_combmod_star",
-                "classprob_dsc_combmod_whitedwarf", "classprob_dsc_combmod_binarystar", "best_class_name", "best_class_score",
-                "event_mjd", "event_discovery_date", "sn_subtype", "pn_spectroscopic_score", "pn_spectroscopic_basis",
+                "parallax",
+                "parallax_error",
+                "pmra",
+                "pmra_error",
+                "pmdec",
+                "pmdec_error",
+                "class",
+                "zwarning",
+                "classprob_dsc_combmod_quasar",
+                "classprob_dsc_combmod_galaxy",
+                "classprob_dsc_combmod_star",
+                "classprob_dsc_combmod_whitedwarf",
+                "classprob_dsc_combmod_binarystar",
+                "best_class_name",
+                "best_class_score",
+                "event_mjd",
+                "event_discovery_date",
+                "sn_subtype",
+                "pn_spectroscopic_score",
+                "pn_spectroscopic_basis",
             ):
                 if col in r and pd.notna(r[col]) and (col not in rec or pd.isna(rec[col])):
                     rec[col] = r[col]
         rec["catalogs"] = "|".join(sorted(set(catalogs)))
         rows.append(rec)
+        for key in ("catalogs", "host_large_galaxy", "host_elliptical_radius"):  # end of every record
+            columns.setdefault(key)
     flag_large_galaxy_hosts(rows)
-    df = pd.DataFrame(rows)
+    df = pd.DataFrame(rows, columns=list(columns))
     # One unit system for quantities measured by several catalogues (AB
     # magnitudes, mJy, spectroscopic z, ...): std_* columns (units.py).
-    df = _units().harmonize(df)
-    out.parent.mkdir(parents=True, exist_ok=True)
-    df.to_csv(out, index=False)
-    print(f"[OK] objects={len(df)} columns={len(df.columns)} -> {out}")
-    return out
+    return load_module(Path(__file__).resolve().parent / "units.py").harmonize(df)
+
+
+def run(associations, raw_dir, out=None) -> pd.DataFrame:
+    """File (or DataFrame) in, file out: see ``integrate``."""
+    df = integrate(read_table(associations, dtype={"catalog_object_id": "string"}, low_memory=False), raw_dir)
+    return write_table(df, out, f"[OK] objects={len(df)} columns={len(df.columns)}")
 
 
 def main():

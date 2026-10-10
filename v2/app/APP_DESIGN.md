@@ -1,4 +1,7 @@
-# Finding Objects — standalone 앱 설계 초안 (2026-10-09)
+# Finding Objects — standalone 앱 설계 (2026-10-09, 2026-10-10 정리)
+
+> 2.5.0: Tkinter 초안(`finding_objects_app.py`)과 그 전용 실행 계층(`backend.py`)은
+> Qt 앱(6절)이 모든 기능을 대신하므로 삭제했다(git 이력에 남아 있음). 1–5절은 초안 당시 기록이다.
 
 사용자 허락을 받아 시작한 초안입니다. 목표는 PC(Windows/macOS/Linux)에서 v2 분류기를 GUI로 실행하는 것입니다.
 
@@ -36,7 +39,7 @@ v2/app/
 ## 5. 실행
 ```
 pip install pandas numpy requests astropy astroquery pyvo
-python v2/app/finding_objects_app.py
+python v2/app/qt_app.py
 ```
 
 ## 6. Qt(PySide6) 프론트엔드 (2026-10-09 추가, 기본 GUI)
