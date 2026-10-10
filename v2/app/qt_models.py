@@ -7,9 +7,9 @@ from PySide6.QtCore import QAbstractTableModel, QModelIndex, QSortFilterProxyMod
 from PySide6.QtGui import QColor
 
 CLASS_COLORS = {"STAR": "#d9822b", "GALAXY": "#2b6cb0", "QSO": "#7b3fb5", "UNKNOWN": "#8a8f98"}
-TABLE_COLUMNS = ["designation", "primary_class", "subclass", "primary_confidence", "classification_status",
+TABLE_COLUMNS = ["designation", "primary_class", "subclass", "subclass_tags", "primary_confidence", "classification_status",
                  "p_star", "p_galaxy", "p_qso", "separation_arcmin", "n_components", "ra", "dec", "designation_catalog", "catalogs"]
-HEADERS = {"designation": "Name", "subclass": "Sub-class", "n_components": "Parts", "designation_catalog": "Name from", "separation_arcmin": "Dist (′)", "primary_class": "Class", "primary_confidence": "Confidence",
+HEADERS = {"designation": "Name", "subclass": "Sub-class", "subclass_tags": "Attributes", "n_components": "Parts", "designation_catalog": "Name from", "separation_arcmin": "Dist (′)", "primary_class": "Class", "primary_confidence": "Confidence",
            "classification_status": "Status", "p_star": "P(star)", "p_galaxy": "P(galaxy)",
            "p_qso": "P(QSO)", "ra": "RA", "dec": "Dec", "catalogs": "Catalogs"}
 SORT_ROLE = Qt.UserRole + 1
@@ -147,7 +147,7 @@ class ResultsFilter(QSortFilterProxyModel):
         col = lambda c: df[c].fillna("").astype(str).to_numpy(dtype=object) if c in df else None
         self._a_cls, self._a_status = col("primary_class"), col("classification_status")
         self._a_part = df["parent_object_id"].notna().to_numpy() if "parent_object_id" in df else None
-        parts = [a for a in (col("designation"), col("subclass"), col("catalog_designations"), col("catalogs"), col("object_id")) if a is not None]
+        parts = [a for a in (col("designation"), col("subclass"), col("subclass_tags"), col("catalog_designations"), col("catalogs"), col("object_id")) if a is not None]
         self._a_text = [" ".join(t).lower() for t in zip(*parts)] if parts else None
 
     def filterAcceptsRow(self, row, parent):

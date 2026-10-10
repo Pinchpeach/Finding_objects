@@ -238,31 +238,81 @@ def star_spectral_type(row):
     return None, None, None, "no spectral type, colour or Teff available"
 
 
-def star_luminosity_class(row, num):
+def cmd_position(row):
+    """(M_G, height above the dwarf sequence dM = M_G - M_G,MS, (BP-RP)0) for a
+    parallax S/N >= 5, else None.  Negative dM = brighter than the sequence."""
     plx, eplx = _num(row, "gaia_dr3__parallax", "parallax"), _num(row, "gaia_dr3__parallax_error", "parallax_error")
     gmag = _num(row, "gaia_dr3__phot_g_mean_mag", "phot_g_mean_mag")
     bprp0, _ = _bprp0(row)
-    if None not in (plx, eplx, gmag, bprp0) and plx > 0 and eplx > 0 and plx / eplx >= 5:
-        ag = _num(row, "gaia_dr3__ag_gspphot")
-        if ag is None:
-            ebv = _ebv(row); ag = A_G_PER_EBV * ebv if ebv is not None else 0.0
-        mg = gmag + 5 * math.log10(plx) - 10 - ag
-        ms = _ms_abs_g(bprp0)
-        if ms is not None:
-            dm = mg - ms
-            # Unresolved equal-mass binaries sit up to 0.75 mag above the MS
-            # (Hurley & Tout 1998); metallicity/age spread adds ~0.3 mag.
-            if dm > -1.0:
-                return "V", "GAIA_CMD", f"M_G = {mg:.2f}, {dm:+.2f} mag from the dwarf sequence"
-            if dm > -2.5 and bprp0 < 1.3:
-                return "IV", "GAIA_CMD", f"M_G = {mg:.2f}, {dm:+.2f} mag above the dwarf sequence"
-            return "III", "GAIA_CMD", f"M_G = {mg:.2f}, {dm:+.2f} mag above the dwarf sequence"
+    if None in (plx, eplx, gmag, bprp0) or plx <= 0 or eplx <= 0 or plx / eplx < 5:
+        return None
+    ag = _num(row, "gaia_dr3__ag_gspphot")
+    if ag is None:
+        ebv = _ebv(row); ag = A_G_PER_EBV * ebv if ebv is not None else 0.0
+    mg = gmag + 5 * math.log10(plx) - 10 - ag
+    ms = _ms_abs_g(bprp0)
+    return None if ms is None else (mg, mg - ms, bprp0)
+
+
+def star_luminosity_class(row, num):
+    pos = cmd_position(row)
+    if pos is not None:
+        mg, dm, bprp0 = pos
+        # Unresolved equal-mass binaries sit up to 0.75 mag above the MS
+        # (Hurley & Tout 1998); metallicity/age spread adds ~0.3 mag.
+        if dm > 3.0:
+            return None, "GAIA_CMD", f"M_G = {mg:.2f}, {dm:+.2f} mag below the dwarf sequence (white-dwarf region)"
+        if dm > 1.0:
+            # Metal-poor subdwarfs lie 1-2 mag below the solar-metallicity
+            # sequence (Kuiper 1939; Gizis 1997).  On the SDSS benchmark stars
+            # with 1 < dM <= 3 have median GSP-Phot [M/H] = -1.4 (MS: -0.66).
+            return "VI", "GAIA_CMD", f"M_G = {mg:.2f}, {dm:+.2f} mag below the dwarf sequence (subdwarf)"
+        if dm > -1.0:
+            return "V", "GAIA_CMD", f"M_G = {mg:.2f}, {dm:+.2f} mag from the dwarf sequence"
+        if dm > -2.5 and bprp0 < 1.3:
+            return "IV", "GAIA_CMD", f"M_G = {mg:.2f}, {dm:+.2f} mag above the dwarf sequence"
+        return "III", "GAIA_CMD", f"M_G = {mg:.2f}, {dm:+.2f} mag above the dwarf sequence"
     teff, logg = _num(row, "gaia_dr3__teff_gspphot", "teff_gspphot"), _num(row, "gaia_dr3__logg_gspphot", "logg_gspphot")
     if teff is not None and logg is not None:
         # Ciardi et al. (2010) red-giant boundary used for Kepler targets.
         lim = 4.0 if teff <= 4250 else (5.2 - 2.8e-4 * teff if teff < 6000 else 3.5)
         return ("III" if logg <= lim else "V"), "GAIA_LOGG", f"GSP-Phot log g = {logg:.2f} vs giant boundary {lim:.2f}"
     return None, None, "no parallax or log g"
+
+
+# Tangential-velocity selections of Babusiaux et al. (2018, A&A 616, A10,
+# Gaia DR2 HRDs): thin disc V_T < 40, thick disc 60-150, halo > 200 km/s.
+# Between the windows the population is left open.
+POPULATION_VT = (("THIN_DISC", 0.0, 40.0), ("THICK_DISC", 60.0, 150.0), ("HALO", 200.0, float("inf")))
+RUWE_BINARY = 1.4      # Lindegren et al. (2018); Belokurov et al. (2020)
+
+
+def star_tags(row):
+    tags = []
+    plx, eplx = _num(row, "gaia_dr3__parallax", "parallax"), _num(row, "gaia_dr3__parallax_error", "parallax_error")
+    pmra, pmdec = _num(row, "gaia_dr3__pmra", "pmra"), _num(row, "gaia_dr3__pmdec", "pmdec")
+    if None not in (plx, eplx, pmra, pmdec) and plx > 0 and eplx > 0 and plx / eplx >= 5:
+        vt = 4.74047 * math.hypot(pmra, pmdec) / plx
+        for pop, lo, hi in POPULATION_VT:
+            if lo <= vt < hi:
+                tags.append({"tag": pop, "label": {"THIN_DISC": "thin-disc star", "THICK_DISC": "thick-disc star",
+                                                    "HALO": "halo star"}[pop],
+                             "rule": "GAIA_VTAN", "basis": f"V_T = {vt:.0f} km/s (Babusiaux+2018 windows 40 / 60-150 / 200)"})
+    ruwe = _num(row, "gaia_dr3__ruwe", "ruwe")
+    if ruwe is not None and ruwe > RUWE_BINARY:
+        tags.append({"tag": "ASTROMETRIC_BINARY", "label": "astrometric binary candidate", "rule": "GAIA_RUWE",
+                     "basis": f"RUWE = {ruwe:.2f} > 1.4 (unresolved companion; Belokurov+2020)"})
+    b = _num(row, "gaia_dr3__classprob_dsc_combmod_binarystar", "classprob_dsc_combmod_binarystar")
+    if b is not None and b >= 0.8 and not any(t["tag"] == "ASTROMETRIC_BINARY" for t in tags):
+        tags.append({"tag": "PHOTOMETRIC_BINARY", "label": "binary candidate (Gaia DSC)", "rule": "GAIA_DSC_BINARY",
+                     "basis": f"Gaia DSC binary probability {b:.2f}"})
+    var = str(row.get("variability_class") or "")
+    if var and var not in ("UNKNOWN", "nan", "None"):
+        sub = row.get("variability_subtype")
+        name = var.replace("_", " ").lower() + (f" ({sub})" if isinstance(sub, str) and sub else "")
+        tags.append({"tag": f"VAR_{var}", "label": f"{name} variable", "rule": "VARIABILITY_AXIS",
+                     "basis": f"variability axis: {row.get('variability_status', '')}"})
+    return tags
 
 
 LUM_NAME = {"V": "dwarf", "IV": "subgiant", "III": "giant", "II": "bright giant", "Ib": "supergiant",
@@ -340,7 +390,90 @@ def galaxy_activity(row):
         nuvr = nuv - r - (8.2 - 2.165) * ebv
         if nuvr > 5.0:
             return "QUIESCENT", "GALEX_NUVR", f"(NUV-r)0 = {nuvr:.2f} > 5"
+        if nuvr > 4.0:
+            # Green valley between the blue cloud and red sequence (Salim 2014,
+            # SerAJ 189, 1: 4 < NUV-r < 5; Wyder et al. 2007).
+            return "GREEN_VALLEY", "GALEX_NUVR_GV", f"4 < (NUV-r)0 = {nuvr:.2f} <= 5 (green valley)"
     return None, None, "no spectrum, mid-IR or UV activity indicator"
+
+
+# ------------------------------------------------- distances (flat LCDM)
+H0, OMEGA_M = 70.0, 0.3            # cosmology of the SDSS DR7 quasar catalogue (Schneider+2010)
+
+
+@lru_cache(maxsize=4096)
+def luminosity_distance_mpc(z: float) -> float:
+    zz = np.linspace(0.0, z, 257)
+    e = np.sqrt(OMEGA_M * (1 + zz) ** 3 + (1 - OMEGA_M))
+    trap = getattr(np, "trapezoid", None) or np.trapz      # numpy < 2.0
+    dc = (299792.458 / H0) * trap(1.0 / e, zz)
+    return float((1 + z) * dc)
+
+
+def distance_modulus(z: float) -> float:
+    return 5 * math.log10(luminosity_distance_mpc(z) * 1e6) - 5
+
+
+def _optical_gr(row):
+    """Dereddened (g, r) AB magnitudes: Legacy Surveys, else SDSS model mags."""
+    ebv = _ebv(row) or 0.0
+    g, r = _ab_mag(_num(row, "desi_legacy_surveys_dr10__flux_g")), _ab_mag(_num(row, "desi_legacy_surveys_dr10__flux_r"))
+    if g is not None and r is not None:
+        return g - 3.214 * ebv, r - 2.165 * ebv
+    g, r = _num(row, "sdss_dr18_photoobj__modelMag_g"), _num(row, "sdss_dr18_photoobj__modelMag_r")
+    if g is not None and r is not None:
+        return g - 3.303 * ebv, r - 2.285 * ebv
+    return None, None
+
+
+SIMBAD_ENVIRONMENT = {
+    "IG": ("INTERACTING", "interacting galaxy"), "PaG": ("PAIR", "galaxy pair"), "GiP": ("PAIR", "galaxy in a pair"),
+    "GiG": ("GROUP", "galaxy in a group"), "GiC": ("CLUSTER", "galaxy in a cluster"),
+    "BiC": ("BCG", "brightest cluster galaxy"), "LSB": ("LSB", "low-surface-brightness galaxy"),
+    "rG": ("RADIO_GALAXY", "radio galaxy"),
+}
+
+
+def galaxy_tags(row, activity):
+    tags = []
+    sub = (_text(row, "sdss_dr18_spectroscopy__subclass") or "").upper()
+    ot = _text(row, "simbad__otype")
+    if "BROADLINE" in sub and "AGN" in sub or ot == "Sy1":
+        tags.append({"tag": "AGN_TYPE1", "label": "type 1 (broad-line) AGN", "rule": "SDSS_BROADLINE" if sub else "SIMBAD_OTYPE",
+                     "basis": f"SDSS subclass {sub}" if sub else "SIMBAD Sy1"})
+    elif sub == "AGN" or ot == "Sy2":
+        tags.append({"tag": "AGN_TYPE2", "label": "type 2 (narrow-line) AGN", "rule": "SDSS_BPT" if sub else "SIMBAD_OTYPE",
+                     "basis": "BPT AGN without broad lines" if sub else "SIMBAD Sy2"})
+    elif ot == "LIN":
+        tags.append({"tag": "LINER", "label": "LINER", "rule": "SIMBAD_OTYPE", "basis": "SIMBAD LIN"})
+    if ot in SIMBAD_ENVIRONMENT:
+        t, lab = SIMBAD_ENVIRONMENT[ot]
+        tags.append({"tag": t, "label": lab, "rule": "SIMBAD_OTYPE", "basis": f"SIMBAD type {ot}"})
+    # Luminosity: M_B from the spectroscopic redshift.  B = g + 0.313(g-r) + 0.227
+    # (Lupton 2005 SDSS->Johnson); dwarf when M_B > -16 (Tammann 1994).  No
+    # K-correction, so only 0.003 < z < 0.1 (peculiar velocities / K-term).
+    z = spectroscopic_z(row)
+    g, r = _optical_gr(row)
+    if z is not None and 0.003 < z < 0.1 and g is not None and r is not None:
+        mb = g + 0.313 * (g - r) + 0.227 - distance_modulus(z)
+        if mb > -16.0:
+            tags.append({"tag": "DWARF", "label": f"dwarf galaxy (M_B = {mb:.1f})", "rule": "ABS_MAG_TAMMANN",
+                         "basis": f"M_B = {mb:.2f} > -16 at z = {z:.4f} (Tammann 1994)"})
+        elif mb < -21.0:
+            tags.append({"tag": "LUMINOUS", "label": f"luminous galaxy (M_B = {mb:.1f})", "rule": "ABS_MAG",
+                         "basis": f"M_B = {mb:.2f} < -21 at z = {z:.4f} (brighter than L*; Schechter M*_B ~ -20.5)"})
+    flux, src = radio_14ghz_mjy(row)
+    if flux is not None and activity == "QUIESCENT":
+        # Radio emission from a galaxy without star formation is AGN-powered
+        # (radio-mode AGN in early types; Best & Heckman 2012).
+        tags.append({"tag": "RADIO_AGN", "label": "radio-loud AGN candidate", "rule": "RADIO_IN_QUIESCENT",
+                     "basis": f"{src} {flux:.2f} mJy in a quiescent galaxy"})
+    elif flux is not None:
+        tags.append({"tag": "RADIO", "label": "radio source", "rule": "RADIO_DETECTED", "basis": f"{src} {flux:.2f} mJy"})
+    xr = _catalogs(row) & set(XRAY_CATALOGS)
+    if xr:
+        tags.append({"tag": "XRAY", "label": "X-ray source", "rule": "XRAY", "basis": ", ".join(sorted(xr))})
+    return tags
 
 
 def galaxy_profile(row):
@@ -361,7 +494,8 @@ def galaxy_profile(row):
     return None, None, "no profile or u-r colour"
 
 
-ACT_NAME = {"AGN": "AGN host", "STARBURST": "starburst", "STAR_FORMING": "star-forming", "QUIESCENT": "quiescent"}
+ACT_NAME = {"AGN": "AGN host", "STARBURST": "starburst", "STAR_FORMING": "star-forming", "QUIESCENT": "quiescent",
+            "GREEN_VALLEY": "green-valley"}
 PROF_NAME = {"EARLY_TYPE": "early-type", "DISK": "disc", "LATE_TYPE": "late-type"}
 
 
@@ -450,18 +584,52 @@ def classify_qso(row):
                    radio=radio, xray=xray, redshift=z, redshift_class=zc)
 
 
+def qso_tags(row):
+    tags = []
+    z, i = spectroscopic_z(row), qso_i_mag(row)
+    if z is not None and z > 0.01 and i is not None:
+        # M_i(z=2) (Richards et al. 2006): continuum K-correction for
+        # alpha_nu = -0.5, K(z) = -2.5 (1 + alpha) log10((1 + z) / 3); the
+        # emission-line term (+-0.2 mag) is not modelled.  Quasar luminosity
+        # when M_i(z=2) < -22 (Schneider et al. 2010 DR7Q cut, converted
+        # M_i(z=0) = M_i(z=2) + 0.596).
+        ebv = _ebv(row) or 0.0
+        k = -2.5 * 0.5 * math.log10((1 + z) / 3.0)
+        mi2 = i - 1.698 * ebv - distance_modulus(z) - k
+        quasar = mi2 + 0.596 < -22.0
+        tags.append({"tag": "QUASAR_LUMINOSITY" if quasar else "SEYFERT_LUMINOSITY",
+                     "label": ("quasar-luminosity" if quasar else "Seyfert-luminosity AGN") + f" (M_i(z=2) = {mi2:.1f})",
+                     "rule": "ABS_MAG_RICHARDS06", "basis": f"i = {i:.2f}, z = {z:.3f}, M_i(z=2) = {mi2:.2f}"})
+    ot = _text(row, "simbad__otype")
+    if ot in ("BLL", "Bla"):
+        tags.append({"tag": "BLAZAR", "label": SIMBAD_QSO[ot], "rule": "SIMBAD_OTYPE", "basis": f"SIMBAD type {ot}"})
+    return tags
+
+
 # -------------------------------------------------------------------- main
 def classify(row):
     coarse = str(row.get("primary_class") or "UNKNOWN").upper()
     if coarse == "STAR":
         out = classify_star(row)
+        tags = star_tags(row) if out.get("code") != "STAR:WD" else []
     elif coarse == "GALAXY":
         out = classify_galaxy(row)
+        tags = galaxy_tags(row, out.get("activity"))
     elif coarse == "QSO":
         out = classify_qso(row)
+        tags = qso_tags(row)
     else:
         out = _result(None, None, None, None, "coarse class UNKNOWN", status="NOT_ROUTED")
+        tags = []
+    out["tags"] = tags
+    if tags and out.get("subclass") is None:
+        # Attributes without a main sub-class still describe the object.
+        out["subclass"] = tags[0]["label"][0].upper() + tags[0]["label"][1:]
+        out["rule"] = tags[0]["rule"]; out["basis"] = tags[0]["basis"]
+        out["code"] = f"{coarse}:?"
     out.setdefault("status", "CLASSIFIED" if out.get("subclass") else "NO_SUBCLASS_EVIDENCE")
+    if out.get("subclass") and out.get("status") != "CLASSIFIED":
+        out["status"] = "CLASSIFIED"
     return out
 
 
@@ -469,10 +637,11 @@ def annotate(df: pd.DataFrame, rows=None) -> pd.DataFrame:
     import json
     rows = rows if rows is not None else df.to_dict("records")
     # The subclass needs the physical-axis result (WD / giant) of the same row.
-    if "physical_class" in df:
-        for r, p, s, c in zip(rows, df["physical_class"], df.get("physical_subtype", [None] * len(df)),
-                              df.get("physical_confidence", [None] * len(df))):
-            r["physical_class"], r["physical_subtype"], r["physical_confidence"] = p, s, c
+    for col in ("physical_class", "physical_subtype", "physical_confidence",
+                "variability_class", "variability_subtype", "variability_status"):
+        if col in df:
+            for r, v in zip(rows, df[col]):
+                r[col] = v
     res = [classify(r) for r in rows]
     out = df.copy()
     out["subclass"] = [r.get("subclass") for r in res]
@@ -481,5 +650,6 @@ def annotate(df: pd.DataFrame, rows=None) -> pd.DataFrame:
     out["subclass_rule"] = [r.get("rule") for r in res]
     out["subclass_status"] = [r.get("status") for r in res]
     out["subclass_basis"] = [r.get("basis") for r in res]
+    out["subclass_tags"] = ["; ".join(t["label"] for t in r.get("tags", [])) or None for r in res]
     out["subclass_json"] = [json.dumps(r, separators=(",", ":"), default=str) for r in res]
     return out

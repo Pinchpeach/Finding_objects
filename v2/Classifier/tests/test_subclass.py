@@ -60,3 +60,43 @@ def test_qso_radio_loudness():
     assert loud["radio"] == "RADIO_LOUD" and loud["redshift_class"] == "HIGH_Z" and loud["xray"]
     quiet = sc.classify({"primary_class": "QSO", "first__Fint": 1.0, "pan_starrs1_dr2_meanobject__iMeanPSFMag": 16.0})
     assert quiet["radio"] == "RADIO_QUIET"
+
+
+def test_star_population_binarity_and_subdwarf():
+    sc = _sc()
+    base = {"primary_class": "STAR", "gaia_dr3__bp_rp": 0.82, "gaia_dr3__ebpminrp_gspphot": 0.0, "gaia_dr3__ag_gspphot": 0.0,
+            "gaia_dr3__teff_gspphot": 5770, "gaia_dr3__parallax": 10.0, "gaia_dr3__parallax_error": 0.05,
+            "gaia_dr3__phot_g_mean_mag": 9.6}
+    thin = sc.classify(dict(base, **{"gaia_dr3__pmra": 30.0, "gaia_dr3__pmdec": 40.0}))          # V_T = 23.7 km/s
+    assert [t["tag"] for t in thin["tags"]] == ["THIN_DISC"]
+    halo = sc.classify(dict(base, **{"gaia_dr3__pmra": 400.0, "gaia_dr3__pmdec": 300.0, "gaia_dr3__ruwe": 2.1}))
+    tags = {t["tag"] for t in halo["tags"]}
+    assert tags == {"HALO", "ASTROMETRIC_BINARY"}
+    sd = sc.classify(dict(base, **{"gaia_dr3__phot_g_mean_mag": 11.4}))                          # 1.8 mag below the MS
+    assert sd["luminosity_class"] == "VI" and "subdwarf" in sd["subclass"]
+    var = sc.classify(dict(base, variability_class="RR_LYRAE", variability_subtype="RRAB"))
+    assert any(t["tag"] == "VAR_RR_LYRAE" for t in var["tags"])
+
+
+def test_galaxy_green_valley_dwarf_and_agn_type():
+    sc = _sc()
+    gv = sc.classify({"primary_class": "GALAXY", "galex_ais__NUVmag": 21.5, "pan_starrs1_dr2_meanobject__rMeanKronMag": 17.0})
+    assert gv["activity"] == "GREEN_VALLEY"
+    # g = 17.0, r = 16.6 at z = 0.01 (DM 33.18): M_B ~ -15.8 -> dwarf
+    f = lambda m: 10 ** ((22.5 - m) / 2.5)
+    dw = sc.classify({"primary_class": "GALAXY", "desi_legacy_surveys_dr10__flux_g": f(17.0),
+                      "desi_legacy_surveys_dr10__flux_r": f(16.6), "sdss_dr18_spectroscopy__z": 0.01})
+    assert any(t["tag"] == "DWARF" for t in dw["tags"]) and dw["subclass"].lower().startswith("dwarf galaxy")
+    t1 = sc.classify({"primary_class": "GALAXY", "sdss_dr18_spectroscopy__subclass": "AGN BROADLINE"})
+    assert any(t["tag"] == "AGN_TYPE1" for t in t1["tags"])
+    t2 = sc.classify({"primary_class": "GALAXY", "sdss_dr18_spectroscopy__subclass": "AGN"})
+    assert any(t["tag"] == "AGN_TYPE2" for t in t2["tags"])
+
+
+def test_qso_luminosity_and_distance():
+    sc = _sc()
+    assert abs(sc.luminosity_distance_mpc(1.0) - 6607.7) < 1.0          # flat LCDM, H0 = 70, Om = 0.3
+    bright = sc.classify({"primary_class": "QSO", "pan_starrs1_dr2_meanobject__iMeanPSFMag": 19.0, "sdss_dr18_spectroscopy__z": 2.0})
+    assert any(t["tag"] == "QUASAR_LUMINOSITY" for t in bright["tags"])
+    faint = sc.classify({"primary_class": "QSO", "pan_starrs1_dr2_meanobject__iMeanPSFMag": 19.0, "sdss_dr18_spectroscopy__z": 0.05})
+    assert any(t["tag"] == "SEYFERT_LUMINOSITY" for t in faint["tags"])

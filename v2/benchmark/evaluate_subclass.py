@@ -29,13 +29,15 @@ BENCH = V2 / "benchmark"
 FEATURES = {
     "gaia_dr3": ("gaia_dr3", {"bp_rp": "bp_rp", "E(BP-RP)": "ebpminrp_gspphot", "teff_gspphot": "teff_gspphot",
                               "logg_gspphot": "logg_gspphot", "parallax": "parallax", "parallax_error": "parallax_error",
-                              "phot_g_mean_mag": "phot_g_mean_mag"}),
+                              "phot_g_mean_mag": "phot_g_mean_mag", "pmra": "pmra", "pmdec": "pmdec",
+                              "ruwe": "ruwe", "[Fe/H]": "mh_gspphot", "AG": "ag_gspphot"}),
     "desi_legacy": ("desi_legacy_surveys_dr10", {c: c for c in ("type", "flux_g", "flux_r", "flux_i", "flux_z",
                                                                 "mw_transmission_g", "mw_transmission_r", "mw_transmission_z")}),
     "panstarrs1": ("pan_starrs1_dr2_meanobject", {c: c for c in ("gMeanPSFMag", "rMeanPSFMag", "iMeanPSFMag", "zMeanPSFMag",
                                                                  "rMeanKronMag")}),
     "allwise": ("allwise", {c: c for c in ("W1mag", "W2mag", "W3mag", "e_W1mag", "e_W2mag", "e_W3mag")}),
     "galex": ("galex_ais", {"NUVmag": "NUVmag", "E(B-V)": "E(B-V)"}),
+    "twomass": ("2mass_psc", {}),
 }
 
 
@@ -84,7 +86,8 @@ def evaluate(rows: pd.DataFrame, sc, label: str) -> tuple[dict, pd.DataFrame]:
     res = [sc.classify(r) for r in recs]
     out = rows.assign(rule=[r.get("rule") for r in res], subclass=[r.get("subclass") for r in res],
                       spectral_type=[r.get("spectral_type") for r in res], lum=[r.get("luminosity_class") for r in res],
-                      activity=[r.get("activity") for r in res], profile=[r.get("profile") for r in res])
+                      activity=[r.get("activity") for r in res], profile=[r.get("profile") for r in res],
+                      tags=["|".join(t["tag"] for t in r.get("tags", [])) for r in res])
     metrics = {"sample": label, "n": int(len(out))}
     stars = out[out.primary_class.eq("STAR")].copy()
     if len(stars):
@@ -115,12 +118,22 @@ def evaluate(rows: pd.DataFrame, sc, label: str) -> tuple[dict, pd.DataFrame]:
             metrics["star"]["K_M_truth"] = {"n": int(km.sum()), "median_abs_subtypes": round(float(d.abs().median()), 2),
                                             "within_2_subtypes": round(float((d.abs() <= 2).mean()), 4)}
         metrics["star"]["luminosity_class_counts"] = stars.lum.value_counts(dropna=False).rename(str).to_dict()
+        # Physical consistency checks without a truth label: GSP-Phot [M/H]
+        # should fall from thin disc to halo, and subdwarfs should be metal-poor.
+        mh = pd.to_numeric(stars.get("gaia_dr3__mh_gspphot"), errors="coerce")
+        pop = stars.tags.str.extract(r"(THIN_DISC|THICK_DISC|HALO)")[0]
+        metrics["star"]["population"] = {k: {"n": int((pop == k).sum()), "median_mh": round(float(mh[pop == k].median()), 2) if (pop == k).any() else None}
+                                         for k in ("THIN_DISC", "THICK_DISC", "HALO")}
+        metrics["star"]["median_mh_by_lum"] = {str(k): round(float(v), 2) for k, v in mh.groupby(stars.lum).median().items()}
+        metrics["star"]["astrometric_binary_fraction"] = round(float(stars.tags.str.contains("ASTROMETRIC_BINARY").mean()), 4)
         wd = stars.truth_spt.astype(str).str.upper().eq("WD")
         if wd.any():
             metrics["star"]["wd_truth_typed_as_wd"] = round(float(stars.subclass[wd].astype(str).str.startswith("White dwarf").mean()), 4)
     gals = out[out.primary_class.eq("GALAXY") & out.truth_activity.notna()].copy()
     if len(gals):
-        act = gals.activity.notna()
+        # Green valley is a transition class with no SDSS counterpart: it is
+        # reported by its truth mix, not scored.
+        act = gals.activity.notna() & gals.activity.ne("GREEN_VALLEY")
         metrics["galaxy"] = {"n": int(len(gals)), "activity_coverage": round(float(act.mean()), 4),
                              "activity_accuracy": round(float((gals.activity[act] == gals.truth_activity[act]).mean()), 4)
                              if act.any() else None, "by_rule": {},
@@ -129,6 +142,15 @@ def evaluate(rows: pd.DataFrame, sc, label: str) -> tuple[dict, pd.DataFrame]:
         for rule, g in gals[act].groupby("rule"):
             metrics["galaxy"]["by_rule"][rule] = {"n": int(len(g)), "precision": round(float((g.activity == g.truth_activity).mean()), 4)}
         metrics["galaxy"]["profile_counts"] = gals.profile.value_counts(dropna=False).rename(str).to_dict()
+        gv = gals.activity.eq("GREEN_VALLEY")
+        metrics["galaxy"]["green_valley_truth_mix"] = gals.truth_activity[gv].value_counts().to_dict()
+        for t in ("DWARF", "LUMINOUS", "AGN_TYPE1", "AGN_TYPE2", "RADIO_AGN"):
+            metrics["galaxy"][f"tag_{t}"] = int(gals.tags.str.contains(t).sum())
+    q = out[out.primary_class.eq("QSO")]
+    if len(q):
+        metrics["qso"] = {"n": int(len(q)), "with_luminosity": int(q.tags.str.contains("LUMINOSITY").sum()),
+                          "quasar_luminosity_fraction": round(float(q.tags.str.contains("QUASAR_LUMINOSITY").sum() /
+                                                                     max(q.tags.str.contains("LUMINOSITY").sum(), 1)), 4)}
     return metrics, out
 
 
@@ -146,6 +168,9 @@ def main():
     sdss["primary_class"] = sdss["class"]
     sdss["truth_spt"] = np.where(sdss["class"].eq("STAR"), sdss.subclass, None)
     sdss["truth_activity"] = np.where(sdss["class"].eq("GALAXY"), sdss.subclass.map(sdss_activity), None)
+    # The redshift (not the class) is given, as a spectrum in the field would be:
+    # luminosity tags need it.
+    sdss["sdss_dr18_spectroscopy__z"] = np.where(sdss["class"].ne("STAR"), sdss.z, np.nan)
     if a.manifest and a.manifest.exists():
         sdss = sdss.merge(pd.read_csv(a.manifest)[["benchmark_id", "split"]], on="benchmark_id", how="left")
     else:
@@ -162,13 +187,14 @@ def main():
     desi["primary_class"] = desi.truth_class
     desi["truth_spt"] = np.where(desi.truth_class.eq("STAR"), desi.truth_subclass, None)
     desi["truth_activity"] = None
+    desi["desi_dr1_spectroscopy__z"] = np.where(desi.truth_class.ne("STAR"), desi.z, np.nan)
     m, tab = evaluate(desi, sc, "DESI DR1 (independent)")
     report["desi"] = m; tables.append(tab.assign(sample="desi"))
 
     (a.out / "subclass_metrics.json").write_text(json.dumps(report, indent=2, default=str))
-    keep = ["benchmark_id", "sample", "primary_class", "truth_spt", "truth_activity", "rule", "subclass", "spectral_type", "lum", "activity", "profile"]
+    keep = ["benchmark_id", "sample", "primary_class", "truth_spt", "truth_activity", "rule", "subclass", "spectral_type", "lum", "activity", "profile", "tags"]
     pd.concat(tables)[keep].to_csv(a.out / "subclass_predictions.csv", index=False)
-    print(json.dumps({k: {kk: v.get(kk) for kk in ("star", "galaxy") if kk in v} for k, v in report.items()}, indent=1, default=str)[:6000])
+    print(json.dumps({k: {kk: v.get(kk) for kk in ("star", "galaxy", "qso") if kk in v} for k, v in report.items()}, indent=1, default=str)[:9000])
     if a.write_precision:
         tr = report["sdss_train"]
         prec = {r: v["letter_accuracy"] for r, v in tr.get("star", {}).get("by_rule", {}).items() if v["n"] >= 30}

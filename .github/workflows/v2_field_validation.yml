@@ -73,6 +73,9 @@ jobs:
                 "| roles", d.get("component_role",pd.Series()).value_counts().to_dict())
           print(top.groupby("primary_class").subclass.apply(lambda x: round(float(x.notna().mean()),3)).to_string())
           print(top.subclass_rule.value_counts().to_string())
+          if "subclass_tags" in top.columns:
+              tg=top.subclass_tags.dropna().str.split("; ").explode().str.replace(r" \(.*","",regex=True)
+              print("attributes:", tg.value_counts().head(20).to_dict())
           st=s[s.truth.eq("STAR")&s.primary_class.eq("STAR")].copy()
           st["desi_type"]=st.get("desi_dr1_spectroscopy__SubType",pd.Series(index=st.index,dtype=object)).astype(str).str.strip().str.upper()
           st["pred"]=st.subclass_code.astype(str).str.split(":").str[1]
