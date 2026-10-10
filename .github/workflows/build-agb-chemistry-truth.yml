@@ -34,9 +34,10 @@ jobs:
           import pandas as pd
           d = pd.read_csv("v2/benchmark/agb_truth/agb_chemistry_truth.csv.gz", low_memory=False)
           print(d.shape); print(d.chem.value_counts())
-          for c in ("gaia_Gmag", "tmass_Kmag", "wise_W3mag", "lpv_is_cstar"):
+          for c in [c for c in d.columns if c.startswith(("tm_", "aw_", "g_", "lpv_"))][:40]:
               if c in d: print(c, d.groupby("chem")[c].apply(lambda s: s.notna().mean()).round(3).to_dict())
           if "lpv_is_cstar" in d: print(pd.crosstab(d.chem, d.lpv_is_cstar.astype(str)))
+          print(d.head(3).T.to_string())
           PY
       - name: Commit
         run: |
