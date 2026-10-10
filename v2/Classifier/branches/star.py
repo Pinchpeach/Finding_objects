@@ -6,177 +6,163 @@ This branch is conservative by design:
 - Variability remains an independent axis.
 - DA/DB/DC/DQ/DZ/DO spectral typing is not attempted from broadband features.
 """
-
 from __future__ import annotations
 import math
-import sys as _sys
-from pathlib import Path as _Path
 
-_V2 = _Path(__file__).resolve().parents[2]
-if str(_V2) not in _sys.path:
-    _sys.path.insert(0, str(_V2))
-from common import row_num as _num, text as _text  # noqa: E402
+def _num(row,key):
+    try:
+        v=float(row.get(key))
+        return v if math.isfinite(v) else None
+    except Exception:
+        return None
 
+def _text(row,key):
+    v=row.get(key)
+    if v is None: return None
+    s=str(v).strip()
+    return None if not s or s.lower()=="nan" else s
 
-def corrected_excess_factor(c, bp_rp):
+def corrected_excess_factor(c,bp_rp):
     """Riello+2021 (A&A 649, A3) Eq. 6 / Table 2: C* = C - f(BP-RP)."""
-    x = bp_rp
-    if x < 0.5:
-        f = 1.154360 + 0.033772 * x + 0.032277 * x * x
-    elif x < 4.0:
-        f = 1.162004 + 0.011464 * x + 0.049255 * x * x - 0.005879 * x**3
-    else:
-        f = 1.057572 + 0.140537 * x
-    return c - f
-
+    x=bp_rp
+    if x<0.5: f=1.154360+0.033772*x+0.032277*x*x
+    elif x<4.0: f=1.162004+0.011464*x+0.049255*x*x-0.005879*x**3
+    else: f=1.057572+0.140537*x
+    return c-f
 
 def sigma_corrected_excess(g):
     """Riello+2021 Eq. 18: 1-sigma C* scatter of well-behaved isolated sources."""
-    return 0.0059898 + 8.817481e-12 * g**7.618399
-
+    return 0.0059898+8.817481e-12*g**7.618399
 
 # HR-locus quality gates.  "broad" is the Gentile Fusillo+2021 (MNRAS 508,
 # 3877) first-stage preselection (parallax_over_error > 1), which they follow
 # with quality cuts and a probability map; it is not itself a WD selection.
 # The stricter gates add their parallax-significance branch
 # (parallax_over_error >= 4) and Riello+2021 photometric consistency |C*|.
-HR_GATES = {
-    "broad": {"min_parallax_over_error": 1.0},
-    "plx4": {"min_parallax_over_error": 4.0},
-    "plx4_cstar3": {"min_parallax_over_error": 4.0, "max_cstar_sigma": 3.0},
-    "plx4_cstar5": {"min_parallax_over_error": 4.0, "max_cstar_sigma": 5.0},
-    "plx4_cstar5_ruwe": {"min_parallax_over_error": 4.0, "max_cstar_sigma": 5.0, "max_ruwe": 1.4},
+HR_GATES={
+    "broad":{"min_parallax_over_error":1.0},
+    "plx4":{"min_parallax_over_error":4.0},
+    "plx4_cstar3":{"min_parallax_over_error":4.0,"max_cstar_sigma":3.0},
+    "plx4_cstar5":{"min_parallax_over_error":4.0,"max_cstar_sigma":5.0},
+    "plx4_cstar5_ruwe":{"min_parallax_over_error":4.0,"max_cstar_sigma":5.0,"max_ruwe":1.4},
     # GF21 alternative significance branch: a weaker parallax is accepted when
     # the total proper motion is significant (pm/pm_err > 10), which nearby
     # WDs satisfy and extragalactic sources (pm ~ 0) do not.
-    "plx4_or_pm10": {"min_parallax_over_error": 1.0, "strong_parallax_over_error": 4.0, "min_pm_significance": 10.0},
-    "plx4_or_pm10_cstar5": {
-        "min_parallax_over_error": 1.0,
-        "strong_parallax_over_error": 4.0,
-        "min_pm_significance": 10.0,
-        "max_cstar_sigma": 5.0,
-    },
+    "plx4_or_pm10":{"min_parallax_over_error":1.0,"strong_parallax_over_error":4.0,"min_pm_significance":10.0},
+    "plx4_or_pm10_cstar5":{"min_parallax_over_error":1.0,"strong_parallax_over_error":4.0,"min_pm_significance":10.0,"max_cstar_sigma":5.0},
 }
 # Chosen on independent truth (WD_HR_GATE_EVALUATION.md): best F1 on a mixed
 # SDSS STAR/GALAXY/QSO sample, QSO false WDs 52 -> 6, LAMOST unchanged.
-DEFAULT_HR_GATE = "plx4_or_pm10"
+DEFAULT_HR_GATE="plx4_or_pm10"
 
-
-def _wd_hr_signal(row, gate=None):
+def _wd_hr_signal(row,gate=None):
     """Gaia HR WD-locus signal: M_G > 6 + 5(BP-RP) (Gentile Fusillo+2021).
 
     Returns True/False only when the cut is usable under the quality gate;
     otherwise None (abstain).  This is candidate evidence, not a subtype.
     """
-    cfg = HR_GATES[gate or DEFAULT_HR_GATE]
-    p = _num(row, "parallax")
-    pe = _num(row, "parallax_error")
-    g = _num(row, "phot_g_mean_mag")
-    color = _num(row, "bp_rp")
+    cfg=HR_GATES[gate or DEFAULT_HR_GATE]
+    p=_num(row,"parallax"); pe=_num(row,"parallax_error")
+    g=_num(row,"phot_g_mean_mag")
+    color=_num(row,"bp_rp")
     if color is None:
-        bp = _num(row, "phot_bp_mean_mag")
-        rp = _num(row, "phot_rp_mean_mag")
-        if bp is not None and rp is not None:
-            color = bp - rp
-    if None in (p, pe, g, color) or p <= 0 or pe <= 0 or p / pe <= cfg["min_parallax_over_error"]:
+        bp=_num(row,"phot_bp_mean_mag"); rp=_num(row,"phot_rp_mean_mag")
+        if bp is not None and rp is not None: color=bp-rp
+    if None in (p,pe,g,color) or p<=0 or pe<=0 or p/pe<=cfg["min_parallax_over_error"]:
         return None
-    if "strong_parallax_over_error" in cfg and p / pe < cfg["strong_parallax_over_error"]:
-        pmra, epmra = _num(row, "pmra"), _num(row, "pmra_error")
-        pmdec, epmdec = _num(row, "pmdec"), _num(row, "pmdec_error")
-        if None in (pmra, epmra, pmdec, epmdec) or epmra <= 0 or epmdec <= 0:
+    if "strong_parallax_over_error" in cfg and p/pe<cfg["strong_parallax_over_error"]:
+        pmra,epmra=_num(row,"pmra"),_num(row,"pmra_error")
+        pmdec,epmdec=_num(row,"pmdec"),_num(row,"pmdec_error")
+        if None in (pmra,epmra,pmdec,epmdec) or epmra<=0 or epmdec<=0:
             return None
-        if math.hypot(pmra / epmra, pmdec / epmdec) <= cfg["min_pm_significance"]:
+        if math.hypot(pmra/epmra,pmdec/epmdec)<=cfg["min_pm_significance"]:
             return None
     if "max_cstar_sigma" in cfg:
-        c = _num(row, "phot_bp_rp_excess_factor")
-        if c is None or abs(corrected_excess_factor(c, color)) > cfg["max_cstar_sigma"] * sigma_corrected_excess(g):
+        c=_num(row,"phot_bp_rp_excess_factor")
+        if c is None or abs(corrected_excess_factor(c,color))>cfg["max_cstar_sigma"]*sigma_corrected_excess(g):
             return None
     if "max_ruwe" in cfg:
-        ruwe = _num(row, "ruwe")
-        if ruwe is None or ruwe > cfg["max_ruwe"]:
+        ruwe=_num(row,"ruwe")
+        if ruwe is None or ruwe>cfg["max_ruwe"]:
             return None
-    abs_g = g + 5 * math.log10(p) - 10
-    return bool(abs_g > 6 + 5 * color)
-
+    abs_g=g+5*math.log10(p)-10
+    return bool(abs_g > 6 + 5*color)
 
 def classify(row):
-    star = _num(row, "classprob_dsc_combmod_star")
-    wd = _num(row, "classprob_dsc_combmod_whitedwarf")
-    binary = _num(row, "classprob_dsc_combmod_binarystar")
-    hr = _wd_hr_signal(row)
+    star=_num(row,"classprob_dsc_combmod_star")
+    wd=_num(row,"classprob_dsc_combmod_whitedwarf")
+    binary=_num(row,"classprob_dsc_combmod_binarystar")
+    hr=_wd_hr_signal(row)
 
-    dsc_wd = wd is not None and wd >= 0.80
-    dsc_star = star is not None and star >= 0.80
-    dsc_binary = binary is not None and binary >= 0.80
+    dsc_wd=wd is not None and wd>=0.80
+    dsc_star=star is not None and star>=0.80
+    dsc_binary=binary is not None and binary>=0.80
 
-    family = "UNRESOLVED"
-    family_score = None
-    family_basis = "insufficient or conflicting stellar-family evidence"
+    family="UNRESOLVED"
+    family_score=None
+    family_basis="insufficient or conflicting stellar-family evidence"
 
     if hr is True and (dsc_star or dsc_binary) and not dsc_wd:
-        family_basis = "Gaia HR WD-locus conflicts with strong Gaia DSC non-WD stellar-family evidence"
+        family_basis="Gaia HR WD-locus conflicts with strong Gaia DSC non-WD stellar-family evidence"
     elif dsc_wd and hr is False:
-        family_basis = "strong Gaia DSC WD posterior conflicts with usable Gaia HR-locus evidence"
+        family_basis="strong Gaia DSC WD posterior conflicts with usable Gaia HR-locus evidence"
     elif dsc_wd or hr is True:
-        family = "WHITE_DWARF_CANDIDATE"
-        family_score = wd if dsc_wd else None
+        family="WHITE_DWARF_CANDIDATE"
+        family_score=wd if dsc_wd else None
         if dsc_wd and hr is True:
-            family_basis = "Gaia DSC and literature Gaia HR-locus both support WD candidate"
+            family_basis="Gaia DSC and literature Gaia HR-locus both support WD candidate"
         elif dsc_wd:
-            family_basis = "Gaia DR3 DSC white-dwarf posterior; HR-locus unavailable"
+            family_basis="Gaia DR3 DSC white-dwarf posterior; HR-locus unavailable"
         else:
-            family_basis = "Gentile Fusillo+2021 broad Gaia HR-locus WD candidate evidence"
+            family_basis="Gentile Fusillo+2021 broad Gaia HR-locus WD candidate evidence"
     elif dsc_binary:
-        family = "BINARY_CANDIDATE"
-        family_score = binary
-        family_basis = "Gaia DR3 DSC physical-binary posterior"
+        family="BINARY_CANDIDATE"
+        family_score=binary
+        family_basis="Gaia DR3 DSC physical-binary posterior"
     elif dsc_star:
-        family = "STAR_LIKE"
-        family_score = star
-        family_basis = "Gaia DR3 DSC stellar posterior"
+        family="STAR_LIKE"
+        family_score=star
+        family_basis="Gaia DR3 DSC stellar posterior"
 
-    var_class = _text(row, "best_class_name")
-    var_score = _num(row, "best_class_score")
-    variability = {
+    var_class=_text(row,"best_class_name")
+    var_score=_num(row,"best_class_score")
+    variability={
         "class": var_class if var_class else "UNRESOLVED",
         "catalog_score": var_score,
-        "basis": (
-            "Gaia DR3 vari_classifier_result; score retained as catalog evidence, not assumed calibrated across classes"
-            if var_class
-            else "no Gaia DR3 variability class available"
-        ),
+        "basis": "Gaia DR3 vari_classifier_result; score retained as catalog evidence, not assumed calibrated across classes"
+                if var_class else "no Gaia DR3 variability class available",
     }
 
-    stellar_parameters = {
-        "teff_gspphot": _num(row, "teff_gspphot"),
-        "logg_gspphot": _num(row, "logg_gspphot"),
-        "mh_gspphot": _num(row, "mh_gspphot"),
+    stellar_parameters={
+        "teff_gspphot":_num(row,"teff_gspphot"),
+        "logg_gspphot":_num(row,"logg_gspphot"),
+        "mh_gspphot":_num(row,"mh_gspphot"),
     }
 
     # Gaia-XP DA/DB subtype predictions are accepted only after the object is
     # independently routed as a WD candidate. The 0.90 gate was fixed before
     # the independent SDSS DR14 external evaluation; unsupported/low-confidence
     # cases remain UNRESOLVED.
-    xp_subtype = _text(row, "wd_xp_subtype_prediction")
-    xp_conf = _num(row, "wd_xp_subtype_confidence")
-    spectral_type = "UNRESOLVED"
-    spectral_type_confidence = None
-    spectral_basis = "Gaia XP coefficients or validated optical spectrum model required"
-    if family == "WHITE_DWARF_CANDIDATE" and xp_subtype in {"DA", "DB"} and xp_conf is not None and xp_conf >= 0.90:
-        spectral_type = xp_subtype
-        spectral_type_confidence = xp_conf
-        spectral_basis = "externally validated Gaia-XP DA/DB model; calibrated probability >= 0.90"
+    xp_subtype=_text(row,"wd_xp_subtype_prediction")
+    xp_conf=_num(row,"wd_xp_subtype_confidence")
+    spectral_type="UNRESOLVED"
+    spectral_type_confidence=None
+    spectral_basis="Gaia XP coefficients or validated optical spectrum model required"
+    if family=="WHITE_DWARF_CANDIDATE" and xp_subtype in {"DA","DB"} and xp_conf is not None and xp_conf>=0.90:
+        spectral_type=xp_subtype
+        spectral_type_confidence=xp_conf
+        spectral_basis="externally validated Gaia-XP DA/DB model; calibrated probability >= 0.90"
 
     return {
-        "detailed_class": family,
-        "confidence": family_score,
-        "stellar_family": family,
-        "stellar_family_score": family_score,
-        "wd_hr_locus_signal": hr,
-        "variability": variability,
-        "spectral_type": spectral_type,
-        "spectral_type_confidence": spectral_type_confidence,
-        "spectral_type_requirement": spectral_basis,
-        "stellar_parameters": stellar_parameters,
-        "basis": family_basis,
+        "detailed_class":family,
+        "confidence":family_score,
+        "stellar_family":family,
+        "stellar_family_score":family_score,
+        "wd_hr_locus_signal":hr,
+        "variability":variability,
+        "spectral_type":spectral_type,
+        "spectral_type_confidence":spectral_type_confidence,
+        "spectral_type_requirement":spectral_basis,
+        "stellar_parameters":stellar_parameters,
+        "basis":family_basis,
     }

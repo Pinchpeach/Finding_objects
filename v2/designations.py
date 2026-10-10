@@ -18,32 +18,22 @@ identifier columns (e.g. ``Gaia DR3 <source_id>``, ``PSO J188.4154+09.1750``).
 When a catalogue contributes several detections to one object, the one with
 the highest association confidence is used.
 """
-
 from __future__ import annotations
 import re
 import numpy as np
 import pandas as pd
 
 PRIORITY = (
-    "SIMBAD",
-    "NED",
-    "SGA-2020",
-    "Gaia DR3",
-    "SDSS DR18 PhotoObj",
-    "Pan-STARRS1 DR2 MeanObject",
-    "DESI Legacy Surveys DR10",
-    "2MASS PSC",
-    "AllWISE",
-    "DESI DR1 spectroscopy",
-    "SDSS DR18 spectroscopy",
-    "GALEX AIS",
+    "SIMBAD", "NED", "SGA-2020", "Gaia DR3", "SDSS DR18 PhotoObj", "Pan-STARRS1 DR2 MeanObject",
+    "DESI Legacy Surveys DR10", "2MASS PSC", "AllWISE", "DESI DR1 spectroscopy",
+    "SDSS DR18 spectroscopy", "GALEX AIS",
 )
 
 
 def clean_name(name: str, catalog: str = "") -> str:
     s = re.sub(r"\s+", " ", str(name)).strip()
     if catalog == "SIMBAD" and s.startswith("NAME "):
-        s = s[5:]  # SIMBAD prefix for common names ("NAME Virgo Cluster")
+        s = s[5:]                      # SIMBAD prefix for common names ("NAME Virgo Cluster")
     return s
 
 
@@ -57,23 +47,17 @@ def _rank(catalog: str) -> tuple[int, str]:
 def designations(association: pd.DataFrame) -> pd.DataFrame:
     """One row per object_id: designation, designation_catalog, catalog_designations."""
     a = association[["object_id", "catalog", "catalog_object_id", "object_name", "association_confidence"]].copy()
-    name = a.object_name.where(
-        a.object_name.notna() & a.object_name.astype(str).str.strip().ne("") & a.object_name.astype(str).ne("nan"),
-        a.catalog.astype(str) + " " + a.catalog_object_id.astype(str),
-    )
+    name = a.object_name.where(a.object_name.notna() & a.object_name.astype(str).str.strip().ne("")
+                               & a.object_name.astype(str).ne("nan"),
+                               a.catalog.astype(str) + " " + a.catalog_object_id.astype(str))
     a["name"] = [clean_name(n, c) for n, c in zip(name, a.catalog.astype(str))]
     a["rank"] = [_rank(c)[0] for c in a.catalog.astype(str)]
     a["conf"] = pd.to_numeric(a.association_confidence, errors="coerce").fillna(0.0)
     a = a.sort_values(["object_id", "rank", "catalog", "conf"], ascending=[True, True, True, False], kind="stable")
     best = a.drop_duplicates("object_id")
     every = a.drop_duplicates(["object_id", "name"]).groupby("object_id", sort=False).name.agg("; ".join)
-    out = pd.DataFrame(
-        {
-            "object_id": best.object_id.to_numpy(),
-            "designation": best.name.to_numpy(),
-            "designation_catalog": best.catalog.to_numpy(),
-        }
-    )
+    out = pd.DataFrame({"object_id": best.object_id.to_numpy(), "designation": best.name.to_numpy(),
+                        "designation_catalog": best.catalog.to_numpy()})
     out["catalog_designations"] = out.object_id.map(every)
     # Two objects can share a name when a catalogue entry is split (rare); keep labels unique.
     dup = out.designation.duplicated(keep=False)
@@ -91,24 +75,17 @@ def angular_sep_arcmin(ra, dec, ra0: float, dec0: float) -> np.ndarray:
     return np.degrees(2 * np.arcsin(np.sqrt(np.clip(h, 0, 1)))) * 60.0
 
 
-def annotate(
-    classified: pd.DataFrame,
-    association: pd.DataFrame,
-    center: tuple[float, float] | None = None,
-    radius_arcmin: float | None = None,
-) -> pd.DataFrame:
+def annotate(classified: pd.DataFrame, association: pd.DataFrame,
+             center: tuple[float, float] | None = None, radius_arcmin: float | None = None) -> pd.DataFrame:
     """Add designation columns; with a centre, add separation_arcmin, keep only
     objects inside the radius (if given) and sort by distance from the centre.
     A kept component keeps its host galaxy (``parent_object_id``) even when
     the host centre lies outside the cone."""
     if "designation" in classified.columns and "catalog_designations" in classified.columns:
-        out = classified.copy()  # already named (e.g. host-consolidated)
+        out = classified.copy()            # already named (e.g. host-consolidated)
     else:
-        out = classified.drop(
-            columns=[
-                c for c in ("designation", "designation_catalog", "catalog_designations") if c in classified.columns
-            ]
-        )
+        out = classified.drop(columns=[c for c in ("designation", "designation_catalog", "catalog_designations")
+                                       if c in classified.columns])
         out = out.merge(designations(association), on="object_id", how="left").copy()
         out["designation"] = out.designation.fillna(out.object_id)
     if center is not None:

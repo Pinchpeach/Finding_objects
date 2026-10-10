@@ -11,34 +11,26 @@ replaced by fitted multinomial-logistic coefficients, and the abstention
 threshold is the one chosen on the calibration split; keys without support
 keep their prior weights.  See v2/benchmark/fit_fusion_weights.py.
 """
-
 from __future__ import annotations
-import argparse, json, math, sys
+import argparse,json,math
 from pathlib import Path
 import numpy as np
 import pandas as pd
-
-V2 = Path(__file__).resolve().parents[1]
-if str(V2) not in sys.path:
-    sys.path.insert(0, str(V2))
-from common import read_table, write_table  # noqa: E402
-
-CLASSES = ("STAR", "GALAXY", "QSO")
-WEIGHT = {"direct_probability": 1.0, "catalog_label": 1.5, "continuous_score": 0.35, "binary_evidence": 0.35}
-MIN_CONFIDENCE = 0.50
-MIN_MARGIN = 0.10
+CLASSES=("STAR","GALAXY","QSO")
+WEIGHT={"direct_probability":1.0,"catalog_label":1.5,"continuous_score":0.35,"binary_evidence":0.35}
+MIN_CONFIDENCE=.50; MIN_MARGIN=.10
 # EXTRAGALACTIC (astrometric null, mid-IR AGN colour) cannot separate
 # galaxies from quasars; POINT_SOURCE (unresolved morphology) cannot separate
 # stars from quasars. Together they single out QSO.
-GROUPS = {"EXTRAGALACTIC": ("GALAXY", "QSO"), "POINT_SOURCE": ("STAR", "QSO")}
+GROUPS={"EXTRAGALACTIC":("GALAXY","QSO"),"POINT_SOURCE":("STAR","QSO")}
 # Inside a large galaxy's D26 ellipse, survey detections are mostly pieces of
 # that galaxy (HII regions, arms) rather than independent objects; only a
 # Gaia-confirmed foreground star is classified there.
-HOST_RADIUS = 1.0
+HOST_RADIUS=1.0
 # Minimum independent objects (with evidence, outside large-galaxy hosts) needed
 # to re-estimate the field's class mix.
-FIELD_PRIOR_MIN_OBJECTS = 50
-CONFLICT_RESOLVED_P = 0.99
+FIELD_PRIOR_MIN_OBJECTS=50
+CONFLICT_RESOLVED_P=0.99
 # A Gaia parallax or proper motion measured at >= 10 sigma is physically
 # incompatible with a galaxy or a quasar: Gaia DR3 quasars scatter about
 # zero with normalised parallax/proper-motion widths of ~1.05-1.1
@@ -48,305 +40,196 @@ CONFLICT_RESOLVED_P = 0.99
 # sigma, 99.6% (SDSS, n = 2989) and 99.0% (DESI, n = 518) are spectroscopic
 # stars; the rest are mis-associations already predicted STAR. Such an object
 # is classified STAR even when other (photometric) evidence conflicts.
-DECISIVE_MOTION_SIGMA = 10.0
-DECISIVE_MIN_RELIABILITY = 0.8  # Gaia astrometry quality (RUWE <= ~1.75) and association
-MODEL_PATH = Path(__file__).resolve().parent / "fusion_weights.json"
-
+DECISIVE_MOTION_SIGMA=10.0
+DECISIVE_MIN_RELIABILITY=0.8   # Gaia astrometry quality (RUWE <= ~1.75) and association
+MODEL_PATH=Path(__file__).resolve().parent/"fusion_weights.json"
 
 def evidence_features(items):
     """Map evidence items to {"RULE:CLASS": logit(score)} plus their kinds."""
-    x = {}
-    kinds = {}
+    x={}; kinds={}
     for e in items:
-        c = e.get("class")
-        if e.get("kind") == "linear_feature":
+        c=e.get("class")
+        if e.get("kind")=="linear_feature":
             # Continuous feature (e.g. a colour): enters the model linearly and
             # carries weight only when a fitted model provides one.
-            try:
-                x[f"{e.get('rule_id')}:{c}"] = float(e.get("value"))
-                kinds[f"{e.get('rule_id')}:{c}"] = "linear_feature"
-            except (TypeError, ValueError):
-                pass
+            try: x[f"{e.get('rule_id')}:{c}"]=float(e.get("value")); kinds[f"{e.get('rule_id')}:{c}"]="linear_feature"
+            except (TypeError,ValueError): pass
             continue
-        if c in {"WD", "BINARY"}:
-            c = "STAR"
-        if c not in GROUPS and c not in CLASSES:
-            continue
+        if c in {"WD","BINARY"}: c="STAR"
+        if c not in GROUPS and c not in CLASSES: continue
         # Reliability discounts the evidence in log-odds space: weight x
         # logit(raw score).  Folding it into the score instead (logit of
         # raw x reliability) turns an unreliable claim into strong evidence
         # *against* the class (a resolved Tractor model with near-zero
         # association reliability gave p_star = 1.00 for galaxies).
         try:
-            raw = e.get("raw_score")
+            raw=e.get("raw_score")
             if raw is not None:
-                r = min(max(float(raw), 0.01), 0.99)
-                rel = float(e.get("reliability", 1.0) if e.get("reliability") is not None else 1.0) * float(
-                    e.get("association_reliability", 1.0) if e.get("association_reliability") is not None else 1.0
-                )
-                v = max(0.0, min(1.0, rel)) * math.log(r / (1 - r))
+                r=min(max(float(raw),.01),.99)
+                rel=float(e.get("reliability",1.0) if e.get("reliability") is not None else 1.0)*float(e.get("association_reliability",1.0) if e.get("association_reliability") is not None else 1.0)
+                v=max(0.0,min(1.0,rel))*math.log(r/(1-r))
             else:
-                s = min(max(float(e.get("score", 0)), 0.01), 0.99)
-                v = math.log(s / (1 - s))
-        except (TypeError, ValueError):
-            continue
-        key = f"{e.get('rule_id')}:{c}"
-        x[key] = x.get(key, 0.0) + v
-        kinds[key] = e.get("kind")
-    return x, kinds
+                s=min(max(float(e.get("score",0)),.01),.99); v=math.log(s/(1-s))
+        except (TypeError,ValueError): continue
+        key=f"{e.get('rule_id')}:{c}"
+        x[key]=x.get(key,0.0)+v; kinds[key]=e.get("kind")
+    return x,kinds
 
-
-def prior_coef(key, kind):
-    if kind == "linear_feature":
-        return {t: 0.0 for t in CLASSES}
-    c = key.rsplit(":", 1)[1]
-    w = WEIGHT.get(kind, 0.25)
-    return {t: (w if t in GROUPS.get(c, (c,)) else 0.0) for t in CLASSES}
-
+def prior_coef(key,kind):
+    if kind=="linear_feature": return {t:0.0 for t in CLASSES}
+    c=key.rsplit(":",1)[1]; w=WEIGHT.get(kind,.25)
+    return {t:(w if t in GROUPS.get(c,(c,)) else 0.0) for t in CLASSES}
 
 def load_model(path=MODEL_PATH):
-    try:
-        return json.loads(Path(path).read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return None
+    try: return json.loads(Path(path).read_text(encoding="utf-8"))
+    except (OSError,json.JSONDecodeError): return None
 
-
-def fuse(items, model=None):
-    x, kinds = evidence_features(items)
-    coef = (model or {}).get("coef", {})
+def fuse(items,model=None):
+    x,kinds=evidence_features(items)
+    coef=(model or {}).get("coef",{})
     # The fitted intercept is the baseline of the fitted feature set; with
     # none of those features present (e.g. only SIMBAD/NED labels, which use
     # prior weights) it would be an extrapolation, so equal odds are used.
-    fitted = any(k in coef for k in x)
-    logit = {c: float((model or {}).get("intercept", {}).get(c, 0.0)) if fitted else 0.0 for c in CLASSES}
-    used = 0
-    for key, v in x.items():
-        w = coef.get(key)
+    fitted=any(k in coef for k in x)
+    logit={c:float((model or {}).get("intercept",{}).get(c,0.0)) if fitted else 0.0 for c in CLASSES}
+    used=0
+    for key,v in x.items():
+        w=coef.get(key)
         if w is None:
             # Unfitted rules are one-sided support: a low-confidence claim
             # (e.g. a catalogue label with poor association reliability) is
             # weak support, not evidence against the class.
-            w = prior_coef(key, kinds[key])
-            v = max(v, 0.0)
-        for t in CLASSES:
-            logit[t] += w.get(t, 0.0) * v
+            w=prior_coef(key,kinds[key]); v=max(v,0.0)
+        for t in CLASSES: logit[t]+=w.get(t,0.0)*v
         # A continuous feature without a fitted weight carries no evidence.
-        used += int(kinds[key] != "linear_feature" or key in coef)
-    m = max(logit.values())
-    p = {c: math.exp(v - m) for c, v in logit.items()}
-    z = sum(p.values())
-    return {c: p[c] / z for c in CLASSES}, used
-
+        used+=int(kinds[key]!="linear_feature" or key in coef)
+    m=max(logit.values()); p={c:math.exp(v-m) for c,v in logit.items()}; z=sum(p.values())
+    return {c:p[c]/z for c in CLASSES},used
 
 def _gaia_foreground_star(items):
     """Significant Gaia parallax or proper motion (S/N >= 5; Stage-4 score >= 0.5)."""
-    return any(
-        e.get("rule_id") in {"AST-GAL-001", "AST-GAL-002"} and float(e.get("raw_score", 0)) >= 0.5 for e in items
-    )
-
+    return any(e.get("rule_id") in {"AST-GAL-001","AST-GAL-002"} and float(e.get("raw_score",0))>=0.5 for e in items)
 
 def _decisive_motion(items):
     """Gaia parallax or proper motion at >= DECISIVE_MOTION_SIGMA with a good
     astrometric solution and a reliable association."""
     for e in items:
-        if e.get("rule_id") not in {"AST-GAL-001", "AST-GAL-002"}:
-            continue
+        if e.get("rule_id") not in {"AST-GAL-001","AST-GAL-002"}: continue
         try:
-            if (
-                float(e.get("value")) >= DECISIVE_MOTION_SIGMA
-                and float(e.get("reliability", 0)) >= DECISIVE_MIN_RELIABILITY
-                and float(e.get("association_reliability", 0)) >= DECISIVE_MIN_RELIABILITY
-            ):
+            if (float(e.get("value"))>=DECISIVE_MOTION_SIGMA and float(e.get("reliability",0))>=DECISIVE_MIN_RELIABILITY
+                    and float(e.get("association_reliability",0))>=DECISIVE_MIN_RELIABILITY):
                 return True
-        except (TypeError, ValueError):
-            continue
+        except (TypeError,ValueError): continue
     return False
-
 
 def _spectroscopic(items):
     """Pipeline spectral class of this position (SPC-* rules, e.g. SDSS
     CLASS with ZWARNING == 0; Bolton et al. 2012, AJ 144, 144).  A spectrum
     classifies the light in its own fibre, so it stays valid inside a large
     galaxy: the nucleus or an HII region gives GALAXY, a foreground star STAR."""
-    return any(str(e.get("rule_id", "")).startswith("SPC-") and float(e.get("raw_score", 0) or 0) >= 0.5 for e in items)
+    return any(str(e.get("rule_id","")).startswith("SPC-") and float(e.get("raw_score",0) or 0)>=0.5 for e in items)
 
-
-def estimate_field_prior(P, train_prior, iters=200, tol=1e-7):
+def estimate_field_prior(P,train_prior,iters=200,tol=1e-7):
     """EM re-estimation of class priors under label shift.
 
     Saerens, Latinne & Decaestecker (2002, Neural Computation 14, 21): with
     posteriors calibrated under ``train_prior``, iterate
     pi <- mean_i p_i(pi), p_i(pi) ~ p_i * pi / train_prior.
     """
-    base = np.asarray(train_prior, dtype=float)
-    pi = base.copy()
+    base=np.asarray(train_prior,dtype=float); pi=base.copy()
     for _ in range(iters):
-        Q = P * pi / base
-        Q /= Q.sum(axis=1, keepdims=True)
-        new = Q.mean(axis=0)
-        done = np.abs(new - pi).max() < tol
-        pi = new
-        if done:
-            break
+        Q=P*pi/base; Q/=Q.sum(axis=1,keepdims=True); new=Q.mean(axis=0)
+        done=np.abs(new-pi).max()<tol; pi=new
+        if done: break
     return pi
 
-
-def run(evidence, out=None, model_path=MODEL_PATH, min_confidence=None, field_prior=False) -> pd.DataFrame:
-    """Evidence (file or DataFrame) -> coarse class, probabilities and status."""
-    model = load_model(model_path)
-    min_conf = float(model.get("min_confidence", MIN_CONFIDENCE)) if model else MIN_CONFIDENCE
-    if min_confidence is not None:
-        min_conf = float(min_confidence)  # caller trades coverage for precision
-    min_margin = float(model.get("min_margin", MIN_MARGIN)) if model else MIN_MARGIN
-    df = read_table(evidence, low_memory=False)
-    raw_series = df["evidence_json"] if "evidence_json" in df else pd.Series(["[]"] * len(df))
-    host_r = (
-        pd.to_numeric(df["host_elliptical_radius"], errors="coerce")
-        if "host_elliptical_radius" in df
-        else pd.Series(float("nan"), index=df.index)
-    )
-    rows = []
-    for raw, hr in zip(raw_series, host_r):
-        try:
-            items = json.loads(raw) if isinstance(raw, str) else []
-        except (json.JSONDecodeError, TypeError):
-            items = []
-        p, used = fuse(items, model)
-        strong = set()
+def run(evidence,out,model_path=MODEL_PATH,min_confidence=None,field_prior=False):
+    model=load_model(model_path)
+    min_conf=float(model.get("min_confidence",MIN_CONFIDENCE)) if model else MIN_CONFIDENCE
+    if min_confidence is not None: min_conf=float(min_confidence)  # caller trades coverage for precision
+    min_margin=float(model.get("min_margin",MIN_MARGIN)) if model else MIN_MARGIN
+    df=pd.read_csv(evidence,low_memory=False)
+    raw_series=df["evidence_json"] if "evidence_json" in df else pd.Series(["[]"]*len(df))
+    host_r=pd.to_numeric(df["host_elliptical_radius"],errors="coerce") if "host_elliptical_radius" in df else pd.Series(float("nan"),index=df.index)
+    rows=[]
+    for raw,hr in zip(raw_series,host_r):
+        try: items=json.loads(raw) if isinstance(raw,str) else []
+        except (json.JSONDecodeError,TypeError): items=[]
+        p,used=fuse(items,model)
+        strong=set()
         for e in items:
-            c = e.get("class")
-            if c in {"WD", "BINARY"}:
-                c = "STAR"
-            try:
-                s = float(e.get("score", 0))
-            except (TypeError, ValueError):
-                s = 0
+            c=e.get("class")
+            if c in {"WD","BINARY"}: c="STAR"
+            try: s=float(e.get("score",0))
+            except (TypeError,ValueError): s=0
             # Colour-kNN fractions are soft evidence for the fitted fusion,
             # not hard claims (same rule as Stage 4's evidence_conflict).
-            if c in CLASSES and s >= 0.8 and not str(e.get("rule_id", "")).endswith("-CKNN-001"):
-                strong.add(c)
-        conflict = bool(items) and len(strong) > 1
-        in_host = hr < HOST_RADIUS and not _gaia_foreground_star(items) and not _spectroscopic(items)
-        rows.append((np.array([p[c] for c in CLASSES]), used, conflict, in_host, _decisive_motion(items)))
-    P = np.array([r[0] for r in rows]).reshape(len(rows), len(CLASSES))
+            if c in CLASSES and s>=.8 and not str(e.get("rule_id","")).endswith("-CKNN-001"): strong.add(c)
+        conflict=bool(items) and len(strong)>1
+        in_host=hr<HOST_RADIUS and not _gaia_foreground_star(items) and not _spectroscopic(items)
+        rows.append((np.array([p[c] for c in CLASSES]),used,conflict,in_host,_decisive_motion(items)))
+    P=np.array([r[0] for r in rows]).reshape(len(rows),len(CLASSES))
     # Field-prior adjustment needs calibrated posteriors (fitted model) and
     # enough independent objects in the field to estimate the class mix.
-    eligible = np.array(
-        [used > 0 and not conflict and not in_host for _, used, conflict, in_host, _ in rows], dtype=bool
-    )
-    train_prior = [float((model or {}).get("training_prior", {}).get(c, 1 / len(CLASSES))) for c in CLASSES]
+    eligible=np.array([used>0 and not conflict and not in_host for _,used,conflict,in_host,_ in rows],dtype=bool)
+    train_prior=[float((model or {}).get("training_prior",{}).get(c,1/len(CLASSES))) for c in CLASSES]
     # The EM estimate assumes pure label shift with calibrated posteriors.
     # Real fields also shift which evidence exists (depth, footprint, archive
     # outages), and on five DESI-checked fields applying it lowered accuracy
     # in four; it is therefore estimated and reported, but applied only on
     # request (``field_prior=True``).
-    estimable = bool(model) and int(eligible.sum()) >= FIELD_PRIOR_MIN_OBJECTS
-    prior = estimate_field_prior(P[eligible], train_prior) if estimable else np.array(train_prior)
-    adjust = estimable and bool(field_prior)
-    Q = P * (prior if adjust else np.array(train_prior)) / np.array(train_prior)
-    Q = Q / Q.sum(axis=1, keepdims=True) if len(Q) else Q
-    labels = []
-    confidence = []
-    margins = []
-    statuses = []
-    best_candidates = []
-    best_candidate_scores = []
-    for q, (_, used, conflict, in_host, moving) in zip(Q, rows):
-        order = np.argsort(-q)
-        conf = float(q[order[0]])
-        margin = conf - float(q[order[1]])
-        top = CLASSES[order[0]]
+    estimable=bool(model) and int(eligible.sum())>=FIELD_PRIOR_MIN_OBJECTS
+    prior=estimate_field_prior(P[eligible],train_prior) if estimable else np.array(train_prior)
+    adjust=estimable and bool(field_prior)
+    Q=P*(prior if adjust else np.array(train_prior))/np.array(train_prior); Q=Q/Q.sum(axis=1,keepdims=True) if len(Q) else Q
+    labels=[]; confidence=[]; margins=[]; statuses=[]; best_candidates=[]; best_candidate_scores=[]
+    for q,(_,used,conflict,in_host,moving) in zip(Q,rows):
+        order=np.argsort(-q); conf=float(q[order[0]]); margin=conf-float(q[order[1]]); top=CLASSES[order[0]]
         # Inside a large galaxy the host status is the most informative one,
         # with or without evidence (e.g. Legacy Surveys DUP sources there).
-        if in_host:
-            label = "UNKNOWN"
-            status = "WITHIN_LARGE_GALAXY"
-        elif used == 0:
-            label = "UNKNOWN"
-            status = "NO_EVIDENCE"
+        if in_host: label="UNKNOWN"; status="WITHIN_LARGE_GALAXY"
+        elif used==0: label="UNKNOWN"; status="NO_EVIDENCE"
         elif moving:
             # Confidence = the rule's benchmark precision (>= 0.99), or the
             # fused STAR probability when that is higher.
-            label = "STAR"
-            status = "CLASSIFIED"
-            top = "STAR"
-            conf = max(float(q[CLASSES.index("STAR")]), 0.99)
-            margin = max(0.0, conf - max(float(v) for c, v in zip(CLASSES, q) if c != "STAR"))
+            label="STAR"; status="CLASSIFIED"; top="STAR"
+            conf=max(float(q[CLASSES.index("STAR")]),0.99); margin=max(0.0,conf-max(float(v) for c,v in zip(CLASSES,q) if c!="STAR"))
         # Strong evidence pointing at different classes abstains unless the
         # fitted fusion resolves it decisively (benchmark held-out conflicts
         # with p >= 0.99: 19/19 correct; at p >= 0.9: 91-100%).
-        elif conflict and (not model or conf < CONFLICT_RESOLVED_P):
-            label = "UNKNOWN"
-            status = "CONFLICT"
-        elif conf < min_conf or margin < min_margin:
-            label = "UNKNOWN"
-            status = "LOW_CONFIDENCE"
-        else:
-            label = top
-            status = "CLASSIFIED"
-        labels.append(label)
-        confidence.append(conf)
-        margins.append(margin)
-        statuses.append(status)
-        if used == 0:
-            best_candidates.append("UNKNOWN")
-            best_candidate_scores.append(float("nan"))
-        else:
-            best_candidates.append(top)
-            best_candidate_scores.append(conf)
-    result_columns = {}
-    for i, c in enumerate(CLASSES):
-        result_columns[f"likelihood_{c.lower()}"] = Q[:, i] if len(Q) else []
-        result_columns[f"p_{c.lower()}"] = Q[:, i] if len(Q) else []  # legacy alias
-        result_columns[f"p_{c.lower()}_training_prior"] = P[:, i] if len(P) else []
-        result_columns[f"field_prior_{c.lower()}"] = [float(prior[i])] * len(df)
-    result_columns.update(
-        {
-            "coarse_probability_calibrated": [bool(model)] * len(df),
-            "coarse_prior_adjusted": [adjust] * len(df),
-            "coarse_score_semantics": [
-                (model or {}).get("semantics", "normalized evidence likelihood; not a calibrated posterior probability")
-                + ("; class priors re-estimated for this field (Saerens+2002 EM)" if adjust else "")
-            ]
-            * len(df),
-            "primary_class": labels,
-            "primary_confidence": confidence,
-            "primary_margin": margins,
-            "classification_status": statuses,
-            "best_candidate_class": best_candidates,
-            "best_candidate_probability": best_candidate_scores,
-        }
-    )
-    df = pd.concat([df, pd.DataFrame(result_columns, index=df.index)], axis=1)
-    note = (
-        (
-            f"; field prior estimate {dict(zip(CLASSES,(round(float(x),3) for x in prior)))}"
-            + (" (applied)" if adjust else " (not applied)")
-        )
-        if estimable
-        else ""
-    )
-    return write_table(df, out, f"[OK] {len(df)} sources{note}")
-
+        elif conflict and (not model or conf<CONFLICT_RESOLVED_P): label="UNKNOWN"; status="CONFLICT"
+        elif conf<min_conf or margin<min_margin: label="UNKNOWN"; status="LOW_CONFIDENCE"
+        else: label=top; status="CLASSIFIED"
+        labels.append(label); confidence.append(conf); margins.append(margin); statuses.append(status)
+        if used==0: best_candidates.append("UNKNOWN"); best_candidate_scores.append(float("nan"))
+        else: best_candidates.append(top); best_candidate_scores.append(conf)
+    result_columns={}
+    for i,c in enumerate(CLASSES):
+        result_columns[f"likelihood_{c.lower()}"]=Q[:,i] if len(Q) else []
+        result_columns[f"p_{c.lower()}"]=Q[:,i] if len(Q) else []  # legacy alias
+        result_columns[f"p_{c.lower()}_training_prior"]=P[:,i] if len(P) else []
+        result_columns[f"field_prior_{c.lower()}"]=[float(prior[i])]*len(df)
+    result_columns.update({
+        "coarse_probability_calibrated":[bool(model)]*len(df),
+        "coarse_prior_adjusted":[adjust]*len(df),
+        "coarse_score_semantics":[(model or {}).get("semantics","normalized evidence likelihood; not a calibrated posterior probability")
+                                  +("; class priors re-estimated for this field (Saerens+2002 EM)" if adjust else "")]*len(df),
+        "primary_class":labels,
+        "primary_confidence":confidence,
+        "primary_margin":margins,
+        "classification_status":statuses,
+        "best_candidate_class":best_candidates,
+        "best_candidate_probability":best_candidate_scores,
+    })
+    df=pd.concat([df,pd.DataFrame(result_columns,index=df.index)],axis=1)
+    out.parent.mkdir(parents=True,exist_ok=True); df.to_csv(out,index=False)
+    print(f"[OK] {len(df)} sources -> {out}"+(f"; field prior estimate {dict(zip(CLASSES,(round(float(x),3) for x in prior)))}"
+          +(" (applied)" if adjust else " (not applied)") if estimable else "")); return out
 
 def main():
-    root = Path(__file__).resolve().parent
-    p = argparse.ArgumentParser()
-    p.add_argument("--evidence", type=Path, default=root / "evidence.csv")
-    p.add_argument("--out", type=Path, default=root / "likelihood_vectors.csv")
-    p.add_argument(
-        "--min-confidence",
-        type=float,
-        help="override the abstention threshold (see COARSE_BENCHMARK_RESULTS.md for coverage/accuracy)",
-    )
-    p.add_argument(
-        "--field-prior",
-        action="store_true",
-        help="apply the EM field class-prior re-estimate (Saerens+2002) to the labels",
-    )
-    a = p.parse_args()
-    run(a.evidence, a.out, min_confidence=a.min_confidence, field_prior=a.field_prior)
-
-
-if __name__ == "__main__":
-    main()
+    root=Path(__file__).resolve().parent; p=argparse.ArgumentParser()
+    p.add_argument("--evidence",type=Path,default=root/"evidence.csv"); p.add_argument("--out",type=Path,default=root/"likelihood_vectors.csv")
+    p.add_argument("--min-confidence",type=float,help="override the abstention threshold (see COARSE_BENCHMARK_RESULTS.md for coverage/accuracy)")
+    p.add_argument("--field-prior",action="store_true",help="apply the EM field class-prior re-estimate (Saerens+2002) to the labels")
+    a=p.parse_args(); run(a.evidence,a.out,min_confidence=a.min_confidence,field_prior=a.field_prior)
+if __name__=="__main__": main()

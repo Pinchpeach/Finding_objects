@@ -16,19 +16,20 @@ The coarse classifier abstains for four reasons (Preprocess/05 status):
 * LOW_CONFIDENCE - the fused probabilities of two classes overlap.
 * CONFLICT - strong evidence points at different classes.
 """
-
 from __future__ import annotations
 import json
 import math
-import sys
-from pathlib import Path
 
-if str(Path(__file__).resolve().parents[1]) not in sys.path:
-    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from common import row_num as _num  # noqa: E402
+LS_MORPH_SNR = 10.0       # LS-MORPH-001/002 threshold
+SDSS_R_LIMIT = 22.2       # SDSS 95% point-source completeness (r)
 
-LS_MORPH_SNR = 10.0  # LS-MORPH-001/002 threshold
-SDSS_R_LIMIT = 22.2  # SDSS 95% point-source completeness (r)
+
+def _num(row, key):
+    try:
+        x = float(row.get(key))
+        return x if math.isfinite(x) else None
+    except (TypeError, ValueError):
+        return None
 
 
 def _ls_snr(row):
@@ -45,16 +46,12 @@ def _single(row, cat):
         valid = any(_num(row, f"std_mag__ps1_{b}") is not None for b in "grizy")
         n = _num(row, "pan_starrs1_dr2_meanobject__nDetections")
         if not valid:
-            return "Pan-STARRS1 detection without valid mean photometry" + (
-                f" ({int(n)} detections)" if n is not None else ""
-            )
+            return "Pan-STARRS1 detection without valid mean photometry" + (f" ({int(n)} detections)" if n is not None else "")
         bands = [b for b in "grizy" if _num(row, f"std_mag__ps1_{b}") is not None]
         i = _num(row, "std_mag__ps1_i")
         if len(bands) < 3:
-            return (
-                f"Pan-STARRS1 only, measured in {len(bands)} band{'s' if len(bands) != 1 else ''} ({''.join(bands)})"
-                + (f", {int(n)} detections" if n is not None else "")
-            )
+            return (f"Pan-STARRS1 only, measured in {len(bands)} band{'s' if len(bands) != 1 else ''} ({''.join(bands)})"
+                    + (f", {int(n)} detections" if n is not None else ""))
         if i is None or not 14 <= i <= 21:
             return "Pan-STARRS1 only, i outside 14-21 (morphology not used); colours inconclusive"
         return "Pan-STARRS1 only; morphology and colours inconclusive"
@@ -84,13 +81,8 @@ def reason(row) -> str | None:
             ev = json.loads(row.get("evidence_json") or "[]")
         except (TypeError, ValueError):
             ev = []
-        strong = sorted(
-            {
-                f"{e.get('class')} ({e.get('rule_id')})"
-                for e in ev
-                if float(e.get("score") or 0) >= 0.8 and e.get("class") in ("STAR", "GALAXY", "QSO")
-            }
-        )
+        strong = sorted({f"{e.get('class')} ({e.get('rule_id')})" for e in ev
+                         if float(e.get("score") or 0) >= 0.8 and e.get("class") in ("STAR", "GALAXY", "QSO")})
         return "conflicting evidence: " + ", ".join(strong) if strong else "conflicting evidence"
     if status == "LOW_CONFIDENCE":
         p = {c: _num(row, f"p_{c.lower()}") for c in ("STAR", "GALAXY", "QSO")}

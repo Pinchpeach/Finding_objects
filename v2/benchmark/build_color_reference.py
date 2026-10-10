@@ -10,7 +10,6 @@ objects only, so calibration/test objects never appear in the reference.
         --catalog-root v2/benchmark/catalog_features v2/benchmark/desi_external/catalog_features \\
         --manifest <sdss benchmark_manifest.csv> <desi benchmark_manifest.csv>
 """
-
 from __future__ import annotations
 import argparse, tempfile
 from pathlib import Path
@@ -22,11 +21,9 @@ PRE = V2 / "Preprocess"
 
 def main():
     import sys
-
     sys.path.insert(0, str(PRE))
     import color_knn
     from fit_fusion_weights import load
-
     ap = argparse.ArgumentParser()
     ap.add_argument("--truth", type=Path, nargs="+", required=True)
     ap.add_argument("--catalog-root", type=Path, nargs="+", required=True)
@@ -40,8 +37,7 @@ def main():
     for t, root, man in zip(a.truth, a.catalog_root, a.manifest):
         raw = base.wide(pd.read_csv(t), base.read_catalogs(root))
         with tempfile.TemporaryDirectory() as td:
-            td = Path(td)
-            raw.to_csv(td / "o.csv", index=False)
+            td = Path(td); raw.to_csv(td / "o.csv", index=False)
             s3.run(td / "o.csv", PRE / "classification_rules.csv", td / "f.csv")
             f = pd.read_csv(td / "f.csv", low_memory=False)
         m = pd.read_csv(man)[["benchmark_id", "truth_class", "split"]]
@@ -50,9 +46,8 @@ def main():
         colours = pd.DataFrame(color_knn.color_matrix(f, allc), columns=allc, index=f.index)
         f = pd.concat([f[["benchmark_id"]], colours], axis=1).merge(m, on="benchmark_id")
         f = f[f.split.eq("train")]
-        usable = pd.concat(
-            [f[list(cs)].notna().sum(axis=1) >= color_knn.MIN_COLORS for cs in color_knn.COLOR_SETS.values()], axis=1
-        ).any(axis=1)
+        usable = pd.concat([f[list(cs)].notna().sum(axis=1) >= color_knn.MIN_COLORS
+                            for cs in color_knn.COLOR_SETS.values()], axis=1).any(axis=1)
         f = f[usable]
         f["dataset"] = t.parent.name
         parts.append(f.drop(columns="split"))

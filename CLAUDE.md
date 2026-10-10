@@ -14,8 +14,6 @@
 
 ## 작업 메모 (개발 환경)
 - 테스트: `cd v2 && python -m pytest -q Preprocess/tests Classifier/tests`
-- 서식: `python -m black v2` (설정은 `pyproject.toml`, 줄 길이 120). 공용 도우미는 `v2/common.py`(모듈 로더, 숫자·문자 변환, 빈 칸 없는 행 dict).
-- 파이프라인은 단계 사이 표를 메모리로 넘긴다. 중간 CSV가 필요하면 `python v2/pipeline.py ... --keep-intermediate`.
 - Coarse 벤치마크(로컬, 네트워크 불필요): 보존된 특징 `v2/benchmark/catalog_features/*.gz` 사용
   - `python v2/benchmark/validate_catalog_truth.py --truth v2/benchmark/truth_data/ground_truth.csv --catalog-root v2/benchmark/catalog_features --out /tmp/ready`
   - `python v2/benchmark/evaluate_rule_baseline.py --truth v2/benchmark/truth_data/ground_truth.csv --catalog-root v2/benchmark/catalog_features --manifest /tmp/ready/benchmark_manifest.csv --out /tmp/eval`

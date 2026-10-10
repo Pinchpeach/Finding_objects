@@ -3,7 +3,6 @@
 Uses the NOIRLab Astro Data Lab TAP service and the combined ls_dr10.tractor
 catalog (DR10 South + DR9 North).  No classification/truth labels are queried.
 """
-
 from pathlib import Path
 import pandas as pd
 
@@ -20,20 +19,16 @@ ATTEMPTS = 3
 
 def _query_with_retries(run):
     import threading, time
-
     last = None
     for attempt in range(ATTEMPTS):
         box = {}
-
         def target():
             try:
                 box["value"] = run()
             except BaseException as exc:  # reported below
                 box["error"] = exc
-
         t = threading.Thread(target=target, daemon=True)
-        t.start()
-        t.join(ATTEMPT_BUDGET_S)
+        t.start(); t.join(ATTEMPT_BUDGET_S)
         if "value" in box:
             return box["value"]
         last = box.get("error") or TimeoutError(f"Data Lab TAP exceeded {ATTEMPT_BUDGET_S:.0f} s")
@@ -44,7 +39,6 @@ def _query_with_retries(run):
 
 def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     import pyvo
-
     radius_deg = float(radius_arcmin) / 60.0
     # Keep the feature set compact and purely photometric/morphological.  In
     # particular, do not join spectroscopy or any truth/classification table.

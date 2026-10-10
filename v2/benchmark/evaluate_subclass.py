@@ -18,68 +18,33 @@ Writes ``subclass_metrics.json`` and, with ``--write-precision``, the
 per-rule precision measured on the train split into
 ``v2/Classifier/subclass_rule_precision.json`` (used as rule confidence).
 """
-
 from __future__ import annotations
-import argparse, json, sys
+import argparse, importlib.util, json, sys
 from pathlib import Path
 import numpy as np
 import pandas as pd
 
 V2 = Path(__file__).resolve().parents[1]
 BENCH = V2 / "benchmark"
-if str(V2) not in sys.path:
-    sys.path.insert(0, str(V2))
-from common import load_module  # noqa: E402
-
 FEATURES = {
-    "gaia_dr3": (
-        "gaia_dr3",
-        {
-            "bp_rp": "bp_rp",
-            "E(BP-RP)": "ebpminrp_gspphot",
-            "teff_gspphot": "teff_gspphot",
-            "logg_gspphot": "logg_gspphot",
-            "parallax": "parallax",
-            "parallax_error": "parallax_error",
-            "phot_g_mean_mag": "phot_g_mean_mag",
-            "pmra": "pmra",
-            "pmdec": "pmdec",
-            "ruwe": "ruwe",
-            "[Fe/H]": "mh_gspphot",
-            "AG": "ag_gspphot",
-        },
-    ),
-    "desi_legacy": (
-        "desi_legacy_surveys_dr10",
-        {
-            c: c
-            for c in (
-                "type",
-                "flux_g",
-                "flux_r",
-                "flux_i",
-                "flux_z",
-                "mw_transmission_g",
-                "mw_transmission_r",
-                "mw_transmission_z",
-            )
-        },
-    ),
-    "panstarrs1": (
-        "pan_starrs1_dr2_meanobject",
-        {c: c for c in ("gMeanPSFMag", "rMeanPSFMag", "iMeanPSFMag", "zMeanPSFMag", "rMeanKronMag")},
-    ),
-    "allwise": (
-        "allwise",
-        {c: c for c in ("W1mag", "W2mag", "W3mag", "e_W1mag", "e_W2mag", "e_W3mag", "Jmag", "Kmag")},
-    ),
+    "gaia_dr3": ("gaia_dr3", {"bp_rp": "bp_rp", "E(BP-RP)": "ebpminrp_gspphot", "teff_gspphot": "teff_gspphot",
+                              "logg_gspphot": "logg_gspphot", "parallax": "parallax", "parallax_error": "parallax_error",
+                              "phot_g_mean_mag": "phot_g_mean_mag", "pmra": "pmra", "pmdec": "pmdec",
+                              "ruwe": "ruwe", "[Fe/H]": "mh_gspphot", "AG": "ag_gspphot"}),
+    "desi_legacy": ("desi_legacy_surveys_dr10", {c: c for c in ("type", "flux_g", "flux_r", "flux_i", "flux_z",
+                                                                "mw_transmission_g", "mw_transmission_r", "mw_transmission_z")}),
+    "panstarrs1": ("pan_starrs1_dr2_meanobject", {c: c for c in ("gMeanPSFMag", "rMeanPSFMag", "iMeanPSFMag", "zMeanPSFMag",
+                                                                 "rMeanKronMag")}),
+    "allwise": ("allwise", {c: c for c in ("W1mag", "W2mag", "W3mag", "e_W1mag", "e_W2mag", "e_W3mag", "Jmag", "Kmag")}),
     "galex": ("galex_ais", {"NUVmag": "NUVmag", "E(B-V)": "E(B-V)"}),
     "twomass": ("2mass_psc", {"Kmag": "Kmag"}),
 }
 
 
 def load_subclass():
-    return load_module(V2 / "Classifier" / "subclass.py")
+    sys.path.insert(0, str(V2 / "Classifier"))
+    spec = importlib.util.spec_from_file_location("v2_subclass", V2 / "Classifier" / "subclass.py")
+    m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m); return m
 
 
 def frame(truth: pd.DataFrame, feature_dir: Path) -> pd.DataFrame:
@@ -98,18 +63,20 @@ def frame(truth: pd.DataFrame, feature_dir: Path) -> pd.DataFrame:
 def sdss_activity(sub) -> str:
     s = str(sub).upper()
     if s in ("", "NAN"):
-        return "QUIESCENT"  # no emission line strong enough to classify
+        return "QUIESCENT"          # no emission line strong enough to classify
     if "AGN" in s or "BROADLINE" in s:
         return "AGN"
-    return "STAR_FORMING"  # STARFORMING or STARBURST
+    return "STAR_FORMING"           # STARFORMING or STARBURST
 
 
 def load_physical():
-    return load_module(V2 / "Classifier" / "axes" / "physical.py")
+    spec = importlib.util.spec_from_file_location("v2_axis_physical", V2 / "Classifier" / "axes" / "physical.py")
+    m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m); return m
 
 
 def load_units():
-    return load_module(V2 / "Preprocess" / "units.py")
+    spec = importlib.util.spec_from_file_location("v2_units", V2 / "Preprocess" / "units.py")
+    m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m); return m
 
 
 def evaluate(rows: pd.DataFrame, sc, label: str) -> tuple[dict, pd.DataFrame]:
@@ -117,114 +84,74 @@ def evaluate(rows: pd.DataFrame, sc, label: str) -> tuple[dict, pd.DataFrame]:
     rows = load_units().harmonize(rows)
     recs = rows.to_dict("records")
     phys = load_physical()
-    for r in recs:  # the physical axis (WD locus) reads bare Gaia names
+    for r in recs:                     # the physical axis (WD locus) reads bare Gaia names
         for k in ("parallax", "parallax_error", "phot_g_mean_mag", "bp_rp", "teff_gspphot", "logg_gspphot"):
             r.setdefault(k, r.get(f"gaia_dr3__{k}"))
         if r.get("primary_class") == "STAR":
             ph = phys.classify(r)
             r["physical_class"], r["physical_confidence"] = ph.get("label"), ph.get("confidence")
     res = [sc.classify(r) for r in recs]
-    out = rows.assign(
-        rule=[r.get("rule") for r in res],
-        subclass=[r.get("subclass") for r in res],
-        spectral_type=[r.get("spectral_type") for r in res],
-        lum=[r.get("luminosity_class") for r in res],
-        activity=[r.get("activity") for r in res],
-        profile=[r.get("profile") for r in res],
-        tags=["|".join(t["tag"] for t in r.get("tags", [])) for r in res],
-    )
+    out = rows.assign(rule=[r.get("rule") for r in res], subclass=[r.get("subclass") for r in res],
+                      spectral_type=[r.get("spectral_type") for r in res], lum=[r.get("luminosity_class") for r in res],
+                      activity=[r.get("activity") for r in res], profile=[r.get("profile") for r in res],
+                      tags=["|".join(t["tag"] for t in r.get("tags", [])) for r in res])
     metrics = {"sample": label, "n": int(len(out))}
     stars = out[out.primary_class.eq("STAR")].copy()
     if len(stars):
         stars["truth_num"] = stars.truth_spt.map(sc.spt_number)
         stars["pred_num"] = stars.spectral_type.map(sc.spt_number)
         ok = stars.truth_num.notna() & stars.pred_num.notna()
-        dl = stars.truth_num // 10 - stars.pred_num // 10
+        dl = (stars.truth_num // 10 - stars.pred_num // 10)
         metrics["star"] = {
-            "with_mk_truth": int(stars.truth_num.notna().sum()),
-            "typed": int(ok.sum()),
+            "with_mk_truth": int(stars.truth_num.notna().sum()), "typed": int(ok.sum()),
             "coverage": round(float(ok.sum() / max(stars.truth_num.notna().sum(), 1)), 4),
             "letter_accuracy": round(float((dl[ok] == 0).mean()), 4) if ok.any() else None,
             "within_one_letter": round(float((dl[ok].abs() <= 1).mean()), 4) if ok.any() else None,
-            "median_abs_subtypes": (
-                round(float((stars.truth_num - stars.pred_num)[ok].abs().median()), 2) if ok.any() else None
-            ),
-            "by_rule": {},
-            "by_truth_letter": {},
+            "median_abs_subtypes": round(float((stars.truth_num - stars.pred_num)[ok].abs().median()), 2) if ok.any() else None,
+            "by_rule": {}, "by_truth_letter": {},
         }
         for rule, g in stars[ok].groupby("rule"):
-            d = g.truth_num // 10 - g.pred_num // 10
-            metrics["star"]["by_rule"][rule] = {
-                "n": int(len(g)),
-                "letter_accuracy": round(float((d == 0).mean()), 4),
-                "within_one_letter": round(float((d.abs() <= 1).mean()), 4),
-            }
+            d = (g.truth_num // 10 - g.pred_num // 10)
+            metrics["star"]["by_rule"][rule] = {"n": int(len(g)), "letter_accuracy": round(float((d == 0).mean()), 4),
+                                                "within_one_letter": round(float((d.abs() <= 1).mean()), 4)}
         for letter, g in stars[ok].groupby(stars.truth_num[ok] // 10):
-            d = g.truth_num // 10 - g.pred_num // 10
+            d = (g.truth_num // 10 - g.pred_num // 10)
             metrics["star"]["by_truth_letter"][sc.LETTERS[int(letter)]] = {
-                "n": int(len(g)),
-                "letter_accuracy": round(float((d == 0).mean()), 4),
-                "median_abs_subtypes": round(float((g.truth_num - g.pred_num).abs().median()), 2),
-            }
+                "n": int(len(g)), "letter_accuracy": round(float((d == 0).mean()), 4),
+                "median_abs_subtypes": round(float((g.truth_num - g.pred_num).abs().median()), 2)}
         km = ok & (stars.truth_num >= 50)
         if km.any():
             d = (stars.truth_num - stars.pred_num)[km]
-            metrics["star"]["K_M_truth"] = {
-                "n": int(km.sum()),
-                "median_abs_subtypes": round(float(d.abs().median()), 2),
-                "within_2_subtypes": round(float((d.abs() <= 2).mean()), 4),
-            }
+            metrics["star"]["K_M_truth"] = {"n": int(km.sum()), "median_abs_subtypes": round(float(d.abs().median()), 2),
+                                            "within_2_subtypes": round(float((d.abs() <= 2).mean()), 4)}
         metrics["star"]["luminosity_class_counts"] = stars.lum.value_counts(dropna=False).rename(str).to_dict()
         # Physical consistency checks without a truth label: GSP-Phot [M/H]
         # should fall from thin disc to halo, and subdwarfs should be metal-poor.
         mh = pd.to_numeric(stars.get("gaia_dr3__mh_gspphot"), errors="coerce")
         pop = stars.tags.str.extract(r"(THIN_DISC|THICK_DISC|HALO)")[0]
-        metrics["star"]["population"] = {
-            k: {
-                "n": int((pop == k).sum()),
-                "median_mh": round(float(mh[pop == k].median()), 2) if (pop == k).any() else None,
-            }
-            for k in ("THIN_DISC", "THICK_DISC", "HALO")
-        }
-        metrics["star"]["median_mh_by_lum"] = {
-            str(k): round(float(v), 2) for k, v in mh.groupby(stars.lum).median().items()
-        }
-        metrics["star"]["astrometric_binary_fraction"] = round(
-            float(stars.tags.str.contains("ASTROMETRIC_BINARY").mean()), 4
-        )
-        metrics["star"]["tag_counts"] = {
-            t: int(stars.tags.str.contains(t).sum())
-            for t in ("NEARBY", "HIGH_PM", "RED_CLUMP", "IR_EXCESS", "XRAY", "METAL_POOR")
-        }
+        metrics["star"]["population"] = {k: {"n": int((pop == k).sum()), "median_mh": round(float(mh[pop == k].median()), 2) if (pop == k).any() else None}
+                                         for k in ("THIN_DISC", "THICK_DISC", "HALO")}
+        metrics["star"]["median_mh_by_lum"] = {str(k): round(float(v), 2) for k, v in mh.groupby(stars.lum).median().items()}
+        metrics["star"]["astrometric_binary_fraction"] = round(float(stars.tags.str.contains("ASTROMETRIC_BINARY").mean()), 4)
+        metrics["star"]["tag_counts"] = {t: int(stars.tags.str.contains(t).sum()) for t in
+                                         ("NEARBY", "HIGH_PM", "RED_CLUMP", "IR_EXCESS", "XRAY", "METAL_POOR")}
         mp = stars.tags.str.contains("METAL_POOR")
-        metrics["star"]["metal_poor_population"] = (
-            stars.tags[mp].str.extract(r"(THIN_DISC|THICK_DISC|HALO)")[0].value_counts().to_dict()
-        )
+        metrics["star"]["metal_poor_population"] = stars.tags[mp].str.extract(r"(THIN_DISC|THICK_DISC|HALO)")[0].value_counts().to_dict()
         wd = stars.truth_spt.astype(str).str.upper().eq("WD")
         if wd.any():
-            metrics["star"]["wd_truth_typed_as_wd"] = round(
-                float(stars.subclass[wd].astype(str).str.startswith("White dwarf").mean()), 4
-            )
+            metrics["star"]["wd_truth_typed_as_wd"] = round(float(stars.subclass[wd].astype(str).str.startswith("White dwarf").mean()), 4)
     gals = out[out.primary_class.eq("GALAXY") & out.truth_activity.notna()].copy()
     if len(gals):
         # Green valley is a transition class with no SDSS counterpart: it is
         # reported by its truth mix, not scored.
         act = gals.activity.notna() & gals.activity.ne("GREEN_VALLEY")
-        metrics["galaxy"] = {
-            "n": int(len(gals)),
-            "activity_coverage": round(float(act.mean()), 4),
-            "activity_accuracy": (
-                round(float((gals.activity[act] == gals.truth_activity[act]).mean()), 4) if act.any() else None
-            ),
-            "by_rule": {},
-            "truth_mix": gals.truth_activity.value_counts().to_dict(),
-            "confusion": pd.crosstab(gals.truth_activity[act], gals.activity[act]).to_dict(),
-        }
+        metrics["galaxy"] = {"n": int(len(gals)), "activity_coverage": round(float(act.mean()), 4),
+                             "activity_accuracy": round(float((gals.activity[act] == gals.truth_activity[act]).mean()), 4)
+                             if act.any() else None, "by_rule": {},
+                             "truth_mix": gals.truth_activity.value_counts().to_dict(),
+                             "confusion": pd.crosstab(gals.truth_activity[act], gals.activity[act]).to_dict()}
         for rule, g in gals[act].groupby("rule"):
-            metrics["galaxy"]["by_rule"][rule] = {
-                "n": int(len(g)),
-                "precision": round(float((g.activity == g.truth_activity).mean()), 4),
-            }
+            metrics["galaxy"]["by_rule"][rule] = {"n": int(len(g)), "precision": round(float((g.activity == g.truth_activity).mean()), 4)}
         metrics["galaxy"]["profile_counts"] = gals.profile.value_counts(dropna=False).rename(str).to_dict()
         gv = gals.activity.eq("GREEN_VALLEY")
         metrics["galaxy"]["green_valley_truth_mix"] = gals.truth_activity[gv].value_counts().to_dict()
@@ -232,24 +159,17 @@ def evaluate(rows: pd.DataFrame, sc, label: str) -> tuple[dict, pd.DataFrame]:
             metrics["galaxy"][f"tag_{t}"] = int(gals.tags.str.contains(t).sum())
     q = out[out.primary_class.eq("QSO")]
     if len(q):
-        metrics["qso"] = {
-            "n": int(len(q)),
-            "with_luminosity": int(q.tags.str.contains("LUMINOSITY").sum()),
-            "obscured_candidates": int(q.tags.str.contains("OBSCURED").sum()),
-            "very_high_z": int(q.tags.str.contains("VERY_HIGH_Z").sum()),
-            "quasar_luminosity_fraction": round(
-                float(q.tags.str.contains("QUASAR_LUMINOSITY").sum() / max(q.tags.str.contains("LUMINOSITY").sum(), 1)),
-                4,
-            ),
-        }
+        metrics["qso"] = {"n": int(len(q)), "with_luminosity": int(q.tags.str.contains("LUMINOSITY").sum()),
+                          "obscured_candidates": int(q.tags.str.contains("OBSCURED").sum()),
+                          "very_high_z": int(q.tags.str.contains("VERY_HIGH_Z").sum()),
+                          "quasar_luminosity_fraction": round(float(q.tags.str.contains("QUASAR_LUMINOSITY").sum() /
+                                                                     max(q.tags.str.contains("LUMINOSITY").sum(), 1)), 4)}
     return metrics, out
 
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument(
-        "--manifest", type=Path, help="benchmark_manifest.csv (validate_catalog_truth.py) for train/test splits"
-    )
+    p.add_argument("--manifest", type=Path, help="benchmark_manifest.csv (validate_catalog_truth.py) for train/test splits")
     p.add_argument("--out", type=Path, default=Path("/tmp/subclass_eval"))
     p.add_argument("--write-precision", action="store_true")
     a = p.parse_args()
@@ -273,8 +193,7 @@ def main():
     for split in ("train", "test"):
         part = sdss[sdss.split.eq(split)] if split in set(sdss.split) else sdss
         m, tab = evaluate(part, sc, f"SDSS {split}")
-        report[f"sdss_{split}"] = m
-        tables.append(tab.assign(sample=f"sdss_{split}"))
+        report[f"sdss_{split}"] = m; tables.append(tab.assign(sample=f"sdss_{split}"))
 
     dt = pd.read_csv(BENCH / "desi_external" / "truth.csv")
     desi = frame(dt, BENCH / "desi_external" / "catalog_features")
@@ -283,43 +202,18 @@ def main():
     desi["truth_activity"] = None
     desi["desi_dr1_spectroscopy__z"] = np.where(desi.truth_class.ne("STAR"), desi.z, np.nan)
     m, tab = evaluate(desi, sc, "DESI DR1 (independent)")
-    report["desi"] = m
-    tables.append(tab.assign(sample="desi"))
+    report["desi"] = m; tables.append(tab.assign(sample="desi"))
 
     (a.out / "subclass_metrics.json").write_text(json.dumps(report, indent=2, default=str))
-    keep = [
-        "benchmark_id",
-        "sample",
-        "primary_class",
-        "truth_spt",
-        "truth_activity",
-        "rule",
-        "subclass",
-        "spectral_type",
-        "lum",
-        "activity",
-        "profile",
-        "tags",
-    ]
+    keep = ["benchmark_id", "sample", "primary_class", "truth_spt", "truth_activity", "rule", "subclass", "spectral_type", "lum", "activity", "profile", "tags"]
     pd.concat(tables)[keep].to_csv(a.out / "subclass_predictions.csv", index=False)
-    print(
-        json.dumps(
-            {k: {kk: v.get(kk) for kk in ("star", "galaxy", "qso") if kk in v} for k, v in report.items()},
-            indent=1,
-            default=str,
-        )[:9000]
-    )
+    print(json.dumps({k: {kk: v.get(kk) for kk in ("star", "galaxy", "qso") if kk in v} for k, v in report.items()}, indent=1, default=str)[:9000])
     if a.write_precision:
         tr = report["sdss_train"]
         prec = {r: v["letter_accuracy"] for r, v in tr.get("star", {}).get("by_rule", {}).items() if v["n"] >= 30}
         prec.update({r: v["precision"] for r, v in tr.get("galaxy", {}).get("by_rule", {}).items() if v["n"] >= 30})
         path = V2 / "Classifier" / "subclass_rule_precision.json"
-        path.write_text(
-            json.dumps(
-                {"source": "SDSS DR18 benchmark train split (evaluate_subclass.py)", "precision": prec}, indent=2
-            )
-            + "\n"
-        )
+        path.write_text(json.dumps({"source": "SDSS DR18 benchmark train split (evaluate_subclass.py)", "precision": prec}, indent=2) + "\n")
         print("wrote", path)
 
 
