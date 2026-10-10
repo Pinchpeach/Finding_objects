@@ -199,13 +199,13 @@ ASU_CATALOGS = {   # name: (VizieR table, radius arcsec, columns, renames)
 }
 
 
-def vizier_asu(df: pd.DataFrame, chunk: int = 500) -> pd.DataFrame:
+def vizier_asu(df: pd.DataFrame, chunk: int = 500, catalogs: dict | None = None) -> pd.DataFrame:
     """Multi-position cone searches on the standard VizieR service (the route that
     fetched the Suh tables; TAPVizieR uploads failed).  Nearest source per star."""
     from astroquery.vizier import Vizier
     from astropy.coordinates import SkyCoord
     import astropy.units as u
-    for name, (table, radius, cols, ren) in ASU_CATALOGS.items():
+    for name, (table, radius, cols, ren) in (catalogs or ASU_CATALOGS).items():
         v = Vizier(columns=cols + ["+_r"], row_limit=-1, timeout=600)
         parts = []
         for s0 in range(0, len(df), chunk):
