@@ -47,6 +47,13 @@ def _single(row, cat):
         n = _num(row, "pan_starrs1_dr2_meanobject__nDetections")
         if not valid:
             return "Pan-STARRS1 detection without valid mean photometry" + (f" ({int(n)} detections)" if n is not None else "")
+        bands = [b for b in "grizy" if _num(row, f"std_mag__ps1_{b}") is not None]
+        i = _num(row, "std_mag__ps1_i")
+        if len(bands) < 3:
+            return (f"Pan-STARRS1 only, measured in {len(bands)} band{'s' if len(bands) != 1 else ''} ({''.join(bands)})"
+                    + (f", {int(n)} detections" if n is not None else ""))
+        if i is None or not 14 <= i <= 21:
+            return "Pan-STARRS1 only, i outside 14-21 (morphology not used); colours inconclusive"
         return "Pan-STARRS1 only; morphology and colours inconclusive"
     if cat == "SDSS DR18 PhotoObj":
         r = _num(row, "std_mag__sdss_r")
