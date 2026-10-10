@@ -5,13 +5,13 @@ name: Build AGB chemistry truth
 # AGB chemistry rules of Classifier/subclass.py can be validated offline.
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - .github/workflows/build-agb-chemistry-truth.yml
-      - v2/benchmark/build_agb_chemistry_truth.py
+    inputs:
+      source:
+        description: "photometry service: gaia (Gaia archive) or vizier (TAPVizieR)"
+        default: gaia
 
 concurrency:
-  group: build-agb-chemistry-truth-${{ github.ref }}
+  group: build-agb-chemistry-truth-${{ github.ref }}-${{ inputs.source || 'gaia' }}
   cancel-in-progress: true
 
 jobs:
@@ -27,7 +27,7 @@ jobs:
           python-version: "3.11"
       - run: pip install pandas numpy astropy astroquery
       - name: Build
-        run: python -u v2/benchmark/build_agb_chemistry_truth.py
+        run: python -u v2/benchmark/build_agb_chemistry_truth.py --source "${{ inputs.source || 'gaia' }}"
       - name: Summary
         run: |
           python - <<'PY'

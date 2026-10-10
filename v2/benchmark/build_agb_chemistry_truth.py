@@ -126,11 +126,72 @@ def gaia_tap(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+VIZIER_TAP = "https://tapvizier.cds.unistra.fr/TAPVizieR/tap"
+VIZIER_Q = {
+    "gaia": """SELECT u.agb_id, g.Source AS g_source_id, g.Gmag AS g_gmag, g.BPmag AS g_bp, g.RPmag AS g_rp,
+       g.Plx AS g_plx, g.e_Plx AS g_eplx, g.RUWE AS g_ruwe,
+       DISTANCE(POINT('ICRS', u.ra, u.dec), POINT('ICRS', g.RA_ICRS, g.DE_ICRS)) * 3600 AS g_sep
+FROM TAP_UPLOAD.ids AS u JOIN "I/355/gaiadr3" AS g
+  ON 1 = CONTAINS(POINT('ICRS', g.RA_ICRS, g.DE_ICRS), CIRCLE('ICRS', u.ra, u.dec, 2.0 / 3600.0))""",
+    "2mass": """SELECT u.agb_id, t.Jmag AS tm_j, t.Hmag AS tm_h, t.Kmag AS tm_ks, t.Qflg AS tm_qual,
+       DISTANCE(POINT('ICRS', u.ra, u.dec), POINT('ICRS', t.RAJ2000, t.DEJ2000)) * 3600 AS tm_sep
+FROM TAP_UPLOAD.ids AS u JOIN "II/246/out" AS t
+  ON 1 = CONTAINS(POINT('ICRS', t.RAJ2000, t.DEJ2000), CIRCLE('ICRS', u.ra, u.dec, 2.0 / 3600.0))""",
+    "allwise": """SELECT u.agb_id, w.W1mag AS aw_w1, w.e_W1mag AS aw_ew1, w.W2mag AS aw_w2, w.e_W2mag AS aw_ew2,
+       w.W3mag AS aw_w3, w.e_W3mag AS aw_ew3, w.W4mag AS aw_w4, w.e_W4mag AS aw_ew4,
+       DISTANCE(POINT('ICRS', u.ra, u.dec), POINT('ICRS', w.RAJ2000, w.DEJ2000)) * 3600 AS aw_sep
+FROM TAP_UPLOAD.ids AS u JOIN "II/328/allwise" AS w
+  ON 1 = CONTAINS(POINT('ICRS', w.RAJ2000, w.DEJ2000), CIRCLE('ICRS', u.ra, u.dec, 1.0 / 3600.0))""",
+}
+VIZIER_LPV_Q = """SELECT u.agb_id, v.isCstar AS lpv_is_cstar, v.Freq AS lpv_frequency, v.Amp AS lpv_amplitude
+FROM TAP_UPLOAD.ids AS u JOIN "I/358/vlpv" AS v ON v.Source = u.g_source_id"""
+
+
+def vizier_tap(df: pd.DataFrame, chunk: int = 2000) -> pd.DataFrame:
+    """Same columns from TAPVizieR (positional joins: Gaia 2", 2MASS 2", AllWISE 1";
+    Gaia DR3 LPV I/358/vlpv by Gaia source id).  Fallback when the Gaia archive is down."""
+    import pyvo
+    from astropy.table import Table
+    svc = pyvo.dal.TAPService(VIZIER_TAP)
+
+    def run(query, table, name):
+        parts = []
+        for s0 in range(0, len(table), chunk):
+            part = Table.from_pandas(table.iloc[s0:s0 + chunk])
+            t0 = time.time()
+            try:
+                res = retry(lambda: svc.run_async(query, uploads={"ids": part}).to_table().to_pandas(), tries=3)
+            except Exception as exc:
+                print(f"{name}: rows {s0}+ failed: {str(exc)[:200]}", flush=True)
+                continue
+            print(f"{name}: rows {s0}-{s0 + len(part)}: {len(res)} in {time.time() - t0:.0f} s", flush=True)
+            parts.append(res)
+        return pd.concat(parts, ignore_index=True) if parts else None
+
+    base = df[["agb_id", "ra", "dec"]]
+    for name, q in VIZIER_Q.items():
+        res = run(q, base, name)
+        if res is None:
+            continue
+        sep = [c for c in res.columns if c.endswith("_sep")]
+        res = res.sort_values(sep[0]).drop_duplicates("agb_id") if sep else res.drop_duplicates("agb_id")
+        df = df.merge(res, on="agb_id", how="left")
+    if "g_source_id" in df:
+        ids = df.dropna(subset=["g_source_id"])[["agb_id", "g_source_id"]].copy()
+        ids["g_source_id"] = ids["g_source_id"].astype("int64")
+        res = run(VIZIER_LPV_Q, ids, "lpv")
+        if res is not None:
+            df = df.merge(res.drop_duplicates("agb_id"), on="agb_id", how="left")
+    return df
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--out", type=Path, default=Path(__file__).resolve().parent / "agb_truth" / "agb_chemistry_truth.csv.gz")
+    p.add_argument("--source", choices=("gaia", "vizier"), default="gaia",
+                   help="photometry service: the Gaia archive, or TAPVizieR when the Gaia archive is down")
     a = p.parse_args()
-    df = gaia_tap(labels())
+    df = (gaia_tap if a.source == "gaia" else vizier_tap)(labels())
     a.out.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(a.out, index=False, compression="gzip")
     print(df.chem.value_counts().to_dict(), "->", a.out)
