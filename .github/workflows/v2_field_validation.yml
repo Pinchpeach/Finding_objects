@@ -115,8 +115,8 @@ jobs:
           wd=st[st.desi_type.eq("WD")]
           if len(wd): print("DESI WD typed STAR:WD:", int(wd.subclass_code.eq("STAR:WD").sum()), "/", len(wd))
           gal=top[top.primary_class.eq("GALAXY")]
-          n=pd.to_numeric(gal.get("desi_legacy_surveys_dr10__sersic"),errors="coerce")
-          u=pd.to_numeric(gal.get("sdss_dr18_photoobj__modelMag_u"),errors="coerce"); r=pd.to_numeric(gal.get("sdss_dr18_photoobj__modelMag_r"),errors="coerce")
+          n=pd.to_numeric(gal.get("desi_legacy_surveys_dr10__sersic",pd.Series(index=gal.index,dtype=float)),errors="coerce")
+          u=pd.to_numeric(gal.get("sdss_dr18_photoobj__modelMag_u",pd.Series(index=gal.index,dtype=float)),errors="coerce"); r=pd.to_numeric(gal.get("sdss_dr18_photoobj__modelMag_r",pd.Series(index=gal.index,dtype=float)),errors="coerce")
           both=n.notna()&(n>0)&u.notna()&r.notna()&gal.get("desi_legacy_surveys_dr10__type",pd.Series(index=gal.index)).astype(str).eq("SER")
           print("LS sersic present for galaxies:", int((n>0).sum()), "/", len(gal))
           if both.any(): print(f"Sersic n>=2.5 vs SDSS u-r>=2.22 agreement: n={int(both.sum())} agree={float(((n[both]>=2.5)==((u-r)[both]>=2.22)).mean()):.3f}")
