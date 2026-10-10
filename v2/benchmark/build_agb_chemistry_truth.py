@@ -58,43 +58,72 @@ def labels() -> pd.DataFrame:
     return df
 
 
-def gaia_tap(df: pd.DataFrame, chunk: int = 2000) -> pd.DataFrame:
-    """Gaia DR3, 2MASS, AllWISE and Gaia LPV columns for the Suh stars.
-
-    Indexed route of the Gaia archive (Marrese et al. 2019 best-neighbour
-    tables): a 2" positional join to gaia_source (Q3C index), then
-    tmass_psc_xsc_best_neighbour -> tmass_psc_xsc_join -> tmass_original_valid
-    and allwise_best_neighbour -> allwise_original_valid by their keys.
-    Joining the 2MASS designation strings directly scanned the whole table.
-    """
-    from astroquery.gaia import Gaia
-    from astropy.table import Table
-    q = """SELECT u.agb_id, g.source_id AS g_source_id, DISTANCE(POINT(u.ra, u.dec), POINT(g.ra, g.dec)) * 3600 AS g_sep,
+GAIA_Q = """SELECT u.agb_id, g.source_id AS g_source_id,
+       DISTANCE(POINT(u.ra, u.dec), POINT(g.ra, g.dec)) * 3600 AS g_sep,
        g.phot_g_mean_mag AS g_gmag, g.phot_bp_mean_mag AS g_bp, g.phot_rp_mean_mag AS g_rp,
        g.parallax AS g_plx, g.parallax_error AS g_eplx, g.ruwe AS g_ruwe,
-       tm.j_m AS tm_j, tm.h_m AS tm_h, tm.ks_m AS tm_ks, tm.ph_qual AS tm_qual,
-       aw.w1mpro AS aw_w1, aw.w1mpro_error AS aw_ew1, aw.w2mpro AS aw_w2, aw.w2mpro_error AS aw_ew2,
-       aw.w3mpro AS aw_w3, aw.w3mpro_error AS aw_ew3, aw.w4mpro AS aw_w4, aw.w4mpro_error AS aw_ew4,
        l.is_cstar AS lpv_is_cstar, l.frequency AS lpv_frequency, l.amplitude AS lpv_amplitude
 FROM tap_upload.ids AS u
 JOIN gaiadr3.gaia_source AS g ON 1 = CONTAINS(POINT(g.ra, g.dec), CIRCLE(u.ra, u.dec, 2.0 / 3600.0))
-LEFT JOIN gaiadr3.tmass_psc_xsc_best_neighbour AS xn ON xn.source_id = g.source_id
-LEFT JOIN gaiadr3.tmass_psc_xsc_join AS xj ON xj.clean_tmass_psc_xsc_oid = xn.clean_tmass_psc_xsc_oid
-LEFT JOIN gaiadr1.tmass_original_valid AS tm ON tm.tmass_oid = xj.original_psc_source_id
-LEFT JOIN gaiadr3.allwise_best_neighbour AS an ON an.source_id = g.source_id
-LEFT JOIN gaiadr1.allwise_original_valid AS aw ON aw.allwise_oid = an.allwise_oid
 LEFT JOIN gaiadr3.vari_long_period_variable AS l ON l.source_id = g.source_id"""
+# Gaia archive documentation: tmass_psc_xsc_join.original_psc_source_id is the
+# 2MASS designation (joins tmass_original_valid.designation).
+TMASS_Q = """SELECT u.agb_id, tm.j_m AS tm_j, tm.h_m AS tm_h, tm.ks_m AS tm_ks, tm.ph_qual AS tm_qual
+FROM tap_upload.ids AS u
+JOIN gaiadr3.tmass_psc_xsc_best_neighbour AS xn ON xn.source_id = u.g_source_id
+JOIN gaiadr3.tmass_psc_xsc_join AS xj ON xj.clean_tmass_psc_xsc_oid = xn.clean_tmass_psc_xsc_oid
+JOIN gaiadr1.tmass_original_valid AS tm ON tm.designation = xj.original_psc_source_id"""
+WISE_Q = """SELECT u.agb_id, aw.w1mpro AS aw_w1, aw.w1mpro_error AS aw_ew1, aw.w2mpro AS aw_w2, aw.w2mpro_error AS aw_ew2,
+       aw.w3mpro AS aw_w3, aw.w3mpro_error AS aw_ew3, aw.w4mpro AS aw_w4, aw.w4mpro_error AS aw_ew4
+FROM tap_upload.ids AS u
+JOIN gaiadr3.allwise_best_neighbour AS an ON an.source_id = u.g_source_id
+JOIN gaiadr1.allwise_original_valid AS aw ON aw.allwise_oid = an.allwise_oid"""
+
+
+def _run(query: str, table: pd.DataFrame, name: str, chunk: int = 2000):
+    """Run ``query`` on ``table`` uploaded in chunks; a 50-row probe first, so a
+    query error shows up in seconds.  Returns a DataFrame or None."""
+    from astroquery.gaia import Gaia
+    from astropy.table import Table
+    def one(part):
+        return Gaia.launch_job_async(query, upload_resource=Table.from_pandas(part),
+                                     upload_table_name="ids").get_results().to_pandas()
+    try:
+        probe = one(table.head(50))
+        print(f"{name}: probe ok ({len(probe)} rows from 50)", flush=True)
+    except Exception as exc:
+        print(f"{name}: probe failed: {type(exc).__name__}: {str(exc)[:300]}", flush=True)
+        return None
     parts = []
-    for s0 in range(0, len(df), chunk):
-        up = Table.from_pandas(df[["agb_id", "ra", "dec"]].iloc[s0:s0 + chunk])
+    for s0 in range(0, len(table), chunk):
+        part = table.iloc[s0:s0 + chunk]
         t0 = time.time()
-        res = retry(lambda: Gaia.launch_job_async(q, upload_resource=up, upload_table_name="ids").get_results(),
-                    tries=3).to_pandas()
-        print(f"rows {s0}-{s0 + len(up)}: {len(res)} matches in {time.time() - t0:.0f} s", flush=True)
+        try:
+            res = retry(lambda: one(part), tries=3)
+        except Exception as exc:
+            print(f"{name}: rows {s0}+ failed: {str(exc)[:200]}", flush=True)
+            continue
+        print(f"{name}: rows {s0}-{s0 + len(part)}: {len(res)} in {time.time() - t0:.0f} s", flush=True)
         parts.append(res)
-    res = pd.concat(parts, ignore_index=True).sort_values("g_sep").drop_duplicates("agb_id")
-    print(f"Gaia matches: {len(res)} / {len(df)}", flush=True)
-    return df.merge(res, on="agb_id", how="left")
+    return pd.concat(parts, ignore_index=True) if parts else None
+
+
+def gaia_tap(df: pd.DataFrame) -> pd.DataFrame:
+    """Gaia DR3 (2" from the AllWISE position) with the Gaia LPV C-star flag, then
+    2MASS and AllWISE photometry of that Gaia source through the archive's
+    best-neighbour tables (Marrese et al. 2019).  Each part is optional."""
+    g = _run(GAIA_Q, df[["agb_id", "ra", "dec"]], "gaia")
+    if g is None:
+        return df
+    g = g.sort_values("g_sep").drop_duplicates("agb_id")
+    df = df.merge(g, on="agb_id", how="left")
+    ids = df.dropna(subset=["g_source_id"])[["agb_id", "g_source_id"]].copy()
+    ids["g_source_id"] = ids["g_source_id"].astype("int64")
+    for q, name in ((TMASS_Q, "2mass"), (WISE_Q, "allwise")):
+        res = _run(q, ids, name)
+        if res is not None:
+            df = df.merge(res.drop_duplicates("agb_id"), on="agb_id", how="left")
+    return df
 
 
 def main():
