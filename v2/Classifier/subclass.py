@@ -385,6 +385,100 @@ def star_tags(row):
     return tags
 
 
+# ------------------------------------------------------------ AGB chemistry
+# AGB stars are oxygen-rich (C/O < 1; silicate dust, M-type spectra) or
+# carbon-rich (C/O > 1; amorphous-carbon/SiC dust, C-type spectra) after third
+# dredge-up.  Order of evidence: spectra / curated types, the Suh (2021)
+# catalogue, the Gaia DR3 RP-spectrum C-star flag, then photometry.  The
+# photometric criteria are only applied to AGB candidates (long-period
+# variables or AGB physical class): on ordinary stars the same colours mean
+# nothing (benchmark stars with J-Ks >= 1 mostly have W_RP - W_KJ >= 0.9).
+#
+# * Gaia-2MASS Wesenheit difference (Lebzelter et al. 2018, A&A 616, L13):
+#   W_RP = G_RP - 1.3 (G_BP - G_RP), W_KJ = Ks - 0.686 (J - Ks); C-rich above
+#   ~0.9 mag and extreme (dust-enshrouded) C-rich above ~1.7 mag for Galactic
+#   LPVs (Mowlavi et al. 2019; Abia et al. 2020, A&A 633, A135).
+# * AllWISE colours (Lian et al. 2014, A&A 564, A84): the line
+#   W1-W2 = 2.35 (W3-W4) - 1.24 separates 87 % of O-rich and 86 % of C-rich
+#   AGB stars; used when Gaia/2MASS photometry is missing (dusty stars).
+# * Silicate (dusty O-rich) AGB: O-rich with a mid-IR dust excess, Ks - W3 above
+#   the stellar photosphere (Suh 2021 two-colour diagrams).
+AGB_DW_C, AGB_DW_XC = 0.9, 1.7
+AGB_DUST_KW3 = 1.0
+AGB_VARIABILITY = {"LPV", "MIRA"}
+SIMBAD_AGB = {"AGB*", "C*", "S*", "Mi*", "LP*", "OH*", "pA*"}
+
+
+def wesenheit_dw(row):
+    """W_RP - W_KJ (Gaia RP/BP Vega, 2MASS J/Ks Vega), or None."""
+    rp = _num(row, "gaia_dr3__phot_rp_mean_mag", "phot_rp_mean_mag")
+    bp = _num(row, "gaia_dr3__phot_bp_mean_mag", "phot_bp_mean_mag")
+    j = _num(row, "2mass_psc__Jmag", "allwise__Jmag")
+    k = _num(row, "2mass_psc__Kmag", "allwise__Kmag")
+    if None in (rp, bp, j, k):
+        return None
+    return (rp - 1.3 * (bp - rp)) - (k - 0.686 * (j - k))
+
+
+def agb_candidate(row):
+    """Why the object counts as an AGB candidate, or None."""
+    if str(row.get("physical_class") or "") == "AGB":
+        return "physical axis AGB"
+    var = str(row.get("variability_class") or "")
+    if var in AGB_VARIABILITY:
+        return f"{var} variable"
+    if _num(row, "gaia_lpv_frequency", "gaia_lpv_amplitude") is not None:
+        return "Gaia DR3 long-period variable"
+    ot = _text(row, "simbad__otype")
+    if ot in SIMBAD_AGB:
+        return f"SIMBAD type {ot}"
+    return None
+
+
+def agb_chemistry(row):
+    """{'chem': 'C'|'O'|'S', 'rule', 'basis', 'extreme', 'dusty'} or None."""
+    sp = _text(row, "simbad__sp_type") or ""
+    ot = _text(row, "simbad__otype") or ""
+    out = None
+    if re.match(r"^C[-\d(]|^C$|^C-?[NRJH]", sp) or ot == "C*":
+        out = {"chem": "C", "rule": "SIMBAD_CSTAR", "basis": f"SIMBAD {'type C*' if ot == 'C*' else 'spectral type ' + sp}"}
+    elif re.match(r"^(MS|SC|S)([\d(/ -]|$)", sp) or ot == "S*":
+        out = {"chem": "S", "rule": "SIMBAD_SSTAR", "basis": f"SIMBAD {'type S*' if ot == 'S*' else 'spectral type ' + sp}"}
+    if out is None:
+        sub = (_text(row, "suh_2021_agb_catalog__agb_subclass", "agb_subclass") or "").upper()
+        if sub.startswith(("CAGB", "OAGB")):
+            out = {"chem": sub[0], "rule": "SUH2021", "basis": f"Suh (2021) catalogue {sub}"}
+    if out is None and _num(row, "gaia_lpv_is_cstar") == 1:
+        out = {"chem": "C", "rule": "GAIA_LPV_CSTAR",
+               "basis": "Gaia DR3 LPV RP-spectrum C-star flag (Lebzelter et al. 2023)"}
+    gate = agb_candidate(row)
+    dw = wesenheit_dw(row)
+    if out is None and gate:
+        if dw is not None:
+            out = {"chem": "C" if dw >= AGB_DW_C else "O", "rule": "GAIA_2MASS_WESENHEIT",
+                   "basis": f"{gate}; W_RP - W_KJ = {dw:.2f} ({'>=' if dw >= AGB_DW_C else '<'} {AGB_DW_C}, Lebzelter+2018)"}
+        else:
+            w1, w2, w3, w4 = (_wise_vega(row, b) for b in (1, 2, 3, 4))
+            if None not in (w1, w2, w3, w4):
+                line = 2.35 * (w3 - w4) - 1.24
+                chem = "C" if w1 - w2 > line else "O"
+                out = {"chem": chem, "rule": "WISE_LIAN14",
+                       "basis": f"{gate}; W1-W2 = {w1 - w2:.2f} vs 2.35(W3-W4)-1.24 = {line:.2f} (Lian+2014)"}
+    if out is None:
+        return None
+    out["agb_candidate"] = gate
+    out["extreme"] = out["chem"] == "C" and dw is not None and dw >= AGB_DW_XC
+    k = _num(row, "2mass_psc__Kmag", "allwise__Kmag")
+    w3 = _wise_vega(row, 3)
+    out["dusty"] = k is not None and w3 is not None and k - w3 > AGB_DUST_KW3
+    out["k_w3"] = None if k is None or w3 is None else k - w3
+    return out
+
+
+AGB_NAME = {"C": ("Carbon star (C-rich AGB)", "STAR:C:AGB"), "O": ("O-rich AGB star", "STAR:M:AGB"),
+            "S": ("S-type star (C/O ~ 1, AGB)", "STAR:S:AGB")}
+
+
 LUM_NAME = {"V": "dwarf", "IV": "subgiant", "III": "giant", "II": "bright giant", "Ib": "supergiant",
             "Ia": "supergiant", "VI": "subdwarf"}
 
@@ -405,6 +499,17 @@ def classify_star(row):
         sub = row.get("physical_subtype")
         return _result("White dwarf" + (f" ({sub})" if isinstance(sub, str) and sub else ""), "STAR:WD",
                        _num(row, "physical_confidence"), "WD_LOCUS", "physical axis: Gaia WD locus / DSC")
+    agb = agb_chemistry(row)
+    if agb is not None:
+        name, code = AGB_NAME[agb["chem"]]
+        if agb["chem"] == "O" and agb["dusty"]:
+            name = "O-rich AGB star with silicate dust"
+        elif agb["chem"] == "C" and agb["extreme"]:
+            name = "Extreme (dust-enshrouded) carbon star"
+        if agb["chem"] != "S" and not agb.get("agb_candidate") and agb["rule"].startswith("SIMBAD"):
+            name = name.replace(" (C-rich AGB)", "")      # carbon dwarfs / CH stars are not AGB stars
+            code = code.replace(":AGB", ":?")
+        return _result(name, code, RULE_PRECISION.get(agb["rule"]), agb["rule"], agb["basis"], agb_chemistry=agb["chem"])
     num, lum, rule, basis = star_spectral_type(row)
     if num is None:
         return _result(None, None, None, None, basis, status="NO_SPECTRAL_INFORMATION")

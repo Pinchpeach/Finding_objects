@@ -175,3 +175,30 @@ def test_unknown_reason_explains_abstentions():
     assert "beyond the r = 22.2" in out.loc[1, "unknown_reason"]
     assert out.loc[2, "unknown_reason"].startswith("STAR or QSO")
     assert pd.isna(out.loc[3, "unknown_reason"])
+
+
+def test_agb_chemistry_rules():
+    sc = _sc()
+    base = {"primary_class": "STAR", "variability_class": "LPV"}
+    # Gaia-2MASS Wesenheit: RP - 1.3 (BP - RP) - (Ks - 0.686 (J - Ks))
+    c = dict(base, **{"gaia_dr3__phot_bp_mean_mag": 14.0, "gaia_dr3__phot_rp_mean_mag": 10.5,
+                      "2mass_psc__Jmag": 7.5, "2mass_psc__Kmag": 5.5})          # dW = 6.0 - 4.128 = 1.87
+    r = sc.classify(c)
+    assert r["code"] == "STAR:C:AGB" and r["rule"] == "GAIA_2MASS_WESENHEIT" and r["subclass"].startswith("Extreme")
+    o = dict(base, **{"gaia_dr3__phot_bp_mean_mag": 10.0, "gaia_dr3__phot_rp_mean_mag": 8.0,
+                      "2mass_psc__Jmag": 7.0, "2mass_psc__Kmag": 5.8,            # dW = 5.40 - 4.98 = 0.42 -> O-rich
+                      "allwise__W3mag": 4.2, "allwise__e_W3mag": 0.02})          # Ks - W3 = 1.6: dust
+    r = sc.classify(o)
+    assert r["code"] == "STAR:M:AGB" and "silicate" in r["subclass"]
+    # Without an AGB candidate gate the photometric criteria are not applied.
+    plain = {k: v for k, v in c.items() if k != "variability_class"}
+    assert sc.classify(plain)["rule"] != "GAIA_2MASS_WESENHEIT"
+    # Catalogue / spectral labels win over photometry.
+    assert sc.classify(dict(o, suh_2021_agb_catalog__agb_subclass="CAGB_WISE"))["code"] == "STAR:C:AGB"
+    assert sc.classify(dict(base, gaia_lpv_is_cstar=1))["rule"] == "GAIA_LPV_CSTAR"
+    assert sc.classify(dict(base, simbad__sp_type="S4/3"))["code"] == "STAR:S:AGB"
+    # A carbon dwarf / CH star from SIMBAD without AGB evidence is not called AGB.
+    assert sc.classify({"primary_class": "STAR", "simbad__sp_type": "C-H4"})["code"] == "STAR:C:?"
+    # WISE fallback (no Gaia/2MASS): Lian et al. 2014 line
+    w = dict(base, **{"allwise__W1mag": 6.0, "allwise__W2mag": 4.6, "allwise__W3mag": 3.5, "allwise__W4mag": 3.2})
+    assert sc.classify(w)["rule"] == "WISE_LIAN14"
