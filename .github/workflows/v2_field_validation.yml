@@ -158,10 +158,10 @@ jobs:
               print(round(float(r.get("match_separation_arcsec") or float("nan")),2), round(float(r.get("combined_sigma_arcsec") or float("nan")),2),
                     "|", sorted({(c,o,round(x,2)) for c,o,x in zip(nb.catalog,nb.object_id,nb.sep)}, key=lambda t:t[2])[:6])
           import glob, numpy as np
-          print(pd.read_csv(glob.glob("/tmp/field/raw/collection_summary_*.csv")[0])[["collector","status","rows","elapsed_seconds"]].to_string(index=False))
-          if not glob.glob("/tmp/field/raw/desi_legacy_*.csv"): raise SystemExit("Legacy Surveys collection failed in this run")
-          ls=pd.read_csv(glob.glob("/tmp/field/raw/desi_legacy_*.csv")[0],low_memory=False)
-          ds=pd.read_csv(glob.glob("/tmp/field/raw/desi_spectroscopy_*.csv")[0],low_memory=False)
+          print(pd.read_csv(glob.glob("/tmp/field/raw/**/collection_summary_*.csv",recursive=True)[0])[["collector","status","rows","elapsed_seconds"]].to_string(index=False))
+          if not glob.glob("/tmp/field/raw/**/desi_legacy_*.csv",recursive=True): raise SystemExit("Legacy Surveys collection failed in this run")
+          ls=pd.read_csv(glob.glob("/tmp/field/raw/**/desi_legacy_*.csv",recursive=True)[0],low_memory=False)
+          ds=pd.read_csv(glob.glob("/tmp/field/raw/**/desi_spectroscopy_*.csv",recursive=True)[0],low_memory=False)
           print("\nLS rows",len(ls),"DESI rows",len(ds), "LS release values", ls.get("release",pd.Series()).value_counts().head().to_dict())
           cosd=np.cos(np.radians(43.0))
           sep=[np.min(np.hypot((ls.ra-r)*cosd,ls.dec-d))*3600 for r,d in zip(ds.ra,ds.dec)]

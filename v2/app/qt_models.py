@@ -112,7 +112,8 @@ class ResultsFilter(QSortFilterProxyModel):
         self._status = "ALL"
         self._text = ""
         self._components = False
-        self._a_cls = self._a_status = self._a_text = None
+        self._a_cls = self._a_status = self._a_text = self._a_part = None
+        self._n_cached = -1
 
     def _refilter(self, apply):
         # Qt >= 6.10 replaces invalidateFilter() with begin/endFilterChange().
@@ -121,28 +122,37 @@ class ResultsFilter(QSortFilterProxyModel):
         else:
             apply(); self.invalidateFilter()
 
+    # Each setter refilters only when its value changes (typing in the
+    # search box called all four on every keystroke).
+    def _set(self, name, value):
+        if getattr(self, name) != value:
+            self._refilter(lambda: setattr(self, name, value))
+
     def set_class(self, cls: str):
-        self._refilter(lambda: setattr(self, "_cls", cls))
+        self._set("_cls", cls)
 
     def set_status(self, status: str):
-        self._refilter(lambda: setattr(self, "_status", status))
+        self._set("_status", status)
 
     def set_text(self, text: str):
-        self._refilter(lambda: setattr(self, "_text", text.strip().lower()))
+        self._set("_text", text.strip().lower())
 
     def set_show_components(self, on: bool):
         """Show the parts of large galaxies (hidden by default: they are listed under their host)."""
-        self._refilter(lambda: setattr(self, "_components", bool(on)))
+        self._set("_components", bool(on))
 
     def setSourceModel(self, model):
-        super().setSourceModel(model)
+        # Connected before the proxy's own reset handler, so the column arrays
+        # match the new frame when the proxy refilters it.
         model.modelReset.connect(self._cache)
+        super().setSourceModel(model)
         self._cache()
 
     def _cache(self):
         # Column arrays once per result set: filtering thousands of rows must
         # not go through per-row pandas indexing.
         df = self.sourceModel().frame()
+        self._n_cached = len(df)
         # fillna first: with pandas' string dtype astype(str) keeps missing values as NaN
         col = lambda c: df[c].fillna("").astype(str).to_numpy(dtype=object) if c in df else None
         self._a_cls, self._a_status = col("primary_class"), col("classification_status")
@@ -151,6 +161,8 @@ class ResultsFilter(QSortFilterProxyModel):
         self._a_text = [" ".join(t).lower() for t in zip(*parts)] if parts else None
 
     def filterAcceptsRow(self, row, parent):
+        if self._n_cached != self.sourceModel().rowCount():     # never index arrays of an older frame
+            self._cache()
         if not self._components and self._a_part is not None and self._a_part[row]:
             return False
         if self._cls != "ALL" and self._a_cls is not None and self._a_cls[row] != self._cls:

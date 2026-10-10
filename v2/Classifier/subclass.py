@@ -148,7 +148,10 @@ def spt_number(spt) -> float:
     m = re.match(r"^\s*([OBAFGKMLTY])\s*(\d+(?:\.\d+)?)?", str(spt))
     if not m:
         return float("nan")
-    return LETTERS.index(m.group(1)) * 10 + (float(m.group(2)) if m.group(2) else 5.0)
+    sub = float(m.group(2)) if m.group(2) else 5.0
+    if sub >= 10:                  # not an MK subtype ("M10", "Y10" would index past the letter list)
+        return float("nan")
+    return LETTERS.index(m.group(1)) * 10 + sub
 
 
 def spt_label(num: float) -> str:

@@ -43,9 +43,10 @@ def test_gui_runs_pipeline_and_shows_results(tmp_path):
     w.txt_raw.setText(str(raw)); w.txt_work.setText(str(tmp_path / "run"))
     assert "--ra" not in w.pipeline_args()
     w.start_run()
-    loop = QEventLoop(); w.proc.finished.connect(loop.quit); QTimer.singleShot(120000, loop.quit); loop.exec()
+    proc = w.proc
+    loop = QEventLoop(); proc.finished.connect(loop.quit); QTimer.singleShot(120000, loop.quit); loop.exec()
     app.processEvents()
-    assert w.proc.exitCode() == 0, w.log.toPlainText()[-2000:]
+    assert w.proc is None and w.statusBar().currentMessage().startswith("Done"), w.log.toPlainText()[-2000:]
     n = w.model.rowCount()
     names = w.model.frame().designation
     assert not names.str.match(r"OBJ\d+$").any() and names.is_unique      # real catalogue names only
@@ -147,3 +148,28 @@ def test_literature_row_links_papers_to_ads():
     assert "<b>Galaxy in a group</b>" in out and "&lt;stripping&gt;" in out
     assert "href='https://ui.adsabs.harvard.edu/abs/2004AJ....127.3361K'" in out
     assert _paper_html({"paper_class": float("nan")}) == "–"
+
+
+def test_filter_proxy_follows_a_larger_new_frame():
+    pytest.importorskip("PySide6")
+    import pandas as pd
+    from PySide6.QtWidgets import QApplication
+    from qt_models import DataFrameModel, ResultsFilter
+    app = QApplication.instance() or QApplication([])
+    model, proxy = DataFrameModel(), ResultsFilter()
+    proxy.setSourceModel(model)
+    frame = lambda n: pd.DataFrame({"object_id": [f"O{i}" for i in range(n)], "primary_class": ["STAR"] * n,
+                                    "classification_status": ["CLASSIFIED"] * n, "parent_object_id": [None] * n})
+    model.set_frame(frame(3)); assert proxy.rowCount() == 3
+    model.set_frame(frame(10)); assert proxy.rowCount() == 10      # used to index the 3-row cache
+    proxy.set_class("GALAXY"); assert proxy.rowCount() == 0
+
+
+def test_pipeline_on_an_empty_field_returns_no_objects(tmp_path):
+    import importlib.util, sys
+    sys.path.insert(0, str(V2))
+    spec = importlib.util.spec_from_file_location("v2_pipeline_empty", V2 / "pipeline.py")
+    mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod)
+    (tmp_path / "raw").mkdir()
+    out = mod.run(tmp_path / "work", raw_dir=tmp_path / "raw")
+    assert len(out) == 0 and (tmp_path / "work" / "classified_objects.csv").exists()
