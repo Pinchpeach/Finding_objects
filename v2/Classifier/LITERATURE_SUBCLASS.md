@@ -154,6 +154,12 @@ stored with their measurement in `subclass_json["tags"]`, listed in
 | astrometric binary candidate | RUWE > 1.4 | Lindegren et al. 2018; Belokurov et al. 2020 |
 | binary candidate | Gaia DSC binary probability ≥ 0.8 | Creevey et al. 2023 |
 | variable type | the variability axis (Gaia DR3 SOS / classifier, SIMBAD) | Rimoldini et al. 2023 |
+| nearby star | ϖ > 10 mas, ϖ/σ ≥ 10 (within 100 pc) | Gaia Catalogue of Nearby Stars volume (Gaia Collaboration, Smart et al. 2021) |
+| high proper motion | μ > 150 mas/yr | LSPM-North limit (Lépine & Shara 2005) |
+| red-clump giant | giant, 1.8 ≤ G−Ks ≤ 2.6, \|M_G − (0.495 + 1.121(G−Ks−2.1))\| ≤ 0.5 | Ruiz-Dern et al. 2018, A&A 609, A116 |
+| infrared excess (dust disc / shell) | W1−W2 > 0.25 and W2−W3 > 1.0 (W3 S/N ≥ 5) | lower bounds of the Koenig et al. 2012 class II locus; YSO, debris disc or AGB shell (background galaxies can mimic it) |
+| X-ray active star | Chandra / XMM / eROSITA counterpart | coronal activity: young stars, fast rotators, active binaries |
+| metal-poor candidate | GSP-Phot [M/H] < −1, G < 17 | Beers & Christlieb 2005. GSP-Phot [M/H] is only indicative (Andrae et al. 2023) |
 
 Physical checks (no truth labels exist for these):
 * SDSS stars: median GSP-Phot [M/H] falls from the thin disc (−0.52) to the
@@ -172,6 +178,11 @@ Physical checks (no truth labels exist for these):
 | interacting / pair / group / cluster / BCG / LSB / radio galaxy | SIMBAD object type (IG, PaG, GiP, GiG, GiC, BiC, LSB, rG) | Wenger et al. 2000 |
 | radio-loud AGN candidate | radio detection in a quiescent galaxy | Best & Heckman 2012 |
 | X-ray source | Chandra / XMM / eROSITA counterpart | |
+| edge-on / face-on | SGA b/a ≤ 0.3 / ≥ 0.85; inclination from cos²i = (q² − q0²)/(1 − q0²), q0 = 0.2 | Hubble 1926; Holmberg 1958 |
+| spectroscopic redshift | z and luminosity distance (flat ΛCDM) | |
+
+NGC 4522: "galaxy in a group; edge-on galaxy (i ≈ 81°); z = 0.0077". Kenney et al.
+(2004) give i ≈ 78° for this ram-pressure-stripped Virgo spiral.
 
 Redshifts for luminosities come only from spectra: SDSS, DESI and LAMOST,
 or an NED redshift not flagged photometric. SIMBAD rvz_redshift is not used,
@@ -189,6 +200,14 @@ AGN-rich nature (Salim 2014), so the label is reported but not scored.
 |---|---|---|
 | quasar vs Seyfert luminosity | M_i(z=2) with K(z) = −1.25 log10((1+z)/3) (α_ν = −0.5); quasar when M_i(z=0) = M_i(z=2) + 0.596 < −22 | Richards et al. 2006; Schneider et al. 2010 |
 | BL Lac / blazar | SIMBAD BLL / Bla | |
+| obscured (red) quasar candidate | R − W2 > 6.1 (Vega), R = r − 0.1837(g−r) − 0.0971 | Hickox et al. 2007 (≈ 80 % reliable); Lupton 2005 |
+| very-high-redshift quasar | spectroscopic z ≥ 5 | Fan et al. 2001, 2006 |
+
+Benchmark counts:
+* Obscured-quasar candidates: 9 / 644 SDSS-test quasars, 56 / 1595 DESI
+  quasars. DESI goes fainter and redder.
+* Metal-poor star candidates (SDSS test, 75): their kinematics are halo 14,
+  thick disc 12 and thin disc 2, as expected for metal-poor stars.
 
 Check: 87 % of SDSS and 93 % of DESI spectroscopic quasars come out at
 quasar luminosity.

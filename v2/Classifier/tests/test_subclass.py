@@ -71,7 +71,7 @@ def test_star_population_binarity_and_subdwarf():
     assert [t["tag"] for t in thin["tags"]] == ["THIN_DISC"]
     halo = sc.classify(dict(base, **{"gaia_dr3__pmra": 400.0, "gaia_dr3__pmdec": 300.0, "gaia_dr3__ruwe": 2.1}))
     tags = {t["tag"] for t in halo["tags"]}
-    assert tags == {"HALO", "ASTROMETRIC_BINARY"}
+    assert tags == {"HALO", "ASTROMETRIC_BINARY", "HIGH_PM"}           # 500 mas/yr is also a high proper motion
     sd = sc.classify(dict(base, **{"gaia_dr3__phot_g_mean_mag": 11.4}))                          # 1.8 mag below the MS
     assert sd["luminosity_class"] == "VI" and "subdwarf" in sd["subclass"]
     var = sc.classify(dict(base, variability_class="RR_LYRAE", variability_subtype="RRAB"))
@@ -106,5 +106,27 @@ def test_luminosity_needs_a_spectroscopic_redshift_and_a_physical_value():
     sc = _sc()
     f = lambda m: 10 ** ((22.5 - m) / 2.5)
     row = {"primary_class": "GALAXY", "desi_legacy_surveys_dr10__flux_g": f(24.0), "desi_legacy_surveys_dr10__flux_r": f(23.6)}
-    assert not sc.classify(dict(row, simbad__rvz_redshift=0.01))["tags"]          # SIMBAD z: source unknown
-    assert not sc.classify(dict(row, sdss_dr18_spectroscopy__z=0.01))["tags"]     # M_B ~ -8.8: inconsistent, no label
+    lum = lambda r: {t["tag"] for t in sc.classify(r)["tags"]} & {"DWARF", "LUMINOUS", "SPEC_Z"}
+    assert not lum(dict(row, simbad__rvz_redshift=0.01))                          # SIMBAD z: source unknown
+    assert lum(dict(row, sdss_dr18_spectroscopy__z=0.01)) == {"SPEC_Z"}            # M_B ~ -8.8: no luminosity label
+
+
+def test_more_star_galaxy_qso_attributes():
+    sc = _sc()
+    near = {"primary_class": "STAR", "gaia_dr3__bp_rp": 1.25, "gaia_dr3__ebpminrp_gspphot": 0.0, "gaia_dr3__ag_gspphot": 0.0,
+            "gaia_dr3__parallax": 20.0, "gaia_dr3__parallax_error": 0.05, "gaia_dr3__phot_g_mean_mag": 9.7,
+            "gaia_dr3__pmra": 300.0, "gaia_dr3__pmdec": 0.0, "catalogs": "Gaia DR3|eROSITA eRASS1",
+            "allwise__W1mag": 7.0, "allwise__W2mag": 6.6, "allwise__W3mag": 5.0, "allwise__e_W3mag": 0.05}
+    tags = {t["tag"] for t in sc.classify(near)["tags"]}
+    assert {"NEARBY", "HIGH_PM", "XRAY", "IR_EXCESS"} <= tags
+    # K giant at 1 kpc with M_G = 0.5 and G - Ks = 2.1: red clump
+    rc = {"primary_class": "STAR", "gaia_dr3__bp_rp": 1.2, "gaia_dr3__ebpminrp_gspphot": 0.0, "gaia_dr3__ag_gspphot": 0.0,
+          "gaia_dr3__parallax": 1.0, "gaia_dr3__parallax_error": 0.02, "gaia_dr3__phot_g_mean_mag": 10.5, "2mass_psc__Kmag": 8.4}
+    assert any(t["tag"] == "RED_CLUMP" for t in sc.classify(rc)["tags"])
+    edge = sc.classify({"primary_class": "GALAXY", "sga_2020__catalog_object_id": 1.0, "sga_2020__sga_ba": 0.25})
+    assert any(t["tag"] == "EDGE_ON" for t in edge["tags"])
+    f = lambda m: 10 ** ((22.5 - m) / 2.5)
+    red = sc.classify({"primary_class": "QSO", "desi_legacy_surveys_dr10__flux_g": f(23.5), "desi_legacy_surveys_dr10__flux_r": f(22.8),
+                       "allwise__W2mag": 15.5, "sdss_dr18_spectroscopy__z": 5.3, "pan_starrs1_dr2_meanobject__iMeanPSFMag": 21.0})
+    tags = {t["tag"] for t in red["tags"]}
+    assert {"OBSCURED", "VERY_HIGH_Z"} <= tags

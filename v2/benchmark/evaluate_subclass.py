@@ -37,7 +37,7 @@ FEATURES = {
                                                                  "rMeanKronMag")}),
     "allwise": ("allwise", {c: c for c in ("W1mag", "W2mag", "W3mag", "e_W1mag", "e_W2mag", "e_W3mag")}),
     "galex": ("galex_ais", {"NUVmag": "NUVmag", "E(B-V)": "E(B-V)"}),
-    "twomass": ("2mass_psc", {}),
+    "twomass": ("2mass_psc", {"Kmag": "Kmag"}),
 }
 
 
@@ -126,6 +126,10 @@ def evaluate(rows: pd.DataFrame, sc, label: str) -> tuple[dict, pd.DataFrame]:
                                          for k in ("THIN_DISC", "THICK_DISC", "HALO")}
         metrics["star"]["median_mh_by_lum"] = {str(k): round(float(v), 2) for k, v in mh.groupby(stars.lum).median().items()}
         metrics["star"]["astrometric_binary_fraction"] = round(float(stars.tags.str.contains("ASTROMETRIC_BINARY").mean()), 4)
+        metrics["star"]["tag_counts"] = {t: int(stars.tags.str.contains(t).sum()) for t in
+                                         ("NEARBY", "HIGH_PM", "RED_CLUMP", "IR_EXCESS", "XRAY", "METAL_POOR")}
+        mp = stars.tags.str.contains("METAL_POOR")
+        metrics["star"]["metal_poor_population"] = stars.tags[mp].str.extract(r"(THIN_DISC|THICK_DISC|HALO)")[0].value_counts().to_dict()
         wd = stars.truth_spt.astype(str).str.upper().eq("WD")
         if wd.any():
             metrics["star"]["wd_truth_typed_as_wd"] = round(float(stars.subclass[wd].astype(str).str.startswith("White dwarf").mean()), 4)
@@ -149,6 +153,8 @@ def evaluate(rows: pd.DataFrame, sc, label: str) -> tuple[dict, pd.DataFrame]:
     q = out[out.primary_class.eq("QSO")]
     if len(q):
         metrics["qso"] = {"n": int(len(q)), "with_luminosity": int(q.tags.str.contains("LUMINOSITY").sum()),
+                          "obscured_candidates": int(q.tags.str.contains("OBSCURED").sum()),
+                          "very_high_z": int(q.tags.str.contains("VERY_HIGH_Z").sum()),
                           "quasar_luminosity_fraction": round(float(q.tags.str.contains("QUASAR_LUMINOSITY").sum() /
                                                                      max(q.tags.str.contains("LUMINOSITY").sum(), 1)), 4)}
     return metrics, out

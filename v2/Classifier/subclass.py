@@ -306,6 +306,47 @@ def star_tags(row):
     if b is not None and b >= 0.8 and not any(t["tag"] == "ASTROMETRIC_BINARY" for t in tags):
         tags.append({"tag": "PHOTOMETRIC_BINARY", "label": "binary candidate (Gaia DSC)", "rule": "GAIA_DSC_BINARY",
                      "basis": f"Gaia DSC binary probability {b:.2f}"})
+    # Distance and motion.
+    if plx is not None and eplx is not None and plx > 0 and eplx > 0:
+        if plx > 10.0 and plx / eplx >= 10:
+            # Inside the Gaia Catalogue of Nearby Stars volume (100 pc;
+            # Gaia Collaboration, Smart et al. 2021).
+            tags.append({"tag": "NEARBY", "label": f"nearby star ({1000 / plx:.0f} pc)", "rule": "GAIA_PARALLAX",
+                         "basis": f"parallax {plx:.2f} +- {eplx:.2f} mas (< 100 pc)"})
+    if pmra is not None and pmdec is not None and math.hypot(pmra, pmdec) > 150.0:
+        tags.append({"tag": "HIGH_PM", "label": "high-proper-motion star", "rule": "GAIA_PM",
+                     "basis": f"mu = {math.hypot(pmra, pmdec):.0f} mas/yr > 150 (LSPM limit; Lepine & Shara 2005)"})
+    # Red clump: core-helium-burning giants, M_G = 0.495 + 1.121 (G - Ks - 2.1)
+    # (Ruiz-Dern et al. 2018, A&A 609, A116; intrinsic spread ~0.2 mag).
+    pos = cmd_position(row)
+    gmag = _num(row, "gaia_dr3__phot_g_mean_mag", "phot_g_mean_mag")
+    ks = _num(row, "2mass_psc__Kmag", "allwise__Kmag")
+    if pos is not None and gmag is not None and ks is not None:
+        mg, dm, bprp0 = pos
+        gk = gmag - ks
+        if 1.8 <= gk <= 2.6 and dm <= -2.5:
+            m_rc = 0.495 + 1.121 * (gk - 2.1)
+            if abs(mg - m_rc) <= 0.5:
+                tags.append({"tag": "RED_CLUMP", "label": "red-clump giant candidate", "rule": "GAIA_RC",
+                             "basis": f"M_G = {mg:.2f} vs red clump {m_rc:.2f} at G-Ks = {gk:.2f} (Ruiz-Dern+2018)"})
+    # Mid-IR excess over the photosphere (stellar W1-W2 ~ W2-W3 ~ 0, Vega):
+    # lower bounds of the Koenig et al. (2012) class II locus.  Dusty discs
+    # (YSOs, debris discs) or circumstellar shells (AGB); background
+    # galaxies can mimic it.
+    w1, w2, w3, ew3 = (_num(row, f"allwise__{k}") for k in ("W1mag", "W2mag", "W3mag", "e_W3mag"))
+    if None not in (w1, w2, w3, ew3) and ew3 < 0.2 and w1 - w2 > 0.25 and w2 - w3 > 1.0:
+        tags.append({"tag": "IR_EXCESS", "label": "infrared-excess star (dust disc / shell candidate)", "rule": "WISE_IR_EXCESS",
+                     "basis": f"W1-W2 = {w1 - w2:.2f} > 0.25, W2-W3 = {w2 - w3:.2f} > 1.0 (Koenig+2012)"})
+    xr = _catalogs(row) & set(XRAY_CATALOGS)
+    if xr:
+        # Stellar X-rays trace coronal activity (young / fast rotators / active binaries).
+        tags.append({"tag": "XRAY", "label": "X-ray active star", "rule": "XRAY", "basis": ", ".join(sorted(xr))})
+    mh = _num(row, "gaia_dr3__mh_gspphot", "mh_gspphot")
+    if mh is not None and gmag is not None and gmag < 17 and mh < -1.0:
+        # [M/H] < -1 "metal-poor" (Beers & Christlieb 2005).  GSP-Phot [M/H]
+        # is only indicative (Andrae et al. 2023), hence "candidate".
+        tags.append({"tag": "METAL_POOR", "label": "metal-poor star candidate", "rule": "GAIA_GSPPHOT_MH",
+                     "basis": f"GSP-Phot [M/H] = {mh:.2f} < -1 (G = {gmag:.1f})"})
     var = str(row.get("variability_class") or "")
     if var and var not in ("UNKNOWN", "nan", "None"):
         sub = row.get("variability_subtype")
@@ -466,6 +507,22 @@ def galaxy_tags(row, activity):
         elif mb < -21.0:
             tags.append({"tag": "LUMINOUS", "label": f"luminous galaxy (M_B = {mb:.1f})", "rule": "ABS_MAG",
                          "basis": f"M_B = {mb:.2f} < -21 at z = {z:.4f} (brighter than L*; Schechter M*_B ~ -20.5)"})
+    z = spectroscopic_z(row)
+    ba = _num(row, "sga_2020__sga_ba", "sga_ba")
+    if ba is not None and _num(row, "sga_2020__catalog_object_id") is not None:
+        # Thin-disc inclination cos^2 i = (q^2 - q0^2) / (1 - q0^2), q0 = 0.2
+        # (Hubble 1926; Holmberg 1958): b/a <= 0.3 -> i >~ 77 deg.
+        q0 = 0.2
+        inc = math.degrees(math.acos(math.sqrt(max(min((ba * ba - q0 * q0) / (1 - q0 * q0), 1.0), 0.0))))
+        if ba <= 0.3:
+            tags.append({"tag": "EDGE_ON", "label": f"edge-on galaxy (i ~ {inc:.0f} deg)", "rule": "SGA_AXIS_RATIO",
+                         "basis": f"SGA b/a = {ba:.2f}, inclination from Hubble (1926) with q0 = 0.2"})
+        elif ba >= 0.85:
+            tags.append({"tag": "FACE_ON", "label": f"face-on galaxy (i ~ {inc:.0f} deg)", "rule": "SGA_AXIS_RATIO",
+                         "basis": f"SGA b/a = {ba:.2f}"})
+    if z is not None and z > 0:
+        tags.append({"tag": "SPEC_Z", "label": f"spectroscopic z = {z:.4f}", "rule": "SPEC_Z",
+                     "basis": f"distance {luminosity_distance_mpc(z):.0f} Mpc (flat LCDM, H0 = 70)"})
     flux, src = radio_14ghz_mjy(row)
     if flux is not None and activity == "QUIESCENT":
         # Radio emission from a galaxy without star formation is AGN-powered
@@ -613,6 +670,18 @@ def qso_tags(row):
         tags.append({"tag": "QUASAR_LUMINOSITY" if quasar else "SEYFERT_LUMINOSITY",
                      "label": ("quasar-luminosity" if quasar else "Seyfert-luminosity AGN") + f" (M_i(z=2) = {mi2:.1f})",
                      "rule": "ABS_MAG_RICHARDS06", "basis": f"i = {i:.2f}, z = {z:.3f}, M_i(z=2) = {mi2:.2f}"})
+    if z is not None and z >= 5.0:
+        tags.append({"tag": "VERY_HIGH_Z", "label": f"very-high-redshift quasar (z = {z:.2f})", "rule": "SPEC_Z",
+                     "basis": "z >= 5: reionisation-era quasar (Fan et al. 2001, 2006)"})
+    # Obscured (red) quasar: R - [4.5] > 6.1 (Vega; Hickox et al. 2007), with
+    # R = r - 0.1837 (g - r) - 0.0971 (Lupton 2005) and W2 for [4.5].
+    g, r = _optical_gr(row)
+    w2 = _num(row, "allwise__W2mag")
+    if g is not None and r is not None and w2 is not None:
+        rv = r - 0.1837 * (g - r) - 0.0971
+        if rv - w2 > 6.1:
+            tags.append({"tag": "OBSCURED", "label": "obscured (red) quasar candidate", "rule": "HICKOX07",
+                         "basis": f"R - W2 = {rv - w2:.2f} > 6.1 (Vega; Hickox+2007)"})
     ot = _text(row, "simbad__otype")
     if ot in ("BLL", "Bla"):
         tags.append({"tag": "BLAZAR", "label": SIMBAD_QSO[ot], "rule": "SIMBAD_OTYPE", "basis": f"SIMBAD type {ot}"})
