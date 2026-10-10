@@ -185,13 +185,63 @@ def vizier_tap(df: pd.DataFrame, chunk: int = 2000) -> pd.DataFrame:
     return df
 
 
+ASU_CATALOGS = {   # name: (VizieR table, radius arcsec, columns, renames)
+    "gaia": ("I/355/gaiadr3", 2.0, ["Source", "Gmag", "BPmag", "RPmag", "Plx", "e_Plx", "RUWE"],
+             {"Source": "g_source_id", "Gmag": "g_gmag", "BPmag": "g_bp", "RPmag": "g_rp", "Plx": "g_plx",
+              "e_Plx": "g_eplx", "RUWE": "g_ruwe"}),
+    "2mass": ("II/246/out", 2.0, ["Jmag", "Hmag", "Kmag", "Qflg"],
+              {"Jmag": "tm_j", "Hmag": "tm_h", "Kmag": "tm_ks", "Qflg": "tm_qual"}),
+    "allwise": ("II/328/allwise", 1.0, ["W1mag", "e_W1mag", "W2mag", "e_W2mag", "W3mag", "e_W3mag", "W4mag", "e_W4mag"],
+                {"W1mag": "aw_w1", "e_W1mag": "aw_ew1", "W2mag": "aw_w2", "e_W2mag": "aw_ew2", "W3mag": "aw_w3",
+                 "e_W3mag": "aw_ew3", "W4mag": "aw_w4", "e_W4mag": "aw_ew4"}),
+    "lpv": ("I/358/vlpv", 2.0, ["isCstar", "Freq", "Amp"],
+            {"isCstar": "lpv_is_cstar", "Freq": "lpv_frequency", "Amp": "lpv_amplitude"}),
+}
+
+
+def vizier_asu(df: pd.DataFrame, chunk: int = 500) -> pd.DataFrame:
+    """Multi-position cone searches on the standard VizieR service (the route that
+    fetched the Suh tables; TAPVizieR uploads failed).  Nearest source per star."""
+    from astroquery.vizier import Vizier
+    from astropy.coordinates import SkyCoord
+    import astropy.units as u
+    for name, (table, radius, cols, ren) in ASU_CATALOGS.items():
+        v = Vizier(columns=cols + ["+_r"], row_limit=-1, timeout=600)
+        parts = []
+        for s0 in range(0, len(df), chunk):
+            sub = df.iloc[s0:s0 + chunk]
+            coords = SkyCoord(sub.ra.to_numpy() * u.deg, sub.dec.to_numpy() * u.deg)
+            t0 = time.time()
+            try:
+                res = retry(lambda: v.query_region(coords, radius=radius * u.arcsec, catalog=table), tries=3, wait=20)
+            except Exception as exc:
+                print(f"{name}: rows {s0}+ failed: {str(exc)[:200]}", flush=True)
+                continue
+            if not res:
+                continue
+            t = res[0].to_pandas()
+            t["agb_id"] = sub.agb_id.to_numpy()[t["_q"].astype(int).to_numpy() - 1]   # _q: 1-based input row
+            parts.append(t.sort_values("_r").drop_duplicates("agb_id"))
+            print(f"{name}: rows {s0}-{s0 + len(sub)}: {len(parts[-1])} matched in {time.time() - t0:.0f} s", flush=True)
+        if parts:
+            t = pd.concat(parts, ignore_index=True).rename(columns=ren)
+            t = t.rename(columns={"_r": f"{name}_sep"})
+            keep = ["agb_id", f"{name}_sep"] + [c for c in ren.values() if c in t.columns]
+            df = df.merge(t[keep], on="agb_id", how="left")
+    return df
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--out", type=Path, default=Path(__file__).resolve().parent / "agb_truth" / "agb_chemistry_truth.csv.gz")
-    p.add_argument("--source", choices=("gaia", "vizier"), default="gaia",
-                   help="photometry service: the Gaia archive, or TAPVizieR when the Gaia archive is down")
+    p.add_argument("--source", choices=("gaia", "vizier", "asu"), default="asu",
+                   help="photometry service: VizieR cone searches (asu), TAPVizieR uploads (vizier) or the Gaia archive")
     a = p.parse_args()
-    df = (gaia_tap if a.source == "gaia" else vizier_tap)(labels())
+    df = {"gaia": gaia_tap, "vizier": vizier_tap, "asu": vizier_asu}[a.source](labels())
+    phot = [c for c in df.columns if c.startswith(("g_", "tm_", "aw_"))]
+    if not phot or df[phot].notna().any(axis=1).mean() < 0.2:
+        # Never overwrite the truth file with labels only (archive outage).
+        raise SystemExit(f"photometry missing for most stars (columns {phot}); not writing {a.out}")
     a.out.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(a.out, index=False, compression="gzip")
     print(df.chem.value_counts().to_dict(), "->", a.out)

@@ -7,11 +7,11 @@ on:
   workflow_dispatch:
     inputs:
       source:
-        description: "photometry service: gaia (Gaia archive) or vizier (TAPVizieR)"
-        default: gaia
+        description: "photometry service: asu (VizieR cone search), vizier (TAPVizieR) or gaia (Gaia archive)"
+        default: asu
 
 concurrency:
-  group: build-agb-chemistry-truth-${{ github.ref }}-${{ inputs.source || 'gaia' }}
+  group: build-agb-chemistry-truth-${{ github.ref }}-${{ inputs.source || 'asu' }}
   cancel-in-progress: true
 
 jobs:
@@ -27,7 +27,7 @@ jobs:
           python-version: "3.11"
       - run: pip install pandas numpy astropy astroquery
       - name: Build
-        run: python -u v2/benchmark/build_agb_chemistry_truth.py --source "${{ inputs.source || 'gaia' }}"
+        run: python -u v2/benchmark/build_agb_chemistry_truth.py --source "${{ inputs.source || 'asu' }}"
       - name: Summary
         run: |
           python - <<'PY'
