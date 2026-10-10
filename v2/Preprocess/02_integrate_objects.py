@@ -39,6 +39,12 @@ def _num(v):
         return None
 
 
+def _units():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("v2_preprocess_units", Path(__file__).resolve().parent / "units.py")
+    m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m); return m
+
+
 def flag_large_galaxy_hosts(rows):
     """Mark objects inside an SGA-2020 D26 ellipse that are not that galaxy."""
     hosts = [(r["object_id"], r["ra"], r["dec"], _num(r.get("sga_d26_arcmin")), _num(r.get("sga_pa_deg")),
@@ -137,6 +143,9 @@ def run(associations, raw_dir, out):
         rows.append(rec)
     flag_large_galaxy_hosts(rows)
     df = pd.DataFrame(rows)
+    # One unit system for quantities measured by several catalogues (AB
+    # magnitudes, mJy, spectroscopic z, ...): std_* columns (units.py).
+    df = _units().harmonize(df)
     out.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(out, index=False)
     print(f"[OK] objects={len(df)} columns={len(df.columns)} -> {out}")

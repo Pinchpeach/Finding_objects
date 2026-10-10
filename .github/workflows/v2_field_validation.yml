@@ -66,6 +66,34 @@ jobs:
               eff=s.primary_class.where(s.parent_object_id.isna(), s.parent_object_id.map(host_cls))
               ce=eff.ne("UNKNOWN")
               print(f"parts scored by their host ({int(s.parent_object_id.notna().sum())}): coverage={ce.mean():.3f} accuracy_when_classified={(eff==s.truth)[ce].mean():.3f}")
+          import importlib.util
+          spec=importlib.util.spec_from_file_location("units","v2/Preprocess/units.py"); units=importlib.util.module_from_spec(spec); spec.loader.exec_module(units)
+          pts=d[d.get("desi_legacy_surveys_dr10__type",pd.Series(index=d.index)).astype(str).eq("PSF")]
+          print("\n== why objects stay UNKNOWN (top-level)")
+          tl=d[d.parent_object_id.isna()] if "parent_object_id" in d.columns else d
+          unk=tl[tl.primary_class.eq("UNKNOWN")]
+          print("UNKNOWN", len(unk), "/", len(tl)); print(unk.classification_status.value_counts().to_string())
+          if "unknown_reason" in unk.columns: print("unknown_reason:", unk.unknown_reason.str.replace(r"[0-9.]+","#",regex=True).value_counts().head(12).to_dict())
+          if "simbad__simbad_reference_status" in d.columns: print("SIMBAD reference status:", d.simbad__simbad_reference_status.value_counts().to_dict())
+          ncat=unk.catalogs.fillna("").str.count(r"\|")+1
+          print("catalogue count:", ncat.value_counts().sort_index().to_dict())
+          print("SIMBAD otype of UNKNOWN:", unk.get("simbad__otype",pd.Series(dtype=object)).value_counts().head(25).to_dict())
+          print("NED Type of UNKNOWN:", unk.get("ned__Type",pd.Series(dtype=object)).value_counts().head(15).to_dict())
+          for cat,col in (("Pan-STARRS1 DR2 MeanObject","std_mag__ps1_r"),("DESI Legacy Surveys DR10","std_mag__ls_r"),("SDSS DR18 PhotoObj","std_mag__sdss_r"),("AllWISE","std_mag__wise_w1"),("GALEX AIS","std_mag__galex_nuv")):
+              one=unk[unk.catalogs.eq(cat)]
+              if len(one) and col in one:
+                  m=pd.to_numeric(one[col],errors="coerce")
+                  print(f"only {cat}: n={len(one)} mag quartiles={m.quantile([.25,.5,.75]).round(2).tolist()}")
+          ps=unk[unk.catalogs.eq("Pan-STARRS1 DR2 MeanObject")]
+          if len(ps) and "pan_starrs1_dr2_meanobject__nDetections" in ps:
+              print("  PS1-only nDetections quartiles", pd.to_numeric(ps["pan_starrs1_dr2_meanobject__nDetections"],errors="coerce").quantile([.25,.5,.75]).tolist(),
+                    "| bands with PSF mag:", ps[[f"std_mag__ps1_{b}" for b in "grizy"]].notna().sum(axis=1).value_counts().to_dict())
+          ls_=unk[unk.catalogs.eq("DESI Legacy Surveys DR10")]
+          if len(ls_):
+              print("  LS-only type:", ls_.get("desi_legacy_surveys_dr10__type",pd.Series(dtype=object)).value_counts().to_dict(),
+                    "| g/r/z S/N>5:", [int((1/pd.to_numeric(ls_[f"std_magerr__ls_{b}"],errors="coerce")*1.0857>5).sum()) for b in "grz"])
+          print("\n== unit harmonisation: same band from two catalogues (point sources; AB after conversion)")
+          print(units.consistency(pts))
           print("\n== second-stage sub-class")
           print(d.subclass_status.value_counts().to_string())
           top=d[d.parent_object_id.isna()] if "parent_object_id" in d.columns else d
@@ -89,8 +117,8 @@ jobs:
           wd=st[st.desi_type.eq("WD")]
           if len(wd): print("DESI WD typed STAR:WD:", int(wd.subclass_code.eq("STAR:WD").sum()), "/", len(wd))
           gal=top[top.primary_class.eq("GALAXY")]
-          n=pd.to_numeric(gal.get("desi_legacy_surveys_dr10__sersic"),errors="coerce")
-          u=pd.to_numeric(gal.get("sdss_dr18_photoobj__modelMag_u"),errors="coerce"); r=pd.to_numeric(gal.get("sdss_dr18_photoobj__modelMag_r"),errors="coerce")
+          n=pd.to_numeric(gal.get("desi_legacy_surveys_dr10__sersic",pd.Series(index=gal.index,dtype=float)),errors="coerce")
+          u=pd.to_numeric(gal.get("sdss_dr18_photoobj__modelMag_u",pd.Series(index=gal.index,dtype=float)),errors="coerce"); r=pd.to_numeric(gal.get("sdss_dr18_photoobj__modelMag_r",pd.Series(index=gal.index,dtype=float)),errors="coerce")
           both=n.notna()&(n>0)&u.notna()&r.notna()&gal.get("desi_legacy_surveys_dr10__type",pd.Series(index=gal.index)).astype(str).eq("SER")
           print("LS sersic present for galaxies:", int((n>0).sum()), "/", len(gal))
           if both.any(): print(f"Sersic n>=2.5 vs SDSS u-r>=2.22 agreement: n={int(both.sum())} agree={float(((n[both]>=2.5)==((u-r)[both]>=2.22)).mean()):.3f}")

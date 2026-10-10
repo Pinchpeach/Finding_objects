@@ -136,3 +136,14 @@ def test_sky_map_zoom_pan_and_icons():
     assert kinds[0]["letter"] == "K" and kinds[1]["activity"] == "STAR_FORMING" and kinds[2]["radio"] == "RADIO_LOUD" and kinds[2]["xray"]
     img = v.grab().toImage(); assert not img.isNull()
     v.close()
+
+
+def test_literature_row_links_papers_to_ads():
+    pytest.importorskip("PySide6")
+    from qt_widgets import _paper_html
+    row = {"paper_class": "Galaxy in a group", "paper_source": "SIMBAD NGC  4522 (otype GiG, 250 papers)",
+           "paper_refs": "2004AJ....127.3361K (2004) Ram pressure <stripping>"}
+    out = _paper_html(row)
+    assert "<b>Galaxy in a group</b>" in out and "&lt;stripping&gt;" in out
+    assert "href='https://ui.adsabs.harvard.edu/abs/2004AJ....127.3361K'" in out
+    assert _paper_html({"paper_class": float("nan")}) == "–"

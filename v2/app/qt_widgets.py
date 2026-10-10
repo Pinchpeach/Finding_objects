@@ -1,6 +1,7 @@
 """Custom widgets: a sky map of the classified objects and an object detail panel."""
 from __future__ import annotations
-import json, math
+import html, json, math
+from urllib.parse import quote
 import pandas as pd
 from PySide6.QtCore import QPointF, QRectF, Qt, QUrl, Signal
 from PySide6.QtGui import QBrush, QColor, QDesktopServices, QGuiApplication, QPainter, QPen
@@ -346,11 +347,14 @@ class DetailPanel(QWidget):
         info = QFormLayout()
         self.lbl_pos, self.lbl_status, self.lbl_cats = QLabel("–"), QLabel("–"), QLabel("–")
         self.lbl_names = QLabel("–"); self.lbl_sub = QLabel("–"); self.lbl_parts = QLabel("–"); self.lbl_tags = QLabel("–")
-        for w in (self.lbl_cats, self.lbl_names, self.lbl_sub, self.lbl_parts, self.lbl_tags):
+        self.lbl_paper = QLabel("–"); self.lbl_paper.setOpenExternalLinks(True)
+        for w in (self.lbl_cats, self.lbl_names, self.lbl_sub, self.lbl_parts, self.lbl_tags, self.lbl_paper, self.lbl_status):
             w.setWordWrap(True)
-        for k, w in (("Sub-class", self.lbl_sub), ("Attributes", self.lbl_tags), ("Position", self.lbl_pos), ("Status", self.lbl_status),
+        for k, w in (("Sub-class", self.lbl_sub), ("Attributes", self.lbl_tags), ("Literature", self.lbl_paper),
+                     ("Position", self.lbl_pos), ("Status", self.lbl_status),
                      ("Structure", self.lbl_parts), ("Catalog IDs", self.lbl_names), ("Catalogs", self.lbl_cats)):
-            w.setTextInteractionFlags(Qt.TextSelectableByMouse); info.addRow(k, w)
+            w.setTextInteractionFlags(Qt.TextBrowserInteraction if w is self.lbl_paper else Qt.TextSelectableByMouse)
+            info.addRow(k, w)
         lay.addLayout(info)
 
         probs = QGroupBox("Coarse class probability")
@@ -391,7 +395,8 @@ class DetailPanel(QWidget):
         if row is None:
             self.title.setText("Select an object")
             self.title.setStyleSheet("font-weight: 600; font-size: 14px;")
-            for w in (self.lbl_pos, self.lbl_status, self.lbl_cats, self.lbl_names, self.lbl_sub, self.lbl_parts, self.lbl_tags):
+            for w in (self.lbl_pos, self.lbl_status, self.lbl_cats, self.lbl_names, self.lbl_sub, self.lbl_parts, self.lbl_tags,
+                      self.lbl_paper):
                 w.setText("–")
             for bar in self.bars.values():
                 bar.setValue(0)
@@ -415,6 +420,7 @@ class DetailPanel(QWidget):
             status = row.get("subclass_status")
             self.lbl_sub.setText(f"–  ({status})" if isinstance(status, str) else "–")
         self.lbl_tags.setText(_tags_html(row.get("subclass_json")))
+        self.lbl_paper.setText(_paper_html(row))
         ncomp = int(_num(row.get("n_components")) or 0)
         parent = row.get("parent_object_id")
         if ncomp:
@@ -429,7 +435,9 @@ class DetailPanel(QWidget):
             self.lbl_parts.setText("Single object")
         names = row.get("catalog_designations")
         self.lbl_names.setText(str(names).replace("; ", "\n") if isinstance(names, str) and names else "–")
-        self.lbl_status.setText(f"{row.get('classification_status', '')}  (confidence {_f(row.get('primary_confidence'), 3)})")
+        why = row.get("unknown_reason")
+        self.lbl_status.setText(f"{row.get('classification_status', '')}  (confidence {_f(row.get('primary_confidence'), 3)})"
+                                + (f"<br><span style='color:gray'>why UNKNOWN: {html.escape(why)}</span>" if isinstance(why, str) and why else ""))
         self.lbl_cats.setText(str(row.get("catalogs", "")).replace("|", ", "))
         for c, bar in self.bars.items():
             v = _num(row.get(f"p_{c.lower()}"))
@@ -473,6 +481,22 @@ def _tags_html(raw) -> str:
     if not tags:
         return "–"
     return "<br>".join(f"{t.get('label', '')} <span style='color:gray'>— {t.get('basis', '')}</span>" for t in tags)
+
+
+def _paper_html(row) -> str:
+    """What the literature calls the object: class, source and the papers
+    (linked to ADS)."""
+    cls, src = row.get("paper_class"), row.get("paper_source")
+    if not isinstance(cls, str) or not cls:
+        return "–"
+    lines = [f"<b>{html.escape(cls)}</b> <span style='color:gray'>— {html.escape(str(src or ''))}</span>"]
+    refs = row.get("paper_refs")
+    refs = refs.split("|") if isinstance(refs, str) and refs else []
+    for ref in refs:
+        bib = ref.split(" ", 1)[0]
+        lines.append(f"<a href='https://ui.adsabs.harvard.edu/abs/{quote(bib, safe='')}'>{html.escape(bib)}</a>"
+                     f"{html.escape(ref[len(bib):])}")
+    return "<br>".join(lines)
 
 
 def _angle(arcmin: float) -> str:

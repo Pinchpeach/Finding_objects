@@ -115,3 +115,81 @@ A future trained tree/random forest should be learned from a large external
 spectroscopic training set matched to exactly the same Gaia/PS1/WISE/2MASS
 features, with train/validation/test separation and magnitude/sky-domain checks.
 
+
+
+## Unit harmonisation (`units.py`, Stage 2)
+Quantities measured by several catalogues are converted to one system and
+added as `std_*` columns. The native columns are kept unchanged.
+
+| quantity | standard | conversion | source |
+|---|---|---|---|
+| Legacy Surveys g r i z W1 W2 | AB mag | 22.5 − 2.5 log10(f [nanomaggy]); σ = 1.0857 / (f √ivar) | Dey et al. 2019; unWISE calibrated to AllWISE (Schlafly et al. 2019) |
+| Pan-STARRS1 | AB mag | — | Tonry et al. 2012 |
+| SDSS | AB mag | u − 0.04, z + 0.02 | SDSS DR14 flux-calibration notes |
+| GALEX | AB mag | — | Morrissey et al. 2007 |
+| AllWISE W1–W4 | AB mag | Vega + 2.699 / 3.339 / 5.174 / 6.620 | Jarrett et al. 2011; WISE Explanatory Supplement IV.4.h |
+| 2MASS J H Ks | AB mag | Vega + 0.91 / 1.39 / 1.85 | Blanton & Roweis 2007 |
+| Gaia G BP RP | Gaia (Vega) system, not converted | — | compared only with Gaia-system references |
+| reddening | SFD E(B−V) | LS mw_transmission_g, R_g = 3.214; else GALEX E(B−V) | Schlafly & Finkbeiner 2011 |
+| radio | mJy; 1.4 GHz equivalent | LoTSS 144 MHz and VLASS 3 GHz with α = −0.7 | Condon 1992 |
+| redshift | spectroscopic z only | SDSS / DESI / LAMOST; NED z or v/c unless flagged photometric; SIMBAD → `std_z_catalog` | |
+
+Consistency checks (median difference, NMAD), benchmark point sources:
+
+| comparison | stars | quasars | why |
+|---|---|---|---|
+| LS − PS1 g | 0.003 (0.024), n = 3183 | | |
+| LS − PS1 r | −0.059 (0.040), n = 3225 | | |
+| LS − PS1 z | −0.030 (0.032), n = 3246 | | |
+| scatter | | 0.21–0.23 | variability between epochs |
+| 2MASS PSC Ks − AllWISE Kmag | 0.000 | | |
+
+* The star offsets are the DECam/PS1 passband differences (a few hundredths
+  of a mag).
+* A wrong unit would show as offsets of magnitudes; for example, 2.7 mag for
+  a missing WISE Vega → AB term.
+* WISE W1/W2 (LS unWISE AB − AllWISE after Vega → AB), field 245/+43
+  point sources (`v2_field_validation.yml`): W1 +0.026 (NMAD 0.147, n = 59),
+  W2 +0.039 (NMAD 0.166, n = 57). Without the Vega → AB terms the offsets
+  would be −2.7 and −3.3 mag, so the conversion is confirmed.
+* Missing-value sentinels (PS1 −999, SDSS −9999, nulls) are removed: a
+  magnitude counts only if 0 < m < 40 and an error only if 0 < σ < 10. The
+  first version copied PS1 −999 into `std_mag__ps1_*` (seen as magnitude
+  quartiles of −999 for PS1-only objects in the field diagnostics).
+
+## Decisive Gaia motion (`05_likelihood_vectors.py`, `DECISIVE_MOTION_SIGMA`)
+A Gaia DR3 parallax or proper motion measured at ≥ 10σ classifies the object
+as STAR, even when photometric evidence conflicts. The criterion also needs
+astrometry and association reliability ≥ 0.8 (RUWE ≲ 1.75).
+
+* Physics: galaxies and quasars have no measurable parallax or proper motion
+  at Gaia precision. Gaia DR3 quasars scatter around zero with normalised
+  widths of ≈ 1.05–1.1 (Lindegren et al. 2021, A&A 649, A2; Klioner et al.
+  2022, Gaia-CRF3).
+* 10σ stays decisive even if faint-end errors are underestimated by about 1.5
+  (El-Badry, Rix & Heintz 2021).
+* Before the change, a 26σ proper motion entered the fusion only as STAR
+  score 26/31 = 0.84. Any other strong claim then made the object CONFLICT,
+  including one star at 1020σ.
+
+Benchmark (spectroscopic truth):
+
+| set | objects with motion ≥ 10σ | spectroscopic stars | changed | correct after change |
+|---|---|---|---|---|
+| SDSS (all) | 2989 | 99.6 % | 23 (19 UNKNOWN, 2 GALAXY → STAR; 2 non-stars UNKNOWN → STAR) | 21 |
+| DESI faint | 518 | 99.0 % | 7 (6 UNKNOWN, 1 QSO → STAR) | 7 |
+
+Coarse metrics before → after:
+
+| set | abstention | accuracy (UNKNOWN = wrong) | accuracy when classified |
+|---|---|---|---|
+| SDSS test | 2.56 → 2.21 % | 0.9372 → 0.9402 | 0.9619 → 0.9615 |
+| DESI faint | 7.92 → 7.80 % | 0.8488 → 0.8503 | 0.9219 → 0.9222 |
+
+The non-stars with large motions in the truth sets were already predicted
+STAR before the change. They are most likely mis-associations (a
+foreground star at the spectroscopic position); the rule neither creates
+nor fixes them.
+
+Confidence for such objects = the measured precision (0.99), or the fused
+STAR probability when that is higher.

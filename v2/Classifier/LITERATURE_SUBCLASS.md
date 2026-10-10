@@ -217,3 +217,46 @@ Hosts made by `v2/host_groups.py` inherit the nucleus SDSS spectrum, the
 redshift and the SIMBAD type of their identity/nucleus entries. Their
 sub-class is computed after grouping. NGC 4522 → "Star-forming galaxy
 (large, resolved)", from its nucleus spectrum (SDSS STARFORMING).
+
+## From paper (`Classifier/literature.py`)
+Objects that the catalogue data leave UNKNOWN show what the literature
+calls them, as `from paper: <class>` with status `FROM_PAPER`. The primary
+class stays UNKNOWN, so the classifier's accuracy is not mixed with
+literature labels.
+
+Sources, in order:
+
+1. Paper catalogues that the pipeline cross-matches. Each is the product of
+   one publication:
+   * Suh 2021 AGB, 2021ApJS..256...43S
+   * HASH PN, 2016JPhCS.728c2008P
+   * ATNF pulsars, 2005AJ....129.1993M
+   * Asiago SN, 1999A&AS..139..531B
+   * ASAS-SN SN, 2017MNRAS.464.2672H
+2. SIMBAD object type. Curators assign it from the literature (Wenger et al.
+   2000). It comes with the three papers that discuss the object most:
+   `has_ref.obj_freq`, then the most recent (`Get_data/simbad.py`, TAP
+   tables `basic`, `has_ref`, `ref`, `otypedef`).
+3. NED preferred type and its number of references.
+
+Types that only name the band of a detection are marked "(detection only)":
+SIMBAD IR/X/Rad/UV/mR/cm/smm/Opt/?, and NED IrS/RadioS/UvS/XrayS/VisS. They
+do not say what the object is.
+
+Output columns: `paper_class`, `paper_source`, `paper_refs` (bibcode (year)
+title, '|' separated) and `paper_ads` (ADS links). They are filled for
+every object. A classified object keeps its own sub-class, and its paper
+class is shown alongside.
+
+## Why UNKNOWN (`Classifier/unknown_reason.py`)
+`unknown_reason` explains each abstention from the data:
+
+* Inside a large galaxy.
+* Conflicting evidence, listing the classes and rules.
+* Two classes whose probabilities overlap, with both values.
+* Single-survey limits:
+  * SDSS beyond r = 22.2, its 95 % point-source completeness (York et al.
+    2000; Stoughton et al. 2002).
+  * Legacy Surveys S/N < 10, where Tractor morphology is not used (Dey et al.
+    2019).
+  * Pan-STARRS1 rows without a valid mean PSF magnitude.

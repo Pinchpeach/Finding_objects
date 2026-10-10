@@ -108,6 +108,30 @@ def _catalogs(row):
     return set(str(row.get("catalogs") or "").split("|"))
 
 
+def _mag(row, std_key, raw_flux_key=None, raw_mag_keys=(), offset=0.0):
+    """AB magnitude from the harmonised ``std_mag__*`` column (Preprocess/units.py);
+    falls back to the raw catalogue field when the row was not harmonised."""
+    v = _num(row, std_key)
+    if v is not None or std_key in row:          # harmonised: a missing value stays missing
+        return v
+    if raw_flux_key:
+        return _ab_mag(_num(row, raw_flux_key))
+    v = _num(row, *raw_mag_keys)
+    return None if v is None or not 0 < v < 40 else v + offset    # PS1 -999 / SDSS -9999 sentinels
+
+
+WISE_AB = {1: 2.699, 2: 3.339, 3: 5.174, 4: 6.620}     # units.WISE_AB (Jarrett+2011)
+
+
+def _wise_vega(row, band):
+    """WISE magnitude in the Vega system the WISE colour criteria are defined in."""
+    v = _num(row, f"std_mag__wise_w{band}")
+    if v is not None or f"std_mag__wise_w{band}" in row:
+        return None if v is None else v - WISE_AB[band]
+    v = _num(row, f"allwise__W{band}mag")
+    return v if v is not None and 0 < v < 40 else None
+
+
 def _ab_mag(flux_nmgy):
     return 22.5 - 2.5 * math.log10(flux_nmgy) if flux_nmgy and flux_nmgy > 0 else None
 
@@ -154,6 +178,9 @@ def _ms_abs_g(bprp0: float):
 
 
 def _ebv(row):
+    v = _num(row, "std_ebv")
+    if v is not None:
+        return v
     t = _num(row, "desi_legacy_surveys_dr10__mw_transmission_g")
     if t and 0 < t <= 1:
         return -2.5 * math.log10(t) / R_DECAM_G
@@ -221,14 +248,15 @@ def star_spectral_type(row):
     if n_bp is not None:
         return n_bp, None, "GAIA_BPRP0", f"Gaia (BP-RP)0 = {bprp0:.2f} ({how}) on the Pecaut & Mamajek dwarf sequence"
     ebv = _ebv(row) or 0.0
-    g = _ab_mag(_num(row, "desi_legacy_surveys_dr10__flux_g")); r = _ab_mag(_num(row, "desi_legacy_surveys_dr10__flux_r"))
+    g = _mag(row, "std_mag__ls_g", "desi_legacy_surveys_dr10__flux_g"); r = _mag(row, "std_mag__ls_r", "desi_legacy_surveys_dr10__flux_r")
     if g is not None and r is not None:
         gr0 = g - r - (3.214 - 2.165) * ebv
         if gr0 < 1.3:
             n = _nearest("g-r", gr0)
             if n is not None:
                 return n, None, "LS_GR0", f"Legacy Surveys (g-r)0 = {gr0:.2f} on the Pecaut & Mamajek dwarf sequence"
-    i, z = _num(row, "pan_starrs1_dr2_meanobject__iMeanPSFMag"), _num(row, "pan_starrs1_dr2_meanobject__zMeanPSFMag")
+    i = _mag(row, "std_mag__ps1_i", raw_mag_keys=("pan_starrs1_dr2_meanobject__iMeanPSFMag",))
+    z = _mag(row, "std_mag__ps1_z", raw_mag_keys=("pan_starrs1_dr2_meanobject__zMeanPSFMag",))
     if i is not None and z is not None and i - z > 0.25:
         n = _nearest("i-z", i - z, lo=60)
         if n is not None:
@@ -333,7 +361,8 @@ def star_tags(row):
     # lower bounds of the Koenig et al. (2012) class II locus.  Dusty discs
     # (YSOs, debris discs) or circumstellar shells (AGB); background
     # galaxies can mimic it.
-    w1, w2, w3, ew3 = (_num(row, f"allwise__{k}") for k in ("W1mag", "W2mag", "W3mag", "e_W3mag"))
+    w1, w2, w3 = (_wise_vega(row, k) for k in (1, 2, 3))
+    ew3 = _num(row, "std_magerr__wise_w3", "allwise__e_W3mag")
     if None not in (w1, w2, w3, ew3) and ew3 < 0.2 and w1 - w2 > 0.25 and w2 - w3 > 1.0:
         tags.append({"tag": "IR_EXCESS", "label": "infrared-excess star (dust disc / shell candidate)", "rule": "WISE_IR_EXCESS",
                      "basis": f"W1-W2 = {w1 - w2:.2f} > 0.25, W2-W3 = {w2 - w3:.2f} > 1.0 (Koenig+2012)"})
@@ -408,8 +437,8 @@ def galaxy_activity(row):
     if ot in SIMBAD_GALAXY:
         act, name = SIMBAD_GALAXY[ot]
         return act, "SIMBAD_OTYPE", f"SIMBAD type {ot} ({name})"
-    w1, w2, w3 = (_num(row, f"allwise__W{k}mag") for k in (1, 2, 3))
-    ew3 = _num(row, "allwise__e_W3mag")
+    w1, w2, w3 = (_wise_vega(row, k) for k in (1, 2, 3))
+    ew3 = _num(row, "std_magerr__wise_w3", "allwise__e_W3mag")
     if w1 is not None and w2 is not None and w1 - w2 >= 0.8 and w2 < 15.05:
         return "AGN", "WISE_STERN12", f"W1-W2 = {w1 - w2:.2f} >= 0.8 with W2 = {w2:.2f} < 15.05"
     if w2 is not None and w3 is not None:
@@ -422,10 +451,10 @@ def galaxy_activity(row):
         elif ew3 is None and c < 1.5:
             # AllWISE W3 upper limit: the true W2-W3 is bluer still.
             return "QUIESCENT", "WISE_W23_UL", f"W2-W3 < {c:.2f} (W3 upper limit) < 1.5"
-    nuv = _num(row, "galex_ais__NUVmag")
-    r = _ab_mag(_num(row, "desi_legacy_surveys_dr10__flux_r"))
+    nuv = _mag(row, "std_mag__galex_nuv", raw_mag_keys=("galex_ais__NUVmag",))
+    r = _mag(row, "std_mag__ls_r", "desi_legacy_surveys_dr10__flux_r")
     if r is None:
-        r = _num(row, "pan_starrs1_dr2_meanobject__rMeanKronMag", "sdss_dr18_photoobj__petroMag_r")
+        r = _mag(row, "std_mag__ps1kron_r", raw_mag_keys=("pan_starrs1_dr2_meanobject__rMeanKronMag", "sdss_dr18_photoobj__petroMag_r"))
     if nuv is not None and r is not None:
         ebv = _ebv(row) or 0.0
         nuvr = nuv - r - (8.2 - 2.165) * ebv
@@ -458,10 +487,11 @@ def distance_modulus(z: float) -> float:
 def _optical_gr(row):
     """Dereddened (g, r) AB magnitudes: Legacy Surveys, else SDSS model mags."""
     ebv = _ebv(row) or 0.0
-    g, r = _ab_mag(_num(row, "desi_legacy_surveys_dr10__flux_g")), _ab_mag(_num(row, "desi_legacy_surveys_dr10__flux_r"))
+    g, r = _mag(row, "std_mag__ls_g", "desi_legacy_surveys_dr10__flux_g"), _mag(row, "std_mag__ls_r", "desi_legacy_surveys_dr10__flux_r")
     if g is not None and r is not None:
         return g - 3.214 * ebv, r - 2.165 * ebv
-    g, r = _num(row, "sdss_dr18_photoobj__modelMag_g"), _num(row, "sdss_dr18_photoobj__modelMag_r")
+    g = _mag(row, "std_mag__sdss_g", raw_mag_keys=("sdss_dr18_photoobj__modelMag_g",))
+    r = _mag(row, "std_mag__sdss_r", raw_mag_keys=("sdss_dr18_photoobj__modelMag_r",))
     if g is not None and r is not None:
         return g - 3.303 * ebv, r - 2.285 * ebv
     return None, None
@@ -548,7 +578,12 @@ def galaxy_profile(row):
         # Sersic n = 2.5 separates early (bulge-dominated) from late (disc)
         # types (Shen et al. 2003, MNRAS 343, 978; Blanton et al. 2003).
         return ("EARLY_TYPE" if n >= 2.5 else "DISK"), "LS_SERSIC", f"Legacy Surveys Sersic n = {n:.2f} (early type if >= 2.5)"
-    u, r = _num(row, "sdss_dr18_photoobj__modelMag_u"), _num(row, "sdss_dr18_photoobj__modelMag_r")
+    # Strateva et al. defined u-r = 2.22 in the native SDSS system: undo the
+    # AB offset of u (units.SDSS_AB, -0.04).
+    u = _mag(row, "std_mag__sdss_u", raw_mag_keys=("sdss_dr18_photoobj__modelMag_u",))
+    if u is not None and _num(row, "std_mag__sdss_u") is not None:
+        u += 0.04
+    r = _mag(row, "std_mag__sdss_r", raw_mag_keys=("sdss_dr18_photoobj__modelMag_r",))
     if u is not None and r is not None:
         ur = u - r - (R_SDSS_U - R_SDSS_R) * (_ebv(row) or 0.0)
         return ("EARLY_TYPE" if ur >= 2.22 else "LATE_TYPE"), "SDSS_UR", f"(u-r)0 = {ur:.2f} vs 2.22 (Strateva+2001)"
@@ -588,9 +623,11 @@ def radio_14ghz_mjy(row):
 
 
 def qso_i_mag(row):
-    i = _num(row, "pan_starrs1_dr2_meanobject__iMeanPSFMag", "sdss_dr18_photoobj__psfMag_i")
+    i = _mag(row, "std_mag__ps1_i", raw_mag_keys=("pan_starrs1_dr2_meanobject__iMeanPSFMag",))
     if i is None:
-        i = _ab_mag(_num(row, "desi_legacy_surveys_dr10__flux_i"))
+        i = _mag(row, "std_mag__sdsspsf_i", raw_mag_keys=("sdss_dr18_photoobj__psfMag_i",))
+    if i is None:
+        i = _mag(row, "std_mag__ls_i", "desi_legacy_surveys_dr10__flux_i")
     return i
 
 
@@ -599,7 +636,7 @@ def spectroscopic_z(row):
     redshift not flagged photometric.  SIMBAD rvz_redshift is not used: its
     source (spectroscopic or photometric) is not carried by the collector,
     and in COSMOS it produced impossible luminosities (M_B ~ -5)."""
-    z = _num(row, "sdss_dr18_spectroscopy__z", "desi_dr1_spectroscopy__z", "lamost_dr_catalog__z")
+    z = _num(row, "std_z_spec", "sdss_dr18_spectroscopy__z", "desi_dr1_spectroscopy__z", "lamost_dr_catalog__z")
     if z is not None:
         return z
     flag = str(row.get("ned__Redshift Flag") or "").upper()
@@ -676,7 +713,7 @@ def qso_tags(row):
     # Obscured (red) quasar: R - [4.5] > 6.1 (Vega; Hickox et al. 2007), with
     # R = r - 0.1837 (g - r) - 0.0971 (Lupton 2005) and W2 for [4.5].
     g, r = _optical_gr(row)
-    w2 = _num(row, "allwise__W2mag")
+    w2 = _wise_vega(row, 2)
     if g is not None and r is not None and w2 is not None:
         rv = r - 0.1837 * (g - r) - 0.0971
         if rv - w2 > 6.1:
@@ -715,6 +752,20 @@ def classify(row):
     return out
 
 
+@lru_cache(maxsize=1)
+def _literature():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("v2_literature", ROOT / "literature.py")
+    m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m); return m
+
+
+@lru_cache(maxsize=1)
+def _unknown_reason():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("v2_unknown_reason", ROOT / "unknown_reason.py")
+    m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m); return m
+
+
 def annotate(df: pd.DataFrame, rows=None) -> pd.DataFrame:
     import json
     rows = rows if rows is not None else df.to_dict("records")
@@ -725,6 +776,14 @@ def annotate(df: pd.DataFrame, rows=None) -> pd.DataFrame:
             for r, v in zip(rows, df[col]):
                 r[col] = v
     res = [classify(r) for r in rows]
+    # Literature ("from paper") classification. It is reported for every
+    # object, but replaces the sub-class only where the catalogue data leave
+    # the object UNKNOWN; the primary class itself stays UNKNOWN.
+    papers = [_literature().from_paper(r) for r in rows]
+    for row, r, p in zip(rows, res, papers):
+        if p and str(row.get("primary_class") or "UNKNOWN").upper() == "UNKNOWN":
+            r["subclass"] = f"from paper: {p['paper_class']}" + (" (detection only)" if p["detection_only"] else "")
+            r["status"], r["rule"], r["basis"] = "FROM_PAPER", "LITERATURE", p["paper_source"]
     out = df.copy()
     out["subclass"] = [r.get("subclass") for r in res]
     out["subclass_code"] = [r.get("code") for r in res]
@@ -732,6 +791,9 @@ def annotate(df: pd.DataFrame, rows=None) -> pd.DataFrame:
     out["subclass_rule"] = [r.get("rule") for r in res]
     out["subclass_status"] = [r.get("status") for r in res]
     out["subclass_basis"] = [r.get("basis") for r in res]
+    for col in ("paper_class", "paper_source", "paper_refs", "paper_ads"):
+        out[col] = [p.get(col) if p else None for p in papers]
+    out["unknown_reason"] = [_unknown_reason().reason(r) for r in rows]
     out["subclass_tags"] = ["; ".join(t["label"] for t in r.get("tags", [])) or None for r in res]
     out["subclass_json"] = [json.dumps(r, separators=(",", ":"), default=str) for r in res]
     return out
