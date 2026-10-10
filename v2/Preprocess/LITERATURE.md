@@ -115,3 +115,38 @@ A future trained tree/random forest should be learned from a large external
 spectroscopic training set matched to exactly the same Gaia/PS1/WISE/2MASS
 features, with train/validation/test separation and magnitude/sky-domain checks.
 
+
+
+## Unit harmonisation (`units.py`, Stage 2)
+Quantities measured by several catalogues are converted to one system and
+added as `std_*` columns. The native columns are kept unchanged.
+
+| quantity | standard | conversion | source |
+|---|---|---|---|
+| Legacy Surveys g r i z W1 W2 | AB mag | 22.5 − 2.5 log10(f [nanomaggy]); σ = 1.0857 / (f √ivar) | Dey et al. 2019; unWISE calibrated to AllWISE (Schlafly et al. 2019) |
+| Pan-STARRS1 | AB mag | — | Tonry et al. 2012 |
+| SDSS | AB mag | u − 0.04, z + 0.02 | SDSS DR14 flux-calibration notes |
+| GALEX | AB mag | — | Morrissey et al. 2007 |
+| AllWISE W1–W4 | AB mag | Vega + 2.699 / 3.339 / 5.174 / 6.620 | Jarrett et al. 2011; WISE Explanatory Supplement IV.4.h |
+| 2MASS J H Ks | AB mag | Vega + 0.91 / 1.39 / 1.85 | Blanton & Roweis 2007 |
+| Gaia G BP RP | Gaia (Vega) system, not converted | — | compared only with Gaia-system references |
+| reddening | SFD E(B−V) | LS mw_transmission_g, R_g = 3.214; else GALEX E(B−V) | Schlafly & Finkbeiner 2011 |
+| radio | mJy; 1.4 GHz equivalent | LoTSS 144 MHz and VLASS 3 GHz with α = −0.7 | Condon 1992 |
+| redshift | spectroscopic z only | SDSS / DESI / LAMOST; NED z or v/c unless flagged photometric; SIMBAD → `std_z_catalog` | |
+
+Consistency checks (median difference, NMAD), benchmark point sources:
+
+| comparison | stars | quasars | why |
+|---|---|---|---|
+| LS − PS1 g | 0.003 (0.024), n = 3183 | | |
+| LS − PS1 r | −0.059 (0.040), n = 3225 | | |
+| LS − PS1 z | −0.030 (0.032), n = 3246 | | |
+| scatter | | 0.21–0.23 | variability between epochs |
+| 2MASS PSC Ks − AllWISE Kmag | 0.000 | | |
+
+* The star offsets are the DECam/PS1 passband differences (a few hundredths
+  of a mag).
+* A wrong unit would show as offsets of magnitudes; for example, 2.7 mag for
+  a missing WISE Vega → AB term.
+* The WISE W1/W2 check (LS unWISE AB vs AllWISE) needs real fields. It is
+  printed by `v2_field_validation.yml`.

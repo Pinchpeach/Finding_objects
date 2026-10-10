@@ -66,6 +66,11 @@ jobs:
               eff=s.primary_class.where(s.parent_object_id.isna(), s.parent_object_id.map(host_cls))
               ce=eff.ne("UNKNOWN")
               print(f"parts scored by their host ({int(s.parent_object_id.notna().sum())}): coverage={ce.mean():.3f} accuracy_when_classified={(eff==s.truth)[ce].mean():.3f}")
+          import importlib.util
+          spec=importlib.util.spec_from_file_location("units","v2/Preprocess/units.py"); units=importlib.util.module_from_spec(spec); spec.loader.exec_module(units)
+          pts=d[d.get("desi_legacy_surveys_dr10__type",pd.Series(index=d.index)).astype(str).eq("PSF")]
+          print("\n== unit harmonisation: same band from two catalogues (point sources; AB after conversion)")
+          print(units.consistency(pts))
           print("\n== second-stage sub-class")
           print(d.subclass_status.value_counts().to_string())
           top=d[d.parent_object_id.isna()] if "parent_object_id" in d.columns else d

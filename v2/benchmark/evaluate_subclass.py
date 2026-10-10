@@ -35,7 +35,7 @@ FEATURES = {
                                                                 "mw_transmission_g", "mw_transmission_r", "mw_transmission_z")}),
     "panstarrs1": ("pan_starrs1_dr2_meanobject", {c: c for c in ("gMeanPSFMag", "rMeanPSFMag", "iMeanPSFMag", "zMeanPSFMag",
                                                                  "rMeanKronMag")}),
-    "allwise": ("allwise", {c: c for c in ("W1mag", "W2mag", "W3mag", "e_W1mag", "e_W2mag", "e_W3mag")}),
+    "allwise": ("allwise", {c: c for c in ("W1mag", "W2mag", "W3mag", "e_W1mag", "e_W2mag", "e_W3mag", "Jmag", "Kmag")}),
     "galex": ("galex_ais", {"NUVmag": "NUVmag", "E(B-V)": "E(B-V)"}),
     "twomass": ("2mass_psc", {"Kmag": "Kmag"}),
 }
@@ -74,7 +74,14 @@ def load_physical():
     m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m); return m
 
 
+def load_units():
+    spec = importlib.util.spec_from_file_location("v2_units", V2 / "Preprocess" / "units.py")
+    m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m); return m
+
+
 def evaluate(rows: pd.DataFrame, sc, label: str) -> tuple[dict, pd.DataFrame]:
+    # Same harmonised std_* columns as the pipeline (Stage 2).
+    rows = load_units().harmonize(rows)
     recs = rows.to_dict("records")
     phys = load_physical()
     for r in recs:                     # the physical axis (WD locus) reads bare Gaia names
