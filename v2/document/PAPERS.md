@@ -11,13 +11,13 @@ v2의 코드·문서·규칙표가 인용하는 논문, 카탈로그 출판물, 
 | [탐사·카탈로그 데이터](#survey) | 22 |
 | [데이터 출처 카탈로그 (논문 인용 없음)](#data) | 13 |
 | [교차 대응·통계·분류 방법](#method) | 8 |
-| [별 분류](#star) | 21 |
+| [별 분류](#star) | 25 |
 | [은하 분류](#galaxy) | 23 |
 | [퀘이사·AGN](#qso) | 14 |
 | [전파·X선·밀집성](#radio) | 4 |
 | [행성상성운·초신성·과도 현상](#trans) | 6 |
 | [기타 문서](#doc) | 13 |
-| **합계** | **152** |
+| **합계** | **156** |
 
 <a id="gaia"></a>
 ## 측성·Gaia
@@ -35,7 +35,7 @@ Gaia 데이터 릴리스, Gaia 처리·검증 논문, 측성 품질 기준.
 | Rimoldini et al. 2023 (Gaia DR3 supervised variability classification) | — | — | `Classifier/LITERATURE.md`<br>`Classifier/LITERATURE_SUBCLASS.md` (변광 유형 속성) | Gaia DR3 지도학습 변광 분류(vari_classifier_result) |
 | Clementini et al. 2022/2023 (Gaia DR3 SOS RR Lyrae) (저장소 표기 그대로) | — | — | `Classifier/LITERATURE_MULTI_AXIS.md` | RR Lyrae 검증: 주기-진폭, Fourier 위상 φ21·φ31 |
 | Ripepi et al. 2022/2023 (Gaia DR3 SOS Cepheids) (저장소 표기 그대로) | — | — | `Classifier/LITERATURE_MULTI_AXIS.md` | 세페이드 하위 유형의 다파장 시계열 특성화·검증 |
-| Lebzelter et al. 2023 (Gaia DR3 LPV table) (저장소 표기 그대로) | — | — | `benchmark/build_agb_chemistry_truth.py` | gaiadr3.vari_long_period_variable의 is_cstar로 AGB 화학형 정답을 독립 점검 |
+| Lebzelter et al. 2023 (Gaia DR3 LPV table) (저장소 표기 그대로) | — | — | `benchmark/build_agb_chemistry_truth.py`<br>`Classifier/subclass.py` (GAIA_LPV_CSTAR) | gaiadr3.vari_long_period_variable의 is_cstar로 AGB 화학형 정답을 독립 점검; 세부 분류에서 C-star 판정 |
 | (저자 미기재) "Gaia DR3 all-sky variability classification" (저장소 표기 그대로) | URL: https://www.aanda.org/articles/aa/full_html/2023/06/aa45591-22/aa45591-22.html | — | `Classifier/STELLAR_EVIDENCE_CONFIGURATION_2026-10-08.md` (Sources) | Gaia DR3 SOS 변광 세부 유형(RRab/RRc/RRd, 세페이드 유형·모드, LPV 탄소별 후보)과 XP 기반 백색왜성 유형 설정의 근거 |
 | (저자 미기재) "Gaia DR3 RR Lyrae SOS catalogue" (저장소 표기 그대로) | URL: https://www.aanda.org/articles/aa/full_html/2023/06/aa43964-22/aa43964-22.html | — | `Classifier/STELLAR_EVIDENCE_CONFIGURATION_2026-10-08.md` (Sources) | Gaia DR3 SOS 변광 세부 유형(RRab/RRc/RRd, 세페이드 유형·모드, LPV 탄소별 후보)과 XP 기반 백색왜성 유형 설정의 근거 |
 | (저자 미기재) "Gaia DR3 long-period-variable catalogue" (저장소 표기 그대로) | URL: https://www.aanda.org/articles/aa/full_html/2023/06/aa44241-22/aa44241-22.html | — | `Classifier/STELLAR_EVIDENCE_CONFIGURATION_2026-10-08.md` (Sources) | Gaia DR3 SOS 변광 세부 유형(RRab/RRc/RRd, 세페이드 유형·모드, LPV 탄소별 후보)과 XP 기반 백색왜성 유형 설정의 근거 |
@@ -158,6 +158,10 @@ Gaia 데이터 릴리스, Gaia 처리·검증 논문, 측성 품질 기준.
 | Elsworth et al. 2019 (APOKASC evolutionary states) | MNRAS 489, 4641 | — | `Classifier/LITERATURE_MULTI_AXIS.md` | 성진학 기반 적색거성 진화 단계; AGB 분리는 어려움 |
 | Vrard et al. 2025 (Kepler red-giant evolutionary states) (저장소 표기 그대로) | VizieR J/A+A/697/A165 (table4) | — | `Classifier/truth/build_independent_truth_sets.py`<br>`Classifier/truth/generated/README.md`<br>`Classifier/MODEL_STATUS_AND_IMPROVEMENT_2026-10-08.md`<br>`Classifier/LITERATURE_MULTI_AXIS.md` ('Vrard et al. (2024 preprint)') | RGB(EV=1)/AGB 후보(EV=2) 독립 정답. LITERATURE_MULTI_AXIS.md의 2024 preprint 표기와 같은 연구로 보고 병합 |
 | Groenewegen 2017 | — | — | `Classifier/LITERATURE_MULTI_AXIS.md` | 미라·RR Lyrae·세페이드 주기-광도 관계 |
+| Lebzelter et al. 2018 | A&A 616, L13 | — | `Classifier/subclass.py` (agb_chemistry, GAIA_2MASS_WESENHEIT) | Gaia–2MASS Wesenheit 차 W_RP−W_KJ로 O-rich/C-rich AGB 구분 |
+| Mowlavi, Trabucchi & Lebzelter 2019 | arXiv:1907.05359 (저장소 표기 그대로) | — | `Classifier/subclass.py` (AGB_DW_C) | 은하계 LPV의 O/C 경계 ≈ 0.9 mag |
+| Abia et al. 2020 | A&A 633, A135 | — | `Classifier/subclass.py` (AGB_DW_XC) | 은하계 탄소별 Gaia–2MASS 도표, 극단 C-rich 경계 ≈ 1.7 mag |
+| Lian et al. 2014 | A&A 564, A84 | — | `Classifier/subclass.py` (WISE_LIAN14) | AllWISE W1−W2 대 W3−W4 직선으로 O-rich/C-rich AGB 구분 (87 %/86 %) |
 
 <a id="galaxy"></a>
 ## 은하 분류

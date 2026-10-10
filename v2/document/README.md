@@ -29,13 +29,13 @@ v2의 분류기 코드와 문서가 근거로 인용하는 과학 논문, 카탈
 | 탐사·카탈로그 데이터 | 22 | Legacy Surveys, Pan-STARRS1, SDSS, SGA-2020, DESI DR1, GALEX, NVSS, SIMBAD, Suh 2021, HASH, ATNF, Asiago, ASAS-SN, Acker, LAMOST·SDSS 백색왜성 목록 |
 | 데이터 출처 카탈로그 (논문 인용 없음) | 13 | 코드가 VizieR ID나 서비스 이름으로만 쓰는 카탈로그(AllWISE, 2MASS, FIRST, LoTSS, VLASS, CSC 2.0, 4XMM, eRASS1, LAMOST DR5, SDSS DR18, NED, ASAS-SN 변광성, Gaia DR3 VizieR 사본) |
 | 교차 대응·통계·분류 방법 | 8 | 베이즈 교차 대응, EM 사전확률, kNN·결정트리·랜덤 포레스트, PS1 형태 분리 |
-| 별 분류 | 21 | 분광형·광도 계급, 백색왜성, 운동학 집단, 근거리·고유운동, 적색 거성군, 적외선 초과, 금속 결핍, 쌍성, RGB/AGB, 주기-광도 |
+| 별 분류 | 25 | 분광형·광도 계급, 백색왜성, 운동학 집단, 근거리·고유운동, 적색 거성군, 적외선 초과, 금속 결핍, 쌍성, RGB/AGB, 주기-광도 |
 | 은하 분류 | 23 | BPT, WISE·GALEX 색, 녹색 계곡, Sérsic·u−r, 광도, 경사각, 은하군, Galaxy Zoo |
 | 퀘이사·AGN | 14 | WISE AGN, z≈6 선택, DESI QSO 선택, 전파 세기, 광도(M_i), 가린 퀘이사, 고적색편이, 분석 우주론(Schneider+2010) |
 | 전파·X선·밀집성 | 4 | 전파 스펙트럼 지수, 펄서 후보 선택 |
 | 행성상성운·초신성·과도 현상 | 6 | PN 진단, 광도곡선 기반 초신성 분류 |
 | 기타 문서 | 13 | 설명서(WISE/AllWISE/2MASS), SDSS·Gaia·NED·SIMBAD 문서, PS1 아카이브 안내, desitarget, Redrock |
-| **합계** | **152** | |
+| **합계** | **156** | |
 
 별도의 "우주론·거리" 분야는 두지 않았습니다. 거리 계산에 쓰는 평탄 ΛCDM(H0 = 70, Ωm = 0.3)은
 Schneider et al. 2010 하나에서 오며, 이 논문은 퀘이사 광도 절단에도 쓰이므로 "퀘이사·AGN"에 넣었습니다.

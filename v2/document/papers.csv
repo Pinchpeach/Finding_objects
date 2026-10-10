@@ -8,7 +8,7 @@ category,citation,journal_ref,bibcode,used_in,purpose
 측성·Gaia,Rimoldini et al. 2023 (Gaia DR3 supervised variability classification),—,—,Classifier/LITERATURE.md; Classifier/LITERATURE_SUBCLASS.md (변광 유형 속성),Gaia DR3 지도학습 변광 분류(vari_classifier_result)
 측성·Gaia,Clementini et al. 2022/2023 (Gaia DR3 SOS RR Lyrae) (저장소 표기 그대로),—,—,Classifier/LITERATURE_MULTI_AXIS.md,"RR Lyrae 검증: 주기-진폭, Fourier 위상 φ21·φ31"
 측성·Gaia,Ripepi et al. 2022/2023 (Gaia DR3 SOS Cepheids) (저장소 표기 그대로),—,—,Classifier/LITERATURE_MULTI_AXIS.md,세페이드 하위 유형의 다파장 시계열 특성화·검증
-측성·Gaia,Lebzelter et al. 2023 (Gaia DR3 LPV table) (저장소 표기 그대로),—,—,benchmark/build_agb_chemistry_truth.py,gaiadr3.vari_long_period_variable의 is_cstar로 AGB 화학형 정답을 독립 점검
+측성·Gaia,Lebzelter et al. 2023 (Gaia DR3 LPV table) (저장소 표기 그대로),—,—,benchmark/build_agb_chemistry_truth.py; Classifier/subclass.py (GAIA_LPV_CSTAR),gaiadr3.vari_long_period_variable의 is_cstar로 AGB 화학형 정답을 독립 점검; 세부 분류에서 C-star 판정
 측성·Gaia,"(저자 미기재) ""Gaia DR3 all-sky variability classification"" (저장소 표기 그대로)",URL: https://www.aanda.org/articles/aa/full_html/2023/06/aa45591-22/aa45591-22.html,—,Classifier/STELLAR_EVIDENCE_CONFIGURATION_2026-10-08.md (Sources),"Gaia DR3 SOS 변광 세부 유형(RRab/RRc/RRd, 세페이드 유형·모드, LPV 탄소별 후보)과 XP 기반 백색왜성 유형 설정의 근거"
 측성·Gaia,"(저자 미기재) ""Gaia DR3 RR Lyrae SOS catalogue"" (저장소 표기 그대로)",URL: https://www.aanda.org/articles/aa/full_html/2023/06/aa43964-22/aa43964-22.html,—,Classifier/STELLAR_EVIDENCE_CONFIGURATION_2026-10-08.md (Sources),"Gaia DR3 SOS 변광 세부 유형(RRab/RRc/RRd, 세페이드 유형·모드, LPV 탄소별 후보)과 XP 기반 백색왜성 유형 설정의 근거"
 측성·Gaia,"(저자 미기재) ""Gaia DR3 long-period-variable catalogue"" (저장소 표기 그대로)",URL: https://www.aanda.org/articles/aa/full_html/2023/06/aa44241-22/aa44241-22.html,—,Classifier/STELLAR_EVIDENCE_CONFIGURATION_2026-10-08.md (Sources),"Gaia DR3 SOS 변광 세부 유형(RRab/RRc/RRd, 세페이드 유형·모드, LPV 탄소별 후보)과 XP 기반 백색왜성 유형 설정의 근거"
@@ -151,3 +151,7 @@ category,citation,journal_ref,bibcode,used_in,purpose
 기타 문서,SIMBAD object-type guide / documentation,—,—,Preprocess/classification_rules.csv SIMBAD-TYPE-001; Preprocess/catalog_reliability.csv (catalog_confidence_simbad_type),SIMBAD 주 천체 유형 계층
 기타 문서,desitarget (targets.encode_targetid),—,—,Preprocess/association_model.py; Preprocess/COARSE_BENCHMARK_RESULTS.md; WORK_LOG_2026-10-08.md,DESI TARGETID에 LS RELEASE/BRICKID/OBJID가 들어 있음 → ID로 정확히 연결
 기타 문서,"Redrock (DESI spectral classification, SPECTYPE)",—,—,benchmark/build_desi_truth.py; Get_data/desi_spectroscopy.py; Preprocess/COARSE_BENCHMARK_RESULTS.md,"DESI 정답 레이블 SPECTYPE (ZWARN = 0, DELTACHI2 > 25)"
+별 분류,Lebzelter et al. 2018,"A&A 616, L13",—,"Classifier/subclass.py (agb_chemistry, GAIA_2MASS_WESENHEIT)",Gaia–2MASS Wesenheit 차 W_RP−W_KJ로 O-rich/C-rich AGB 구분
+별 분류,"Mowlavi, Trabucchi & Lebzelter 2019",arXiv:1907.05359 (저장소 표기 그대로),—,Classifier/subclass.py (AGB_DW_C),은하계 LPV의 O/C 경계 ≈ 0.9 mag
+별 분류,Abia et al. 2020,"A&A 633, A135",—,Classifier/subclass.py (AGB_DW_XC),"은하계 탄소별 Gaia–2MASS 도표, 극단 C-rich 경계 ≈ 1.7 mag"
+별 분류,Lian et al. 2014,"A&A 564, A84",—,Classifier/subclass.py (WISE_LIAN14),AllWISE W1−W2 대 W3−W4 직선으로 O-rich/C-rich AGB 구분(87 %/86 %)

@@ -260,3 +260,43 @@ class is shown alongside.
   * Legacy Surveys S/N < 10, where Tractor morphology is not used (Dey et al.
     2019).
   * Pan-STARRS1 rows without a valid mean PSF magnitude.
+
+## AGB chemistry: carbon (C-rich) and O-rich silicate AGB stars (2.5.0)
+After third dredge-up, AGB stars are either:
+- **O-rich** (C/O < 1): M-type spectra, silicate dust with the 9.7 µm feature.
+- **C-rich** (C/O > 1): carbon stars, with amorphous-carbon and SiC dust.
+
+**S stars** (C/O ≈ 1) lie between the two. Separating them traces the third
+dredge-up and makes carbon stars and dusty O-rich ("silicate") stars good AGB
+markers. `Classifier/subclass.py` `agb_chemistry()` tries the following
+evidence in order and stops at the first that applies.
+
+| Order | Evidence | Rule | Source |
+|---|---|---|---|
+| 1 | SIMBAD spectral type C… (C-N, C-R, C-J, C-H) or type C* → carbon; S, MS or SC, or type S* → S star | `SIMBAD_CSTAR` / `SIMBAD_SSTAR` | Wenger et al. 2000 (curated literature types) |
+| 2 | Suh (2021) catalogue membership (OAGB/CAGB tables) | `SUH2021` | Suh 2021, ApJS 256, 43 |
+| 3 | Gaia DR3 LPV RP-spectrum C-star flag `is_cstar` | `GAIA_LPV_CSTAR` | Lebzelter et al. 2023 (Gaia DR3 LPV catalogue) |
+| 4 | Gaia–2MASS Wesenheit difference ΔW = W_RP − W_KJ, with W_RP = G_RP − 1.3 (G_BP − G_RP) and W_KJ = Ks − 0.686 (J − Ks). ΔW ≥ 0.9 → C-rich; ≥ 1.7 → extreme (dust-enshrouded) C-rich; otherwise O-rich | `GAIA_2MASS_WESENHEIT` | Lebzelter et al. 2018, A&A 616, L13; Galactic boundaries from Mowlavi et al. 2019 and Abia et al. 2020 |
+| 5 | Without Gaia/2MASS: AllWISE line W1−W2 = 2.35 (W3−W4) − 1.24 (C-rich above). It separates 87 % of O-rich and 86 % of C-rich AGB stars | `WISE_LIAN14` | Lian et al. 2014, A&A 564, A84 |
+
+- **AGB-candidate gate:** the photometric rules (4 and 5) are applied only to
+  AGB candidates. A candidate is a long-period or Mira variable (variability
+  axis, Gaia SOS LPV), has AGB physical class (Suh 2021, SIMBAD AGB*), or
+  has a SIMBAD type among C*, S*, Mi*, LP*, OH* and pA*. Without the gate
+  the colours mean nothing: on the SDSS benchmark stars, 200 of 257 with
+  J−Ks ≥ 1 already have ΔW ≥ 0.9, and L dwarfs reach ΔW ≈ 3.
+- **Silicate tag:** an O-rich AGB star with a mid-IR dust excess,
+  Ks − W3 > 1.0, is labelled "O-rich AGB star with silicate dust". The
+  stellar photosphere has Ks − W3 ≈ 0.
+- **Carbon stars that are not AGB:** a SIMBAD carbon type without AGB
+  evidence is labelled "Carbon star" with code `STAR:C:?`, not as an AGB
+  star. These are dwarf carbon and CH stars.
+- **Codes:**
+  - `STAR:C:AGB`: carbon AGB star
+  - `STAR:M:AGB`: O-rich AGB star
+  - `STAR:S:AGB`: S-type AGB star
+- **Validation:** pending. The truth set is
+  `benchmark/build_agb_chemistry_truth.py`: Suh 2021 O-AGB/C-AGB stars with
+  Gaia, 2MASS and AllWISE photometry, built by GitHub Actions. The
+  thresholds above are the published values; they will be checked or
+  recalibrated on that set, and the result recorded in `CHANGELOG.md`.
