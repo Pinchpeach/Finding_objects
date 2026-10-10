@@ -66,7 +66,9 @@ class SkyMap(QWidget):
         self._kinds = [kind_of(r) for r in rows]
         name_col = "designation" if "designation" in df else "object_id" if "object_id" in df else None
         self._names = df[name_col].astype(str).tolist() if name_col else [""] * len(df)
-        self._subs = df["subclass"].fillna("").astype(str).tolist() if "subclass" in df else [""] * len(df)
+        subs = df["subclass"].fillna("").astype(str) if "subclass" in df else pd.Series([""] * len(df))
+        tags = df["subclass_tags"].fillna("").astype(str) if "subclass_tags" in df else pd.Series([""] * len(df))
+        self._subs = [a + (f"\n{b}" if b else "") for a, b in zip(subs.tolist(), tags.tolist())]
         self._hosts = []
         for i, r in enumerate(rows):
             d26 = _num(r.get("sga_d26_arcmin", r.get("sga_2020__sga_d26_arcmin")))
@@ -343,10 +345,10 @@ class DetailPanel(QWidget):
         lay.addWidget(self.title)
         info = QFormLayout()
         self.lbl_pos, self.lbl_status, self.lbl_cats = QLabel("–"), QLabel("–"), QLabel("–")
-        self.lbl_names = QLabel("–"); self.lbl_sub = QLabel("–"); self.lbl_parts = QLabel("–")
-        for w in (self.lbl_cats, self.lbl_names, self.lbl_sub, self.lbl_parts):
+        self.lbl_names = QLabel("–"); self.lbl_sub = QLabel("–"); self.lbl_parts = QLabel("–"); self.lbl_tags = QLabel("–")
+        for w in (self.lbl_cats, self.lbl_names, self.lbl_sub, self.lbl_parts, self.lbl_tags):
             w.setWordWrap(True)
-        for k, w in (("Sub-class", self.lbl_sub), ("Position", self.lbl_pos), ("Status", self.lbl_status),
+        for k, w in (("Sub-class", self.lbl_sub), ("Attributes", self.lbl_tags), ("Position", self.lbl_pos), ("Status", self.lbl_status),
                      ("Structure", self.lbl_parts), ("Catalog IDs", self.lbl_names), ("Catalogs", self.lbl_cats)):
             w.setTextInteractionFlags(Qt.TextSelectableByMouse); info.addRow(k, w)
         lay.addLayout(info)
@@ -389,7 +391,7 @@ class DetailPanel(QWidget):
         if row is None:
             self.title.setText("Select an object")
             self.title.setStyleSheet("font-weight: 600; font-size: 14px;")
-            for w in (self.lbl_pos, self.lbl_status, self.lbl_cats, self.lbl_names, self.lbl_sub, self.lbl_parts):
+            for w in (self.lbl_pos, self.lbl_status, self.lbl_cats, self.lbl_names, self.lbl_sub, self.lbl_parts, self.lbl_tags):
                 w.setText("–")
             for bar in self.bars.values():
                 bar.setValue(0)
@@ -412,6 +414,7 @@ class DetailPanel(QWidget):
         else:
             status = row.get("subclass_status")
             self.lbl_sub.setText(f"–  ({status})" if isinstance(status, str) else "–")
+        self.lbl_tags.setText(_tags_html(row.get("subclass_json")))
         ncomp = int(_num(row.get("n_components")) or 0)
         parent = row.get("parent_object_id")
         if ncomp:
@@ -459,6 +462,17 @@ class DetailPanel(QWidget):
     def _copy(self):
         if self._row is not None:
             QGuiApplication.clipboard().setText(f"{_f(self._row.get('ra'), 6)} {_f(self._row.get('dec'), 6)}")
+
+
+def _tags_html(raw) -> str:
+    """One line per attribute: label and the measurement behind it."""
+    try:
+        tags = json.loads(raw).get("tags", []) if isinstance(raw, str) and raw else []
+    except (ValueError, AttributeError):
+        tags = []
+    if not tags:
+        return "–"
+    return "<br>".join(f"{t.get('label', '')} <span style='color:gray'>— {t.get('basis', '')}</span>" for t in tags)
 
 
 def _angle(arcmin: float) -> str:

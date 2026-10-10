@@ -27,7 +27,7 @@ from PySide6.QtGui import QBrush, QColor, QIcon, QPainter, QPainterPath, QPen, Q
 STAR_COLORS = {"O": "#9bb0ff", "B": "#aabfff", "A": "#cad7ff", "F": "#f8f7ff", "G": "#fff4ea",
                "K": "#ffd2a1", "M": "#ffb46c", "L": "#ff8a4c", "T": "#e0603a", "Y": "#b04020"}
 OUTLINE = QColor("#3b3f45")
-GAL_EARLY, GAL_DISK, GAL_AGN, GAL_UNK = "#e8a85a", "#4f8fdc", "#d64f9a", "#8fa3c8"
+GAL_EARLY, GAL_DISK, GAL_AGN, GAL_UNK, GAL_GV = "#e8a85a", "#4f8fdc", "#d64f9a", "#8fa3c8", "#4caf50"
 QSO_COLOR = "#7b3fb5"
 UNKNOWN_COLOR = "#8a8f98"
 
@@ -39,6 +39,10 @@ def kind_of(row) -> dict:
     code = str(get("subclass_code", "") or "")
     parts = code.split(":")
     k = {"cls": cls, "code": code}
+    tags = str(get("subclass_tags", "") or "").lower()
+    k["binary"] = "binary" in tags
+    k["halo"] = "halo star" in tags
+    k["dwarf"] = "dwarf galaxy" in tags
     if cls == "STAR":
         k["letter"] = parts[1] if len(parts) > 1 and parts[1] not in ("", "?") else None
         k["lum"] = parts[2] if len(parts) > 2 and parts[2] not in ("", "?") else None
@@ -81,8 +85,11 @@ def draw(p: QPainter, k: dict, c: QPointF, size: float = 9.0, selected: bool = F
             if k.get("lum") in ("III", "II", "Ib", "Ia"):
                 halo = QColor(col); halo.setAlpha(70)
                 p.setPen(Qt.NoPen); p.setBrush(halo); p.drawEllipse(c, r * 1.15, r * 1.15)
-            p.setPen(QPen(OUTLINE, 1.0)); p.setBrush(col)
+            p.setPen(QPen(OUTLINE, 1.0, Qt.DashLine if k.get("halo") else Qt.SolidLine)); p.setBrush(col)
             p.drawPolygon(_star_path(c, r))
+            if k.get("binary"):                      # unresolved companion
+                p.setPen(QPen(OUTLINE, 0.8)); p.setBrush(col.darker(130))
+                p.drawEllipse(QPointF(c.x() + r * 0.95, c.y() - r * 0.75), r * 0.32, r * 0.32)
             if code == "STAR:CV":
                 p.setPen(QPen(QColor("#e0a000"), 1.2))
                 for i in range(8):
@@ -93,9 +100,11 @@ def draw(p: QPainter, k: dict, c: QPointF, size: float = 9.0, selected: bool = F
         act, prof = k.get("activity"), k.get("profile")
         disk = act in ("STAR_FORMING", "STARBURST") or prof in ("DISK", "LATE_TYPE")
         early = act == "QUIESCENT" or prof == "EARLY_TYPE"
-        col = QColor(GAL_AGN if act == "AGN" else GAL_DISK if disk else GAL_EARLY if early else GAL_UNK)
+        col = QColor(GAL_AGN if act == "AGN" else GAL_GV if act == "GREEN_VALLEY" else GAL_DISK if disk
+                     else GAL_EARLY if early else GAL_UNK)
         p.translate(c); p.rotate(-30)
-        rx, ry = size * 1.25, size * (0.55 if disk else 0.8)
+        sz = size * (0.7 if k.get("dwarf") else 1.0)
+        rx, ry = sz * 1.25, sz * (0.55 if disk else 0.8)
         fill = QColor(col); fill.setAlpha(170)
         p.setPen(QPen(col.darker(150), 1.0)); p.setBrush(fill)
         p.drawEllipse(QPointF(0, 0), rx, ry)
@@ -164,6 +173,9 @@ LEGEND = [
     ("Star-forming galaxy", {"cls": "GALAXY", "activity": "STAR_FORMING"}),
     ("Quiescent galaxy", {"cls": "GALAXY", "activity": "QUIESCENT"}),
     ("AGN host", {"cls": "GALAXY", "activity": "AGN"}),
+    ("Green-valley galaxy", {"cls": "GALAXY", "activity": "GREEN_VALLEY"}),
+    ("Binary candidate", {"cls": "STAR", "code": "STAR:K:V", "letter": "K", "lum": "V", "binary": True}),
+    ("Halo star (dashed)", {"cls": "STAR", "code": "STAR:G:VI", "letter": "G", "lum": "VI", "halo": True}),
     ("Galaxy", {"cls": "GALAXY"}),
     ("Quasar", {"cls": "QSO"}),
     ("Radio-loud QSO", {"cls": "QSO", "radio": "RADIO_LOUD"}),

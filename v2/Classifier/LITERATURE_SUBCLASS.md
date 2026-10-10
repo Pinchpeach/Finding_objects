@@ -141,6 +141,77 @@ line strong enough for an SDSS subclass.
 * Not validated here: the benchmark preserves no radio or X-ray fluxes. These
   are definitional properties computed from the measurements.
 
+## Attributes (`subclass_tags`, 2026-10-10 extension)
+Each object can carry several attributes besides its main sub-class. They are
+stored with their measurement in `subclass_json["tags"]`, listed in
+`subclass_tags`, and shown in the app.
+
+### STAR
+| attribute | rule | basis |
+|---|---|---|
+| thin disc / thick disc / halo | Gaia V_T = 4.74 μ/ϖ (ϖ/σ ≥ 5): < 40, 60–150, > 200 km/s (gaps left open) | Babusiaux et al. 2018, A&A 616, A10 (Gaia DR2 HRDs) |
+| subdwarf (luminosity class VI) | 1 < ΔM_G ≤ 3 below the dwarf sequence | metal-poor subdwarfs lie 1–2 mag below the MS (Kuiper 1939; Gizis 1997) |
+| astrometric binary candidate | RUWE > 1.4 | Lindegren et al. 2018; Belokurov et al. 2020 |
+| binary candidate | Gaia DSC binary probability ≥ 0.8 | Creevey et al. 2023 |
+| variable type | the variability axis (Gaia DR3 SOS / classifier, SIMBAD) | Rimoldini et al. 2023 |
+| nearby star | ϖ > 10 mas, ϖ/σ ≥ 10 (within 100 pc) | Gaia Catalogue of Nearby Stars volume (Gaia Collaboration, Smart et al. 2021) |
+| high proper motion | μ > 150 mas/yr | LSPM-North limit (Lépine & Shara 2005) |
+| red-clump giant | giant, 1.8 ≤ G−Ks ≤ 2.6, \|M_G − (0.495 + 1.121(G−Ks−2.1))\| ≤ 0.5 | Ruiz-Dern et al. 2018, A&A 609, A116 |
+| infrared excess (dust disc / shell) | W1−W2 > 0.25 and W2−W3 > 1.0 (W3 S/N ≥ 5) | lower bounds of the Koenig et al. 2012 class II locus; YSO, debris disc or AGB shell (background galaxies can mimic it) |
+| X-ray active star | Chandra / XMM / eROSITA counterpart | coronal activity: young stars, fast rotators, active binaries |
+| metal-poor candidate | GSP-Phot [M/H] < −1, G < 17 | Beers & Christlieb 2005. GSP-Phot [M/H] is only indicative (Andrae et al. 2023) |
+
+Physical checks (no truth labels exist for these):
+* SDSS stars: median GSP-Phot [M/H] falls from the thin disc (−0.52) to the
+  thick disc (−0.69) to the halo (−1.35).
+* SDSS stars with 1 < ΔM ≤ 3 have [M/H] = −1.40 / −1.47, against −0.66 on the
+  main sequence.
+* The fainter DESI star sample has no halo stars with ϖ/σ ≥ 5, and its
+  thin/thick-disc [M/H] trend is not monotonic (−0.51 / −0.36, n = 56 / 36).
+
+### GALAXY
+| attribute | rule | basis |
+|---|---|---|
+| green valley (activity) | 4 < (NUV−r)₀ ≤ 5 | Salim 2014; Wyder et al. 2007 |
+| type 1 / type 2 AGN | SDSS AGN with or without BROADLINE; SIMBAD Sy1/Sy2; LINER | Bolton et al. 2012; Khachikian & Weedman 1974 |
+| dwarf / luminous | M_B = g + 0.313(g−r) + 0.227 − DM(z), 0.003 < z < 0.1: dwarf if M_B > −16; luminous if < −21 | Tammann 1994; Lupton 2005 SDSS→Johnson; flat ΛCDM H0 = 70, Ωm = 0.3 |
+| interacting / pair / group / cluster / BCG / LSB / radio galaxy | SIMBAD object type (IG, PaG, GiP, GiG, GiC, BiC, LSB, rG) | Wenger et al. 2000 |
+| radio-loud AGN candidate | radio detection in a quiescent galaxy | Best & Heckman 2012 |
+| X-ray source | Chandra / XMM / eROSITA counterpart | |
+| edge-on / face-on | SGA b/a ≤ 0.3 / ≥ 0.85; inclination from cos²i = (q² − q0²)/(1 − q0²), q0 = 0.2 | Hubble 1926; Holmberg 1958 |
+| spectroscopic redshift | z and luminosity distance (flat ΛCDM) | |
+
+NGC 4522: "galaxy in a group; edge-on galaxy (i ≈ 81°); z = 0.0077". Kenney et al.
+(2004) give i ≈ 78° for this ram-pressure-stripped Virgo spiral.
+
+Redshifts for luminosities come only from spectra: SDSS, DESI and LAMOST,
+or an NED redshift not flagged photometric. SIMBAD rvz_redshift is not used,
+because its source is unknown. In the first COSMOS run it produced 30
+"dwarf galaxies" with M_B ≈ −4 to −6. A value M_B > −10 (fainter than any
+galaxy seen beyond the Local Group) means a wrong redshift or association,
+and no luminosity label is given.
+
+On the SDSS test split, green-valley galaxies are 30 with no strong lines,
+5 AGN and 2 star-forming. This matches the green valley's transitional,
+AGN-rich nature (Salim 2014), so the label is reported but not scored.
+
+### QSO
+| attribute | rule | basis |
+|---|---|---|
+| quasar vs Seyfert luminosity | M_i(z=2) with K(z) = −1.25 log10((1+z)/3) (α_ν = −0.5); quasar when M_i(z=0) = M_i(z=2) + 0.596 < −22 | Richards et al. 2006; Schneider et al. 2010 |
+| BL Lac / blazar | SIMBAD BLL / Bla | |
+| obscured (red) quasar candidate | R − W2 > 6.1 (Vega), R = r − 0.1837(g−r) − 0.0971 | Hickox et al. 2007 (≈ 80 % reliable); Lupton 2005 |
+| very-high-redshift quasar | spectroscopic z ≥ 5 | Fan et al. 2001, 2006 |
+
+Benchmark counts:
+* Obscured-quasar candidates: 9 / 644 SDSS-test quasars, 56 / 1595 DESI
+  quasars. DESI goes fainter and redder.
+* Metal-poor star candidates (SDSS test, 75): their kinematics are halo 14,
+  thick disc 12 and thin disc 2, as expected for metal-poor stars.
+
+Check: 87 % of SDSS and 93 % of DESI spectroscopic quasars come out at
+quasar luminosity.
+
 ## Large galaxies
 Hosts made by `v2/host_groups.py` inherit the nucleus SDSS spectrum, the
 redshift and the SIMBAD type of their identity/nucleus entries. Their
