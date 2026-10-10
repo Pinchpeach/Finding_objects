@@ -68,6 +68,18 @@ def _col(df, name):
     return pd.to_numeric(df[name], errors="coerce") if name in df else pd.Series(np.nan, index=df.index)
 
 
+def _magcol(df, name):
+    """A catalogue magnitude with missing-value sentinels removed (PS1 -999,
+    SDSS -9999 and 9999, GALEX/AllWISE nulls): only 0 < m < 40 is a measurement."""
+    m = _col(df, name)
+    return m.where((m > 0) & (m < 40))
+
+
+def _errcol(df, name):
+    e = _col(df, name)
+    return e.where((e > 0) & (e < 10))
+
+
 def _nmgy_to_ab(flux, ivar):
     f = flux.where(flux > 0)
     mag = 22.5 - 2.5 * np.log10(f)
@@ -84,31 +96,31 @@ def harmonize(df: pd.DataFrame) -> pd.DataFrame:
         new[f"std_mag__ls_{b}"], new[f"std_magerr__ls_{b}"] = m, e
     # Pan-STARRS1 (AB)
     for b in ("g", "r", "i", "z", "y"):
-        new[f"std_mag__ps1_{b}"] = _col(df, f"{PS1}{b}MeanPSFMag")
-        new[f"std_magerr__ps1_{b}"] = _col(df, f"{PS1}{b}MeanPSFMagErr")
-        new[f"std_mag__ps1kron_{b}"] = _col(df, f"{PS1}{b}MeanKronMag")
+        new[f"std_mag__ps1_{b}"] = _magcol(df, f"{PS1}{b}MeanPSFMag")
+        new[f"std_magerr__ps1_{b}"] = _errcol(df, f"{PS1}{b}MeanPSFMagErr")
+        new[f"std_mag__ps1kron_{b}"] = _magcol(df, f"{PS1}{b}MeanKronMag")
     # SDSS (asinh ~ AB; u and z offsets)
     for b, off in SDSS_AB.items():
-        new[f"std_mag__sdss_{b}"] = _col(df, f"{SDSS}modelMag_{b}") + off
-        new[f"std_magerr__sdss_{b}"] = _col(df, f"{SDSS}modelMagErr_{b}")
-        new[f"std_mag__sdsspsf_{b}"] = _col(df, f"{SDSS}psfMag_{b}") + off
+        new[f"std_mag__sdss_{b}"] = _magcol(df, f"{SDSS}modelMag_{b}") + off
+        new[f"std_magerr__sdss_{b}"] = _errcol(df, f"{SDSS}modelMagErr_{b}")
+        new[f"std_mag__sdsspsf_{b}"] = _magcol(df, f"{SDSS}psfMag_{b}") + off
     # GALEX (AB)
     for b, col in (("fuv", "FUVmag"), ("nuv", "NUVmag")):
-        new[f"std_mag__galex_{b}"] = _col(df, f"{GALEX}{col}")
-        new[f"std_magerr__galex_{b}"] = _col(df, f"{GALEX}e_{col}")
+        new[f"std_mag__galex_{b}"] = _magcol(df, f"{GALEX}{col}")
+        new[f"std_magerr__galex_{b}"] = _errcol(df, f"{GALEX}e_{col}")
     # AllWISE (Vega -> AB)
     for b, off in WISE_AB.items():
         n = b.upper()
-        new[f"std_mag__wise_{b}"] = _col(df, f"{WISE}{n}mag") + off
-        new[f"std_magerr__wise_{b}"] = _col(df, f"{WISE}e_{n}mag")
+        new[f"std_mag__wise_{b}"] = _magcol(df, f"{WISE}{n}mag") + off
+        new[f"std_magerr__wise_{b}"] = _errcol(df, f"{WISE}e_{n}mag")
     # 2MASS (Vega -> AB): PSC first, else the 2MASS columns carried by AllWISE
     for b, col in (("j", "Jmag"), ("h", "Hmag"), ("ks", "Kmag")):
-        v = _col(df, f"{TMASS}{col}").fillna(_col(df, f"{WISE}{col}"))
-        e = _col(df, f"{TMASS}e_{col}").fillna(_col(df, f"{WISE}e_{col}"))
+        v = _magcol(df, f"{TMASS}{col}").fillna(_magcol(df, f"{WISE}{col}"))
+        e = _errcol(df, f"{TMASS}e_{col}").fillna(_errcol(df, f"{WISE}e_{col}"))
         new[f"std_mag__2mass_{b}"], new[f"std_magerr__2mass_{b}"] = v + TMASS_AB[b], e
     # Gaia: native system
     for b, col in (("g", "phot_g_mean_mag"), ("bp", "phot_bp_mean_mag"), ("rp", "phot_rp_mean_mag")):
-        new[f"std_mag_gaia__{b}"] = _col(df, f"{GAIA}{col}")
+        new[f"std_mag_gaia__{b}"] = _magcol(df, f"{GAIA}{col}")
     new["std_parallax_mas"] = _col(df, f"{GAIA}parallax")
     new["std_parallax_err_mas"] = _col(df, f"{GAIA}parallax_error")
     new["std_pm_mas_yr"] = np.hypot(_col(df, f"{GAIA}pmra"), _col(df, f"{GAIA}pmdec"))

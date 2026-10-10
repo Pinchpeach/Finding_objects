@@ -154,3 +154,24 @@ def test_from_paper_for_unknown_objects_only():
     # A classified object keeps its own sub-class; the paper class is reported alongside.
     assert out.loc[3, "subclass_status"] != "FROM_PAPER" and out.loc[3, "paper_class"] == "Galaxy"
     assert pd.isna(out.loc[4, "paper_class"]) and out.loc[4, "subclass_status"] != "FROM_PAPER"
+
+
+def test_unknown_reason_explains_abstentions():
+    import pandas as pd
+    sc = _sc()
+    rows = pd.DataFrame([
+        {"primary_class": "UNKNOWN", "classification_status": "NO_EVIDENCE", "catalogs": "Pan-STARRS1 DR2 MeanObject",
+         "pan_starrs1_dr2_meanobject__rMeanPSFMag": -999.0, "pan_starrs1_dr2_meanobject__nDetections": 2},
+        {"primary_class": "UNKNOWN", "classification_status": "NO_EVIDENCE", "catalogs": "SDSS DR18 PhotoObj",
+         "sdss_dr18_photoobj__modelMag_r": 24.3},
+        {"primary_class": "UNKNOWN", "classification_status": "LOW_CONFIDENCE", "p_star": 0.45, "p_qso": 0.40, "p_galaxy": 0.15},
+        {"primary_class": "STAR", "classification_status": "CLASSIFIED"},
+    ])
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("v2_units_t", ROOT.parent / "Preprocess" / "units.py")
+    units = importlib.util.module_from_spec(spec); spec.loader.exec_module(units)
+    out = sc.annotate(units.harmonize(rows))
+    assert out.loc[0, "unknown_reason"] == "Pan-STARRS1 detection without valid mean photometry (2 detections)"
+    assert "beyond the r = 22.2" in out.loc[1, "unknown_reason"]
+    assert out.loc[2, "unknown_reason"].startswith("STAR or QSO")
+    assert pd.isna(out.loc[3, "unknown_reason"])

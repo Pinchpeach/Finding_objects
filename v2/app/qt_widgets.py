@@ -348,7 +348,7 @@ class DetailPanel(QWidget):
         self.lbl_pos, self.lbl_status, self.lbl_cats = QLabel("–"), QLabel("–"), QLabel("–")
         self.lbl_names = QLabel("–"); self.lbl_sub = QLabel("–"); self.lbl_parts = QLabel("–"); self.lbl_tags = QLabel("–")
         self.lbl_paper = QLabel("–"); self.lbl_paper.setOpenExternalLinks(True)
-        for w in (self.lbl_cats, self.lbl_names, self.lbl_sub, self.lbl_parts, self.lbl_tags, self.lbl_paper):
+        for w in (self.lbl_cats, self.lbl_names, self.lbl_sub, self.lbl_parts, self.lbl_tags, self.lbl_paper, self.lbl_status):
             w.setWordWrap(True)
         for k, w in (("Sub-class", self.lbl_sub), ("Attributes", self.lbl_tags), ("Literature", self.lbl_paper),
                      ("Position", self.lbl_pos), ("Status", self.lbl_status),
@@ -435,7 +435,9 @@ class DetailPanel(QWidget):
             self.lbl_parts.setText("Single object")
         names = row.get("catalog_designations")
         self.lbl_names.setText(str(names).replace("; ", "\n") if isinstance(names, str) and names else "–")
-        self.lbl_status.setText(f"{row.get('classification_status', '')}  (confidence {_f(row.get('primary_confidence'), 3)})")
+        why = row.get("unknown_reason")
+        self.lbl_status.setText(f"{row.get('classification_status', '')}  (confidence {_f(row.get('primary_confidence'), 3)})"
+                                + (f"<br><span style='color:gray'>why UNKNOWN: {html.escape(why)}</span>" if isinstance(why, str) and why else ""))
         self.lbl_cats.setText(str(row.get("catalogs", "")).replace("|", ", "))
         for c, bar in self.bars.items():
             v = _num(row.get(f"p_{c.lower()}"))

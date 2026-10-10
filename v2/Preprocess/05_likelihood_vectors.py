@@ -31,6 +31,17 @@ HOST_RADIUS=1.0
 # to re-estimate the field's class mix.
 FIELD_PRIOR_MIN_OBJECTS=50
 CONFLICT_RESOLVED_P=0.99
+# A Gaia parallax or proper motion measured at >= 10 sigma is physically
+# incompatible with a galaxy or a quasar: Gaia DR3 quasars scatter about
+# zero with normalised parallax/proper-motion widths of ~1.05-1.1
+# (Lindegren et al. 2021, A&A 649, A2; Gaia-CRF3, Klioner et al. 2022), so
+# 10 sigma stays decisive even if the faint-end errors are underestimated by
+# ~1.5 (El-Badry, Rix & Heintz 2021). Benchmarks: of the objects at >= 10
+# sigma, 99.6% (SDSS, n = 2989) and 99.0% (DESI, n = 518) are spectroscopic
+# stars; the rest are mis-associations already predicted STAR. Such an object
+# is classified STAR even when other (photometric) evidence conflicts.
+DECISIVE_MOTION_SIGMA=10.0
+DECISIVE_MIN_RELIABILITY=0.8   # Gaia astrometry quality (RUWE <= ~1.75) and association
 MODEL_PATH=Path(__file__).resolve().parent/"fusion_weights.json"
 
 def evidence_features(items):
@@ -99,6 +110,18 @@ def _gaia_foreground_star(items):
     """Significant Gaia parallax or proper motion (S/N >= 5; Stage-4 score >= 0.5)."""
     return any(e.get("rule_id") in {"AST-GAL-001","AST-GAL-002"} and float(e.get("raw_score",0))>=0.5 for e in items)
 
+def _decisive_motion(items):
+    """Gaia parallax or proper motion at >= DECISIVE_MOTION_SIGMA with a good
+    astrometric solution and a reliable association."""
+    for e in items:
+        if e.get("rule_id") not in {"AST-GAL-001","AST-GAL-002"}: continue
+        try:
+            if (float(e.get("value"))>=DECISIVE_MOTION_SIGMA and float(e.get("reliability",0))>=DECISIVE_MIN_RELIABILITY
+                    and float(e.get("association_reliability",0))>=DECISIVE_MIN_RELIABILITY):
+                return True
+        except (TypeError,ValueError): continue
+    return False
+
 def _spectroscopic(items):
     """Pipeline spectral class of this position (SPC-* rules, e.g. SDSS
     CLASS with ZWARNING == 0; Bolton et al. 2012, AJ 144, 144).  A spectrum
@@ -144,11 +167,11 @@ def run(evidence,out,model_path=MODEL_PATH,min_confidence=None,field_prior=False
             if c in CLASSES and s>=.8 and not str(e.get("rule_id","")).endswith("-CKNN-001"): strong.add(c)
         conflict=bool(items) and len(strong)>1
         in_host=hr<HOST_RADIUS and not _gaia_foreground_star(items) and not _spectroscopic(items)
-        rows.append((np.array([p[c] for c in CLASSES]),used,conflict,in_host))
+        rows.append((np.array([p[c] for c in CLASSES]),used,conflict,in_host,_decisive_motion(items)))
     P=np.array([r[0] for r in rows]).reshape(len(rows),len(CLASSES))
     # Field-prior adjustment needs calibrated posteriors (fitted model) and
     # enough independent objects in the field to estimate the class mix.
-    eligible=np.array([used>0 and not conflict and not in_host for _,used,conflict,in_host in rows],dtype=bool)
+    eligible=np.array([used>0 and not conflict and not in_host for _,used,conflict,in_host,_ in rows],dtype=bool)
     train_prior=[float((model or {}).get("training_prior",{}).get(c,1/len(CLASSES))) for c in CLASSES]
     # The EM estimate assumes pure label shift with calibrated posteriors.
     # Real fields also shift which evidence exists (depth, footprint, archive
@@ -160,12 +183,17 @@ def run(evidence,out,model_path=MODEL_PATH,min_confidence=None,field_prior=False
     adjust=estimable and bool(field_prior)
     Q=P*(prior if adjust else np.array(train_prior))/np.array(train_prior); Q=Q/Q.sum(axis=1,keepdims=True) if len(Q) else Q
     labels=[]; confidence=[]; margins=[]; statuses=[]; best_candidates=[]; best_candidate_scores=[]
-    for q,(_,used,conflict,in_host) in zip(Q,rows):
+    for q,(_,used,conflict,in_host,moving) in zip(Q,rows):
         order=np.argsort(-q); conf=float(q[order[0]]); margin=conf-float(q[order[1]]); top=CLASSES[order[0]]
         # Inside a large galaxy the host status is the most informative one,
         # with or without evidence (e.g. Legacy Surveys DUP sources there).
         if in_host: label="UNKNOWN"; status="WITHIN_LARGE_GALAXY"
         elif used==0: label="UNKNOWN"; status="NO_EVIDENCE"
+        elif moving:
+            # Confidence = the rule's benchmark precision (>= 0.99), or the
+            # fused STAR probability when that is higher.
+            label="STAR"; status="CLASSIFIED"; top="STAR"
+            conf=max(float(q[CLASSES.index("STAR")]),0.99); margin=max(0.0,conf-max(float(v) for c,v in zip(CLASSES,q) if c!="STAR"))
         # Strong evidence pointing at different classes abstains unless the
         # fitted fusion resolves it decisively (benchmark held-out conflicts
         # with p >= 0.99: 19/19 correct; at p >= 0.9: 91-100%).

@@ -73,6 +73,8 @@ jobs:
           tl=d[d.parent_object_id.isna()] if "parent_object_id" in d.columns else d
           unk=tl[tl.primary_class.eq("UNKNOWN")]
           print("UNKNOWN", len(unk), "/", len(tl)); print(unk.classification_status.value_counts().to_string())
+          if "unknown_reason" in unk.columns: print("unknown_reason:", unk.unknown_reason.str.replace(r"[0-9.]+","#",regex=True).value_counts().head(12).to_dict())
+          if "simbad__simbad_reference_status" in d.columns: print("SIMBAD reference status:", d.simbad__simbad_reference_status.value_counts().to_dict())
           ncat=unk.catalogs.fillna("").str.count(r"\|")+1
           print("catalogue count:", ncat.value_counts().sort_index().to_dict())
           print("SIMBAD otype of UNKNOWN:", unk.get("simbad__otype",pd.Series(dtype=object)).value_counts().head(25).to_dict())

@@ -112,12 +112,12 @@ def _mag(row, std_key, raw_flux_key=None, raw_mag_keys=(), offset=0.0):
     """AB magnitude from the harmonised ``std_mag__*`` column (Preprocess/units.py);
     falls back to the raw catalogue field when the row was not harmonised."""
     v = _num(row, std_key)
-    if v is not None:
+    if v is not None or std_key in row:          # harmonised: a missing value stays missing
         return v
     if raw_flux_key:
         return _ab_mag(_num(row, raw_flux_key))
     v = _num(row, *raw_mag_keys)
-    return None if v is None else v + offset
+    return None if v is None or not 0 < v < 40 else v + offset    # PS1 -999 / SDSS -9999 sentinels
 
 
 WISE_AB = {1: 2.699, 2: 3.339, 3: 5.174, 4: 6.620}     # units.WISE_AB (Jarrett+2011)
@@ -126,7 +126,10 @@ WISE_AB = {1: 2.699, 2: 3.339, 3: 5.174, 4: 6.620}     # units.WISE_AB (Jarrett+
 def _wise_vega(row, band):
     """WISE magnitude in the Vega system the WISE colour criteria are defined in."""
     v = _num(row, f"std_mag__wise_w{band}")
-    return v - WISE_AB[band] if v is not None else _num(row, f"allwise__W{band}mag")
+    if v is not None or f"std_mag__wise_w{band}" in row:
+        return None if v is None else v - WISE_AB[band]
+    v = _num(row, f"allwise__W{band}mag")
+    return v if v is not None and 0 < v < 40 else None
 
 
 def _ab_mag(flux_nmgy):
@@ -756,6 +759,13 @@ def _literature():
     m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m); return m
 
 
+@lru_cache(maxsize=1)
+def _unknown_reason():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("v2_unknown_reason", ROOT / "unknown_reason.py")
+    m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m); return m
+
+
 def annotate(df: pd.DataFrame, rows=None) -> pd.DataFrame:
     import json
     rows = rows if rows is not None else df.to_dict("records")
@@ -783,6 +793,7 @@ def annotate(df: pd.DataFrame, rows=None) -> pd.DataFrame:
     out["subclass_basis"] = [r.get("basis") for r in res]
     for col in ("paper_class", "paper_source", "paper_refs", "paper_ads"):
         out[col] = [p.get(col) if p else None for p in papers]
+    out["unknown_reason"] = [_unknown_reason().reason(r) for r in rows]
     out["subclass_tags"] = ["; ".join(t["label"] for t in r.get("tags", [])) or None for r in res]
     out["subclass_json"] = [json.dumps(r, separators=(",", ":"), default=str) for r in res]
     return out

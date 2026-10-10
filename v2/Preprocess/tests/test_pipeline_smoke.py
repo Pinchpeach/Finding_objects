@@ -237,3 +237,32 @@ def test_desi_targetid_links_to_legacy_surveys_source(tmp_path):
     desi = a[a.catalog == "DESI DR1 spectroscopy"].iloc[0]
     target = a[a.catalog_object_id == "a"].iloc[0]
     assert desi.object_id == target.object_id and desi.association_status != "ambiguous_new"
+
+
+def test_decisive_gaia_motion_classifies_star_despite_conflict(tmp_path):
+    import json
+    mod = _load("05_likelihood_vectors")
+    gal = {"rule_id": "LS-MORPH-001", "class": "GALAXY", "kind": "binary_evidence", "raw_score": 0.9,
+           "reliability": 1.0, "association_reliability": 1.0, "score": 0.9}
+    pm = lambda sig, rel=1.0: {"rule_id": "AST-GAL-002", "class": "STAR", "kind": "continuous_score", "value": sig,
+                               "raw_score": sig / (sig + 5), "reliability": rel, "association_reliability": 1.0,
+                               "score": rel * sig / (sig + 5)}
+    rows = [[gal, pm(40.0)], [gal, pm(4.0)], [gal, pm(40.0, rel=0.5)]]   # decisive / weak / poor RUWE
+    ev = tmp_path / "ev.csv"; out = tmp_path / "lk.csv"
+    pd.DataFrame({"object_id": ["a", "b", "c"], "evidence_json": [json.dumps(r) for r in rows]}).to_csv(ev, index=False)
+    mod.run(ev, out)
+    res = pd.read_csv(out)
+    assert res.loc[0, "primary_class"] == "STAR" and res.loc[0, "primary_confidence"] >= 0.99
+    assert not mod._decisive_motion(rows[1]) and not mod._decisive_motion(rows[2])
+    assert not (res.loc[2, "primary_class"] == "STAR" and res.loc[2, "primary_confidence"] >= 0.99)
+
+
+def test_units_drop_missing_value_sentinels():
+    mod = _load("units")
+    df = pd.DataFrame({"pan_starrs1_dr2_meanobject__rMeanPSFMag": [-999.0, 20.5],
+                       "pan_starrs1_dr2_meanobject__rMeanPSFMagErr": [-999.0, 0.05],
+                       "sdss_dr18_photoobj__modelMag_u": [-9999.0, 21.0], "allwise__W1mag": [None, 15.0]})
+    h = mod.harmonize(df)
+    assert h["std_mag__ps1_r"].isna()[0] and h["std_mag__ps1_r"][1] == 20.5 and h["std_magerr__ps1_r"].isna()[0]
+    assert h["std_mag__sdss_u"].isna()[0] and abs(h["std_mag__sdss_u"][1] - 20.96) < 1e-9
+    assert abs(h["std_mag__wise_w1"][1] - 17.699) < 1e-9
