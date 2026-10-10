@@ -261,7 +261,7 @@ class is shown alongside.
     2019).
   * Pan-STARRS1 rows without a valid mean PSF magnitude.
 
-## AGB chemistry: carbon (C-rich) and O-rich silicate AGB stars (2.5.0)
+## AGB chemistry: carbon (C-rich) and O-rich silicate AGB stars (2.5.0, calibrated 2.5.3)
 After third dredge-up, AGB stars are either:
 - **O-rich** (C/O < 1): M-type spectra, silicate dust with the 9.7 µm feature.
 - **C-rich** (C/O > 1): carbon stars, with amorphous-carbon and SiC dust.
@@ -275,11 +275,30 @@ evidence in order and stops at the first that applies.
 |---|---|---|---|
 | 1 | SIMBAD spectral type C… (C-N, C-R, C-J, C-H) or type C* → carbon; S, MS or SC, or type S* → S star | `SIMBAD_CSTAR` / `SIMBAD_SSTAR` | Wenger et al. 2000 (curated literature types) |
 | 2 | Suh (2021) catalogue membership (OAGB/CAGB tables) | `SUH2021` | Suh 2021, ApJS 256, 43 |
-| 3 | Gaia DR3 LPV RP-spectrum C-star flag `is_cstar` | `GAIA_LPV_CSTAR` | Lebzelter et al. 2023 (Gaia DR3 LPV catalogue) |
-| 4 | Gaia–2MASS Wesenheit difference ΔW = W_RP − W_KJ, with W_RP = G_RP − 1.3 (G_BP − G_RP) and W_KJ = Ks − 0.686 (J − Ks). ΔW ≥ 0.9 → C-rich; ≥ 1.7 → extreme (dust-enshrouded) C-rich; otherwise O-rich | `GAIA_2MASS_WESENHEIT` | Lebzelter et al. 2018, A&A 616, L13; Galactic boundaries from Mowlavi et al. 2019 and Abia et al. 2020 |
-| 5 | Without Gaia/2MASS: AllWISE line W1−W2 = 2.35 (W3−W4) − 1.24 (C-rich above). It separates 87 % of O-rich and 86 % of C-rich AGB stars | `WISE_LIAN14` | Lian et al. 2014, A&A 564, A84 |
+| 3 | AGB candidates only: logistic models (`agb_chemistry_model.json`, below) on W_RP − W_KJ, Ks − W3, Gaia DR3 LPV `is_cstar`, J − Ks and WISE colours. Here W_RP = G_RP − 1.3 (G_BP − G_RP) and W_KJ = Ks − 0.686 (J − Ks). Within 0.15 of p = 0.5 → "chemistry uncertain" (`STAR:?:AGB`) | `AGB_GAIA_2MASS_WISE_CSTAR`, `AGB_GAIA_2MASS_WISE`, `AGB_NIR_MIR` | Lebzelter et al. 2018, A&A 616, L13 (ΔW); Lebzelter et al. 2023 (`is_cstar`); calibrated on Suh 2021 |
+| 4 | AGB candidate lacking the model inputs, with Gaia DR3 LPV `is_cstar` = 1 → carbon (C precision 0.76 on the Suh stars) | `GAIA_LPV_CSTAR` | Lebzelter et al. 2023 (Gaia DR3 LPV catalogue) |
 
-- **AGB-candidate gate:** the photometric rules (4 and 5) are applied only to
+**Photometric models (2.5.3).** The 2.5.0 rules used published single cuts:
+ΔW ≥ 0.9 → C-rich (Mowlavi et al. 2019; ≥ 1.7 "extreme", Abia et al. 2020),
+and the AllWISE line W1−W2 = 2.35 (W3−W4) − 1.24 (Lian et al. 2014). On the
+Suh (2021) stars (mostly dust-obscured Galactic AGB stars) they scored only
+68.5 % and 75.4 %. They were replaced by three logistic models in a cascade;
+a star uses the first model whose features it has. The models are fitted
+with `benchmark/fit_agb_chemistry.py` on a random half (seed 42) and scored
+on the other half (4,417 stars):
+
+| Model | Features | Decided / n | Accuracy |
+|---|---|---|---|
+| `GAIA_2MASS_WISE_CSTAR` | ΔW, Ks − W3, `is_cstar` | 2962 / 3079 | 95.5 % |
+| `GAIA_2MASS_WISE` | ΔW, Ks − W3 | 874 / 968 | 81.0 % |
+| `NIR_MIR` | J − Ks, Ks − W3, W1 − W2, W3 − W4 | 198 / 215 | 90.9 % |
+| all | | coverage 91.3 % | **92.2 %** (C precision 0.95 / recall 0.84; O 0.90 / 0.97) |
+
+Ks − W3 carries most of the separation: silicate dust brightens W3, so
+O-rich stars sit redder (median 1.93 vs 1.02 for C-rich). WISE colours alone
+(46.6 % on stars without 2MASS) are not used.
+
+- **AGB-candidate gate:** the photometric models (3) are applied only to
   AGB candidates. A candidate is a long-period or Mira variable (variability
   axis, Gaia SOS LPV), has AGB physical class (Suh 2021, SIMBAD AGB*), or
   has a SIMBAD type among C*, S*, Mi*, LP*, OH* and pA*. Without the gate
@@ -295,8 +314,10 @@ evidence in order and stops at the first that applies.
   - `STAR:C:AGB`: carbon AGB star
   - `STAR:M:AGB`: O-rich AGB star
   - `STAR:S:AGB`: S-type AGB star
-- **Validation:** pending. The truth set is
-  `benchmark/build_agb_chemistry_truth.py`: Suh 2021 O-AGB/C-AGB stars with
-  Gaia, 2MASS and AllWISE photometry, built by GitHub Actions. The
-  thresholds above are the published values; they will be checked or
-  recalibrated on that set, and the result recorded in `CHANGELOG.md`.
+  - `STAR:?:AGB`: AGB star, chemistry uncertain
+- **Validation (2.5.3):** see the model table above. The truth set is
+  `benchmark/agb_truth/agb_chemistry_truth.csv.gz`, built by
+  `benchmark/build_agb_chemistry_truth.py` (GitHub Actions, VizieR cone
+  search): Suh 2021 O-AGB (5,301) and C-AGB (3,576) stars with Gaia DR3,
+  2MASS, AllWISE and Gaia DR3 LPV photometry. 98.4 % of the O-AGB stars have
+  Ks − W3 > 1.0, which supports the silicate threshold.

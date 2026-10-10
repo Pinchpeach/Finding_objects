@@ -180,25 +180,28 @@ def test_unknown_reason_explains_abstentions():
 def test_agb_chemistry_rules():
     sc = _sc()
     base = {"primary_class": "STAR", "variability_class": "LPV"}
-    # Gaia-2MASS Wesenheit: RP - 1.3 (BP - RP) - (Ks - 0.686 (J - Ks))
-    c = dict(base, **{"gaia_dr3__phot_bp_mean_mag": 14.0, "gaia_dr3__phot_rp_mean_mag": 10.5,
-                      "2mass_psc__Jmag": 7.5, "2mass_psc__Kmag": 5.5})          # dW = 6.0 - 4.128 = 1.87
+    phot = lambda bp, rp, j, k, w3: {"gaia_dr3__phot_bp_mean_mag": bp, "gaia_dr3__phot_rp_mean_mag": rp,
+                                     "2mass_psc__Jmag": j, "2mass_psc__Kmag": k, "allwise__W3mag": w3}
+    # dW = (RP - 1.3 (BP - RP)) - (Ks - 0.686 (J - Ks)); fitted model GAIA_2MASS_WISE (dW, Ks - W3)
+    c = dict(base, **phot(14.0, 10.5, 7.5, 5.5, 5.0))          # dW = 1.82, Ks - W3 = 0.5 -> P(C) ~ 0.95
     r = sc.classify(c)
-    assert r["code"] == "STAR:C:AGB" and r["rule"] == "GAIA_2MASS_WESENHEIT" and r["subclass"].startswith("Extreme")
-    o = dict(base, **{"gaia_dr3__phot_bp_mean_mag": 10.0, "gaia_dr3__phot_rp_mean_mag": 8.0,
-                      "2mass_psc__Jmag": 7.0, "2mass_psc__Kmag": 5.8,            # dW = 5.40 - 4.98 = 0.42 -> O-rich
-                      "allwise__W3mag": 4.2, "allwise__e_W3mag": 0.02})          # Ks - W3 = 1.6: dust
+    assert r["code"] == "STAR:C:AGB" and r["rule"] == "AGB_GAIA_2MASS_WISE" and r["confidence"] > 0.9
+    o = dict(base, **phot(10.0, 8.0, 7.0, 5.8, 4.2))           # dW = 0.42, Ks - W3 = 1.6 -> P(C) ~ 0.27
     r = sc.classify(o)
     assert r["code"] == "STAR:M:AGB" and "silicate" in r["subclass"]
-    # Without an AGB candidate gate the photometric criteria are not applied.
+    # Near P = 0.5 the chemistry is not decided.
+    u = dict(base, **phot(10.0, 8.0, 7.0, 5.8, 4.2))
+    u["allwise__W3mag"] = 5.8 - 1.0                             # Ks - W3 = 1.0 with dW = 0.42 -> P(C) ~ 0.55
+    assert sc.classify(u)["code"] == "STAR:?:AGB"
+    # Without an AGB candidate gate the photometric models are not applied.
     plain = {k: v for k, v in c.items() if k != "variability_class"}
-    assert sc.classify(plain)["rule"] != "GAIA_2MASS_WESENHEIT"
+    assert not str(sc.classify(plain)["rule"]).startswith("AGB_")
     # Catalogue / spectral labels win over photometry.
     assert sc.classify(dict(o, suh_2021_agb_catalog__agb_subclass="CAGB_WISE"))["code"] == "STAR:C:AGB"
     assert sc.classify(dict(base, gaia_lpv_is_cstar=1))["rule"] == "GAIA_LPV_CSTAR"
     assert sc.classify(dict(base, simbad__sp_type="S4/3"))["code"] == "STAR:S:AGB"
     # A carbon dwarf / CH star from SIMBAD without AGB evidence is not called AGB.
     assert sc.classify({"primary_class": "STAR", "simbad__sp_type": "C-H4"})["code"] == "STAR:C:?"
-    # WISE fallback (no Gaia/2MASS): Lian et al. 2014 line
+    # WISE colours alone were 47 % correct on the Suh (2021) stars: not used.
     w = dict(base, **{"allwise__W1mag": 6.0, "allwise__W2mag": 4.6, "allwise__W3mag": 3.5, "allwise__W4mag": 3.2})
-    assert sc.classify(w)["rule"] == "WISE_LIAN14"
+    assert sc.agb_chemistry(w) is None

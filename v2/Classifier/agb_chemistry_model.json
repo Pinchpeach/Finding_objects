@@ -1,0 +1,73 @@
+{
+ "models": {
+  "GAIA_2MASS_WISE_CSTAR": {
+   "features": [
+    "dW",
+    "kw3",
+    "cst"
+   ],
+   "coef": [
+    0.4878,
+    -2.9735,
+    3.8919
+   ],
+   "intercept": 1.2244
+  },
+  "GAIA_2MASS_WISE": {
+   "features": [
+    "dW",
+    "kw3"
+   ],
+   "coef": [
+    0.7245,
+    -2.5973
+   ],
+   "intercept": 2.8785
+  },
+  "NIR_MIR": {
+   "features": [
+    "jk",
+    "kw3",
+    "w12",
+    "w34"
+   ],
+   "coef": [
+    0.5416,
+    -2.403,
+    -3.0082,
+    0.6784
+   ],
+   "intercept": 2.082
+  }
+ },
+ "abstain_band": 0.15,
+ "test": {
+  "test_n": 4417,
+  "coverage": 0.913,
+  "accuracy": 0.922,
+  "C_precision": 0.954,
+  "C_recall": 0.842,
+  "O_precision": 0.904,
+  "O_recall": 0.973,
+  "per_model": {
+   "GAIA_2MASS_WISE_CSTAR": {
+    "n": 3079,
+    "decided": 2962,
+    "accuracy": 0.955
+   },
+   "GAIA_2MASS_WISE": {
+    "n": 968,
+    "decided": 874,
+    "accuracy": 0.81
+   },
+   "NIR_MIR": {
+    "n": 215,
+    "decided": 198,
+    "accuracy": 0.909
+   }
+  },
+  "O_rich_Ks_W3_gt_1": 0.984
+ },
+ "split": "50/50 random (seed 42); fitted on train half, metrics on test half",
+ "truth": "benchmark/agb_truth/agb_chemistry_truth.csv.gz (Suh 2021 O-AGB 5301, C-AGB 3576)"
+}

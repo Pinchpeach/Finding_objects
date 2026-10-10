@@ -392,24 +392,39 @@ def star_tags(row):
 # AGB stars are oxygen-rich (C/O < 1; silicate dust, M-type spectra) or
 # carbon-rich (C/O > 1; amorphous-carbon/SiC dust, C-type spectra) after third
 # dredge-up.  Order of evidence: spectra / curated types, the Suh (2021)
-# catalogue, the Gaia DR3 RP-spectrum C-star flag, then photometry.  The
-# photometric criteria are only applied to AGB candidates (long-period
-# variables or AGB physical class): on ordinary stars the same colours mean
-# nothing (benchmark stars with J-Ks >= 1 mostly have W_RP - W_KJ >= 0.9).
+# catalogue, then photometry.  The photometric models are only applied to AGB
+# candidates (long-period variables or AGB physical class): on ordinary stars
+# the same colours mean nothing (benchmark stars with J-Ks >= 1 mostly have
+# W_RP - W_KJ >= 0.9).
 #
-# * Gaia-2MASS Wesenheit difference (Lebzelter et al. 2018, A&A 616, L13):
-#   W_RP = G_RP - 1.3 (G_BP - G_RP), W_KJ = Ks - 0.686 (J - Ks); C-rich above
-#   ~0.9 mag and extreme (dust-enshrouded) C-rich above ~1.7 mag for Galactic
-#   LPVs (Mowlavi et al. 2019; Abia et al. 2020, A&A 633, A135).
-# * AllWISE colours (Lian et al. 2014, A&A 564, A84): the line
-#   W1-W2 = 2.35 (W3-W4) - 1.24 separates 87 % of O-rich and 86 % of C-rich
-#   AGB stars; used when Gaia/2MASS photometry is missing (dusty stars).
-# * Silicate (dusty O-rich) AGB: O-rich with a mid-IR dust excess, Ks - W3 above
-#   the stellar photosphere (Suh 2021 two-colour diagrams).
-AGB_DW_C, AGB_DW_XC = 0.9, 1.7
+# Photometric chemistry (2.5.3): logistic models in agb_chemistry_model.json,
+# fitted on half of the Suh (2021) O-AGB/C-AGB stars with Gaia/2MASS/AllWISE
+# photometry and scored on the other half (benchmark/agb_truth):
+#   1. W_RP - W_KJ (Lebzelter et al. 2018), Ks - W3 and the Gaia DR3 LPV
+#      RP-spectrum C-star flag (Lebzelter et al. 2023): 95.5 % on 2962 stars;
+#   2. W_RP - W_KJ and Ks - W3: 81 % on 874 stars;
+#   3. J-Ks, Ks-W3, W1-W2, W3-W4: 90.9 % on 198 stars;
+#   probabilities within 0.15 of 0.5 abstain ("chemistry uncertain").
+#   All together: 92.2 % at 91.3 % coverage (C precision 0.95, O 0.90).
+# The published single cuts did worse on these mostly dust-obscured Galactic
+# AGB stars: W_RP - W_KJ >= 0.9 (Mowlavi+2019) 68.5 %, the AllWISE line of
+# Lian et al. (2014) 75.4 %; WISE colours alone (46.6 % on stars without
+# 2MASS) are not used.  Ks - W3 carries most of the separation: silicate dust
+# brightens W3 (O-rich median 1.93 vs C-rich 1.02).
+# Silicate (dusty O-rich) AGB: O-rich with Ks - W3 > 1.0 (98.4 % of the Suh
+# O-AGB stars; an M-giant photosphere has Ks - W3 near 0).
 AGB_DUST_KW3 = 1.0
 AGB_VARIABILITY = {"LPV", "MIRA"}
 SIMBAD_AGB = {"AGB*", "C*", "S*", "Mi*", "LP*", "OH*", "pA*"}
+
+
+@lru_cache(maxsize=1)
+def _agb_model():
+    import json
+    try:
+        return json.loads((ROOT / "agb_chemistry_model.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
 
 
 def wesenheit_dw(row):
@@ -423,6 +438,17 @@ def wesenheit_dw(row):
     return (rp - 1.3 * (bp - rp)) - (k - 0.686 * (j - k))
 
 
+def agb_features(row):
+    """Colour features of the AGB chemistry models (Vega magnitudes)."""
+    j = _num(row, "2mass_psc__Jmag", "allwise__Jmag")
+    k = _num(row, "2mass_psc__Kmag", "allwise__Kmag")
+    w1, w2, w3, w4 = (_wise_vega(row, b) for b in (1, 2, 3, 4))
+    cst = _num(row, "gaia_lpv_is_cstar")
+    sub = lambda a, b: None if a is None or b is None else a - b
+    return {"dW": wesenheit_dw(row), "kw3": sub(k, w3), "jk": sub(j, k), "w12": sub(w1, w2),
+            "w34": sub(w3, w4), "cst": None if cst is None else float(cst >= 0.5)}
+
+
 def agb_candidate(row):
     """Why the object counts as an AGB candidate, or None."""
     if str(row.get("physical_class") or "") == "AGB":
@@ -430,7 +456,7 @@ def agb_candidate(row):
     var = str(row.get("variability_class") or "")
     if var in AGB_VARIABILITY:
         return f"{var} variable"
-    if _num(row, "gaia_lpv_frequency", "gaia_lpv_amplitude") is not None:
+    if _num(row, "gaia_lpv_frequency", "gaia_lpv_amplitude", "gaia_lpv_is_cstar") is not None:
         return "Gaia DR3 long-period variable"
     ot = _text(row, "simbad__otype")
     if ot in SIMBAD_AGB:
@@ -438,8 +464,28 @@ def agb_candidate(row):
     return None
 
 
+def agb_photometric(row):
+    """(chem 'C'/'O'/None, probability of C, model name, basis) from the first
+    applicable model, or None when no model has its inputs."""
+    model = _agb_model()
+    if not model:
+        return None
+    f = agb_features(row)
+    for name, m in model["models"].items():
+        x = [f.get(k) for k in m["features"]]
+        if any(v is None for v in x):
+            continue
+        z = m["intercept"] + sum(c * v for c, v in zip(m["coef"], x))
+        p = 1.0 / (1.0 + math.exp(-z))
+        vals = ", ".join(f"{k} = {v:.2f}" for k, v in zip(m["features"], x))
+        if abs(p - 0.5) < model.get("abstain_band", 0.15):
+            return None, p, name, f"{vals}; P(C-rich) = {p:.2f} (uncertain)"
+        return ("C" if p >= 0.5 else "O"), p, name, f"{vals}; P(C-rich) = {p:.2f}"
+    return None
+
+
 def agb_chemistry(row):
-    """{'chem': 'C'|'O'|'S', 'rule', 'basis', 'extreme', 'dusty'} or None."""
+    """{'chem': 'C'|'O'|'S'|None, 'rule', 'basis', 'confidence', 'dusty'} or None."""
     sp = _text(row, "simbad__sp_type") or ""
     ot = _text(row, "simbad__otype") or ""
     out = None
@@ -451,35 +497,28 @@ def agb_chemistry(row):
         sub = (_text(row, "suh_2021_agb_catalog__agb_subclass", "agb_subclass") or "").upper()
         if sub.startswith(("CAGB", "OAGB")):
             out = {"chem": sub[0], "rule": "SUH2021", "basis": f"Suh (2021) catalogue {sub}"}
-    if out is None and _num(row, "gaia_lpv_is_cstar") == 1:
-        out = {"chem": "C", "rule": "GAIA_LPV_CSTAR",
-               "basis": "Gaia DR3 LPV RP-spectrum C-star flag (Lebzelter et al. 2023)"}
     gate = agb_candidate(row)
-    dw = wesenheit_dw(row)
     if out is None and gate:
-        if dw is not None:
-            out = {"chem": "C" if dw >= AGB_DW_C else "O", "rule": "GAIA_2MASS_WESENHEIT",
-                   "basis": f"{gate}; W_RP - W_KJ = {dw:.2f} ({'>=' if dw >= AGB_DW_C else '<'} {AGB_DW_C}, Lebzelter+2018)"}
-        else:
-            w1, w2, w3, w4 = (_wise_vega(row, b) for b in (1, 2, 3, 4))
-            if None not in (w1, w2, w3, w4):
-                line = 2.35 * (w3 - w4) - 1.24
-                chem = "C" if w1 - w2 > line else "O"
-                out = {"chem": chem, "rule": "WISE_LIAN14",
-                       "basis": f"{gate}; W1-W2 = {w1 - w2:.2f} vs 2.35(W3-W4)-1.24 = {line:.2f} (Lian+2014)"}
+        ph = agb_photometric(row)
+        if ph is not None:
+            chem, p, name, basis = ph
+            out = {"chem": chem, "rule": f"AGB_{name}", "basis": f"{gate}; {basis}",
+                   "confidence": None if chem is None else round(max(p, 1 - p), 3)}
+        elif _num(row, "gaia_lpv_is_cstar") == 1:
+            # Flag alone: C-rich precision 0.76 on the Suh (2021) stars.
+            out = {"chem": "C", "rule": "GAIA_LPV_CSTAR", "confidence": 0.76,
+                   "basis": f"{gate}; Gaia DR3 LPV RP-spectrum C-star flag (Lebzelter et al. 2023)"}
     if out is None:
         return None
     out["agb_candidate"] = gate
-    out["extreme"] = out["chem"] == "C" and dw is not None and dw >= AGB_DW_XC
     k = _num(row, "2mass_psc__Kmag", "allwise__Kmag")
     w3 = _wise_vega(row, 3)
     out["dusty"] = k is not None and w3 is not None and k - w3 > AGB_DUST_KW3
-    out["k_w3"] = None if k is None or w3 is None else k - w3
     return out
 
 
 AGB_NAME = {"C": ("Carbon star (C-rich AGB)", "STAR:C:AGB"), "O": ("O-rich AGB star", "STAR:M:AGB"),
-            "S": ("S-type star (C/O ~ 1, AGB)", "STAR:S:AGB")}
+            "S": ("S-type star (C/O ~ 1, AGB)", "STAR:S:AGB"), None: ("AGB star (chemistry uncertain)", "STAR:?:AGB")}
 
 
 LUM_NAME = {"V": "dwarf", "IV": "subgiant", "III": "giant", "II": "bright giant", "Ib": "supergiant",
@@ -507,12 +546,11 @@ def classify_star(row):
         name, code = AGB_NAME[agb["chem"]]
         if agb["chem"] == "O" and agb["dusty"]:
             name = "O-rich AGB star with silicate dust"
-        elif agb["chem"] == "C" and agb["extreme"]:
-            name = "Extreme (dust-enshrouded) carbon star"
-        if agb["chem"] != "S" and not agb.get("agb_candidate") and agb["rule"].startswith("SIMBAD"):
-            name = name.replace(" (C-rich AGB)", "")      # carbon dwarfs / CH stars are not AGB stars
+        if agb["chem"] in ("C", "S") and not agb.get("agb_candidate") and agb["rule"].startswith("SIMBAD"):
+            name = name.split(" (")[0]                     # carbon dwarfs / CH stars are not AGB stars
             code = code.replace(":AGB", ":?")
-        return _result(name, code, RULE_PRECISION.get(agb["rule"]), agb["rule"], agb["basis"], agb_chemistry=agb["chem"])
+        conf = agb.get("confidence", RULE_PRECISION.get(agb["rule"]))
+        return _result(name, code, conf, agb["rule"], agb["basis"], agb_chemistry=agb["chem"])
     num, lum, rule, basis = star_spectral_type(row)
     if num is None:
         return _result(None, None, None, None, basis, status="NO_SPECTRAL_INFORMATION")
