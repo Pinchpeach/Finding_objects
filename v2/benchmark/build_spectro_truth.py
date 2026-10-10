@@ -36,7 +36,7 @@ MPA_SQL = """SELECT l.specobjid, l.h_alpha_flux, l.h_alpha_flux_err, l.h_beta_fl
 PORT_SQL = "SELECT * FROM emissionLinesPort WHERE specobjid IN ({ids})"
 
 
-def sdss_sql(template: str, ids: list[str], name: str, chunk: int = 400) -> pd.DataFrame:
+def sdss_sql(template: str, ids: list[str], name: str, chunk: int = 80) -> pd.DataFrame:
     from astroquery.sdss import SDSS
     parts = []
     for s0 in range(0, len(ids), chunk):

@@ -16,8 +16,8 @@ LINE_SQL=("SELECT l.specobjid,"+",".join(("i." if c=="d4000_n" else "l.")+c for 
 def _lines(ids:list[str])->pd.DataFrame:
  from astroquery.sdss import SDSS
  parts=[]
- for s in range(0,len(ids),400):
-  t=SDSS.query_sql(LINE_SQL.format(ids=",".join(ids[s:s+400])),data_release=18)
+ for s in range(0,len(ids),80):   # SkyServer answers 404 to over-long GET queries
+  t=SDSS.query_sql(LINE_SQL.format(ids=",".join(ids[s:s+80])),data_release=18)
   if t is not None and len(t):parts.append(t.to_pandas())
  if not parts:return pd.DataFrame(columns=["specobjid",*LINE_FIELDS])
  out=pd.concat(parts,ignore_index=True);out.columns=[c.lower() for c in out.columns]
