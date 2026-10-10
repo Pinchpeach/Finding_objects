@@ -17,7 +17,8 @@ v2의 코드·문서·규칙표가 인용하는 논문, 카탈로그 출판물, 
 | [전파·X선·밀집성](#radio) | 4 |
 | [행성상성운·초신성·과도 현상](#trans) | 6 |
 | [기타 문서](#doc) | 13 |
-| **합계** | **156** |
+| [분광 분류 기준](#spec) | 37 |
+| **합계** | **193** |
 
 <a id="gaia"></a>
 ## 측성·Gaia
@@ -262,6 +263,51 @@ PN 진단, 광도곡선 기반 초신성/과도 현상 분류.
 | SIMBAD object-type guide / documentation | — | — | `Preprocess/classification_rules.csv` SIMBAD-TYPE-001<br>`Preprocess/catalog_reliability.csv` (catalog_confidence_simbad_type) | SIMBAD 주 천체 유형 계층 |
 | desitarget (targets.encode_targetid) | — | — | `Preprocess/association_model.py`<br>`Preprocess/COARSE_BENCHMARK_RESULTS.md`<br>`WORK_LOG_2026-10-08.md` | DESI TARGETID에 LS RELEASE/BRICKID/OBJID가 들어 있음 → ID로 정확히 연결 |
 | Redrock (DESI spectral classification, SPECTYPE) | — | — | `benchmark/build_desi_truth.py`<br>`Get_data/desi_spectroscopy.py`<br>`Preprocess/COARSE_BENCHMARK_RESULTS.md` | DESI 정답 레이블 SPECTYPE (ZWARN = 0, DELTACHI2 > 25) |
+
+<a id="spec"></a>
+## 분광 분류 기준
+
+분광 자료(분광형·대기 변수·방출선·분광 지수)로 별·은하·퀘이사를 분류하는 기준. 정리: `Classifier/LITERATURE_SPECTROSCOPY.md` (2.6.0).
+
+| 인용 | 학술지·권·쪽 | ADS bibcode | 사용처 | 무엇에 쓰였나 |
+|---|---|---|---|---|
+| Morgan, Keenan & Kellman 1943 | An Atlas of Stellar Spectra (Univ. Chicago Press) | — | `Classifier/LITERATURE_SPECTROSCOPY.md` | MK 분광 분류 체계(분광형·광도 계급) |
+| Gray & Corbally 2009 | Stellar Spectral Classification (Princeton Univ. Press) | — | `Classifier/LITERATURE_SPECTROSCOPY.md` | MK 분류 기준 교과서 |
+| Luo et al. 2015 (LAMOST DR1, LASP) | RAA 15, 1095 | — | `Classifier/LITERATURE_SPECTROSCOPY.md`<br>`Get_data/lamost_spectroscopy.py` (V/164/stellar5)<br>`Classifier/subclass.py` (spectro_params, LAMOST_LOGG, LAMOST_FEH) | LAMOST LASP Teff·log g·[Fe/H]와 오차(110 K, 0.2 dex, 0.1 dex) |
+| Wu et al. 2011 (LASP / ULySS) | RAA 11, 924 | — | `Classifier/LITERATURE_SPECTROSCOPY.md` | LAMOST 항성 대기 변수 파이프라인 |
+| Recio-Blanco et al. 2023 (Gaia DR3 GSP-Spec) | A&A 674, A29 | — | `Classifier/LITERATURE_SPECTROSCOPY.md`<br>`Get_data/gaia_dr3.py` (SPEC_AP)<br>`Classifier/subclass.py` (GSPSPEC_LOGG, GSPSPEC_FEH) | Gaia RVS 분광 Teff·log g·[M/H]와 flags_gspspec, log g 보정 |
+| Gaia Collaboration, Creevey et al. 2023 (golden sample) | A&A 674, A39 | — | `Classifier/LITERATURE_SPECTROSCOPY.md` | flags_gspspec 앞 13자리 0 = 고품질 표본 |
+| Keenan 1993 (revised MK carbon classes) | PASP 105, 905 | — | `Classifier/LITERATURE_SPECTROSCOPY.md`<br>`Classifier/subclass.py` (SIMBAD_CSTAR) | 탄소별 C-R, C-N, C-J, C-H 분류 |
+| Barnbaum, Stone & Keenan 1996 | ApJS 105, 419 | — | `Classifier/LITERATURE_SPECTROSCOPY.md` | 탄소별 분광 도감 |
+| Keenan & Boeshaar 1980 | ApJS 43, 379 | — | `Classifier/LITERATURE_SPECTROSCOPY.md`<br>`Classifier/subclass.py` (SIMBAD_SSTAR) | S형 별(ZrO 띠), MS·SC형 분류 |
+| Green 2013 (SDSS carbon stars) | ApJ 765, 12 | — | `Classifier/LITERATURE_SPECTROSCOPY.md`<br>`Classifier/subclass.py` (DC_MIN_MG) | SDSS 탄소별의 약 69 %가 왜성(dC), dC 절대등급 6.5–10.5 |
+| Li et al. 2018 (LAMOST DR4 carbon stars) | ApJS 234, 31 | — | `Classifier/LITERATURE_SPECTROSCOPY.md` | LAMOST 탄소별 분광 식별 |
+| Li et al. 2024 (LAMOST DR7 carbon stars) | ApJS 271, 12 | — | `Classifier/LITERATURE_SPECTROSCOPY.md`<br>`Classifier/subclass.py` (DC_MIN_MG) | M_G > 5이면 왜성 탄소별(dC) |
+| Roulston et al. 2025 (Gaia DR3 XP carbon stars) | ApJ 982, 184 | — | `Classifier/LITERATURE_SPECTROSCOPY.md` | Gaia XP 탄소별과 dC 공간 밀도 |
+| Alves 2000 (red clump K-band) | ApJ 539, 732 | — | `Classifier/LITERATURE_SPECTROSCOPY.md`<br>`Classifier/subclass.py` (AGB_MAX_MKS) | 적색 거성군 M_K = −1.61: AGB는 이보다 밝음 → M_Ks > −1이면 AGB 아님 |
+| Hawkins et al. 2017 (red clump) | MNRAS 471, 722 | — | `Classifier/LITERATURE_SPECTROSCOPY.md`<br>`Classifier/subclass.py` (AGB_MAX_MKS) | Gaia 시차로 본 적색 거성군 절대등급 |
+| Nikolaev & Weinberg 2000 (2MASS LMC) | ApJ 542, 804 | — | `Classifier/LITERATURE_SPECTROSCOPY.md` | LMC 2MASS RGB tip Ks = 12.3 → M_Ks ≈ −6.2 |
+| Cioni et al. 2000 (TRGB, DENIS) | A&A 359, 601 | — | `Classifier/LITERATURE_SPECTROSCOPY.md` | Magellan 은하 TRGB와 거리 |
+| Paczyński 1970 | Acta Astron. 20, 47 | — | `Classifier/LITERATURE_SPECTROSCOPY.md` | 핵질량–광도 관계 → AGB 최대 광도 |
+| Wood, Bessell & Fox 1983 | ApJ 272, 99 | — | `Classifier/LITERATURE_SPECTROSCOPY.md` | AGB 광도 한계 M_bol ≈ −7.1 |
+| Wagenhuber & Groenewegen 1998 | A&A 340, 183 | — | `Classifier/LITERATURE_SPECTROSCOPY.md` | AGB 광도 한계 −8.0, RSG와 겹침 |
+| Mowlavi et al. 2018 (Gaia DR2 LPVs) | A&A 618, A58 | — | `Classifier/LITERATURE_SPECTROSCOPY.md`<br>`benchmark/build_agb_contamination.py` | LPV 목록의 YSO 오염과 시차 기준 |
+| Cardelli, Clayton & Mathis 1989 | ApJ 345, 245 | — | `Classifier/subclass.py` (A_KS_PER_A_G) | A_K/A_V = 0.114로 Ks 소광 환산 |
+| Brinchmann et al. 2004 (MPA-JHU) | MNRAS 351, 1151 | — | `Classifier/LITERATURE_SPECTROSCOPY.md`<br>`Get_data/sdss_spectroscopy.py`<br>`Classifier/subclass.py` (galaxy_lines) | SDSS 은하 방출선 측정과 BPT 분류 |
+| Kauffmann et al. 2003 (stellar masses, Dn4000) | MNRAS 341, 33 | — | `Classifier/LITERATURE_SPECTROSCOPY.md`<br>`Classifier/subclass.py` (D4000_OLD) | Dn4000 이봉 분포: ≥ 1.6이면 늙은 항성 종족 |
+| Tremonti et al. 2004 | ApJ 613, 898 | — | `Classifier/LITERATURE_SPECTROSCOPY.md` | MPA-JHU 스펙트럼 맞춤(방출선 측정) |
+| Schawinski et al. 2007 | MNRAS 382, 1415 | — | `Classifier/LITERATURE_SPECTROSCOPY.md`<br>`Classifier/subclass.py` (galaxy_lines) | [N II] BPT에서 Seyfert/LINER 경계 y = 1.05x + 0.45 |
+| Kewley et al. 2006 | MNRAS 372, 961 | — | `Classifier/LITERATURE_SPECTROSCOPY.md` | [S II]·[O I]로 Seyfert/LINER 구분(미수집) |
+| Cid Fernandes et al. 2010 | MNRAS 403, 1036 | — | `Classifier/LITERATURE_SPECTROSCOPY.md`<br>`Classifier/subclass.py` (galaxy_lines) | 약한 Hα LINER는 늙은 별이 이온화한 '은퇴' 은하 |
+| Cid Fernandes et al. 2011 (WHAN) | MNRAS 413, 1687 | — | `Classifier/LITERATURE_SPECTROSCOPY.md`<br>`Classifier/subclass.py` (SDSS_WHAN) | WHAN: EW(Hα) < 3 Å 은퇴, < 0.5 Å 수동, log [N II]/Hα = −0.4 |
+| Balogh et al. 1999 (narrow Dn4000) | ApJ 527, 54 | — | `Classifier/LITERATURE_SPECTROSCOPY.md`<br>`Classifier/subclass.py` (SDSS_D4000) | Dn4000 좁은 지수 정의 |
+| Hao et al. 2005 (SDSS AGN) | AJ 129, 1783 | — | `Classifier/LITERATURE_SPECTROSCOPY.md` | 넓은 Balmer선(FWHM ≳ 1200 km/s) = 1형 AGN |
+| Kleinman et al. 2013 (SDSS DR7 WDs) | ApJS 204, 5 | — | `Classifier/LITERATURE_SPECTROSCOPY.md` | SDSS 백색왜성 분광 분류 |
+| Lyke et al. 2020 (SDSS DR16Q) | ApJS 250, 8 | — | `Classifier/LITERATURE_SPECTROSCOPY.md` | 분광 퀘이사 목록, BAL 표지 |
+| Weymann et al. 1991 (BAL quasars) | ApJ 373, 23 | — | `Classifier/LITERATURE_SPECTROSCOPY.md` | BAL 퀘이사 정의(미구현) |
+| Guy et al. 2023 (DESI spectroscopic pipeline) | AJ 165, 144 | — | `Classifier/LITERATURE_SPECTROSCOPY.md` | DESI 분광 처리·분류 |
+| Gaia DR3 documentation §11.3.7 (ESP-ELS) | — | — | `Classifier/LITERATURE_SPECTROSCOPY.md`<br>`Get_data/gaia_dr3.py` (SPEC_AP)<br>`Classifier/subclass.py` (ESP_ELS) | 방출선 별 7종(Be, Herbig Ae/Be, T Tauri, dMe, WC, WN, PN), flag ≤ 2 = 확률 > 0.5 |
+| Babusiaux et al. 2023 (Gaia DR3 catalogue validation) | A&A 674, A32 | — | `Classifier/LITERATURE_SPECTROSCOPY.md`<br>`Classifier/subclass.py` (GSPSPEC_FLAG_POS) | GSP-Spec 품질 플래그 위치(Teff 1/4/8/13, log g 2/5/8/13, [M/H] 3/6/8); AGB 별에 GSP-Spec log g를 쓰지 말 것 |
 
 ## 확인이 필요한 인용
 

@@ -13,6 +13,10 @@ import pandas as pd
 CATALOG="Gaia DR3"
 SOURCE=["source_id","designation","ra","dec","ra_error","dec_error","parallax","parallax_error","pmra","pmra_error","pmdec","pmdec_error","ruwe","phot_g_mean_flux","phot_g_mean_flux_error","phot_g_mean_mag","phot_bp_mean_flux","phot_bp_mean_flux_error","phot_bp_mean_mag","phot_rp_mean_flux","phot_rp_mean_flux_error","phot_rp_mean_mag","bp_rp","bp_g","g_rp","phot_bp_rp_excess_factor","radial_velocity","radial_velocity_error","rv_nb_transits"]
 AP=["teff_gspphot","logg_gspphot","mh_gspphot","distance_gspphot","ag_gspphot","ebpminrp_gspphot","mass_flame","age_flame","evolstage_flame","flags_flame","classprob_dsc_combmod_quasar","classprob_dsc_combmod_galaxy","classprob_dsc_combmod_star","classprob_dsc_combmod_whitedwarf","classprob_dsc_combmod_binarystar"]
+# Spectroscopic parameters: GSP-Spec from RVS spectra (Recio-Blanco et al.
+# 2023) and the ESP-ELS emission-line class from BP/RP (Creevey et al. 2023).
+# Queried separately so a failure never removes the GSP-Phot / DSC columns.
+SPEC_AP=["teff_gspspec","logg_gspspec","mh_gspspec","flags_gspspec","classlabel_espels","classlabel_espels_flag"]
 VAR_SUMMARY=["in_vari_classification_result","in_vari_rrlyrae","in_vari_cepheid","in_vari_long_period_variable","in_vari_eclipsing_binary","in_vari_rotation_modulation","in_vari_agn","in_vari_microlensing","in_vari_compact_companion"]
 
 # Wall-clock budgets: a slow Gaia archive previously held a field for ~26 min
@@ -100,7 +104,10 @@ def _vizier_fallback(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
     # Gaia DSC-Combmod class probabilities (astrophysical-parameter table).
     try:
         dsc={"PQSO":"classprob_dsc_combmod_quasar","PGal":"classprob_dsc_combmod_galaxy","Pstar":"classprob_dsc_combmod_star",
-             "PWD":"classprob_dsc_combmod_whitedwarf","Pbin":"classprob_dsc_combmod_binarystar"}
+             "PWD":"classprob_dsc_combmod_whitedwarf","Pbin":"classprob_dsc_combmod_binarystar",
+             # VizieR I/355/paramp names of the GSP-Spec and ESP-ELS columns.
+             "Teff-S":"teff_gspspec","logg-S":"logg_gspspec","[M/H]-S":"mh_gspspec","Flags":"flags_gspspec",
+             "ClassELS":"classlabel_espels","f_ClassELS":"classlabel_espels_flag"}
         pt=Vizier(columns=["Source",*dsc],row_limit=-1).query_region(c,radius=float(radius_arcmin)*u.arcmin,catalog="I/355/paramp")
         ap=pt[0].to_pandas() if pt else pd.DataFrame()
         if not ap.empty and "Source" in ap.columns:
@@ -120,7 +127,7 @@ def _vizier_fallback(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
                 out=out.merge(tmp,on="source_id",how="left")
     except Exception:
         pass
-    for col in AP+VAR_SUMMARY+["best_class_name","best_class_score"]:
+    for col in AP+SPEC_AP+VAR_SUMMARY+["best_class_name","best_class_score"]:
         if col not in out.columns:out[col]=pd.NA
     out["gaia_base_query_status"]="vizier_fallback";out["gaia_ap_query_status"]="fallback_partial";out["gaia_vari_classifier_query_status"]="vizier_fallback";out["gaia_vari_summary_query_status"]="fallback_unavailable"
     return out
@@ -132,11 +139,12 @@ def fetch(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
         df=_bounded(_tap,BASE_TAP_BUDGET_S,q);df["gaia_base_query_status"]="tap"
         if not df.empty:
             df=_merge_optional(df,"gaiadr3.astrophysical_parameters",AP,"gaia_ap_query_status")
+            df=_merge_optional(df,"gaiadr3.astrophysical_parameters",SPEC_AP,"gaia_spec_ap_query_status")
             df=_merge_optional(df,"gaiadr3.vari_classifier_result",["best_class_name","best_class_score"],"gaia_vari_classifier_query_status")
             df=_merge_optional(df,"gaiadr3.vari_summary",VAR_SUMMARY,"gaia_vari_summary_query_status")
     except Exception:
         df=_vizier_fallback(ra,dec,radius_arcmin)
-    if df.empty:return pd.DataFrame(columns=["catalog","catalog_object_id","object_name","ra","dec"]+SOURCE[2:]+AP+["best_class_name","best_class_score"]+VAR_SUMMARY)
+    if df.empty:return pd.DataFrame(columns=["catalog","catalog_object_id","object_name","ra","dec"]+SOURCE[2:]+AP+SPEC_AP+["best_class_name","best_class_score"]+VAR_SUMMARY)
     df.insert(0,"catalog",CATALOG)
     sid=pd.to_numeric(df["source_id"],errors="coerce").astype("Int64").astype("string")
     df.insert(1,"catalog_object_id",sid);df.insert(2,"object_name",df.get("designation",pd.Series("Gaia DR3 "+sid,index=df.index)).astype("string"))
