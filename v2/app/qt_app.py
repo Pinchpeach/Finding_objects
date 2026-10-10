@@ -551,7 +551,12 @@ def main():
     w = MainWindow(); w.show()
     if len(sys.argv) > 1 and Path(sys.argv[1]).is_file():   # optional: open a results CSV directly
         w.load_results(Path(sys.argv[1]))
-    return app.exec()
+    code = app.exec()
+    # Destroy the window (and its children) while QApplication still exists;
+    # Qt objects outliving it at interpreter exit can crash on shutdown.
+    w.deleteLater(); app.processEvents()
+    del w
+    return code
 
 
 if __name__ == "__main__":

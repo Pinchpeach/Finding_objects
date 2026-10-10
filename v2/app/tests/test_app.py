@@ -136,7 +136,9 @@ def test_sky_map_zoom_pan_and_icons():
     kinds = [qt_icons.kind_of(r) for r in df.to_dict("records")]
     assert kinds[0]["letter"] == "K" and kinds[1]["activity"] == "STAR_FORMING" and kinds[2]["radio"] == "RADIO_LOUD" and kinds[2]["xray"]
     img = v.grab().toImage(); assert not img.isNull()
-    v.close()
+    # A parentless widget must be deleted while the QApplication exists;
+    # left to the garbage collector at interpreter exit it crashed Qt.
+    v.close(); v.deleteLater(); app.processEvents()
 
 
 def test_literature_row_links_papers_to_ads():
