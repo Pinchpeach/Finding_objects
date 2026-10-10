@@ -1,38 +1,38 @@
 {
   "test_rows": 4795,
-  "classified_rows": 4718,
-  "abstention_rate": 0.016058394160583966,
-  "accuracy_all_unknown_wrong": 0.8408759124087591,
-  "accuracy_when_classified": 0.8545994065281899,
-  "macro_f1_when_classified": 0.8553063956205914,
+  "classified_rows": 4415,
+  "abstention_rate": 0.07924921793534934,
+  "accuracy_all_unknown_wrong": 0.848800834202294,
+  "accuracy_when_classified": 0.9218573046432617,
+  "macro_f1_when_classified": 0.9220099101640497,
   "confusion": {
     "STAR": {
-      "STAR": 1258,
-      "GALAXY": 46,
-      "QSO": 282,
-      "UNKNOWN": 14
+      "STAR": 1338,
+      "GALAXY": 40,
+      "QSO": 101,
+      "UNKNOWN": 121
     },
     "GALAXY": {
-      "STAR": 46,
-      "GALAXY": 1416,
-      "QSO": 95,
-      "UNKNOWN": 43
+      "STAR": 20,
+      "GALAXY": 1372,
+      "QSO": 78,
+      "UNKNOWN": 130
     },
     "QSO": {
-      "STAR": 152,
-      "GALAXY": 65,
-      "QSO": 1358,
-      "UNKNOWN": 20
+      "STAR": 59,
+      "GALAXY": 47,
+      "QSO": 1360,
+      "UNKNOWN": 129
     }
   },
   "per_class_recall_all": {
-    "STAR": 0.78625,
-    "GALAXY": 0.885,
-    "QSO": 0.8514106583072101
+    "STAR": 0.83625,
+    "GALAXY": 0.8575,
+    "QSO": 0.8526645768025078
   },
   "per_class_precision": {
-    "STAR": 0.864010989010989,
-    "GALAXY": 0.9273084479371316,
-    "QSO": 0.7827089337175792
+    "STAR": 0.9442484121383204,
+    "GALAXY": 0.9403701165181632,
+    "QSO": 0.8836907082521117
   }
 }
