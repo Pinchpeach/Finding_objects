@@ -130,3 +130,27 @@ def test_more_star_galaxy_qso_attributes():
                        "allwise__W2mag": 15.5, "sdss_dr18_spectroscopy__z": 5.3, "pan_starrs1_dr2_meanobject__iMeanPSFMag": 21.0})
     tags = {t["tag"] for t in red["tags"]}
     assert {"OBSCURED", "VERY_HIGH_Z"} <= tags
+
+
+def test_from_paper_for_unknown_objects_only():
+    import pandas as pd
+    sc = _sc()
+    rows = pd.DataFrame([
+        {"primary_class": "UNKNOWN", "simbad__otype": "GiG", "simbad__main_id": "NGC  4522", "simbad__simbad_nbref": 250,
+         "simbad__simbad_ref_bibcodes": "2004AJ....127.3361K|2006ApJ...645.1047V",
+         "simbad__simbad_ref_titles": "Ram pressure stripping|HI in Virgo", "simbad__simbad_ref_years": "2004|2006"},
+        {"primary_class": "UNKNOWN", "ned__Type": "IrS", "ned__Object Name": "WISEA J1", "ned__References": 2},
+        {"primary_class": "UNKNOWN", "catalogs": "HASH PN Catalog|Gaia DR3"},
+        {"primary_class": "GALAXY", "simbad__otype": "G"},
+        {"primary_class": "UNKNOWN"},
+    ])
+    out = sc.annotate(rows)
+    assert out.loc[0, "subclass"] == "from paper: Galaxy in a group" and out.loc[0, "subclass_status"] == "FROM_PAPER"
+    assert "NGC  4522" in out.loc[0, "subclass_basis"] and "250 papers" in out.loc[0, "subclass_basis"]
+    assert out.loc[0, "paper_refs"].startswith("2004AJ....127.3361K (2004) Ram pressure stripping")
+    assert out.loc[0, "paper_ads"].split("|")[0] == "https://ui.adsabs.harvard.edu/abs/2004AJ....127.3361K"
+    assert out.loc[1, "subclass"] == "from paper: Infrared source (detection only)"
+    assert out.loc[2, "paper_class"] == "Planetary nebula" and "2016JPhCS.728c2008P" in out.loc[2, "paper_refs"]
+    # A classified object keeps its own sub-class; the paper class is reported alongside.
+    assert out.loc[3, "subclass_status"] != "FROM_PAPER" and out.loc[3, "paper_class"] == "Galaxy"
+    assert pd.isna(out.loc[4, "paper_class"]) and out.loc[4, "subclass_status"] != "FROM_PAPER"

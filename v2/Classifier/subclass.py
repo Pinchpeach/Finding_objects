@@ -749,6 +749,13 @@ def classify(row):
     return out
 
 
+@lru_cache(maxsize=1)
+def _literature():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("v2_literature", ROOT / "literature.py")
+    m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m); return m
+
+
 def annotate(df: pd.DataFrame, rows=None) -> pd.DataFrame:
     import json
     rows = rows if rows is not None else df.to_dict("records")
@@ -759,6 +766,14 @@ def annotate(df: pd.DataFrame, rows=None) -> pd.DataFrame:
             for r, v in zip(rows, df[col]):
                 r[col] = v
     res = [classify(r) for r in rows]
+    # Literature ("from paper") classification. It is reported for every
+    # object, but replaces the sub-class only where the catalogue data leave
+    # the object UNKNOWN; the primary class itself stays UNKNOWN.
+    papers = [_literature().from_paper(r) for r in rows]
+    for row, r, p in zip(rows, res, papers):
+        if p and str(row.get("primary_class") or "UNKNOWN").upper() == "UNKNOWN":
+            r["subclass"] = f"from paper: {p['paper_class']}" + (" (detection only)" if p["detection_only"] else "")
+            r["status"], r["rule"], r["basis"] = "FROM_PAPER", "LITERATURE", p["paper_source"]
     out = df.copy()
     out["subclass"] = [r.get("subclass") for r in res]
     out["subclass_code"] = [r.get("code") for r in res]
@@ -766,6 +781,8 @@ def annotate(df: pd.DataFrame, rows=None) -> pd.DataFrame:
     out["subclass_rule"] = [r.get("rule") for r in res]
     out["subclass_status"] = [r.get("status") for r in res]
     out["subclass_basis"] = [r.get("basis") for r in res]
+    for col in ("paper_class", "paper_source", "paper_refs", "paper_ads"):
+        out[col] = [p.get(col) if p else None for p in papers]
     out["subclass_tags"] = ["; ".join(t["label"] for t in r.get("tags", [])) or None for r in res]
     out["subclass_json"] = [json.dumps(r, separators=(",", ":"), default=str) for r in res]
     return out
