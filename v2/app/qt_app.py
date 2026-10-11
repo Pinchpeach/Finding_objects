@@ -27,6 +27,7 @@ def _worker_main(argv: list[str]) -> int:
     mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod)
     sys.argv = ["pipeline.py", *argv]
     mod.main()
+    mod.exit_now(0)          # skips teardown if a timed-out archive query is still running
     return 0
 
 

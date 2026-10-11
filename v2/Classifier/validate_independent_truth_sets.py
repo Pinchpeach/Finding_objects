@@ -138,4 +138,10 @@ def main():
     pd.DataFrame(rows).to_csv(checkpoint,index=False)
     if len(rows)%10==0:print(f"checkpoint: {len(rows)}/{len(truth)}",flush=True)
  result=pd.DataFrame(rows);write_report(result,a.out_dir);checkpoint.unlink(missing_ok=True);print(result.groupby(["axis","truth_class"])[["classified","match"]].mean())
-if __name__=="__main__":main()
+if __name__=="__main__":
+ main()
+ # Timed-out collector queries stay in daemon threads; tearing the
+ # interpreter down under them segfaulted after the report was written.
+ import os,threading
+ sys.stdout.flush();sys.stderr.flush()
+ if threading.active_count()>1:os._exit(0)

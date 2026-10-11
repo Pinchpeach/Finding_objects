@@ -132,5 +132,19 @@ def main():
     run(a.work, a.raw_dir, a.ra, a.dec, a.radius, a.min_confidence, max(1, a.workers), a.field_prior)
 
 
+def exit_now(code: int = 0) -> None:
+    """Exit after a finished run.  Archive queries that time out are left in
+    daemon threads (Get_data/controller.py, gaia_dr3.py); if one is still
+    inside network / C code, interpreter teardown can segfault after all
+    outputs are written (seen in the scientific cross-validation).  With such
+    threads alive the process ends with os._exit once stdio is flushed."""
+    import os, threading
+    sys.stdout.flush(); sys.stderr.flush()
+    if threading.active_count() > 1:
+        os._exit(code)
+    raise SystemExit(code)
+
+
 if __name__ == "__main__":
     main()
+    exit_now(0)
