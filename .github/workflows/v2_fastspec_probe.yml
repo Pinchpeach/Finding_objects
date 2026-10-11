@@ -1,0 +1,62 @@
+name: v2 DESI FastSpecFit probe
+
+# Finds where the DESI DR1 FastSpecFit emission-line VAC can be cone-searched
+# (2.7.0): NOIRLab Data Lab TAP schema desi_dr1, else VizieR.
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/code-review-7ox8zn]
+    paths:
+      - .github/workflows/v2_fastspec_probe.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pandas astropy astroquery pyvo
+      - name: Data Lab TAP tables and FastSpecFit columns
+        continue-on-error: true
+        run: |
+          python - <<'PY'
+          import pyvo
+          s = pyvo.dal.TAPService("https://datalab.noirlab.edu/tap")
+          t = s.search("SELECT schema_name, table_name, description FROM tap_schema.tables WHERE schema_name LIKE 'desi%'").to_table()
+          for r in t: print(r["schema_name"], r["table_name"], "|", str(r["description"])[:100])
+          names = [r["table_name"] for r in t if "fast" in str(r["table_name"]).lower()]
+          print("FASTSPEC TABLES:", names)
+          for n in names:
+              c = s.search(f"SELECT column_name, unit, description FROM tap_schema.columns WHERE table_name = '{n}'").to_table()
+              print("==", n, len(c), "columns")
+              for r in c: print("  ", r["column_name"], "|", r["unit"], "|", str(r["description"])[:90])
+          PY
+      - name: Data Lab cone query (COSMOS field) and timing
+        continue-on-error: true
+        run: |
+          python - <<'PY'
+          import time, pyvo
+          s = pyvo.dal.TAPService("https://datalab.noirlab.edu/tap")
+          for tab in ("desi_dr1.fastspec", "desi_dr1.fastspecfit", "desi_dr1.fastspec_main"):
+              t0 = time.time()
+              try:
+                  r = s.search(f"SELECT TOP 5 * FROM {tab} WHERE q3c_radial_query(ra, dec, 150.1, 2.2, 0.05)").to_table()
+                  print(tab, "rows", len(r), "%.1fs" % (time.time() - t0)); print(r.colnames[:200])
+                  print(r[:3])
+              except Exception as e:
+                  print(tab, "failed", type(e).__name__, str(e)[:300])
+          PY
+      - name: VizieR search
+        continue-on-error: true
+        run: |
+          python - <<'PY'
+          from astroquery.vizier import Vizier
+          for kw in ("FastSpecFit", "DESI emission line", "DESI DR1 value added"):
+              cats = Vizier.find_catalogs(kw)
+              print(kw, "->", [(k, v.description[:80]) for k, v in cats.items()][:15])
+          PY
