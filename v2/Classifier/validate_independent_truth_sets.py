@@ -23,7 +23,7 @@ COLLECTORS={
  ("variability","MIRA"):("gaia_dr3_variability_vizier","gaia_dr3_variability_sos_vizier"),
  ("variability","LPV"):("gaia_dr3_variability_vizier","gaia_dr3_variability_sos_vizier"),
  # ATNF is truth here and is deliberately excluded from evidence.
- ("compact","PULSAR"):("gaia_dr3","chandra","xmm","first","nvss"),
+ ("compact","PULSAR"):("gaia_dr3","chandra","xmm","first","nvss","tgss"),
  # Acker V/84 is truth; HASH is independent production evidence.
  ("phenomenon","PN"):("hash_pn",),
  # Asiago is truth; ASAS-SN is independent, but only covers a limited epoch.
@@ -80,7 +80,7 @@ def evaluate_one(rec,base,radius):
  if row is None:return {"truth_id":rec.truth_id,"axis":rec.truth_axis,"truth_class":rec.truth_class,"predicted_class":"UNKNOWN","status":"NO_OBJECT","raw_score":math.nan,"match":False,"family_match":False,"classified":False,"sep_arcsec":math.nan,"collectors":json.dumps(logs)}
  axis=str(rec.truth_axis);pred=str(row.get(f"{axis}_class","UNKNOWN"));status=str(row.get(f"{axis}_status",""));score=pd.to_numeric(pd.Series([row.get(f"{axis}_confidence")]),errors="coerce").iloc[0]
  classified=pred not in {"UNKNOWN","nan","ERROR"}
- family_match=(pred==rec.truth_class) or (str(rec.truth_class)=="MIRA" and pred=="LPV")
+ family_match=(pred==rec.truth_class) or (str(rec.truth_class)=="MIRA" and pred=="LPV") or (str(rec.truth_class)=="PULSAR" and pred=="PULSAR_CANDIDATE")
  return {"truth_id":rec.truth_id,"axis":axis,"truth_class":rec.truth_class,"predicted_class":pred,"status":status,"raw_score":score,"match":pred==rec.truth_class,"family_match":family_match,"classified":classified,"sep_arcsec":sep,"collectors":json.dumps(logs)}
 
 def sample_truth(truth_dir,per_class):
@@ -107,7 +107,7 @@ def write_report(rows,out):
   exact=f"{r.accuracy_when_classified:.1%}" if pd.notna(r.accuracy_when_classified) else "n/a"
   fam=f"{r.family_accuracy_when_classified:.1%}" if pd.notna(r.family_accuracy_when_classified) else "n/a"
   lines.append(f"| {r.axis} | {r.truth_class} | {int(r.n)} | {int(r.classified)} | {r.coverage:.1%} | {r.exact_accuracy_all:.1%} | {exact} | {r.family_accuracy_all:.1%} | {fam} |")
- lines += ["","Exact accuracy requires the requested leaf label. Family accuracy additionally credits a Mira truth object classified as the broader Gaia LPV family; it is reported separately and never substituted for the exact value. UNKNOWN is abstention. Low coverage is therefore reported separately from errors. Pulsar truth explicitly excludes ATNF evidence, and SN truth excludes Asiago evidence; those rows test whether another evidence family can independently recover the identity."]
+ lines += ["","Exact accuracy requires the requested leaf label. Family accuracy additionally credits a Mira truth object classified as the broader Gaia LPV family, and a pulsar classified as a radio pulsar candidate; it is reported separately and never substituted for the exact value. UNKNOWN is abstention. Low coverage is therefore reported separately from errors. Pulsar truth explicitly excludes ATNF evidence, and SN truth excludes Asiago evidence; those rows test whether another evidence family can independently recover the identity."]
  (out/"INDEPENDENT_TRUTH_VALIDATION.md").write_text("\n".join(lines)+"\n",encoding="utf-8")
  return s
 

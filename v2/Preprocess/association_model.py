@@ -38,6 +38,8 @@ PROFILES = {
     "GALEX AIS": SurveyProfile(None, 0.80, 5.3, 8.0),
     "FIRST": SurveyProfile(None, 1.0, 5.0, 8.0),
     "NVSS": SurveyProfile(None, 3.0, 45.0, 30.0),
+    # TGSS ADR1: 25" beam, astrometry better than 2" (Intema et al. 2017).
+    "TGSS ADR1": SurveyProfile(None, 2.0, 25.0, 25.0),
     "Chandra CSC 2.0": SurveyProfile(None, 0.60, 0.5, 5.0),
     "XMM 4XMM-DR13": SurveyProfile(None, 1.5, 6.0, 10.0),
     "eROSITA eRASS1": SurveyProfile(2020.5, 4.0, 26.0, 20.0),
