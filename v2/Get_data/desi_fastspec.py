@@ -27,6 +27,10 @@ LINE_FIELDS = [f"line_{k}_{s}" for k in LINES for s in ("flux", "flux_err")] + [
 
 def _query_with_retries(run):
     # Same bounded-attempt pattern as desi_legacy.py (Data Lab can stall).
+    import sys
+    here = str(Path(__file__).resolve().parent)
+    if here not in sys.path:                      # loaded by file path elsewhere
+        sys.path.insert(0, here)
     from desi_legacy import _query_with_retries as q
     return q(run)
 

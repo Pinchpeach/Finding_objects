@@ -52,3 +52,18 @@ def test_ztf_periodic_variable_types():
     assert v.classify({Z + "Type": "EW", "gaia_rrlyrae_best_classification": "RRab"})["label"] == "RR_LYRAE"
     # ZTF before the broad Gaia classifier.
     assert v.classify({Z + "Type": "SR", "best_class_name": "ECL"})["label"] == "LPV"
+
+
+def test_gaia_release_switch(monkeypatch):
+    import sys
+    sys.path.insert(0, str(ROOT.parent / "Get_data"))
+    import gaia_release as gr
+    assert gr.current().ref_epoch == 2016.0 and gr.table(gr.current(), "gaia_source") == "gaiadr3.gaia_source"
+    monkeypatch.setenv("V2_GAIA_RELEASE", "dr4")
+    r = gr.current()
+    assert (r.ref_epoch, gr.table(r, "vari_summary"), r.designation_prefix) == (2017.5, "gaiadr4.vari_summary", "Gaia DR4")
+    assert gr.SLOT_CATALOG == "Gaia DR3"          # downstream column slot is release-independent
+    monkeypatch.setenv("V2_GAIA_RELEASE", "DR9")
+    import pytest
+    with pytest.raises(ValueError):
+        gr.current()
