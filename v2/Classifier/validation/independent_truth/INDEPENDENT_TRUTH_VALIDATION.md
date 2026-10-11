@@ -4,7 +4,7 @@ Truth-catalog rows are used only as coordinates/labels. The same catalog is excl
 
 | axis | class | n | classified | coverage | exact all | exact classified | family all | family classified |
 |---|---|---:|---:|---:|---:|---:|---:|---:|
-| compact | PULSAR | 250 | 0 | 0.0% | 0.0% | n/a | 0.0% | n/a |
+| compact | PULSAR | 250 | 1 | 0.4% | 0.0% | 0.0% | 0.4% | 100.0% |
 | phenomenon | PN | 250 | 233 | 93.2% | 93.2% | 100.0% | 93.2% | 100.0% |
 | phenomenon | SN | 250 | 2 | 0.8% | 0.8% | 100.0% | 0.8% | 100.0% |
 | physical | AGB | 250 | 0 | 0.0% | 0.0% | n/a | 0.0% | n/a |

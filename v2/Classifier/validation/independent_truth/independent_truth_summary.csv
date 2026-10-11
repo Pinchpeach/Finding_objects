@@ -1,5 +1,5 @@
 axis,truth_class,n,classified,coverage,exact_accuracy_all,accuracy_when_classified,family_accuracy_all,family_accuracy_when_classified
-compact,PULSAR,250,0,0.0,0.0,,0.0,
+compact,PULSAR,250,1,0.004,0.0,0.0,0.004,1.0
 phenomenon,PN,250,233,0.932,0.932,1.0,0.932,1.0
 phenomenon,SN,250,2,0.008,0.008,1.0,0.008,1.0
 physical,AGB,250,0,0.0,0.0,,0.0,
