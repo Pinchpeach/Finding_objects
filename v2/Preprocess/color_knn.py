@@ -20,7 +20,16 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-COLORS = ("ls_g_r_color", "ls_r_z_color", "ls_z_w1_color", "ls_w1_w2_color")
+# The dereddened r magnitude (scaled: 4 mag of r count like 1 mag of colour)
+# is a kNN coordinate too, so a faint object is compared with reference
+# objects of similar depth: at r > 21 colour errors grow and the class mix
+# changes (2.6.5).  On the DESI DR1 held-out split the kNN alone goes from
+# 0.805 to 0.834 accuracy (0.932 -> 0.959 at fraction >= 0.8).  It never counts
+# towards MIN_COLORS.  Basis: XDQSO (Bovy et al. 2011, ApJ 729, 141) models the
+# star / quasar colour densities as functions of apparent magnitude, because
+# both the colour distributions and the class number counts change with depth.
+MAG_DIMS = {"ls_r_mag_scaled": ("desi_legacy_surveys_dr10__flux_r", "desi_legacy_surveys_dr10__mw_transmission_r", 4.0)}
+COLORS = ("ls_g_r_color", "ls_r_z_color", "ls_z_w1_color", "ls_w1_w2_color", "ls_r_mag_scaled")
 # Pan-STARRS1 PSF colours cover the whole sky north of Dec -30 (also where the
 # Legacy Surveys are missing or unavailable).  Not dereddened: PS1 rows carry
 # no extinction, so this set is less reliable at low Galactic latitude.
@@ -47,6 +56,12 @@ def color_matrix(df: pd.DataFrame, colors) -> np.ndarray:
     """Colours as floats; NaN where missing or where ``<colour>_err`` > MAX_COLOR_ERR."""
     cols = []
     for c in colors:
+        if c in MAG_DIMS and c not in df:
+            flux, mw, scale = MAG_DIMS[c]
+            f = pd.to_numeric(df[flux], errors="coerce") if flux in df else pd.Series(np.nan, index=df.index)
+            t = pd.to_numeric(df[mw], errors="coerce").fillna(1.0) if mw in df else 1.0
+            cols.append(((22.5 - 2.5 * np.log10((f / t).where(f > 0))) / scale).to_numpy(float))
+            continue
         v = pd.to_numeric(df[c], errors="coerce") if c in df else pd.Series(np.nan, index=df.index)
         if f"{c}_err" in df:
             v = v.where(pd.to_numeric(df[f"{c}_err"], errors="coerce") <= MAX_COLOR_ERR)
@@ -60,6 +75,8 @@ def class_fractions(df: pd.DataFrame, ref: pd.DataFrame, k: int = K, ids=None, c
     ``ids`` (optional, aligned with ``df``) are matched against ``ref.id`` so a
     reference object never counts itself (leave-one-out on the train split).
     """
+    # A reference built before a magnitude dimension existed simply lacks it.
+    colors = tuple(c for c in colors if c in ref or c not in MAG_DIMS)
     X = color_matrix(df, colors)
     if not all(c in ref for c in colors):
         return np.full((len(df), len(CLASSES)), np.nan)
@@ -69,8 +86,9 @@ def class_fractions(df: pd.DataFrame, ref: pd.DataFrame, k: int = K, ids=None, c
     out = np.full((len(df), len(CLASSES)), np.nan)
     present = ~np.isnan(X)
     patterns = {}
+    is_colour = np.array([c not in MAG_DIMS for c in colors])
     for i, p in enumerate(map(tuple, present)):
-        if sum(p) >= MIN_COLORS:
+        if int(np.sum(np.array(p) & is_colour)) >= MIN_COLORS:
             patterns.setdefault(p, []).append(i)
     for p, rows in patterns.items():
         cols = np.array(p)

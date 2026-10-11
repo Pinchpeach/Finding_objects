@@ -70,6 +70,33 @@ Variability classification should consume time-series features rather than stati
 photometry alone. AGB and Mira must remain separate axes so an object can be
 physical=AGB and variability=MIRA simultaneously.
 
+### 3.1 ZTF periodic variables (2.8.0)
+
+Source: Chen et al. (2020, ApJS 249, 18), 781,602 periodic variables from
+ZTF DR2 g/r light curves (Bellm et al. 2019, PASP 131, 018002; Masci et al.
+2019, PASP 131, 018003), VizieR J/ApJS/249/18/table2. Types from period,
+amplitude and Fourier shape: EW, EA, BYDra, RSCVN, SR, Mira, RR, RRc,
+DSCT, CEP, CEPII (map in `axes/variability.py: ZTF_MAP`).
+
+Order of evidence: SIMBAD curated type > Gaia SOS RR Lyrae / Cepheid
+(dedicated multi-band fits) > ZTF type > Gaia LPV C-star flag > broad Gaia
+classifier. ZTF is the only source here with a Mira leaf.
+
+Cross-validation on ASAS-SN variables (II/366, independent of ZTF and
+Gaia), 250 per class:
+
+| truth | exact before | exact after | ZTF-labelled (exact) |
+|---|---:|---:|---|
+| MIRA | 0.0 % | 25.6 % | 65 (98.5 %) |
+| LPV | 68.8 % | 68.0 % | 24 (83.3 %; 3 called Mira) |
+| RR Lyrae | 82.4 % | 82.4 % | 11 (9.1 %; 10 called EW/EA) |
+| Cepheid | 93.2 % | 93.2 % | 0 |
+
+The RR → eclipsing cases are the known RRc / EW ambiguity (near-sinusoidal
+light curves; an EW at twice the period looks alike) and partly matches
+3–6″ away (blends). These objects had no correct label before either, so
+the RR Lyrae exact rate is unchanged.
+
 ## 4. Neutron stars / pulsars (compact axis)
 
 Recommended observables:
@@ -91,6 +118,46 @@ Literature:
 Implementation implication:
 Output NS/PULSAR as candidate likelihood unless pulsation or trusted catalogue
 identification gives direct evidence. Do not equate an X-ray source with an NS.
+
+### 4.1 Radio pulsar candidates without ATNF (2.6.3; revised 2.10.0)
+
+Rule (`axes/compact.py: radio_pulsar_evidence`, label `PULSAR_CANDIDATE`):
+alpha(150 MHz → 1.4 GHz) ≤ −1.5 AND TGSS S_total/S_peak ≤ 1.5 (Frail et al.
+2018). NVSS linear polarisation is supporting evidence (status
+`RADIO_STEEP_COMPACT_POLARISED`) only when significant: P/σ_P ≥ 3 and
+P/S > 5 %.
+
+- Frail et al. (2016, ApJ 829, 119; 2018, MNRAS 475, 942): TGSS ADR1 – NVSS
+  spectral index alpha ≤ −1.5 with compactness S_int/S_peak ≤ 1.5 selects
+  pulsar candidates; known pulsars are recovered by this cut.
+- Han & Tian (1999, A&AS 136, 571): NVSS linear polarisation > ~5 % keeps most
+  pulsars and rejects most extragalactic sources (median ~2 %).
+- Jankowski et al. (2018, MNRAS 473, 4436): mean pulsar spectral index
+  −1.60 ± 0.54; Bates et al. (2013, MNRAS 431, 1352): −1.4 ± 1.0.
+- Intema et al. (2017, A&A 598, A78): TGSS ADR1, 150 MHz, 25″ beam.
+- Condon et al. (1998, AJ 115, 1693): NVSS 1.4 GHz with Stokes Q/U.
+
+Calibration (`benchmark/build_pulsar_truth.py`, `evaluate_pulsar.py`; every
+quantity measured around the NVSS position, ATNF only as label; one row per
+NVSS source, since e.g. 33 Terzan 5 pulsars share one source):
+
+| quantity | ATNF pulsar sources (116 in NVSS) | NVSS control (2,531) |
+|---|---|---|
+| median alpha(150–1400) | −1.38 | −0.73 |
+| median NVSS fractional pol. | 0.139 | 0.024 |
+| Gaia DR3 within 5″ | 38.8 % | 16.8 % |
+| alpha + compactness (rule) | 25 (recall 0.216) | 3 (FPR 0.0012) |
+| + "fpol > 5 %" (2.6.3 rule) | 16 (0.138) | 3 (0.0012) |
+| + significant polarisation | 6 (0.052) | 0 |
+
+Why polarisation is not a cut: NVSS polarised-flux errors are ~0.3 mJy, so
+for the typical 3–7 mJy candidate "fpol > 5 %" is a ~1σ test; it removed no
+false positive and lost 9 pulsars. "No optical counterpart" was not used:
+pulsars in the Galactic plane have a chance Gaia neighbour within 5″ more
+often than the control sources. The rule needs a TGSS detection (66/116
+pulsar sources). With ~3,000 pulsars among ~1.8 M NVSS sources the sky-wide
+purity is low (an FPR of 0.12 % is ~2,000 sources), so the label is a
+candidate, not an identification.
 
 ## 5. Planetary nebulae (phenomenon/nebular axis)
 

@@ -21,6 +21,7 @@ Validation results are in the "Validation" sections and in `CHANGELOG.md`.
 | SDSS galaxy emission lines (2.6.0) | `sdss_spectroscopy.py` | Hα, Hβ, [O III] 5007, [N II] 6584 flux and EW from the Portsmouth fits (SDSS-I/II and BOSS; 100 % of the benchmark galaxies), else MPA-JHU (SDSS-I/II only; 1.6 %); Dn4000 from MPA-JHU | Thomas et al. 2013, MNRAS 431, 1383 (Portsmouth); Brinchmann et al. 2004, MNRAS 351, 1151; Kauffmann et al. 2003, MNRAS 341, 33; Tremonti et al. 2004, ApJ 613, 898 |
 | LAMOST DR5 | `lamost_spectroscopy.py` | class, subclass, z (LASP Teff, log g, [Fe/H] for AFGK stars) | Luo et al. 2015, RAA 15, 1095; Wu et al. 2011, RAA 11, 924 |
 | DESI DR1 redshift catalogue | `desi_spectroscopy.py` | spectral type, z | Guy et al. 2023, AJ 165, 144; DESI Collaboration 2025 (DR1) |
+| DESI DR1 galaxy emission lines (2.7.0) | `desi_fastspec.py` | Hα, Hβ, [O III] 5007, [N II] 6584 flux and inverse variance, EW(Hα), broad Hα; FastSpecFit fits as carried by the DESI DR1 AGN/galaxy VAC (Data Lab `desi_dr1.agngal`; the full FastSpecFit VAC is not cone-searchable). Used only where no SDSS lines exist | Moustakas et al. 2023 (FastSpecFit, ASCL 2308.005); DESI Collaboration 2025 (DR1) |
 | Gaia DR3 astrophysical parameters | `gaia_dr3.py` | GSP-Phot (BP/RP) Teff, log g, [M/H]; DSC class probabilities; GSP-Spec (RVS) and ESP-ELS (emission-line class), see §3 | Creevey et al. 2023, A&A 674, A26; Andrae et al. 2023, A&A 674, A27; Recio-Blanco et al. 2023, A&A 674, A29 |
 | Gaia DR3 LPV RP-spectrum C-star flag | `gaia_dr3_variability_sos_vizier.py` | `is_cstar` from the C2/CN band shape of RP spectra | Lebzelter et al. 2023, A&A 674, A15 |
 | Acker PN spectroscopy | `pn_spectroscopy.py` | PN line intensities | Acker et al. 1992 (Strasbourg–ESO PN catalogue) |
@@ -47,7 +48,30 @@ Spectroscopic log g separates dwarfs, subgiants and giants without a parallax.
   - The DR3 validation paper advises against GSP-Spec log g for AGB stars (Babusiaux et al. 2023, A&A 674, A32).
 - **Metallicity:** [Fe/H] < −1 metal-poor, < −2 very metal-poor, < −3 extremely metal-poor (Beers & Christlieb 2005, ARA&A 43, 531). The pipeline uses GSP-Phot [M/H] only as a candidate flag, because Andrae et al. 2023 report biases; a spectroscopic [Fe/H] is direct.
 
-### 2.2.1 Validation (2.6.0)
+### 2.2.1 Validation on bright stars (2.6.2, APOGEE DR17)
+
+Data: 8,196 APOGEE DR17 stars (S/N > 100, 24 RA slices).
+
+- **Truth:** the luminosity class comes from APOGEE log g, using the Ciardi boundary.
+- **Luminosity-class rules:**
+
+  | Rule | n | Accuracy | Giant recall | Giant precision |
+  |---|---|---|---|---|
+  | Gaia GSP-Spec (flags 0) | 3,078 | 97.8 % | 98.5 % | 97.9 % |
+  | LAMOST LASP | 1,880 | 98.3 % | 97.5 % | 99.2 % |
+  | Gaia GSP-Phot | 5,331 | 96.9 % | 96.1 % | 98.4 % |
+
+- **Metal-poor ([Fe/H] < −1):**
+
+  | Source | Precision | Recall | Note |
+  |---|---|---|---|
+  | GSP-Spec | 0.78 | 0.89 | 32 flagged |
+  | LAMOST | 0.98 | 0.88 | |
+  | GSP-Phot | 0.15 | 0.14 | 0.0–0.25 at any cut, so no longer used |
+
+- **GSP-Spec flags:** VizieR serves the 41-character `flags_gspspec` as a number, which drops leading zeros. A CSV round trip does the same. The collector therefore stores the per-parameter decision (`gspspec_<par>_ok`).
+
+### 2.2.2 Validation on faint benchmark stars (2.6.0)
 
 Data: 388 benchmark stars with LAMOST LASP parameters.
 
@@ -87,7 +111,16 @@ Data: 388 benchmark stars with LAMOST LASP parameters.
   - 229 of 443 known Wolf-Rayet stars were found, with 1 misassignment.
   - PNe are the hardest class.
   - Weak Hα emitters are missed.
-- **Use in the pipeline:** an emission-line class tags a star. Young-star classes (T Tauri, Herbig Ae/Be) also veto the AGB label, because YSOs mimic dusty AGB stars in Ks − W3.
+- **Validation (2.6.2, `benchmark/evaluate_bright.py`):** 4,000 ESP-ELS stars were compared with SIMBAD types. The query returned 1,500 Be, 1,500 T Tauri and 1,000 Herbig; no other labels.
+
+  | ESP-ELS label | SIMBAD class match | Notes |
+  |---|---|---|
+  | TTauri | 2 % | Most are long-period variables (LP?/LP*) |
+  | HerbigStar | 30 % | |
+  | beStar | 27 % | 541 of 1,111 are generic emission-line stars (Em*) |
+
+  Requiring flag ≤ 2 does not help (9–44 %).
+- **Use in the pipeline (2.6.2):** only the emission itself is used, as the tag "H-alpha emission-line star". The class label changes nothing, and it no longer vetoes the AGB label: T Tauri-labelled stars are mostly AGB-type variables.
 
 ### 2.5 White dwarfs and cataclysmic variables
 
@@ -140,6 +173,41 @@ Data: 3,333 SDSS benchmark galaxies with Portsmouth lines
   | AGN | 80 | 2.56 | 20 % |
 
 - **Change found in validation:** plain WHAN called 104 SDSS star-forming galaxies AGN. 96 of them are star-forming or composite in the Portsmouth BPT. The Stasińska et al. (2006) composite zone reduces this to 19.
+
+### 3.2 DESI FastSpecFit lines (2.7.0, `benchmark/evaluate_desi_lines.py`)
+
+The same rules (WHAN, BPT, [N II]/Hα, rule names `DESI_*`) run on DESI
+lines when a galaxy has no SDSS line measurement. Lines with zero inverse
+variance (outside 3,600–9,800 Å, e.g. Hα at z > 0.49) are left empty, so
+"not measured" never reads as "no emission". EW([N II]) is not in the table,
+so the WHAN "passive" sub-case is not reachable from DESI (retired still is).
+
+Check on 3,492 galaxies with both a DESI DR1 and an SDSS spectrum
+(Data Lab DESI × SDSS DR17 1.5″ crossmatch, z < 0.3, median z 0.12):
+
+- **Coverage:** SDSS lines decide 2,592, DESI 2,864; 691 only by DESI.
+- **Agreement where both decide (2,173):** 80.7 % exact, 94.4 % within
+  the neighbouring class on the SF – composite – AGN sequence. BPT
+  decisions agree 86.6 %, WHAN / [N II]–Hα decisions 76.8 %.
+
+  | SDSS → DESI | AGN | composite | quiescent | SF |
+  |---|---:|---:|---:|---:|
+  | AGN (117) | 81 | 10 | 26 | 0 |
+  | composite (375) | 60 | 205 | 63 | 47 |
+  | quiescent (714) | 8 | 4 | 701 | 1 |
+  | SF (967) | 9 | 181 | 11 | 766 |
+
+- **Systematic:** DESI log [N II]/Hα is +0.053 dex higher than SDSS
+  (1,653 galaxies, scatter 0.076 dex); [O III]/Hβ agrees (+0.005 dex);
+  DESI EW(Hα) is 0.82 × SDSS. This is what a smaller aperture gives: the
+  DESI fibre (1.5″) samples more of the bulge than the SDSS fibre (3″;
+  BOSS 2″),
+  with higher [N II]/Hα and more old-star continuum (Kewley, Jansen &
+  Geller 2005, PASP 117, 227). Hence the SF → composite shift.
+- **No correction applied.** Removing the measured offsets raises agreement
+  only to 83.4 % (in-sample), the thresholds are the literature ones, and
+  the aperture difference is physical (the DESI spectrum describes the
+  central region). SDSS lines keep precedence when both exist.
 
 ## 4. Quasars
 

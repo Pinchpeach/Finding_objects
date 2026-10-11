@@ -1,0 +1,60 @@
+{
+ "n": 3492,
+ "z_median": 0.123,
+ "sdss_decided": 2592,
+ "desi_decided": 2864,
+ "both_decided": 2173,
+ "desi_only": 691,
+ "agreement": 0.8067,
+ "agreement_within_adjacent": 0.9439,
+ "confusion_sdss_rows_desi_cols": {
+  "AGN": {
+   "AGN": 81,
+   "COMPOSITE": 10,
+   "QUIESCENT": 26,
+   "STAR_FORMING": 0
+  },
+  "COMPOSITE": {
+   "AGN": 60,
+   "COMPOSITE": 205,
+   "QUIESCENT": 63,
+   "STAR_FORMING": 47
+  },
+  "QUIESCENT": {
+   "AGN": 8,
+   "COMPOSITE": 4,
+   "QUIESCENT": 701,
+   "STAR_FORMING": 1
+  },
+  "STAR_FORMING": {
+   "AGN": 9,
+   "COMPOSITE": 181,
+   "QUIESCENT": 11,
+   "STAR_FORMING": 766
+  }
+ },
+ "agreement_by_desi_rule": {
+  "DESI_LINES_BPT": {
+   "n": 859,
+   "agreement": 0.8661
+  },
+  "DESI_WHAN": {
+   "n": 1314,
+   "agreement": 0.7679
+  }
+ },
+ "class_fraction": {
+  "sdss": {
+   "STAR_FORMING": 0.445,
+   "QUIESCENT": 0.3286,
+   "COMPOSITE": 0.1726,
+   "AGN": 0.0538
+  },
+  "desi": {
+   "STAR_FORMING": 0.3746,
+   "QUIESCENT": 0.3686,
+   "COMPOSITE": 0.1841,
+   "AGN": 0.0727
+  }
+ }
+}

@@ -19,4 +19,6 @@
   - `python v2/benchmark/evaluate_rule_baseline.py --truth v2/benchmark/truth_data/ground_truth.csv --catalog-root v2/benchmark/catalog_features --manifest /tmp/ready/benchmark_manifest.csv --out /tmp/eval`
   - 융합 가중치 재학습: `python v2/benchmark/fit_fusion_weights.py ...` (train split만 사용, test는 보고용)
 - 클라우드 세션 컨테이너는 천문 데이터 서비스(Gaia/VizieR/MAST 등)에 직접 접속할 수 없을 수 있음 → 데이터가 필요한 검증은 GitHub Actions 워크플로로 실행하고 로그/커밋으로 결과를 받는다.
-- `v2/Get_data/*.py`를 바꾸면 `Build Catalog Truth Features`(13 jobs, 수 시간)가 자동 실행된다. 벤치마크 재수집이 필요 없으면 취소한다.
+- `Build Catalog Truth Features`(13 jobs, 수 시간)는 2.6.4부터 수동 실행 전용이다(`v2/Get_data/*.py`를 바꿔도 자동 실행되지 않음). 벤치마크 재수집이 필요할 때만 workflow_dispatch로 실행한다.
+- 데이터를 커밋하는 워크플로는 `.github/scripts/push_with_retry.sh <branch>`로 push한다(동시 push 경합 시 rebase 후 재시도). 실행한 브랜치(`github.ref_name`)를 checkout하고 그 브랜치에 push한다.
+- 수집 결과 캐시(2.9.1): `V2_CACHE_DIR`(기본 `~/.cache/finding_objects/v2`), `V2_CACHE=0`으로 끔. Gaia 릴리스는 `V2_GAIA_RELEASE`(기본 DR3), 전환 전 `python v2/Get_data/check_gaia_release.py --release DR4`.

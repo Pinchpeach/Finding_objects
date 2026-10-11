@@ -193,3 +193,18 @@ nor fixes them.
 
 Confidence for such objects = the measured precision (0.99), or the fused
 STAR probability when that is higher.
+
+## Magnitude-conditioned colour kNN (`color_knn.py`, 2.6.5)
+
+The Legacy Surveys colour kNN (LS-CKNN-001) uses the dereddened r magnitude as
+an extra coordinate (4 mag ≈ 1 mag of colour), so a faint object is compared
+with reference objects of similar depth.
+
+- Bovy et al. (2011, ApJ 729, 141), XDQSO: star and quasar densities in colour
+  space are modelled in bins of apparent magnitude, since photometric errors,
+  colour distributions and the relative number counts all change with depth.
+- Measured (DESI DR1 held-out split): kNN accuracy 0.805 → 0.834; the fused
+  coarse classifier abstains on 5.9 % instead of 7.7 % at the same or better
+  accuracy when classified (CHANGELOG 2.6.5).
+- The magnitude never counts toward the minimum number of colours, so a
+  source with only a magnitude is not classified by colour.

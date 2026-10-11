@@ -8,17 +8,17 @@ v2의 코드·문서·규칙표가 인용하는 논문, 카탈로그 출판물, 
 |---|---:|
 | [측성·Gaia](#gaia) | 20 |
 | [측광 체계·단위](#phot) | 8 |
-| [탐사·카탈로그 데이터](#survey) | 22 |
+| [탐사·카탈로그 데이터](#survey) | 25 |
 | [데이터 출처 카탈로그 (논문 인용 없음)](#data) | 13 |
-| [교차 대응·통계·분류 방법](#method) | 8 |
+| [교차 대응·통계·분류 방법](#method) | 9 |
 | [별 분류](#star) | 25 |
 | [은하 분류](#galaxy) | 23 |
 | [퀘이사·AGN](#qso) | 14 |
-| [전파·X선·밀집성](#radio) | 4 |
+| [전파·X선·밀집성](#radio) | 10 |
 | [행성상성운·초신성·과도 현상](#trans) | 6 |
 | [기타 문서](#doc) | 13 |
-| [분광 분류 기준](#spec) | 41 |
-| **합계** | **197** |
+| [분광 분류 기준](#spec) | 43 |
+| **합계** | **209** |
 
 <a id="gaia"></a>
 ## 측성·Gaia
@@ -93,6 +93,9 @@ Gaia 데이터 릴리스, Gaia 처리·검증 논문, 측성 품질 기준.
 | Acker et al. (연도 미기재; Galactic PN catalogue VizieR V/84) (저장소 표기 그대로) | VizieR V/84 (main, intens) | — | `Get_data/pn_spectroscopy.py`<br>`Classifier/truth/build_independent_truth_sets.py`<br>`Classifier/axes/phenomenon.py` ('Acker PN Spectroscopy') | PN 방출선 세기(H, He, [O III], [N II], [S II])와 PN 정답 집합 |
 | Guo et al. 2022 (LAMOST DR5 white dwarfs) | VizieR J/MNRAS/509/2674 (table3, table6) | — | `Classifier/build_lamost_star_external_truth.py`<br>`Classifier/build_wd_subtype_truth.py`<br>`Classifier/WD_SUBTYPE_VALIDATION.md`<br>`Classifier/WD_SUBTYPE_XP_VALIDATION.md`<br>`Classifier/WD_SUBTYPE_XP_EXTERNAL_VALIDATION.md`<br>`Classifier/STAR_WD_EXTERNAL_VALIDATION.md` | 백색왜성 외부 정답과 DA/DB 학습 정답 |
 | Kepler et al. 2019 (SDSS DR14 white dwarfs) | VizieR J/MNRAS/486/2169 (table2) | — | `Classifier/build_sdss_wd_subtype_external_truth.py`<br>`Classifier/WD_SUBTYPE_XP_EXTERNAL_VALIDATION.md` | DA/DB 독립 외부 검증 정답(213개) |
+| Chen et al. 2020 (ZTF periodic variables) | ApJS 249, 18; VizieR J/ApJS/249/18 | — | `Get_data/ztf_periodic.py`<br>`Classifier/axes/variability.py (ZTF_MAP)`<br>`Classifier/LITERATURE_MULTI_AXIS.md §3.1` | ZTF 주기 변광성 78만 개의 유형(Mira, SR, RR, EW 등)·주기·진폭 |
+| Bellm et al. 2019 (ZTF) | PASP 131, 018002 | — | `Preprocess/association_model.py (ZTF periodic variables)`<br>`Classifier/LITERATURE_MULTI_AXIS.md §3.1` | ZTF 관측 체계(시상 ~2″) |
+| Masci et al. 2019 (ZTF data system) | PASP 131, 018003 | — | `Preprocess/association_model.py (ZTF periodic variables)` | ZTF 측성 정밀도(~0.1″) |
 
 <a id="data"></a>
 ## 데이터 출처 카탈로그 (논문 인용 없음)
@@ -130,6 +133,7 @@ Gaia 데이터 릴리스, Gaia 처리·검증 논문, 측성 품질 기준.
 | Clarke et al. 2020 | A&A 639, A84 | — | `Preprocess/LITERATURE.md` (DT-HIER-001) | SDSS+WISE 랜덤 포레스트 별/은하/퀘이사 분류, 확률·검증 분리 |
 | Tachibana & Miller 2018 | PASP 130, 128001; DOI 10.1088/1538-3873/aae3d9 | — | `Preprocess/classification_rules.csv` PS1-MORPH-001/002 (Sec. 4.1)<br>`Preprocess/catalog_reliability.csv` (catalog_confidence_ps1_morphology)<br>`Preprocess/LITERATURE.md` | PS1 iPSF − iKron > 0.05 확장원 판별과 한계 |
 | Farrow et al. 2014 | MNRAS 437, 748–770; DOI 10.1093/mnras/stt1933 | — | `Preprocess/LITERATURE.md` | PS1 별/은하 분리 배경과 검증 |
+| Bovy et al. 2011 (XDQSO) | ApJ 729, 141 | — | `Preprocess/color_knn.py` (MAG_DIMS ls_r_mag_scaled)<br>`Preprocess/LITERATURE.md` | 등급에 따라 색 분포·천체 수가 달라지므로 색 kNN에 r 등급 축 추가 |
 
 <a id="star"></a>
 ## 별 분류
@@ -228,6 +232,12 @@ AGN/퀘이사 선택, 전파 세기, 광도, 가려진 퀘이사, 고적색편�
 | Bates et al. 2014 (SPINN) | — | — | `Classifier/LITERATURE_MULTI_AXIS.md` | 신경망 펄서 후보 선택 |
 | Hui et al. 2020 | MNRAS 495, 1093 | — | `Classifier/LITERATURE_MULTI_AXIS.md` | Fermi 펄서형 천체 ML 선택 후 X선/광학/IR 대응체 분석 |
 | "Saz Parkinson et al.-style / later Fermi ML work" (저장소 표기 그대로) | — | — | `Classifier/LITERATURE_MULTI_AXIS.md` | 감마선 스펙트럼·변광 특징으로 펄서형과 AGN형 구분 |
+| Frail et al. 2016 | ApJ 829, 119 | — | `Classifier/axes/compact.py` (radio_pulsar_evidence)<br>`Classifier/LITERATURE_MULTI_AXIS.md §4.1`<br>`benchmark/build_pulsar_truth.py` | TGSS–NVSS 가파른 스펙트럼 펄서 후보 선택 |
+| Frail et al. 2018 | MNRAS 475, 942 | — | `Classifier/axes/compact.py` (PSR_ALPHA_MAX = −1.5, PSR_COMPACT_MAX = 1.5)<br>`Classifier/LITERATURE_MULTI_AXIS.md §4.1` | α ≤ −1.5, S_tot/S_peak ≤ 1.5 펄서 후보 기준 |
+| Han & Tian 1999 | A&AS 136, 571 | — | `Classifier/axes/compact.py` (PSR_POL_MIN = 0.05)<br>`Classifier/LITERATURE_MULTI_AXIS.md §4.1` | NVSS 편광률 > 5 %로 펄서와 외부은하 전파원 구분 |
+| Jankowski et al. 2018 | MNRAS 473, 4436 | — | `Classifier/LITERATURE_MULTI_AXIS.md §4.1`<br>`benchmark/build_pulsar_truth.py` | 펄서 평균 전파 스펙트럼 지수 −1.60 ± 0.54 |
+| Bates et al. 2013 | MNRAS 431, 1352 | — | `Classifier/LITERATURE_MULTI_AXIS.md §4.1`<br>`benchmark/build_pulsar_truth.py` | 펄서 스펙트럼 지수 분포 −1.4 ± 1.0 |
+| Intema et al. 2017 (TGSS ADR1) | A&A 598, A78 | — | `Get_data/tgss.py` (J/A+A/598/A78/table3)<br>`Preprocess/association_model.py` (TGSS ADR1) | 150 MHz 전파 카탈로그(25″ 빔) |
 
 <a id="trans"></a>
 ## 행성상성운·초신성·과도 현상
@@ -312,6 +322,8 @@ PN 진단, 광도곡선 기반 초신성/과도 현상 분류.
 | Thomas et al. 2013 (Portsmouth emission-line fits) | MNRAS 431, 1383 | — | `Classifier/LITERATURE_SPECTROSCOPY.md`<br>`Get_data/sdss_spectroscopy.py` (emissionLinesPort)<br>`benchmark/build_spectro_truth.py` | SDSS-I/II·BOSS 은하 방출선 플럭스·EW(벤치마크 은하 100 %) |
 | Samus et al. 2017 (GCVS 5.1) | Astron. Rep. 61, 80; VizieR B/gcvs | — | `benchmark/build_agb_gcvs_truth.py`<br>`Classifier/subclass.py` (AGB chemistry models)<br>`Classifier/LITERATURE_SUBCLASS.md` | 분광형 있는 Mira·반규칙·불규칙 변광성(M → O형, C/R/N → C형): 먼지 없는 O형 거성을 AGB 화학형 정답에 추가 |
 | Cutri et al. 2012 (AllWISE/WISE Explanatory Supplement) | — | — | `Classifier/subclass.py` (WISE_SAT_VEGA)<br>`benchmark/fit_agb_chemistry.py` (WISE_SAT) | WISE 포화 한계 W1 8.0, W2 6.7, W3 3.8, W4 −0.4 (Vega) |
+| Moustakas et al. 2023 (FastSpecFit) | ASCL 2308.005 | — | `Get_data/desi_fastspec.py`<br>`Classifier/LITERATURE_SPECTROSCOPY.md §3.2` | DESI 스펙트럼 방출선 측정(Hα, Hβ, [O III], [N II], EW) |
+| Kewley, Jansen & Geller 2005 | PASP 117, 227 | — | `Classifier/LITERATURE_SPECTROSCOPY.md §3.2`<br>`benchmark/evaluate_desi_lines.py` | 광섬유 구경 효과: 작은 구경은 [N II]/Hα가 높고 EW(Hα)가 낮음(DESI 1.5″ vs SDSS 3″) |
 
 ## 확인이 필요한 인용
 

@@ -1,15 +1,10 @@
 name: Build Catalog Truth Features
 env:
   BENCHMARK_TARGET_SIZE: '9999'
+# Manual only (2.6.4): this rebuild takes hours and re-collects the whole
+# benchmark; it used to start on every Get_data change and was cancelled by
+# hand almost every time.  Run it when the benchmark itself must be rebuilt.
 on:
-  push:
-    paths:
-      - 'v2/benchmark/collect_catalog_truth.py'
-      - 'v2/benchmark/truth_data/ground_truth.csv'
-      - 'v2/benchmark/validate_catalog_truth.py'
-      - 'v2/benchmark/train_validate_classifier.py'
-      - 'v2/Get_data/*.py'
-      - '.github/workflows/build-catalog-truth-features.yml'
   workflow_dispatch:
     inputs:
       limit_per_class:

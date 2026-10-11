@@ -4,7 +4,6 @@ on:
   push:
     paths:
       - 'v2/benchmark/build_radio_xray_truth.py'
-      - '.github/workflows/build-radio-xray-benchmark.yml'
 jobs:
   truth:
     runs-on: ubuntu-latest
@@ -37,6 +36,4 @@ jobs:
           git add v2/benchmark/radio_xray_truth
           git diff --cached --quiet && exit 0
           git commit -m "Add radio X-ray selected benchmark truth"
-          git fetch origin main
-          git rebase origin/main
-          git push
+          bash .github/scripts/push_with_retry.sh

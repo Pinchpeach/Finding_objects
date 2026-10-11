@@ -3,11 +3,9 @@ name: Re-collect Legacy Surveys benchmark features
 # Re-queries DESI Legacy Surveys DR10 (now with unWISE W1/W2) for the SDSS
 # coarse benchmark and the DESI DR1 external truth set, and commits the gzip
 # features next to the other preserved catalog features.
+# Manual only (2.6.4): a workflow-file edit must not re-collect data.
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - .github/workflows/recollect-ls-features.yml
 
 concurrency:
   group: recollect-ls-features-${{ github.ref }}
@@ -64,4 +62,4 @@ jobs:
           git add v2/benchmark/catalog_features v2/benchmark/desi_external/catalog_features
           git diff --cached --quiet && exit 0
           git commit -m "Re-collect Legacy Surveys benchmark features with unWISE W1/W2"
-          for i in 1 2 3; do git pull --no-rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep 5; done
+          bash .github/scripts/push_with_retry.sh

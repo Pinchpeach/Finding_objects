@@ -16,6 +16,7 @@ def fetch(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
  df=df.drop_duplicates("catalog_object_id",keep="last").reset_index(drop=True)
  # LASP Teff / log g / [Fe/H] of A, F, G, K stars (V/164/stellar5; Luo et al.
  # 2015).  A failed query leaves them empty and keeps the spectra.
+ df["lasp_query_status"]="ok"     # a failure is recorded so the archive cache does not keep a partial result
  try:
   st=Vizier(columns=["ObsID","Teff","e_Teff","logg","e_logg","[Fe/H]","e_[Fe/H]"],row_limit=-1).query_region(
       SkyCoord(ra*u.deg,dec*u.deg),radius=radius_arcmin*u.arcmin,catalog=STELLAR_CATALOG)
@@ -25,6 +26,7 @@ def fetch(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
    df=df.merge(p.drop_duplicates("catalog_object_id")[["catalog_object_id",*[c for c in LASP.values() if c in p]]],on="catalog_object_id",how="left")
  except Exception as exc:
   print(f"[lamost_spectroscopy] LASP parameter query failed: {type(exc).__name__}: {str(exc)[:120]}")
+  df["lasp_query_status"]="error:"+type(exc).__name__
  for c in LASP.values():
   if c not in df:df[c]=pd.NA
  return df

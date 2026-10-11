@@ -10,7 +10,13 @@ import time
 from pathlib import Path
 import pandas as pd
 
-CATALOG="Gaia DR3"
+import sys
+if str(Path(__file__).resolve().parent) not in sys.path:      # loaded by file path elsewhere
+    sys.path.insert(0,str(Path(__file__).resolve().parent))
+from gaia_release import SLOT_CATALOG, current as _release, table as _table, RELEASES
+# Pipeline slot name for every Gaia release (see gaia_release.py); each row
+# records the release and epoch it really comes from.
+CATALOG=SLOT_CATALOG
 SOURCE=["source_id","designation","ra","dec","ra_error","dec_error","parallax","parallax_error","pmra","pmra_error","pmdec","pmdec_error","ruwe","phot_g_mean_flux","phot_g_mean_flux_error","phot_g_mean_mag","phot_bp_mean_flux","phot_bp_mean_flux_error","phot_bp_mean_mag","phot_rp_mean_flux","phot_rp_mean_flux_error","phot_rp_mean_mag","bp_rp","bp_g","g_rp","phot_bp_rp_excess_factor","radial_velocity","radial_velocity_error","rv_nb_transits"]
 AP=["teff_gspphot","logg_gspphot","mh_gspphot","distance_gspphot","ag_gspphot","ebpminrp_gspphot","mass_flame","age_flame","evolstage_flame","flags_flame","classprob_dsc_combmod_quasar","classprob_dsc_combmod_galaxy","classprob_dsc_combmod_star","classprob_dsc_combmod_whitedwarf","classprob_dsc_combmod_binarystar"]
 # Spectroscopic parameters: GSP-Spec from RVS spectra (Recio-Blanco et al.
@@ -135,22 +141,44 @@ def _vizier_fallback(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
     out["gaia_base_query_status"]="vizier_fallback";out["gaia_ap_query_status"]="fallback_partial";out["gaia_vari_classifier_query_status"]="vizier_fallback";out["gaia_vari_summary_query_status"]="fallback_unavailable"
     return out
 
+# GSP-Spec quality (Babusiaux et al. 2023): a parameter is usable when its
+# flags_gspspec characters are 0 (1-based positions).  The 41-character flag
+# string loses its leading zeros when VizieR serves it as a number and when a
+# CSV is read back, so the decision is made here, on the zero-padded string,
+# and stored as 0/1 columns.
+GSPSPEC_FLAG_POS={"teff":(1,4,8,13),"logg":(2,5,8,13),"mh":(3,6,8)}
+def _gspspec_quality(df:pd.DataFrame)->pd.DataFrame:
+    def pad(v):
+        s=str(v).strip() if v is not None and str(v).strip() not in ("","nan","<NA>","None") else ""
+        if "e" in s.lower():return None        # float notation: digits already lost, decision unknown
+        s=s.split(".")[0]
+        return s.zfill(41) if s.isdigit() else None
+    flags=df["flags_gspspec"].map(pad) if "flags_gspspec" in df else pd.Series(None,index=df.index,dtype=object)
+    for par,pos in GSPSPEC_FLAG_POS.items():
+        df[f"gspspec_{par}_ok"]=flags.map(lambda f:int(all(f[i-1]=="0" for i in pos)) if isinstance(f,str) else pd.NA).astype("Int64")
+    if "flags_gspspec" in df:df["flags_gspspec"]=flags.map(lambda f:"F"+f if isinstance(f,str) else None)   # text, keeps the zeros
+    return df
+
 def fetch(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
+    rel=_release();used=rel
     select=",".join(SOURCE)
-    q=f"""SELECT {select} FROM gaiadr3.gaia_source WHERE 1=CONTAINS(POINT('ICRS',ra,dec),CIRCLE('ICRS',{float(ra)},{float(dec)},{float(radius_arcmin)/60.0}))"""
+    q=f"""SELECT {select} FROM {_table(rel,'gaia_source')} WHERE 1=CONTAINS(POINT('ICRS',ra,dec),CIRCLE('ICRS',{float(ra)},{float(dec)},{float(radius_arcmin)/60.0}))"""
     try:
         df=_bounded(_tap,BASE_TAP_BUDGET_S,q);df["gaia_base_query_status"]="tap"
         if not df.empty:
-            df=_merge_optional(df,"gaiadr3.astrophysical_parameters",AP+SPEC_AP,"gaia_ap_query_status")
-            df=_merge_optional(df,"gaiadr3.vari_classifier_result",["best_class_name","best_class_score"],"gaia_vari_classifier_query_status")
-            df=_merge_optional(df,"gaiadr3.vari_summary",VAR_SUMMARY,"gaia_vari_summary_query_status")
+            df=_merge_optional(df,_table(rel,"astrophysical_parameters"),AP+SPEC_AP,"gaia_ap_query_status")
+            df=_merge_optional(df,_table(rel,"vari_classifier_result"),["best_class_name","best_class_score"],"gaia_vari_classifier_query_status")
+            df=_merge_optional(df,_table(rel,"vari_summary"),VAR_SUMMARY,"gaia_vari_summary_query_status")
     except Exception:
-        df=_vizier_fallback(ra,dec,radius_arcmin)
+        # The VizieR mirror is DR3: label the rows DR3 (epoch 2016.0) even
+        # when another release was requested, so propagation stays correct.
+        df=_vizier_fallback(ra,dec,radius_arcmin);used=RELEASES["DR3"]
     if df.empty:return pd.DataFrame(columns=["catalog","catalog_object_id","object_name","ra","dec"]+SOURCE[2:]+AP+SPEC_AP+["best_class_name","best_class_score"]+VAR_SUMMARY)
     df.insert(0,"catalog",CATALOG)
     sid=pd.to_numeric(df["source_id"],errors="coerce").astype("Int64").astype("string")
-    df.insert(1,"catalog_object_id",sid);df.insert(2,"object_name",df.get("designation",pd.Series("Gaia DR3 "+sid,index=df.index)).astype("string"))
-    df["query_radius_arcmin"]=float(radius_arcmin);df["ref_epoch"]=2016.0;df["entity_kind"]="persistent_source";df["psf_fwhm_arcsec"]=0.18
+    df.insert(1,"catalog_object_id",sid);df.insert(2,"object_name",df.get("designation",pd.Series(used.designation_prefix+" "+sid,index=df.index)).astype("string"))
+    df["query_radius_arcmin"]=float(radius_arcmin);df["gaia_release"]=used.name;df["ref_epoch"]=used.ref_epoch;df["entity_kind"]="persistent_source";df["psf_fwhm_arcsec"]=0.18
+    df=_gspspec_quality(df)
     # Native RA/Dec errors are mas; Stage-1 performs the conversion.
     return df.drop_duplicates("catalog_object_id",keep="last").reset_index(drop=True)
 

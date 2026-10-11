@@ -295,9 +295,22 @@ def cmd_position(row):
 GSPSPEC_FLAG_POS = {"teff": (1, 4, 8, 13), "logg": (2, 5, 8, 13), "mh": (3, 6, 8)}
 
 
-def _gspspec_ok(flags, par):
-    f = str(flags or "")
-    return len(f) >= max(GSPSPEC_FLAG_POS[par]) and all(f[i - 1] == "0" for i in GSPSPEC_FLAG_POS[par])
+def _gspspec_ok(flags, par, row=None):
+    """GSP-Spec parameter usable?  The collector stores the decision
+    (gspspec_<par>_ok, from the zero-padded flags); otherwise the flags string
+    is read here, restoring the leading zeros a numeric round trip removes."""
+    if row is not None:
+        ok = _num(row, f"gaia_dr3__gspspec_{par}_ok", f"gspspec_{par}_ok")
+        if ok is not None:
+            return ok == 1
+    raw = str(flags or "").strip().lstrip("F")
+    if "e" in raw.lower():          # float notation (>= 1e16): digits already lost
+        return False
+    f = raw.split(".")[0]
+    if not f.isdigit():
+        return False
+    f = f.zfill(41)
+    return all(f[i - 1] == "0" for i in GSPSPEC_FLAG_POS[par])
 
 
 def spectro_params(row):
@@ -307,16 +320,17 @@ def spectro_params(row):
         return {"teff": teff, "logg": logg, "feh": feh, "source": "LAMOST"}
     flags = _text(row, "gaia_dr3__flags_gspspec", "flags_gspspec")
     teff, logg, mh = (_num(row, f"gaia_dr3__{k}_gspspec", f"{k}_gspspec") for k in ("teff", "logg", "mh"))
-    if teff is not None and logg is not None and _gspspec_ok(flags, "teff") and _gspspec_ok(flags, "logg"):
-        return {"teff": teff, "logg": logg, "feh": mh if _gspspec_ok(flags, "mh") else None, "source": "GSPSPEC"}
+    if teff is not None and logg is not None and _gspspec_ok(flags, "teff", row) and _gspspec_ok(flags, "logg", row):
+        return {"teff": teff, "logg": logg, "feh": mh if _gspspec_ok(flags, "mh", row) else None, "source": "GSPSPEC"}
     return None
 
 
 # Gaia DR3 ESP-ELS emission-line classes from BP/RP spectra (Creevey et al.
-# 2023; DR3 documentation 11.3.7).  classlabel_espels_flag <= 2 means a class
-# probability > 0.5.  57 511 stars; 96 % of known classical Be stars are
-# classed Be, 229 of 443 known WR stars found with one misassignment; weak
-# H-alpha emitters are missed and PNe are the least reliable class.
+# 2023; DR3 documentation 11.3.7).  Checked against SIMBAD on 4000 ESP-ELS
+# stars (2.6.2, benchmark/evaluate_bright.py): "TTauri" matched a young-star
+# type for 2 % (most are long-period variables), "HerbigStar" 30 %, "beStar"
+# 27 %, while 40-80 % are emission-line stars of some kind.  Only the
+# emission itself is used (tag); the class label decides nothing.
 ESP_ELS = {"bestar": ("BE", "Be star (emission-line B star)"), "herbigstar": ("YSO", "Herbig Ae/Be star (young stellar object)"),
            "ttauri": ("YSO", "T Tauri star (young stellar object)"), "reddwarfemstar": ("DME", "active M dwarf (dMe)"),
            "wc": ("WR", "Wolf-Rayet star (WC)"), "wn": ("WR", "Wolf-Rayet star (WN)"),
@@ -440,17 +454,13 @@ def star_tags(row):
         tags.append({"tag": "VERY_METAL_POOR" if very else "METAL_POOR",
                      "label": "very metal-poor star" if very else "metal-poor star", "rule": f"{sp['source']}_FEH",
                      "basis": f"spectroscopic [Fe/H] = {sp['feh']:.2f} ({sp['source']}; Beers & Christlieb 2005)"})
-    mh = _num(row, "gaia_dr3__mh_gspphot", "mh_gspphot")
-    if sp is not None and sp["feh"] is not None:
-        mh = None                      # the spectrum decides; GSP-Phot [M/H] agrees for 91 of its 156 metal-poor flags
-    if mh is not None and gmag is not None and gmag < 17 and mh < -1.0:
-        # [M/H] < -1 "metal-poor" (Beers & Christlieb 2005).  GSP-Phot [M/H]
-        # is only indicative (Andrae et al. 2023), hence "candidate".
-        tags.append({"tag": "METAL_POOR", "label": "metal-poor star candidate", "rule": "GAIA_GSPPHOT_MH",
-                     "basis": f"GSP-Phot [M/H] = {mh:.2f} < -1 (G = {gmag:.1f})"})
+    # GSP-Phot [M/H] is not used for the metal-poor tag (2.6.2): against
+    # APOGEE DR17 its [M/H] < -1 flag has precision 0.15 / recall 0.14
+    # (0-0.25 at any cut), against GSP-Spec 0.78 / 0.89 and LAMOST 0.98 / 0.88.
     els = emission_line_class(row)
-    if els is not None and els[0] in ("BE", "DME"):
-        tags.append({"tag": "EMISSION_LINE", "label": els[1], "rule": "GAIA_ESP_ELS", "basis": els[2]})
+    if els is not None:
+        tags.append({"tag": "EMISSION_LINE", "label": "H-alpha emission-line star", "rule": "GAIA_ESP_ELS",
+                     "basis": f"{els[2]}; class label not used (SIMBAD agreement 2-30 %)"})
     var = str(row.get("variability_class") or "")
     if var and var not in ("UNKNOWN", "nan", "None"):
         sub = row.get("variability_subtype")
@@ -631,9 +641,6 @@ def agb_chemistry(row):
         if sub.startswith(("CAGB", "OAGB")):
             out = {"chem": sub[0], "rule": "SUH2021", "basis": f"Suh (2021) catalogue {sub}"}
     gate = agb_candidate(row)
-    els = emission_line_class(row)
-    if els is not None and els[0] == "YSO":
-        return None                  # young stars mimic dusty AGB stars in Ks - W3
     if out is None and gate:
         ph = agb_photometric(row)
         if ph is not None:
@@ -693,9 +700,6 @@ def classify_star(row):
             return _result("Cataclysmic variable", "STAR:CV", None, f"{src}_SUBCLASS", f"{src} spectrum subclass {label}")
         if u.startswith(("WD", "DA", "DB", "DC", "DQ", "DZ", "DO")):
             return _result(f"White dwarf ({label})", "STAR:WD", None, f"{src}_SUBCLASS", f"{src} spectrum subclass {label}")
-    els = emission_line_class(row)
-    if els is not None and els[0] in ("YSO", "WR", "PN"):
-        return _result(els[1], f"STAR:{els[0]}", None, "GAIA_ESP_ELS", els[2])
     if phys == "WD":
         sub = row.get("physical_subtype")
         return _result("White dwarf" + (f" ({sub})" if isinstance(sub, str) and sub else ""), "STAR:WD",
@@ -761,39 +765,53 @@ LINE_SNR = 3.0
 D4000_OLD = 1.6
 
 
-def _line(row, name):
-    """(flux, S/N) of an SDSS emission line, or (None, None)."""
-    f = _num(row, f"sdss_dr18_spectroscopy__line_{name}_flux")
-    e = _num(row, f"sdss_dr18_spectroscopy__line_{name}_flux_err")
+# Line sources in order of precedence: SDSS (Portsmouth / MPA-JHU), then DESI
+# DR1 FastSpecFit (2.7.0; Get_data/desi_fastspec.py writes the same line_*
+# columns: fluxes, 1-sigma errors, EW positive in emission, Dn4000).
+LINE_SOURCES = (("sdss_dr18_spectroscopy__", "SDSS"), ("desi_dr1_fastspecfit__", "DESI"))
+
+
+def _line(row, name, prefix="sdss_dr18_spectroscopy__"):
+    """(flux, S/N) of an emission line from one source, or (None, None)."""
+    f = _num(row, f"{prefix}line_{name}_flux")
+    e = _num(row, f"{prefix}line_{name}_flux_err")
     if f is None:
         return None, None
     return f, (f / e if e and e > 0 else None)
 
 
 def galaxy_lines(row):
-    """(activity, rule, basis) from SDSS emission-line measurements, or None."""
-    ha, ha_sn = _line(row, "ha")
-    hb, hb_sn = _line(row, "hb")
-    o3, o3_sn = _line(row, "oiii5007")
-    n2, n2_sn = _line(row, "nii6584")
+    """(activity, rule, basis) from the first line source that decides, or None."""
+    for prefix, tag in LINE_SOURCES:
+        r = _galaxy_lines(row, prefix, tag)
+        if r is not None:
+            return r
+    return None
+
+
+def _galaxy_lines(row, prefix, tag):
+    ha, ha_sn = _line(row, "ha", prefix)
+    hb, hb_sn = _line(row, "hb", prefix)
+    o3, o3_sn = _line(row, "oiii5007", prefix)
+    n2, n2_sn = _line(row, "nii6584", prefix)
     good = lambda f, sn: f is not None and f > 0 and sn is not None and sn >= LINE_SNR
-    w = ew_ha = _num(row, "sdss_dr18_spectroscopy__line_ha_ew")
-    wn = _num(row, "sdss_dr18_spectroscopy__line_nii6584_ew")
+    w = ew_ha = _num(row, f"{prefix}line_ha_ew")
+    wn = _num(row, f"{prefix}line_nii6584_ew")
     # Weak H-alpha first: LINER-like ratios with EW(Ha) < 3 A come from old
     # stars, not an AGN (retired galaxies; Cid Fernandes et al. 2010, 2011).
     if w is not None and w < 0.5 and wn is not None and wn < 0.5:
-        return "QUIESCENT", "SDSS_WHAN", f"EW(Ha) = {w:.1f} A, EW([N II]) = {wn:.1f} A < 0.5 A (passive; WHAN)"
+        return "QUIESCENT", f"{tag}_WHAN", f"EW(Ha) = {w:.1f} A, EW([N II]) = {wn:.1f} A < 0.5 A (passive; WHAN)"
     if w is not None and w < 3.0:
-        return "QUIESCENT", "SDSS_WHAN", f"EW(Ha) = {w:.1f} A < 3 A (retired; WHAN)"
+        return "QUIESCENT", f"{tag}_WHAN", f"EW(Ha) = {w:.1f} A < 3 A (retired; WHAN)"
     if all(good(f, sn) for f, sn in ((ha, ha_sn), (hb, hb_sn), (o3, o3_sn), (n2, n2_sn))):
         x, y = math.log10(n2 / ha), math.log10(o3 / hb)
         pos = f"log [N II]/Ha = {x:.2f}, log [O III]/Hb = {y:.2f}"
         if x >= 0.47 or y > 0.61 / (x - 0.47) + 1.19:
             kind = "Seyfert" if y > 1.05 * x + 0.45 else "LINER"
-            return "AGN", "SDSS_LINES_BPT", f"{pos}: above Kewley+2001 ({kind}-like, Schawinski+2007)"
+            return "AGN", f"{tag}_LINES_BPT", f"{pos}: above Kewley+2001 ({kind}-like, Schawinski+2007)"
         if x < 0.05 and y < 0.61 / (x - 0.05) + 1.3:
-            return "STAR_FORMING", "SDSS_LINES_BPT", f"{pos}: below Kauffmann+2003"
-        return "COMPOSITE", "SDSS_LINES_BPT", f"{pos}: between Kauffmann+2003 and Kewley+2001"
+            return "STAR_FORMING", f"{tag}_LINES_BPT", f"{pos}: below Kauffmann+2003"
+        return "COMPOSITE", f"{tag}_LINES_BPT", f"{pos}: between Kauffmann+2003 and Kewley+2001"
     if w is not None and good(ha, ha_sn) and n2 is not None and n2 > 0:
         # [N II]/Ha alone (Stasinska et al. 2006): < -0.4 star-forming,
         # -0.4 to -0.2 composite, > -0.2 AGN.  WHAN calls everything above
@@ -802,14 +820,14 @@ def galaxy_lines(row):
         x = math.log10(n2 / ha)
         pos = f"EW(Ha) = {w:.1f} A, log [N II]/Ha = {x:.2f}"
         if x < -0.4:
-            return "STAR_FORMING", "SDSS_WHAN", f"{pos} < -0.4 (WHAN; Stasinska+2006)"
+            return "STAR_FORMING", f"{tag}_WHAN", f"{pos} < -0.4 (WHAN; Stasinska+2006)"
         if x < -0.2:
-            return "COMPOSITE", "SDSS_WHAN", f"{pos} in -0.4..-0.2 (composite; Stasinska+2006)"
+            return "COMPOSITE", f"{tag}_WHAN", f"{pos} in -0.4..-0.2 (composite; Stasinska+2006)"
         kind = "strong" if w > 6.0 else "weak"
-        return "AGN", "SDSS_WHAN", f"{pos} >= -0.2 ({kind} AGN; WHAN, Stasinska+2006)"
-    d4 = _num(row, "sdss_dr18_spectroscopy__d4000_n")
+        return "AGN", f"{tag}_WHAN", f"{pos} >= -0.2 ({kind} AGN; WHAN, Stasinska+2006)"
+    d4 = _num(row, f"{prefix}d4000_n")
     if d4 is not None and d4 >= D4000_OLD and ew_ha is None:
-        return "QUIESCENT", "SDSS_D4000", f"Dn4000 = {d4:.2f} >= {D4000_OLD} (old stellar population)"
+        return "QUIESCENT", f"{tag}_D4000", f"Dn4000 = {d4:.2f} >= {D4000_OLD} (old stellar population)"
     return None
 
 

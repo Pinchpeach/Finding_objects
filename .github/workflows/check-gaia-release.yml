@@ -1,0 +1,34 @@
+name: Check Gaia release schema
+
+# Compares a Gaia release on the ESA archive with the columns the collector
+# needs (2.9.0).  Run with release=DR4 when DR4 is public; DR3 must pass.
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: Gaia release (DR3, DR4)
+        default: DR3
+  push:
+    branches: [claude/code-review-7ox8zn]
+    paths:
+      - v2/Get_data/check_gaia_release.py
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pandas astropy astroquery
+      - name: DR3 (must pass)
+        run: python -u v2/Get_data/check_gaia_release.py --release DR3
+      - name: Requested release
+        if: inputs.release && inputs.release != 'DR3'
+        run: python -u v2/Get_data/check_gaia_release.py --release "${{ inputs.release }}"
+      - name: DR4 (informational until release)
+        if: ${{ !inputs.release }}
+        continue-on-error: true
+        run: python -u v2/Get_data/check_gaia_release.py --release DR4

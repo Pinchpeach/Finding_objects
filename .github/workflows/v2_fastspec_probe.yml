@@ -1,0 +1,56 @@
+name: v2 catalogue probe
+
+# Inspects archive tables before a collector is written (2.7.0 DESI lines,
+# 2.8.0 ZTF periodic variables).
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/code-review-7ox8zn]
+    paths:
+      - .github/workflows/v2_fastspec_probe.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pandas astropy astroquery pyvo
+      - name: ZTF periodic variables (Chen et al. 2020) on VizieR
+        continue-on-error: true
+        run: |
+          python - <<'PY'
+          from astroquery.vizier import Vizier
+          from astropy.coordinates import SkyCoord
+          import astropy.units as u
+          cats = Vizier.find_catalogs("J/ApJS/249/18")
+          for k, v in cats.items(): print(k, "|", v.description)
+          t = Vizier(columns=["**"], row_limit=5).get_catalogs("J/ApJS/249/18")
+          for tab in t:
+              print("==", tab.meta.get("name"), len(tab))
+              for c in tab.colnames: print("  ", c, "|", tab[c].unit, "|", tab[c].description)
+              print(tab[:3])
+          # RR Lyrae itself (bright, may saturate) and a field cone
+          for name, (ra, dec) in {"RR Lyr": (291.3660, 42.7844), "field": (150.1, 2.2)}.items():
+              r = Vizier(columns=["**"], row_limit=-1).query_region(SkyCoord(ra*u.deg, dec*u.deg), radius=10*u.arcmin, catalog="J/ApJS/249/18")
+              print(name, [len(x) for x in r])
+              for x in r: print(x[:5])
+          import collections
+          tt = Vizier(columns=["Type"], row_limit=200000).get_catalogs("J/ApJS/249/18")
+          for x in tt:
+              if "Type" in x.colnames: print(collections.Counter(map(str, x["Type"])).most_common(20))
+          PY
+      - name: Other ZTF variability catalogues on VizieR
+        continue-on-error: true
+        run: |
+          python - <<'PY'
+          from astroquery.vizier import Vizier
+          for kw in ("ZTF periodic variable", "ZTF variable stars", "ZTF light curve classification"):
+              c = Vizier.find_catalogs(kw)
+              print(kw, "->", [(k, (v.description or "")[:90]) for k, v in c.items()][:12])
+          PY

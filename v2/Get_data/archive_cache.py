@@ -1,0 +1,197 @@
+"""Local archive cache / mirror for collector results (2.9.1; review fixes 2.10.0).
+
+Each successful ``fetch(ra, dec, radius)`` result is stored as gzip CSV under
+``V2_CACHE_DIR`` (default ``~/.cache/finding_objects/v2``).  A later request
+is served from the cache when a stored cone of the same collector *contains*
+it (centre separation + requested radius <= stored radius); the rows are then
+filtered to the requested cone (plus the collector's own search margin,
+``CACHE_FILTER_MARGIN_ARCMIN``, e.g. SGA-2020 searches 10' beyond the field)
+and ``query_radius_arcmin`` is set to the requested radius, as a fresh fetch
+would.  Re-running a field, or zooming into part of it, needs no network.
+
+Correctness rules:
+* the key hashes every collector module in ``Get_data`` (shared helpers such
+  as ``_catalog_utils.py`` and ``gaia_release.py`` included) and the Gaia
+  release, so changing collection code never reuses old rows;
+* only complete successful fetches are stored: errors, timeouts and partial
+  results (any ``*_query_status`` that is not ok, e.g. the Gaia VizieR
+  fallback or a failed optional query) are not;
+* empty results expire after ``EMPTY_TTL_DAYS`` (an archive outage can look
+  like an empty answer), non-empty ones after ``TTL_DAYS`` (the archives
+  here are fixed releases except SIMBAD / NED, which get ``LIVE_TTL_DAYS``);
+* several processes (app worker, command line) may share the directory: data
+  files are written to a unique temporary name and renamed, and the index is
+  updated under a lock file;
+* ``V2_CACHE=0`` disables the cache.
+"""
+from __future__ import annotations
+import hashlib
+import json
+import math
+import os
+import tempfile
+import threading
+import time
+from pathlib import Path
+
+import pandas as pd
+
+TTL_DAYS = 90.0
+LIVE_TTL_DAYS = 7.0
+EMPTY_TTL_DAYS = 1.0
+LIVE = {"simbad", "ned"}
+OK_STATUS = {"", "ok", "tap", "missing_source_id", "nan", "<NA>", "None"}
+SAME_TOL_ARCMIN = 1e-6
+LOCK_STALE_S = 30.0
+_LOCK = threading.Lock()
+_HASH: dict[tuple, str] = {}
+
+
+def enabled() -> bool:
+    return os.environ.get("V2_CACHE", "1").strip() not in {"0", "false", "no", "off"}
+
+
+def root() -> Path:
+    return Path(os.environ.get("V2_CACHE_DIR", Path.home() / ".cache" / "finding_objects" / "v2"))
+
+
+def _code_hash(source: Path) -> str:
+    """Hash of every module in the collector's folder plus the Gaia release."""
+    folder = Path(source).resolve().parent
+    files = sorted(folder.glob("*.py"))
+    sig = (str(folder), tuple((f.name, f.stat().st_mtime_ns, f.stat().st_size) for f in files))
+    if sig not in _HASH:
+        h = hashlib.sha1()
+        for f in files:
+            h.update(f.name.encode()); h.update(f.read_bytes())
+        _HASH[sig] = h.hexdigest()[:12]
+    return _HASH[sig] + "-" + os.environ.get("V2_GAIA_RELEASE", "DR3").strip().upper()
+
+
+def _sep_arcmin(ra1, dec1, ra2, dec2):
+    """Haversine separation (exact 0 for identical points, stable at small angles)."""
+    r1, d1, r2, d2 = map(math.radians, (ra1, dec1, ra2, dec2))
+    a = math.sin((d2 - d1) / 2) ** 2 + math.cos(d1) * math.cos(d2) * math.sin((r2 - r1) / 2) ** 2
+    return math.degrees(2 * math.asin(min(1.0, math.sqrt(a)))) * 60.0
+
+
+def _dir(name: str, source: Path) -> Path:
+    return root() / name / _code_hash(source)
+
+
+def _index(d: Path) -> list[dict]:
+    try:
+        return json.loads((d / "index.json").read_text())
+    except Exception:
+        return []
+
+
+def _ttl(name: str, rows: int) -> float:
+    if rows == 0:
+        return EMPTY_TTL_DAYS
+    return LIVE_TTL_DAYS if name in LIVE else TTL_DAYS
+
+
+def cacheable(df: pd.DataFrame) -> bool:
+    """False for partial results (a ``*_query_status`` column reporting a failure)."""
+    for c in df.columns:
+        if str(c).endswith("_query_status"):
+            if set(df[c].astype(str).str.strip()) - OK_STATUS:
+                return False
+    return True
+
+
+def get(name: str, source: Path, ra: float, dec: float, radius_arcmin: float,
+        margin_arcmin: float = 0.0) -> pd.DataFrame | None:
+    """Rows inside the requested cone from a containing cached cone, or None."""
+    if not enabled():
+        return None
+    d = _dir(name, source)
+    now = time.time()
+    best = None
+    for e in _index(d):
+        if now - e["t"] > _ttl(name, e["rows"]) * 86400:
+            continue
+        if _sep_arcmin(ra, dec, e["ra"], e["dec"]) + radius_arcmin <= e["r"] + SAME_TOL_ARCMIN:
+            if best is None or e["r"] < best["r"]:
+                best = e
+    if best is None:
+        return None
+    try:
+        # Text in, text out: 64-bit IDs (SDSS specObjID, DESI TARGETID) must
+        # not pass through float; the collector's save() writes them back as read.
+        df = pd.read_csv(d / best["file"], dtype=str, keep_default_na=False, na_filter=False)
+    except Exception:
+        return None
+    same_cone = (abs(best["r"] - radius_arcmin) < SAME_TOL_ARCMIN
+                 and _sep_arcmin(ra, dec, best["ra"], best["dec"]) < SAME_TOL_ARCMIN)
+    if df.empty or same_cone:
+        return df
+    r = pd.to_numeric(df.get("ra"), errors="coerce")
+    de = pd.to_numeric(df.get("dec"), errors="coerce")
+    sep = [(_sep_arcmin(ra, dec, a, b) if a == a and b == b else math.inf) for a, b in zip(r, de)]
+    out = df[pd.Series(sep, index=df.index) <= radius_arcmin + margin_arcmin].reset_index(drop=True)
+    for col in ("query_radius_arcmin", "cone_radius_arcmin"):
+        if col in out.columns:
+            out[col] = repr(float(radius_arcmin))        # as a fresh fetch of this cone would record
+    return out
+
+
+class _FileLock:
+    """Cross-process lock via an exclusively created file (stale after LOCK_STALE_S)."""
+
+    def __init__(self, path: Path, timeout: float = 10.0):
+        self.path, self.timeout = path, timeout
+
+    def __enter__(self):
+        t0 = time.monotonic()
+        while True:
+            try:
+                os.close(os.open(self.path, os.O_CREAT | os.O_EXCL | os.O_WRONLY))
+                return self
+            except FileExistsError:
+                try:
+                    if time.time() - self.path.stat().st_mtime > LOCK_STALE_S:
+                        self.path.unlink(missing_ok=True)
+                        continue
+                except FileNotFoundError:
+                    continue
+                if time.monotonic() - t0 > self.timeout:
+                    raise TimeoutError(f"cache lock busy: {self.path}")
+                time.sleep(0.05)
+
+    def __exit__(self, *exc):
+        self.path.unlink(missing_ok=True)
+
+
+def put(name: str, source: Path, ra: float, dec: float, radius_arcmin: float, df: pd.DataFrame) -> None:
+    if not enabled() or not cacheable(df):
+        return
+    d = _dir(name, source)
+    try:
+        d.mkdir(parents=True, exist_ok=True)
+        fname = hashlib.sha1(f"{ra:.7f},{dec:.7f},{radius_arcmin:.5f}".encode()).hexdigest()[:16] + ".csv.gz"
+        fd, tmp = tempfile.mkstemp(dir=d, suffix=".tmp")
+        os.close(fd)
+        # level 1: write 1.41 -> 0.67 s for 5,000 x 65
+        df.to_csv(tmp, index=False, compression={"method": "gzip", "compresslevel": 1})
+        os.replace(tmp, d / fname)
+        now = time.time()
+        with _LOCK, _FileLock(d / "index.lock"):
+            keep, drop = [], []
+            for e in _index(d):
+                if e["file"] == fname:
+                    continue
+                (drop if now - e["t"] > _ttl(name, e["rows"]) * 86400 else keep).append(e)
+            keep.append({"ra": float(ra), "dec": float(dec), "r": float(radius_arcmin), "rows": int(len(df)),
+                         "t": now, "file": fname})
+            fd, itmp = tempfile.mkstemp(dir=d, suffix=".json.tmp")
+            with os.fdopen(fd, "w") as fh:
+                json.dump(keep, fh)
+            os.replace(itmp, d / "index.json")
+        live = {e["file"] for e in keep}
+        for e in drop:                       # expired entries: remove their files
+            if e["file"] not in live:
+                (d / e["file"]).unlink(missing_ok=True)
+    except Exception as exc:          # a cache problem must never fail a collection
+        print(f"[cache] {name}: not stored ({exc!r})", flush=True)

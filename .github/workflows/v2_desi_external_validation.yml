@@ -9,7 +9,6 @@ on:
   push:
     paths:
       - v2/benchmark/build_desi_truth.py
-      - .github/workflows/v2_desi_external_validation.yml
 
 concurrency:
   group: v2-desi-external-${{ github.ref }}
@@ -107,4 +106,4 @@ jobs:
           git add v2/benchmark/desi_external
           if git diff --cached --quiet; then exit 0; fi
           git commit -m "DESI DR1 external coarse validation results"
-          for i in 1 2 3; do git pull --no-rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep 5; done
+          bash .github/scripts/push_with_retry.sh

@@ -12,7 +12,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: v2-controller-ngc4522-test
+  group: v2-controller-ngc4522-test-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ github.ref_name }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -53,8 +53,7 @@ jobs:
           git add v2/rawdata
           if ! git diff --cached --quiet; then
             git commit -m "Test v2 controller on NGC4522"
-            git pull --rebase origin main
-            git push origin HEAD:main
+            bash .github/scripts/push_with_retry.sh "${{ github.ref_name }}"
           fi
       - uses: actions/upload-artifact@v4
         if: always()

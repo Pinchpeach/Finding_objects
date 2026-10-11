@@ -18,12 +18,13 @@ DEFAULT_OUT = ROOT / "rawdata"
 # make that work when this module is imported from elsewhere.
 if str(GET_DATA) not in sys.path:
     sys.path.insert(0, str(GET_DATA))
+import archive_cache  # noqa: E402  (local cache / mirror of collector results, 2.9.1)
 
 COLLECTORS = [
     "gaia_dr3", "gaia_dr3_variability_sos_vizier", "sdss_dr18", "panstarrs1", "desi_legacy", "galex",
-    "twomass", "allwise", "lotss", "first", "nvss", "vlass", "xmm",
-    "chandra", "erosita", "sdss_spectroscopy", "desi_spectroscopy",
-    "lamost_spectroscopy", "atnf_pulsar", "agb_suh2021", "sga2020", "simbad", "ned",
+    "twomass", "allwise", "lotss", "first", "nvss", "tgss", "vlass", "xmm",
+    "chandra", "erosita", "sdss_spectroscopy", "desi_spectroscopy", "desi_fastspec",
+    "lamost_spectroscopy", "ztf_periodic", "atnf_pulsar", "agb_suh2021", "sga2020", "simbad", "ned",
 ]
 
 
@@ -56,13 +57,23 @@ def _collect_one(name: str, ra: float, dec: float, radius_arcmin: float, out_dir
                  cancelled=None) -> dict:
     started = time.monotonic()
     output = out_dir / f"{name}_{tag}.csv"
+    cache = "off"
     try:
         module = _load_collector(name)
-        df = module.fetch(ra, dec, radius_arcmin)
-        if df is None:
-            df = pd.DataFrame()
-        if not isinstance(df, pd.DataFrame):
-            df = pd.DataFrame(df)
+        source = GET_DATA / f"{name}.py"
+        df = archive_cache.get(name, source, ra, dec, radius_arcmin,
+                               float(getattr(module, "CACHE_FILTER_MARGIN_ARCMIN", 0.0)))
+        if df is not None:
+            cache = "hit"
+        else:
+            cache = "miss" if archive_cache.enabled() else "off"
+            df = module.fetch(ra, dec, radius_arcmin)
+            if df is None:
+                df = pd.DataFrame()
+            if not isinstance(df, pd.DataFrame):
+                df = pd.DataFrame(df)
+            if not (cancelled is not None and cancelled.is_set()):
+                archive_cache.put(name, source, ra, dec, radius_arcmin, df)
         if cancelled is not None and cancelled.is_set():
             raise TimeoutError(f"{name} finished after the {COLLECTOR_BUDGET_S:.0f} s budget; result discarded")
 
@@ -89,8 +100,9 @@ def _collect_one(name: str, ra: float, dec: float, radius_arcmin: float, out_dir
         "elapsed_seconds": round(time.monotonic() - started, 3),
         "output_file": output_file,
         "error": error,
+        "cache": cache,
     }
-    print(f"[{name}] {status}: {rows} rows ({result['elapsed_seconds']} s)", flush=True)
+    print(f"[{name}] {status}: {rows} rows ({result['elapsed_seconds']} s, cache {cache})", flush=True)
     return result
 
 

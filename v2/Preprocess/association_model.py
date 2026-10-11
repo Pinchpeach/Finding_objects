@@ -38,6 +38,10 @@ PROFILES = {
     "GALEX AIS": SurveyProfile(None, 0.80, 5.3, 8.0),
     "FIRST": SurveyProfile(None, 1.0, 5.0, 8.0),
     "NVSS": SurveyProfile(None, 3.0, 45.0, 30.0),
+    # TGSS ADR1: 25" beam, astrometry better than 2" (Intema et al. 2017).
+    "TGSS ADR1": SurveyProfile(None, 2.0, 25.0, 25.0),
+    # ZTF: ~0.1" astrometry, ~2" seeing (Bellm et al. 2019; Masci et al. 2019).
+    "ZTF periodic variables": SurveyProfile(None, 0.15, 2.0, 3.0),
     "Chandra CSC 2.0": SurveyProfile(None, 0.60, 0.5, 5.0),
     "XMM 4XMM-DR13": SurveyProfile(None, 1.5, 6.0, 10.0),
     "eROSITA eRASS1": SurveyProfile(2020.5, 4.0, 26.0, 20.0),
@@ -109,7 +113,7 @@ def canonical_aliases(catalog: str, row: Mapping[str, Any], catalog_object_id: s
     if catalog=="DESI Legacy Surveys DR10":
         rel,bid,oid=(_int(row.get(low[k])) if k in low else None for k in ("release","brickid","objid"))
         if None not in (rel,bid,oid):add("LSID",f"{rel}_{bid}_{oid}")
-    if catalog=="DESI DR1 spectroscopy":
+    if catalog in ("DESI DR1 spectroscopy","DESI DR1 FastSpecFit"):
         tid=_int(catalog_object_id if catalog_object_id is not None else row.get(low.get("targetid","TargetID")))
         if tid is not None and tid>0 and not (tid>>58)&0x3:   # skip mock / sky targets
             add("LSID",f"{(tid>>42)&0xFFFF}_{(tid>>22)&0xFFFFF}_{tid&0x3FFFFF}")

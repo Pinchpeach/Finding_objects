@@ -1,0 +1,39 @@
+name: DESI x SDSS emission-line overlap
+
+# Galaxies with both a DESI DR1 (FastSpecFit) and an SDSS spectrum (2.7.0):
+# checks the DESI emission-line route against the SDSS one.
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/code-review-7ox8zn]
+    paths:
+      - v2/benchmark/build_desi_lines_truth.py
+
+concurrency:
+  group: desi-lines-truth-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pandas numpy astropy astroquery pyvo
+      - name: Build
+        run: python -u v2/benchmark/build_desi_lines_truth.py
+      - name: Commit
+        if: ${{ !cancelled() }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add v2/benchmark/desi_lines_truth || true
+          if git diff --cached --quiet; then echo "nothing to commit"; exit 0; fi
+          git commit -m "DESI x SDSS emission-line overlap"
+          bash .github/scripts/push_with_retry.sh
