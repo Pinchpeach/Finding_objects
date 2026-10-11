@@ -83,11 +83,15 @@ def main() -> None:
     d["truth_ra"], d["truth_dec"] = d.ra, d.dec
     d["ra"], d["dec"] = d["nvss__RAJ2000"], d["nvss__DEJ2000"]          # measure everything around the radio position
     # Column names differ between surveys: keep all, choose in the analysis.
-    d = nearest(d, "J/A+A/598/A78/table3", 25.0, ["**"], "tgss_")
-    d = nearest(d, "J/A+A/659/A1", 10.0, ["**"], "lotss_")
-    d = nearest(d, "VIII/92/first14", 5.0, ["**"], "first_")
-    d = nearest(d, "J/ApJS/255/30", 5.0, ["**"], "vlass_")
-    d = nearest(d, "I/355/gaiadr3", 5.0, ["Source", "Gmag", "Plx", "e_Plx"], "gaia_")
+    for table, radius, cols, prefix in (("J/A+A/598/A78/table3", 25.0, ["**"], "tgss_"),
+                                        ("J/A+A/659/A1", 10.0, ["**"], "lotss_"),
+                                        ("VIII/92/first14", 5.0, ["**"], "first_"),
+                                        ("J/ApJS/255/30", 5.0, ["**"], "vlass_"),
+                                        ("I/355/gaiadr3", 5.0, ["Source", "Gmag", "Plx", "e_Plx"], "gaia_")):
+        try:                     # one failing survey must not lose the others
+            d = nearest(d, table, radius, cols, prefix)
+        except Exception as exc:
+            print(f"{table}: skipped ({type(exc).__name__}: {str(exc)[:120]})", flush=True)
     d.to_csv(OUT / "radio_sample.csv.gz", index=False, compression="gzip")
     print(d.shape, d.groupby("is_pulsar").size().to_dict(), flush=True)
     print(d.notna().groupby(d.is_pulsar).mean().T.round(2).to_string(), flush=True)

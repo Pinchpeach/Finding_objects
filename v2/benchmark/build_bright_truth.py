@@ -58,7 +58,17 @@ def nearest(df: pd.DataFrame, table: str, radius: float, cols: list[str], prefix
             continue
         if not res:
             continue
-        t = res[0].to_pandas()
+        # Multi-table catalogues (e.g. VLASS) return several tables; use the
+        # first whose _q (1-based input row) indexes this chunk.
+        t = None
+        for tab in res:
+            x = tab.to_pandas()
+            if "_q" in x and len(x) and 1 <= x["_q"].min() and x["_q"].max() <= len(sub):
+                t = x
+                break
+        if t is None:
+            print(f"{table} rows {s0}+: no table with a usable _q", flush=True)
+            continue
         t["rid"] = sub.rid.to_numpy()[t["_q"].astype(int).to_numpy() - 1]
         parts.append(t.sort_values("_r").drop_duplicates("rid"))
         print(f"{table} rows {s0}-{s0 + len(sub)}: {len(parts[-1])} in {time.time() - t0:.0f} s", flush=True)
