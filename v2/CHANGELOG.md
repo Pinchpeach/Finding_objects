@@ -11,6 +11,7 @@
 
 | 버전 | 날짜 | PR | 요약 |
 |---|---|---|---|
+| 2.6.0 | 2026-10-11 | (브랜치) | 분광 자료 분류 기준(별 log g·[Fe/H], 방출선 별, 은하 BPT·WHAN), AGB 비-AGB 오염 제거와 GCVS 재보정 |
 | 2.5.3 | 2026-10-11 | (브랜치) | AGB 화학형 측광 기준을 Suh 2021 정답 세트로 재보정(92.2 %, 적용률 91.3 %) |
 | 2.5.2 | 2026-10-10 | (브랜치) | 장시간 구동 안정성: 검색 간 결과 섞임, 빈 영역 오류, 앱 누수·종료 충돌 수정 (분류 결과 동일) |
 | 2.5.1 | 2026-10-10 | (브랜치) | 인용 문헌 모음 `v2/document` (156편, 분야별) |
@@ -26,6 +27,46 @@
 | 2.0.0 | ~2026-10-04 | — | v2 파이프라인 기준선 (수집 → 전처리 1–5단계 → 분류기) |
 
 ---
+
+## 2.6.0 — 분광 분류 기준 · 비-AGB 오염 제거 (브랜치)
+사용자 요청은 세 가지였다.
+1. AGB가 아닌 별이 AGB로 잘못 분류되는 경우를 확인한다.
+2. 분광 자료로 분류하는 데 쓸 기준 문헌을 정리한다.
+3. 그 분류 기준을 구현한다.
+
+SDSS/DESI 세부 분류 벤치마크 예측은 2.5.3과 행 단위로 같다. 벤치마크에는 분광 열을 넣지 않기 때문이다.
+
+### AGB 오염 (요청 1)
+| 변경 | 이유(찾은 문제) | 측정 |
+|---|---|---|
+| 좋은 시차(S/N ≥ 5, RUWE < 1.4)로 M_Ks > −1(적색 거성군보다 어두움)이면 AGB가 아님. 탄소별 중 M_G > 5는 "왜성 탄소별(dC)" `STAR:C:V` | Suh 2021 C-AGB 표에 왜성·CH 탄소별 263개가 섞여 있었다(LPV 0개, G−Ks 중앙값 2.2 vs 5.4). AGB는 적색 거성군(M_Ks = −1.61; Alves 2000)보다 밝다 | 좋은 시차의 O-AGB 중 이 선보다 어두운 별은 0개. 2.5.3 모델을 이 263개를 빼고 재적합하면 92.2 → 92.9 % |
+| 필드 LPV 검증 표본(Gaia DR3 LPV, 무작위 1° 원뿔 66개, 23,969개; `build_agb_contamination.py`, `evaluate_agb_contamination.py`) | SIMBAD 유형은 대부분 Gaia LPV에서 들여온 "LP?"라 독립 정답이 될 수 없다. 그래서 Gaia 광도로 나눴다 | 적색 거성군보다 어두운 별 16개는 AGB 0개(거부 정상). 적색 거성 가지 끝(RGB tip) 위 254개는 AGB 248개 |
+| **필드 LPV의 60 %가 탄소별로 나오던 문제 수정**: GCVS의 분광형 있는 LPV 6,491개(M → O형, C/R/N → C형; `build_agb_gcvs_truth.py`)를 정답에 추가하고, 포화된 WISE 등급(W3 < 3.8 등; Cutri+2012)을 가린 뒤 재적합 | Suh의 O형 AGB는 적외선으로 뽑힌 먼지 많은 별(Ks−W3 중앙값 1.93)뿐이다. 그래서 2.5.3 모델은 "먼지가 적으면 탄소별"로 배웠고, 먼지 없는 M형 거성을 탄소별로 불렀다. GCVS 별의 61 %는 W3가 포화돼 있다 | 보지 않은 절반 7,567개에서 정확도 **94.6 %**, 적용률 83 %(Suh 91.2 %, GCVS 98.3 %, C 정밀도 0.87, O 0.97). 필드 LPV 탄소 비율 60 → 25.7 %(Gaia 탄소 표지 24.4 %). 시차 좋은 RGB tip 위 별은 O형 232, C형 13 |
+| Gaia C 표지 없는 ΔW + Ks−W3 모델 제거. ΔW+J−Ks(+C 표지) 모델 추가 | 이 모델은 73.8 %였고, 기권 폭을 넓히면 64 %로 오히려 떨어졌다(먼지 많은 O형과 먼지 없는 별이 겹침) | — |
+| RGB tip(M_Ks = −6.2; Nikolaev & Weinberg 2000)과 적색 거성군 사이의 LPV는 "적색 거성(RGB 또는 초기 AGB)" `STAR:<M\|C>:III` | 측광으로는 RGB와 초기 AGB를 구분할 수 없다 | 필드 표본 340개가 해당 |
+| 분광 log g > 3.5(왜성)나 ESP-ELS 어린 별(T Tauri, Herbig Ae/Be)이면 AGB가 아님 | 어린 별의 원반 먼지는 규산염 AGB 색을 흉내 낸다 | 단위 테스트 |
+
+### 분광 기준 문헌 (요청 2)
+- `Classifier/LITERATURE_SPECTROSCOPY.md`에 분광 자료 제품, 별·은하·퀘이사 기준, 구현 여부, 검증 결과를 정리했다.
+- `v2/document`에 41편을 추가해 모두 197편이다.
+
+### 분광 분류 기준 구현 (요청 3)
+| 변경 | 근거 | 측정 (`benchmark/evaluate_spectro.py`) |
+|---|---|---|
+| 광도 계급: 분광 log g를 GSP-Phot log g보다 우선. 출처는 LAMOST LASP(V/164/stellar5)와 Gaia GSP-Spec(품질 플래그 0인 경우만). 경계는 Ciardi+2011 | Luo+2015, Recio-Blanco+2023, Babusiaux+2023 | LAMOST 별 388개: 시차 CMD 왜성과 219/221 일치, 시차 없는 별 152개에 계급 부여. GSP-Phot log g는 LAMOST 거성 22개 중 1개만 찾음 |
+| 금속 결핍: 분광 [Fe/H] < −1이면 금속 결핍, < −2이면 극금속 결핍(Beers & Christlieb 2005). 분광값이 있으면 GSP-Phot [M/H]는 쓰지 않음 | — | GSP-Phot 금속 결핍 156개 중 LAMOST로 확인된 것은 91개 |
+| Gaia ESP-ELS 방출선 별(flag ≤ 2): T Tauri·Herbig Ae/Be → `STAR:YSO`, WR → `STAR:WR`, PN → `STAR:PN`; Be·dMe는 태그 | Creevey+2023, DR3 문서 11.3.7 | 벤치마크 별은 어두워서 값이 없다. 문헌 검증치: Be 96 %, WR 229/443 |
+| SDSS/LAMOST 탄소 스펙트럼을 AGB 화학형에 사용. SDSS "CarbonWD"는 DQ 백색왜성(이전에는 탄소별로 잘못 분류) | Bolton+2012, Green 2013 | — |
+| 은하 방출선: SDSS 수집기가 Portsmouth 선(벤치마크 은하 100 %)과 MPA-JHU(1.6 %, Dn4000)를 가져온다. 규칙 순서는 WHAN 은퇴·수동(EW(Hα) < 3 Å) → BPT(S/N ≥ 3: Kauffmann+2003, Kewley+2001, Schawinski+2007) → [N II]/Hα 단독(Stasińska+2006) → Dn4000 ≥ 1.6. SDSS subclass가 있으면 그것이 우선 | Cid Fernandes+2010/2011, Balogh+1999 | 은하 3,333개 중 98.6 %에 활동성 부여. BPT 규칙과 Portsmouth BPT 일치 95.1 %. subclass 없는 은하 2,128개: 정지 1,667개(W2−W3 중앙값 1.92, > 3인 비율 2 %), 별생성 129개(81 %가 W2−W3 > 3) |
+| WHAN만 쓰면 SDSS 별생성 은하 104개를 AGN으로 부름 → Stasińska 복합 구간(−0.4 ~ −0.2) 추가 | Stasińska+2006 | 104 → 19 |
+
+### 기타
+- **수집기:**
+  - Gaia: GSP-Spec·ESP-ELS 열을 별도 질의로 가져온다. 실패해도 기존 열은 그대로이고, VizieR I/355/paramp로 대체할 수 있다.
+  - LAMOST: LASP 열을 추가했다.
+  - SDSS: 방출선을 추가했다. SkyServer는 80개 ID 단위로 질의한다. 400개씩 보내면 URL이 길어 404가 났다.
+- **정답 생성기·워크플로:** `build_agb_contamination.py`, `build_agb_gcvs_truth.py`, `build_spectro_truth.py`.
+- **앱:** YSO·WR·PN 별 색을 추가했고, 복합 은하는 AGN 색으로 표시한다.
 
 ## 2.5.3 — AGB 화학형 재보정 (브랜치)
 AGB 후보의 탄소/산소 판정만 바뀐다. SDSS/DESI 세부 분류 벤치마크는 바이트 단위로 같다(AGB 게이트가 열리는 별이 없음).

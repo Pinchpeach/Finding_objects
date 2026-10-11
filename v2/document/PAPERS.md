@@ -17,8 +17,8 @@ v2의 코드·문서·규칙표가 인용하는 논문, 카탈로그 출판물, 
 | [전파·X선·밀집성](#radio) | 4 |
 | [행성상성운·초신성·과도 현상](#trans) | 6 |
 | [기타 문서](#doc) | 13 |
-| [분광 분류 기준](#spec) | 39 |
-| **합계** | **195** |
+| [분광 분류 기준](#spec) | 41 |
+| **합계** | **197** |
 
 <a id="gaia"></a>
 ## 측성·Gaia
@@ -310,6 +310,8 @@ PN 진단, 광도곡선 기반 초신성/과도 현상 분류.
 | Babusiaux et al. 2023 (Gaia DR3 catalogue validation) | A&A 674, A32 | — | `Classifier/LITERATURE_SPECTROSCOPY.md`<br>`Classifier/subclass.py` (GSPSPEC_FLAG_POS) | GSP-Spec 품질 플래그 위치(Teff 1/4/8/13, log g 2/5/8/13, [M/H] 3/6/8); AGB 별에 GSP-Spec log g를 쓰지 말 것 |
 | Stasińska et al. 2006 | MNRAS 371, 972 | — | `Classifier/LITERATURE_SPECTROSCOPY.md`<br>`Classifier/subclass.py` (galaxy_lines) | [N II]/Hα 단독: < −0.4 별생성, −0.4~−0.2 복합, > −0.2 AGN (Hβ·[O III]가 약할 때) |
 | Thomas et al. 2013 (Portsmouth emission-line fits) | MNRAS 431, 1383 | — | `Classifier/LITERATURE_SPECTROSCOPY.md`<br>`Get_data/sdss_spectroscopy.py` (emissionLinesPort)<br>`benchmark/build_spectro_truth.py` | SDSS-I/II·BOSS 은하 방출선 플럭스·EW(벤치마크 은하 100 %) |
+| Samus et al. 2017 (GCVS 5.1) | Astron. Rep. 61, 80; VizieR B/gcvs | — | `benchmark/build_agb_gcvs_truth.py`<br>`Classifier/subclass.py` (AGB chemistry models)<br>`Classifier/LITERATURE_SUBCLASS.md` | 분광형 있는 Mira·반규칙·불규칙 변광성(M → O형, C/R/N → C형): 먼지 없는 O형 거성을 AGB 화학형 정답에 추가 |
+| Cutri et al. 2012 (AllWISE/WISE Explanatory Supplement) | — | — | `Classifier/subclass.py` (WISE_SAT_VEGA)<br>`benchmark/fit_agb_chemistry.py` (WISE_SAT) | WISE 포화 한계 W1 8.0, W2 6.7, W3 3.8, W4 −0.4 (Vega) |
 
 ## 확인이 필요한 인용
 

@@ -469,16 +469,25 @@ def star_tags(row):
 # the same colours mean nothing (benchmark stars with J-Ks >= 1 mostly have
 # W_RP - W_KJ >= 0.9).
 #
-# Photometric chemistry (2.5.3): logistic models in agb_chemistry_model.json,
-# fitted on half of the Suh (2021) O-AGB/C-AGB stars with Gaia/2MASS/AllWISE
-# photometry and scored on the other half (benchmark/agb_truth):
-#   1. W_RP - W_KJ (Lebzelter et al. 2018), Ks - W3 and the Gaia DR3 LPV
-#      RP-spectrum C-star flag (Lebzelter et al. 2023): 95.5 % on 2943 stars;
-#   2. W_RP - W_KJ and Ks - W3: 83.4 % on 771 stars;
-#   3. J-Ks, Ks-W3, W1-W2, W3-W4: 91.5 % on 200 stars;
-#   probabilities within 0.15 of 0.5 abstain ("chemistry uncertain").
-#   All together: 92.9 % at 91.3 % coverage (C precision 0.95, O 0.92); refitted
-#   in 2.6.0 without the sub-red-clump carbon stars (AGB_MAX_MKS; 2.5.3: 92.2 %).
+# Photometric chemistry (2.6.0): logistic models in agb_chemistry_model.json,
+# fitted (benchmark/fit_agb_chemistry.py) on half of two truth sets and
+# scored on the other half (benchmark/agb_truth):
+#   * Suh (2021) O-AGB / C-AGB stars: IR-selected, dusty;
+#   * GCVS Miras / semiregulars / irregulars with literature spectral types
+#     (Samus et al. 2017): mostly dust-free M giants.  Without them the 2.5.3
+#     models (Suh only) called 60 % of field Gaia LPVs carbon-rich, because
+#     "little dust" meant "carbon" in the Suh set.
+# Cascade (first model whose inputs exist; saturated WISE bands masked):
+#   1. W_RP - W_KJ (Lebzelter et al. 2018), Ks - W3, Gaia LPV C-star flag
+#      (Lebzelter et al. 2023): 96.0 % on 3656 stars;
+#   2. W_RP - W_KJ, J - Ks, C-star flag: 96.9 % on 1987;
+#   3. W_RP - W_KJ, J - Ks: 79.0 % on 614;
+#   4. J - Ks, Ks - W3, W1 - W2, W3 - W4: 88.5 % on 26.
+#   A Ks - W3 model without the flag was dropped (73.8 %: dusty O-rich and
+#   dust-free stars overlap).  Within 0.15 of p = 0.5: "chemistry uncertain".
+#   All together: 94.6 % at 83 % coverage (Suh 91.2 %, GCVS 98.3 %; C
+#   precision 0.87, O 0.97).  On 23 969 field LPVs in random cones the
+#   predicted C fraction is 25.7 % (Gaia C-star flag: 24.4 %).
 # The published single cuts did worse on these mostly dust-obscured Galactic
 # AGB stars: W_RP - W_KJ >= 0.9 (Mowlavi+2019) 68.5 %, the AllWISE line of
 # Lian et al. (2014) 75.4 %; WISE colours alone (46.6 % on stars without
@@ -507,6 +516,7 @@ DC_MIN_MG = 5.0
 RGB_TIP_MKS = -6.2
 A_KS_PER_A_G = 0.137      # A_K/A_V = 0.114 (Cardelli et al. 1989), A_G/A_V = 0.83
 AGB_VARIABILITY = {"LPV", "MIRA"}
+WISE_SAT_VEGA = (8.0, 6.7, 3.8, -0.4)
 SIMBAD_AGB = {"AGB*", "C*", "S*", "Mi*", "LP*", "OH*", "pA*"}
 
 
@@ -535,6 +545,9 @@ def agb_features(row):
     j = _num(row, "2mass_psc__Jmag", "allwise__Jmag")
     k = _num(row, "2mass_psc__Kmag", "allwise__Kmag")
     w1, w2, w3, w4 = (_wise_vega(row, b) for b in (1, 2, 3, 4))
+    # AllWISE saturates at W1 < 8.0, W2 < 6.7, W3 < 3.8, W4 < -0.4 (Vega;
+    # Cutri et al. 2012): saturated bands are not used (as in the fit).
+    w1, w2, w3, w4 = (None if v is None or v < lim else v for v, lim in zip((w1, w2, w3, w4), WISE_SAT_VEGA))
     cst = _num(row, "gaia_lpv_is_cstar")
     sub = lambda a, b: None if a is None or b is None else a - b
     return {"dW": wesenheit_dw(row), "kw3": sub(k, w3), "jk": sub(j, k), "w12": sub(w1, w2),
@@ -591,7 +604,7 @@ def agb_photometric(row):
         z = m["intercept"] + sum(c * v for c, v in zip(m["coef"], x))
         p = 1.0 / (1.0 + math.exp(-z))
         vals = ", ".join(f"{k} = {v:.2f}" for k, v in zip(m["features"], x))
-        if abs(p - 0.5) < model.get("abstain_band", 0.15):
+        if abs(p - 0.5) < m.get("abstain_band", model.get("abstain_band", 0.15)):
             return None, p, name, f"{vals}; P(C-rich) = {p:.2f} (uncertain)"
         return ("C" if p >= 0.5 else "O"), p, name, f"{vals}; P(C-rich) = {p:.2f}"
     return None
@@ -655,9 +668,8 @@ def agb_chemistry(row):
     elif mk is not None and mk > RGB_TIP_MKS:
         out["below_tip"] = True
         out["basis"] = f"{out['basis']}; M_Ks = {mk:.2f} below the RGB tip ({RGB_TIP_MKS}): RGB or early AGB"
-    k = _num(row, "2mass_psc__Kmag", "allwise__Kmag")
-    w3 = _wise_vega(row, 3)
-    out["dusty"] = k is not None and w3 is not None and k - w3 > AGB_DUST_KW3
+    kw3 = agb_features(row)["kw3"]
+    out["dusty"] = kw3 is not None and kw3 > AGB_DUST_KW3
     return out
 
 

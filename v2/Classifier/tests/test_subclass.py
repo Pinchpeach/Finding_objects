@@ -185,19 +185,20 @@ def test_agb_chemistry_rules():
     base = {"primary_class": "STAR", "variability_class": "LPV"}
     phot = lambda bp, rp, j, k, w3: {"gaia_dr3__phot_bp_mean_mag": bp, "gaia_dr3__phot_rp_mean_mag": rp,
                                      "2mass_psc__Jmag": j, "2mass_psc__Kmag": k, "allwise__W3mag": w3}
-    # dW = (RP - 1.3 (BP - RP)) - (Ks - 0.686 (J - Ks)); fitted model GAIA_2MASS_WISE (dW, Ks - W3)
-    c = dict(base, **phot(14.0, 10.5, 7.5, 5.5, 5.0))          # dW = 1.82, Ks - W3 = 0.5 -> P(C) ~ 0.95
+    # dW = (RP - 1.3 (BP - RP)) - (Ks - 0.686 (J - Ks)); model GAIA_2MASS_WISE_CSTAR (dW, Ks - W3, Gaia C-star flag)
+    c = dict(base, **phot(14.0, 10.5, 7.5, 5.5, 5.0), gaia_lpv_is_cstar=1)   # dW = 1.82, Ks - W3 = 0.5 -> P(C) = 0.98
     r = sc.classify(c)
-    assert r["code"] == "STAR:C:AGB" and r["rule"] == "AGB_GAIA_2MASS_WISE" and r["confidence"] > 0.9
-    o = dict(base, **phot(10.0, 8.0, 7.0, 5.8, 4.2))           # dW = 0.42, Ks - W3 = 1.6 -> P(C) ~ 0.27
+    assert r["code"] == "STAR:C:AGB" and r["rule"] == "AGB_GAIA_2MASS_WISE_CSTAR" and r["confidence"] > 0.9
+    o = dict(base, **phot(10.0, 8.0, 7.0, 5.8, 4.2), gaia_lpv_is_cstar=0)   # dW = 0.42, Ks - W3 = 1.6 -> P(C) = 0.01
     r = sc.classify(o)
     assert r["code"] == "STAR:M:AGB" and "silicate" in r["subclass"]
-    # Near P = 0.5 the chemistry is not decided.
-    u = dict(base, **phot(10.0, 8.0, 7.0, 5.8, 4.2))
-    u["allwise__W3mag"] = 5.8 - 1.0                             # Ks - W3 = 1.0 with dW = 0.42 -> P(C) ~ 0.55
+    # Near P = 0.5 the chemistry is not decided: C-star flag but dusty, low dW -> P(C) = 0.62.
+    u = dict(o, gaia_lpv_is_cstar=1)
     assert sc.classify(u)["code"] == "STAR:?:AGB"
+    # Saturated W3 (< 3.8 mag) is not used: the model without Ks - W3 decides.
+    assert sc.agb_photometric(dict(c, allwise__W3mag=3.0))[2] == "GAIA_2MASS_CSTAR"
     # Without an AGB candidate gate the photometric models are not applied.
-    plain = {k: v for k, v in c.items() if k != "variability_class"}
+    plain = {k: v for k, v in c.items() if k not in ("variability_class", "gaia_lpv_is_cstar")}
     assert not str(sc.classify(plain)["rule"]).startswith("AGB_")
     # Catalogue / spectral labels win over photometry.
     assert sc.classify(dict(o, suh_2021_agb_catalog__agb_subclass="CAGB_WISE"))["code"] == "STAR:C:AGB"
@@ -277,7 +278,7 @@ def test_spectroscopic_star_parameters_and_emission_lines():
     assert "EMISSION_LINE" in be
     # A YSO or a spectroscopic dwarf in the AGB gate is not an AGB star.
     lpv = {"primary_class": "STAR", "variability_class": "LPV", "gaia_dr3__phot_bp_mean_mag": 10.0, "gaia_dr3__phot_rp_mean_mag": 8.0,
-           "2mass_psc__Jmag": 7.0, "2mass_psc__Kmag": 5.8, "allwise__W3mag": 4.2}
+           "2mass_psc__Jmag": 7.0, "2mass_psc__Kmag": 5.8, "allwise__W3mag": 4.2, "gaia_lpv_is_cstar": 0}
     assert sc.classify(lpv)["code"] == "STAR:M:AGB"
     assert sc.agb_chemistry(dict(lpv, gaia_dr3__classlabel_espels="TTauri", gaia_dr3__classlabel_espels_flag=1)) is None
     assert sc.agb_chemistry(dict(lpv, lamost_dr_catalog__lasp_teff=3900.0, lamost_dr_catalog__lasp_logg=4.6)) is None

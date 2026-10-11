@@ -275,31 +275,57 @@ evidence in order and stops at the first that applies.
 |---|---|---|---|
 | 1 | SIMBAD spectral type C… (C-N, C-R, C-J, C-H) or type C* → carbon; S, MS or SC, or type S* → S star | `SIMBAD_CSTAR` / `SIMBAD_SSTAR` | Wenger et al. 2000 (curated literature types) |
 | 2 | Suh (2021) catalogue membership (OAGB/CAGB tables) | `SUH2021` | Suh 2021, ApJS 256, 43 |
-| 3 | AGB candidates only: logistic models (`agb_chemistry_model.json`, below) on W_RP − W_KJ, Ks − W3, Gaia DR3 LPV `is_cstar`, J − Ks and WISE colours. Here W_RP = G_RP − 1.3 (G_BP − G_RP) and W_KJ = Ks − 0.686 (J − Ks). Within 0.15 of p = 0.5 → "chemistry uncertain" (`STAR:?:AGB`) | `AGB_GAIA_2MASS_WISE_CSTAR`, `AGB_GAIA_2MASS_WISE`, `AGB_NIR_MIR` | Lebzelter et al. 2018, A&A 616, L13 (ΔW); Lebzelter et al. 2023 (`is_cstar`); calibrated on Suh 2021 |
+| 3 | AGB candidates only: logistic models (`agb_chemistry_model.json`, below) on W_RP − W_KJ, Ks − W3, Gaia DR3 LPV `is_cstar`, J − Ks and WISE colours. Here W_RP = G_RP − 1.3 (G_BP − G_RP) and W_KJ = Ks − 0.686 (J − Ks). Within 0.15 of p = 0.5 → "chemistry uncertain" (`STAR:?:AGB`) | `AGB_GAIA_2MASS_WISE_CSTAR`, `AGB_GAIA_2MASS_CSTAR`, `AGB_GAIA_2MASS`, `AGB_NIR_MIR` | Lebzelter et al. 2018, A&A 616, L13 (ΔW); Lebzelter et al. 2023 (`is_cstar`); calibrated on Suh 2021 + GCVS |
 | 4 | AGB candidate lacking the model inputs, with Gaia DR3 LPV `is_cstar` = 1 → carbon (C precision 0.76 on the Suh stars) | `GAIA_LPV_CSTAR` | Lebzelter et al. 2023 (Gaia DR3 LPV catalogue) |
 
-**Photometric models (2.5.3).** The 2.5.0 rules used published single cuts:
-ΔW ≥ 0.9 → C-rich (Mowlavi et al. 2019; ≥ 1.7 "extreme", Abia et al. 2020),
-and the AllWISE line W1−W2 = 2.35 (W3−W4) − 1.24 (Lian et al. 2014). On the
-Suh (2021) stars (mostly dust-obscured Galactic AGB stars) they scored only
-68.5 % and 75.4 %. They were replaced by three logistic models in a cascade;
-a star uses the first model whose features it has. The models are fitted
-with `benchmark/fit_agb_chemistry.py` on a random half (seed 42) and scored
-on the other half (4,286 stars; refitted in 2.6.0 without the 263
-sub-red-clump carbon stars, see the vetoes below — 2.5.3 had 92.2 % on 4,417):
+**Photometric models.**
+
+The 2.5.0 rules used published single cuts:
+- ΔW ≥ 0.9 → C-rich (Mowlavi et al. 2019; ≥ 1.7 "extreme", Abia et al. 2020);
+- the AllWISE line W1−W2 = 2.35 (W3−W4) − 1.24 (Lian et al. 2014).
+
+On the Suh (2021) stars, which are mostly dust-obscured Galactic AGB stars,
+these cuts scored only 68.5 % and 75.4 %. In 2.5.3 they were replaced by
+logistic models fitted on Suh.
+
+Version 2.6.0 refits the models on two truth sets:
+- **Suh (2021):** IR-selected and dusty.
+- **GCVS LPVs with literature spectral types** (Samus et al. 2017;
+  `benchmark/build_agb_gcvs_truth.py`): 5,699 M → O-rich and 792 C/R/N → C-rich,
+  mostly dust-free.
+
+Why the refit was needed: the Suh-only models called 60 % of 23,969 field
+Gaia LPVs carbon-rich (`benchmark/evaluate_agb_contamination.py`), because in
+that set "little dust" meant "carbon".
+
+How the cascade is built:
+- AllWISE magnitudes brighter than the saturation limits (W1 8.0, W2 6.7,
+  W3 3.8, W4 −0.4; Cutri et al. 2012) are masked. 61 % of the GCVS stars are
+  saturated in W3.
+- A star uses the first model whose inputs it has.
+- The fit is on a random half (seed 42) and the scores are on the other half
+  (7,567 stars; `benchmark/fit_agb_chemistry.py`):
 
 | Model | Features | Decided / n | Accuracy |
 |---|---|---|---|
-| `GAIA_2MASS_WISE_CSTAR` | ΔW, Ks − W3, `is_cstar` | 2943 / 3060 | 95.5 % |
-| `GAIA_2MASS_WISE` | ΔW, Ks − W3 | 771 / 843 | 83.4 % |
-| `NIR_MIR` | J − Ks, Ks − W3, W1 − W2, W3 − W4 | 200 / 220 | 91.5 % |
-| all | | coverage 91.3 % | **92.9 %** (C precision 0.95 / recall 0.86; O 0.92 / 0.97) |
+| `GAIA_2MASS_WISE_CSTAR` | ΔW, Ks − W3, `is_cstar` | 3656 / 3761 | 96.0 % |
+| `GAIA_2MASS_CSTAR` | ΔW, J − Ks, `is_cstar` | 1987 / 2042 | 96.9 % |
+| `GAIA_2MASS` | ΔW, J − Ks | 614 / 1346 | 79.0 % |
+| `NIR_MIR` | J − Ks, Ks − W3, W1 − W2, W3 − W4 | 26 / 28 | 88.5 % |
+| all | | coverage 83 % | **94.6 %** (Suh 91.2 %, GCVS 98.3 %; C precision 0.87 / recall 0.89; O 0.97 / 0.96) |
 
-Ks − W3 carries most of the separation: silicate dust brightens W3, so
-O-rich stars sit redder (median 1.93 vs 1.02 for C-rich). WISE colours alone
-(46.6 % on stars without 2MASS) are not used.
+- **Dropped model:** ΔW + Ks − W3 without the Gaia flag scored 73.8 %, and
+  64 % with a wider abstain band. Dusty O-rich stars and dust-free stars
+  overlap there, so the model is not used.
+- **Field LPVs:**
+  - The predicted C fraction is 25.7 %, against 24.4 % flagged by Gaia.
+  - Above the RGB tip with a good parallax: 232 O-rich and 13 C-rich.
+- **Gaia `is_cstar` reliability:**
+  - Good for the bright GCVS stars: 31 of 4,706 O-rich flagged.
+  - Weaker on the fainter Suh stars: 519 of 4,442 O-rich flagged.
+  - Used alone, the flag gets confidence 0.76.
 
-- **AGB-candidate gate:** the photometric models (3) are applied only to
+- **AGB-candidate gate:** the photometric models (row 3) are applied only to
   AGB candidates. A candidate is a long-period or Mira variable (variability
   axis, Gaia SOS LPV), has AGB physical class (Suh 2021, SIMBAD AGB*), or
   has a SIMBAD type among C*, S*, Mi*, LP*, OH* and pA*. Without the gate
@@ -316,6 +342,11 @@ O-rich stars sit redder (median 1.93 vs 1.02 for C-rich). WISE colours alone
   - `STAR:M:AGB`: O-rich AGB star
   - `STAR:S:AGB`: S-type AGB star
   - `STAR:?:AGB`: AGB star, chemistry uncertain
+- **Below the RGB tip (2.6.0):** with a good parallax and −6.2 < M_Ks ≤ −1
+  (2MASS RGB tip; Nikolaev & Weinberg 2000) an LPV may be a red giant or an
+  early-AGB star; it is named "O-rich red giant / Carbon giant (RGB or early
+  AGB)" with code `STAR:<M|C>:III`. 340 field LPVs with good parallaxes lie
+  there, 254 above the tip.
 - **Non-AGB vetoes (2.6.0):** a star is not called AGB when
   - its Gaia parallax is good (S/N ≥ 5, RUWE < 1.4) and it is fainter than
     the red clump, M_Ks > −1 (red clump M_Ks = −1.61; Alves 2000, Hawkins

@@ -7,22 +7,38 @@
     "cst"
    ],
    "coef": [
-    0.4997,
-    -3.0538,
-    3.8895
+    0.6865,
+    -2.2672,
+    4.7308
    ],
-   "intercept": 1.3533
+   "intercept": -0.897,
+   "abstain_band": 0.15
   },
-  "GAIA_2MASS_WISE": {
+  "GAIA_2MASS_CSTAR": {
    "features": [
     "dW",
-    "kw3"
+    "jk",
+    "cst"
    ],
    "coef": [
-    0.8415,
-    -2.9509
+    0.5827,
+    -1.9921,
+    5.9939
    ],
-   "intercept": 3.1575
+   "intercept": -0.8995,
+   "abstain_band": 0.15
+  },
+  "GAIA_2MASS": {
+   "features": [
+    "dW",
+    "jk"
+   ],
+   "coef": [
+    1.3384,
+    -1.6524
+   ],
+   "intercept": 1.0259,
+   "abstain_band": 0.15
   },
   "NIR_MIR": {
    "features": [
@@ -32,45 +48,75 @@
     "w34"
    ],
    "coef": [
-    0.8725,
-    -2.5713,
-    -3.0041,
-    0.3284
+    -0.7094,
+    -0.4298,
+    -3.8307,
+    0.7678
    ],
-   "intercept": 1.8996
+   "intercept": 1.3102,
+   "abstain_band": 0.15
   }
  },
  "abstain_band": 0.15,
  "test": {
-  "test_n": 4286,
-  "coverage": 0.913,
-  "accuracy": 0.929,
-  "C_precision": 0.95,
-  "C_recall": 0.855,
-  "O_precision": 0.918,
-  "O_recall": 0.973,
+  "test_n": 7567,
+  "coverage": 0.83,
+  "accuracy": 0.946,
+  "C_precision": 0.87,
+  "C_recall": 0.885,
+  "O_precision": 0.968,
+  "O_recall": 0.963,
   "per_model": {
    "GAIA_2MASS_WISE_CSTAR": {
-    "n": 3060,
-    "decided": 2943,
-    "accuracy": 0.955
+    "n": 3761,
+    "decided": 3656,
+    "accuracy": 0.96
    },
-   "GAIA_2MASS_WISE": {
-    "n": 843,
-    "decided": 771,
-    "accuracy": 0.834
+   "GAIA_2MASS_CSTAR": {
+    "n": 2042,
+    "decided": 1987,
+    "accuracy": 0.969
+   },
+   "GAIA_2MASS": {
+    "n": 1346,
+    "decided": 614,
+    "accuracy": 0.79
    },
    "NIR_MIR": {
-    "n": 220,
-    "decided": 200,
-    "accuracy": 0.915
+    "n": 28,
+    "decided": 26,
+    "accuracy": 0.885
    }
   },
-  "O_rich_Ks_W3_gt_1": 0.984
+  "by_source": {
+   "agb_chemistry_truth": {
+    "test_n": 4286,
+    "decided": 3258,
+    "accuracy": 0.912,
+    "C_fraction_true": 0.395
+   },
+   "agb_gcvs_truth": {
+    "test_n": 3281,
+    "decided": 3025,
+    "accuracy": 0.983,
+    "C_fraction_true": 0.124
+   }
+  },
+  "field_lpv_sample": {
+   "n": 23969,
+   "decided": 21231,
+   "C_fraction_predicted": 0.257,
+   "is_cstar_fraction": 0.244
+  },
+  "O_rich_Ks_W3_gt_1": 0.518
  },
  "split": "50/50 random (seed 42); fitted on train half, metrics on test half",
  "excluded_sub_red_clump": {
-  "C": 263
+  "C": 263,
+  "O": 1
  },
- "truth": "benchmark/agb_truth/agb_chemistry_truth.csv.gz (Suh 2021 O-AGB 5301, C-AGB 3576)"
+ "truth": [
+  "benchmark/agb_truth/agb_chemistry_truth.csv.gz",
+  "benchmark/agb_truth/agb_gcvs_truth.csv.gz"
+ ]
 }

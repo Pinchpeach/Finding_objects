@@ -18,37 +18,35 @@
  "groups": {
   "above RGB tip": {
    "n": 254,
-   "agb_label": 244,
+   "agb_label": 248,
    "codes": {
-    "STAR:?:AGB": 88,
-    "STAR:C:AGB": 84,
-    "STAR:M:AGB": 72
+    "STAR:M:AGB": 232,
+    "STAR:C:AGB": 13,
+    "STAR:?:AGB": 3
    }
   },
   "below RGB tip": {
    "n": 340,
-   "agb_label": 312,
+   "agb_label": 0,
    "codes": {
-    "STAR:C:AGB": 157,
-    "STAR:?:AGB": 109,
-    "STAR:M:AGB": 46
+    "STAR:M:III": 293,
+    "STAR:?:III": 16,
+    "STAR:C:III": 11
    }
   },
   "below red clump": {
    "n": 16,
    "agb_label": 0,
-   "codes": {
-    "STAR:C:V": 1
-   }
+   "codes": {}
   },
   "no good parallax": {
    "n": 23359,
-   "agb_label": 14507,
+   "agb_label": 21561,
    "codes": {
-    "STAR:C:AGB": 7303,
-    "STAR:M:AGB": 3956,
-    "STAR:?:AGB": 3248,
-    "STAR:?": 2285
+    "STAR:M:AGB": 15155,
+    "STAR:C:AGB": 5466,
+    "STAR:?:AGB": 940,
+    "STAR:?": 322
    }
   }
  }

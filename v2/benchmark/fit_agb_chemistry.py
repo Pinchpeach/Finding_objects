@@ -37,12 +37,19 @@ GCVS = V2 / "benchmark/agb_truth/agb_gcvs_truth.csv.gz"
 FIELD = V2 / "benchmark/agb_truth/agb_gate_sample.csv.gz"
 MODEL = V2 / "Classifier/agb_chemistry_model.json"
 SPEC = [("GAIA_2MASS_WISE_CSTAR", ["dW", "kw3", "cst"]),
-        ("GAIA_2MASS_WISE", ["dW", "kw3"]),
+        ("GAIA_2MASS_CSTAR", ["dW", "jk", "cst"]),
+        ("GAIA_2MASS", ["dW", "jk"]),
         ("NIR_MIR", ["jk", "kw3", "w12", "w34"])]
+# AllWISE saturation (Cutri et al. 2012, Explanatory Supplement): W1 < 8.0,
+# W2 < 6.7, W3 < 3.8, W4 < -0.4 (Vega).  61 % of the bright GCVS LPVs are
+# saturated in W3; their Ks - W3 is not usable.
+WISE_SAT = {"aw_w1": 8.0, "aw_w2": 6.7, "aw_w3": 3.8, "aw_w4": -0.4}
 
 
 def features(d: pd.DataFrame) -> pd.DataFrame:
     d = d.copy()
+    for c, lim in WISE_SAT.items():
+        d[c] = d[c].where(d[c] >= lim)
     d["jk"] = d.tm_j - d.tm_ks
     d["kw3"] = d.tm_ks - d.aw_w3
     d["w34"] = d.aw_w3 - d.aw_w4
@@ -56,7 +63,8 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--truth", nargs="+", default=[str(TRUTH)] + ([str(GCVS)] if GCVS.exists() else []),
                     help="truth files (Suh 2021; GCVS LPVs with spectral types)")
-    ap.add_argument("--band", type=float, default=0.15)
+    ap.add_argument("--band", type=float, default=0.15, help="abstain band of the models with the Gaia C-star flag")
+    ap.add_argument("--band-noflag", type=float, default=0.15, help="abstain band of the models without it")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--keep-faint", action="store_true", help="keep the sub-red-clump (non-AGB) stars")
     ap.add_argument("--write", action="store_true", help=f"write {MODEL.relative_to(V2)}")
@@ -84,10 +92,13 @@ def main() -> None:
 
     pred = np.full(len(d), np.nan)
     src = np.full(len(d), "", dtype=object)
+    feats_of = dict(SPEC)
     for name, _ in SPEC:                       # first available model wins
         todo = (src == "") & ~np.isnan(P[name])
         src[todo] = name
-        sure = todo & (np.abs(P[name] - 0.5) >= a.band)
+        band = a.band if "cst" in feats_of[name] else a.band_noflag
+        models[name]["abstain_band"] = band
+        sure = todo & (np.abs(P[name] - 0.5) >= band)
         pred[sure] = P[name][sure] >= 0.5
 
     m = te & ~np.isnan(pred)
@@ -118,7 +129,7 @@ def main() -> None:
             m = f[feats].notna().all(axis=1).to_numpy() & ~done
             z = models[name]["intercept"] + f.loc[m, feats].to_numpy() @ np.array(models[name]["coef"])
             p_ = 1 / (1 + np.exp(-z))
-            fp[np.where(m)[0]] = np.where(np.abs(p_ - 0.5) >= a.band, p_ >= 0.5, np.nan)
+            fp[np.where(m)[0]] = np.where(np.abs(p_ - 0.5) >= models[name]["abstain_band"], p_ >= 0.5, np.nan)
             done |= m
         res["field_lpv_sample"] = {"n": int(len(f)), "decided": int((~np.isnan(fp)).sum()),
                                    "C_fraction_predicted": r(np.nanmean(fp)),
