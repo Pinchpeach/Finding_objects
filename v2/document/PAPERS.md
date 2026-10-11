@@ -8,7 +8,7 @@ v2의 코드·문서·규칙표가 인용하는 논문, 카탈로그 출판물, 
 |---|---:|
 | [측성·Gaia](#gaia) | 20 |
 | [측광 체계·단위](#phot) | 8 |
-| [탐사·카탈로그 데이터](#survey) | 22 |
+| [탐사·카탈로그 데이터](#survey) | 25 |
 | [데이터 출처 카탈로그 (논문 인용 없음)](#data) | 13 |
 | [교차 대응·통계·분류 방법](#method) | 9 |
 | [별 분류](#star) | 25 |
@@ -18,7 +18,7 @@ v2의 코드·문서·규칙표가 인용하는 논문, 카탈로그 출판물, 
 | [행성상성운·초신성·과도 현상](#trans) | 6 |
 | [기타 문서](#doc) | 13 |
 | [분광 분류 기준](#spec) | 43 |
-| **합계** | **206** |
+| **합계** | **209** |
 
 <a id="gaia"></a>
 ## 측성·Gaia
@@ -93,6 +93,9 @@ Gaia 데이터 릴리스, Gaia 처리·검증 논문, 측성 품질 기준.
 | Acker et al. (연도 미기재; Galactic PN catalogue VizieR V/84) (저장소 표기 그대로) | VizieR V/84 (main, intens) | — | `Get_data/pn_spectroscopy.py`<br>`Classifier/truth/build_independent_truth_sets.py`<br>`Classifier/axes/phenomenon.py` ('Acker PN Spectroscopy') | PN 방출선 세기(H, He, [O III], [N II], [S II])와 PN 정답 집합 |
 | Guo et al. 2022 (LAMOST DR5 white dwarfs) | VizieR J/MNRAS/509/2674 (table3, table6) | — | `Classifier/build_lamost_star_external_truth.py`<br>`Classifier/build_wd_subtype_truth.py`<br>`Classifier/WD_SUBTYPE_VALIDATION.md`<br>`Classifier/WD_SUBTYPE_XP_VALIDATION.md`<br>`Classifier/WD_SUBTYPE_XP_EXTERNAL_VALIDATION.md`<br>`Classifier/STAR_WD_EXTERNAL_VALIDATION.md` | 백색왜성 외부 정답과 DA/DB 학습 정답 |
 | Kepler et al. 2019 (SDSS DR14 white dwarfs) | VizieR J/MNRAS/486/2169 (table2) | — | `Classifier/build_sdss_wd_subtype_external_truth.py`<br>`Classifier/WD_SUBTYPE_XP_EXTERNAL_VALIDATION.md` | DA/DB 독립 외부 검증 정답(213개) |
+| Chen et al. 2020 (ZTF periodic variables) | ApJS 249, 18; VizieR J/ApJS/249/18 | — | `Get_data/ztf_periodic.py`<br>`Classifier/axes/variability.py (ZTF_MAP)`<br>`Classifier/LITERATURE_MULTI_AXIS.md §3.1` | ZTF 주기 변광성 78만 개의 유형(Mira, SR, RR, EW 등)·주기·진폭 |
+| Bellm et al. 2019 (ZTF) | PASP 131, 018002 | — | `Preprocess/association_model.py (ZTF periodic variables)`<br>`Classifier/LITERATURE_MULTI_AXIS.md §3.1` | ZTF 관측 체계(시상 ~2″) |
+| Masci et al. 2019 (ZTF data system) | PASP 131, 018003 | — | `Preprocess/association_model.py (ZTF periodic variables)` | ZTF 측성 정밀도(~0.1″) |
 
 <a id="data"></a>
 ## 데이터 출처 카탈로그 (논문 인용 없음)

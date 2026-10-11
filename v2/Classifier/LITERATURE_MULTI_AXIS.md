@@ -70,6 +70,33 @@ Variability classification should consume time-series features rather than stati
 photometry alone. AGB and Mira must remain separate axes so an object can be
 physical=AGB and variability=MIRA simultaneously.
 
+### 3.1 ZTF periodic variables (2.8.0)
+
+Source: Chen et al. (2020, ApJS 249, 18), 781,602 periodic variables from
+ZTF DR2 g/r light curves (Bellm et al. 2019, PASP 131, 018002; Masci et al.
+2019, PASP 131, 018003), VizieR J/ApJS/249/18/table2. Types from period,
+amplitude and Fourier shape: EW, EA, BYDra, RSCVN, SR, Mira, RR, RRc,
+DSCT, CEP, CEPII (map in `axes/variability.py: ZTF_MAP`).
+
+Order of evidence: SIMBAD curated type > Gaia SOS RR Lyrae / Cepheid
+(dedicated multi-band fits) > ZTF type > Gaia LPV C-star flag > broad Gaia
+classifier. ZTF is the only source here with a Mira leaf.
+
+Cross-validation on ASAS-SN variables (II/366, independent of ZTF and
+Gaia), 250 per class:
+
+| truth | exact before | exact after | ZTF-labelled (exact) |
+|---|---:|---:|---|
+| MIRA | 0.0 % | 25.6 % | 65 (98.5 %) |
+| LPV | 68.8 % | 68.0 % | 24 (83.3 %; 3 called Mira) |
+| RR Lyrae | 82.4 % | 82.4 % | 11 (9.1 %; 10 called EW/EA) |
+| Cepheid | 93.2 % | 93.2 % | 0 |
+
+The RR → eclipsing cases are the known RRc / EW ambiguity (near-sinusoidal
+light curves; an EW at twice the period looks alike) and partly matches
+3–6″ away (blends). These objects had no correct label before either, so
+the RR Lyrae exact rate is unchanged.
+
 ## 4. Neutron stars / pulsars (compact axis)
 
 Recommended observables:
