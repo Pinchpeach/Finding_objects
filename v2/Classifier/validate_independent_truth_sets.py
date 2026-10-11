@@ -140,8 +140,8 @@ def main():
  result=pd.DataFrame(rows);write_report(result,a.out_dir);checkpoint.unlink(missing_ok=True);print(result.groupby(["axis","truth_class"])[["classified","match"]].mean())
 if __name__=="__main__":
  main()
- # Timed-out collector queries stay in daemon threads; tearing the
- # interpreter down under them segfaulted after the report was written.
- import os,threading
+ # Interpreter teardown after the archive queries segfaulted in CI after the
+ # report was written (also with no Python thread alive): skip it.
+ import os
  sys.stdout.flush();sys.stderr.flush()
- if threading.active_count()>1:os._exit(0)
+ os._exit(0)

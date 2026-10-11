@@ -133,16 +133,15 @@ def main():
 
 
 def exit_now(code: int = 0) -> None:
-    """Exit after a finished run.  Archive queries that time out are left in
-    daemon threads (Get_data/controller.py, gaia_dr3.py); if one is still
-    inside network / C code, interpreter teardown can segfault after all
-    outputs are written (seen in the scientific cross-validation).  With such
-    threads alive the process ends with os._exit once stdio is flushed."""
-    import os, threading
+    """Exit after a finished run without interpreter teardown.  All outputs are
+    written and closed by then.  Teardown after a run with archive queries
+    segfaulted in CI after the results were written (scientific
+    cross-validation, compact-pulsar shard, twice), also with no Python
+    thread left alive, i.e. in a C extension's cleanup.  Callers use this
+    only after success; errors still raise and exit normally."""
+    import os
     sys.stdout.flush(); sys.stderr.flush()
-    if threading.active_count() > 1:
-        os._exit(code)
-    raise SystemExit(code)
+    os._exit(code)
 
 
 if __name__ == "__main__":
