@@ -70,6 +70,7 @@ category,citation,journal_ref,bibcode,used_in,purpose
 교차 대응·통계·분류 방법,Clarke et al. 2020,"A&A 639, A84",—,Preprocess/LITERATURE.md (DT-HIER-001),"SDSS+WISE 랜덤 포레스트 별/은하/퀘이사 분류, 확률·검증 분리"
 교차 대응·통계·분류 방법,Tachibana & Miller 2018,"PASP 130, 128001; DOI 10.1088/1538-3873/aae3d9",—,Preprocess/classification_rules.csv PS1-MORPH-001/002 (Sec. 4.1); Preprocess/catalog_reliability.csv (catalog_confidence_ps1_morphology); Preprocess/LITERATURE.md,PS1 iPSF − iKron > 0.05 확장원 판별과 한계
 교차 대응·통계·분류 방법,Farrow et al. 2014,"MNRAS 437, 748–770; DOI 10.1093/mnras/stt1933",—,Preprocess/LITERATURE.md,PS1 별/은하 분리 배경과 검증
+교차 대응·통계·분류 방법,Bovy et al. 2011 (XDQSO),"ApJ 729, 141",—,Preprocess/color_knn.py (MAG_DIMS ls_r_mag_scaled); Preprocess/LITERATURE.md,등급에 따라 색 분포·천체 수가 달라지므로 색 kNN에 r 등급 축 추가
 별 분류,Pecaut & Mamajek 2013,"ApJS 208, 9",—,"Classifier/subclass.py (분광형 GAIA_BPRP0/LS_GR0/PS1_IZ/GAIA_TEFF, 주계열 M_G); Preprocess/units.py; Classifier/LITERATURE_SUBCLASS.md; WORK_REPORT_2026-10-10.md",왜성 색–Teff 계열(분광형 척도)
 별 분류,"Mamajek, ""A Modern Mean Dwarf Stellar Color and Effective Temperature Sequence"", v2022.04.16",—,—,Classifier/reference/mamajek_dwarf_sequence.csv; Classifier/subclass.py; Classifier/LITERATURE_SUBCLASS.md; WORK_REPORT_2026-10-10.md (E1),"Pecaut & Mamajek 계열의 유지 판 표(SpT, Teff, BP−RP, M_G, g−r, i−z 등)"
 별 분류,Ciardi et al. 2010/2011 (저장소 표기 그대로),—,—,"Classifier/subclass.py (star_luminosity_class, GAIA_LOGG); Classifier/LITERATURE_SUBCLASS.md; WORK_REPORT_2026-10-10.md",Kepler 대상의 Teff–log g 거성 경계(시차 없을 때 광도 계급)

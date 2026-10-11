@@ -46,7 +46,7 @@ def main():
         colours = pd.DataFrame(color_knn.color_matrix(f, allc), columns=allc, index=f.index)
         f = pd.concat([f[["benchmark_id"]], colours], axis=1).merge(m, on="benchmark_id")
         f = f[f.split.eq("train")]
-        usable = pd.concat([f[list(cs)].notna().sum(axis=1) >= color_knn.MIN_COLORS
+        usable = pd.concat([f[[c for c in cs if c not in color_knn.MAG_DIMS]].notna().sum(axis=1) >= color_knn.MIN_COLORS
                             for cs in color_knn.COLOR_SETS.values()], axis=1).any(axis=1)
         f = f[usable]
         f["dataset"] = t.parent.name
