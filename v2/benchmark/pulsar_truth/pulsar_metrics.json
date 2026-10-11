@@ -1,0 +1,27 @@
+{
+ "pulsars_nvss": 152,
+ "control_nvss": 2532,
+ "pulsars_with_tgss": 99,
+ "median_alpha": {
+  "pulsar": -1.67,
+  "control": -0.73
+ },
+ "median_fractional_pol": {
+  "pulsar": 0.255,
+  "control": 0.024
+ },
+ "gaia_within_5arcsec": {
+  "pulsar": 0.526,
+  "control": 0.168
+ },
+ "rule_recall": 0.316,
+ "rule_false_positive_rate": 0.00118,
+ "rule_hits": {
+  "pulsar": 48,
+  "control": 3
+ },
+ "rule_hits_abs_b_lt_10": {
+  "pulsar": 38,
+  "control": 1
+ }
+}
