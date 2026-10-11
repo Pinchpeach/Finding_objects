@@ -36,8 +36,8 @@
         "truth_independent": true
       },
       "LPV": {
-        "coef": 0.35458044940459654,
-        "intercept": -0.8158307416744259,
+        "coef": 0.35458044940459765,
+        "intercept": -0.8158307416744268,
         "method": "platt",
         "n": 466,
         "negative": 293,
