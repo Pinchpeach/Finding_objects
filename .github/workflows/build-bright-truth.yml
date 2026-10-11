@@ -13,7 +13,6 @@ on:
     branches: [claude/code-review-7ox8zn]
     paths:
       - v2/benchmark/build_bright_truth.py
-      - .github/workflows/build-bright-truth.yml
 
 concurrency:
   group: bright-truth-${{ github.ref }}
@@ -42,4 +41,4 @@ jobs:
           git add v2/benchmark/bright_truth || true
           if git diff --cached --quiet; then echo "nothing to commit"; exit 0; fi
           git commit -m "Bright-star truth (APOGEE, ESP-ELS, LPV LAMOST)"
-          for i in 1 2 3; do git pull --no-rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep 5; done
+          bash .github/scripts/push_with_retry.sh

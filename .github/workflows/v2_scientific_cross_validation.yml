@@ -133,6 +133,5 @@ jobs:
           git add v2/Classifier/validation/independent_truth v2/Classifier/validation/REAL_SAMPLE_VALIDATION.md v2/Classifier/validation/real_sample_validation.csv v2/Classifier/calibration/models.json
           if ! git diff --cached --quiet; then
             git commit -m "Update sharded scientific validation products"
-            git pull --rebase origin "${{ github.ref_name }}"
-            git push origin "HEAD:${{ github.ref_name }}"
+            bash .github/scripts/push_with_retry.sh "${{ github.ref_name }}"
           fi

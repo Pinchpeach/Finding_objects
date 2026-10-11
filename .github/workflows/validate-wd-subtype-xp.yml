@@ -7,7 +7,6 @@ on:
       - v2/Classifier/build_wd_subtype_truth.py
       - v2/Classifier/collect_gaia_xp_coefficients.py
       - v2/Classifier/train_validate_wd_subtype_xp.py
-      - .github/workflows/validate-wd-subtype-xp.yml
 
 jobs:
   validate:
@@ -54,9 +53,7 @@ jobs:
           git add v2/Classifier/wd_subtype_truth.csv
           git diff --cached --quiet && exit 0
           git commit -m "Add fixed DA DB subtype truth"
-          git fetch origin main
-          git rebase origin/main
-          git push
+          bash .github/scripts/push_with_retry.sh
       - uses: actions/upload-artifact@v4
         with:
           name: wd-subtype-gaia-xp-eval

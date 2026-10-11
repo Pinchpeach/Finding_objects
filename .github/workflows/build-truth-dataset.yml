@@ -4,7 +4,6 @@ on:
   push:
     paths:
       - 'v2/benchmark/build_truth_sets.py'
-      - '.github/workflows/build-truth-dataset.yml'
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -42,6 +41,4 @@ jobs:
           git add v2/benchmark/truth_data
           git diff --cached --quiet && exit 0
           git commit -m "Add balanced SDSS ground-truth benchmark seeds"
-          git fetch origin main
-          git rebase origin/main
-          git push
+          bash .github/scripts/push_with_retry.sh

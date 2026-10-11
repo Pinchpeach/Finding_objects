@@ -5,7 +5,6 @@ on:
   push:
     paths:
       - v2/Classifier/build_lamost_star_external_truth.py
-      - .github/workflows/build-lamost-star-external-truth.yml
 
 jobs:
   build:
@@ -38,6 +37,4 @@ jobs:
           git add v2/Classifier/lamost_star_external_truth.csv
           git diff --cached --quiet && exit 0
           git commit -m "Add fixed LAMOST STAR external truth"
-          git fetch origin main
-          git rebase origin/main
-          git push
+          bash .github/scripts/push_with_retry.sh
