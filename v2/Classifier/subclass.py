@@ -762,39 +762,53 @@ LINE_SNR = 3.0
 D4000_OLD = 1.6
 
 
-def _line(row, name):
-    """(flux, S/N) of an SDSS emission line, or (None, None)."""
-    f = _num(row, f"sdss_dr18_spectroscopy__line_{name}_flux")
-    e = _num(row, f"sdss_dr18_spectroscopy__line_{name}_flux_err")
+# Line sources in order of precedence: SDSS (Portsmouth / MPA-JHU), then DESI
+# DR1 FastSpecFit (2.7.0; Get_data/desi_fastspec.py writes the same line_*
+# columns: fluxes, 1-sigma errors, EW positive in emission, Dn4000).
+LINE_SOURCES = (("sdss_dr18_spectroscopy__", "SDSS"), ("desi_dr1_fastspecfit__", "DESI"))
+
+
+def _line(row, name, prefix="sdss_dr18_spectroscopy__"):
+    """(flux, S/N) of an emission line from one source, or (None, None)."""
+    f = _num(row, f"{prefix}line_{name}_flux")
+    e = _num(row, f"{prefix}line_{name}_flux_err")
     if f is None:
         return None, None
     return f, (f / e if e and e > 0 else None)
 
 
 def galaxy_lines(row):
-    """(activity, rule, basis) from SDSS emission-line measurements, or None."""
-    ha, ha_sn = _line(row, "ha")
-    hb, hb_sn = _line(row, "hb")
-    o3, o3_sn = _line(row, "oiii5007")
-    n2, n2_sn = _line(row, "nii6584")
+    """(activity, rule, basis) from the first line source that decides, or None."""
+    for prefix, tag in LINE_SOURCES:
+        r = _galaxy_lines(row, prefix, tag)
+        if r is not None:
+            return r
+    return None
+
+
+def _galaxy_lines(row, prefix, tag):
+    ha, ha_sn = _line(row, "ha", prefix)
+    hb, hb_sn = _line(row, "hb", prefix)
+    o3, o3_sn = _line(row, "oiii5007", prefix)
+    n2, n2_sn = _line(row, "nii6584", prefix)
     good = lambda f, sn: f is not None and f > 0 and sn is not None and sn >= LINE_SNR
-    w = ew_ha = _num(row, "sdss_dr18_spectroscopy__line_ha_ew")
-    wn = _num(row, "sdss_dr18_spectroscopy__line_nii6584_ew")
+    w = ew_ha = _num(row, f"{prefix}line_ha_ew")
+    wn = _num(row, f"{prefix}line_nii6584_ew")
     # Weak H-alpha first: LINER-like ratios with EW(Ha) < 3 A come from old
     # stars, not an AGN (retired galaxies; Cid Fernandes et al. 2010, 2011).
     if w is not None and w < 0.5 and wn is not None and wn < 0.5:
-        return "QUIESCENT", "SDSS_WHAN", f"EW(Ha) = {w:.1f} A, EW([N II]) = {wn:.1f} A < 0.5 A (passive; WHAN)"
+        return "QUIESCENT", f"{tag}_WHAN", f"EW(Ha) = {w:.1f} A, EW([N II]) = {wn:.1f} A < 0.5 A (passive; WHAN)"
     if w is not None and w < 3.0:
-        return "QUIESCENT", "SDSS_WHAN", f"EW(Ha) = {w:.1f} A < 3 A (retired; WHAN)"
+        return "QUIESCENT", f"{tag}_WHAN", f"EW(Ha) = {w:.1f} A < 3 A (retired; WHAN)"
     if all(good(f, sn) for f, sn in ((ha, ha_sn), (hb, hb_sn), (o3, o3_sn), (n2, n2_sn))):
         x, y = math.log10(n2 / ha), math.log10(o3 / hb)
         pos = f"log [N II]/Ha = {x:.2f}, log [O III]/Hb = {y:.2f}"
         if x >= 0.47 or y > 0.61 / (x - 0.47) + 1.19:
             kind = "Seyfert" if y > 1.05 * x + 0.45 else "LINER"
-            return "AGN", "SDSS_LINES_BPT", f"{pos}: above Kewley+2001 ({kind}-like, Schawinski+2007)"
+            return "AGN", f"{tag}_LINES_BPT", f"{pos}: above Kewley+2001 ({kind}-like, Schawinski+2007)"
         if x < 0.05 and y < 0.61 / (x - 0.05) + 1.3:
-            return "STAR_FORMING", "SDSS_LINES_BPT", f"{pos}: below Kauffmann+2003"
-        return "COMPOSITE", "SDSS_LINES_BPT", f"{pos}: between Kauffmann+2003 and Kewley+2001"
+            return "STAR_FORMING", f"{tag}_LINES_BPT", f"{pos}: below Kauffmann+2003"
+        return "COMPOSITE", f"{tag}_LINES_BPT", f"{pos}: between Kauffmann+2003 and Kewley+2001"
     if w is not None and good(ha, ha_sn) and n2 is not None and n2 > 0:
         # [N II]/Ha alone (Stasinska et al. 2006): < -0.4 star-forming,
         # -0.4 to -0.2 composite, > -0.2 AGN.  WHAN calls everything above
@@ -803,14 +817,14 @@ def galaxy_lines(row):
         x = math.log10(n2 / ha)
         pos = f"EW(Ha) = {w:.1f} A, log [N II]/Ha = {x:.2f}"
         if x < -0.4:
-            return "STAR_FORMING", "SDSS_WHAN", f"{pos} < -0.4 (WHAN; Stasinska+2006)"
+            return "STAR_FORMING", f"{tag}_WHAN", f"{pos} < -0.4 (WHAN; Stasinska+2006)"
         if x < -0.2:
-            return "COMPOSITE", "SDSS_WHAN", f"{pos} in -0.4..-0.2 (composite; Stasinska+2006)"
+            return "COMPOSITE", f"{tag}_WHAN", f"{pos} in -0.4..-0.2 (composite; Stasinska+2006)"
         kind = "strong" if w > 6.0 else "weak"
-        return "AGN", "SDSS_WHAN", f"{pos} >= -0.2 ({kind} AGN; WHAN, Stasinska+2006)"
-    d4 = _num(row, "sdss_dr18_spectroscopy__d4000_n")
+        return "AGN", f"{tag}_WHAN", f"{pos} >= -0.2 ({kind} AGN; WHAN, Stasinska+2006)"
+    d4 = _num(row, f"{prefix}d4000_n")
     if d4 is not None and d4 >= D4000_OLD and ew_ha is None:
-        return "QUIESCENT", "SDSS_D4000", f"Dn4000 = {d4:.2f} >= {D4000_OLD} (old stellar population)"
+        return "QUIESCENT", f"{tag}_D4000", f"Dn4000 = {d4:.2f} >= {D4000_OLD} (old stellar population)"
     return None
 
 
