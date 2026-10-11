@@ -19,8 +19,22 @@ from app_paths import v2_root, version  # noqa: E402
 V2 = v2_root()
 
 
+def _worker_stdio() -> None:
+    """A windowed (no-console) frozen build starts with sys.stdout / stderr set
+    to None, but the GUI reads the worker's progress from its stdout pipe:
+    re-open the inherited standard handles when they exist."""
+    import os
+    for name, fd in (("stdout", 1), ("stderr", 2)):
+        if getattr(sys, name) is None:
+            try:
+                setattr(sys, name, os.fdopen(fd, "w", buffering=1, encoding="utf-8", errors="replace"))
+            except OSError:
+                setattr(sys, name, open(os.devnull, "w"))
+
+
 def _worker_main(argv: list[str]) -> int:
     """Run v2/pipeline.py's CLI in this process (``--pipeline`` mode)."""
+    _worker_stdio()
     import importlib.util
     sys.path.insert(0, str(V2))
     spec = importlib.util.spec_from_file_location("v2_pipeline", V2 / "pipeline.py")
