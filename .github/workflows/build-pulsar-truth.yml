@@ -1,0 +1,40 @@
+name: Pulsar radio truth (ATNF vs NVSS control)
+
+# Radio properties (TGSS, LoTSS, NVSS polarisation, FIRST, VLASS) and Gaia
+# counterparts of ATNF pulsars and of random NVSS sources, measured around the
+# NVSS position, to calibrate an ATNF-independent pulsar rule (2.6.3).
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/code-review-7ox8zn]
+    paths:
+      - v2/benchmark/build_pulsar_truth.py
+      - .github/workflows/build-pulsar-truth.yml
+
+concurrency:
+  group: pulsar-truth-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pandas numpy astropy astroquery pyvo
+      - name: Build
+        run: python -u v2/benchmark/build_pulsar_truth.py
+      - name: Commit
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add v2/benchmark/pulsar_truth
+          if git diff --cached --quiet; then echo "nothing to commit"; exit 0; fi
+          git commit -m "Pulsar radio truth (ATNF vs NVSS control)"
+          for i in 1 2 3; do git pull --no-rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep 5; done
