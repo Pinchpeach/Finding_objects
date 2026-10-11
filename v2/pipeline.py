@@ -37,6 +37,10 @@ def _load(path: Path, name: str):
     return module
 
 
+EMPTY_RESULT_COLUMNS = ["object_id", "designation", "ra", "dec", "catalogs", "primary_class", "primary_confidence",
+                        "classification_status", "subclass", "subclass_tags", "subclass_status"]
+
+
 def run(work: Path, raw_dir: Path | None = None, ra: float | None = None, dec: float | None = None,
         radius: float | None = None, min_confidence: float | None = None, workers: int = 6,
         field_prior: bool = False) -> pd.DataFrame:
@@ -54,8 +58,10 @@ def run(work: Path, raw_dir: Path | None = None, ra: float | None = None, dec: f
     if collect:
         if None in (ra, dec, radius):
             raise ValueError("give --raw-dir, or --ra/--dec/--radius to collect")
-        raw_dir = work / "raw"
         controller = _load(GET / "controller.py", "v2_get_data_controller")
+        # One raw folder per search position: Stage 1 reads every CSV in the
+        # folder, so a shared folder mixed earlier searches into later results.
+        raw_dir = work / "raw" / controller._tag(ra, dec, radius)
         step("collect", controller.collect_all, ra, dec, radius, raw_dir, workers)
 
     rules = PRE / "classification_rules.csv"
@@ -68,6 +74,14 @@ def run(work: Path, raw_dir: Path | None = None, ra: float | None = None, dec: f
     control = _load(CLS / "control.py", "v2_classifier_control")
 
     step("1_associate", s1.run, Path(raw_dir), work / "source_association.csv")
+    if pd.read_csv(work / "source_association.csv").empty:
+        # Nothing detected (empty sky patch, tiny radius, or every archive
+        # down): an empty result, not a failure of the later stages.
+        out = pd.DataFrame(columns=EMPTY_RESULT_COLUMNS)
+        out.to_csv(work / "classified_objects.csv", index=False)
+        pd.DataFrame(timings).to_csv(work / "pipeline_summary.csv", index=False)
+        print("[pipeline] 0 objects: no detections in the search area", flush=True)
+        return out
     step("2_integrate", s2.run, work / "source_association.csv", Path(raw_dir), work / "integrated_objects.csv")
     step("3_features", s3.run, work / "integrated_objects.csv", rules, work / "features.csv")
     step("4_evidence", s4.run, work / "features.csv", rules, work / "evidence.csv")

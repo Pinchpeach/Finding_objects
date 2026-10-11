@@ -1,0 +1,50 @@
+name: Build AGB chemistry truth
+
+# Suh (2021) O-rich / C-rich AGB stars with Gaia DR3, 2MASS, AllWISE photometry
+# and Gaia DR3 LPV is_cstar flags; committed as a compact truth file so the
+# AGB chemistry rules of Classifier/subclass.py can be validated offline.
+on:
+  workflow_dispatch:
+    inputs:
+      source:
+        description: "photometry service: asu (VizieR cone search), vizier (TAPVizieR) or gaia (Gaia archive)"
+        default: asu
+
+concurrency:
+  group: build-agb-chemistry-truth-${{ github.ref }}-${{ inputs.source || 'asu' }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pandas numpy astropy astroquery
+      - name: Build
+        run: python -u v2/benchmark/build_agb_chemistry_truth.py --source "${{ inputs.source || 'asu' }}"
+      - name: Summary
+        run: |
+          python - <<'PY'
+          import pandas as pd
+          d = pd.read_csv("v2/benchmark/agb_truth/agb_chemistry_truth.csv.gz", low_memory=False)
+          print(d.shape); print(d.chem.value_counts())
+          for c in [c for c in d.columns if c.startswith(("tm_", "aw_", "g_", "lpv_"))][:40]:
+              if c in d: print(c, d.groupby("chem")[c].apply(lambda s: s.notna().mean()).round(3).to_dict())
+          if "lpv_is_cstar" in d: print(pd.crosstab(d.chem, d.lpv_is_cstar.astype(str)))
+          print(d.head(3).T.to_string())
+          PY
+      - name: Commit
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add v2/benchmark/agb_truth
+          if git diff --cached --quiet; then echo "nothing to commit"; exit 0; fi
+          git commit -m "AGB chemistry truth set (Suh 2021 + Gaia/2MASS/AllWISE)"
+          for i in 1 2 3; do git pull --no-rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep 5; done

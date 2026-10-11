@@ -1,0 +1,53 @@
+{
+ "n": 23969,
+ "cones": 66,
+ "simbad_types": {
+  "LP?": 16131,
+  "LP*": 6978,
+  "Mi*": 743,
+  "El*": 31,
+  "C*": 22,
+  "EB*": 14,
+  "AB?": 12,
+  "AB*": 11,
+  "s*r": 7,
+  "S*": 5,
+  "OH*": 3,
+  "SB*": 2
+ },
+ "groups": {
+  "above RGB tip": {
+   "n": 254,
+   "agb_label": 248,
+   "codes": {
+    "STAR:M:AGB": 232,
+    "STAR:C:AGB": 13,
+    "STAR:?:AGB": 3
+   }
+  },
+  "below RGB tip": {
+   "n": 340,
+   "agb_label": 0,
+   "codes": {
+    "STAR:M:III": 293,
+    "STAR:?:III": 16,
+    "STAR:C:III": 11
+   }
+  },
+  "below red clump": {
+   "n": 16,
+   "agb_label": 0,
+   "codes": {}
+  },
+  "no good parallax": {
+   "n": 23359,
+   "agb_label": 21561,
+   "codes": {
+    "STAR:M:AGB": 15155,
+    "STAR:C:AGB": 5466,
+    "STAR:?:AGB": 940,
+    "STAR:?": 322
+   }
+  }
+ }
+}

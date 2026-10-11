@@ -25,7 +25,10 @@ from PySide6.QtGui import QBrush, QColor, QIcon, QPainter, QPainterPath, QPen, Q
 # Representative stellar colours by spectral letter (sRGB, approximate
 # blackbody colours at the dwarf-scale Teff of each class).
 STAR_COLORS = {"O": "#9bb0ff", "B": "#aabfff", "A": "#cad7ff", "F": "#f8f7ff", "G": "#fff4ea",
-               "K": "#ffd2a1", "M": "#ffb46c", "L": "#ff8a4c", "T": "#e0603a", "Y": "#b04020"}
+               "K": "#ffd2a1", "M": "#ffb46c", "L": "#ff8a4c", "T": "#e0603a", "Y": "#b04020",
+               "C": "#b3261e", "S": "#c45a2a",          # carbon and S-type (AGB) stars
+               "YSO": "#f0a830", "WR": "#6a5acd", "PN": "#2e9e6a"}   # Gaia ESP-ELS emission-line classes
+GIANT_LUM = ("III", "II", "Ib", "Ia", "AGB")
 OUTLINE = QColor("#3b3f45")
 GAL_EARLY, GAL_DISK, GAL_AGN, GAL_UNK, GAL_GV = "#e8a85a", "#4f8fdc", "#d64f9a", "#8fa3c8", "#4caf50"
 QSO_COLOR = "#7b3fb5"
@@ -81,8 +84,8 @@ def draw(p: QPainter, k: dict, c: QPointF, size: float = 9.0, selected: bool = F
             p.setBrush(Qt.NoBrush); p.drawEllipse(c, size * 0.8, size * 0.8)
         else:
             col = QColor("#b3261e") if code == "STAR:C" else QColor(STAR_COLORS.get(k.get("letter") or "", "#d8d8d8"))
-            r = size * (1.35 if k.get("lum") in ("III", "II", "Ib", "Ia") else 1.0)
-            if k.get("lum") in ("III", "II", "Ib", "Ia"):
+            r = size * (1.35 if k.get("lum") in GIANT_LUM else 1.0)
+            if k.get("lum") in GIANT_LUM:
                 halo = QColor(col); halo.setAlpha(70)
                 p.setPen(Qt.NoPen); p.setBrush(halo); p.drawEllipse(c, r * 1.15, r * 1.15)
             p.setPen(QPen(OUTLINE, 1.0, Qt.DashLine if k.get("halo") else Qt.SolidLine)); p.setBrush(col)
@@ -100,7 +103,7 @@ def draw(p: QPainter, k: dict, c: QPointF, size: float = 9.0, selected: bool = F
         act, prof = k.get("activity"), k.get("profile")
         disk = act in ("STAR_FORMING", "STARBURST") or prof in ("DISK", "LATE_TYPE")
         early = act == "QUIESCENT" or prof == "EARLY_TYPE"
-        col = QColor(GAL_AGN if act == "AGN" else GAL_GV if act == "GREEN_VALLEY" else GAL_DISK if disk
+        col = QColor(GAL_AGN if act in ("AGN", "COMPOSITE") else GAL_GV if act == "GREEN_VALLEY" else GAL_DISK if disk
                      else GAL_EARLY if early else GAL_UNK)
         p.translate(c); p.rotate(-30)
         sz = size * (0.7 if k.get("dwarf") else 1.0)
@@ -169,6 +172,8 @@ LEGEND = [
     ("M dwarf", {"cls": "STAR", "code": "STAR:M:V", "letter": "M", "lum": "V"}),
     ("A/B star", {"cls": "STAR", "code": "STAR:A:V", "letter": "A", "lum": "V"}),
     ("Giant", {"cls": "STAR", "code": "STAR:K:III", "letter": "K", "lum": "III"}),
+    ("Carbon star (C-rich AGB)", {"cls": "STAR", "code": "STAR:C:AGB", "letter": "C", "lum": "AGB"}),
+    ("O-rich AGB star", {"cls": "STAR", "code": "STAR:M:AGB", "letter": "M", "lum": "AGB"}),
     ("White dwarf", {"cls": "STAR", "code": "STAR:WD"}),
     ("Star-forming galaxy", {"cls": "GALAXY", "activity": "STAR_FORMING"}),
     ("Quiescent galaxy", {"cls": "GALAXY", "activity": "QUIESCENT"}),

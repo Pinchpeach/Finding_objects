@@ -127,6 +127,7 @@ class MainWindow(QMainWindow):
         self.resize(1400, 860)
         self.settings = QSettings("FindingObjects", "v2")
         self.proc: QProcess | None = None
+        self._out_buf = b""
         self.tracker: ProgressTracker | None = None
         self.work_dir: Path | None = None
         self.model = DataFrameModel(parent=self)
@@ -321,13 +322,19 @@ class MainWindow(QMainWindow):
         self.btn_resolve.setEnabled(False); self._status(f"Resolving {name}…")
         job = _NameResolver(name)
         job.signals.done.connect(self._resolved)
-        job.signals.failed.connect(lambda msg: (self.btn_resolve.setEnabled(True), self._status(f"Could not resolve {msg}")))
+        # Bound methods, not lambdas: the runnable's signal object is deleted
+        # after run(), and queued calls to a lambda slot were then dropped.
+        job.signals.failed.connect(self._resolve_failed)
         QThreadPool.globalInstance().start(job)
 
     def _center_from_map(self, ra, dec):
         if self._area_used():
             self.sp_ra.setValue(ra); self.sp_dec.setValue(dec)
             self._status(f"Centre set from map: RA {ra:.6f}, Dec {dec:+.6f}")
+
+    def _resolve_failed(self, msg):
+        self.btn_resolve.setEnabled(True)
+        self._status(f"Could not resolve {msg}")
 
     def _resolved(self, ra, dec, name):
         self.sp_ra.setValue(ra); self.sp_dec.setValue(dec); self.btn_resolve.setEnabled(True)
@@ -361,12 +368,15 @@ class MainWindow(QMainWindow):
         self.work_dir = Path(args[1])
         self.tracker = ProgressTracker(collecting=self.rb_sky.isChecked())
         self.log.clear(); self._log("$ pipeline " + " ".join(args))
+        self._out_buf = b""
         self.proc = QProcess(self)
         self.proc.setProcessChannelMode(QProcess.MergedChannels)
         env = QProcessEnvironment.systemEnvironment(); env.insert("PYTHONUNBUFFERED", "1")
         self.proc.setProcessEnvironment(env)
         self.proc.readyReadStandardOutput.connect(self._read_output)
         self.proc.finished.connect(self._finished)
+        # A worker that cannot start emits only errorOccurred, never finished.
+        self.proc.errorOccurred.connect(self._proc_error)
         program, pre = worker_command()
         self.proc.start(program, [*pre, "--pipeline", *args])
         self.btn_run.setEnabled(False); self.btn_cancel.setEnabled(True)
@@ -378,15 +388,31 @@ class MainWindow(QMainWindow):
             self._log("Cancelled by user.")
             self.proc.kill()
 
+    def _proc_error(self, error):
+        if error == QProcess.FailedToStart:
+            self._log("The pipeline worker could not be started.")
+            self._finished(-1, QProcess.CrashExit)
+
     def _read_output(self):
-        data = bytes(self.proc.readAllStandardOutput()).decode("utf-8", "replace")
-        for line in data.splitlines():
+        if self.proc is None:
+            return
+        # Keep partial lines (and split UTF-8 sequences) until the newline arrives.
+        self._out_buf += bytes(self.proc.readAllStandardOutput())
+        *complete, self._out_buf = self._out_buf.split(b"\n")
+        for raw in complete:
+            line = raw.decode("utf-8", "replace").rstrip("\r")
             self._log(line)
             msg = self.tracker.feed(line) if self.tracker else None
             if msg:
                 self.progress.setValue(int(self.tracker.fraction * 1000)); self._status(msg)
 
     def _finished(self, code, status):
+        if self.proc is not None:
+            self._read_output()
+            if self._out_buf:
+                self._log(self._out_buf.decode("utf-8", "replace")); self._out_buf = b""
+            self.proc.deleteLater()              # one QProcess per run, released when it ends
+            self.proc = None
         self.btn_run.setEnabled(True); self.btn_cancel.setEnabled(False); self.progress.setVisible(False)
         failed = self.tracker.failed_archives if self.tracker else []
         if status == QProcess.NormalExit and code == 0 and self.work_dir and (self.work_dir / RESULT_FILE).exists():
@@ -398,7 +424,11 @@ class MainWindow(QMainWindow):
 
     # ---------------------------------------------------------- results
     def load_results(self, path: Path):
-        df = pd.read_csv(path, low_memory=False)
+        try:
+            df = pd.read_csv(path, low_memory=False)
+        except Exception as exc:                  # unreadable / malformed file chosen by the user
+            QMessageBox.warning(self, APP_NAME, f"Could not read {path}:\n{exc}")
+            return
         assoc = path.parent / "source_association.csv"
         if "designation" not in df.columns and assoc.exists():   # results written before designations existed
             df = _designations().annotate(df, pd.read_csv(assoc, low_memory=False, dtype={"catalog_object_id": "string"}))
@@ -427,6 +457,8 @@ class MainWindow(QMainWindow):
             self.lbl_counts.setText(f"{self.proxy.rowCount()} shown / {len(top)} objects"
                                     + (f" (+{parts} galaxy parts)" if parts else "") + " · "
                                     + " · ".join(f"{k} {v}" for k, v in counts.items()))
+        else:
+            self.lbl_counts.setText("0 objects")
 
     def _row_changed(self, current: QModelIndex, _prev):
         if not current.isValid():
@@ -519,7 +551,12 @@ def main():
     w = MainWindow(); w.show()
     if len(sys.argv) > 1 and Path(sys.argv[1]).is_file():   # optional: open a results CSV directly
         w.load_results(Path(sys.argv[1]))
-    return app.exec()
+    code = app.exec()
+    # Destroy the window (and its children) while QApplication still exists;
+    # Qt objects outliving it at interpreter exit can crash on shutdown.
+    w.deleteLater(); app.processEvents()
+    del w
+    return code
 
 
 if __name__ == "__main__":

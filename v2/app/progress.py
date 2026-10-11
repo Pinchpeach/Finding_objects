@@ -5,6 +5,7 @@ The pipeline prints one line per finished archive query
 (``[pipeline] 3_features: 0.81 s``); progress is the fraction of those done.
 """
 from __future__ import annotations
+from functools import lru_cache
 import re
 
 STAGES = ("1_associate", "2_integrate", "3_features", "4_evidence", "5_coarse", "6_prepare", "7_classify")
@@ -12,13 +13,16 @@ _COLLECTOR = re.compile(r"^\[(?P<name>[A-Za-z0-9_]+)\] (?P<status>ok|empty|error
 _STAGE = re.compile(r"^\[pipeline\] (?P<stage>[0-9a-z_]+): (?P<sec>[0-9.]+) s")
 
 
+@lru_cache(maxsize=1)
 def collector_count() -> int:
+    """Number of archive collectors (read once per app session: every run used
+    to re-execute controller.py and add one more sys.path entry)."""
     try:
         import importlib.util, sys
-        from pathlib import Path
         from app_paths import v2_root
         p = v2_root() / "Get_data" / "controller.py"
-        sys.path.insert(0, str(p.parent))
+        if str(p.parent) not in sys.path:
+            sys.path.insert(0, str(p.parent))
         spec = importlib.util.spec_from_file_location("v2_controller_for_count", p)
         m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
         return len(m.COLLECTORS)

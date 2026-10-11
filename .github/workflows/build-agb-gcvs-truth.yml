@@ -1,0 +1,40 @@
+name: AGB chemistry truth (GCVS LPVs)
+
+# GCVS Miras / semiregulars / irregulars with literature spectral types
+# (M -> O-rich, C/R/N -> C-rich) with Gaia, 2MASS, AllWISE, Gaia LPV
+# photometry: dust-free O-rich giants that the Suh (2021) set lacks.
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/code-review-7ox8zn]
+    paths:
+      - v2/benchmark/build_agb_gcvs_truth.py
+      - .github/workflows/build-agb-gcvs-truth.yml
+
+concurrency:
+  group: agb-gcvs-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pandas numpy astropy astroquery
+      - name: Build
+        run: python -u v2/benchmark/build_agb_gcvs_truth.py
+      - name: Commit
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add v2/benchmark/agb_truth
+          if git diff --cached --quiet; then echo "nothing to commit"; exit 0; fi
+          git commit -m "AGB chemistry truth from GCVS LPVs with spectral types"
+          for i in 1 2 3; do git pull --no-rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep 5; done

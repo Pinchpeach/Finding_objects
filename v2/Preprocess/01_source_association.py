@@ -152,6 +152,10 @@ def _anchor_key(det):
     return (0 if gaia and has_motion else 1 if has_motion else 2, float(det.get("poserr_arcsec") or 99.0))
 
 
+EMPTY_COLUMNS = ["object_id", "catalog", "catalog_object_id", "ra", "dec", "input_file", "source_row",
+                 "association_status", "association_confidence", "object_ra", "object_dec"]
+
+
 def run(raw_dir: Path, out: Path):
     detections, skipped = load(raw_dir)
     # Build groups from the best astrometric anchors first.  This prevents a
@@ -298,7 +302,9 @@ def run(raw_dir: Path, out: Path):
         rec["object_entity_kind"] = group_by_id[rec["object_id"]]["entity_kind"]
 
     out.parent.mkdir(parents=True, exist_ok=True)
-    pd.DataFrame(records).to_csv(out, index=False)
+    # An empty field still gets a header, so later stages read 0 rows
+    # instead of failing on a file without columns.
+    pd.DataFrame(records, columns=None if records else EMPTY_COLUMNS).to_csv(out, index=False)
     print(f"[OK] detections={len(records)} deduplicated={skipped} groups={len(groups)} -> {out}")
     return out
 
