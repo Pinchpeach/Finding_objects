@@ -108,7 +108,7 @@ def put(name: str, source: Path, ra: float, dec: float, radius_arcmin: float, df
     try:
         d.mkdir(parents=True, exist_ok=True)
         fname = hashlib.sha1(f"{ra:.7f},{dec:.7f},{radius_arcmin:.5f}".encode()).hexdigest()[:16] + ".csv.gz"
-        df.to_csv(d / fname, index=False, compression="gzip")
+        df.to_csv(d / fname, index=False, compression={"method": "gzip", "compresslevel": 1})   # level 1: write 1.41 -> 0.67 s for 5,000 x 65
         with _LOCK:
             idx = [e for e in _index(d) if e["file"] != fname]
             idx.append({"ra": float(ra), "dec": float(dec), "r": float(radius_arcmin), "rows": int(len(df)),
