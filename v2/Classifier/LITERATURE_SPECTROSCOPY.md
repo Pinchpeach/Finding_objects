@@ -21,6 +21,7 @@ Validation results are in the "Validation" sections and in `CHANGELOG.md`.
 | SDSS galaxy emission lines (2.6.0) | `sdss_spectroscopy.py` | Hα, Hβ, [O III] 5007, [N II] 6584 flux and EW from the Portsmouth fits (SDSS-I/II and BOSS; 100 % of the benchmark galaxies), else MPA-JHU (SDSS-I/II only; 1.6 %); Dn4000 from MPA-JHU | Thomas et al. 2013, MNRAS 431, 1383 (Portsmouth); Brinchmann et al. 2004, MNRAS 351, 1151; Kauffmann et al. 2003, MNRAS 341, 33; Tremonti et al. 2004, ApJ 613, 898 |
 | LAMOST DR5 | `lamost_spectroscopy.py` | class, subclass, z (LASP Teff, log g, [Fe/H] for AFGK stars) | Luo et al. 2015, RAA 15, 1095; Wu et al. 2011, RAA 11, 924 |
 | DESI DR1 redshift catalogue | `desi_spectroscopy.py` | spectral type, z | Guy et al. 2023, AJ 165, 144; DESI Collaboration 2025 (DR1) |
+| DESI DR1 galaxy emission lines (2.7.0) | `desi_fastspec.py` | Hα, Hβ, [O III] 5007, [N II] 6584 flux and inverse variance, EW(Hα), broad Hα; FastSpecFit fits as carried by the DESI DR1 AGN/galaxy VAC (Data Lab `desi_dr1.agngal`; the full FastSpecFit VAC is not cone-searchable). Used only where no SDSS lines exist | Moustakas et al. 2023 (FastSpecFit, ASCL 2308.005); DESI Collaboration 2025 (DR1) |
 | Gaia DR3 astrophysical parameters | `gaia_dr3.py` | GSP-Phot (BP/RP) Teff, log g, [M/H]; DSC class probabilities; GSP-Spec (RVS) and ESP-ELS (emission-line class), see §3 | Creevey et al. 2023, A&A 674, A26; Andrae et al. 2023, A&A 674, A27; Recio-Blanco et al. 2023, A&A 674, A29 |
 | Gaia DR3 LPV RP-spectrum C-star flag | `gaia_dr3_variability_sos_vizier.py` | `is_cstar` from the C2/CN band shape of RP spectra | Lebzelter et al. 2023, A&A 674, A15 |
 | Acker PN spectroscopy | `pn_spectroscopy.py` | PN line intensities | Acker et al. 1992 (Strasbourg–ESO PN catalogue) |
@@ -172,6 +173,41 @@ Data: 3,333 SDSS benchmark galaxies with Portsmouth lines
   | AGN | 80 | 2.56 | 20 % |
 
 - **Change found in validation:** plain WHAN called 104 SDSS star-forming galaxies AGN. 96 of them are star-forming or composite in the Portsmouth BPT. The Stasińska et al. (2006) composite zone reduces this to 19.
+
+### 3.2 DESI FastSpecFit lines (2.7.0, `benchmark/evaluate_desi_lines.py`)
+
+The same rules (WHAN, BPT, [N II]/Hα, rule names `DESI_*`) run on DESI
+lines when a galaxy has no SDSS line measurement. Lines with zero inverse
+variance (outside 3,600–9,800 Å, e.g. Hα at z > 0.49) are left empty, so
+"not measured" never reads as "no emission". EW([N II]) is not in the table,
+so the WHAN "passive" sub-case is not reachable from DESI (retired still is).
+
+Check on 3,492 galaxies with both a DESI DR1 and an SDSS spectrum
+(Data Lab DESI × SDSS DR17 1.5″ crossmatch, z < 0.3, median z 0.12):
+
+- **Coverage:** SDSS lines decide 2,592, DESI 2,864; 691 only by DESI.
+- **Agreement where both decide (2,173):** 80.7 % exact, 94.4 % within
+  the neighbouring class on the SF – composite – AGN sequence. BPT
+  decisions agree 86.6 %, WHAN / [N II]–Hα decisions 76.8 %.
+
+  | SDSS → DESI | AGN | composite | quiescent | SF |
+  |---|---:|---:|---:|---:|
+  | AGN (117) | 81 | 10 | 26 | 0 |
+  | composite (375) | 60 | 205 | 63 | 47 |
+  | quiescent (714) | 8 | 4 | 701 | 1 |
+  | SF (967) | 9 | 181 | 11 | 766 |
+
+- **Systematic:** DESI log [N II]/Hα is +0.053 dex higher than SDSS
+  (1,653 galaxies, scatter 0.076 dex); [O III]/Hβ agrees (+0.005 dex);
+  DESI EW(Hα) is 0.82 × SDSS. This is what a smaller aperture gives: the
+  DESI fibre (1.5″) samples more of the bulge than the SDSS fibre (3″;
+  BOSS 2″),
+  with higher [N II]/Hα and more old-star continuum (Kewley, Jansen &
+  Geller 2005, PASP 117, 227). Hence the SF → composite shift.
+- **No correction applied.** Removing the measured offsets raises agreement
+  only to 83.4 % (in-sample), the thresholds are the literature ones, and
+  the aperture difference is physical (the DESI spectrum describes the
+  central region). SDSS lines keep precedence when both exist.
 
 ## 4. Quasars
 
