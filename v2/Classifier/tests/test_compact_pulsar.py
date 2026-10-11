@@ -12,12 +12,16 @@ def _compact():
 def test_radio_pulsar_candidate_rule():
     c = _compact()
     # alpha(150 MHz - 1.4 GHz) = -1.75, compact, 20 % polarised -> candidate
-    psr = {"nvss__S1.4": 3.0, "tgss_adr1__Stotal": 150.0, "tgss_adr1__Speak": 130.0, "nvss__polFlux": 0.6}
+    psr = {"nvss__S1.4": 3.0, "tgss_adr1__Stotal": 150.0, "tgss_adr1__Speak": 130.0, "nvss__polFlux": 0.6, "nvss__e_polFlux": 0.15}
     r = c.classify(psr)
     assert r["label"] == "PULSAR_CANDIDATE" and r["evidence"][0]["alpha_150_1400"] < -1.5
+    assert r["status"] == "RADIO_STEEP_COMPACT_POLARISED"                                 # 20 %, 4 sigma
+    # Polarisation is supporting evidence: a 1-sigma "20 %" is not significant.
+    weak = c.classify(dict(psr, **{"nvss__e_polFlux": 0.6}))
+    assert (weak["label"], weak["status"]) == ("PULSAR_CANDIDATE", "RADIO_STEEP_COMPACT")
     assert c.classify(dict(psr, **{"nvss__S1.4": 30.0}))["label"] == "UNKNOWN"          # alpha = -0.7: ordinary source
     assert c.classify(dict(psr, **{"tgss_adr1__Speak": 60.0}))["label"] == "UNKNOWN"    # extended (S_tot/S_peak = 2.5)
-    assert c.classify(dict(psr, **{"nvss__polFlux": 0.05}))["label"] == "UNKNOWN"      # 1.7 % polarised
+    assert c.classify(dict(psr, **{"nvss__polFlux": 0.05}))["status"] == "RADIO_STEEP_COMPACT"   # 1.7 %: not polarised
     # Catalogue evidence still wins.
     assert c.classify(dict(psr, catalogs="ATNF Pulsar Catalog"))["label"] == "PULSAR"
 
@@ -46,6 +50,7 @@ def test_ztf_periodic_variable_types():
     r = v.classify({Z + "Type": "Mira", Z + "Per": 320.0, Z + "rAmp": 3.1})
     assert (r["label"], r["status"]) == ("MIRA", "ZTF_PERIODIC_VARIABLE")
     assert v.classify({Z + "Type": "Mira", "gaia_lpv_is_cstar": 1})["subtype"] == "C_STAR_CANDIDATE"
+    assert v.classify({Z + "Type": "SR", "gaia_lpv_is_cstar": 1})["subtype"] == "C_STAR_CANDIDATE"
     assert v.classify({Z + "Type": "RRc"})["subtype"] == "RRC"
     assert v.classify({Z + "Type": "EW"})["label"] == "ECLIPSING"
     # Gaia SOS RR Lyrae fit keeps precedence over ZTF.

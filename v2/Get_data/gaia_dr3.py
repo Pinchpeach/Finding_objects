@@ -149,7 +149,9 @@ def _vizier_fallback(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
 GSPSPEC_FLAG_POS={"teff":(1,4,8,13),"logg":(2,5,8,13),"mh":(3,6,8)}
 def _gspspec_quality(df:pd.DataFrame)->pd.DataFrame:
     def pad(v):
-        s=str(v).strip().split(".")[0] if v is not None and str(v).strip() not in ("","nan","<NA>","None") else ""
+        s=str(v).strip() if v is not None and str(v).strip() not in ("","nan","<NA>","None") else ""
+        if "e" in s.lower():return None        # float notation: digits already lost, decision unknown
+        s=s.split(".")[0]
         return s.zfill(41) if s.isdigit() else None
     flags=df["flags_gspspec"].map(pad) if "flags_gspspec" in df else pd.Series(None,index=df.index,dtype=object)
     for par,pos in GSPSPEC_FLAG_POS.items():

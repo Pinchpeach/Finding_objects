@@ -61,7 +61,8 @@ def _collect_one(name: str, ra: float, dec: float, radius_arcmin: float, out_dir
     try:
         module = _load_collector(name)
         source = GET_DATA / f"{name}.py"
-        df = archive_cache.get(name, source, ra, dec, radius_arcmin)
+        df = archive_cache.get(name, source, ra, dec, radius_arcmin,
+                               float(getattr(module, "CACHE_FILTER_MARGIN_ARCMIN", 0.0)))
         if df is not None:
             cache = "hit"
         else:

@@ -42,8 +42,6 @@ PROFILES = {
     "TGSS ADR1": SurveyProfile(None, 2.0, 25.0, 25.0),
     # ZTF: ~0.1" astrometry, ~2" seeing (Bellm et al. 2019; Masci et al. 2019).
     "ZTF periodic variables": SurveyProfile(None, 0.15, 2.0, 3.0),
-    # ZTF: ~0.1" astrometry, ~2" seeing (Bellm et al. 2019; Masci et al. 2019).
-    "ZTF periodic variables": SurveyProfile(None, 0.15, 2.0, 3.0),
     "Chandra CSC 2.0": SurveyProfile(None, 0.60, 0.5, 5.0),
     "XMM 4XMM-DR13": SurveyProfile(None, 1.5, 6.0, 10.0),
     "eROSITA eRASS1": SurveyProfile(2020.5, 4.0, 26.0, 20.0),

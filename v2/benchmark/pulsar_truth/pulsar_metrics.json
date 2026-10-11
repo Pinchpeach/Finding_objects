@@ -1,27 +1,32 @@
 {
- "pulsars_nvss": 152,
- "control_nvss": 2532,
- "pulsars_with_tgss": 99,
+ "pulsar_rows": 152,
+ "pulsars_nvss": 116,
+ "control_nvss": 2531,
+ "pulsars_with_tgss": 66,
  "median_alpha": {
-  "pulsar": -1.67,
+  "pulsar": -1.38,
   "control": -0.73
  },
  "median_fractional_pol": {
-  "pulsar": 0.255,
+  "pulsar": 0.139,
   "control": 0.024
  },
  "gaia_within_5arcsec": {
-  "pulsar": 0.526,
+  "pulsar": 0.388,
   "control": 0.168
  },
- "rule_recall": 0.316,
- "rule_false_positive_rate": 0.00118,
+ "rule_recall": 0.216,
+ "rule_false_positive_rate": 0.00119,
  "rule_hits": {
-  "pulsar": 48,
+  "pulsar": 25,
   "control": 3
  },
+ "significantly_polarised_hits": {
+  "pulsar": 6,
+  "control": 0
+ },
  "rule_hits_abs_b_lt_10": {
-  "pulsar": 38,
+  "pulsar": 12,
   "control": 1
  }
 }

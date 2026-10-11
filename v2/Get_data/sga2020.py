@@ -15,6 +15,8 @@ from _catalog_utils import add_standard_metadata, coordinates, numeric, pick
 CATALOG="SGA-2020"
 VIZIER_CATALOG="J/ApJS/269/3"
 MAX_EXTRA_ARCMIN=10.0
+# The archive cache keeps rows this far beyond a smaller cached cone too (2.10.0).
+CACHE_FILTER_MARGIN_ARCMIN=MAX_EXTRA_ARCMIN
 
 def fetch(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
     from astroquery.vizier import Vizier

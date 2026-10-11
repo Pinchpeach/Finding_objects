@@ -62,3 +62,26 @@ def test_controller_second_run_uses_cache(tmp_path, monkeypatch):
     assert b["rows"] == 1
     out = pd.read_csv(tmp_path / "out" / "nvss_t2.csv", dtype=str)
     assert out.catalog_object_id.tolist() == ["18446744073709551615"]
+
+
+def test_review_fixes(tmp_path, monkeypatch):
+    monkeypatch.setenv("V2_CACHE_DIR", str(tmp_path / "c"))
+    pkg = tmp_path / "pkg"; pkg.mkdir()
+    src = pkg / "coll.py"; src.write_text("x = 1\n"); helper = pkg / "_helper.py"; helper.write_text("y = 1\n")
+    df = _frame().assign(dec=[20.5, 20.55], query_radius_arcmin="5.0")
+    ac.put("coll", src, 10.0, 20.5, 5.0, df)
+    # identical cone at dec != 0 (acos rounding used to miss)
+    assert ac.get("coll", src, 10.0, 20.5, 5.0) is not None
+    # smaller cone: rows filtered and the recorded radius is the requested one
+    sub = ac.get("coll", src, 10.0, 20.5, 1.0)
+    assert len(sub) == 1 and float(sub.query_radius_arcmin[0]) == 1.0
+    # a collector margin keeps rows beyond the bare radius (SGA-2020)
+    assert len(ac.get("coll", src, 10.0, 20.5, 1.0, margin_arcmin=3.0)) == 2
+    # a shared helper module changed: old rows never reused
+    helper.write_text("y = 2\n")
+    assert ac.get("coll", src, 10.0, 20.5, 5.0) is None
+    # partial results are not stored
+    ac.put("coll", src, 50.0, 0.0, 1.0, _frame().assign(gaia_ap_query_status="error:TimeoutError"))
+    assert ac.get("coll", src, 50.0, 0.0, 1.0) is None
+    ac.put("coll", src, 50.0, 0.0, 1.0, _frame().assign(gaia_ap_query_status="ok"))
+    assert ac.get("coll", src, 50.0, 0.0, 1.0) is not None

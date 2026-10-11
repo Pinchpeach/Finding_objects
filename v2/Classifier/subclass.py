@@ -303,7 +303,10 @@ def _gspspec_ok(flags, par, row=None):
         ok = _num(row, f"gaia_dr3__gspspec_{par}_ok", f"gspspec_{par}_ok")
         if ok is not None:
             return ok == 1
-    f = str(flags or "").strip().lstrip("F").split(".")[0]
+    raw = str(flags or "").strip().lstrip("F")
+    if "e" in raw.lower():          # float notation (>= 1e16): digits already lost
+        return False
+    f = raw.split(".")[0]
     if not f.isdigit():
         return False
     f = f.zfill(41)

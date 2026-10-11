@@ -311,3 +311,10 @@ def test_desi_fastspecfit_lines():
     # SDSS lines take precedence over DESI.
     both = dict(rows[0], **{"sdss_dr18_spectroscopy__line_ha_ew": 1.0})
     assert sc.galaxy_lines(both)[1] == "SDSS_WHAN"
+
+
+def test_gspspec_flags_in_float_notation_are_rejected():
+    sc = _sc()
+    assert sc._gspspec_ok(1.2e33, "teff") is False          # digits lost in float: unknown -> not usable
+    assert sc._gspspec_ok("0" * 41, "teff") is True
+

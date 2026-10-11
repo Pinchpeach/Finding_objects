@@ -40,13 +40,13 @@ def _clean(v:pd.Series)->pd.Series:
  v=pd.to_numeric(v,errors="coerce")
  return v.where((v.abs()<1e6)&(v>-999))      # -9999 / -999 and 1e38 fill values
 def _lines(ids:list[str])->pd.DataFrame:
- out=pd.DataFrame({"specobjid":ids})
+ out=pd.DataFrame({"specobjid":ids});status="ok"   # recorded so the archive cache skips partial results
  try:port=_sql(PORT_SQL,ids)
  except Exception as exc:
-  print(f"[sdss_spectroscopy] Portsmouth line query failed: {type(exc).__name__}: {str(exc)[:120]}");port=pd.DataFrame(columns=["specobjid"])
+  print(f"[sdss_spectroscopy] Portsmouth line query failed: {type(exc).__name__}: {str(exc)[:120]}");port=pd.DataFrame(columns=["specobjid"]);status="error:portsmouth"
  try:mpa=_sql(MPA_SQL,ids)
  except Exception as exc:
-  print(f"[sdss_spectroscopy] MPA-JHU line query failed: {type(exc).__name__}: {str(exc)[:120]}");mpa=pd.DataFrame(columns=["specobjid"])
+  print(f"[sdss_spectroscopy] MPA-JHU line query failed: {type(exc).__name__}: {str(exc)[:120]}");mpa=pd.DataFrame(columns=["specobjid"]);status="error:mpa_jhu"
  out=out.merge(port,on="specobjid",how="left").merge(mpa,on="specobjid",how="left",suffixes=("","_mpa"))
  has_port=pd.Series(False,index=out.index)
  for g,(p,m) in LINES.items():
@@ -58,7 +58,8 @@ def _lines(ids:list[str])->pd.DataFrame:
  out["line_source"]=pd.Series("Portsmouth",index=out.index).where(has_port,pd.Series("MPA-JHU",index=out.index).where(out["line_ha_flux"].notna()))
  out["port_bpt"]=out["bpt"] if "bpt" in out else pd.NA
  out["d4000_n"]=_clean(out["d4000_n"]) if "d4000_n" in out else pd.NA
- return out[["specobjid",*LINE_FIELDS]]
+ out["line_query_status"]=status
+ return out[["specobjid",*LINE_FIELDS,"line_query_status"]]
 def fetch(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
  from astroquery.sdss import SDSS
  from astropy.coordinates import SkyCoord
