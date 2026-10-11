@@ -14,11 +14,11 @@ v2의 코드·문서·규칙표가 인용하는 논문, 카탈로그 출판물, 
 | [별 분류](#star) | 25 |
 | [은하 분류](#galaxy) | 23 |
 | [퀘이사·AGN](#qso) | 14 |
-| [전파·X선·밀집성](#radio) | 4 |
+| [전파·X선·밀집성](#radio) | 10 |
 | [행성상성운·초신성·과도 현상](#trans) | 6 |
 | [기타 문서](#doc) | 13 |
 | [분광 분류 기준](#spec) | 41 |
-| **합계** | **197** |
+| **합계** | **203** |
 
 <a id="gaia"></a>
 ## 측성·Gaia
@@ -228,6 +228,12 @@ AGN/퀘이사 선택, 전파 세기, 광도, 가려진 퀘이사, 고적색편�
 | Bates et al. 2014 (SPINN) | — | — | `Classifier/LITERATURE_MULTI_AXIS.md` | 신경망 펄서 후보 선택 |
 | Hui et al. 2020 | MNRAS 495, 1093 | — | `Classifier/LITERATURE_MULTI_AXIS.md` | Fermi 펄서형 천체 ML 선택 후 X선/광학/IR 대응체 분석 |
 | "Saz Parkinson et al.-style / later Fermi ML work" (저장소 표기 그대로) | — | — | `Classifier/LITERATURE_MULTI_AXIS.md` | 감마선 스펙트럼·변광 특징으로 펄서형과 AGN형 구분 |
+| Frail et al. 2016 | ApJ 829, 119 | — | `Classifier/axes/compact.py` (radio_pulsar_evidence)<br>`Classifier/LITERATURE_MULTI_AXIS.md §4.1`<br>`benchmark/build_pulsar_truth.py` | TGSS–NVSS 가파른 스펙트럼 펄서 후보 선택 |
+| Frail et al. 2018 | MNRAS 475, 942 | — | `Classifier/axes/compact.py` (PSR_ALPHA_MAX = −1.5, PSR_COMPACT_MAX = 1.5)<br>`Classifier/LITERATURE_MULTI_AXIS.md §4.1` | α ≤ −1.5, S_tot/S_peak ≤ 1.5 펄서 후보 기준 |
+| Han & Tian 1999 | A&AS 136, 571 | — | `Classifier/axes/compact.py` (PSR_POL_MIN = 0.05)<br>`Classifier/LITERATURE_MULTI_AXIS.md §4.1` | NVSS 편광률 > 5 %로 펄서와 외부은하 전파원 구분 |
+| Jankowski et al. 2018 | MNRAS 473, 4436 | — | `Classifier/LITERATURE_MULTI_AXIS.md §4.1`<br>`benchmark/build_pulsar_truth.py` | 펄서 평균 전파 스펙트럼 지수 −1.60 ± 0.54 |
+| Bates et al. 2013 | MNRAS 431, 1352 | — | `Classifier/LITERATURE_MULTI_AXIS.md §4.1`<br>`benchmark/build_pulsar_truth.py` | 펄서 스펙트럼 지수 분포 −1.4 ± 1.0 |
+| Intema et al. 2017 (TGSS ADR1) | A&A 598, A78 | — | `Get_data/tgss.py` (J/A+A/598/A78/table3)<br>`Preprocess/association_model.py` (TGSS ADR1) | 150 MHz 전파 카탈로그(25″ 빔) |
 
 <a id="trans"></a>
 ## 행성상성운·초신성·과도 현상

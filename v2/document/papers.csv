@@ -132,6 +132,12 @@ category,citation,journal_ref,bibcode,used_in,purpose
 전파·X선·밀집성,Bates et al. 2014 (SPINN),—,—,Classifier/LITERATURE_MULTI_AXIS.md,신경망 펄서 후보 선택
 전파·X선·밀집성,Hui et al. 2020,"MNRAS 495, 1093",—,Classifier/LITERATURE_MULTI_AXIS.md,Fermi 펄서형 천체 ML 선택 후 X선/광학/IR 대응체 분석
 전파·X선·밀집성,"""Saz Parkinson et al.-style / later Fermi ML work"" (저장소 표기 그대로)",—,—,Classifier/LITERATURE_MULTI_AXIS.md,감마선 스펙트럼·변광 특징으로 펄서형과 AGN형 구분
+전파·X선·밀집성,Frail et al. 2016,"ApJ 829, 119",—,Classifier/axes/compact.py (radio_pulsar_evidence); Classifier/LITERATURE_MULTI_AXIS.md §4.1; benchmark/build_pulsar_truth.py,TGSS–NVSS 가파른 스펙트럼 펄서 후보 선택
+전파·X선·밀집성,Frail et al. 2018,"MNRAS 475, 942",—,"Classifier/axes/compact.py (PSR_ALPHA_MAX = −1.5, PSR_COMPACT_MAX = 1.5); Classifier/LITERATURE_MULTI_AXIS.md §4.1","α ≤ −1.5, S_tot/S_peak ≤ 1.5 펄서 후보 기준"
+전파·X선·밀집성,Han & Tian 1999,"A&AS 136, 571",—,Classifier/axes/compact.py (PSR_POL_MIN = 0.05); Classifier/LITERATURE_MULTI_AXIS.md §4.1,NVSS 편광률 > 5 %로 펄서와 외부은하 전파원 구분
+전파·X선·밀집성,Jankowski et al. 2018,"MNRAS 473, 4436",—,Classifier/LITERATURE_MULTI_AXIS.md §4.1; benchmark/build_pulsar_truth.py,펄서 평균 전파 스펙트럼 지수 −1.60 ± 0.54
+전파·X선·밀집성,Bates et al. 2013,"MNRAS 431, 1352",—,Classifier/LITERATURE_MULTI_AXIS.md §4.1; benchmark/build_pulsar_truth.py,펄서 스펙트럼 지수 분포 −1.4 ± 1.0
+전파·X선·밀집성,Intema et al. 2017 (TGSS ADR1),"A&A 598, A78",—,Get_data/tgss.py (J/A+A/598/A78/table3); Preprocess/association_model.py (TGSS ADR1),150 MHz 전파 카탈로그(25″ 빔)
 행성상성운·초신성·과도 현상,Akras et al. 2019,"MNRAS 488, 3238",—,Classifier/LITERATURE_MULTI_AXIS.md,2MASS/WISE 색 진단과 분류 트리로 조밀 PN과 흉내 천체 구분
 행성상성운·초신성·과도 현상,Akyuz et al. 2024,"MNRAS 527, 1481",—,Classifier/LITERATURE_MULTI_AXIS.md,방출선 비·SMB/BPT 진단으로 PN 분광 확인
 행성상성운·초신성·과도 현상,Lochner et al. 2016,—,—,Classifier/LITERATURE_MULTI_AXIS.md,"광도곡선 특징 추출 + ML, 대표성 있는 학습 집합의 중요성"

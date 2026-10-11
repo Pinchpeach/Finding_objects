@@ -92,6 +92,38 @@ Implementation implication:
 Output NS/PULSAR as candidate likelihood unless pulsation or trusted catalogue
 identification gives direct evidence. Do not equate an X-ray source with an NS.
 
+### 4.1 Radio pulsar candidates without ATNF (2.6.3)
+
+Rule (`axes/compact.py: radio_pulsar_evidence`, label `PULSAR_CANDIDATE`):
+alpha(150 MHz → 1.4 GHz) ≤ −1.5 AND TGSS S_total/S_peak ≤ 1.5 AND NVSS
+fractional linear polarisation > 5 %.
+
+- Frail et al. (2016, ApJ 829, 119; 2018, MNRAS 475, 942): TGSS ADR1 – NVSS
+  spectral index alpha ≤ −1.5 with compactness S_int/S_peak ≤ 1.5 selects
+  pulsar candidates; known pulsars are recovered by this cut.
+- Han & Tian (1999, A&AS 136, 571): NVSS linear polarisation > ~5 % keeps most
+  pulsars and rejects most extragalactic sources (median ~2 %).
+- Jankowski et al. (2018, MNRAS 473, 4436): mean pulsar spectral index
+  −1.60 ± 0.54; Bates et al. (2013, MNRAS 431, 1352): −1.4 ± 1.0.
+- Intema et al. (2017, A&A 598, A78): TGSS ADR1, 150 MHz, 25″ beam.
+- Condon et al. (1998, AJ 115, 1693): NVSS 1.4 GHz with Stokes Q/U.
+
+Calibration (`benchmark/build_pulsar_truth.py`, `evaluate_pulsar.py`; every
+quantity measured around the NVSS position, ATNF only as label):
+
+| quantity | ATNF pulsars (152 in NVSS) | NVSS control (2,532) |
+|---|---|---|
+| median alpha(150–1400) | −1.67 | −0.73 |
+| median NVSS fractional pol. | 0.255 | 0.024 |
+| Gaia DR3 within 5″ | 52.6 % | 16.8 % |
+| rule hit | 48 (recall 0.316) | 3 (FPR 0.0012) |
+
+"No optical counterpart" was not used: pulsars in the Galactic plane have a
+chance Gaia neighbour within 5″ more often than the control sources. The rule
+needs a TGSS detection (99/152 pulsars), which limits recall; with a prior of
+~3,000 pulsars among ~1.8 M NVSS sources the expected purity over the whole
+sky is low, so the label is a candidate, not an identification.
+
 ## 5. Planetary nebulae (phenomenon/nebular axis)
 
 Recommended observables:
