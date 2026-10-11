@@ -111,7 +111,7 @@ def canonical_aliases(catalog: str, row: Mapping[str, Any], catalog_object_id: s
     if catalog=="DESI Legacy Surveys DR10":
         rel,bid,oid=(_int(row.get(low[k])) if k in low else None for k in ("release","brickid","objid"))
         if None not in (rel,bid,oid):add("LSID",f"{rel}_{bid}_{oid}")
-    if catalog=="DESI DR1 spectroscopy":
+    if catalog in ("DESI DR1 spectroscopy","DESI DR1 FastSpecFit"):
         tid=_int(catalog_object_id if catalog_object_id is not None else row.get(low.get("targetid","TargetID")))
         if tid is not None and tid>0 and not (tid>>58)&0x3:   # skip mock / sky targets
             add("LSID",f"{(tid>>42)&0xFFFF}_{(tid>>22)&0xFFFFF}_{tid&0x3FFFFF}")

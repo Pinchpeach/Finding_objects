@@ -285,3 +285,29 @@ def test_spectroscopic_star_parameters_and_emission_lines():
     assert sc.classify(lpv)["code"] == "STAR:M:AGB"
     assert sc.classify(dict(lpv, gaia_dr3__classlabel_espels="TTauri", gaia_dr3__classlabel_espels_flag=1))["code"] == "STAR:M:AGB"
     assert sc.agb_chemistry(dict(lpv, lamost_dr_catalog__lasp_teff=3900.0, lamost_dr_catalog__lasp_logg=4.6)) is None
+
+
+def test_desi_fastspecfit_lines():
+    import importlib.util, sys
+    import pandas as pd
+    get = Path(__file__).resolve().parents[2] / "Get_data"
+    sys.path.insert(0, str(get))
+    spec = importlib.util.spec_from_file_location("v2_desi_fastspec_t", get / "desi_fastspec.py")
+    m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+    raw = pd.DataFrame([{"halpha_flux": 100.0, "halpha_flux_ivar": 1.0, "hbeta_flux": 30.0, "hbeta_flux_ivar": 1.0,
+                         "oiii_5007_flux": 15.0, "oiii_5007_flux_ivar": 1.0, "nii_6584_flux": 30.0, "nii_6584_flux_ivar": 1.0,
+                         "halpha_ew": 20.0, "halpha_ew_ivar": 4.0},
+                        # H-alpha outside the DESI range (z > 0.49): zero flux and zero ivar must not read as "no emission"
+                        {"halpha_flux": 0.0, "halpha_flux_ivar": 0.0, "hbeta_flux": 30.0, "hbeta_flux_ivar": 1.0,
+                         "oiii_5007_flux": 15.0, "oiii_5007_flux_ivar": 1.0, "nii_6584_flux": 0.0, "nii_6584_flux_ivar": 0.0,
+                         "halpha_ew": 0.0, "halpha_ew_ivar": 0.0}])
+    s = m.standardise(raw)
+    sc = _sc()
+    P = "desi_dr1_fastspecfit__"
+    rows = [{P + k: v for k, v in r.items() if k.startswith("line_") and v == v} for r in s.to_dict("records")]
+    r0 = sc.galaxy_lines(rows[0])
+    assert r0[:2] == ("STAR_FORMING", "DESI_LINES_BPT")                         # x = -0.52, y = -0.30
+    assert sc.galaxy_lines(rows[1]) is None                                    # no H-alpha: no decision, not "retired"
+    # SDSS lines take precedence over DESI.
+    both = dict(rows[0], **{"sdss_dr18_spectroscopy__line_ha_ew": 1.0})
+    assert sc.galaxy_lines(both)[1] == "SDSS_WHAN"
