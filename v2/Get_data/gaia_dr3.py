@@ -135,6 +135,22 @@ def _vizier_fallback(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
     out["gaia_base_query_status"]="vizier_fallback";out["gaia_ap_query_status"]="fallback_partial";out["gaia_vari_classifier_query_status"]="vizier_fallback";out["gaia_vari_summary_query_status"]="fallback_unavailable"
     return out
 
+# GSP-Spec quality (Babusiaux et al. 2023): a parameter is usable when its
+# flags_gspspec characters are 0 (1-based positions).  The 41-character flag
+# string loses its leading zeros when VizieR serves it as a number and when a
+# CSV is read back, so the decision is made here, on the zero-padded string,
+# and stored as 0/1 columns.
+GSPSPEC_FLAG_POS={"teff":(1,4,8,13),"logg":(2,5,8,13),"mh":(3,6,8)}
+def _gspspec_quality(df:pd.DataFrame)->pd.DataFrame:
+    def pad(v):
+        s=str(v).strip().split(".")[0] if v is not None and str(v).strip() not in ("","nan","<NA>","None") else ""
+        return s.zfill(41) if s.isdigit() else None
+    flags=df["flags_gspspec"].map(pad) if "flags_gspspec" in df else pd.Series(None,index=df.index,dtype=object)
+    for par,pos in GSPSPEC_FLAG_POS.items():
+        df[f"gspspec_{par}_ok"]=flags.map(lambda f:int(all(f[i-1]=="0" for i in pos)) if isinstance(f,str) else pd.NA).astype("Int64")
+    if "flags_gspspec" in df:df["flags_gspspec"]=flags.map(lambda f:"F"+f if isinstance(f,str) else None)   # text, keeps the zeros
+    return df
+
 def fetch(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
     select=",".join(SOURCE)
     q=f"""SELECT {select} FROM gaiadr3.gaia_source WHERE 1=CONTAINS(POINT('ICRS',ra,dec),CIRCLE('ICRS',{float(ra)},{float(dec)},{float(radius_arcmin)/60.0}))"""
@@ -151,6 +167,7 @@ def fetch(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
     sid=pd.to_numeric(df["source_id"],errors="coerce").astype("Int64").astype("string")
     df.insert(1,"catalog_object_id",sid);df.insert(2,"object_name",df.get("designation",pd.Series("Gaia DR3 "+sid,index=df.index)).astype("string"))
     df["query_radius_arcmin"]=float(radius_arcmin);df["ref_epoch"]=2016.0;df["entity_kind"]="persistent_source";df["psf_fwhm_arcsec"]=0.18
+    df=_gspspec_quality(df)
     # Native RA/Dec errors are mas; Stage-1 performs the conversion.
     return df.drop_duplicates("catalog_object_id",keep="last").reset_index(drop=True)
 

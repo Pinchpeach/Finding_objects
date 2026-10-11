@@ -159,7 +159,7 @@ stored with their measurement in `subclass_json["tags"]`, listed in
 | red-clump giant | giant, 1.8 ≤ G−Ks ≤ 2.6, \|M_G − (0.495 + 1.121(G−Ks−2.1))\| ≤ 0.5 | Ruiz-Dern et al. 2018, A&A 609, A116 |
 | infrared excess (dust disc / shell) | W1−W2 > 0.25 and W2−W3 > 1.0 (W3 S/N ≥ 5) | lower bounds of the Koenig et al. 2012 class II locus; YSO, debris disc or AGB shell (background galaxies can mimic it) |
 | X-ray active star | Chandra / XMM / eROSITA counterpart | coronal activity: young stars, fast rotators, active binaries |
-| metal-poor candidate | GSP-Phot [M/H] < −1, G < 17 | Beers & Christlieb 2005. GSP-Phot [M/H] is only indicative (Andrae et al. 2023) |
+| metal-poor / very metal-poor | spectroscopic [Fe/H] < −1 / < −2 (LAMOST LASP, Gaia GSP-Spec). GSP-Phot [M/H] is no longer used (2.6.2): against APOGEE DR17 its [M/H] < −1 flag had precision 0.15, recall 0.14 | Beers & Christlieb 2005; validation `LITERATURE_SPECTROSCOPY.md` §2.2.1 |
 
 Physical checks (no truth labels exist for these):
 * SDSS stars: median GSP-Phot [M/H] falls from the thin disc (−0.52) to the
@@ -320,6 +320,7 @@ How the cascade is built:
 - **Field LPVs:**
   - The predicted C fraction is 25.7 %, against 24.4 % flagged by Gaia.
   - Above the RGB tip with a good parallax: 232 O-rich and 13 C-rich.
+- **Independent spectra (2.6.2):** 29 field LPVs have LAMOST C or M spectral types (1 carbon). The models got all 26 decided stars right, with predicted C 3.8 % vs true 3.4 %. That LAMOST-covered subsample is bright and away from the plane. The 25.7 % C fraction of the whole field sample comes from faint stars near the plane and is still not checked independently.
 - **Gaia `is_cstar` reliability:**
   - Good for the bright GCVS stars: 31 of 4,706 O-rich flagged.
   - Weaker on the fainter Suh stars: 519 of 4,442 O-rich flagged.

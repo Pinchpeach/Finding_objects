@@ -270,15 +270,18 @@ def test_spectroscopic_star_parameters_and_emission_lines():
     gs = dict(base, gaia_dr3__teff_gspspec=4700.0, gaia_dr3__logg_gspspec=2.6)
     assert sc.classify(dict(gs, gaia_dr3__flags_gspspec=good))["luminosity_rule"] == "GSPSPEC_LOGG"
     assert sc.classify(dict(gs, gaia_dr3__flags_gspspec=bad))["luminosity_rule"] == "GAIA_LOGG"
-    # ESP-ELS: young stars and WR stars get their own class; Be stars a tag.
-    assert sc.classify(dict(base, gaia_dr3__classlabel_espels="TTauri", gaia_dr3__classlabel_espels_flag=1))["code"] == "STAR:YSO"
-    assert sc.classify(dict(base, gaia_dr3__classlabel_espels="wN", gaia_dr3__classlabel_espels_flag=0))["code"] == "STAR:WR"
-    assert sc.classify(dict(base, gaia_dr3__classlabel_espels="TTauri", gaia_dr3__classlabel_espels_flag=4))["code"] != "STAR:YSO"
-    be = {t["tag"] for t in sc.star_tags(dict(base, gaia_dr3__classlabel_espels="beStar", gaia_dr3__classlabel_espels_flag=2))}
-    assert "EMISSION_LINE" in be
-    # A YSO or a spectroscopic dwarf in the AGB gate is not an AGB star.
+    # ESP-ELS (2.6.2): only the emission is used; the class label (T Tauri
+    # matched SIMBAD young stars for 2 %) does not change the classification.
+    tt = dict(base, gaia_dr3__classlabel_espels="TTauri", gaia_dr3__classlabel_espels_flag=1)
+    assert sc.classify(tt)["code"] == sc.classify(base)["code"]
+    assert "EMISSION_LINE" in {t["tag"] for t in sc.star_tags(tt)}
+    # GSP-Spec flags that lost their leading zeros (VizieR / CSV) are restored.
+    stripped = str(int("0" * 12 + "1" + "0" * 28))                      # flag 13 set; leading zeros lost
+    assert sc._gspspec_ok(stripped, "mh") and not sc._gspspec_ok(stripped, "logg")
+    assert sc._gspspec_ok(None, "logg", {"gaia_dr3__gspspec_logg_ok": 1})
+    # A spectroscopic dwarf in the AGB gate is not an AGB star.
     lpv = {"primary_class": "STAR", "variability_class": "LPV", "gaia_dr3__phot_bp_mean_mag": 10.0, "gaia_dr3__phot_rp_mean_mag": 8.0,
            "2mass_psc__Jmag": 7.0, "2mass_psc__Kmag": 5.8, "allwise__W3mag": 4.2, "gaia_lpv_is_cstar": 0}
     assert sc.classify(lpv)["code"] == "STAR:M:AGB"
-    assert sc.agb_chemistry(dict(lpv, gaia_dr3__classlabel_espels="TTauri", gaia_dr3__classlabel_espels_flag=1)) is None
+    assert sc.classify(dict(lpv, gaia_dr3__classlabel_espels="TTauri", gaia_dr3__classlabel_espels_flag=1))["code"] == "STAR:M:AGB"
     assert sc.agb_chemistry(dict(lpv, lamost_dr_catalog__lasp_teff=3900.0, lamost_dr_catalog__lasp_logg=4.6)) is None

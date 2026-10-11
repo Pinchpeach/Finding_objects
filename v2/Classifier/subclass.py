@@ -295,9 +295,19 @@ def cmd_position(row):
 GSPSPEC_FLAG_POS = {"teff": (1, 4, 8, 13), "logg": (2, 5, 8, 13), "mh": (3, 6, 8)}
 
 
-def _gspspec_ok(flags, par):
-    f = str(flags or "")
-    return len(f) >= max(GSPSPEC_FLAG_POS[par]) and all(f[i - 1] == "0" for i in GSPSPEC_FLAG_POS[par])
+def _gspspec_ok(flags, par, row=None):
+    """GSP-Spec parameter usable?  The collector stores the decision
+    (gspspec_<par>_ok, from the zero-padded flags); otherwise the flags string
+    is read here, restoring the leading zeros a numeric round trip removes."""
+    if row is not None:
+        ok = _num(row, f"gaia_dr3__gspspec_{par}_ok", f"gspspec_{par}_ok")
+        if ok is not None:
+            return ok == 1
+    f = str(flags or "").strip().lstrip("F").split(".")[0]
+    if not f.isdigit():
+        return False
+    f = f.zfill(41)
+    return all(f[i - 1] == "0" for i in GSPSPEC_FLAG_POS[par])
 
 
 def spectro_params(row):
@@ -307,16 +317,17 @@ def spectro_params(row):
         return {"teff": teff, "logg": logg, "feh": feh, "source": "LAMOST"}
     flags = _text(row, "gaia_dr3__flags_gspspec", "flags_gspspec")
     teff, logg, mh = (_num(row, f"gaia_dr3__{k}_gspspec", f"{k}_gspspec") for k in ("teff", "logg", "mh"))
-    if teff is not None and logg is not None and _gspspec_ok(flags, "teff") and _gspspec_ok(flags, "logg"):
-        return {"teff": teff, "logg": logg, "feh": mh if _gspspec_ok(flags, "mh") else None, "source": "GSPSPEC"}
+    if teff is not None and logg is not None and _gspspec_ok(flags, "teff", row) and _gspspec_ok(flags, "logg", row):
+        return {"teff": teff, "logg": logg, "feh": mh if _gspspec_ok(flags, "mh", row) else None, "source": "GSPSPEC"}
     return None
 
 
 # Gaia DR3 ESP-ELS emission-line classes from BP/RP spectra (Creevey et al.
-# 2023; DR3 documentation 11.3.7).  classlabel_espels_flag <= 2 means a class
-# probability > 0.5.  57 511 stars; 96 % of known classical Be stars are
-# classed Be, 229 of 443 known WR stars found with one misassignment; weak
-# H-alpha emitters are missed and PNe are the least reliable class.
+# 2023; DR3 documentation 11.3.7).  Checked against SIMBAD on 4000 ESP-ELS
+# stars (2.6.2, benchmark/evaluate_bright.py): "TTauri" matched a young-star
+# type for 2 % (most are long-period variables), "HerbigStar" 30 %, "beStar"
+# 27 %, while 40-80 % are emission-line stars of some kind.  Only the
+# emission itself is used (tag); the class label decides nothing.
 ESP_ELS = {"bestar": ("BE", "Be star (emission-line B star)"), "herbigstar": ("YSO", "Herbig Ae/Be star (young stellar object)"),
            "ttauri": ("YSO", "T Tauri star (young stellar object)"), "reddwarfemstar": ("DME", "active M dwarf (dMe)"),
            "wc": ("WR", "Wolf-Rayet star (WC)"), "wn": ("WR", "Wolf-Rayet star (WN)"),
@@ -440,17 +451,13 @@ def star_tags(row):
         tags.append({"tag": "VERY_METAL_POOR" if very else "METAL_POOR",
                      "label": "very metal-poor star" if very else "metal-poor star", "rule": f"{sp['source']}_FEH",
                      "basis": f"spectroscopic [Fe/H] = {sp['feh']:.2f} ({sp['source']}; Beers & Christlieb 2005)"})
-    mh = _num(row, "gaia_dr3__mh_gspphot", "mh_gspphot")
-    if sp is not None and sp["feh"] is not None:
-        mh = None                      # the spectrum decides; GSP-Phot [M/H] agrees for 91 of its 156 metal-poor flags
-    if mh is not None and gmag is not None and gmag < 17 and mh < -1.0:
-        # [M/H] < -1 "metal-poor" (Beers & Christlieb 2005).  GSP-Phot [M/H]
-        # is only indicative (Andrae et al. 2023), hence "candidate".
-        tags.append({"tag": "METAL_POOR", "label": "metal-poor star candidate", "rule": "GAIA_GSPPHOT_MH",
-                     "basis": f"GSP-Phot [M/H] = {mh:.2f} < -1 (G = {gmag:.1f})"})
+    # GSP-Phot [M/H] is not used for the metal-poor tag (2.6.2): against
+    # APOGEE DR17 its [M/H] < -1 flag has precision 0.15 / recall 0.14
+    # (0-0.25 at any cut), against GSP-Spec 0.78 / 0.89 and LAMOST 0.98 / 0.88.
     els = emission_line_class(row)
-    if els is not None and els[0] in ("BE", "DME"):
-        tags.append({"tag": "EMISSION_LINE", "label": els[1], "rule": "GAIA_ESP_ELS", "basis": els[2]})
+    if els is not None:
+        tags.append({"tag": "EMISSION_LINE", "label": "H-alpha emission-line star", "rule": "GAIA_ESP_ELS",
+                     "basis": f"{els[2]}; class label not used (SIMBAD agreement 2-30 %)"})
     var = str(row.get("variability_class") or "")
     if var and var not in ("UNKNOWN", "nan", "None"):
         sub = row.get("variability_subtype")
@@ -631,9 +638,6 @@ def agb_chemistry(row):
         if sub.startswith(("CAGB", "OAGB")):
             out = {"chem": sub[0], "rule": "SUH2021", "basis": f"Suh (2021) catalogue {sub}"}
     gate = agb_candidate(row)
-    els = emission_line_class(row)
-    if els is not None and els[0] == "YSO":
-        return None                  # young stars mimic dusty AGB stars in Ks - W3
     if out is None and gate:
         ph = agb_photometric(row)
         if ph is not None:
@@ -693,9 +697,6 @@ def classify_star(row):
             return _result("Cataclysmic variable", "STAR:CV", None, f"{src}_SUBCLASS", f"{src} spectrum subclass {label}")
         if u.startswith(("WD", "DA", "DB", "DC", "DQ", "DZ", "DO")):
             return _result(f"White dwarf ({label})", "STAR:WD", None, f"{src}_SUBCLASS", f"{src} spectrum subclass {label}")
-    els = emission_line_class(row)
-    if els is not None and els[0] in ("YSO", "WR", "PN"):
-        return _result(els[1], f"STAR:{els[0]}", None, "GAIA_ESP_ELS", els[2])
     if phys == "WD":
         sub = row.get("physical_subtype")
         return _result("White dwarf" + (f" ({sub})" if isinstance(sub, str) and sub else ""), "STAR:WD",

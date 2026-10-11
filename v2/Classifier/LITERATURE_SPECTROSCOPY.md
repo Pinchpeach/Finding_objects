@@ -47,7 +47,30 @@ Spectroscopic log g separates dwarfs, subgiants and giants without a parallax.
   - The DR3 validation paper advises against GSP-Spec log g for AGB stars (Babusiaux et al. 2023, A&A 674, A32).
 - **Metallicity:** [Fe/H] < −1 metal-poor, < −2 very metal-poor, < −3 extremely metal-poor (Beers & Christlieb 2005, ARA&A 43, 531). The pipeline uses GSP-Phot [M/H] only as a candidate flag, because Andrae et al. 2023 report biases; a spectroscopic [Fe/H] is direct.
 
-### 2.2.1 Validation (2.6.0)
+### 2.2.1 Validation on bright stars (2.6.2, APOGEE DR17)
+
+Data: 8,196 APOGEE DR17 stars (S/N > 100, 24 RA slices).
+
+- **Truth:** the luminosity class comes from APOGEE log g, using the Ciardi boundary.
+- **Luminosity-class rules:**
+
+  | Rule | n | Accuracy | Giant recall | Giant precision |
+  |---|---|---|---|---|
+  | Gaia GSP-Spec (flags 0) | 3,078 | 97.8 % | 98.5 % | 97.9 % |
+  | LAMOST LASP | 1,880 | 98.3 % | 97.5 % | 99.2 % |
+  | Gaia GSP-Phot | 5,331 | 96.9 % | 96.1 % | 98.4 % |
+
+- **Metal-poor ([Fe/H] < −1):**
+
+  | Source | Precision | Recall | Note |
+  |---|---|---|---|
+  | GSP-Spec | 0.78 | 0.89 | 32 flagged |
+  | LAMOST | 0.98 | 0.88 | |
+  | GSP-Phot | 0.15 | 0.14 | 0.0–0.25 at any cut, so no longer used |
+
+- **GSP-Spec flags:** VizieR serves the 41-character `flags_gspspec` as a number, which drops leading zeros. A CSV round trip does the same. The collector therefore stores the per-parameter decision (`gspspec_<par>_ok`).
+
+### 2.2.2 Validation on faint benchmark stars (2.6.0)
 
 Data: 388 benchmark stars with LAMOST LASP parameters.
 
@@ -87,7 +110,16 @@ Data: 388 benchmark stars with LAMOST LASP parameters.
   - 229 of 443 known Wolf-Rayet stars were found, with 1 misassignment.
   - PNe are the hardest class.
   - Weak Hα emitters are missed.
-- **Use in the pipeline:** an emission-line class tags a star. Young-star classes (T Tauri, Herbig Ae/Be) also veto the AGB label, because YSOs mimic dusty AGB stars in Ks − W3.
+- **Validation (2.6.2, `benchmark/evaluate_bright.py`):** 4,000 ESP-ELS stars were compared with SIMBAD types. The query returned 1,500 Be, 1,500 T Tauri and 1,000 Herbig; no other labels.
+
+  | ESP-ELS label | SIMBAD class match | Notes |
+  |---|---|---|
+  | TTauri | 2 % | Most are long-period variables (LP?/LP*) |
+  | HerbigStar | 30 % | |
+  | beStar | 27 % | 541 of 1,111 are generic emission-line stars (Em*) |
+
+  Requiring flag ≤ 2 does not help (9–44 %).
+- **Use in the pipeline (2.6.2):** only the emission itself is used, as the tag "H-alpha emission-line star". The class label changes nothing, and it no longer vetoes the AGB label: T Tauri-labelled stars are mostly AGB-type variables.
 
 ### 2.5 White dwarfs and cataclysmic variables
 
