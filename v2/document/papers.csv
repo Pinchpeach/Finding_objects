@@ -192,3 +192,5 @@ category,citation,journal_ref,bibcode,used_in,purpose
 분광 분류 기준,Guy et al. 2023 (DESI spectroscopic pipeline),"AJ 165, 144",—,Classifier/LITERATURE_SPECTROSCOPY.md,DESI 분광 처리·분류
 분광 분류 기준,Gaia DR3 documentation §11.3.7 (ESP-ELS),—,—,Classifier/LITERATURE_SPECTROSCOPY.md; Get_data/gaia_dr3.py (SPEC_AP); Classifier/subclass.py (ESP_ELS),"방출선 별 7종(Be, Herbig Ae/Be, T Tauri, dMe, WC, WN, PN), flag ≤ 2 = 확률 > 0.5"
 분광 분류 기준,Babusiaux et al. 2023 (Gaia DR3 catalogue validation),"A&A 674, A32",—,Classifier/LITERATURE_SPECTROSCOPY.md; Classifier/subclass.py (GSPSPEC_FLAG_POS),"GSP-Spec 품질 플래그 위치(Teff 1/4/8/13, log g 2/5/8/13, [M/H] 3/6/8); AGB 별에 GSP-Spec log g를 쓰지 말 것"
+분광 분류 기준,Stasińska et al. 2006,"MNRAS 371, 972",—,Classifier/LITERATURE_SPECTROSCOPY.md; Classifier/subclass.py (galaxy_lines),"[N II]/Hα 단독: < −0.4 별생성, −0.4~−0.2 복합, > −0.2 AGN (Hβ·[O III]가 약할 때)"
+분광 분류 기준,Thomas et al. 2013 (Portsmouth emission-line fits),"MNRAS 431, 1383",—,Classifier/LITERATURE_SPECTROSCOPY.md; Get_data/sdss_spectroscopy.py (emissionLinesPort); benchmark/build_spectro_truth.py,SDSS-I/II·BOSS 은하 방출선 플럭스·EW(벤치마크 은하 100 %)
