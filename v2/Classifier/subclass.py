@@ -498,6 +498,13 @@ AGB_DUST_KW3 = 1.0
 # Li et al. 2024, ApJS 271, 12, LAMOST DR7 carbon stars; Green 2013).
 AGB_MAX_MKS = -1.0
 DC_MIN_MG = 5.0
+# RGB tip: M_Ks = -6.2 (2MASS LMC tip Ks = 12.3 at m - M = 18.5; Nikolaev &
+# Weinberg 2000).  Between the clump and the tip an LPV can be a red giant
+# (RGB) or an early-AGB star, which photometry cannot separate: 340 of the
+# Gaia DR3 LPVs with good parallaxes in random cones lie there
+# (benchmark/evaluate_agb_contamination.py).  They are named "red giant
+# (RGB or early AGB)" with luminosity class III instead of AGB.
+RGB_TIP_MKS = -6.2
 A_KS_PER_A_G = 0.137      # A_K/A_V = 0.114 (Cardelli et al. 1989), A_G/A_V = 0.83
 AGB_VARIABILITY = {"LPV", "MIRA"}
 SIMBAD_AGB = {"AGB*", "C*", "S*", "Mi*", "LP*", "OH*", "pA*"}
@@ -645,6 +652,9 @@ def agb_chemistry(row):
         if out["dwarf"]:
             out["not_agb"] += f"; M_G = {mg:.2f} > {DC_MIN_MG} (dwarf)"
         out["basis"] = f"{out['basis']}; {out['not_agb']}"
+    elif mk is not None and mk > RGB_TIP_MKS:
+        out["below_tip"] = True
+        out["basis"] = f"{out['basis']}; M_Ks = {mk:.2f} below the RGB tip ({RGB_TIP_MKS}): RGB or early AGB"
     k = _num(row, "2mass_psc__Kmag", "allwise__Kmag")
     w3 = _wise_vega(row, 3)
     out["dusty"] = k is not None and w3 is not None and k - w3 > AGB_DUST_KW3
@@ -689,6 +699,10 @@ def classify_star(row):
         elif agb.get("not_agb") or (agb["chem"] in ("C", "S") and not agb.get("agb_candidate") and spectral):
             name = name.split(" (")[0]                     # carbon dwarfs / CH stars are not AGB stars
             code = code.replace(":AGB", ":?")
+        elif agb.get("below_tip"):
+            name = {"C": "Carbon giant", "O": "O-rich red giant", "S": "S-type giant", None: "Red giant"}[agb["chem"]]
+            name += " (RGB or early AGB)"
+            code = code.replace(":AGB", ":III")
         conf = agb.get("confidence", RULE_PRECISION.get(agb["rule"]))
         return _result(name, code, conf, agb["rule"], agb["basis"], agb_chemistry=agb["chem"])
     num, lum, rule, basis = star_spectral_type(row)
