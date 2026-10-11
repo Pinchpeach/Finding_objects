@@ -1,7 +1,7 @@
-name: v2 DESI FastSpecFit probe
+name: v2 catalogue probe
 
-# Finds where the DESI DR1 FastSpecFit emission-line VAC can be cone-searched
-# (2.7.0): NOIRLab Data Lab TAP schema desi_dr1, else VizieR.
+# Inspects archive tables before a collector is written (2.7.0 DESI lines,
+# 2.8.0 ZTF periodic variables).
 on:
   workflow_dispatch:
   push:
@@ -21,34 +21,36 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install pandas astropy astroquery pyvo
-      - name: DESI DR1 line VAC columns (Data Lab)
+      - name: ZTF periodic variables (Chen et al. 2020) on VizieR
         continue-on-error: true
         run: |
           python - <<'PY'
-          import pyvo
-          s = pyvo.dal.TAPService("https://datalab.noirlab.edu/tap")
-          for n in ("desi_dr1.emfit", "desi_dr1.stellar_mass_emline", "desi_dr1.agngal"):
-              t = s.search(f"SELECT description FROM tap_schema.tables WHERE table_name = '{n}'").to_table()
-              print("==", n, "|", t[0]["description"] if len(t) else "")
-              c = s.search(f"SELECT column_name, unit, description FROM tap_schema.columns WHERE table_name = '{n}'").to_table()
-              print(len(c), "columns")
-              for r in c: print("  ", r["column_name"], "|", r["unit"], "|", str(r["description"])[:110])
+          from astroquery.vizier import Vizier
+          from astropy.coordinates import SkyCoord
+          import astropy.units as u
+          cats = Vizier.find_catalogs("J/ApJS/249/18")
+          for k, v in cats.items(): print(k, "|", v.description)
+          t = Vizier(columns=["**"], row_limit=5).get_catalogs("J/ApJS/249/18")
+          for tab in t:
+              print("==", tab.meta.get("name"), len(tab))
+              for c in tab.colnames: print("  ", c, "|", tab[c].unit, "|", tab[c].description)
+              print(tab[:3])
+          # RR Lyrae itself (bright, may saturate) and a field cone
+          for name, (ra, dec) in {"RR Lyr": (291.3660, 42.7844), "field": (150.1, 2.2)}.items():
+              r = Vizier(columns=["**"], row_limit=-1).query_region(SkyCoord(ra*u.deg, dec*u.deg), radius=10*u.arcmin, catalog="J/ApJS/249/18")
+              print(name, [len(x) for x in r])
+              for x in r: print(x[:5])
+          import collections
+          tt = Vizier(columns=["Type"], row_limit=200000).get_catalogs("J/ApJS/249/18")
+          for x in tt:
+              if "Type" in x.colnames: print(collections.Counter(map(str, x["Type"])).most_common(20))
           PY
-      - name: Cone query forms and timing
+      - name: Other ZTF variability catalogues on VizieR
         continue-on-error: true
         run: |
           python - <<'PY'
-          import time, pyvo
-          s = pyvo.dal.TAPService("https://datalab.noirlab.edu/tap")
-          for n in ("desi_dr1.emfit", "desi_dr1.stellar_mass_emline", "desi_dr1.agngal"):
-              for where in ("'t' = q3c_radial_query(ra, dec, 150.1, 2.2, 0.05)",
-                            "1 = CONTAINS(POINT('ICRS', ra, dec), CIRCLE('ICRS', 150.1, 2.2, 0.05))",
-                            "'t' = q3c_radial_query(target_ra, target_dec, 150.1, 2.2, 0.05)"):
-                  t0 = time.time()
-                  try:
-                      r = s.search(f"SELECT TOP 5 * FROM {n} WHERE {where}").to_table()
-                      print(n, "|", where[:40], "| rows", len(r), "%.1fs" % (time.time() - t0))
-                      if len(r): print(r[:2]); break
-                  except Exception as e:
-                      print(n, "|", where[:40], "| failed", str(e)[:200])
+          from astroquery.vizier import Vizier
+          for kw in ("ZTF periodic variable", "ZTF variable stars", "ZTF light curve classification"):
+              c = Vizier.find_catalogs(kw)
+              print(kw, "->", [(k, (v.description or "")[:90]) for k, v in c.items()][:12])
           PY
