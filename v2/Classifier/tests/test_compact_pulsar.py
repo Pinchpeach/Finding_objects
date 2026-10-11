@@ -37,3 +37,18 @@ def test_radio_collectors_convert_sexagesimal_positions():
         df["_RAJ2000"], df["_DEJ2000"] = [8.5363], [-7.3648]
         ra, dec = m._degrees(df)
         assert ra.iloc[0] == 8.5363 and dec.iloc[0] == -7.3648
+
+
+def test_ztf_periodic_variable_types():
+    spec = importlib.util.spec_from_file_location("v2_var_t", ROOT / "axes" / "variability.py")
+    v = importlib.util.module_from_spec(spec); spec.loader.exec_module(v)
+    Z = "ztf_periodic_variables__"
+    r = v.classify({Z + "Type": "Mira", Z + "Per": 320.0, Z + "rAmp": 3.1})
+    assert (r["label"], r["status"]) == ("MIRA", "ZTF_PERIODIC_VARIABLE")
+    assert v.classify({Z + "Type": "Mira", "gaia_lpv_is_cstar": 1})["subtype"] == "C_STAR_CANDIDATE"
+    assert v.classify({Z + "Type": "RRc"})["subtype"] == "RRC"
+    assert v.classify({Z + "Type": "EW"})["label"] == "ECLIPSING"
+    # Gaia SOS RR Lyrae fit keeps precedence over ZTF.
+    assert v.classify({Z + "Type": "EW", "gaia_rrlyrae_best_classification": "RRab"})["label"] == "RR_LYRAE"
+    # ZTF before the broad Gaia classifier.
+    assert v.classify({Z + "Type": "SR", "best_class_name": "ECL"})["label"] == "LPV"

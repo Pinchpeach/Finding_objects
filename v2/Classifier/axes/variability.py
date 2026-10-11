@@ -9,6 +9,14 @@ import math
 AXIS="variability";CLASSES=("RR_LYRAE","CEPHEID","MIRA","LPV","ECLIPSING","ROTATIONAL","ERUPTIVE","PULSATING","OTHER_VARIABLE","UNKNOWN")
 SIMBAD_MAP={"RR*":"RR_LYRAE","Ce*":"CEPHEID","Mi*":"MIRA","LP*":"LPV","EB*":"ECLIPSING","Ro*":"ROTATIONAL","Er*":"ERUPTIVE","Pu*":"PULSATING"}
 GAIA_MAP={"RR":"RR_LYRAE","CEP":"CEPHEID","LPV":"LPV","ECL":"ECLIPSING","ELL":"ECLIPSING","SOLAR_LIKE":"ROTATIONAL","ACV|CP|MCP|ROAM|ROAP|SXARI":"ROTATIONAL","CV":"ERUPTIVE","RCB":"ERUPTIVE","BCEP":"PULSATING","DSCT|GDOR|SXPHE":"PULSATING","SPB":"PULSATING","ACYG":"PULSATING","SDB":"PULSATING","RS":"OTHER_VARIABLE","S":"OTHER_VARIABLE","SYST":"OTHER_VARIABLE","YSO":"OTHER_VARIABLE","BE|GCAS|SDOR|WR":"OTHER_VARIABLE"}
+# ZTF periodic variables (Chen et al. 2020, ApJS 249, 18): types from period,
+# g/r amplitude and light-curve shape (Fourier R21 / phi21); Mira and SR are
+# separated by amplitude among the long-period stars.  This is the only
+# catalogue here with a Mira leaf (Gaia DR3 LPV SOS has none).
+ZTF_MAP={"RR":("RR_LYRAE","RRAB"),"RRC":("RR_LYRAE","RRC"),"CEP":("CEPHEID","DCEP"),"CEPII":("CEPHEID","T2CEP"),
+ "MIRA":("MIRA",None),"SR":("LPV","SR"),"EW":("ECLIPSING","EW"),"EA":("ECLIPSING","EA"),
+ "BYDRA":("ROTATIONAL","BY_DRA"),"RSCVN":("ROTATIONAL","RS_CVN"),"DSCT":("PULSATING","DSCT")}
+ZTF="ztf_periodic_variables__"
 EVENT_CLASSES={"SN","MICROLENSING"};NON_STELLAR={"AGN","GALAXY"};OTHER_SPECIAL={"EP","WD"}
 def _text(row,key):
  v=row.get(key)
@@ -42,6 +50,14 @@ def classify(row):
  if cep in {"DCEP","ACEP","T2CEP"}:
   subtype="_".join(x for x in (cep,csub or cmode) if x) or None
   return _result("CEPHEID",None,"GAIA_DR3_SOS_CEPHEID",[{"kind":"gaia_dr3_vari_cepheid","best_classification":cep,"subclassification":csub or None,"mode_classification":cmode or None,"period_fundamental_days":_num(row,"gaia_cepheid_pf"),"period_first_overtone_days":_num(row,"gaia_cepheid_p1_o"),"peak_to_peak_g_mag":_num(row,"gaia_cepheid_peak_to_peak_g")}],subtype)
+ # ZTF periodic-variable type (after the Gaia SOS RR Lyrae / Cepheid fits,
+ # which use dedicated multi-band models; before the broad Gaia classifier).
+ zt=_clean(_text(row,ZTF+"Type"))
+ if zt in ZTF_MAP:
+  label,sub=ZTF_MAP[zt]
+  if label=="MIRA" and _flag(row,"gaia_lpv_is_cstar"):sub="C_STAR_CANDIDATE"
+  ev=[{"kind":"ztf_periodic_variable","type":_text(row,ZTF+"Type"),"period_days":_num(row,ZTF+"Per"),"amplitude_r_mag":_num(row,ZTF+"rAmp"),"amplitude_g_mag":_num(row,ZTF+"gAmp"),"ztf_id":_text(row,ZTF+"catalog_object_id")}]
+  return _result(label,None,"ZTF_PERIODIC_VARIABLE",ev,sub)
  # LPV SOS has a published C-star-candidate flag.  It does not publish a
  # validated Mira leaf, so no period/amplitude threshold is used to make one.
  if _flag(row,"gaia_lpv_is_cstar"):
