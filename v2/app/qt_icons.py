@@ -26,7 +26,8 @@ from PySide6.QtGui import QBrush, QColor, QIcon, QPainter, QPainterPath, QPen, Q
 # blackbody colours at the dwarf-scale Teff of each class).
 STAR_COLORS = {"O": "#9bb0ff", "B": "#aabfff", "A": "#cad7ff", "F": "#f8f7ff", "G": "#fff4ea",
                "K": "#ffd2a1", "M": "#ffb46c", "L": "#ff8a4c", "T": "#e0603a", "Y": "#b04020",
-               "C": "#b3261e", "S": "#c45a2a"}          # carbon and S-type (AGB) stars
+               "C": "#b3261e", "S": "#c45a2a",          # carbon and S-type (AGB) stars
+               "YSO": "#f0a830", "WR": "#6a5acd", "PN": "#2e9e6a"}   # Gaia ESP-ELS emission-line classes
 GIANT_LUM = ("III", "II", "Ib", "Ia", "AGB")
 OUTLINE = QColor("#3b3f45")
 GAL_EARLY, GAL_DISK, GAL_AGN, GAL_UNK, GAL_GV = "#e8a85a", "#4f8fdc", "#d64f9a", "#8fa3c8", "#4caf50"
@@ -102,7 +103,7 @@ def draw(p: QPainter, k: dict, c: QPointF, size: float = 9.0, selected: bool = F
         act, prof = k.get("activity"), k.get("profile")
         disk = act in ("STAR_FORMING", "STARBURST") or prof in ("DISK", "LATE_TYPE")
         early = act == "QUIESCENT" or prof == "EARLY_TYPE"
-        col = QColor(GAL_AGN if act == "AGN" else GAL_GV if act == "GREEN_VALLEY" else GAL_DISK if disk
+        col = QColor(GAL_AGN if act in ("AGN", "COMPOSITE") else GAL_GV if act == "GREEN_VALLEY" else GAL_DISK if disk
                      else GAL_EARLY if early else GAL_UNK)
         p.translate(c); p.rotate(-30)
         sz = size * (0.7 if k.get("dwarf") else 1.0)

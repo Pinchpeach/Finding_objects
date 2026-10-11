@@ -1,0 +1,92 @@
+{
+ "galaxies": {
+  "n": 3333,
+  "coverage": 0.9859,
+  "rules": {
+   "SDSS_WHAN": 2325,
+   "SDSS_LINES_BPT": 961
+  },
+  "vs_sdss_subclass": {
+   "AGN": {
+    "AGN": 51,
+    "COMPOSITE": 9,
+    "QUIESCENT": 10,
+    "STAR_FORMING": 0,
+    "none": 2
+   },
+   "STAR_FORMING": {
+    "AGN": 19,
+    "COMPOSITE": 217,
+    "QUIESCENT": 12,
+    "STAR_FORMING": 812,
+    "none": 6
+   }
+  },
+  "bpt_rule_agrees_with_portsmouth_bpt": 0.9511,
+  "no_subclass": {
+   "n": 2128,
+   "labelled": 2089,
+   "by_label": {
+    "AGN": {
+     "n": 80,
+     "w23_median": 2.56,
+     "w23_gt3": 0.2,
+     "w23_lt1.5": 0.013
+    },
+    "COMPOSITE": {
+     "n": 213,
+     "w23_median": 3.04,
+     "w23_gt3": 0.526,
+     "w23_lt1.5": 0.0
+    },
+    "QUIESCENT": {
+     "n": 1667,
+     "w23_median": 1.92,
+     "w23_gt3": 0.023,
+     "w23_lt1.5": 0.218
+    },
+    "STAR_FORMING": {
+     "n": 129,
+     "w23_median": 3.41,
+     "w23_gt3": 0.814,
+     "w23_lt1.5": 0.0
+    },
+    "none": {
+     "n": 39,
+     "w23_median": 2.22,
+     "w23_gt3": 0.128,
+     "w23_lt1.5": 0.026
+    }
+   }
+  }
+ },
+ "stars": {
+  "n_lamost": 388,
+  "lamost_vs_cmd": {
+   "III": {
+    "III": 2,
+    "V": 1
+   },
+   "IV": {
+    "III": 2,
+    "V": 6
+   },
+   "V": {
+    "III": 2,
+    "V": 219
+   },
+   "VI": {
+    "III": 0,
+    "V": 4
+   }
+  },
+  "cmd_dwarfs_lamost_dwarf": "219/221",
+  "lamost_giants_found_by_gspphot_logg": "1/22",
+  "luminosity_class_without_parallax": 152,
+  "metal_poor": {
+   "lamost_feh_lt_-1": 104,
+   "gspphot_mh_lt_-1": 156,
+   "both": 91
+  }
+ }
+}

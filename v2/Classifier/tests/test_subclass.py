@@ -34,7 +34,10 @@ def test_star_type_and_luminosity_from_gaia():
 def test_spectroscopic_labels_outrank_photometry():
     sc = _sc()
     assert sc.classify({"primary_class": "STAR", "simbad__sp_type": "K2III", "gaia_dr3__bp_rp": 0.5})["code"] == "STAR:K:III"
-    assert sc.classify({"primary_class": "STAR", "sdss_dr18_spectroscopy__subclass": "CarbonWD"})["code"] == "STAR:C"
+    # SDSS "CarbonWD" is the DQ white-dwarf template, "Carbon" a carbon star.
+    assert sc.classify({"primary_class": "STAR", "sdss_dr18_spectroscopy__subclass": "CarbonWD"})["code"] == "STAR:WD"
+    r = sc.classify({"primary_class": "STAR", "sdss_dr18_spectroscopy__subclass": "Carbon"})
+    assert r["code"] == "STAR:C:?" and r["rule"] == "SDSS_CSTAR"
     assert sc.classify({"primary_class": "STAR", "physical_class": "WD", "gaia_dr3__bp_rp": 0.0})["code"] == "STAR:WD"
 
 
@@ -202,6 +205,76 @@ def test_agb_chemistry_rules():
     assert sc.classify(dict(base, simbad__sp_type="S4/3"))["code"] == "STAR:S:AGB"
     # A carbon dwarf / CH star from SIMBAD without AGB evidence is not called AGB.
     assert sc.classify({"primary_class": "STAR", "simbad__sp_type": "C-H4"})["code"] == "STAR:C:?"
+    # Luminosity veto: with a good parallax, fainter than the red clump is not AGB.
+    near = {"gaia_dr3__parallax": 2.0, "gaia_dr3__parallax_error": 0.05, "gaia_dr3__ruwe": 1.0}   # DM = 8.49
+    assert sc.classify(dict(c, **near))["code"] == "STAR:C:AGB"             # M_Ks = 5.5 - 8.49 = -2.99
+    assert sc.agb_chemistry(dict(c, **near, **{"2mass_psc__Kmag": 8.0, "2mass_psc__Jmag": 9.0})) is None   # M_Ks = -0.49
+    dwarf = dict(base, **near, simbad__otype="C*", **{"2mass_psc__Kmag": 10.0, "gaia_dr3__phot_g_mean_mag": 14.0})
+    r = sc.classify(dwarf)                                                   # M_Ks = +1.5, M_G = +5.5
+    assert r["code"] == "STAR:C:V" and r["subclass"] == "Dwarf carbon star (dC)"
+    giant = dict(dwarf, **{"gaia_dr3__phot_g_mean_mag": 12.0})               # M_G = +3.5: CH / subgiant carbon star
+    assert sc.classify(giant)["code"] == "STAR:C:?"
+    bright = dict(dwarf, **{"2mass_psc__Kmag": 5.0})                         # M_Ks = -3.5: AGB allowed
+    assert sc.classify(bright)["code"] == "STAR:C:AGB"
     # WISE colours alone were 47 % correct on the Suh (2021) stars: not used.
     w = dict(base, **{"allwise__W1mag": 6.0, "allwise__W2mag": 4.6, "allwise__W3mag": 3.5, "allwise__W4mag": 3.2})
     assert sc.agb_chemistry(w) is None
+
+
+def test_galaxy_emission_line_rules():
+    sc = _sc()
+    P = "sdss_dr18_spectroscopy__"
+    def g(ha, hb, o3, n2, ew_ha, ew_n2=-1.0, d4=None, err=1.0):
+        r = {"primary_class": "GALAXY", P + "line_ha_flux": ha, P + "line_hb_flux": hb, P + "line_oiii5007_flux": o3,
+             P + "line_nii6584_flux": n2, P + "line_ha_ew": -ew_ha, P + "line_nii6584_ew": -ew_n2}
+        for k in ("ha", "hb", "oiii5007", "nii6584"):
+            r[P + "line_" + k + "_flux_err"] = err
+        if d4 is not None:
+            r[P + "d4000_n"] = d4
+        return r
+    # Test values are given negative in emission (MPA-JHU style); the row stores them positive.
+    assert sc.galaxy_lines(g(100, 30, 15, 30, -20.0))[0] == "STAR_FORMING"      # x = -0.52, y = -0.30
+    assert sc.galaxy_lines(g(100, 30, 150, 120, -20.0))[0] == "AGN"             # x = 0.08, y = 0.70 (Seyfert)
+    assert sc.galaxy_lines(g(100, 30, 25, 60, -20.0))[0] == "COMPOSITE"         # x = -0.22, y = -0.08
+    # LINER-like ratios with EW(Ha) < 3 A: retired, not AGN (WHAN).
+    r = sc.galaxy_lines(g(100, 30, 60, 150, -2.0))
+    assert r[0] == "QUIESCENT" and "retired" in r[2]
+    assert "passive" in sc.galaxy_lines(g(1, 1, 1, 1, -0.2, -0.3, err=10))[2]
+    # Weak H-beta / [O III]: WHAN on [N II]/Ha.
+    assert sc.galaxy_lines(g(100, 1, 1, 20, -12.0, err=5))[0] == "STAR_FORMING"
+    assert sc.galaxy_lines(g(100, 1, 1, 80, -4.0, err=5))[:2] == ("AGN", "SDSS_WHAN")          # x = -0.10
+    assert sc.galaxy_lines(g(100, 1, 1, 45, -12.0, err=5))[0] == "COMPOSITE"                  # x = -0.35 (Stasinska+2006)
+    # The SDSS pipeline subclass keeps precedence.
+    row = dict(g(100, 30, 150, 120, -20.0), **{P + "subclass": "STARFORMING"})
+    assert sc.classify(row)["activity"] == "STAR_FORMING"
+    # Dn4000 alone (no line measurement).
+    assert sc.galaxy_lines({P + "d4000_n": 1.8})[1] == "SDSS_D4000"
+
+
+def test_spectroscopic_star_parameters_and_emission_lines():
+    sc = _sc()
+    base = {"primary_class": "STAR", "gaia_dr3__bp_rp": 1.2, "gaia_dr3__teff_gspphot": 4600.0, "gaia_dr3__logg_gspphot": 4.5}
+    # LAMOST LASP log g outranks GSP-Phot log g (no parallax).
+    r = sc.classify(dict(base, lamost_dr_catalog__lasp_teff=4600.0, lamost_dr_catalog__lasp_logg=2.4, lamost_dr_catalog__lasp_feh=-1.6))
+    assert r["luminosity_class"] == "III" and r["luminosity_rule"] == "LAMOST_LOGG"
+    tags = {t["tag"]: t for t in sc.star_tags(dict(base, lamost_dr_catalog__lasp_teff=4600.0, lamost_dr_catalog__lasp_logg=2.4,
+                                                     lamost_dr_catalog__lasp_feh=-2.3, gaia_dr3__mh_gspphot=-0.2,
+                                                     gaia_dr3__phot_g_mean_mag=14.0))}
+    assert "VERY_METAL_POOR" in tags and tags["VERY_METAL_POOR"]["rule"] == "LAMOST_FEH"
+    # GSP-Spec only with clean flags (positions 2, 5, 8, 13 for log g).
+    good, bad = "0" * 41, "0" + "1" + "0" * 39
+    gs = dict(base, gaia_dr3__teff_gspspec=4700.0, gaia_dr3__logg_gspspec=2.6)
+    assert sc.classify(dict(gs, gaia_dr3__flags_gspspec=good))["luminosity_rule"] == "GSPSPEC_LOGG"
+    assert sc.classify(dict(gs, gaia_dr3__flags_gspspec=bad))["luminosity_rule"] == "GAIA_LOGG"
+    # ESP-ELS: young stars and WR stars get their own class; Be stars a tag.
+    assert sc.classify(dict(base, gaia_dr3__classlabel_espels="TTauri", gaia_dr3__classlabel_espels_flag=1))["code"] == "STAR:YSO"
+    assert sc.classify(dict(base, gaia_dr3__classlabel_espels="wN", gaia_dr3__classlabel_espels_flag=0))["code"] == "STAR:WR"
+    assert sc.classify(dict(base, gaia_dr3__classlabel_espels="TTauri", gaia_dr3__classlabel_espels_flag=4))["code"] != "STAR:YSO"
+    be = {t["tag"] for t in sc.star_tags(dict(base, gaia_dr3__classlabel_espels="beStar", gaia_dr3__classlabel_espels_flag=2))}
+    assert "EMISSION_LINE" in be
+    # A YSO or a spectroscopic dwarf in the AGB gate is not an AGB star.
+    lpv = {"primary_class": "STAR", "variability_class": "LPV", "gaia_dr3__phot_bp_mean_mag": 10.0, "gaia_dr3__phot_rp_mean_mag": 8.0,
+           "2mass_psc__Jmag": 7.0, "2mass_psc__Kmag": 5.8, "allwise__W3mag": 4.2}
+    assert sc.classify(lpv)["code"] == "STAR:M:AGB"
+    assert sc.agb_chemistry(dict(lpv, gaia_dr3__classlabel_espels="TTauri", gaia_dr3__classlabel_espels_flag=1)) is None
+    assert sc.agb_chemistry(dict(lpv, lamost_dr_catalog__lasp_teff=3900.0, lamost_dr_catalog__lasp_logg=4.6)) is None

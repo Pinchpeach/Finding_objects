@@ -285,14 +285,15 @@ Suh (2021) stars (mostly dust-obscured Galactic AGB stars) they scored only
 68.5 % and 75.4 %. They were replaced by three logistic models in a cascade;
 a star uses the first model whose features it has. The models are fitted
 with `benchmark/fit_agb_chemistry.py` on a random half (seed 42) and scored
-on the other half (4,417 stars):
+on the other half (4,286 stars; refitted in 2.6.0 without the 263
+sub-red-clump carbon stars, see the vetoes below — 2.5.3 had 92.2 % on 4,417):
 
 | Model | Features | Decided / n | Accuracy |
 |---|---|---|---|
-| `GAIA_2MASS_WISE_CSTAR` | ΔW, Ks − W3, `is_cstar` | 2962 / 3079 | 95.5 % |
-| `GAIA_2MASS_WISE` | ΔW, Ks − W3 | 874 / 968 | 81.0 % |
-| `NIR_MIR` | J − Ks, Ks − W3, W1 − W2, W3 − W4 | 198 / 215 | 90.9 % |
-| all | | coverage 91.3 % | **92.2 %** (C precision 0.95 / recall 0.84; O 0.90 / 0.97) |
+| `GAIA_2MASS_WISE_CSTAR` | ΔW, Ks − W3, `is_cstar` | 2943 / 3060 | 95.5 % |
+| `GAIA_2MASS_WISE` | ΔW, Ks − W3 | 771 / 843 | 83.4 % |
+| `NIR_MIR` | J − Ks, Ks − W3, W1 − W2, W3 − W4 | 200 / 220 | 91.5 % |
+| all | | coverage 91.3 % | **92.9 %** (C precision 0.95 / recall 0.86; O 0.92 / 0.97) |
 
 Ks − W3 carries most of the separation: silicate dust brightens W3, so
 O-rich stars sit redder (median 1.93 vs 1.02 for C-rich). WISE colours alone
@@ -315,6 +316,21 @@ O-rich stars sit redder (median 1.93 vs 1.02 for C-rich). WISE colours alone
   - `STAR:M:AGB`: O-rich AGB star
   - `STAR:S:AGB`: S-type AGB star
   - `STAR:?:AGB`: AGB star, chemistry uncertain
+- **Non-AGB vetoes (2.6.0):** a star is not called AGB when
+  - its Gaia parallax is good (S/N ≥ 5, RUWE < 1.4) and it is fainter than
+    the red clump, M_Ks > −1 (red clump M_Ks = −1.61; Alves 2000, Hawkins
+    et al. 2017). In the Suh (2021) truth set this removes 263 "C-AGB"
+    stars (none an LPV, median G − Ks 2.2 vs 5.4) and no O-AGB star;
+  - a spectroscopic log g (LAMOST LASP or clean-flag Gaia GSP-Spec) is
+    above 3.5;
+  - Gaia ESP-ELS calls it a T Tauri or Herbig Ae/Be star (young stars have
+    dusty discs that mimic silicate AGB colours).
+  A carbon star caught by a veto is "Dwarf carbon star (dC)" (`STAR:C:V`)
+  if M_G > 5 (Li et al. 2024; Green 2013) and "Carbon star" (`STAR:C:?`,
+  CH / sub-giant carbon star) otherwise. SDSS and LAMOST carbon spectra
+  (rule `SDSS_CSTAR` / `LAMOST_CSTAR`) enter the chemistry after SIMBAD;
+  SDSS "CarbonWD" is a DQ white dwarf. Spectroscopic criteria in general:
+  `LITERATURE_SPECTROSCOPY.md`.
 - **Validation (2.5.3):** see the model table above. The truth set is
   `benchmark/agb_truth/agb_chemistry_truth.csv.gz`, built by
   `benchmark/build_agb_chemistry_truth.py` (GitHub Actions, VizieR cone
