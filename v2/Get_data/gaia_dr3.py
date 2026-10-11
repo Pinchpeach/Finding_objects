@@ -15,7 +15,10 @@ SOURCE=["source_id","designation","ra","dec","ra_error","dec_error","parallax","
 AP=["teff_gspphot","logg_gspphot","mh_gspphot","distance_gspphot","ag_gspphot","ebpminrp_gspphot","mass_flame","age_flame","evolstage_flame","flags_flame","classprob_dsc_combmod_quasar","classprob_dsc_combmod_galaxy","classprob_dsc_combmod_star","classprob_dsc_combmod_whitedwarf","classprob_dsc_combmod_binarystar"]
 # Spectroscopic parameters: GSP-Spec from RVS spectra (Recio-Blanco et al.
 # 2023) and the ESP-ELS emission-line class from BP/RP (Creevey et al. 2023).
-# Queried separately so a failure never removes the GSP-Phot / DSC columns.
+# Same table as AP, fetched in the same query (column names checked against
+# the archive metadata, 2026-10-10): a second query would leave one more
+# abandoned daemon thread when TAP is slow, and abandoned threads crashed the
+# interpreter at exit (scientific cross-validation, compact-pulsar shard).
 SPEC_AP=["teff_gspspec","logg_gspspec","mh_gspspec","flags_gspspec","classlabel_espels","classlabel_espels_flag"]
 VAR_SUMMARY=["in_vari_classification_result","in_vari_rrlyrae","in_vari_cepheid","in_vari_long_period_variable","in_vari_eclipsing_binary","in_vari_rotation_modulation","in_vari_agn","in_vari_microlensing","in_vari_compact_companion"]
 
@@ -138,8 +141,7 @@ def fetch(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
     try:
         df=_bounded(_tap,BASE_TAP_BUDGET_S,q);df["gaia_base_query_status"]="tap"
         if not df.empty:
-            df=_merge_optional(df,"gaiadr3.astrophysical_parameters",AP,"gaia_ap_query_status")
-            df=_merge_optional(df,"gaiadr3.astrophysical_parameters",SPEC_AP,"gaia_spec_ap_query_status")
+            df=_merge_optional(df,"gaiadr3.astrophysical_parameters",AP+SPEC_AP,"gaia_ap_query_status")
             df=_merge_optional(df,"gaiadr3.vari_classifier_result",["best_class_name","best_class_score"],"gaia_vari_classifier_query_status")
             df=_merge_optional(df,"gaiadr3.vari_summary",VAR_SUMMARY,"gaia_vari_summary_query_status")
     except Exception:

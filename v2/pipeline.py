@@ -132,5 +132,18 @@ def main():
     run(a.work, a.raw_dir, a.ra, a.dec, a.radius, a.min_confidence, max(1, a.workers), a.field_prior)
 
 
+def exit_now(code: int = 0) -> None:
+    """Exit after a finished run without interpreter teardown.  All outputs are
+    written and closed by then.  Teardown after a run with archive queries
+    segfaulted in CI after the results were written (scientific
+    cross-validation, compact-pulsar shard, twice), also with no Python
+    thread left alive, i.e. in a C extension's cleanup.  Callers use this
+    only after success; errors still raise and exit normally."""
+    import os
+    sys.stdout.flush(); sys.stderr.flush()
+    os._exit(code)
+
+
 if __name__ == "__main__":
     main()
+    exit_now(0)

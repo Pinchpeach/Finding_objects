@@ -138,4 +138,10 @@ def main():
     pd.DataFrame(rows).to_csv(checkpoint,index=False)
     if len(rows)%10==0:print(f"checkpoint: {len(rows)}/{len(truth)}",flush=True)
  result=pd.DataFrame(rows);write_report(result,a.out_dir);checkpoint.unlink(missing_ok=True);print(result.groupby(["axis","truth_class"])[["classified","match"]].mean())
-if __name__=="__main__":main()
+if __name__=="__main__":
+ main()
+ # Interpreter teardown after the archive queries segfaulted in CI after the
+ # report was written (also with no Python thread alive): skip it.
+ import os
+ sys.stdout.flush();sys.stderr.flush()
+ os._exit(0)
