@@ -225,14 +225,14 @@ def test_galaxy_emission_line_rules():
     sc = _sc()
     P = "sdss_dr18_spectroscopy__"
     def g(ha, hb, o3, n2, ew_ha, ew_n2=-1.0, d4=None, err=1.0):
-        r = {"primary_class": "GALAXY", P + "h_alpha_flux": ha, P + "h_beta_flux": hb, P + "oiii_5007_flux": o3,
-             P + "nii_6584_flux": n2, P + "h_alpha_eqw": ew_ha, P + "nii_6584_eqw": ew_n2}
-        for k in ("h_alpha", "h_beta", "oiii_5007", "nii_6584"):
-            r[P + k + "_flux_err"] = err
+        r = {"primary_class": "GALAXY", P + "line_ha_flux": ha, P + "line_hb_flux": hb, P + "line_oiii5007_flux": o3,
+             P + "line_nii6584_flux": n2, P + "line_ha_ew": -ew_ha, P + "line_nii6584_ew": -ew_n2}
+        for k in ("ha", "hb", "oiii5007", "nii6584"):
+            r[P + "line_" + k + "_flux_err"] = err
         if d4 is not None:
             r[P + "d4000_n"] = d4
         return r
-    # MPA-JHU equivalent widths are negative in emission.
+    # Test values are given negative in emission (MPA-JHU style); the row stores them positive.
     assert sc.galaxy_lines(g(100, 30, 15, 30, -20.0))[0] == "STAR_FORMING"      # x = -0.52, y = -0.30
     assert sc.galaxy_lines(g(100, 30, 150, 120, -20.0))[0] == "AGN"             # x = 0.08, y = 0.70 (Seyfert)
     assert sc.galaxy_lines(g(100, 30, 25, 60, -20.0))[0] == "COMPOSITE"         # x = -0.22, y = -0.08
@@ -242,7 +242,8 @@ def test_galaxy_emission_line_rules():
     assert "passive" in sc.galaxy_lines(g(1, 1, 1, 1, -0.2, -0.3, err=10))[2]
     # Weak H-beta / [O III]: WHAN on [N II]/Ha.
     assert sc.galaxy_lines(g(100, 1, 1, 20, -12.0, err=5))[0] == "STAR_FORMING"
-    assert sc.galaxy_lines(g(100, 1, 1, 80, -4.0, err=5))[1] == "SDSS_WHAN"
+    assert sc.galaxy_lines(g(100, 1, 1, 80, -4.0, err=5))[:2] == ("AGN", "SDSS_WHAN")          # x = -0.10
+    assert sc.galaxy_lines(g(100, 1, 1, 45, -12.0, err=5))[0] == "COMPOSITE"                  # x = -0.35 (Stasinska+2006)
     # The SDSS pipeline subclass keeps precedence.
     row = dict(g(100, 30, 150, 120, -20.0), **{P + "subclass": "STARFORMING"})
     assert sc.classify(row)["activity"] == "STAR_FORMING"

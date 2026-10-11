@@ -710,8 +710,10 @@ def classify_star(row):
 
 
 # ------------------------------------------------------------------ GALAXY
-# Emission-line diagnostics from the SDSS spectrum (MPA-JHU galSpecLine /
-# galSpecIndx; Brinchmann et al. 2004, Kauffmann et al. 2003).  The SDSS
+# Emission-line diagnostics from the SDSS spectrum: Portsmouth fits
+# (emissionLinesPort; Thomas et al. 2013), else MPA-JHU (galSpecLine /
+# galSpecIndx; Brinchmann et al. 2004, Kauffmann et al. 2003), merged by
+# Get_data/sdss_spectroscopy.py into line_* columns (EW positive in emission).  The SDSS
 # pipeline subclass (Bolton et al. 2012) needs all lines at 10 sigma; these
 # rules reach the weaker-line galaxies it leaves empty.
 #  * BPT with S/N >= 3 in H-beta, [O III] 5007, H-alpha, [N II] 6584
@@ -723,20 +725,20 @@ def classify_star(row):
 #  * WHAN (Cid Fernandes et al. 2011, MNRAS 413, 1687), applied first for
 #    weak H-alpha: EW(H-alpha) < 3 A retired, < 0.5 A with EW([N II]) < 0.5 A
 #    passive (both quiescent: no star formation, ionised by old stars).
-#    When H-beta / [O III] are too weak for the BPT: x < -0.4 star-forming,
-#    x >= -0.4 AGN (strong EW > 6 A, weak 3-6 A).
+#    When H-beta / [O III] are too weak for the BPT, [N II]/H-alpha alone
+#    (Stasinska et al. 2006, MNRAS 371, 972): x < -0.4 star-forming, -0.4 to
+#    -0.2 composite, > -0.2 AGN (strong EW > 6 A, weak 3-6 A).
 #  * 4000 A break with no emission measured: Dn4000 >= 1.6 old stellar
 #    population (Kauffmann et al. 2003 bimodality; narrow index of Balogh
 #    et al. 1999).
-MPA_EW_EMISSION_SIGN = -1.0     # MPA-JHU equivalent widths are negative in emission
 LINE_SNR = 3.0
 D4000_OLD = 1.6
 
 
 def _line(row, name):
-    """(flux, S/N) of an MPA-JHU line, or (None, None)."""
-    f = _num(row, f"sdss_dr18_spectroscopy__{name}_flux")
-    e = _num(row, f"sdss_dr18_spectroscopy__{name}_flux_err")
+    """(flux, S/N) of an SDSS emission line, or (None, None)."""
+    f = _num(row, f"sdss_dr18_spectroscopy__line_{name}_flux")
+    e = _num(row, f"sdss_dr18_spectroscopy__line_{name}_flux_err")
     if f is None:
         return None, None
     return f, (f / e if e and e > 0 else None)
@@ -744,15 +746,13 @@ def _line(row, name):
 
 def galaxy_lines(row):
     """(activity, rule, basis) from SDSS emission-line measurements, or None."""
-    ha, ha_sn = _line(row, "h_alpha")
-    hb, hb_sn = _line(row, "h_beta")
-    o3, o3_sn = _line(row, "oiii_5007")
-    n2, n2_sn = _line(row, "nii_6584")
+    ha, ha_sn = _line(row, "ha")
+    hb, hb_sn = _line(row, "hb")
+    o3, o3_sn = _line(row, "oiii5007")
+    n2, n2_sn = _line(row, "nii6584")
     good = lambda f, sn: f is not None and f > 0 and sn is not None and sn >= LINE_SNR
-    ew_ha = _num(row, "sdss_dr18_spectroscopy__h_alpha_eqw")
-    ew_n2 = _num(row, "sdss_dr18_spectroscopy__nii_6584_eqw")
-    w = None if ew_ha is None else MPA_EW_EMISSION_SIGN * ew_ha
-    wn = None if ew_n2 is None else MPA_EW_EMISSION_SIGN * ew_n2
+    w = ew_ha = _num(row, "sdss_dr18_spectroscopy__line_ha_ew")
+    wn = _num(row, "sdss_dr18_spectroscopy__line_nii6584_ew")
     # Weak H-alpha first: LINER-like ratios with EW(Ha) < 3 A come from old
     # stars, not an AGN (retired galaxies; Cid Fernandes et al. 2010, 2011).
     if w is not None and w < 0.5 and wn is not None and wn < 0.5:
@@ -769,11 +769,18 @@ def galaxy_lines(row):
             return "STAR_FORMING", "SDSS_LINES_BPT", f"{pos}: below Kauffmann+2003"
         return "COMPOSITE", "SDSS_LINES_BPT", f"{pos}: between Kauffmann+2003 and Kewley+2001"
     if w is not None and good(ha, ha_sn) and n2 is not None and n2 > 0:
+        # [N II]/Ha alone (Stasinska et al. 2006): < -0.4 star-forming,
+        # -0.4 to -0.2 composite, > -0.2 AGN.  WHAN calls everything above
+        # -0.4 AGN, but on the benchmark 96 of 104 such SDSS star-forming
+        # galaxies are star-forming / composite in the Portsmouth BPT.
         x = math.log10(n2 / ha)
+        pos = f"EW(Ha) = {w:.1f} A, log [N II]/Ha = {x:.2f}"
         if x < -0.4:
-            return "STAR_FORMING", "SDSS_WHAN", f"EW(Ha) = {w:.1f} A, log [N II]/Ha = {x:.2f} < -0.4 (WHAN)"
+            return "STAR_FORMING", "SDSS_WHAN", f"{pos} < -0.4 (WHAN; Stasinska+2006)"
+        if x < -0.2:
+            return "COMPOSITE", "SDSS_WHAN", f"{pos} in -0.4..-0.2 (composite; Stasinska+2006)"
         kind = "strong" if w > 6.0 else "weak"
-        return "AGN", "SDSS_WHAN", f"EW(Ha) = {w:.1f} A, log [N II]/Ha = {x:.2f} >= -0.4 ({kind} AGN; WHAN)"
+        return "AGN", "SDSS_WHAN", f"{pos} >= -0.2 ({kind} AGN; WHAN, Stasinska+2006)"
     d4 = _num(row, "sdss_dr18_spectroscopy__d4000_n")
     if d4 is not None and d4 >= D4000_OLD and ew_ha is None:
         return "QUIESCENT", "SDSS_D4000", f"Dn4000 = {d4:.2f} >= {D4000_OLD} (old stellar population)"
