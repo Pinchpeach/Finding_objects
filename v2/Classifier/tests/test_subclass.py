@@ -207,14 +207,17 @@ def test_agb_chemistry_rules():
     assert sc.classify({"primary_class": "STAR", "simbad__sp_type": "C-H4"})["code"] == "STAR:C:?"
     # Luminosity veto: with a good parallax, fainter than the red clump is not AGB.
     near = {"gaia_dr3__parallax": 2.0, "gaia_dr3__parallax_error": 0.05, "gaia_dr3__ruwe": 1.0}   # DM = 8.49
-    assert sc.classify(dict(c, **near))["code"] == "STAR:C:AGB"             # M_Ks = 5.5 - 8.49 = -2.99
+    r = sc.classify(dict(c, **near))                                         # M_Ks = 5.5 - 8.49 = -2.99: below the RGB tip
+    assert r["code"] == "STAR:C:III" and "RGB or early AGB" in r["subclass"]
+    far = {"gaia_dr3__parallax": 0.3, "gaia_dr3__parallax_error": 0.05, "gaia_dr3__ruwe": 1.0}   # DM = 12.61
+    assert sc.classify(dict(c, **far))["code"] == "STAR:C:AGB"              # M_Ks = -7.1: above the tip
     assert sc.agb_chemistry(dict(c, **near, **{"2mass_psc__Kmag": 8.0, "2mass_psc__Jmag": 9.0})) is None   # M_Ks = -0.49
     dwarf = dict(base, **near, simbad__otype="C*", **{"2mass_psc__Kmag": 10.0, "gaia_dr3__phot_g_mean_mag": 14.0})
     r = sc.classify(dwarf)                                                   # M_Ks = +1.5, M_G = +5.5
     assert r["code"] == "STAR:C:V" and r["subclass"] == "Dwarf carbon star (dC)"
     giant = dict(dwarf, **{"gaia_dr3__phot_g_mean_mag": 12.0})               # M_G = +3.5: CH / subgiant carbon star
     assert sc.classify(giant)["code"] == "STAR:C:?"
-    bright = dict(dwarf, **{"2mass_psc__Kmag": 5.0})                         # M_Ks = -3.5: AGB allowed
+    bright = dict(dwarf, **{"2mass_psc__Kmag": 1.5})                         # M_Ks = -6.99: above the RGB tip
     assert sc.classify(bright)["code"] == "STAR:C:AGB"
     # WISE colours alone were 47 % correct on the Suh (2021) stars: not used.
     w = dict(base, **{"allwise__W1mag": 6.0, "allwise__W2mag": 4.6, "allwise__W3mag": 3.5, "allwise__W4mag": 3.2})
