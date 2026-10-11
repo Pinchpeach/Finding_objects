@@ -285,6 +285,61 @@ def cmd_position(row):
     return None if ms is None else (mg, mg - ms, bprp0)
 
 
+# Spectroscopic atmospheric parameters (2.6.0): LAMOST LASP (Luo et al. 2015;
+# errors ~110 K, 0.2 dex in log g, 0.1 dex in [Fe/H]) and Gaia GSP-Spec from
+# RVS spectra (Recio-Blanco et al. 2023), accepted when the flags of the
+# parameter are 0 (positions 1/4/8/13 for Teff, 2/5/8/13 for log g, 3/6/8 for
+# [M/H]; Babusiaux et al. 2023, DR3 validation).  On 388 benchmark stars with
+# LAMOST parameters the log g class agrees with the Gaia CMD class for 219 of
+# 221 dwarfs, while GSP-Phot log g finds 1 of the 22 LAMOST giants.
+GSPSPEC_FLAG_POS = {"teff": (1, 4, 8, 13), "logg": (2, 5, 8, 13), "mh": (3, 6, 8)}
+
+
+def _gspspec_ok(flags, par):
+    f = str(flags or "")
+    return len(f) >= max(GSPSPEC_FLAG_POS[par]) and all(f[i - 1] == "0" for i in GSPSPEC_FLAG_POS[par])
+
+
+def spectro_params(row):
+    """{'teff', 'logg', 'feh', 'source'} from a spectroscopic survey, or None."""
+    teff, logg, feh = (_num(row, f"lamost_dr_catalog__lasp_{k}") for k in ("teff", "logg", "feh"))
+    if teff is not None and logg is not None:
+        return {"teff": teff, "logg": logg, "feh": feh, "source": "LAMOST"}
+    flags = _text(row, "gaia_dr3__flags_gspspec", "flags_gspspec")
+    teff, logg, mh = (_num(row, f"gaia_dr3__{k}_gspspec", f"{k}_gspspec") for k in ("teff", "logg", "mh"))
+    if teff is not None and logg is not None and _gspspec_ok(flags, "teff") and _gspspec_ok(flags, "logg"):
+        return {"teff": teff, "logg": logg, "feh": mh if _gspspec_ok(flags, "mh") else None, "source": "GSPSPEC"}
+    return None
+
+
+# Gaia DR3 ESP-ELS emission-line classes from BP/RP spectra (Creevey et al.
+# 2023; DR3 documentation 11.3.7).  classlabel_espels_flag <= 2 means a class
+# probability > 0.5.  57 511 stars; 96 % of known classical Be stars are
+# classed Be, 229 of 443 known WR stars found with one misassignment; weak
+# H-alpha emitters are missed and PNe are the least reliable class.
+ESP_ELS = {"bestar": ("BE", "Be star (emission-line B star)"), "herbigstar": ("YSO", "Herbig Ae/Be star (young stellar object)"),
+           "ttauri": ("YSO", "T Tauri star (young stellar object)"), "reddwarfemstar": ("DME", "active M dwarf (dMe)"),
+           "wc": ("WR", "Wolf-Rayet star (WC)"), "wn": ("WR", "Wolf-Rayet star (WN)"),
+           "planetarynebula": ("PN", "planetary nebula (central star)")}
+
+
+def emission_line_class(row):
+    """(kind, name, basis) from Gaia ESP-ELS, or None."""
+    label = _text(row, "gaia_dr3__classlabel_espels", "classlabel_espels")
+    if not label:
+        return None
+    flag = _num(row, "gaia_dr3__classlabel_espels_flag", "classlabel_espels_flag")
+    hit = ESP_ELS.get(label.replace(" ", "").replace("_", "").lower())
+    if hit is None or (flag is not None and flag > 2):
+        return None
+    return hit[0], hit[1], f"Gaia ESP-ELS class {label}" + (f" (flag {flag:.0f}: P > 0.5)" if flag is not None else "")
+
+
+def _giant_logg_limit(teff):
+    # Ciardi et al. (2011) red-giant boundary used for Kepler targets.
+    return 4.0 if teff <= 4250 else (5.2 - 2.8e-4 * teff if teff < 6000 else 3.5)
+
+
 def star_luminosity_class(row, num):
     pos = cmd_position(row)
     if pos is not None:
@@ -303,10 +358,15 @@ def star_luminosity_class(row, num):
         if dm > -2.5 and bprp0 < 1.3:
             return "IV", "GAIA_CMD", f"M_G = {mg:.2f}, {dm:+.2f} mag above the dwarf sequence"
         return "III", "GAIA_CMD", f"M_G = {mg:.2f}, {dm:+.2f} mag above the dwarf sequence"
+    sp = spectro_params(row)
+    if sp is not None:
+        lim = _giant_logg_limit(sp["teff"])
+        name = {"LAMOST": "LAMOST LASP", "GSPSPEC": "Gaia GSP-Spec"}[sp["source"]]
+        return (("III" if sp["logg"] <= lim else "V"), f"{sp['source']}_LOGG",
+                f"{name} log g = {sp['logg']:.2f} at Teff = {sp['teff']:.0f} K vs giant boundary {lim:.2f} (spectroscopic)")
     teff, logg = _num(row, "gaia_dr3__teff_gspphot", "teff_gspphot"), _num(row, "gaia_dr3__logg_gspphot", "logg_gspphot")
     if teff is not None and logg is not None:
-        # Ciardi et al. (2010) red-giant boundary used for Kepler targets.
-        lim = 4.0 if teff <= 4250 else (5.2 - 2.8e-4 * teff if teff < 6000 else 3.5)
+        lim = _giant_logg_limit(teff)
         return ("III" if logg <= lim else "V"), "GAIA_LOGG", f"GSP-Phot log g = {logg:.2f} vs giant boundary {lim:.2f}"
     return None, None, "no parallax or log g"
 
@@ -373,12 +433,24 @@ def star_tags(row):
     if xr:
         # Stellar X-rays trace coronal activity (young / fast rotators / active binaries).
         tags.append({"tag": "XRAY", "label": "X-ray active star", "rule": "XRAY", "basis": ", ".join(sorted(xr))})
+    sp = spectro_params(row)
+    if sp is not None and sp["feh"] is not None and sp["feh"] < -1.0:
+        # Beers & Christlieb (2005): [Fe/H] < -1 metal-poor, < -2 very metal-poor.
+        very = sp["feh"] < -2.0
+        tags.append({"tag": "VERY_METAL_POOR" if very else "METAL_POOR",
+                     "label": "very metal-poor star" if very else "metal-poor star", "rule": f"{sp['source']}_FEH",
+                     "basis": f"spectroscopic [Fe/H] = {sp['feh']:.2f} ({sp['source']}; Beers & Christlieb 2005)"})
     mh = _num(row, "gaia_dr3__mh_gspphot", "mh_gspphot")
+    if sp is not None and sp["feh"] is not None:
+        mh = None                      # the spectrum decides; GSP-Phot [M/H] agrees for 91 of its 156 metal-poor flags
     if mh is not None and gmag is not None and gmag < 17 and mh < -1.0:
         # [M/H] < -1 "metal-poor" (Beers & Christlieb 2005).  GSP-Phot [M/H]
         # is only indicative (Andrae et al. 2023), hence "candidate".
         tags.append({"tag": "METAL_POOR", "label": "metal-poor star candidate", "rule": "GAIA_GSPPHOT_MH",
                      "basis": f"GSP-Phot [M/H] = {mh:.2f} < -1 (G = {gmag:.1f})"})
+    els = emission_line_class(row)
+    if els is not None and els[0] in ("BE", "DME"):
+        tags.append({"tag": "EMISSION_LINE", "label": els[1], "rule": "GAIA_ESP_ELS", "basis": els[2]})
     var = str(row.get("variability_class") or "")
     if var and var not in ("UNKNOWN", "nan", "None"):
         sub = row.get("variability_subtype")
@@ -401,11 +473,12 @@ def star_tags(row):
 # fitted on half of the Suh (2021) O-AGB/C-AGB stars with Gaia/2MASS/AllWISE
 # photometry and scored on the other half (benchmark/agb_truth):
 #   1. W_RP - W_KJ (Lebzelter et al. 2018), Ks - W3 and the Gaia DR3 LPV
-#      RP-spectrum C-star flag (Lebzelter et al. 2023): 95.5 % on 2962 stars;
-#   2. W_RP - W_KJ and Ks - W3: 81 % on 874 stars;
-#   3. J-Ks, Ks-W3, W1-W2, W3-W4: 90.9 % on 198 stars;
+#      RP-spectrum C-star flag (Lebzelter et al. 2023): 95.5 % on 2943 stars;
+#   2. W_RP - W_KJ and Ks - W3: 83.4 % on 771 stars;
+#   3. J-Ks, Ks-W3, W1-W2, W3-W4: 91.5 % on 200 stars;
 #   probabilities within 0.15 of 0.5 abstain ("chemistry uncertain").
-#   All together: 92.2 % at 91.3 % coverage (C precision 0.95, O 0.90).
+#   All together: 92.9 % at 91.3 % coverage (C precision 0.95, O 0.92); refitted
+#   in 2.6.0 without the sub-red-clump carbon stars (AGB_MAX_MKS; 2.5.3: 92.2 %).
 # The published single cuts did worse on these mostly dust-obscured Galactic
 # AGB stars: W_RP - W_KJ >= 0.9 (Mowlavi+2019) 68.5 %, the AllWISE line of
 # Lian et al. (2014) 75.4 %; WISE colours alone (46.6 % on stars without
@@ -538,6 +611,9 @@ def agb_chemistry(row):
         if sub.startswith(("CAGB", "OAGB")):
             out = {"chem": sub[0], "rule": "SUH2021", "basis": f"Suh (2021) catalogue {sub}"}
     gate = agb_candidate(row)
+    els = emission_line_class(row)
+    if els is not None and els[0] == "YSO":
+        return None                  # young stars mimic dusty AGB stars in Ks - W3
     if out is None and gate:
         ph = agb_photometric(row)
         if ph is not None:
@@ -553,7 +629,15 @@ def agb_chemistry(row):
     out["agb_candidate"] = gate
     mags = abs_mags(row)
     mk, mg = mags if mags else (None, None)
-    if mk is not None and mk > AGB_MAX_MKS:
+    sp = spectro_params(row)
+    if sp is not None and sp["logg"] > 3.5:
+        # A spectroscopic dwarf / subgiant (AGB stars have log g < ~1).
+        if out["rule"].startswith("AGB_") or out["chem"] is None:
+            return None
+        out["not_agb"] = f"spectroscopic log g = {sp['logg']:.2f} ({sp['source']}): not a giant"
+        out["dwarf"] = sp["logg"] > _giant_logg_limit(sp["teff"])
+        out["basis"] = f"{out['basis']}; {out['not_agb']}"
+    elif mk is not None and mk > AGB_MAX_MKS:
         if out["rule"].startswith("AGB_") or out["chem"] is None:
             return None                       # the photometric models describe AGB stars only
         out["not_agb"] = f"M_Ks = {mk:.2f} fainter than the red clump (AGB stars: M_Ks < {AGB_MAX_MKS})"
@@ -587,6 +671,9 @@ def classify_star(row):
             return _result("Cataclysmic variable", "STAR:CV", None, f"{src}_SUBCLASS", f"{src} spectrum subclass {label}")
         if u.startswith(("WD", "DA", "DB", "DC", "DQ", "DZ", "DO")):
             return _result(f"White dwarf ({label})", "STAR:WD", None, f"{src}_SUBCLASS", f"{src} spectrum subclass {label}")
+    els = emission_line_class(row)
+    if els is not None and els[0] in ("YSO", "WR", "PN"):
+        return _result(els[1], f"STAR:{els[0]}", None, "GAIA_ESP_ELS", els[2])
     if phys == "WD":
         sub = row.get("physical_subtype")
         return _result("White dwarf" + (f" ({sub})" if isinstance(sub, str) and sub else ""), "STAR:WD",
