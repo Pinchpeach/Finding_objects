@@ -12,7 +12,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: v2-controller-ngc4522-test
+  group: v2-controller-ngc4522-test-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:

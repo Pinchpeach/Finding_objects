@@ -13,7 +13,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: v2-ngc4522-small
+  group: v2-ngc4522-small-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:

@@ -28,7 +28,7 @@ jobs:
       - name: Build
         run: python -u v2/benchmark/build_desi_lines_truth.py
       - name: Commit
-        if: always()
+        if: ${{ !cancelled() }}
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
