@@ -473,11 +473,12 @@ def star_tags(row):
 # fitted on half of the Suh (2021) O-AGB/C-AGB stars with Gaia/2MASS/AllWISE
 # photometry and scored on the other half (benchmark/agb_truth):
 #   1. W_RP - W_KJ (Lebzelter et al. 2018), Ks - W3 and the Gaia DR3 LPV
-#      RP-spectrum C-star flag (Lebzelter et al. 2023): 95.5 % on 2962 stars;
-#   2. W_RP - W_KJ and Ks - W3: 81 % on 874 stars;
-#   3. J-Ks, Ks-W3, W1-W2, W3-W4: 90.9 % on 198 stars;
+#      RP-spectrum C-star flag (Lebzelter et al. 2023): 95.5 % on 2943 stars;
+#   2. W_RP - W_KJ and Ks - W3: 83.4 % on 771 stars;
+#   3. J-Ks, Ks-W3, W1-W2, W3-W4: 91.5 % on 200 stars;
 #   probabilities within 0.15 of 0.5 abstain ("chemistry uncertain").
-#   All together: 92.2 % at 91.3 % coverage (C precision 0.95, O 0.90).
+#   All together: 92.9 % at 91.3 % coverage (C precision 0.95, O 0.92); refitted
+#   in 2.6.0 without the sub-red-clump carbon stars (AGB_MAX_MKS; 2.5.3: 92.2 %).
 # The published single cuts did worse on these mostly dust-obscured Galactic
 # AGB stars: W_RP - W_KJ >= 0.9 (Mowlavi+2019) 68.5 %, the AllWISE line of
 # Lian et al. (2014) 75.4 %; WISE colours alone (46.6 % on stars without
