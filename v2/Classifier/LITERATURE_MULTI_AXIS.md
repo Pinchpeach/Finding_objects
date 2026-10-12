@@ -97,6 +97,29 @@ light curves; an EW at twice the period looks alike) and partly matches
 3–6″ away (blends). These objects had no correct label before either, so
 the RR Lyrae exact rate is unchanged.
 
+#### 3.1.1 RR Lyrae vs eclipsing binaries in ZTF (2.11.1)
+
+ASAS-SN RRAB/RRC/EW/EA stars (II/366) matched to Chen et al. (2020) ZTF
+types (`benchmark/build_rr_ew_truth.py`, `evaluate_rr_ew.py`).  The ZTF g/r
+amplitude ratio is a physical arbiter: a pulsator changes temperature over
+its cycle, so its amplitude grows towards the blue; a contact binary of two
+similar-temperature stars varies nearly achromatically.
+
+| ASAS-SN → ZTF | n | A_g/A_r median | P_ZTF / P_ASAS-SN |
+|---|---:|---:|---:|
+| RRC → RRc (agree) | 1,612 | 1.42 | 1.0 |
+| EW → EW (agree) | 1,670 | 1.07 | 1.0 |
+| RRC → EW | 182 | **1.05** | 2.0 |
+| EW → RRc | 41 | **1.40** | 0.5 |
+
+In both directions of disagreement the amplitude ratio sides with ZTF: the
+ASAS-SN single-band (V) type is the error.  A veto on the ratio (pulsator
+label with A_g/A_r < 1.15–1.20, eclipsing label > 1.20–1.25) would reject
+only labels that ASAS-SN also confirms (detached binaries with unequal
+components are chromatic too), so the rule is unchanged and the ratio is
+reported in the ZTF evidence (`amplitude_ratio_g_r`).  Part of the
+"RR Lyrae → eclipsing" cross-validation errors are therefore truth errors.
+
 ## 4. Neutron stars / pulsars (compact axis)
 
 Recommended observables:

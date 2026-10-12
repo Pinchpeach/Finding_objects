@@ -167,6 +167,7 @@ category,citation,journal_ref,bibcode,used_in,purpose
 별 분류,"Mowlavi, Trabucchi & Lebzelter 2019",arXiv:1907.05359 (저장소 표기 그대로),—,Classifier/subclass.py (AGB_DW_C),은하계 LPV의 O/C 경계 ≈ 0.9 mag
 별 분류,Abia et al. 2020,"A&A 633, A135",—,Classifier/subclass.py (AGB_DW_XC),"은하계 탄소별 Gaia–2MASS 도표, 극단 C-rich 경계 ≈ 1.7 mag"
 별 분류,Lian et al. 2014,"A&A 564, A84",—,Classifier/subclass.py (WISE_LIAN14),AllWISE W1−W2 대 W3−W4 직선으로 O-rich/C-rich AGB 구분(87 %/86 %)
+별 분류,Jayasinghe et al. 2018–2021 (ASAS-SN Variable Stars),"MNRAS 477, 3145; VizieR II/366",—,benchmark/build_rr_ew_truth.py; benchmark/build_mira_truth.py; Classifier/truth/build_independent_truth_sets.py,변광성 정답(RRAB/RRC/EW/EA/M/SR)
 분광 분류 기준,"Morgan, Keenan & Kellman 1943",An Atlas of Stellar Spectra (Univ. Chicago Press),—,Classifier/LITERATURE_SPECTROSCOPY.md,MK 분광 분류 체계(분광형·광도 계급)
 분광 분류 기준,Gray & Corbally 2009,Stellar Spectral Classification (Princeton Univ. Press),—,Classifier/LITERATURE_SPECTROSCOPY.md,MK 분류 기준 교과서
 분광 분류 기준,"Luo et al. 2015 (LAMOST DR1, LASP)","RAA 15, 1095",—,"Classifier/LITERATURE_SPECTROSCOPY.md; Get_data/lamost_spectroscopy.py (V/164/stellar5); Classifier/subclass.py (spectro_params, LAMOST_LOGG, LAMOST_FEH)","LAMOST LASP Teff·log g·[Fe/H]와 오차(110 K, 0.2 dex, 0.1 dex)"

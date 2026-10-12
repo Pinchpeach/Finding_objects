@@ -11,14 +11,14 @@ v2의 코드·문서·규칙표가 인용하는 논문, 카탈로그 출판물, 
 | [탐사·카탈로그 데이터](#survey) | 25 |
 | [데이터 출처 카탈로그 (논문 인용 없음)](#data) | 13 |
 | [교차 대응·통계·분류 방법](#method) | 11 |
-| [별 분류](#star) | 25 |
+| [별 분류](#star) | 26 |
 | [은하 분류](#galaxy) | 23 |
 | [퀘이사·AGN](#qso) | 14 |
 | [전파·X선·밀집성](#radio) | 10 |
 | [행성상성운·초신성·과도 현상](#trans) | 6 |
 | [기타 문서](#doc) | 13 |
 | [분광 분류 기준](#spec) | 43 |
-| **합계** | **211** |
+| **합계** | **212** |
 
 <a id="gaia"></a>
 ## 측성·Gaia
@@ -169,6 +169,7 @@ Gaia 데이터 릴리스, Gaia 처리·검증 논문, 측성 품질 기준.
 | Mowlavi, Trabucchi & Lebzelter 2019 | arXiv:1907.05359 (저장소 표기 그대로) | — | `Classifier/subclass.py` (AGB_DW_C) | 은하계 LPV의 O/C 경계 ≈ 0.9 mag |
 | Abia et al. 2020 | A&A 633, A135 | — | `Classifier/subclass.py` (AGB_DW_XC) | 은하계 탄소별 Gaia–2MASS 도표, 극단 C-rich 경계 ≈ 1.7 mag |
 | Lian et al. 2014 | A&A 564, A84 | — | `Classifier/subclass.py` (WISE_LIAN14) | AllWISE W1−W2 대 W3−W4 직선으로 O-rich/C-rich AGB 구분 (87 %/86 %) |
+| Jayasinghe et al. 2018–2021 (ASAS-SN Variable Stars) | MNRAS 477, 3145; VizieR II/366 | — | `benchmark/build_rr_ew_truth.py`<br>`benchmark/build_mira_truth.py`<br>`Classifier/truth/build_independent_truth_sets.py` | 변광성 정답(RRAB/RRC/EW/EA/M/SR) |
 
 <a id="galaxy"></a>
 ## 은하 분류
