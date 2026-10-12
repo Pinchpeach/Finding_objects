@@ -17,6 +17,7 @@ ZTF_MAP={"RR":("RR_LYRAE","RRAB"),"RRC":("RR_LYRAE","RRC"),"CEP":("CEPHEID","DCE
  "MIRA":("MIRA",None),"SR":("LPV","SR"),"EW":("ECLIPSING","EW"),"EA":("ECLIPSING","EA"),
  "BYDRA":("ROTATIONAL","BY_DRA"),"RSCVN":("ROTATIONAL","RS_CVN"),"DSCT":("PULSATING","DSCT")}
 ZTF="ztf_periodic_variables__"
+GAIA_MIRA_SEMI_AMP=0.6;MIRA_MIN_PERIOD_D=80.0
 EVENT_CLASSES={"SN","MICROLENSING"};NON_STELLAR={"AGN","GALAXY"};OTHER_SPECIAL={"EP","WD"}
 def _text(row,key):
  v=row.get(key)
@@ -63,6 +64,17 @@ def classify(row):
   if label in ("MIRA","LPV") and _flag(row,"gaia_lpv_is_cstar"):sub="C_STAR_CANDIDATE"   # keep the Gaia RP C-star flag
   ev=[{"kind":"ztf_periodic_variable","type":_text(row,ZTF+"Type"),"period_days":_num(row,ZTF+"Per"),"amplitude_r_mag":_num(row,ZTF+"rAmp"),"amplitude_g_mag":_num(row,ZTF+"gAmp"),"amplitude_ratio_g_r":_ratio(_num(row,ZTF+"gAmp"),_num(row,ZTF+"rAmp")),"ztf_id":_text(row,ZTF+"catalog_object_id")}]
   return _result(label,None,"ZTF_PERIODIC_VARIABLE",ev,sub)
+ # Mira from the Gaia DR3 LPV SOS G amplitude (2.13.0).  ``amplitude`` is half
+ # the peak-to-peak range of the fitted G model (Lebzelter et al. 2023); Miras
+ # are the large-amplitude LPVs (GCVS: dV > 2.5 mag; Mira-like in Gaia DR2:
+ # G range > ~1 mag, Mowlavi et al. 2018).  Semi-amplitude >= 0.6 mag (range
+ # >= 1.2 mag), with the GCVS Mira period range (>= 80 d) when a period is
+ # published.  ASAS-SN M vs SR (benchmark/build_mira_truth.py), threshold
+ # chosen on one half, other half: precision 0.934, recall 0.968.
+ amp=_num(row,"gaia_lpv_amplitude");freq=_num(row,"gaia_lpv_frequency")
+ if amp is not None and amp>=GAIA_MIRA_SEMI_AMP and (freq is None or freq<=0 or 1/freq>=MIRA_MIN_PERIOD_D):
+  sub="C_STAR_CANDIDATE" if _flag(row,"gaia_lpv_is_cstar") else None
+  return _result("MIRA",None,"GAIA_DR3_SOS_LPV_LARGE_AMPLITUDE",[{"kind":"gaia_dr3_vari_long_period_variable","semi_amplitude_g_mag":amp,"period_days":round(1/freq,1) if freq else None,"is_cstar":_flag(row,"gaia_lpv_is_cstar")}],sub)
  # LPV SOS has a published C-star-candidate flag.  It does not publish a
  # validated Mira leaf, so no period/amplitude threshold is used to make one.
  if _flag(row,"gaia_lpv_is_cstar"):

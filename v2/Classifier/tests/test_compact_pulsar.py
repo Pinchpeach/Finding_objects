@@ -72,3 +72,14 @@ def test_gaia_release_switch(monkeypatch):
     import pytest
     with pytest.raises(ValueError):
         gr.current()
+
+
+def test_gaia_lpv_mira_amplitude():
+    spec = importlib.util.spec_from_file_location("v2_var_m", ROOT / "axes" / "variability.py")
+    v = importlib.util.module_from_spec(spec); spec.loader.exec_module(v)
+    r = v.classify({"gaia_lpv_amplitude": 1.1, "gaia_lpv_frequency": 1 / 300.0, "best_class_name": "LPV"})
+    assert (r["label"], r["status"]) == ("MIRA", "GAIA_DR3_SOS_LPV_LARGE_AMPLITUDE")
+    assert v.classify({"gaia_lpv_amplitude": 0.2, "gaia_lpv_frequency": 1 / 60.0, "best_class_name": "LPV"})["label"] == "LPV"
+    assert v.classify({"gaia_lpv_amplitude": 0.9, "gaia_lpv_frequency": 1 / 50.0, "best_class_name": "LPV"})["label"] == "LPV"   # P < 80 d
+    assert v.classify({"gaia_lpv_amplitude": 1.0, "gaia_lpv_is_cstar": 1})["subtype"] == "C_STAR_CANDIDATE"
+
