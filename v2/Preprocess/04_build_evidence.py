@@ -254,6 +254,26 @@ def _color_knn_evidence(df,rule_list):
                     emit(empty[i],rule,cls,float(v),round(float(v),4),"colour-space kNN class fraction")
     return empty
 
+def _ls_gbm_evidence(df,rule_list):
+    """LS-GBM-001: gradient-boosting STAR/GALAXY/QSO probabilities from the Legacy Surveys Tractor columns (2.11.0)."""
+    empty=[[] for _ in range(len(df))]
+    rule=next((r for r in rule_list if r["rule_id"]=="LS-GBM-001"),None)
+    if rule is None: return empty
+    import sys
+    here=str(Path(__file__).resolve().parent)
+    if here not in sys.path: sys.path.insert(0,here)
+    import ls_gbm
+    prob=ls_gbm.predict_proba(df)
+    for i,f in enumerate(prob):
+        if f[0]==f[0]:
+            for cls,v in zip(ls_gbm.CLASSES,f):
+                emit(empty[i],rule,cls,float(v),round(float(v),4),"gradient-boosting class probability")
+    return empty
+
+# Soft statistical evidence (class fractions / probabilities over all three
+# classes), weighed by the fitted fusion; never counted as a hard conflict.
+SOFT_SUFFIXES=("-CKNN-001","-GBM-001")
+
 def run(features:Path,rules_path:Path,out:Path)->Path:
     df=pd.read_csv(features); rules=pd.read_csv(rules_path,keep_default_na=False)
     result=df.copy(); payload=[]; counts=[]; conflicts=[]
@@ -261,15 +281,16 @@ def run(features:Path,rules_path:Path,out:Path)->Path:
     # Plain dicts: building a pandas Series per row/rule dominated runtime.
     rule_list=rules.to_dict("records")
     knn=_color_knn_evidence(df,rule_list)
+    gbm=_ls_gbm_evidence(df,rule_list)
     for i,row in enumerate(df[_rule_columns(df.columns)].to_dict("records")):
         ev=[]
         for rule in rule_list: ev.extend(evaluate(rule,row,namespaced))
-        ev.extend(knn[i])
+        ev.extend(knn[i]); ev.extend(gbm[i])
         payload.append(json.dumps(ev,separators=(",",":")))
         counts.append(len(ev))
         # kNN class fractions are soft statistical evidence, weighed by the
         # fitted fusion; they are not independent hard claims that can conflict.
-        strong={e["class"] for e in ev if e["class"] in PRIMARY and e["score"]>=.8 and not e["rule_id"].endswith("-CKNN-001")}
+        strong={e["class"] for e in ev if e["class"] in PRIMARY and e["score"]>=.8 and not e["rule_id"].endswith(SOFT_SUFFIXES)}
         conflicts.append(int(len(strong)>1))
     result["evidence_json"]=payload; result["evidence_count"]=counts; result["evidence_conflict"]=conflicts
     out.parent.mkdir(parents=True,exist_ok=True); result.to_csv(out,index=False)

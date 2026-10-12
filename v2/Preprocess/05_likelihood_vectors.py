@@ -164,7 +164,7 @@ def run(evidence,out,model_path=MODEL_PATH,min_confidence=None,field_prior=False
             except (TypeError,ValueError): s=0
             # Colour-kNN fractions are soft evidence for the fitted fusion,
             # not hard claims (same rule as Stage 4's evidence_conflict).
-            if c in CLASSES and s>=.8 and not str(e.get("rule_id","")).endswith("-CKNN-001"): strong.add(c)
+            if c in CLASSES and s>=.8 and not str(e.get("rule_id","")).endswith(("-CKNN-001","-GBM-001")): strong.add(c)
         conflict=bool(items) and len(strong)>1
         in_host=hr<HOST_RADIUS and not _gaia_foreground_star(items) and not _spectroscopic(items)
         rows.append((np.array([p[c] for c in CLASSES]),used,conflict,in_host,_decisive_motion(items)))
