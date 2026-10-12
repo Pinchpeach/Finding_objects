@@ -2,7 +2,16 @@
 from __future__ import annotations
 import importlib.util,math
 from pathlib import Path
-AXIS="physical";CLASSES=("WD","RGB","AGB","UNKNOWN");ROOT=Path(__file__).resolve().parents[1]
+AXIS="physical";CLASSES=("WD","RGB","AGB","RED_GIANT","UNKNOWN")
+# RED_GIANT (2.13.0): an evolved cool giant (RGB or AGB, not separable without
+# asteroseismology or luminosity) from the luminosity class of the sub-class
+# classifier (Gaia CMD with parallax S/N >= 5, else spectroscopic log g from
+# LAMOST / Gaia GSP-Spec, else Gaia GSP-Phot log g against the Ciardi et al.
+# 2011 giant boundary; 96.9-98.3 % agreement with APOGEE DR17, 2.6.2) and
+# Teff < 5500 K.  Used where Gaia FLAME gives no validated RGB stage: FLAME
+# masses / ages of the Kepler giants are unphysical (median 3.3 Msun,
+# 0.3 Gyr; benchmark/flame_giants), so its RGB guardrails reject most.
+GIANT_TEFF_MAX=5500.0;ROOT=Path(__file__).resolve().parents[1]
 def _load_branch(name):
  p=ROOT/"branches"/f"{name}.py";s=importlib.util.spec_from_file_location(f"classifier_branch_{name}",p)
  if s is None or s.loader is None:raise ImportError(p)
@@ -16,6 +25,18 @@ def _num(row,key):
   v=float(row.get(key));return v if math.isfinite(v) else None
  except Exception:return None
 STAR=_load_branch("star");EVOLVED=_load_branch("evolved_star")
+_SUB=None
+def _subclass():
+ global _SUB
+ if _SUB is None:
+  p=ROOT/"subclass.py";s=importlib.util.spec_from_file_location("classifier_subclass_for_physical",p)
+  m=importlib.util.module_from_spec(s);s.loader.exec_module(m);_SUB=m
+ return _SUB
+def _teff(row):
+ for k in ("lamost_dr_catalog__lasp_teff","gaia_dr3__teff_gspspec","gaia_dr3__teff_gspphot","teff_gspphot"):
+  v=_num(row,k)
+  if v is not None:return v
+ return None
 def classify(row):
  catalogs=_text(row,"catalogs") or ""
  if "Suh 2021 AGB Catalog" in catalogs:
@@ -34,5 +55,9 @@ def classify(row):
  # not evidence for a physical/evolutionary state, and must not become a
  # catch-all physical class.  In particular, doing so turns missing RGB/AGB
  # evidence into a confident but wrong label in independent truth tests.
+ sub=_subclass();lum,rule,basis=sub.star_luminosity_class(row,sub._num);teff=_teff(row)
+ if lum=="III" and teff is not None and teff<GIANT_TEFF_MAX:
+  evidence.append({"kind":"luminosity_class","class":lum,"rule":rule,"basis":basis,"teff":teff})
+  return {"axis":AXIS,"label":"RED_GIANT","confidence":None,"status":f"RED_GIANT_{rule}","evidence":evidence}
  if family in {"STAR_LIKE","BINARY_CANDIDATE"}:return {"axis":AXIS,"label":"UNKNOWN","confidence":None,"status":"STAR_LIKE_NO_VALIDATED_PHYSICAL_STATE","evidence":evidence}
  return {"axis":AXIS,"label":"UNKNOWN","confidence":None,"status":"INSUFFICIENT_PHYSICAL_EVIDENCE","evidence":evidence}
