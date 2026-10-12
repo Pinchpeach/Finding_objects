@@ -20,9 +20,12 @@ PSR_ALPHA_MAX=-1.5;PSR_COMPACT_MAX=1.5;PSR_POL_MIN=0.05;PSR_POL_SNR=3.0
 # (benchmark/evaluate_pulsar.py): prior = known pulsar sources among all NVSS
 # sources (116 / 1.77 M); steep + compact LR = 0.216 / (4/2533) (Laplace);
 # Galactic plane |b| < 10 deg: 0.621 / 0.099 (off-plane 0.379 / 0.901);
-# significant polarisation: 0.241 / 0.0332 (absent 0.759 / 0.9668).
-# Pulsars concentrate to the plane (scale height ~0.5 kpc; Lorimer et al.
-# 2006, MNRAS 372, 777); the independence of the factors is an assumption.
+# significant polarisation: 0.241 / 0.0332 (absent 0.759 / 0.9668) -- rates
+# over all sources (pulsars 28/116, controls 84/2531), not within the steep +
+# compact candidates, so the factors are combined assuming independence.
+# Normal pulsars concentrate to the plane (scale height 330 pc; Lorimer et
+# al. 2006, MNRAS 372, 777); millisecond pulsars are nearly isotropic, so the
+# plane factor under-rates them.
 PSR_PRIOR_ODDS=116/1.77e6;PSR_LR_RULE=0.216/(4/2533)
 PSR_LR_PLANE=(0.621/0.099,0.379/0.901);PSR_LR_POL=(0.241/0.0332,0.759/0.9668);PSR_PLANE_B=10.0
 def _galactic_b(ra,dec):

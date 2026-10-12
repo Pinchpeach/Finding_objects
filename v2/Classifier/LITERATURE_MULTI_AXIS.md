@@ -219,6 +219,36 @@ pulsar sources). With ~3,000 pulsars among ~1.8 M NVSS sources the sky-wide
 purity is low (an FPR of 0.12 % is ~2,000 sources), so the label is a
 candidate, not an identification.
 
+### 4.2 Pulsar-candidate posterior (2.14.0)
+
+The candidate label is kept (no recall loss); its confidence is a sky-level
+posterior from naive Bayes with likelihood ratios measured per NVSS source
+(`benchmark/evaluate_pulsar.py`):
+
+| factor | pulsar sources | ordinary sources | LR present / absent |
+|---|---|---|---|
+| prior | 116 known pulsar sources among 1.77 M NVSS sources | | odds 6.6 × 10⁻⁵ |
+| steep + compact | 25/116 | 3/2531 (Laplace 4/2533) | 137 |
+| Galactic plane, \|b\| < 10° | 0.621 | 0.099 | 6.3 / 0.42 |
+| significant polarisation (P/σ ≥ 3, > 5 %) | 28/116 | 84/2531 | 7.3 / 0.79 |
+
+Normal pulsars concentrate to the plane (scale height 330 pc; Lorimer et al.
+2006); millisecond pulsars are nearly isotropic, so the plane factor
+under-rates them.  The factors are combined assuming independence.  Posterior
+by group, with the candidates of the sample:
+
+| group | pulsars | controls | posterior |
+|---|---:|---:|---:|
+| plane, polarised | 2 | 0 | 0.29 |
+| plane, not polarised | 10 | 1 | 0.042 |
+| off-plane, polarised | 4 | 0 | 0.027 |
+| off-plane, not polarised | 9 | 2 | 0.003 |
+
+Not done: LoTSS 144 MHz as a second spectral index (only 5 of the 116 pulsar
+sources are in LoTSS); Fermi 4FGL (only γ-ray pulsars, ~10 %, and a full
+rebuild of the sample); circular polarisation surveys (Sobey et al. 2022;
+Wang et al. 2022) -- the most promising next step.
+
 ## 5. Planetary nebulae (phenomenon/nebular axis)
 
 Recommended observables:

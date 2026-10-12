@@ -14,11 +14,11 @@ v2의 코드·문서·규칙표가 인용하는 논문, 카탈로그 출판물, 
 | [별 분류](#star) | 28 |
 | [은하 분류](#galaxy) | 23 |
 | [퀘이사·AGN](#qso) | 14 |
-| [전파·X선·밀집성](#radio) | 10 |
+| [전파·X선·밀집성](#radio) | 11 |
 | [행성상성운·초신성·과도 현상](#trans) | 6 |
 | [기타 문서](#doc) | 13 |
 | [분광 분류 기준](#spec) | 43 |
-| **합계** | **214** |
+| **합계** | **215** |
 
 <a id="gaia"></a>
 ## 측성·Gaia
@@ -243,6 +243,7 @@ AGN/퀘이사 선택, 전파 세기, 광도, 가려진 퀘이사, 고적색편�
 | Jankowski et al. 2018 | MNRAS 473, 4436 | — | `Classifier/LITERATURE_MULTI_AXIS.md §4.1`<br>`benchmark/build_pulsar_truth.py` | 펄서 평균 전파 스펙트럼 지수 −1.60 ± 0.54 |
 | Bates et al. 2013 | MNRAS 431, 1352 | — | `Classifier/LITERATURE_MULTI_AXIS.md §4.1`<br>`benchmark/build_pulsar_truth.py` | 펄서 스펙트럼 지수 분포 −1.4 ± 1.0 |
 | Intema et al. 2017 (TGSS ADR1) | A&A 598, A78 | — | `Get_data/tgss.py` (J/A+A/598/A78/table3)<br>`Preprocess/association_model.py` (TGSS ADR1) | 150 MHz 전파 카탈로그(25″ 빔) |
+| Lorimer et al. 2006 (pulsar Galactic distribution) | MNRAS 372, 777 | — | `Classifier/axes/compact.py (PSR_LR_PLANE)` | 보통 펄서의 은하면 집중(척도 높이 330 pc) |
 
 <a id="trans"></a>
 ## 행성상성운·초신성·과도 현상
