@@ -120,6 +120,25 @@ components are chromatic too), so the rule is unchanged and the ratio is
 reported in the ZTF evidence (`amplitude_ratio_g_r`).  Part of the
 "RR Lyrae → eclipsing" cross-validation errors are therefore truth errors.
 
+### 3.2 Mira from the Gaia DR3 LPV amplitude (2.12.0)
+
+Miras are the large-amplitude long-period variables (GCVS: ΔV > 2.5 mag).
+Gaia DR3 LPV `amplitude` is half the peak-to-peak range of the fitted G
+model (Lebzelter et al. 2023, A&A 674, A15).  In Gaia DR2 the Mira-like LPVs
+sit at G ranges of ~1–2.5 mag and the semi-regulars below ~1 mag (Mowlavi et
+al. 2018, A&A 618, A58); Grady et al. (2019) cut ΔG > 0.433 mag on a
+different amplitude statistic.
+
+Rule: semi-amplitude ≥ 0.6 mag (G range ≥ 1.2 mag) and, when a period is
+published, P ≥ 80 d (GCVS Mira range).  Fitted on even-numbered ASAS-SN
+M/SR stars matched to the Gaia LPV table (3,681 M, 2,592 SR), checked on the
+odd half: precision 0.934, recall 0.968 (precision levels off at 0.93–0.95
+for any threshold: a tail of large-amplitude ASAS-SN SR stars).
+
+Cross-validation (250 ASAS-SN Miras, 250 SR): Mira exact 25.6 → 94.8 %
+(the rule's 173 labels all correct); LPV exact 68.0 → 63.6 % (11 SR called
+Mira).
+
 ## 4. Neutron stars / pulsars (compact axis)
 
 Recommended observables:
