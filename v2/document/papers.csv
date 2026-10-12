@@ -76,6 +76,7 @@ category,citation,journal_ref,bibcode,used_in,purpose
 교차 대응·통계·분류 방법,Bovy et al. 2011 (XDQSO),"ApJ 729, 141",—,Preprocess/color_knn.py (MAG_DIMS ls_r_mag_scaled); Preprocess/LITERATURE.md,등급에 따라 색 분포·천체 수가 달라지므로 색 kNN에 r 등급 축 추가
 교차 대응·통계·분류 방법,Friedman 2001 (gradient boosting),"Ann. Stat. 29, 1189",—,Preprocess/ls_gbm.py; Preprocess/LITERATURE.md,LS-GBM-001 그래디언트 부스팅 분류기
 교차 대응·통계·분류 방법,Ke et al. 2017 (LightGBM),NeurIPS 30,—,Preprocess/ls_gbm.py; Preprocess/LITERATURE.md,히스토그램 기반 그래디언트 부스팅
+교차 대응·통계·분류 방법,Wilson 1927 (score interval),"JASA 22, 209",—,Classifier/calibration/fit_axis_calibration.py (wilson_lower),규칙 정밀도의 95 % 하한
 별 분류,Pecaut & Mamajek 2013,"ApJS 208, 9",—,"Classifier/subclass.py (분광형 GAIA_BPRP0/LS_GR0/PS1_IZ/GAIA_TEFF, 주계열 M_G); Preprocess/units.py; Classifier/LITERATURE_SUBCLASS.md; WORK_REPORT_2026-10-10.md",왜성 색–Teff 계열(분광형 척도)
 별 분류,"Mamajek, ""A Modern Mean Dwarf Stellar Color and Effective Temperature Sequence"", v2022.04.16",—,—,Classifier/reference/mamajek_dwarf_sequence.csv; Classifier/subclass.py; Classifier/LITERATURE_SUBCLASS.md; WORK_REPORT_2026-10-10.md (E1),"Pecaut & Mamajek 계열의 유지 판 표(SpT, Teff, BP−RP, M_G, g−r, i−z 등)"
 별 분류,Ciardi et al. 2010/2011 (저장소 표기 그대로),—,—,"Classifier/subclass.py (star_luminosity_class, GAIA_LOGG); Classifier/LITERATURE_SUBCLASS.md; WORK_REPORT_2026-10-10.md",Kepler 대상의 Teff–log g 거성 경계(시차 없을 때 광도 계급)

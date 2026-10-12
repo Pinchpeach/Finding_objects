@@ -294,6 +294,18 @@ Implementation implication:
 SN classification belongs to a temporal/event pipeline. A single static catalogue
 row without multi-epoch evidence should not produce a confident SN subtype.
 
+## Confidence of axis labels (2.15.0)
+
+Most axis labels come from rules without a score.  Their calibrated
+probability is the measured precision of the rule that produced them on the
+independent truth sets (`calibration/fit_axis_calibration.py`,
+`rule_precision`): the share of rows with that (status, label) whose truth is
+that label (a broader family label counts as right for its members), only for
+labels among the axis's truth classes and with ≥ 20 rows; the Wilson (1927)
+95 % lower bound is stored with it.  The truth sets are class-balanced (250
+per class), so this is a precision for that mix, not a sky-prior posterior.
+Labels without truth (e.g. ECLIPSING) stay uncalibrated.
+
 ## Implementation order
 
 1. Preserve and wire validated WD path into physical axis.
