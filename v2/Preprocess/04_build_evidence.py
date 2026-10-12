@@ -24,6 +24,27 @@ def num(row,name):
         return v if math.isfinite(v) else None
     except (TypeError,ValueError): return None
 
+R90_MIN_SNR2=5.0
+# AST-EXT-001 is the Gaia-CRF3 consistency cut |(plx+0.017)/sigma| < 5
+# (Klioner+2022 Eq. 2), which Klioner et al. apply only to filter catalogued
+# QSO candidates.  As positive EXTRAGALACTIC evidence it is informative only
+# when sigma_plx is small: with sigma = 1 mas any star beyond ~0.2 kpc passes.
+# Emitted for sigma_plx <= 0.3 mas (G <~ 19.5 in DR3; Lindegren+2021 A2)
+# (2.16.0; DESI benchmark 89.29 -> 89.50 %, SDSS unchanged).
+AST_EXT_MAX_PLX_ERR=0.3
+def _r90_sky(ra,dec):
+    """Assef+2018 R90 footprint: |b| > 10 deg and > 30 deg from the Galactic
+    Centre.  Unknown position -> allowed (the colour cut still applies)."""
+    if ra is None or dec is None: return True
+    r,d=math.radians(ra),math.radians(dec)
+    # ICRS -> Galactic unit vector (rotation matrix, ESA 1997 Hipparcos vol. 1)
+    x,y,z=math.cos(d)*math.cos(r),math.cos(d)*math.sin(r),math.sin(d)
+    gx=-0.0548755604*x-0.8734370902*y-0.4838350155*z
+    gy=+0.4941094279*x-0.4448296300*y+0.7469822445*z
+    gz=-0.8676661490*x-0.1980763734*y+0.4559837762*z
+    b=math.degrees(math.asin(max(-1.0,min(1.0,gz))))
+    return abs(b)>10.0 and math.degrees(math.acos(max(-1.0,min(1.0,gx))))>30.0
+
 class CatalogFields:
     """Read survey-native fields from the catalog a rule is about.
 
@@ -45,7 +66,7 @@ class CatalogFields:
 RAW_FIELDS={"parallax","parallax_error","pmra","pmra_error","pmdec","pmdec_error",
   "class","zwarning","iMeanPSFMag","rMeanPSFMag","zMeanPSFMag","W1mag","W2mag","snr1","snr2",
   "type","clean","Type","otype","best_class_name","best_class_score",*DSC_MAP.values(),
-  "flux_r","flux_ivar_r","flux_z","flux_ivar_z","catalog_object_id"}
+  "flux_r","flux_ivar_r","flux_z","flux_ivar_z","catalog_object_id","RAJ2000","DEJ2000"}
 DERIVED_PREFIXES=("association_confidence__","catalog_confidence_","ps1_","ls_","catalogs")
 
 def _rule_columns(columns):
@@ -63,6 +84,11 @@ def emit(out, rule, cls, score, value=None, note="", reliability=1.0, associatio
       "raw_score":raw,"reliability":rel,"association_reliability":arel,"kind":rule["likelihood_method"],
       "origin":rule["threshold_origin"],"feature_group":rule["feature_group"],
       "value":value,"note":note})
+
+# Gaia DR3 DSC-Combmod class prior (Delchambre et al. 2023, Table 2), coarse
+# classes: STAR family = star + binary + white dwarf.
+DSC_PRIOR={"STAR":0.988728+0.009887+0.000198,"GALAXY":0.000198,"QSO":0.000989}
+DSC_FLOOR=1e-6
 
 def evaluate(rule,row,namespaced=frozenset()):
     rid=rule["rule_id"]; out=[]
@@ -98,7 +124,7 @@ def evaluate(rule,row,namespaced=frozenset()):
     if rcol and reliability is None: reliability=0.0
     if rid=="AST-EXT-001":
         p,e=num(src,"parallax"),num(src,"parallax_error")
-        if p is not None and e and e>0:
+        if p is not None and e and 0<e<=AST_EXT_MAX_PLX_ERR:
             x=abs((p+0.017)/e)
             if x<float(rule["threshold"]): emit(out,rule,"EXTRAGALACTIC",1-x/float(rule["threshold"]),x,reliability=reliability,association_reliability=association_reliability)
     elif rid=="AST-EXT-002":
@@ -135,8 +161,14 @@ def evaluate(rule,row,namespaced=frozenset()):
                 score=min(0.65,0.50+min(max(0,0.05-delta),0.15))
                 emit(out,rule,"POINT_SOURCE",score,delta,"weak point-source evidence; unresolved morphology is not STAR-specific",reliability,association_reliability)
     elif rid=="WISE-AGN-R90-001":
+        # Assef+2018 (ApJS 234, 23) sec. 3 build R90 only where it is
+        # calibrated: W2 S/N > 5, W1 > 8 and W2 > 7 mag (saturation), and
+        # outside |b| <= 10 deg and 30 deg of the Galactic Centre (YSOs, AGB
+        # stars, PNe mimic AGN colours there).  cc_flags = 0 is already
+        # enforced by catalog_confidence_allwise.  (2.16.0; was S/N >= 3 only.)
         w1,w2,s1,s2=(num(src,x) for x in ("W1mag","W2mag","snr1","snr2"))
-        if None not in (w1,w2,s1,s2) and s1>=3 and s2>=3:
+        ra,dec=num(src,"RAJ2000"),num(src,"DEJ2000")
+        if None not in (w1,w2,s1,s2) and s1>=3 and s2>R90_MIN_SNR2 and w1>8 and w2>7 and _r90_sky(ra,dec):
             cut=0.650 if w2<=13.86 else 0.650*math.exp(0.153*(w2-13.86)**2)
             color=w1-w2
             if color>cut:
@@ -217,16 +249,24 @@ def evaluate(rule,row,namespaced=frozenset()):
         # Preprocess is intentionally coarse. Gaia DSC white-dwarf and
         # physical-binary posterior mass belongs to the stellar family here;
         # detailed stellar subclassification is deferred to v2/Classifier.
+        # DSC-Combmod posteriors carry a fixed class prior (Delchambre et al.
+        # 2023, A&A 674, A31, Table 2: star 0.9887, binary 0.0099, WD 0.0002,
+        # QSO 0.00099, galaxy 0.0002).  The fusion is fitted on class-balanced
+        # benchmarks, so that prior would be counted twice (it is what made the
+        # unconstrained fit give DSC "STAR" a negative weight).  The prior is
+        # divided out (their App. C) and the evidence is the prior-free
+        # probability over STAR family / GALAXY / QSO (2.16.0).
         pv={cls:num(src,col) for cls,col in DSC_MAP.items()}
         stellar=sum(v for cls,v in pv.items() if cls in {"STAR","WD","BINARY"} and v is not None)
-        if stellar>0:
-            emit(out,rule,"STAR",min(1.0,stellar),stellar,
-                 "Gaia DSC STAR+WD+BINARY coarse stellar-family probability",
-                 reliability=reliability,association_reliability=association_reliability)
-        for cls in ("GALAXY","QSO"):
-            v=pv.get(cls)
-            if v is not None:
-                emit(out,rule,cls,v,v,reliability=reliability,association_reliability=association_reliability)
+        coarse={"STAR":stellar if stellar>0 else None,"GALAXY":pv.get("GALAXY"),"QSO":pv.get("QSO")}
+        if all(v is not None for v in coarse.values()):
+            lr={c:max(v,DSC_FLOOR)/DSC_PRIOR[c] for c,v in coarse.items()}
+            z=sum(lr.values())
+            for cls in ("STAR","GALAXY","QSO"):
+                q=lr[cls]/z
+                emit(out,rule,cls,q,coarse[cls],
+                     "Gaia DSC posterior with its class prior divided out (Delchambre+2023 App. C)",
+                     reliability=reliability,association_reliability=association_reliability)
     elif rid=="VAR-001":
         cls=str(src.get("best_class_name","")).strip()
         score=num(src,"best_class_score")

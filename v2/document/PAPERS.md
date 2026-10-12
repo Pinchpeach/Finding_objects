@@ -8,9 +8,9 @@ v2의 코드·문서·규칙표가 인용하는 논문, 카탈로그 출판물, 
 |---|---:|
 | [측성·Gaia](#gaia) | 20 |
 | [측광 체계·단위](#phot) | 8 |
-| [탐사·카탈로그 데이터](#survey) | 25 |
+| [탐사·카탈로그 데이터](#survey) | 29 |
 | [데이터 출처 카탈로그 (논문 인용 없음)](#data) | 13 |
-| [교차 대응·통계·분류 방법](#method) | 12 |
+| [교차 대응·통계·분류 방법](#method) | 14 |
 | [별 분류](#star) | 28 |
 | [은하 분류](#galaxy) | 23 |
 | [퀘이사·AGN](#qso) | 14 |
@@ -18,7 +18,7 @@ v2의 코드·문서·규칙표가 인용하는 논문, 카탈로그 출판물, 
 | [행성상성운·초신성·과도 현상](#trans) | 6 |
 | [기타 문서](#doc) | 13 |
 | [분광 분류 기준](#spec) | 43 |
-| **합계** | **216** |
+| **합계** | **222** |
 
 <a id="gaia"></a>
 ## 측성·Gaia
@@ -96,6 +96,10 @@ Gaia 데이터 릴리스, Gaia 처리·검증 논문, 측성 품질 기준.
 | Chen et al. 2020 (ZTF periodic variables) | ApJS 249, 18; VizieR J/ApJS/249/18 | — | `Get_data/ztf_periodic.py`<br>`Classifier/axes/variability.py (ZTF_MAP)`<br>`Classifier/LITERATURE_MULTI_AXIS.md §3.1` | ZTF 주기 변광성 78만 개의 유형(Mira, SR, RR, EW 등)·주기·진폭 |
 | Bellm et al. 2019 (ZTF) | PASP 131, 018002 | — | `Preprocess/association_model.py (ZTF periodic variables)`<br>`Classifier/LITERATURE_MULTI_AXIS.md §3.1` | ZTF 관측 체계(시상 ~2″) |
 | Masci et al. 2019 (ZTF data system) | PASP 131, 018003 | — | `Preprocess/association_model.py (ZTF periodic variables)` | ZTF 측성 정밀도(~0.1″) |
+| Becker, White & Helfand 1995 | ApJ 450, 559; DOI 10.1086/176166 | — | `Preprocess/association_model.py (FIRST)` | FIRST 빔 5.4″ |
+| Merloni et al. 2024 | A&A 682, A34; DOI 10.1051/0004-6361/202347165 | — | `Preprocess/association_model.py (eRASS1)` | eRASS1 위치 오차(1σ, 최빈 4.5″)와 PSF HEW 30″ |
+| Evans et al. 2010 | ApJS 189, 37; DOI 10.1088/0067-0049/189/1/37 | — | `Preprocess/association_model.py (Chandra CSC)` | CSC 오차 타원 r0는 95 % 반경, 0.16″ 계통 오차 |
+| Webb et al. 2020 | A&A 641, A136; DOI 10.1051/0004-6361/201937353 | — | `Preprocess/association_model.py (4XMM)` | 4XMM POSERR(1σ, 계통 포함), EPIC PSF |
 
 <a id="data"></a>
 ## 데이터 출처 카탈로그 (논문 인용 없음)
@@ -137,6 +141,8 @@ Gaia 데이터 릴리스, Gaia 처리·검증 논문, 측성 품질 기준.
 | Friedman 2001 (gradient boosting) | Ann. Stat. 29, 1189 | — | `Preprocess/ls_gbm.py`<br>`Preprocess/LITERATURE.md` | LS-GBM-001 그래디언트 부스팅 분류기 |
 | Ke et al. 2017 (LightGBM) | NeurIPS 30 | — | `Preprocess/ls_gbm.py`<br>`Preprocess/LITERATURE.md` | 히스토그램 기반 그래디언트 부스팅 |
 | Wilson 1927 (score interval) | JASA 22, 209 | — | `Classifier/calibration/fit_axis_calibration.py (wilson_lower)` | 규칙 정밀도의 95 % 하한 |
+| Ball et al. 2007 | ApJ 663, 774; DOI 10.1086/518362 | — | `Preprocess/color_knn.py`<br>`Preprocess/classification_rules.csv LS-CKNN-001, PS1-CKNN-001` | 색 공간 kNN(사례 기반) 별·은하·QSO 분류 (2.16.0에서 인용 수정) |
+| Chow 1970 | IEEE Trans. Inf. Theory 16, 41; DOI 10.1109/TIT.1970.1054406 | — | `Preprocess/05_likelihood_vectors.py`<br>`LITERATURE_REVIEW_2026-10.md` | 확신도 임계 기권(reject option) |
 
 <a id="star"></a>
 ## 별 분류

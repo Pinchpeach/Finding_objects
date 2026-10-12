@@ -27,6 +27,11 @@ Implementation policy: extended morphology supplies moderate GALAXY evidence onl
   The published catalog is designed for ~90% reliability, but this is a sample-selection
   reliability, not a per-source posterior probability. The pipeline maps it to
   EXTRAGALACTIC/AGN evidence rather than QSO-only evidence.
+  Since 2.16.0 the rule is applied only in the regime Assef et al. (§3) built
+  the catalogue in: W2 S/N > 5, W1 > 8 and W2 > 7 mag (saturation), cc_flags =
+  0 (via `catalog_confidence_allwise`), |b| > 10° and > 30° from the Galactic
+  Centre (YSOs, AGB stars and PNe have AGN-like W1−W2 there).  The earlier
+  gate was S/N ≥ 3 in both bands only.
 
 ### PS1-QSO-Z6-001
 - Bañados, E. et al. (2016), *The Pan-STARRS1 Distant z>5.6 Quasar Survey*,
@@ -238,3 +243,43 @@ does not raise its own class most and refits; removed keys keep their
 literature prior weight in Stage 5 (one-sided support).  A Gaia-only copy of
 the training rows (all LS, PS1 and WISE evidence dropped, weight 0.3) teaches
 the remaining weights that case.
+
+## Gaia DSC class prior removed (2.16.0)
+
+Gaia DR3 DSC-Combmod probabilities are posteriors under a global class prior
+(Delchambre et al. 2023, A&A 674, A31, Table 2: star 0.988728, binary 0.009887,
+WD 0.000198, QSO 0.000989, galaxy 0.000198).  The fusion is trained on
+class-balanced data, so feeding these posteriors in counted a ~1000:1 star
+prior on top of the fitted weights.  Following Delchambre et al. App. C, each
+probability is divided by its prior and renormalised (STAR = star + binary +
+WD), with a 1e-6 floor.  The DSC-001 and VAR-001 rows of
+`classification_rules.csv` were also missing one field, which made their
+`likelihood_method` empty and the Stage-5 weight fall to the 0.25 default.
+Measured with the refitted fusion (test splits): DESI 88.46 → 90.96 %
+(abstention 5.3 → 2.6 %), SDSS 97.64 → 97.69 %.
+
+## Gaia parallax consistent with zero (AST-EXT-001, 2.16.0)
+
+|(ϖ + 0.017)/σϖ| < 5 is the Gaia-CRF3 consistency cut (Klioner et al. 2022,
+A&A 667, A148, Eq. 2; the −0.017 mas QSO median parallax, Lindegren et al.
+2021, A&A 649, A4).  Klioner et al. use it only to clean catalogued QSO
+candidates.  As positive EXTRAGALACTIC evidence it is informative only when
+σϖ is small (σϖ = 1 mas lets every star beyond ~0.2 kpc pass), so it is now
+emitted for σϖ ≤ 0.3 mas only (G ≲ 19.5 in DR3).  DESI 89.29 → 89.50 % before
+the refit; after the refit the key is no longer sign-dropped.
+
+## Survey positional profiles (`association_model.py`, 2.16.0)
+
+| Survey | Change | Source |
+|---|---|---|
+| Pan-STARRS1 | PSF 0.83″ → 1.2″ (delivered i-band median; 0.83″ was the site DIMM seeing); `epochMean` read as the epoch of the mean position | Chambers et al. 2016, Table 11 |
+| FIRST | beam 5.0″ → 5.4″ | Becker, White & Helfand 1995 |
+| eRASS1 | fallback error 4.0″ → 4.5″ (POS_ERR peak), resolution 26″ → 30″ (survey-averaged HEW), epoch 2020.5 → 2020.2; per-source POS_ERR read | Merloni et al. 2024 |
+| Chandra CSC 2.0 | per-source r0 is a 95 % radius: σ = r0/2.448 ⊕ 0.16″ systematic | Evans et al. 2010; CSC column docs |
+| 4XMM | per-source POSERR (1σ incl. systematic) read | Webb et al. 2020 |
+| Legacy Surveys DR10 | new profile (was the 0.6″ default): seeing 1.2″, per-source σ from `ra_ivar`/`dec_ivar`, `ref_epoch` for Gaia-matched stars | Dey et al. 2019 |
+
+The benchmark features are already matched, so these do not change the
+benchmark numbers; they change real-field association (larger PSF/6 floor
+for PS1, correct X-ray error circles, proper-motion propagation to PS1/LS
+epochs).

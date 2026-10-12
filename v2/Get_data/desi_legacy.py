@@ -46,8 +46,12 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     # far deeper than AllWISE; quasars' mid-IR excess separates them from
     # stars where astrometry is unavailable (Chaussidon+2023).  The Tractor
     # Sersic index and half-light radius give the galaxy light profile.
+    # ra_ivar/dec_ivar (1/deg^2) and ref_epoch give the per-source position
+    # error and, for Gaia-matched stars, the epoch of the position (Dey+2019
+    # sec. 8; LS DR10 catalogue schema) -- used by the association (2.16.0).
+    extra = ", ra_ivar, dec_ivar, ref_epoch"
     query = f"""
-        SELECT ls_id, ra, dec, type, release, brickid, objid,
+        SELECT ls_id, ra, dec, type, release, brickid, objid{{extra}},
                flux_g, flux_r, flux_i, flux_z,
                flux_ivar_g, flux_ivar_r, flux_ivar_i, flux_ivar_z,
                mw_transmission_g, mw_transmission_r,
@@ -61,7 +65,13 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
             ra, dec, {float(ra):.10f}, {float(dec):.10f}, {radius_deg:.10f}
         )
     """
-    df = _query_with_retries(lambda: pyvo.dal.TAPService(TAP_URL).search(query).to_table().to_pandas())
+    run = lambda q: _query_with_retries(lambda: pyvo.dal.TAPService(TAP_URL).search(q).to_table().to_pandas())
+    try:
+        df = run(query.replace("{extra}", extra))
+    except RuntimeError:
+        # The astrometric columns are optional: never lose the photometry
+        # because a service rejects them.
+        df = run(query.replace("{extra}", ""))
     if df.empty:
         return pd.DataFrame(columns=["catalog", "catalog_object_id", "object_name", "ra", "dec"])
     df.columns = [str(c).strip() for c in df.columns]

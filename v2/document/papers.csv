@@ -52,6 +52,10 @@ category,citation,journal_ref,bibcode,used_in,purpose
 탐사·카탈로그 데이터,Chen et al. 2020 (ZTF periodic variables),"ApJS 249, 18; VizieR J/ApJS/249/18",—,Get_data/ztf_periodic.py; Classifier/axes/variability.py (ZTF_MAP); Classifier/LITERATURE_MULTI_AXIS.md §3.1,"ZTF 주기 변광성 78만 개의 유형(Mira, SR, RR, EW 등)·주기·진폭"
 탐사·카탈로그 데이터,Bellm et al. 2019 (ZTF),"PASP 131, 018002",—,Preprocess/association_model.py (ZTF periodic variables); Classifier/LITERATURE_MULTI_AXIS.md §3.1,ZTF 관측 체계(시상 ~2″)
 탐사·카탈로그 데이터,Masci et al. 2019 (ZTF data system),"PASP 131, 018003",—,Preprocess/association_model.py (ZTF periodic variables),ZTF 측성 정밀도(~0.1″)
+탐사·카탈로그 데이터,"Becker, White & Helfand 1995","ApJ 450, 559; DOI 10.1086/176166",—,Preprocess/association_model.py (FIRST),FIRST 빔 5.4″
+탐사·카탈로그 데이터,Merloni et al. 2024,"A&A 682, A34; DOI 10.1051/0004-6361/202347165",—,Preprocess/association_model.py (eRASS1),"eRASS1 위치 오차(1σ, 최빈 4.5″)와 PSF HEW 30″"
+탐사·카탈로그 데이터,Evans et al. 2010,"ApJS 189, 37; DOI 10.1088/0067-0049/189/1/37",—,Preprocess/association_model.py (Chandra CSC),"CSC 오차 타원 r0는 95 % 반경, 0.16″ 계통 오차"
+탐사·카탈로그 데이터,Webb et al. 2020,"A&A 641, A136; DOI 10.1051/0004-6361/201937353",—,Preprocess/association_model.py (4XMM),"4XMM POSERR(1σ, 계통 포함), EPIC PSF"
 데이터 출처 카탈로그 (논문 인용 없음),AllWISE — 저장소에 논문 인용 없음,VizieR II/328/allwise,—,Get_data/allwise.py; benchmark/build_agb_chemistry_truth.py,중적외선 W1–W4 측광
 데이터 출처 카탈로그 (논문 인용 없음),2MASS Point Source Catalog — 저장소에 논문 인용 없음,VizieR II/246/out,—,Get_data/twomass.py; benchmark/build_agb_chemistry_truth.py,근적외선 J/H/Ks 측광
 데이터 출처 카탈로그 (논문 인용 없음),FIRST (first14) — 저장소에 논문 인용 없음,VizieR VIII/92/first14,—,Get_data/first.py; benchmark/RADIO_XRAY_BENCHMARK_RESULTS.md,"1.4 GHz 전파 플럭스, 전파 선택 벤치마크"
@@ -77,6 +81,8 @@ category,citation,journal_ref,bibcode,used_in,purpose
 교차 대응·통계·분류 방법,Friedman 2001 (gradient boosting),"Ann. Stat. 29, 1189",—,Preprocess/ls_gbm.py; Preprocess/LITERATURE.md,LS-GBM-001 그래디언트 부스팅 분류기
 교차 대응·통계·분류 방법,Ke et al. 2017 (LightGBM),NeurIPS 30,—,Preprocess/ls_gbm.py; Preprocess/LITERATURE.md,히스토그램 기반 그래디언트 부스팅
 교차 대응·통계·분류 방법,Wilson 1927 (score interval),"JASA 22, 209",—,Classifier/calibration/fit_axis_calibration.py (wilson_lower),규칙 정밀도의 95 % 하한
+교차 대응·통계·분류 방법,Ball et al. 2007,"ApJ 663, 774; DOI 10.1086/518362",—,"Preprocess/color_knn.py; Preprocess/classification_rules.csv LS-CKNN-001, PS1-CKNN-001",색 공간 kNN(사례 기반) 별·은하·QSO 분류 (2.16.0에서 인용 수정)
+교차 대응·통계·분류 방법,Chow 1970,"IEEE Trans. Inf. Theory 16, 41; DOI 10.1109/TIT.1970.1054406",—,Preprocess/05_likelihood_vectors.py; LITERATURE_REVIEW_2026-10.md,확신도 임계 기권(reject option)
 별 분류,Pecaut & Mamajek 2013,"ApJS 208, 9",—,"Classifier/subclass.py (분광형 GAIA_BPRP0/LS_GR0/PS1_IZ/GAIA_TEFF, 주계열 M_G); Preprocess/units.py; Classifier/LITERATURE_SUBCLASS.md; WORK_REPORT_2026-10-10.md",왜성 색–Teff 계열(분광형 척도)
 별 분류,"Mamajek, ""A Modern Mean Dwarf Stellar Color and Effective Temperature Sequence"", v2022.04.16",—,—,Classifier/reference/mamajek_dwarf_sequence.csv; Classifier/subclass.py; Classifier/LITERATURE_SUBCLASS.md; WORK_REPORT_2026-10-10.md (E1),"Pecaut & Mamajek 계열의 유지 판 표(SpT, Teff, BP−RP, M_G, g−r, i−z 등)"
 별 분류,Ciardi et al. 2010/2011 (저장소 표기 그대로),—,—,"Classifier/subclass.py (star_luminosity_class, GAIA_LOGG); Classifier/LITERATURE_SUBCLASS.md; WORK_REPORT_2026-10-10.md",Kepler 대상의 Teff–log g 거성 경계(시차 없을 때 광도 계급)
