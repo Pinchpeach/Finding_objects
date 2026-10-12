@@ -33,13 +33,23 @@ def _subclass():
   m=importlib.util.module_from_spec(s);s.loader.exec_module(m);_SUB=m
  return _SUB
 def _teff(row):
- for k in ("lamost_dr_catalog__lasp_teff","gaia_dr3__teff_gspspec","gaia_dr3__teff_gspphot","teff_gspphot"):
+ # Spectroscopic Teff only through spectro_params (GSP-Spec flag checks,
+ # 2.17.0), else GSP-Phot.
+ sp=_subclass().spectro_params(row)
+ if sp is not None:return sp["teff"]
+ for k in ("gaia_dr3__teff_gspphot","teff_gspphot"):
   v=_num(row,k)
   if v is not None:return v
  return None
 def classify(row):
  catalogs=_text(row,"catalogs") or ""
  if "Suh 2021 AGB Catalog" in catalogs:
+  # Suh (2021) includes visual carbon stars from general lists; with a good
+  # parallax, M_Ks > -1 (fainter than the red clump, M_Ks = -1.61) is not an
+  # AGB star (dwarf / CH carbon stars; same veto as subclass.agb_chemistry).
+  sub_mod=_subclass();mags=sub_mod.abs_mags(row);mk=mags[0] if mags else None
+  if mk is not None and mk>sub_mod.AGB_MAX_MKS:
+   return {"axis":AXIS,"label":"UNKNOWN","confidence":None,"status":"SUH2021_MATCH_BELOW_RED_CLUMP","evidence":[{"kind":"suh2021_agb_catalog_counterpart","abs_ks":round(mk,2),"note":f"M_Ks = {mk:.2f} > {sub_mod.AGB_MAX_MKS}: fainter than the red clump, not on the AGB"}]}
   assoc=_num(row,"association_confidence__suh_2021_agb_catalog");sub=_text(row,"agb_subclass")
   return {"axis":AXIS,"label":"AGB","confidence":assoc,"status":"SUH2021_AGB_CATALOG_MATCH","evidence":[{"kind":"suh2021_agb_catalog_counterpart","agb_subclass":sub,"position_basis":_text(row,"position_basis"),"association_confidence":assoc,"score_semantics":"raw association score; not calibrated posterior"}]}
  simbad=_text(row,"otype")
@@ -50,7 +60,7 @@ def classify(row):
  evidence=[{"kind":"star_branch","stellar_family":family,"stellar_family_score":star.get("stellar_family_score"),"basis":star.get("basis"),"wd_hr_locus_signal":star.get("wd_hr_locus_signal"),"spectral_type":star.get("spectral_type"),"spectral_type_confidence":star.get("spectral_type_confidence")}]
  if family=="WHITE_DWARF_CANDIDATE":return {"axis":AXIS,"label":"WD","confidence":star.get("stellar_family_score"),"status":"CLASSIFIED_WD","evidence":evidence}
  evolved=EVOLVED.classify(row);evidence.extend(evolved.get("evidence",[]))
- if evolved.get("label") in {"RGB","AGB"}:return {"axis":AXIS,"label":evolved["label"],"confidence":evolved.get("confidence"),"status":evolved.get("status","CLASSIFIED"),"evidence":evidence}
+ if evolved.get("label") in {"RGB","AGB","RED_GIANT"}:return {"axis":AXIS,"label":evolved["label"],"confidence":evolved.get("confidence"),"status":evolved.get("status","CLASSIFIED"),"evidence":evidence}
  # A stellar-family route establishes only that the object is stellar.  It is
  # not evidence for a physical/evolutionary state, and must not become a
  # catch-all physical class.  In particular, doing so turns missing RGB/AGB
@@ -59,5 +69,5 @@ def classify(row):
  if lum=="III" and teff is not None and teff<GIANT_TEFF_MAX:
   evidence.append({"kind":"luminosity_class","class":lum,"rule":rule,"basis":basis,"teff":teff})
   return {"axis":AXIS,"label":"RED_GIANT","confidence":None,"status":f"RED_GIANT_{rule}","evidence":evidence}
- if family in {"STAR_LIKE","BINARY_CANDIDATE"}:return {"axis":AXIS,"label":"UNKNOWN","confidence":None,"status":"STAR_LIKE_NO_VALIDATED_PHYSICAL_STATE","evidence":evidence}
+ if family=="STAR_LIKE":return {"axis":AXIS,"label":"UNKNOWN","confidence":None,"status":"STAR_LIKE_NO_VALIDATED_PHYSICAL_STATE","evidence":evidence}
  return {"axis":AXIS,"label":"UNKNOWN","confidence":None,"status":"INSUFFICIENT_PHYSICAL_EVIDENCE","evidence":evidence}

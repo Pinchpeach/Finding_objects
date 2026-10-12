@@ -11,14 +11,14 @@ v2의 코드·문서·규칙표가 인용하는 논문, 카탈로그 출판물, 
 | [탐사·카탈로그 데이터](#survey) | 29 |
 | [데이터 출처 카탈로그 (논문 인용 없음)](#data) | 13 |
 | [교차 대응·통계·분류 방법](#method) | 14 |
-| [별 분류](#star) | 28 |
+| [별 분류](#star) | 35 |
 | [은하 분류](#galaxy) | 23 |
 | [퀘이사·AGN](#qso) | 14 |
 | [전파·X선·밀집성](#radio) | 11 |
 | [행성상성운·초신성·과도 현상](#trans) | 6 |
 | [기타 문서](#doc) | 13 |
 | [분광 분류 기준](#spec) | 43 |
-| **합계** | **222** |
+| **합계** | **229** |
 
 <a id="gaia"></a>
 ## 측성·Gaia
@@ -179,6 +179,13 @@ Gaia 데이터 릴리스, Gaia 처리·검증 논문, 측성 품질 기준.
 | Jayasinghe et al. 2018–2021 (ASAS-SN Variable Stars) | MNRAS 477, 3145; VizieR II/366 | — | `benchmark/build_rr_ew_truth.py`<br>`benchmark/build_mira_truth.py`<br>`Classifier/truth/build_independent_truth_sets.py` | 변광성 정답(RRAB/RRC/EW/EA/M/SR) |
 | Mowlavi et al. 2018 (Gaia DR2 LPV catalogue) | A&A 618, A58 | — | `Classifier/axes/variability.py (GAIA_MIRA_SEMI_AMP)`<br>`Classifier/LITERATURE_MULTI_AXIS.md §3.2` | Gaia G 진폭 > ~1 mag인 미라형 LPV |
 | Grady et al. 2019 | MNRAS 483, 3022 | — | `Classifier/LITERATURE_MULTI_AXIS.md §3.2` | Gaia 진폭 기반 미라 선택(다른 진폭 통계) |
+| Andriantsaralaza et al. 2022 | A&A 667, A74; DOI 10.1051/0004-6361/202243670 | — | `Classifier/subclass.py (star_tags RUWE)` | AGB 별의 높은 RUWE는 쌍성보다 포화·크기·광심 이동 때문 |
+| Sanders & Matsunaga 2023 | MNRAS 521, 2745; DOI 10.1093/mnras/stad574 | — | `Classifier/subclass.py (agb_chemistry, gaia_lpv_cstar)` | Gaia LPV C/O 판정: 은하면·벌지 소광, is_cstar 사용 권고(Lebzelter+2023 인용) |
+| Zhang & Sanders 2023 | MNRAS 521, 5309; DOI 10.1093/mnras/stad575 | — | `Classifier/axes/variability.py (Mira)` | Gaia DR3 미라 선택: 80 < P < 1000 d, 반진폭 ≥ 0.5 |
+| Kulkarni et al. 2025 | arXiv:2509.03120 | — | `Classifier/axes/variability.py (_ratio)` | RR Lyrae ZTF g/r 진폭비 ≈ 1.4 |
+| Fouesneau et al. 2023 | A&A 674, A28; DOI 10.1051/0004-6361/202243919 | — | `Classifier/branches/evolved_star.py`<br>`Classifier/subclass.py (GSP-Spec)` | FLAME 거성 질량·나이 사용 범위(1 < M < 2, 나이 > 1.5 Gyr), GSP-Spec 보정 권고 |
+| Culpan et al. 2022 | A&A 662, A40; DOI 10.1051/0004-6361/202243337 | — | `Classifier/subclass.py (star_luminosity_class)` | Gaia 고온 준왜성: 주계열 아래 청색 영역 |
+| Górski et al. 2018 | AJ 156, 278; DOI 10.3847/1538-3881/aaeacb | — | `Classifier/subclass.py (RGB_TIP_MKS)` | Ks 적색 거성 가지 끝 등급 −6.28, 색 의존성 |
 
 <a id="galaxy"></a>
 ## 은하 분류

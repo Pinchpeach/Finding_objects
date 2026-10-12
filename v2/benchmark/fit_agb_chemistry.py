@@ -46,6 +46,16 @@ SPEC = [("GAIA_2MASS_WISE_CSTAR", ["dW", "kw3", "cst"]),
 WISE_SAT = {"aw_w1": 8.0, "aw_w2": 6.7, "aw_w3": 3.8, "aw_w4": -0.4}
 
 
+def cstar_reliable(d: pd.DataFrame) -> pd.Series:
+    """Gaia DR3 LPV is_cstar used only where Lebzelter et al. (2023) advise:
+    G_BP < 19 and, when given, 7 < median_delta_wl_rp < 11 (2.17.0); NaN
+    without the flag."""
+    ok = d.g_bp < 19
+    if "lpv_mdwlrp" in d:
+        ok &= d.lpv_mdwlrp.isna() | ((d.lpv_mdwlrp > 7) & (d.lpv_mdwlrp < 11))
+    return d.lpv_is_cstar.where(d.lpv_is_cstar.isna(), (d.lpv_is_cstar == 1) & ok).astype(float)
+
+
 def features(d: pd.DataFrame) -> pd.DataFrame:
     d = d.copy()
     for c, lim in WISE_SAT.items():
@@ -55,7 +65,7 @@ def features(d: pd.DataFrame) -> pd.DataFrame:
     d["w34"] = d.aw_w3 - d.aw_w4
     d["w12"] = d.aw_w1 - d.aw_w2
     d["dW"] = (d.g_rp - 1.3 * (d.g_bp - d.g_rp)) - (d.tm_ks - 0.686 * d.jk)
-    d["cst"] = d.lpv_is_cstar
+    d["cst"] = cstar_reliable(d)
     return d
 
 

@@ -5,30 +5,76 @@
   "luminosity_class": {
    "GSPSPEC": {
     "n": 3078,
-    "accuracy": 0.9779,
-    "giant_recall": 0.9852,
-    "giant_precision": 0.979
+    "accuracy": 0.9311,
+    "giant_recall": 0.8959,
+    "giant_precision": 0.9988
    },
    "LAMOST": {
     "n": 1880,
-    "accuracy": 0.983,
-    "giant_recall": 0.9753,
-    "giant_precision": 0.9916
+    "accuracy": 0.9399,
+    "giant_recall": 0.8918,
+    "giant_precision": 0.9988
    },
    "GSPPHOT": {
     "n": 5331,
-    "accuracy": 0.9685,
-    "giant_recall": 0.9608,
-    "giant_precision": 0.9835
+    "accuracy": 0.9503,
+    "giant_recall": 0.9288,
+    "giant_precision": 0.9891
+   }
+  },
+  "luminosity_class_strict": {
+   "GAIA_CMD": {
+    "n": 7002,
+    "called_III": 4191,
+    "III_precision": 0.9587,
+    "III_recall": 0.9936,
+    "truth_of_III_calls": {
+     "III": 4018,
+     "IV": 95,
+     "V": 78
+    }
+   },
+   "GSPSPEC_LOGG": {
+    "n": 3078,
+    "called_III": 1698,
+    "III_precision": 0.9953,
+    "III_recall": 0.9281,
+    "truth_of_III_calls": {
+     "III": 1690,
+     "IV": 6,
+     "V": 2
+    }
+   },
+   "LAMOST_LOGG": {
+    "n": 1880,
+    "called_III": 866,
+    "III_precision": 0.9942,
+    "III_recall": 0.943,
+    "truth_of_III_calls": {
+     "III": 861,
+     "IV": 4,
+     "V": 1
+    }
+   },
+   "GAIA_LOGG": {
+    "n": 5331,
+    "called_III": 2847,
+    "III_precision": 0.9817,
+    "III_recall": 0.9517,
+    "truth_of_III_calls": {
+     "III": 2795,
+     "V": 31,
+     "IV": 21
+    }
    }
   },
   "metal_poor": {
    "GSPSPEC": {
     "n": 3045,
     "flagged": 32,
-    "precision": 0.7812,
-    "recall": 0.8929,
-    "median_offset": 0.019
+    "precision": 0.75,
+    "recall": 0.8571,
+    "median_offset": 0.003
    },
    "LAMOST": {
     "n": 1868,

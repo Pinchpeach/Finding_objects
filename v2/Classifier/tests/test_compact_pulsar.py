@@ -49,8 +49,8 @@ def test_ztf_periodic_variable_types():
     Z = "ztf_periodic_variables__"
     r = v.classify({Z + "Type": "Mira", Z + "Per": 320.0, Z + "rAmp": 3.1})
     assert (r["label"], r["status"]) == ("MIRA", "ZTF_PERIODIC_VARIABLE")
-    assert v.classify({Z + "Type": "Mira", "gaia_lpv_is_cstar": 1})["subtype"] == "C_STAR_CANDIDATE"
-    assert v.classify({Z + "Type": "SR", "gaia_lpv_is_cstar": 1})["subtype"] == "C_STAR_CANDIDATE"
+    assert v.classify({Z + "Type": "Mira", "gaia_lpv_is_cstar": 1, "gaia_dr3__phot_bp_mean_mag": 15.0})["subtype"] == "C_STAR_CANDIDATE"
+    assert v.classify({Z + "Type": "SR", "gaia_lpv_is_cstar": 1, "gaia_dr3__phot_bp_mean_mag": 15.0})["subtype"] == "C_STAR_CANDIDATE"
     assert v.classify({Z + "Type": "RRc"})["subtype"] == "RRC"
     assert v.classify({Z + "Type": "EW"})["label"] == "ECLIPSING"
     # Gaia SOS RR Lyrae fit keeps precedence over ZTF.
@@ -81,7 +81,14 @@ def test_gaia_lpv_mira_amplitude():
     assert (r["label"], r["status"]) == ("MIRA", "GAIA_DR3_SOS_LPV_LARGE_AMPLITUDE")
     assert v.classify({"gaia_lpv_amplitude": 0.2, "gaia_lpv_frequency": 1 / 60.0, "best_class_name": "LPV"})["label"] == "LPV"
     assert v.classify({"gaia_lpv_amplitude": 0.9, "gaia_lpv_frequency": 1 / 50.0, "best_class_name": "LPV"})["label"] == "LPV"   # P < 80 d
-    assert v.classify({"gaia_lpv_amplitude": 1.0, "gaia_lpv_is_cstar": 1})["subtype"] == "C_STAR_CANDIDATE"
+    mira_c = {"gaia_lpv_amplitude": 1.0, "gaia_lpv_frequency": 1 / 300.0, "gaia_lpv_is_cstar": 1, "gaia_dr3__phot_bp_mean_mag": 15.0}
+    assert v.classify(mira_c)["subtype"] == "C_STAR_CANDIDATE"
+    # Lebzelter+2023 reliability window: faint in BP or outside 7-11 nm -> no C flag.
+    assert v.classify(dict(mira_c, gaia_dr3__phot_bp_mean_mag=19.5))["subtype"] is None
+    assert v.classify(dict(mira_c, gaia_lpv_median_delta_wl_rp=12.0))["subtype"] is None
+    # A period is required, and P < 1000 d (Zhang & Sanders 2023).
+    assert v.classify({"gaia_lpv_amplitude": 1.0, "best_class_name": "LPV"})["label"] == "LPV"
+    assert v.classify({"gaia_lpv_amplitude": 1.0, "gaia_lpv_frequency": 1 / 1500.0, "best_class_name": "LPV"})["label"] == "LPV"
 
 
 def test_pulsar_candidate_posterior():

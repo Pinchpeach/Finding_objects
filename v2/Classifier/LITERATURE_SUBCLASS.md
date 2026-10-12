@@ -41,20 +41,52 @@ empty with a status (`NO_SUBCLASS_EVIDENCE`, `NOT_ROUTED`).
 * Primary: height above the dwarf sequence in the Gaia CMD,
   ΔM_G = M_G − M_G,MS((BP−RP)₀). This needs parallax S/N ≥ 5 and A_G
   (GSP-Phot, or 2.740 E(B−V)).
+  * White-dwarf region: M_G > 6 + 5 (BP−RP)₀ (Gentile Fusillo et al. 2021,
+    Eq. 1; the same line as the WD branch). No class is given. Before 2.17.0
+    the line was ΔM > 3, which sits about 2 mag above the WD locus.
+  * VI: 1 < ΔM ≤ 3 and (BP−RP)₀ ≥ 0.3. Bluer stars, or stars more than
+    3 mag below the sequence, are hot subdwarfs, WD+MS binaries or CVs
+    (Culpan et al. 2022), so no class is given.
   * V: ΔM > −1.0. Unresolved equal-mass binaries lie ≤ 0.75 mag above the
     main sequence (Hurley & Tout 1998); metallicity and age spread add about
     0.3 mag.
-  * IV: −2.5 < ΔM ≤ −1.0, and only blueward of (BP−RP)₀ = 1.3, where a
-    subgiant branch exists.
-  * III: otherwise.
-* Fallback: the Ciardi et al. (2010/2011) giant boundary on GSP-Phot
-  log g, as used for Kepler targets:
+  * III: ΔM ≤ −3, or M_G < 4 with ΔM ≤ −2.5 or (BP−RP)₀ ≥ 1.3. Red giants
+    are ≥ 3 mag above the sequence, and Ruiz-Dern et al. (2018) select red
+    giants with M_G < 4.
+  * IV: everything else above the sequence. Red stars 1–3 mag above it are
+    subgiants, pre-main-sequence stars or overluminous binaries. Before
+    2.17.0 these were III.
+  * Measured against APOGEE DR17 giants (log g < 3.5, 8,196 stars, no
+    extinction applied): III precision 0.948 → 0.959, recall 0.994 → 0.994.
+* Fallback: the Ciardi et al. (2011, AJ 141, 108) dwarf / evolved-star
+  boundary, as used for Kepler targets:
   * log g ≤ 5.2 − 2.8×10⁻⁴ Teff for 4250 < Teff < 6000 K;
   * log g ≤ 4.0 below 4250 K;
   * log g ≤ 3.5 above 6000 K.
-* The physical axis (Gaia FLAME RGB) forces III. The white-dwarf route
+
+  The overlap near log g 3.7 is "likely dominated by sub-giants", so since
+  2.17.0 only log g < 3.5 below the boundary is III; the rest is IV. The
+  log g comes from LAMOST LASP, Gaia GSP-Spec or GSP-Phot.
+  * Measured against APOGEE, III precision rises and recall falls:
+
+    | Source | Precision | Recall |
+    |---|---|---|
+    | GSP-Spec | 0.948 → 0.995 | 0.992 → 0.928 |
+    | LAMOST | 0.949 → 0.994 | 0.991 → 0.943 |
+    | GSP-Phot | 0.963 → 0.982 | 0.971 → 0.952 |
+* GSP-Spec log g and [M/H] are calibrated as the producers recommend
+  (Recio-Blanco et al. 2023, Eqs. 1–2 and Table 3; Fouesneau et al. 2023
+  App. A).
+  * Median log g residual vs APOGEE: −0.13 → +0.07.
+  * Median [M/H] residual for giants: −0.066 → +0.020.
+  * Metal-poor tag: 25 → 24 of 32 flagged are correct, within noise.
+* The physical axis (Gaia FLAME giant stage) forces III. The white-dwarf route
   (Gentile Fusillo et al. 2021 locus + Gaia DSC) overrides the spectral type.
 * Carbon stars, CVs and WD subtypes are taken only from LAMOST/SDSS spectra.
+* Binary tags: no tag from the Gaia DSC "binary" class (purity 0.075;
+  Delchambre et al. 2023, Table 3). There is no RUWE binary tag for AGB
+  candidates, because for AGB stars a high RUWE reflects size and saturation,
+  not binarity (Andriantsaralaza et al. 2022).
 
 ### Validation
 SDSS DR18 stars (template subclass) and DESI DR1 stars (letter type),
@@ -276,7 +308,7 @@ evidence in order and stops at the first that applies.
 | 1 | SIMBAD spectral type C… (C-N, C-R, C-J, C-H) or type C* → carbon; S, MS or SC, or type S* → S star | `SIMBAD_CSTAR` / `SIMBAD_SSTAR` | Wenger et al. 2000 (curated literature types) |
 | 2 | Suh (2021) catalogue membership (OAGB/CAGB tables) | `SUH2021` | Suh 2021, ApJS 256, 43 |
 | 3 | AGB candidates only: logistic models (`agb_chemistry_model.json`, below) on W_RP − W_KJ, Ks − W3, Gaia DR3 LPV `is_cstar`, J − Ks and WISE colours. Here W_RP = G_RP − 1.3 (G_BP − G_RP) and W_KJ = Ks − 0.686 (J − Ks). Within 0.15 of p = 0.5 → "chemistry uncertain" (`STAR:?:AGB`) | `AGB_GAIA_2MASS_WISE_CSTAR`, `AGB_GAIA_2MASS_CSTAR`, `AGB_GAIA_2MASS`, `AGB_NIR_MIR` | Lebzelter et al. 2018, A&A 616, L13 (ΔW); Lebzelter et al. 2023 (`is_cstar`); calibrated on Suh 2021 + GCVS |
-| 4 | AGB candidate lacking the model inputs, with Gaia DR3 LPV `is_cstar` = 1 → carbon (C precision 0.76 on the Suh stars) | `GAIA_LPV_CSTAR` | Lebzelter et al. 2023 (Gaia DR3 LPV catalogue) |
+| 4 | AGB candidate lacking the model inputs, with Gaia DR3 LPV `is_cstar` = 1 inside its reliability window (G_BP < 19, 7 < median_delta_wl_rp < 11) → carbon (C precision 0.977 on the Suh stars) | `GAIA_LPV_CSTAR` | Lebzelter et al. 2023 (Gaia DR3 LPV catalogue) |
 
 **Photometric models.**
 
@@ -306,25 +338,45 @@ How the cascade is built:
 - The fit is on a random half (seed 42) and the scores are on the other half
   (7,567 stars; `benchmark/fit_agb_chemistry.py`):
 
+Since 2.17.0, `is_cstar` enters the models only inside the reliability window Lebzelter et al. (2023) give: G_BP < 19 and 7 < median_delta_wl_rp < 11 (`gaia_lpv_cstar`, below). The models were refitted with this gated flag. Before → after:
+
 | Model | Features | Decided / n | Accuracy |
 |---|---|---|---|
-| `GAIA_2MASS_WISE_CSTAR` | ΔW, Ks − W3, `is_cstar` | 3656 / 3761 | 96.0 % |
-| `GAIA_2MASS_CSTAR` | ΔW, J − Ks, `is_cstar` | 1987 / 2042 | 96.9 % |
+| `GAIA_2MASS_WISE_CSTAR` | ΔW, Ks − W3, `is_cstar` | 3760 / 3761 | 96.0 → 97.1 % |
+| `GAIA_2MASS_CSTAR` | ΔW, J − Ks, `is_cstar` | 2027 / 2042 | 96.9 → 98.5 % |
 | `GAIA_2MASS` | ΔW, J − Ks | 614 / 1346 | 79.0 % |
 | `NIR_MIR` | J − Ks, Ks − W3, W1 − W2, W3 − W4 | 26 / 28 | 88.5 % |
-| all | | coverage 83 % | **94.6 %** (Suh 91.2 %, GCVS 98.3 %; C precision 0.87 / recall 0.89; O 0.97 / 0.96) |
+
+All models together:
+- Coverage: 83 → 84.9 %.
+- Accuracy: 94.6 → **95.8 %** (Suh 93.1 %, GCVS 98.7 %).
+- C-rich: precision 0.87 → 0.919, recall 0.887.
+- O-rich: precision 0.968, recall 0.978.
 
 - **Dropped model:** ΔW + Ks − W3 without the Gaia flag scored 73.8 %, and
   64 % with a wider abstain band. Dusty O-rich stars and dust-free stars
   overlap there, so the model is not used.
 - **Field LPVs:**
-  - The predicted C fraction is 25.7 %, against 24.4 % flagged by Gaia.
+  - The predicted C fraction is 3.3 % (25.7 % before the 2.17.0 gate),
+    against 24.4 % raw Gaia flags. LAMOST spectra give 3.4 %, so the raw
+    flags of faint stars near the plane were mostly spurious, as Lebzelter
+    et al. warned.
   - Above the RGB tip with a good parallax: 232 O-rich and 13 C-rich.
 - **Independent spectra (2.6.2):** 29 field LPVs have LAMOST C or M spectral types (1 carbon). The models got all 26 decided stars right, with predicted C 3.8 % vs true 3.4 %. That LAMOST-covered subsample is bright and away from the plane. The 25.7 % C fraction of the whole field sample comes from faint stars near the plane and is still not checked independently.
 - **Gaia `is_cstar` reliability:**
   - Good for the bright GCVS stars: 31 of 4,706 O-rich flagged.
   - Weaker on the fainter Suh stars: 519 of 4,442 O-rich flagged.
-  - Used alone, the flag gets confidence 0.76.
+  - Used alone, the flag is right 76.2 % of the time on the Suh stars.
+    With G_BP < 19 it is 97.7 % (1,600 C of 1,638); with G_BP ≥ 19 it is
+    11.3 %. Since 2.17.0 the flag counts only with G_BP < 19 and
+    7 < median_delta_wl_rp < 11 (Lebzelter et al. 2023, quoted by Sanders &
+    Matsunaga 2023), and it gets confidence 0.977 when used alone.
+- **Extinction guard (2.17.0):** toward the bulge (|b| < 5°, |l| < 30°),
+  reddened O-rich LPVs look carbon-rich in ΔW (Sanders & Matsunaga 2023).
+  Photometric C calls there were 33 % correct (98 of 294 on Suh + GCVS);
+  elsewhere they are 96–99 %. These calls are withheld ("chemistry
+  uncertain"), which raises C precision from 0.912 to 0.981 (all truth
+  stars).
 
 - **AGB-candidate gate:** the photometric models (row 3) are applied only to
   AGB candidates. A candidate is a long-period or Mira variable (variability

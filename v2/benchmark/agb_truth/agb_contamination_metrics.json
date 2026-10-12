@@ -29,9 +29,9 @@
    "n": 340,
    "agb_label": 0,
    "codes": {
-    "STAR:M:III": 293,
-    "STAR:?:III": 16,
-    "STAR:C:III": 11
+    "STAR:M:III": 298,
+    "STAR:?:III": 12,
+    "STAR:C:III": 10
    }
   },
   "below red clump": {
@@ -41,12 +41,12 @@
   },
   "no good parallax": {
    "n": 23359,
-   "agb_label": 21561,
+   "agb_label": 21529,
    "codes": {
-    "STAR:M:AGB": 15155,
-    "STAR:C:AGB": 5466,
-    "STAR:?:AGB": 940,
-    "STAR:?": 322
+    "STAR:M:AGB": 20436,
+    "STAR:C:AGB": 689,
+    "STAR:?:AGB": 404,
+    "STAR:?": 17
    }
   }
  }

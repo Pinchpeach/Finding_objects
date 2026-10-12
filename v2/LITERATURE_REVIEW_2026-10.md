@@ -49,11 +49,11 @@
 | DSC 사전확률 | DSC-Combmod 사후확률(별 사전확률 0.989)을 계급 균형 융합에 그대로 넣음 | Delchambre+2023 표 2, 부록 C | **2.16.0** 사전확률 제거, DESI 88.46 → 90.96 % |
 | PS1 PSF | 0.83″(관측소 시상) | Chambers+2016 표 11: i 1.19″ | **2.16.0** 1.2″ |
 | Assef R90 품질 조건 | S/N ≥ 3만 확인 | Assef+2018 §3: W2 S/N > 5, 포화, 은하면·은하 중심 제외 | **2.16.0** 적용 범위로 제한 |
-| DSC 쌍성 표지 | binary 확률 ≥ 0.8 → 측광 쌍성 | Delchambre+2023 표 3: 순도 0.075 | 2.17.0 |
-| `is_cstar` | 신뢰 조건 없이 사용 | Lebzelter+2023 권고(median_delta_wl_rp, G_BP) | 2.17.0 |
-| FLAME 거성 | 조건을 잘못 옮김, RGB와 RC/AGB 구분 불가 | Gaia DR3 문서 §11.3.6 | 2.17.0 |
-| GSP-Spec | 보정 없이 log g, [M/H] 사용 | Recio-Blanco+2023 §9.1 | 2.17.0 |
-| Suh 2021 | 광도 확인 없이 물리적 AGB | Suh 2021 표 구성, 프로젝트 G-11 측정 | 2.17.0 |
+| DSC 쌍성 표지 | binary 확률 ≥ 0.8 → 측광 쌍성 | Delchambre+2023 표 3: 순도 0.075 | **2.17.0** 수정 |
+| `is_cstar` | 신뢰 조건 없이 사용 | Lebzelter+2023 권고(median_delta_wl_rp, G_BP) | **2.17.0** 수정 |
+| FLAME 거성 | 조건을 잘못 옮김, RGB와 RC/AGB 구분 불가 | Gaia DR3 문서 §11.3.6 | **2.17.0** 수정 |
+| GSP-Spec | 보정 없이 log g, [M/H] 사용 | Recio-Blanco+2023 §9.1 | **2.17.0** 수정 |
+| Suh 2021 | 광도 확인 없이 물리적 AGB | Suh 2021 표 구성, 프로젝트 G-11 측정 | **2.17.0** 수정 |
 | 은하 활동성 순서 | SDSS subclass가 WHAN/BPT보다 먼저 | Bolton+2012, Cid Fernandes+2011 | 2.18.0 |
 | 펄서 주석 | 척도 높이·편광 비율 문구 | Lorimer+2006 | 2.14.0에서 수정됨 |
 

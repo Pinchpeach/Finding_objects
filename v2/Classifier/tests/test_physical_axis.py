@@ -16,12 +16,25 @@ def check(name,row,label,status=None):
         assert result["status"]==status,(name,result)
     print(f"[OK] {name}: {result['label']} / {result['status']}")
 
-# Strong Gaia DSC WD posterior: validated existing STAR branch should route WD.
+# Strong Gaia DSC WD posterior on the GF21 HR locus (M_G = 10.5 at BP-RP 0)
+# routes WD ...
 check("dsc_wd",{
     "primary_class":"STAR",
     "classprob_dsc_combmod_whitedwarf":0.95,
     "classprob_dsc_combmod_star":0.02,
+    "parallax":20.0,"parallax_error":0.1,"phot_g_mean_mag":14.0,"bp_rp":0.0,
 },"WD","CLASSIFIED_WD")
+# ... but the DSC WD class alone (purity 0.25; Delchambre+2023) does not.
+check("dsc_wd_only",{
+    "primary_class":"STAR",
+    "classprob_dsc_combmod_whitedwarf":0.95,
+    "classprob_dsc_combmod_star":0.02,
+},"UNKNOWN","INSUFFICIENT_PHYSICAL_EVIDENCE")
+# A Suh (2021) match fainter than the red clump (M_Ks = 3.0) is not AGB.
+check("suh_dwarf_carbon",{
+    "primary_class":"STAR","catalogs":"Suh 2021 AGB Catalog",
+    "gaia_dr3__parallax":10.0,"gaia_dr3__parallax_error":0.1,"gaia_dr3__ruwe":1.0,"2mass_psc__Kmag":8.0,
+},"UNKNOWN","SUH2021_MATCH_BELOW_RED_CLUMP")
 
 # A cool star below the Ciardi giant log g boundary is a red giant (RGB or
 # AGB; GSP-Phot luminosity class 96.9 % vs APOGEE, 2.13.0) ...

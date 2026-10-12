@@ -321,8 +321,26 @@ def spectro_params(row):
     flags = _text(row, "gaia_dr3__flags_gspspec", "flags_gspspec")
     teff, logg, mh = (_num(row, f"gaia_dr3__{k}_gspspec", f"{k}_gspspec") for k in ("teff", "logg", "mh"))
     if teff is not None and logg is not None and _gspspec_ok(flags, "teff", row) and _gspspec_ok(flags, "logg", row):
-        return {"teff": teff, "logg": logg, "feh": mh if _gspspec_ok(flags, "mh", row) else None, "source": "GSPSPEC"}
+        mh = gspspec_mh_calibrated(mh, logg) if mh is not None and _gspspec_ok(flags, "mh", row) else None
+        return {"teff": teff, "logg": gspspec_logg_calibrated(logg), "feh": mh, "source": "GSPSPEC"}
     return None
+
+
+# GSP-Spec calibrations recommended by the producers (Recio-Blanco et al.
+# 2023, Sect. 9.1, Eqs. 1-2 and Table 3; Fouesneau et al. 2023, App. A):
+# GSP-Spec log g is biased low, more for giants; [M/H] of giants is
+# underestimated and of dwarfs overestimated.  Both corrections are
+# polynomials in the uncalibrated log g (literature-based row for [M/H]).
+GSPSPEC_LOGG_CAL = (0.4496, -0.0036, -0.0224)
+GSPSPEC_MH_CAL = (0.274, -0.1373, -0.0050, 0.0048)
+
+
+def gspspec_logg_calibrated(logg):
+    return logg + sum(c * logg ** i for i, c in enumerate(GSPSPEC_LOGG_CAL))
+
+
+def gspspec_mh_calibrated(mh, logg_raw):
+    return mh + sum(c * logg_raw ** i for i, c in enumerate(GSPSPEC_MH_CAL))
 
 
 # Gaia DR3 ESP-ELS emission-line classes from BP/RP spectra (Creevey et al.
@@ -331,6 +349,9 @@ def spectro_params(row):
 # type for 2 % (most are long-period variables), "HerbigStar" 30 %, "beStar"
 # 27 %, while 40-80 % are emission-line stars of some kind.  Only the
 # emission itself is used (tag); the class label decides nothing.
+# classlabel_espels_flag 0/1/2 = gap between the two highest class
+# probabilities >= 0.8/0.6/0.4 (DR3 documentation 11.3.7); +10 / +20 mark
+# GSP-Phot parameters inconsistent with / removed for the spectral type.
 ESP_ELS = {"bestar": ("BE", "Be star (emission-line B star)"), "herbigstar": ("YSO", "Herbig Ae/Be star (young stellar object)"),
            "ttauri": ("YSO", "T Tauri star (young stellar object)"), "reddwarfemstar": ("DME", "active M dwarf (dMe)"),
            "wc": ("WR", "Wolf-Rayet star (WC)"), "wn": ("WR", "Wolf-Rayet star (WN)"),
@@ -346,11 +367,23 @@ def emission_line_class(row):
     hit = ESP_ELS.get(label.replace(" ", "").replace("_", "").lower())
     if hit is None or (flag is not None and flag > 2):
         return None
-    return hit[0], hit[1], f"Gaia ESP-ELS class {label}" + (f" (flag {flag:.0f}: P > 0.5)" if flag is not None else "")
+    return hit[0], hit[1], f"Gaia ESP-ELS class {label}" + (f" (flag {flag:.0f}: top-two probability gap >= 0.4)" if flag is not None else "")
+
+
+GIANT_MAX_LOGG = 3.5
+
+
+def _logg_class(logg, lim):
+    """Ciardi et al. (2011) separate dwarfs from evolved stars; the overlap
+    near log g 3.7 is "likely dominated by sub-giants", so below their
+    boundary only log g < 3.5 is a giant (III), the rest IV (2.17.0)."""
+    if logg > lim:
+        return "V"
+    return "III" if logg < GIANT_MAX_LOGG else "IV"
 
 
 def _giant_logg_limit(teff):
-    # Ciardi et al. (2011) red-giant boundary used for Kepler targets.
+    # Ciardi et al. (2011, AJ 141, 108) dwarf / evolved-star boundary for Kepler targets.
     return 4.0 if teff <= 4250 else (5.2 - 2.8e-4 * teff if teff < 6000 else 3.5)
 
 
@@ -360,28 +393,39 @@ def star_luminosity_class(row, num):
         mg, dm, bprp0 = pos
         # Unresolved equal-mass binaries sit up to 0.75 mag above the MS
         # (Hurley & Tout 1998); metallicity/age spread adds ~0.3 mag.
-        if dm > 3.0:
-            return None, "GAIA_CMD", f"M_G = {mg:.2f}, {dm:+.2f} mag below the dwarf sequence (white-dwarf region)"
+        # White dwarfs: the Gentile Fusillo et al. (2021, Eq. 1) locus
+        # M_G > 6 + 5 (BP-RP), the same cut as branches/star.py (2.17.0;
+        # was dM > 3, which reaches ~2 mag above the WD locus).
+        if mg > 6.0 + 5.0 * bprp0:
+            return None, "GAIA_CMD", f"M_G = {mg:.2f} at (BP-RP)0 = {bprp0:.2f}: white-dwarf region (Gentile Fusillo+2021)"
         if dm > 1.0:
             # Metal-poor subdwarfs lie 1-2 mag below the solar-metallicity
             # sequence (Kuiper 1939; Gizis 1997).  On the SDSS benchmark stars
             # with 1 < dM <= 3 have median GSP-Phot [M/H] = -1.4 (MS: -0.66).
+            # Blue objects there are hot subdwarfs, WD+MS binaries or CVs
+            # (Culpan et al. 2022), not metal-poor dwarfs.
+            if bprp0 < 0.3 or dm > 3.0:
+                return None, "GAIA_CMD", f"M_G = {mg:.2f}, {dm:+.2f} mag below the dwarf sequence at (BP-RP)0 = {bprp0:.2f} (hot subdwarf / WD+MS region)"
             return "VI", "GAIA_CMD", f"M_G = {mg:.2f}, {dm:+.2f} mag below the dwarf sequence (subdwarf)"
         if dm > -1.0:
             return "V", "GAIA_CMD", f"M_G = {mg:.2f}, {dm:+.2f} mag from the dwarf sequence"
-        if dm > -2.5 and bprp0 < 1.3:
-            return "IV", "GAIA_CMD", f"M_G = {mg:.2f}, {dm:+.2f} mag above the dwarf sequence"
-        return "III", "GAIA_CMD", f"M_G = {mg:.2f}, {dm:+.2f} mag above the dwarf sequence"
+        # Giants proper are >= 3 mag above the dwarf sequence at red colours;
+        # Ruiz-Dern et al. (2018) select red giants with M_G < 4.  Between,
+        # red stars are subgiants, pre-main-sequence stars or overluminous
+        # binaries (2.17.0; was "III" for any red star 1 mag above).
+        if dm <= -3.0 or (mg < 4.0 and dm <= -2.5) or (mg < 4.0 and bprp0 >= 1.3):
+            return "III", "GAIA_CMD", f"M_G = {mg:.2f}, {dm:+.2f} mag above the dwarf sequence"
+        return "IV", "GAIA_CMD", f"M_G = {mg:.2f}, {dm:+.2f} mag above the dwarf sequence (subgiant / pre-main-sequence)"
     sp = spectro_params(row)
     if sp is not None:
         lim = _giant_logg_limit(sp["teff"])
         name = {"LAMOST": "LAMOST LASP", "GSPSPEC": "Gaia GSP-Spec"}[sp["source"]]
-        return (("III" if sp["logg"] <= lim else "V"), f"{sp['source']}_LOGG",
+        return (_logg_class(sp["logg"], lim), f"{sp['source']}_LOGG",
                 f"{name} log g = {sp['logg']:.2f} at Teff = {sp['teff']:.0f} K vs giant boundary {lim:.2f} (spectroscopic)")
     teff, logg = _num(row, "gaia_dr3__teff_gspphot", "teff_gspphot"), _num(row, "gaia_dr3__logg_gspphot", "logg_gspphot")
     if teff is not None and logg is not None:
         lim = _giant_logg_limit(teff)
-        return ("III" if logg <= lim else "V"), "GAIA_LOGG", f"GSP-Phot log g = {logg:.2f} vs giant boundary {lim:.2f}"
+        return _logg_class(logg, lim), "GAIA_LOGG", f"GSP-Phot log g = {logg:.2f} vs giant boundary {lim:.2f}"
     return None, None, "no parallax or log g"
 
 
@@ -404,13 +448,15 @@ def star_tags(row):
                                                     "HALO": "halo star"}[pop],
                              "rule": "GAIA_VTAN", "basis": f"V_T = {vt:.0f} km/s (Babusiaux+2018 windows 40 / 60-150 / 200)"})
     ruwe = _num(row, "gaia_dr3__ruwe", "ruwe")
-    if ruwe is not None and ruwe > RUWE_BINARY:
+    # For AGB stars a high RUWE "more likely reflects detector saturation,
+    # stellar size, or convective photocentre shifts than binarity"
+    # (Andriantsaralaza et al. 2022): no binary tag for them (2.17.0).
+    if ruwe is not None and ruwe > RUWE_BINARY and not agb_candidate(row):
         tags.append({"tag": "ASTROMETRIC_BINARY", "label": "astrometric binary candidate", "rule": "GAIA_RUWE",
                      "basis": f"RUWE = {ruwe:.2f} > 1.4 (unresolved companion; Belokurov+2020)"})
-    b = _num(row, "gaia_dr3__classprob_dsc_combmod_binarystar", "classprob_dsc_combmod_binarystar")
-    if b is not None and b >= 0.8 and not any(t["tag"] == "ASTROMETRIC_BINARY" for t in tags):
-        tags.append({"tag": "PHOTOMETRIC_BINARY", "label": "binary candidate (Gaia DSC)", "rule": "GAIA_DSC_BINARY",
-                     "basis": f"Gaia DSC binary probability {b:.2f}"})
+    # No tag from the Gaia DSC "binary" class (removed 2.17.0): its purity
+    # is 0.075 and completeness 0.002 (Delchambre et al. 2023, Table 3; "the
+    # results on the binary class are largely meaningless").
     # Distance and motion.
     if plx is not None and eplx is not None and plx > 0 and eplx > 0:
         if plx > 10.0 and plx / eplx >= 10:
@@ -518,11 +564,15 @@ AGB_DUST_KW3 = 1.0
 AGB_MAX_MKS = -1.0
 DC_MIN_MG = 5.0
 # RGB tip: M_Ks = -6.2 (2MASS LMC tip Ks = 12.3 at m - M = 18.5; Nikolaev &
-# Weinberg 2000).  Between the clump and the tip an LPV can be a red giant
-# (RGB) or an early-AGB star, which photometry cannot separate: 340 of the
+# Weinberg 2000; Ks tip intercept -6.28, Gorski et al. 2018).  The tip is
+# colour- and metallicity-dependent (brighter, ~-6.5 to -7, for metal-rich
+# disc giants), so this is a conservative value.  Between the clump and the
+# tip an LPV can be a red giant (RGB) or an AGB star (early AGB and low-mass
+# thermally pulsing AGB stars sit there too), which photometry cannot
+# separate: 340 of the
 # Gaia DR3 LPVs with good parallaxes in random cones lie there
 # (benchmark/evaluate_agb_contamination.py).  They are named "red giant
-# (RGB or early AGB)" with luminosity class III instead of AGB.
+# (RGB or AGB below the tip)" with luminosity class III instead of AGB.
 RGB_TIP_MKS = -6.2
 A_KS_PER_A_G = 0.137      # A_K/A_V = 0.114 (Cardelli et al. 1989), A_G/A_V = 0.83
 AGB_VARIABILITY = {"LPV", "MIRA"}
@@ -558,10 +608,27 @@ def agb_features(row):
     # AllWISE saturates at W1 < 8.0, W2 < 6.7, W3 < 3.8, W4 < -0.4 (Vega;
     # Cutri et al. 2012): saturated bands are not used (as in the fit).
     w1, w2, w3, w4 = (None if v is None or v < lim else v for v, lim in zip((w1, w2, w3, w4), WISE_SAT_VEGA))
-    cst = _num(row, "gaia_lpv_is_cstar")
+    cst = gaia_lpv_cstar(row)
     sub = lambda a, b: None if a is None or b is None else a - b
     return {"dW": wesenheit_dw(row), "kw3": sub(k, w3), "jk": sub(j, k), "w12": sub(w1, w2),
-            "w34": sub(w3, w4), "cst": None if cst is None else float(cst >= 0.5)}
+            "w34": sub(w3, w4), "cst": None if cst is None else float(cst)}
+
+
+def gaia_lpv_cstar(row):
+    """Gaia DR3 LPV C-star flag where Lebzelter et al. (2023) advise using it:
+    G_BP < 19 and 7 < median_delta_wl_rp < 11 (when the collector provides
+    it).  True / False, or None without the flag (2.17.0).  On 2,180 Suh
+    (2021) AGB stars the raw flag is C-rich for 76.2 %, with G_BP < 19 for
+    97.7 % (11.3 % for G_BP >= 19); spurious C flags crowd the faint,
+    reddened plane and bulge (Sanders & Matsunaga 2023)."""
+    flag = _num(row, "gaia_lpv_is_cstar")
+    if flag is None:
+        return None
+    if flag < 0.5:
+        return False
+    bp = _num(row, "gaia_dr3__phot_bp_mean_mag", "phot_bp_mean_mag")
+    wl = _num(row, "gaia_lpv_median_delta_wl_rp")
+    return bp is not None and bp < 19.0 and (wl is None or 7.0 < wl < 11.0)
 
 
 def agb_candidate(row):
@@ -598,6 +665,22 @@ def abs_mags(row):
     k = _num(row, "2mass_psc__Kmag", "allwise__Kmag")
     g = _num(row, "gaia_dr3__phot_g_mean_mag", "phot_g_mean_mag")
     return (None if k is None else k + dm - A_KS_PER_A_G * ag), (None if g is None else g + dm - ag)
+
+
+def _inner_plane(row):
+    """|b| < 5 deg and |l| < 30 deg (toward the bulge); False without a position."""
+    ra, dec = _num(row, "ra"), _num(row, "dec")
+    if ra is None or dec is None:
+        return False
+    r, d = math.radians(ra), math.radians(dec)
+    x, y, z = math.cos(d) * math.cos(r), math.cos(d) * math.sin(r), math.sin(d)
+    # ICRS -> Galactic rotation (Hipparcos, ESA 1997)
+    gx = -0.0548755604 * x - 0.8734370902 * y - 0.4838350155 * z
+    gy = 0.4941094279 * x - 0.4448296300 * y + 0.7469822445 * z
+    gz = -0.8676661490 * x - 0.1980763734 * y + 0.4559837762 * z
+    b = math.degrees(math.asin(max(-1.0, min(1.0, gz))))
+    l = math.degrees(math.atan2(gy, gx))
+    return abs(b) < 5.0 and abs(l) < 30.0
 
 
 def agb_photometric(row):
@@ -645,11 +728,18 @@ def agb_chemistry(row):
         ph = agb_photometric(row)
         if ph is not None:
             chem, p, name, basis = ph
+            if chem == "C" and _inner_plane(row):
+                # Toward the bulge at low latitude, reddened O-rich LPVs look
+                # carbon-rich in dW (Sanders & Matsunaga 2023).  Measured on
+                # the Suh + GCVS truth: C calls there 33 % correct (98 of
+                # 294), elsewhere 96-99 %; withholding them raises C precision
+                # 0.912 -> 0.981 (2.17.0).
+                chem, basis = None, f"{basis}; C call withheld at |b| < 5, |l| < 30 deg (extinction)"
             out = {"chem": chem, "rule": f"AGB_{name}", "basis": f"{gate}; {basis}",
                    "confidence": None if chem is None else round(max(p, 1 - p), 3)}
-        elif _num(row, "gaia_lpv_is_cstar") == 1:
-            # Flag alone: C-rich precision 0.76 on the Suh (2021) stars.
-            out = {"chem": "C", "rule": "GAIA_LPV_CSTAR", "confidence": 0.76,
+        elif gaia_lpv_cstar(row):
+            # Gated flag alone: C-rich precision 0.977 on the Suh (2021) stars.
+            out = {"chem": "C", "rule": "GAIA_LPV_CSTAR", "confidence": 0.977,
                    "basis": f"{gate}; Gaia DR3 LPV RP-spectrum C-star flag (Lebzelter et al. 2023)"}
     if out is None:
         return None
@@ -674,7 +764,7 @@ def agb_chemistry(row):
         out["basis"] = f"{out['basis']}; {out['not_agb']}"
     elif mk is not None and mk > RGB_TIP_MKS:
         out["below_tip"] = True
-        out["basis"] = f"{out['basis']}; M_Ks = {mk:.2f} below the RGB tip ({RGB_TIP_MKS}): RGB or early AGB"
+        out["basis"] = f"{out['basis']}; M_Ks = {mk:.2f} below the RGB tip ({RGB_TIP_MKS}): RGB or AGB"
     kw3 = agb_features(row)["kw3"]
     out["dusty"] = kw3 is not None and kw3 > AGB_DUST_KW3
     return out
@@ -717,7 +807,7 @@ def classify_star(row):
             code = code.replace(":AGB", ":?")
         elif agb.get("below_tip"):
             name = {"C": "Carbon giant", "O": "O-rich red giant", "S": "S-type giant", None: "Red giant"}[agb["chem"]]
-            name += " (RGB or early AGB)"
+            name += " (RGB or AGB below the RGB tip)"
             code = code.replace(":AGB", ":III")
         conf = agb.get("confidence", RULE_PRECISION.get(agb["rule"]))
         return _result(name, code, conf, agb["rule"], agb["basis"], agb_chemistry=agb["chem"])

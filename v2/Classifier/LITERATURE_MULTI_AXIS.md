@@ -22,6 +22,13 @@ Literature:
 - Gaia DR3 synthetic photometry paper (Montegriffo et al. 2023, A&A 674 A33):
   XP spectra support synthetic photometry and a WD DA/non-DA catalogue.
 
+Gaia DSC (2.17.0): the Combmod white-dwarf class has completeness 0.43 and
+purity 0.25 at the all-sky prior, and the physical-binary class purity 0.075
+(Delchambre et al. 2023, A&A 674, A31, Table 3).  A WD needs the Gentile
+Fusillo et al. (2021, Eq. 1) HR locus; DSC WD alone no longer routes WD, and
+the DSC binary class only adds to the stellar probability (no
+BINARY_CANDIDATE family).
+
 Implementation implication:
 Keep the already validated WD routing and Gaia-XP DA/DB path. Expand only when
 external truth exists for DC/DO/DQ/DZ/magnetic/composite subclasses.
@@ -59,6 +66,24 @@ luminosity class III and Teff < 5500 K.  Gaia FLAME was not usable for these
 stars: for the Kepler giants its masses and ages are unphysical (median
 3.3 M☉, 0.3 Gyr; `benchmark/probe_flame_giants.py`), as the Gaia DR3
 documentation and Fouesneau et al. (2023) warn for giants.
+
+2.17.0 (literature review):
+- Luminosity class III is stricter (`LITERATURE_SUBCLASS.md`): ΔM ≤ −3 or
+  M_G < 4 on the CMD (Ruiz-Dern et al. 2018), log g < 3.5 below the Ciardi
+  boundary (subgiants become IV), and GSP-Spec log g calibrated
+  (Recio-Blanco et al. 2023).  Teff for the 5500 K cut comes only from
+  flag-checked spectroscopy or GSP-Phot.
+- Gaia FLAME giants: the documented guardrails are 1.0 ≤ M < 2.0 M☉,
+  age > 1.5 Gyr, evolstage 490–1300, and second flags_flame digit 0
+  (Fouesneau et al. 2023, Sect. 3.3.2; DR3 documentation 11.3.6).
+  - The FLAME tracks end at the RGB tip, so red-clump and AGB stars are
+    forced onto an "RGB" stage.  A passing star is therefore RED_GIANT, not
+    RGB.
+  - On the 180 Kepler stars, 9 pass the new guardrails (8 RGB, 1 AGB).  The
+    old guardrails passed 10 (8 RGB, 2 AGB).
+- Suh (2021) match: with a good parallax and M_Ks > −1 (fainter than the
+  red clump) it is not AGB.  The catalogue includes visual carbon stars from
+  general lists.
 
 Cross-validation (Vrard+2025 Kepler RGB 203, AGB 250): RGB family accuracy
 0 → 51.7 %, AGB 0 → 41.2 %; none labelled a non-giant.  The rest have no
@@ -152,6 +177,15 @@ published, P ≥ 80 d (GCVS Mira range).  Fitted on even-numbered ASAS-SN
 M/SR stars matched to the Gaia LPV table (3,681 M, 2,592 SR), checked on the
 odd half: precision 0.934, recall 0.968 (precision levels off at 0.93–0.95
 for any threshold: a tail of large-amplitude ASAS-SN SR stars).
+
+2.17.0: a published period with 80 ≤ P < 1000 d is required.  This is the
+Gaia DR3 Mira selection of Zhang & Sanders (2023, MNRAS 521, 5309): 80 < P <
+1000 d, semi-amplitude ≥ 0.5.  It made no change on the truth set, where
+every star has a period.  Their alias windows (170–200 d with amplitude >
+1.3, 350–400 d with amplitude > 1.6) are not excluded: they mark unreliable
+periods, and excluding them removed 30 Miras for 6 SRs.  The C-star subtype
+uses the gated `is_cstar` (G_BP < 19, 7 < median_delta_wl_rp < 11; Lebzelter
+et al. 2023).
 
 Cross-validation (250 ASAS-SN Miras, 250 SR): Mira exact 25.6 → 94.8 %.
 The rule labelled 184 objects Mira, 173 correctly (precision 0.94); the 11
