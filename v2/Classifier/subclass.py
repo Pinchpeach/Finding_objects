@@ -16,20 +16,22 @@ STAR
     then Gaia GSP-Phot Teff.
   * luminosity class: height above the main sequence in the Gaia CMD
     (parallax S/N >= 5): V (dwarf), IV (subgiant), III (giant); otherwise
-    the Ciardi et al. (2010/2011) Teff-log g giant boundary on GSP-Phot.
+    the Ciardi et al. (2011) Teff-log g boundary on spectroscopic / GSP-Phot log g.
   * white dwarfs come from the physical axis (Gentile Fusillo+2021 locus).
 GALAXY
-  * activity: SDSS spectral subclass (BPT, Bolton+2012) > SIMBAD type >
-    WISE mid-IR AGN (W1-W2 >= 0.8, W2 < 15.05; Stern+2012) > WISE W2-W3
-    (> 3 star-forming, < 1.5 quiescent; Jarrett+2017/2019) > GALEX NUV-r
-    (> 5 quiescent; Kaviraj+2007).
+  * activity: SDSS broad lines > emission-line WHAN / BPT > SDSS spectral
+    subclass (Bolton+2012) > SIMBAD type > WISE mid-IR AGN (W1-W2 >= 0.8,
+    W2 < 15.05, S/N >= 10; Stern+2012) > WISE W2-W3 (> 3.5 star-forming,
+    < 1.5 quiescent; Jarrett+2017/2019) > GALEX NUV-r (> 5 red sequence;
+    Salim 2014, Wyder+2007).
   * light profile: Legacy Surveys DEV (de Vaucouleurs, early-type-like) /
     EXP (exponential disc); SDSS u-r >= 2.22 early type (Strateva+2001).
 QSO
   * radio loudness R_i = 0.4 (m_i - t), t = -2.5 log10(F_1.4GHz / 3631 Jy);
     radio-loud when R_i > 1 (Ivezic et al. 2002).
   * redshift class from a spectroscopic redshift: z >= 2.1 (Ly-alpha forest
-    in the optical; Ross et al. 2012) "high-z".
+    in the optical; Ross et al. 2012; the DESI Lya-quasar boundary,
+    Chaussidon et al. 2023) "high-z".
   * X-ray detection; SIMBAD Seyfert/blazar types.
 """
 from __future__ import annotations
@@ -921,34 +923,58 @@ def _galaxy_lines(row, prefix, tag):
     return None
 
 
+# WISE W2-W3 sequence (Jarrett et al. 2017, ApJ 836, 182; 2019, ApJS 245,
+# 25): spheroids < ~2, intermediate discs 2-3.5, star-forming discs > 3.5.
+# 2.18.0: SF cut 3.0 -> 3.5 (the published boundary); on the SDSS test split
+# its precision rises 0.754 -> 0.871 and activity accuracy 79.5 -> 87.9 %,
+# while coverage falls 42.3 -> 31.8 % (galaxies at 3-3.5 stay unlabelled).
+# Quiescent < 1.5 (Jarrett et al. 2011 spheroid colour; measured 0.70/0.83).
+# No K-correction: WISE colours change at z > ~0.1.
+W23_SF = 3.5
+W23_Q = 1.5
+
+
 def galaxy_activity(row):
     sub = (_text(row, "sdss_dr18_spectroscopy__subclass") or "").upper()
+    # Broad lines first: a narrow-line fit misses broad H-alpha (29 SDSS
+    # BROADLINE objects look WHAN-retired).  Otherwise the line diagnostics
+    # (WHAN -> BPT) decide before the SDSS pipeline subclass (2.18.0): the
+    # pipeline's SF/AGN line (Bolton et al. 2012) is neither Kewley nor
+    # Kauffmann, so composites become "AGN", and it has no retired-galaxy
+    # test (Cid Fernandes et al. 2011).  Agreement with the Portsmouth BPT on
+    # 1,190 SDSS galaxies with a subclass: 84.1 -> 86.9 %.
+    if "BROADLINE" in sub:
+        return "AGN", "SDSS_BPT", f"SDSS spectrum subclass {sub} (broad lines)"
+    lines = galaxy_lines(row)
+    if lines is not None:
+        return lines
     if sub:
-        if "AGN" in sub or "BROADLINE" in sub:
-            return "AGN", "SDSS_BPT", f"SDSS spectrum subclass {sub} (BPT / broad lines)"
+        if "AGN" in sub:
+            return "AGN", "SDSS_BPT", f"SDSS spectrum subclass {sub} (BPT)"
         if "STARBURST" in sub:
             return "STARBURST", "SDSS_BPT", f"SDSS spectrum subclass {sub} (H-alpha EW > 50 A)"
         if "STARFORMING" in sub:
             return "STAR_FORMING", "SDSS_BPT", f"SDSS spectrum subclass {sub} (BPT)"
-    lines = galaxy_lines(row)
-    if lines is not None:
-        return lines
     ot = _text(row, "simbad__otype")
     if ot in SIMBAD_GALAXY:
         act, name = SIMBAD_GALAXY[ot]
         return act, "SIMBAD_OTYPE", f"SIMBAD type {ot} ({name})"
     w1, w2, w3 = (_wise_vega(row, k) for k in (1, 2, 3))
     ew3 = _num(row, "std_magerr__wise_w3", "allwise__e_W3mag")
-    if w1 is not None and w2 is not None and w1 - w2 >= 0.8 and w2 < 15.05:
+    # Stern et al. (2012) is calibrated on S/N >= 10 photometry (as in the
+    # Stage-4 rule WISE-AGN-001; 2.18.0).
+    s1, s2 = _num(row, "allwise__snr1"), _num(row, "allwise__snr2")
+    snr_ok = s1 is None or s2 is None or min(s1, s2) >= 10
+    if w1 is not None and w2 is not None and w1 - w2 >= 0.8 and w2 < 15.05 and snr_ok:
         return "AGN", "WISE_STERN12", f"W1-W2 = {w1 - w2:.2f} >= 0.8 with W2 = {w2:.2f} < 15.05"
     if w2 is not None and w3 is not None:
         c = w2 - w3
         if ew3 is not None and ew3 < 0.2:
-            if c > 3.0:
-                return "STAR_FORMING", "WISE_W23_SF", f"W2-W3 = {c:.2f} > 3 (star-forming disc)"
-            if c < 1.5:
-                return "QUIESCENT", "WISE_W23_Q", f"W2-W3 = {c:.2f} < 1.5 (spheroid)"
-        elif ew3 is None and c < 1.5:
+            if c > W23_SF:
+                return "STAR_FORMING", "WISE_W23_SF", f"W2-W3 = {c:.2f} > {W23_SF} (star-forming disc)"
+            if c < W23_Q:
+                return "QUIESCENT", "WISE_W23_Q", f"W2-W3 = {c:.2f} < {W23_Q} (spheroid)"
+        elif ew3 is None and c < W23_Q:
             # AllWISE W3 upper limit: the true W2-W3 is bluer still.
             return "QUIESCENT", "WISE_W23_UL", f"W2-W3 < {c:.2f} (W3 upper limit) < 1.5"
     nuv = _mag(row, "std_mag__galex_nuv", raw_mag_keys=("galex_ais__NUVmag",))
@@ -957,9 +983,13 @@ def galaxy_activity(row):
         r = _mag(row, "std_mag__ps1kron_r", raw_mag_keys=("pan_starrs1_dr2_meanobject__rMeanKronMag", "sdss_dr18_photoobj__petroMag_r"))
     if nuv is not None and r is not None:
         ebv = _ebv(row) or 0.0
+        # A_NUV / E(B-V) = 8.2 (Wyder et al. 2007, Cardelli et al. 1989 R_V = 3.1).
         nuvr = nuv - r - (8.2 - 2.165) * ebv
         if nuvr > 5.0:
-            return "QUIESCENT", "GALEX_NUVR", f"(NUV-r)0 = {nuvr:.2f} > 5"
+            # Red sequence NUV-r > 5 (Salim 2014; Wyder et al. 2007).  Kaviraj
+            # et al. (2007) put recent star formation below 5.5, so 5-5.5 is
+            # "quiescent" on the red sequence, not necessarily dead.
+            return "QUIESCENT", "GALEX_NUVR", f"(NUV-r)0 = {nuvr:.2f} > 5 (red sequence)"
         if nuvr > 4.0:
             # Green valley between the blue cloud and red sequence (Salim 2014,
             # SerAJ 189, 1: 4 < NUV-r < 5; Wyder et al. 2007).
@@ -1005,8 +1035,31 @@ SIMBAD_ENVIRONMENT = {
 }
 
 
-def galaxy_tags(row, activity):
+# Fibre aperture (Kewley, Jansen & Geller 2005, PASP 117, 227): the 3"
+# SDSS fibre captures > 20 % of the galaxy light only at z > 0.04; the 1.5"
+# DESI fibre needs about twice the distance.  Below that a line class
+# describes the nucleus (e.g. a nuclear LINER in a star-forming disc).
+APERTURE_MIN_Z = {"SDSS": 0.04, "DESI": 0.08}
+# Radio AGN (2.18.0): below L1.4 ~ 1e23 W/Hz star-forming galaxies dominate
+# radio samples (Mauch & Sadler 2007; Best & Heckman 2012), so a radio
+# detection of a quiescent galaxy is an AGN candidate only above it.
+RADIO_AGN_MIN_L14 = 1e23
+
+
+def radio_luminosity_w_hz(flux_mjy, z, alpha=-0.7):
+    """L_1.4GHz = 4 pi D_L^2 S (1 + z)^(-1 - alpha), S_nu ~ nu^alpha."""
+    d_m = luminosity_distance_mpc(z) * 3.0857e22
+    return 4 * math.pi * d_m * d_m * flux_mjy * 1e-29 * (1 + z) ** (-1 - alpha)
+
+
+def galaxy_tags(row, activity, activity_rule=None):
     tags = []
+    z_spec = spectroscopic_z(row)
+    src = (activity_rule or "").split("_")[0]
+    if src in APERTURE_MIN_Z and (activity_rule or "").endswith(("_LINES_BPT", "_WHAN", "_D4000")) \
+            and z_spec is not None and 0 < z_spec < APERTURE_MIN_Z[src]:
+        tags.append({"tag": "APERTURE_NUCLEAR", "label": "line class of the nucleus (fibre covers < 20 % of the light)",
+                     "rule": "FIBRE_APERTURE", "basis": f"{src} fibre at z = {z_spec:.4f} < {APERTURE_MIN_Z[src]} (Kewley+2005)"})
     sub = (_text(row, "sdss_dr18_spectroscopy__subclass") or "").upper()
     ot = _text(row, "simbad__otype")
     if "BROADLINE" in sub and "AGN" in sub or ot == "Sy1":
@@ -1036,7 +1089,7 @@ def galaxy_tags(row, activity):
                          "basis": f"M_B = {mb:.2f} > -16 at z = {z:.4f} (Tammann 1994)"})
         elif mb < -21.0:
             tags.append({"tag": "LUMINOUS", "label": f"luminous galaxy (M_B = {mb:.1f})", "rule": "ABS_MAG",
-                         "basis": f"M_B = {mb:.2f} < -21 at z = {z:.4f} (brighter than L*; Schechter M*_B ~ -20.5)"})
+                         "basis": f"M_B = {mb:.2f} < -21 at z = {z:.4f} (brighter than L*: M*_bJ = -19.66 + 5 log h ~ -20.4, Norberg et al. 2002)"})
     z = spectroscopic_z(row)
     ba = _num(row, "sga_2020__sga_ba", "sga_ba")
     if ba is not None and _num(row, "sga_2020__catalog_object_id") is not None:
@@ -1054,11 +1107,12 @@ def galaxy_tags(row, activity):
         tags.append({"tag": "SPEC_Z", "label": f"spectroscopic z = {z:.4f}", "rule": "SPEC_Z",
                      "basis": f"distance {luminosity_distance_mpc(z):.0f} Mpc (flat LCDM, H0 = 70)"})
     flux, src = radio_14ghz_mjy(row)
-    if flux is not None and activity == "QUIESCENT":
+    lum = radio_luminosity_w_hz(flux, z_spec) if flux is not None and z_spec is not None and z_spec > 0 else None
+    if flux is not None and activity == "QUIESCENT" and lum is not None and lum > RADIO_AGN_MIN_L14:
         # Radio emission from a galaxy without star formation is AGN-powered
         # (radio-mode AGN in early types; Best & Heckman 2012).
         tags.append({"tag": "RADIO_AGN", "label": "radio-loud AGN candidate", "rule": "RADIO_IN_QUIESCENT",
-                     "basis": f"{src} {flux:.2f} mJy in a quiescent galaxy"})
+                     "basis": f"{src} {flux:.2f} mJy, L1.4 = {lum:.1e} W/Hz > 1e23 in a quiescent galaxy"})
     elif flux is not None:
         tags.append({"tag": "RADIO", "label": "radio source", "rule": "RADIO_DETECTED", "basis": f"{src} {flux:.2f} mJy"})
     xr = _catalogs(row) & set(XRAY_CATALOGS)
@@ -1233,7 +1287,7 @@ def classify(row):
         tags = star_tags(row) if out.get("code") != "STAR:WD" else []
     elif coarse == "GALAXY":
         out = classify_galaxy(row)
-        tags = galaxy_tags(row, out.get("activity"))
+        tags = galaxy_tags(row, out.get("activity"), out.get("activity_rule"))
     elif coarse == "QSO":
         out = classify_qso(row)
         tags = qso_tags(row)

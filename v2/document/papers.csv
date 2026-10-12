@@ -127,6 +127,8 @@ category,citation,journal_ref,bibcode,used_in,purpose
 은하 분류,Banerji et al. 2010 (Galaxy Zoo ML),"MNRAS 406, 342; doi:10.1111/j.1365-2966.2010.16713.x",—,Classifier/LITERATURE.md,기계학습으로 Galaxy Zoo 형태 재현
 은하 분류,Walmsley et al. 2020 (Galaxy Zoo Bayesian CNN),"MNRAS 491, 1554; doi:10.1093/mnras/stz2816",—,Classifier/LITERATURE.md,확률적 형태 분류·능동 학습
 은하 분류,Walmsley et al. 2022 (Galaxy Zoo DECaLS),"MNRAS 509, 3966; doi:10.1093/mnras/stab2093",—,Classifier/LITERATURE.md,세부 시각 형태 측정 → 계층적 형태 분기
+은하 분류,Norberg et al. 2002,"MNRAS 336, 907; DOI 10.1046/j.1365-8711.2002.05831.x",—,Classifier/subclass.py (galaxy_tags LUMINOUS),2dFGRS 광도 함수 M*_bJ = −19.66 + 5 log h
+은하 분류,Mauch & Sadler 2007,"MNRAS 375, 931; DOI 10.1111/j.1365-2966.2006.11353.x",—,Classifier/subclass.py (RADIO_AGN_MIN_L14),1.4 GHz 광도 함수: 약 1e23 W/Hz 아래는 별 생성 은하가 우세
 퀘이사·AGN,Stern et al. 2012,"ApJ 753, 30",—,Preprocess/classification_rules.csv WISE-AGN-001 (Sec. 3.5 / Fig. 6); Preprocess/04_build_evidence.py; Preprocess/03_extract_features.py; Preprocess/catalog_reliability.csv (catalog_confidence_allwise); Classifier/subclass.py (galaxy_activity); Classifier/LITERATURE_SUBCLASS.md; WORK_REPORT_2026-10-10.md,"W1−W2 ≥ 0.8, W2 < 15.05 (Vega) 중적외선 AGN; COSMOS 신뢰도 ~95 %, 완전도 ~78 %"
 퀘이사·AGN,Assef et al. 2018 (The WISE AGN Catalog),"ApJS 234, 23; DOI 10.3847/1538-4365/aaa00a",—,Preprocess/classification_rules.csv WISE-AGN-R90-001 (Eq. 4); Preprocess/04_build_evidence.py; Preprocess/LITERATURE.md,"AllWISE R90 경계 (α, β, γ) = (0.650, 0.153, 13.86)"
 퀘이사·AGN,Bañados et al. 2016 (PS1 distant z > 5.6 quasar survey),"ApJS 227, 11; DOI 10.3847/0067-0049/227/1/11",—,"Preprocess/classification_rules.csv PS1-QSO-Z6-001 (Sec. 2.1.1, Eq. 1–3); Preprocess/04_build_evidence.py; Preprocess/LITERATURE.md",i-dropout 선택(i−z > 2.0 등) z ≈ 6 퀘이사 후보
@@ -158,6 +160,8 @@ category,citation,journal_ref,bibcode,used_in,purpose
 행성상성운·초신성·과도 현상,Möller & de Boissière 2020 (SuperNNova),—,—,Classifier/LITERATURE_MULTI_AXIS.md,RNN 광도곡선 초신성 분류(극대 이전 곡선 포함)
 행성상성운·초신성·과도 현상,"""HSC transient ML work (2020)"" (저장소 표기 그대로)",—,—,Classifier/LITERATURE_MULTI_AXIS.md,시간 자료가 늘수록 성능 향상
 행성상성운·초신성·과도 현상,"""Recent 4MOST transient classifier comparison (2025): SNID, DASH and NGSF"" (저장소 표기 그대로)",—,—,Classifier/LITERATURE_MULTI_AXIS.md,분광 과도 현상 유형 분류 도구 비교
+행성상성운·초신성·과도 현상,"Parker, Bojičić & Frew 2016","J. Phys. Conf. Ser. 728, 032008; arXiv:1603.07042",—,Classifier/axes/phenomenon.py (_hash_grade),"HASH 등급 True/Likely/Possible, 모방체·post-AGB 수록"
+행성상성운·초신성·과도 현상,Frew & Parker 2010,"PASA 27, 129; DOI 10.1071/AS09040",—,Classifier/axes/phenomenon.py (Acker); Classifier/LITERATURE_SPECTROSCOPY.md §5,"PN과 모방체 구분 선비([S II]/Hα, [O III]/Hβ)"
 기타 문서,"STScI/MAST Pan-STARRS Public Archive, ""How to separate stars and galaxies""",URL: https://outerspace.stsci.edu/spaces/PANSTARRS/pages/298812369/How+to+separate+stars+and+galaxies,—,Preprocess/classification_rules.csv PS1-MORPH-001/002; Preprocess/catalog_reliability.csv (catalog_confidence_ps1_morphology); Preprocess/LITERATURE.md,"PSF−Kron 0.05(i), i ≈ 21보다 어두우면 불안정, i ≈ 14보다 밝으면 포화"
 기타 문서,SDSS DR14 flux-calibration notes,—,—,Preprocess/units.py; Preprocess/LITERATURE.md,"SDSS u_AB = u − 0.04, z_AB = z + 0.02"
 기타 문서,"WISE Explanatory Supplement, Sec. IV.4.h",—,—,Preprocess/units.py; Preprocess/LITERATURE.md,WISE Vega→AB 보정값

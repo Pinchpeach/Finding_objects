@@ -3,8 +3,8 @@
   "precision": {
     "GAIA_BPRP0": 0.662,
     "GAIA_BPRP0_TEFF": 0.516,
-    "GALEX_NUVR": 0.906,
-    "WISE_W23_SF": 0.7603,
-    "WISE_W23_UL": 0.9615
+    "GALEX_NUVR": 0.9,
+    "WISE_W23_SF": 0.8521,
+    "WISE_W23_UL": 0.9619
   }
 }

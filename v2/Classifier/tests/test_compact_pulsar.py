@@ -114,3 +114,22 @@ def test_rule_precision_calibration(tmp_path):
     assert out.variability_calibrated_probability.tolist()[0] == 0.9552
     assert out.variability_calibration_method.tolist()[0] == "rule_precision"
     assert out.variability_calibration_method.isna().tolist()[1:] == [True, True]
+
+
+def test_literature_review_phenomenon_and_gaia_score():
+    """2.18.0: HASH grades, SN epoch, Acker identity, Gaia classifier score."""
+    s = importlib.util.spec_from_file_location("phen_t", ROOT / "axes" / "phenomenon.py")
+    ph = importlib.util.module_from_spec(s); s.loader.exec_module(ph)
+    hash_row = lambda st: {"catalogs": "HASH PN Catalog", "pn_catalog_status": st}
+    assert ph.classify(hash_row("T"))["status"] == "HASH_PN_CATALOG_MATCH"
+    assert ph.classify(hash_row("Possible PN"))["status"] == "HASH_POSSIBLE_PN"
+    assert ph.classify(hash_row("Mimic"))["label"] == "OTHER_PHENOMENON"
+    assert ph.classify(hash_row(None))["label"] == "PN"
+    sn = {"catalogs": "ASAS-SN Supernova Catalog", "event_mjd": 58000.0}
+    assert ph.classify(dict(sn, obs_mjd=58100.0))["label"] == "SN"
+    assert ph.classify(dict(sn, obs_mjd=59500.0))["status"] == "SN_HOST_PAST_EVENT"
+    assert ph.classify({"catalogs": "Acker PN Spectroscopy"})["label"] == "PN"
+    spec = importlib.util.spec_from_file_location("v2_var_s", ROOT / "axes" / "variability.py")
+    v = importlib.util.module_from_spec(spec); spec.loader.exec_module(v)
+    assert v.classify({"best_class_name": "RR", "best_class_score": 0.3})["status"] == "GAIA_DR3_VARIABLE_LOW_SCORE"
+    assert v.classify({"best_class_name": "RR", "best_class_score": 0.8})["label"] == "RR_LYRAE"

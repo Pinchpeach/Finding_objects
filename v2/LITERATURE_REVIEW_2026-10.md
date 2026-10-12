@@ -54,7 +54,7 @@
 | FLAME 거성 | 조건을 잘못 옮김, RGB와 RC/AGB 구분 불가 | Gaia DR3 문서 §11.3.6 | **2.17.0** 수정 |
 | GSP-Spec | 보정 없이 log g, [M/H] 사용 | Recio-Blanco+2023 §9.1 | **2.17.0** 수정 |
 | Suh 2021 | 광도 확인 없이 물리적 AGB | Suh 2021 표 구성, 프로젝트 G-11 측정 | **2.17.0** 수정 |
-| 은하 활동성 순서 | SDSS subclass가 WHAN/BPT보다 먼저 | Bolton+2012, Cid Fernandes+2011 | 2.18.0 |
+| 은하 활동성 순서 | SDSS subclass가 WHAN/BPT보다 먼저 | Bolton+2012, Cid Fernandes+2011 | **2.18.0** 수정 |
 | 펄서 주석 | 척도 높이·편광 비율 문구 | Lorimer+2006 | 2.14.0에서 수정됨 |
 
 각 버전의 측정치는 `CHANGELOG.md`, 설계 이유는 `WORK_REPORT_2026-10-10.md` §16에 있다.

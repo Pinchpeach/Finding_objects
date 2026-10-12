@@ -12,13 +12,13 @@ v2의 코드·문서·규칙표가 인용하는 논문, 카탈로그 출판물, 
 | [데이터 출처 카탈로그 (논문 인용 없음)](#data) | 13 |
 | [교차 대응·통계·분류 방법](#method) | 14 |
 | [별 분류](#star) | 35 |
-| [은하 분류](#galaxy) | 23 |
+| [은하 분류](#galaxy) | 25 |
 | [퀘이사·AGN](#qso) | 14 |
 | [전파·X선·밀집성](#radio) | 11 |
-| [행성상성운·초신성·과도 현상](#trans) | 6 |
+| [행성상성운·초신성·과도 현상](#trans) | 8 |
 | [기타 문서](#doc) | 13 |
 | [분광 분류 기준](#spec) | 43 |
-| **합계** | **229** |
+| **합계** | **233** |
 
 <a id="gaia"></a>
 ## 측성·Gaia
@@ -217,6 +217,8 @@ Gaia 데이터 릴리스, Gaia 처리·검증 논문, 측성 품질 기준.
 | Banerji et al. 2010 (Galaxy Zoo ML) | MNRAS 406, 342; doi:10.1111/j.1365-2966.2010.16713.x | — | `Classifier/LITERATURE.md` | 기계학습으로 Galaxy Zoo 형태 재현 |
 | Walmsley et al. 2020 (Galaxy Zoo Bayesian CNN) | MNRAS 491, 1554; doi:10.1093/mnras/stz2816 | — | `Classifier/LITERATURE.md` | 확률적 형태 분류·능동 학습 |
 | Walmsley et al. 2022 (Galaxy Zoo DECaLS) | MNRAS 509, 3966; doi:10.1093/mnras/stab2093 | — | `Classifier/LITERATURE.md` | 세부 시각 형태 측정 → 계층적 형태 분기 |
+| Norberg et al. 2002 | MNRAS 336, 907; DOI 10.1046/j.1365-8711.2002.05831.x | — | `Classifier/subclass.py (galaxy_tags LUMINOUS)` | 2dFGRS 광도 함수 M*_bJ = −19.66 + 5 log h |
+| Mauch & Sadler 2007 | MNRAS 375, 931; DOI 10.1111/j.1365-2966.2006.11353.x | — | `Classifier/subclass.py (RADIO_AGN_MIN_L14)` | 1.4 GHz 광도 함수: 약 1e23 W/Hz 아래는 별 생성 은하가 우세 |
 
 <a id="qso"></a>
 ## 퀘이사·AGN
@@ -272,6 +274,8 @@ PN 진단, 광도곡선 기반 초신성/과도 현상 분류.
 | Möller & de Boissière 2020 (SuperNNova) | — | — | `Classifier/LITERATURE_MULTI_AXIS.md` | RNN 광도곡선 초신성 분류(극대 이전 곡선 포함) |
 | "HSC transient ML work (2020)" (저장소 표기 그대로) | — | — | `Classifier/LITERATURE_MULTI_AXIS.md` | 시간 자료가 늘수록 성능 향상 |
 | "Recent 4MOST transient classifier comparison (2025): SNID, DASH and NGSF" (저장소 표기 그대로) | — | — | `Classifier/LITERATURE_MULTI_AXIS.md` | 분광 과도 현상 유형 분류 도구 비교 |
+| Parker, Bojičić & Frew 2016 | J. Phys. Conf. Ser. 728, 032008; arXiv:1603.07042 | — | `Classifier/axes/phenomenon.py (_hash_grade)` | HASH 등급 True/Likely/Possible, 모방체·post-AGB 수록 |
+| Frew & Parker 2010 | PASA 27, 129; DOI 10.1071/AS09040 | — | `Classifier/axes/phenomenon.py (Acker)`<br>`Classifier/LITERATURE_SPECTROSCOPY.md §5` | PN과 모방체 구분 선비([S II]/Hα, [O III]/Hβ) |
 
 <a id="doc"></a>
 ## 기타 문서

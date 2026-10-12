@@ -46,7 +46,7 @@ Spectroscopic log g separates dwarfs, subgiants and giants without a parallax.
   - Quality is set by `flags_gspspec`. The first 13 characters equal to zero define the "golden sample" (Gaia Collaboration, Creevey et al. 2023, A&A 674, A39).
   - Raw log g is biased low. Recio-Blanco et al. 2023 give polynomial calibrations.
   - The DR3 validation paper advises against GSP-Spec log g for AGB stars (Babusiaux et al. 2023, A&A 674, A32).
-- **Metallicity:** [Fe/H] < −1 metal-poor, < −2 very metal-poor, < −3 extremely metal-poor (Beers & Christlieb 2005, ARA&A 43, 531). The pipeline uses GSP-Phot [M/H] only as a candidate flag, because Andrae et al. 2023 report biases; a spectroscopic [Fe/H] is direct.
+- **Metallicity:** [Fe/H] < −1 metal-poor, < −2 very metal-poor, < −3 extremely metal-poor (Beers & Christlieb 2005, ARA&A 43, 531). GSP-Phot [M/H] is not used for the metal-poor tag since 2.6.2 (precision 0.15 against APOGEE; table below). Spectroscopic [Fe/H] from LAMOST, or calibrated GSP-Spec [M/H] (Recio-Blanco et al. 2023, Eq. 2; since 2.17.0), is used directly.
 
 ### 2.2.1 Validation on bright stars (2.6.2, APOGEE DR17)
 
@@ -219,6 +219,13 @@ Check on 3,492 galaxies with both a DESI DR1 and an SDSS spectrum
 
 ## 5. Planetary nebulae
 
-PN line diagnostics, for example [O III] 5007 / Hα, are used in
-`Classifier/axes/phenomenon.py`. See that file and `Classifier/LITERATURE.md`
-for the references.
+A counterpart in the Strasbourg–ESO PN catalogue (Acker et al. 1992) is
+identity evidence, like HASH (2.18.0). The old "≥ 2 positive lines" test
+only checked that data existed. The line ratios used against PN mimics,
+[O III] 5007 / Hα and [S II] / Hα (Frew & Parker 2010, PASA 27, 129), are
+**reported** in the evidence and not used as a veto: no threshold has been
+measured on this pipeline's data. HASH entries are graded (Parker, Bojičić &
+Frew 2016):
+- True / Likely → PN.
+- Possible → PN with status `HASH_POSSIBLE_PN`, calibrated separately.
+- Mimics, post-AGB stars and other non-PN entries → not PN.

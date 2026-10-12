@@ -45,7 +45,7 @@ def test_galaxy_activity_rules():
     sc = _sc()
     assert sc.classify({"primary_class": "GALAXY", "sdss_dr18_spectroscopy__subclass": "STARFORMING"})["code"].startswith("GALAXY:STAR_FORMING")
     sf = sc.classify({"primary_class": "GALAXY", "allwise__W1mag": 14.0, "allwise__W2mag": 13.9,
-                      "allwise__W3mag": 10.4, "allwise__e_W3mag": 0.05})
+                      "allwise__W3mag": 10.2, "allwise__e_W3mag": 0.05})   # W2-W3 = 3.7 > 3.5
     assert sf["activity"] == "STAR_FORMING" and sf["rule"] == "WISE_W23_SF"
     q = sc.classify({"primary_class": "GALAXY", "allwise__W1mag": 14.0, "allwise__W2mag": 13.9, "allwise__W3mag": 12.6})
     assert q["activity"] == "QUIESCENT" and q["rule"] == "WISE_W23_UL"      # W3 upper limit
@@ -251,9 +251,13 @@ def test_galaxy_emission_line_rules():
     assert sc.galaxy_lines(g(100, 1, 1, 20, -12.0, err=5))[0] == "STAR_FORMING"
     assert sc.galaxy_lines(g(100, 1, 1, 80, -4.0, err=5))[:2] == ("AGN", "SDSS_WHAN")          # x = -0.10
     assert sc.galaxy_lines(g(100, 1, 1, 45, -12.0, err=5))[0] == "COMPOSITE"                  # x = -0.35 (Stasinska+2006)
-    # The SDSS pipeline subclass keeps precedence.
+    # Line diagnostics decide before the SDSS pipeline subclass (2.18.0) ...
     row = dict(g(100, 30, 150, 120, -20.0), **{P + "subclass": "STARFORMING"})
-    assert sc.classify(row)["activity"] == "STAR_FORMING"
+    assert sc.classify(row)["activity"] == "AGN"
+    # ... except broad lines, which a narrow-line fit misses.
+    assert sc.classify(dict(g(100, 30, 25, 60, -2.0), **{P + "subclass": "AGN BROADLINE"}))["activity"] == "AGN"
+    # Without usable lines the subclass is the fallback.
+    assert sc.classify({"primary_class": "GALAXY", P + "subclass": "STARFORMING"})["activity"] == "STAR_FORMING"
     # Dn4000 alone (no line measurement).
     assert sc.galaxy_lines({P + "d4000_n": 1.8})[1] == "SDSS_D4000"
 

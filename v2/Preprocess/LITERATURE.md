@@ -61,7 +61,13 @@ Implementation policy: extended morphology supplies moderate GALAXY evidence onl
 ## Decision-tree architecture
 
 ### DT-HIER-001
-The pipeline now uses an interpretable hierarchical decision tree for final
+**Superseded (2.4.x onward):** the final coarse class now comes from the
+fitted multinomial logistic fusion of the evidence keys with a calibrated
+abstention threshold (Stage 5, `fusion_weights.json`; sign-constrained since
+2.11.0, see below), plus the decisive-Gaia-motion rule. The hierarchy below
+is kept as the record of the earlier design.
+
+The pipeline used an interpretable hierarchical decision tree for final
 classification while retaining the evidence probability vector as a fallback.
 The hierarchy is: spectroscopy -> curated physical type -> Gaia DSC ->
 two-indicator Galactic astrometry -> extended morphology -> validated

@@ -113,6 +113,14 @@ Variability classification should consume time-series features rather than stati
 photometry alone. AGB and Mira must remain separate axes so an object can be
 physical=AGB and variability=MIRA simultaneously.
 
+### 3.0 Gaia vari_classifier score (2.18.0)
+
+`best_class_score` is not calibrated across classes (Rimoldini et al. 2023,
+A&A 674, A14).  On the cross-validation set (192 objects whose variability
+type came from vari_classifier) the type is right for 35 % below score 0.5
+(31 objects) and for 91 % at ≥ 0.5 (161).  Below 0.5 only "variable"
+(OTHER_VARIABLE, status `GAIA_DR3_VARIABLE_LOW_SCORE`) is reported.
+
 ### 3.1 ZTF periodic variables (2.8.0)
 
 Source: Chen et al. (2020, ApJS 249, 18), 781,602 periodic variables from
@@ -305,6 +313,13 @@ Implementation implication:
 PN should not be inferred from IR colour alone. Spectroscopic evidence should
 receive the strongest weight; photometry is candidate-level evidence.
 
+2.18.0: HASH grades (Parker, Bojičić & Frew 2016): True / Likely → PN,
+Possible → PN with status `HASH_POSSIBLE_PN`, mimics / post-AGB / other
+non-PN entries → not PN.  The Acker et al. (1992) catalogue is a PN
+catalogue: its counterpart is identity evidence (the old "≥ 2 lines" check
+only tested that data existed); [O III]/Hα and [S II]/Hα are reported for
+mimic checks (Frew & Parker 2010).
+
 ## 6. Supernovae / transients (phenomenon axis)
 
 Recommended observables:
@@ -327,6 +342,11 @@ Literature:
 Implementation implication:
 SN classification belongs to a temporal/event pipeline. A single static catalogue
 row without multi-epoch evidence should not produce a confident SN subtype.
+
+SN catalogue match (2.18.0): when the observation epoch is known and lies
+more than a year after the event, the source is the host galaxy, not the
+supernova (status `SN_HOST_PAST_EVENT`), as in the time-domain branch that
+needs an event epoch.
 
 ## Confidence of axis labels (2.15.0)
 

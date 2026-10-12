@@ -11,6 +11,7 @@
 
 | 버전 | 날짜 | PR | 요약 |
 |---|---|---|---|
+| 2.18.0 | 2026-10-12 | (브랜치) | 문헌 정합성 검토 3차(은하·QSO·현상): 방출선 진단을 SDSS subclass보다 먼저, W2−W3 별 생성 기준 3.5, Gaia 변광 분류 점수 하한, HASH 등급·SN 시기 — 은하 활동성 정확도 79.5 → 87.9 %, Portsmouth BPT 일치 84.1 → 86.9 %
 | 2.17.0 | 2026-10-12 | (브랜치) | 문헌 정합성 검토 2차(별): 생산자 권고를 따르도록 DSC 쌍성·WD, `is_cstar`, FLAME, GSP-Spec, 거성 기준 수정 — 들판 LPV 탄소별 비율 25.7 → 3.3 %(LAMOST 3.4 %), AGB 화학형 94.6 → 95.8 %
 | 2.16.0 | 2026-10-12 | (브랜치) | 문헌 정합성 검토 1차(연관·1차 분류): Gaia DSC 사전확률 제거, R90·시차 증거 적용 범위, 탐사 위치 오차·PSF 수정 — DESI 88.46 → 90.96 %, 기권 5.3 → 2.6 %
 | 2.15.0 | 2026-10-12 | (브랜치) | 세부 축 판정의 확신도 = 독립 정답에서 측정한 규칙 정밀도 |
@@ -46,6 +47,23 @@
 | 2.0.0 | ~2026-10-04 | — | v2 파이프라인 기준선 (수집 → 전처리 1–5단계 → 분류기) |
 
 ---
+
+## 2.18.0 — 문헌 정합성 검토 3차: 은하·QSO·현상 (브랜치)
+`LITERATURE_REVIEW_2026-10.md` §3.3의 수정 항목.
+
+| 변경 | 근거 | 측정 |
+|---|---|---|
+| 은하 활동성 순서: SDSS BROADLINE → 방출선 WHAN·BPT → SDSS subclass(대체) | SDSS 파이프라인의 SF/AGN 경계(Bolton et al. 2012)는 Kewley·Kauffmann 선이 아니고, 은퇴 은하 판정(Cid Fernandes et al. 2011)이 없다. 넓은 선은 좁은 선 맞춤이 놓쳐 먼저 둔다 | subclass가 있는 SDSS 은하 1,190개에서 Portsmouth BPT 일치 84.1 → 86.9 %. 남은 불일치 22개는 WHAN 은퇴 은하를 Portsmouth가 LINER로 부른 경우(문헌상 AGN 아님) |
+| WISE W2−W3 별 생성 기준 3.0 → 3.5 | Jarrett et al. 2017: 2–3.5는 중간 원반, > 3.5가 별 생성 원반 | SDSS test: 규칙 정밀도 0.754 → 0.871, 활동성 정확도 79.5 → 87.9 %, 적용률 42.3 → 31.8 % |
+| Stern AGN 규칙에 W1·W2 S/N ≥ 10 | Stern et al. 2012가 보정한 측광 조건(1차 분류 규칙과 같게) | 벤치마크 특징에 S/N 열이 없어 동일 |
+| 섬유 구경 표지 `APERTURE_NUCLEAR`(SDSS z < 0.04, DESI z < 0.08) | Kewley, Jansen & Geller 2005: 빛의 20 % 이상을 담는 조건 | 표지만 추가 |
+| 정지 은하의 전파 AGN 표지는 L1.4 > 1e23 W/Hz일 때만 | 그 아래는 별 생성 은하가 우세(Mauch & Sadler 2007; Best & Heckman 2012) | z가 없으면 "RADIO"만 |
+| Gaia vari_classifier 점수 < 0.5면 유형 없이 "변광" | 점수는 계급 간 보정되지 않음(Rimoldini et al. 2023) | 교차 검증 192개: 0.5 미만 정답 35 %(31개), 이상 91 %(161개) |
+| HASH 등급: True/Likely → PN, Possible → 별도 상태, 모방체·post-AGB → PN 아님 | Parker, Bojičić & Frew 2016 | 교차 검증 PN 정밀도 1.000(233)은 다음 실행에서 확인 |
+| SN 카탈로그 대응이 사건 1년 이후 관측이면 모은하(`SN_HOST_PAST_EVENT`) | 시간 영역 분기와 같은 원칙 | 관측 시기가 있을 때만 작동 |
+| Acker PN: "선 2개 이상" 조건 → 카탈로그 정체 증거, [S II]/Hα·[O III]/Hα 보고 | Acker 목록 자체가 PN 목록. 모방체 구분은 선비(Frew & Parker 2010) | — |
+| 인용 수정: NUV−r > 5는 Salim 2014·Wyder et al. 2007(Kaviraj는 5.5), R_NUV = 8.2(Wyder), M*_B(Norberg et al. 2002), z ≥ 2.1(Chaussidon et al. 2023) | 검토 | 결과 동일 |
+| 문서: ESP-ELS AGB 거부(2.6.2에 제거됨), GSP-Phot 금속 결핍 문구, 결정 트리 구조(현재는 학습된 융합) | 오래된 설명 | — |
 
 ## 2.17.0 — 문헌 정합성 검토 2차: 별 (브랜치)
 `LITERATURE_REVIEW_2026-10.md` §3.2의 별 항목 중 생산자(Gaia DPAC) 권고와 어긋나던 다섯 곳과 주요 PARTLY 항목을 고쳤다.

@@ -113,23 +113,40 @@ coarse class given:
 ## GALAXY
 
 ### Activity
-1. SDSS spectrum subclass (Bolton et al. 2012, AJ 144, 144).
-   * STARFORMING / AGN come from the BPT [O III]/Hβ vs [N II]/Hα diagram
-     (Baldwin, Phillips & Terlevich 1981; Kauffmann et al. 2003; Kewley et
-     al. 2001).
-   * STARBURST means EW(Hα) > 50 Å. BROADLINE is treated as AGN.
+1. SDSS spectrum subclass and the project's own line diagnostics (order
+   changed in 2.18.0):
+   * BROADLINE → AGN first: a narrow-line fit misses broad Hα, so 29 SDSS
+     BROADLINE objects would look WHAN-retired.
+   * Then WHAN → BPT from the line fluxes (`galaxy_lines`, below).
+   * Then the SDSS subclass (Bolton et al. 2012, AJ 144, 144) as a fallback.
+     Its SF/AGN line, log([O III]/Hβ) = 0.7 − 1.2(log([N II]/Hα) + 0.4), is
+     neither Kewley et al. 2001 nor Kauffmann et al. 2003, so composites
+     become "AGN". It also has no retired-galaxy test (Cid Fernandes et al.
+     2011).
+   * STARBURST means EW(Hα) > 50 Å.
+   * Agreement with the Portsmouth BPT on 1,190 SDSS galaxies with a
+     subclass: 84.1 % (subclass first) → 86.9 % (lines first).
+   * Fibre aperture: SDSS spectra cover > 20 % of the galaxy light only at
+     z > 0.04 (Kewley, Jansen & Geller 2005); the DESI 1.5″ fibre needs
+     about twice the distance (z > 0.08). Below that the line class is
+     tagged `APERTURE_NUCLEAR`, meaning it describes the nucleus.
 2. SIMBAD types: Sy1/Sy2/SyG/LIN/AGN → AGN; SBG → starburst; H2G/EmG/bCG →
    star-forming.
 3. Mid-IR AGN: W1−W2 ≥ 0.8 with W2 < 15.05 (Vega; Stern et al. 2012, ApJ
-   753, 30).
+   753, 30), with S/N ≥ 10 in W1 and W2 (the photometry Stern et al.
+   calibrated on, as in Stage-4 WISE-AGN-001; 2.18.0).
 4. WISE W2−W3 (Jarrett et al. 2017, ApJ 836, 182; 2019, ApJS 245, 25):
-   * star-forming discs > 3.0, spheroids < 1.5, intermediate discs in
-     between (no label);
+   * star-forming discs > 3.5 (Jarrett et al. 2017; 3.0 before 2.18.0),
+     spheroids < 1.5, intermediate discs in between (no label);
+   * SDSS test split: SF precision 0.754 → 0.871, activity accuracy
+     79.5 → 87.9 %, coverage 42.3 → 31.8 %;
    * applied when W3 S/N ≥ 5 (σ < 0.2 mag);
    * when AllWISE gives only a W3 upper limit, the true colour is bluer than
      W2 − W3_lim, so W2 − W3_lim < 1.5 also implies a spheroid.
-5. GALEX (NUV−r)₀ > 5 → quiescent (Kaviraj et al. 2007; red sequence of
-   Wyder et al. 2007). Uses R_NUV ≈ 8.2.
+5. GALEX (NUV−r)₀ > 5 → quiescent: the red sequence of Salim (2014, SerAJ
+   189, 1) and Wyder et al. (2007). Kaviraj et al. (2007) find recent star
+   formation below 5.5, so 5–5.5 is "red sequence", not necessarily dead.
+   R_NUV = 8.2 (Wyder et al. 2007).
 
 ### Light profile
 * Legacy Surveys DEV (de Vaucouleurs) → early-type-like; EXP → disc
@@ -407,8 +424,10 @@ All models together:
     stars (none an LPV, median G − Ks 2.2 vs 5.4) and no O-AGB star;
   - a spectroscopic log g (LAMOST LASP or clean-flag Gaia GSP-Spec) is
     above 3.5;
-  - Gaia ESP-ELS calls it a T Tauri or Herbig Ae/Be star (young stars have
-    dusty discs that mimic silicate AGB colours).
+  - (until 2.6.2 also: Gaia ESP-ELS calls it a T Tauri or Herbig Ae/Be
+    star. Removed: the ESP-ELS "T Tauri" class matched a young-star type in
+    SIMBAD for only 2 %, and most are AGB-type variables; see
+    `LITERATURE_SPECTROSCOPY.md` §3.)
   A carbon star caught by a veto is "Dwarf carbon star (dC)" (`STAR:C:V`)
   if M_G > 5 (Li et al. 2024; Green 2013) and "Carbon star" (`STAR:C:?`,
   CH / sub-giant carbon star) otherwise. SDSS and LAMOST carbon spectra

@@ -17,6 +17,7 @@ ZTF_MAP={"RR":("RR_LYRAE","RRAB"),"RRC":("RR_LYRAE","RRC"),"CEP":("CEPHEID","DCE
  "MIRA":("MIRA",None),"SR":("LPV","SR"),"EW":("ECLIPSING","EW"),"EA":("ECLIPSING","EA"),
  "BYDRA":("ROTATIONAL","BY_DRA"),"RSCVN":("ROTATIONAL","RS_CVN"),"DSCT":("PULSATING","DSCT")}
 ZTF="ztf_periodic_variables__"
+GAIA_VARI_MIN_SCORE=0.5
 GAIA_MIRA_SEMI_AMP=0.6;MIRA_MIN_PERIOD_D=80.0;MIRA_MAX_PERIOD_D=1000.0
 EVENT_CLASSES={"SN","MICROLENSING"};NON_STELLAR={"AGN","GALAXY"};OTHER_SPECIAL={"EP","WD"}
 def _text(row,key):
@@ -94,6 +95,12 @@ def classify(row):
   return _result("LPV",None,"GAIA_DR3_SOS_LPV_CSTAR_CANDIDATE",[{"kind":"gaia_dr3_vari_long_period_variable","is_cstar":True,"frequency_per_day":_num(row,"gaia_lpv_frequency"),"amplitude_mag":_num(row,"gaia_lpv_amplitude")}],"C_STAR_CANDIDATE")
  raw=_text(row,"best_class_name");score=_num(row,"best_class_score")
  evidence=[] if raw is None else [{"kind":"gaia_dr3_vari_classifier_result","best_class_name":raw,"best_class_score":score,"score_semantics":"raw Gaia normalized-rank score; not calibrated probability"}]
+ # Gaia vari_classifier scores are not calibrated across classes (Rimoldini
+ # et al. 2023).  On the cross-validation set (192 objects) the type is
+ # right for 35 % below score 0.5 and 91 % at >= 0.5, so below it only
+ # "variable" is reported (2.18.0).
+ if raw in GAIA_MAP and score is not None and score<GAIA_VARI_MIN_SCORE:
+  return _result("OTHER_VARIABLE",score,"GAIA_DR3_VARIABLE_LOW_SCORE",evidence)
  if raw in GAIA_MAP:return _result(GAIA_MAP[raw],score,"GAIA_DR3_VARIABLE_CANDIDATE",evidence)
  if raw in EVENT_CLASSES:return _result("UNKNOWN",None,"ROUTED_TO_PHENOMENON",evidence)
  if raw in NON_STELLAR:return _result("UNKNOWN",None,"NON_STELLAR_VARIABILITY_LABEL",evidence)
