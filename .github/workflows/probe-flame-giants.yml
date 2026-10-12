@@ -1,0 +1,38 @@
+name: Gaia FLAME values of the Kepler giant truth
+
+# Gaia DR3 astrophysical parameters for the Vrard+2025 RGB/AGB truth (2.13.0).
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/code-review-7ox8zn]
+    paths:
+      - v2/benchmark/probe_flame_giants.py
+
+concurrency:
+  group: flame-giants-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pandas numpy astropy astroquery
+      - name: Build
+        run: python -u v2/benchmark/probe_flame_giants.py
+      - name: Commit
+        if: ${{ !cancelled() }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add v2/benchmark/flame_giants || true
+          if git diff --cached --quiet; then echo "nothing to commit"; exit 0; fi
+          git commit -m "Gaia FLAME values of the Kepler giant truth"
+          bash .github/scripts/push_with_retry.sh
