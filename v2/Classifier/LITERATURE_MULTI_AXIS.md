@@ -48,6 +48,24 @@ Implementation implication:
 Do not make hard RGB/AGB labels from a single colour cut. Use a hierarchical
 evidence model and abstain when only broad red-giant evidence is available.
 
+### 2.1 RED_GIANT on the physical axis (2.13.0)
+
+RGB and AGB stars cannot be separated without asteroseismology (Vrard et al.
+2025, the truth set) or luminosity.  "Cool giant" can: the luminosity class
+of the sub-class classifier (Gaia CMD with parallax S/N ≥ 5; else LAMOST /
+GSP-Spec log g; else GSP-Phot log g, against the Ciardi et al. 2011 giant
+boundary) agrees with APOGEE DR17 for 96.9–98.3 % (2.6.2).  RED_GIANT =
+luminosity class III and Teff < 5500 K.  Gaia FLAME was not usable for these
+stars: for the Kepler giants its masses and ages are unphysical (median
+3.3 M☉, 0.3 Gyr; `benchmark/probe_flame_giants.py`), as the Gaia DR3
+documentation and Fouesneau et al. (2023) warn for giants.
+
+Cross-validation (Vrard+2025 Kepler RGB 203, AGB 250): RGB family accuracy
+0 → 51.7 %, AGB 0 → 41.2 %; none labelled a non-giant.  The rest have no
+GSP-Phot log g in the validation collector.  Before 2.11.0 these stars never
+reached the axis: the coarse fusion called them GALAXY (wrong-signed Gaia
+weights).
+
 ## 3. Variable stars (variability axis)
 
 Recommended observables:
