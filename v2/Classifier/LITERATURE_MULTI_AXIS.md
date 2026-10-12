@@ -135,9 +135,9 @@ M/SR stars matched to the Gaia LPV table (3,681 M, 2,592 SR), checked on the
 odd half: precision 0.934, recall 0.968 (precision levels off at 0.93–0.95
 for any threshold: a tail of large-amplitude ASAS-SN SR stars).
 
-Cross-validation (250 ASAS-SN Miras, 250 SR): Mira exact 25.6 → 94.8 %
-(the rule's 173 labels all correct); LPV exact 68.0 → 63.6 % (11 SR called
-Mira).
+Cross-validation (250 ASAS-SN Miras, 250 SR): Mira exact 25.6 → 94.8 %.
+The rule labelled 184 objects Mira, 173 correctly (precision 0.94); the 11
+SR stars it called Mira lower LPV exact 68.0 → 63.6 %.
 
 ## 4. Neutron stars / pulsars (compact axis)
 
