@@ -105,4 +105,5 @@ def test_rule_precision_calibration(tmp_path):
                        "variability_status": ["ZTF_PERIODIC_VARIABLE", "GAIA_DR3_SOS_LPV_LARGE_AMPLITUDE", "ZTF_PERIODIC_VARIABLE"]})
     out = cal.annotate(df, path, axes=("variability",))
     assert out.variability_calibrated_probability.tolist()[0] == 0.9552
-    assert out.variability_calibration_method.tolist() == ["rule_precision", None, None]
+    assert out.variability_calibration_method.tolist()[0] == "rule_precision"
+    assert out.variability_calibration_method.isna().tolist()[1:] == [True, True]
