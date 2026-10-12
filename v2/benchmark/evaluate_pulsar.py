@@ -51,6 +51,16 @@ def main() -> None:
            "rule_hits": {"pulsar": int(hit[p].sum()), "control": int(hit[~p].sum())},
            "significantly_polarised_hits": {"pulsar": int(pol[p].sum()), "control": int(pol[~p].sum())},
            "rule_hits_abs_b_lt_10": {"pulsar": int((hit & p & (absb < 10)).sum()), "control": int((hit & ~p & (absb < 10)).sum())}}
+    # Sky-level posterior of the candidates (compact.pulsar_posterior) by group.
+    post = []
+    for i, e in enumerate(ev):
+        if e is not None:
+            post.append({"pulsar": bool(p.iloc[i]), "posterior": c.pulsar_posterior({"ra": d.ra.iloc[i], "dec": d.dec.iloc[i]}, dict(e)),
+                         "plane": bool(absb.iloc[i] < 10), "polarised": bool(e["significantly_polarised"])})
+    pp = pd.DataFrame(post)
+    out["candidate_posterior"] = {f"plane={pl},polarised={po}": {"pulsars": int(g.pulsar.sum()), "controls": int((~g.pulsar).sum()),
+                                                                  "posterior": float(g.posterior.iloc[0])}
+                                  for (pl, po), g in pp.groupby(["plane", "polarised"])}
     print(json.dumps(out, indent=1))
     (BENCH / "pulsar_truth" / "pulsar_metrics.json").write_text(json.dumps(out, indent=1))
 

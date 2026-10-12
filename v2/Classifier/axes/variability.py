@@ -64,7 +64,7 @@ def classify(row):
   if label in ("MIRA","LPV") and _flag(row,"gaia_lpv_is_cstar"):sub="C_STAR_CANDIDATE"   # keep the Gaia RP C-star flag
   ev=[{"kind":"ztf_periodic_variable","type":_text(row,ZTF+"Type"),"period_days":_num(row,ZTF+"Per"),"amplitude_r_mag":_num(row,ZTF+"rAmp"),"amplitude_g_mag":_num(row,ZTF+"gAmp"),"amplitude_ratio_g_r":_ratio(_num(row,ZTF+"gAmp"),_num(row,ZTF+"rAmp")),"ztf_id":_text(row,ZTF+"catalog_object_id")}]
   return _result(label,None,"ZTF_PERIODIC_VARIABLE",ev,sub)
- # Mira from the Gaia DR3 LPV SOS G amplitude (2.13.0).  ``amplitude`` is half
+ # Mira from the Gaia DR3 LPV SOS G amplitude (2.12.0).  ``amplitude`` is half
  # the peak-to-peak range of the fitted G model (Lebzelter et al. 2023); Miras
  # are the large-amplitude LPVs (GCVS: dV > 2.5 mag; Mira-like in Gaia DR2:
  # G range > ~1 mag, Mowlavi et al. 2018).  Semi-amplitude >= 0.6 mag (range

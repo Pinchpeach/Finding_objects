@@ -83,3 +83,12 @@ def test_gaia_lpv_mira_amplitude():
     assert v.classify({"gaia_lpv_amplitude": 0.9, "gaia_lpv_frequency": 1 / 50.0, "best_class_name": "LPV"})["label"] == "LPV"   # P < 80 d
     assert v.classify({"gaia_lpv_amplitude": 1.0, "gaia_lpv_is_cstar": 1})["subtype"] == "C_STAR_CANDIDATE"
 
+
+def test_pulsar_candidate_posterior():
+    c = _compact()
+    base = {"nvss__S1.4": 3.0, "tgss_adr1__Stotal": 150.0, "tgss_adr1__Speak": 130.0}
+    plane_pol = c.classify(dict(base, **{"nvss__polFlux": 0.6, "nvss__e_polFlux": 0.15, "ra": 266.4, "dec": -28.9}))   # Galactic centre
+    off = c.classify(dict(base, **{"ra": 192.86, "dec": 27.13}))                                                       # NGP
+    assert plane_pol["confidence"] > 0.2 and off["confidence"] < 0.01
+    assert plane_pol["label"] == off["label"] == "PULSAR_CANDIDATE"
+
