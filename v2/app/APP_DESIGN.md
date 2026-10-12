@@ -17,7 +17,7 @@ v2/app/
 |---|---|---|
 | GUI | Tkinter (ttk) | Python 표준 라이브러리라 추가 설치가 없습니다. Windows/macOS Python 배포판에 기본 포함되어 있습니다. 초안 단계의 의존성을 최소화하려는 선택입니다. |
 | 대안 → 채택 | PySide6(Qt) | 하늘 지도, 상세 패널, 대용량 표를 위해 Qt 프론트엔드를 추가했습니다(6절). Tkinter 초안은 참고용으로 남깁니다. |
-| 배포 | PyInstaller(one-folder) | 데이터 파일(`fusion_weights.json`, `color_reference.csv.gz`, `classification_rules.csv`)을 `--add-data`로 같이 묶습니다. |
+| 배포 | PyInstaller(one-folder) | 파이프라인이 단계를 파일 경로로 불러오므로 `v2/` 소스·모델·규칙표를 `<bundle>/_internal/v2`에 데이터로 묶고, 그 파일들이 쓰는 외부 패키지를 hidden import로 지정합니다(`app/packaging/finding_objects.spec`). |
 | 네트워크 | 기존 수집기 그대로(아카이브당 300 s 제한) | 오프라인일 때는 "Raw catalog folder"로 미리 받은 데이터를 분류합니다. |
 
 ## 3. 현재 초안 기능
@@ -53,7 +53,7 @@ v2/app/
 - 파이프라인은 **QProcess 별도 프로세스**로 실행합니다(앱이 자기 자신을 `--pipeline` 모드로 다시 호출). GUI가 멈추지 않고, 취소는 프로세스 종료로 확실하게 처리되며, PyInstaller 단일 실행 파일에서도 그대로 동작합니다.
 - 진행률은 수집기의 `[name] ok|empty|error|timeout` 줄과 `[pipeline] stage: s` 줄로 계산합니다. 실패한 아카이브는 완료 후 경고로 표시합니다.
 - 대상 이름 해석(`SkyCoord.from_name`)은 QThreadPool에서 실행해 UI를 막지 않습니다.
-- 4절의 제안 1–4번과 6번을 구현했고, 5번(PyInstaller/빌드 워크플로)은 남아 있습니다.
+- 4절의 제안 1–6번을 모두 구현했습니다(5번 PyInstaller 빌드는 7절).
 
 실행:
 ```
@@ -99,3 +99,16 @@ python v2/app/qt_app.py
   - 휠은 커서 위치를 기준으로 확대하고, 드래그는 이동, 우클릭·Home·Fit은 초기화입니다.
   - +/− 버튼, 축척 막대, 확대 배율 표시가 있습니다. 화면 안 천체가 40개 이하이면 이름을 표시합니다.
   - 큰 은하는 실제 D26 타원(크기·방위각·축비)을 함께 그립니다.
+
+## 7. 배포 빌드 (2.10.1)
+```
+pip install -r v2/app/requirements.txt -r v2/app/packaging/requirements-build.txt
+pyinstaller v2/app/packaging/finding_objects.spec --noconfirm
+python v2/app/packaging/smoke_test.py dist/FindingObjects/FindingObjects   # Windows: ...FindingObjects.exe
+```
+- 결과: `dist/FindingObjects/` 폴더(실행 파일 + `_internal/`). 폴더째 복사하면 Python 설치 없이 실행됩니다.
+- GitHub Actions `Build desktop app`이 Windows·macOS·Linux에서 빌드하고, 오프라인 스모크 테스트(번들 실행 파일의 `--pipeline` 결과 = 소스 실행 결과, 표준 출력에 진행 줄)를 통과한 것만 아티팩트로 올립니다.
+- 창 모드(콘솔 없음) 빌드는 표준 출력이 없는 상태로 시작합니다. 작업자 모드는 상속된 표준 핸들을 다시 열어 GUI가 진행률을 읽을 수 있게 합니다(`qt_app._worker_stdio`).
+- 학습·검증 전용 패키지(scikit-learn, joblib)와 `benchmark/`, `rawdata/`는 묶지 않습니다.
+- 빌드 환경에 pytest가 있으면 PyInstaller의 astropy 훅이 실패합니다(astropy의 시각화 하위 모듈이 pytest로 matplotlib을 건너뜀). 실행에 필요한 패키지만 있는 깨끗한 환경에서 빌드합니다.
+

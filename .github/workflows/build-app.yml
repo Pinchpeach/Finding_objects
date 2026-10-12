@@ -1,0 +1,49 @@
+name: Build desktop app
+
+# PyInstaller one-folder builds of the Finding Objects app for Windows, macOS
+# and Linux, each smoke-tested offline (frozen pipeline == source pipeline on
+# the committed NGC 4522 raw catalogues) and uploaded as an artifact.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, claude/code-review-7ox8zn]
+    paths:
+      - 'v2/app/**'
+      - 'v2/VERSION'
+      - '.github/workflows/build-app.yml'
+
+concurrency:
+  group: build-app-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: python -m pip install -r v2/app/requirements.txt -r v2/app/packaging/requirements-build.txt
+      - name: Build
+        run: pyinstaller v2/app/packaging/finding_objects.spec --noconfirm --distpath dist --workpath build
+      - name: Smoke test (offline)
+        shell: bash
+        run: |
+          exe=dist/FindingObjects/FindingObjects
+          [ -f "$exe.exe" ] && exe="$exe.exe"
+          python v2/app/packaging/smoke_test.py "$exe"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FindingObjects-${{ runner.os }}
+          path: dist/FindingObjects
+          retention-days: 30

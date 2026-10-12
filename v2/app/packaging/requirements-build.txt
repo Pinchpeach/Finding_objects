@@ -1,0 +1,3 @@
+# Build-only requirements for the desktop app (PyInstaller one-folder build).
+# 6.22.3: earlier releases (e.g. 6.11.1) miss numpy 2.x modules (numpy._core._exceptions).
+pyinstaller==6.22.3
