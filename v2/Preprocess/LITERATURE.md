@@ -208,3 +208,33 @@ with reference objects of similar depth.
   accuracy when classified (CHANGELOG 2.6.5).
 - The magnitude never counts toward the minimum number of colours, so a
   source with only a magnitude is not classified by colour.
+
+## Legacy Surveys gradient boosting (`ls_gbm.py`, LS-GBM-001, 2.11.0)
+
+A histogram gradient-boosting classifier (Friedman 2001, Ann. Stat. 29, 1189;
+histogram binning as in LightGBM, Ke et al. 2017) gives STAR/GALAXY/QSO
+probabilities from the Legacy Surveys Tractor measurements: dereddened r,
+g−r, r−z, z−W1, W1−W2, r−W1, log r S/N and the morphological type.
+Machine-learned classification on these features is how DESI selects its own
+quasar targets (Chaussidon et al. 2023, random forest on LS colours).
+
+- Training: 149,769 DESI DR1 spectra (ZWARN = 0, ΔCHI2 > 25, primary
+  spectrum), 50,000 per class, LS DR9 photometry, every benchmark object
+  removed (`benchmark/build_desi_gbm_truth.py`).  Held-out 10 %: 95.6 %
+  (r < 21: 97.5 %, 21–22: 95.3 %, 22–23: 90.4 %, > 23: 90.5 %).
+- Inference is numpy-only (trees exported to `ls_gbm_model.npz`), identical
+  to scikit-learn (max |Δp| = 0).
+- Half-light radius, Sersic index and W1 S/N were left out: the preserved
+  benchmark features do not carry them, and they added only 0.2 points.
+
+## Sign-constrained fusion fit (2.11.0)
+
+The multinomial fusion fit could give a one-class claim the opposite sign
+when it is collinear with other evidence (every benchmark object has Legacy
+Surveys data).  Gaia DSC "STAR" and Gaia parallax/proper-motion "STAR" got
+negative STAR weights, so a star with only Gaia evidence was fused to GALAXY
+(p = 0.85).  `fit_fusion_weights.py` now removes any key whose fitted weight
+does not raise its own class most and refits; removed keys keep their
+literature prior weight in Stage 5 (one-sided support).  A Gaia-only copy of
+the training rows (all LS, PS1 and WISE evidence dropped, weight 0.3) teaches
+the remaining weights that case.

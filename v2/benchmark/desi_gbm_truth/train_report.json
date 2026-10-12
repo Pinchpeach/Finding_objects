@@ -1,29 +1,29 @@
 {
  "train_rows": 132207,
  "holdout_rows": 14447,
- "iterations": 152,
- "holdout_accuracy": 0.9578,
+ "iterations": 153,
+ "holdout_accuracy": 0.9557,
  "numpy_vs_sklearn_max_abs_diff": 0.0,
  "holdout_accuracy_by_r": {
   "0-19": {
    "n": 5306,
-   "acc": 0.9874
+   "acc": 0.9851
   },
   "19-21": {
    "n": 3894,
-   "acc": 0.9625
+   "acc": 0.9602
   },
   "21-22": {
    "n": 1977,
-   "acc": 0.9525
+   "acc": 0.953
   },
   "22-23": {
    "n": 2209,
-   "acc": 0.9049
+   "acc": 0.9036
   },
   "23-30": {
    "n": 1044,
-   "acc": 0.9128
+   "acc": 0.9052
   }
  }
 }

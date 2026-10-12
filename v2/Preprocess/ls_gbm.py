@@ -8,7 +8,7 @@ morphology DESI targeted on.  Machine-learned star / galaxy / quasar
 separation from these features is standard for the DESI imaging (e.g.
 Chaussidon et al. 2023 random forest for DESI QSO targets; Zhou et al.
 2023 for the LRG/ELG photometry).  Unlike the colour kNN (LS-CKNN-001) it
-uses morphology, depth (S/N) and five bands together.
+uses morphological type, depth (r S/N) and five bands together.
 
 Inference needs only numpy: the fitted trees are exported to
 ``ls_gbm_model.npz`` (benchmark/train_ls_gbm.py) and evaluated here, so the
@@ -27,8 +27,10 @@ MODEL_PATH = Path(__file__).with_name("ls_gbm_model.npz")
 P = "desi_legacy_surveys_dr10__"
 BANDS = ("g", "r", "z", "w1", "w2")
 TYPES = ("PSF", "REX", "EXP", "DEV", "SER")
-FEATURES = ("r_mag", "g_r", "r_z", "z_w1", "w1_w2", "r_w1", "log_snr_r", "log_snr_w1",
-            *[f"type_{t}" for t in TYPES], "log_shape_r", "sersic")
+# Only features the preserved benchmark features also carry, so the model's
+# benchmark score is its production score (adding W1 S/N, half-light radius
+# and Sersic index raised held-out accuracy by only 0.2 points, 95.6 -> 95.8 %).
+FEATURES = ("r_mag", "g_r", "r_z", "z_w1", "w1_w2", "r_w1", "log_snr_r", *[f"type_{t}" for t in TYPES])
 
 
 def _col(df, name):
@@ -50,7 +52,7 @@ def features(df: pd.DataFrame, prefix: str = P) -> np.ndarray:
         with np.errstate(divide="ignore", invalid="ignore"):
             mag[b] = np.where(f > 0, 22.5 - 2.5 * np.log10(f / t), np.nan)
     snr = {}
-    for b in ("r", "w1"):
+    for b in ("r",):
         f, iv = _col(df, f"{prefix}flux_{b}"), _col(df, f"{prefix}flux_ivar_{b}")
         with np.errstate(divide="ignore", invalid="ignore"):
             s = f * np.sqrt(np.where(iv > 0, iv, np.nan))
@@ -59,12 +61,8 @@ def features(df: pd.DataFrame, prefix: str = P) -> np.ndarray:
     typ = np.where(typ == "GPSF", "PSF", typ)        # DR9 Gaia point source = point-source model
     known = np.isin(typ, TYPES)
     onehot = [np.where(known, (typ == t).astype(float), np.nan) for t in TYPES]
-    shape = _col(df, f"{prefix}shape_r")
-    with np.errstate(divide="ignore", invalid="ignore"):
-        log_shape = np.where(shape > 0, np.log10(shape), np.where(shape == 0, -2.0, np.nan))
     X = np.column_stack([mag["r"], mag["g"] - mag["r"], mag["r"] - mag["z"], mag["z"] - mag["w1"],
-                         mag["w1"] - mag["w2"], mag["r"] - mag["w1"], snr["r"], snr["w1"], *onehot,
-                         log_shape, _col(df, f"{prefix}sersic")])
+                         mag["w1"] - mag["w2"], mag["r"] - mag["w1"], snr["r"], *onehot])
     return X
 
 
@@ -103,7 +101,7 @@ def predict_proba(df: pd.DataFrame, prefix: str = P) -> np.ndarray:
     model = load_model()
     X = features(df, prefix)
     probs = np.full((len(df), len(CLASSES)), np.nan)
-    has = np.isfinite(X[:, [0, 6]]).any(axis=1) | np.isfinite(X[:, 3])
+    has = np.isfinite(X[:, [0, 6]]).any(axis=1) | np.isfinite(X[:, 3])        # r mag, r S/N or z-W1
     if model is None or not has.any():
         return probs
     z = raw_scores(X[has], model)

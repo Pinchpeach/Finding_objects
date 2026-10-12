@@ -10,7 +10,7 @@ v2의 코드·문서·규칙표가 인용하는 논문, 카탈로그 출판물, 
 | [측광 체계·단위](#phot) | 8 |
 | [탐사·카탈로그 데이터](#survey) | 25 |
 | [데이터 출처 카탈로그 (논문 인용 없음)](#data) | 13 |
-| [교차 대응·통계·분류 방법](#method) | 9 |
+| [교차 대응·통계·분류 방법](#method) | 11 |
 | [별 분류](#star) | 25 |
 | [은하 분류](#galaxy) | 23 |
 | [퀘이사·AGN](#qso) | 14 |
@@ -18,7 +18,7 @@ v2의 코드·문서·규칙표가 인용하는 논문, 카탈로그 출판물, 
 | [행성상성운·초신성·과도 현상](#trans) | 6 |
 | [기타 문서](#doc) | 13 |
 | [분광 분류 기준](#spec) | 43 |
-| **합계** | **209** |
+| **합계** | **211** |
 
 <a id="gaia"></a>
 ## 측성·Gaia
@@ -134,6 +134,8 @@ Gaia 데이터 릴리스, Gaia 처리·검증 논문, 측성 품질 기준.
 | Tachibana & Miller 2018 | PASP 130, 128001; DOI 10.1088/1538-3873/aae3d9 | — | `Preprocess/classification_rules.csv` PS1-MORPH-001/002 (Sec. 4.1)<br>`Preprocess/catalog_reliability.csv` (catalog_confidence_ps1_morphology)<br>`Preprocess/LITERATURE.md` | PS1 iPSF − iKron > 0.05 확장원 판별과 한계 |
 | Farrow et al. 2014 | MNRAS 437, 748–770; DOI 10.1093/mnras/stt1933 | — | `Preprocess/LITERATURE.md` | PS1 별/은하 분리 배경과 검증 |
 | Bovy et al. 2011 (XDQSO) | ApJ 729, 141 | — | `Preprocess/color_knn.py` (MAG_DIMS ls_r_mag_scaled)<br>`Preprocess/LITERATURE.md` | 등급에 따라 색 분포·천체 수가 달라지므로 색 kNN에 r 등급 축 추가 |
+| Friedman 2001 (gradient boosting) | Ann. Stat. 29, 1189 | — | `Preprocess/ls_gbm.py`<br>`Preprocess/LITERATURE.md` | LS-GBM-001 그래디언트 부스팅 분류기 |
+| Ke et al. 2017 (LightGBM) | NeurIPS 30 | — | `Preprocess/ls_gbm.py`<br>`Preprocess/LITERATURE.md` | 히스토그램 기반 그래디언트 부스팅 |
 
 <a id="star"></a>
 ## 별 분류
