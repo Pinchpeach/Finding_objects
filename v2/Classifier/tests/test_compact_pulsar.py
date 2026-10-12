@@ -92,3 +92,17 @@ def test_pulsar_candidate_posterior():
     assert plane_pol["confidence"] > 0.2 and off["confidence"] < 0.01
     assert plane_pol["label"] == off["label"] == "PULSAR_CANDIDATE"
 
+
+
+def test_rule_precision_calibration(tmp_path):
+    import json
+    import pandas as pd
+    spec = importlib.util.spec_from_file_location("v2_cal_t", ROOT / "calibration" / "per_axis.py")
+    cal = importlib.util.module_from_spec(spec); spec.loader.exec_module(cal)
+    m = {"axes": {}, "rules": {"variability": {"ZTF_PERIODIC_VARIABLE|MIRA": {"method": "rule_precision", "n": 67, "precision": 0.9552}}}}
+    path = tmp_path / "m.json"; path.write_text(json.dumps(m))
+    df = pd.DataFrame({"variability_class": ["MIRA", "MIRA", "LPV"], "variability_confidence": [None, None, None],
+                       "variability_status": ["ZTF_PERIODIC_VARIABLE", "GAIA_DR3_SOS_LPV_LARGE_AMPLITUDE", "ZTF_PERIODIC_VARIABLE"]})
+    out = cal.annotate(df, path, axes=("variability",))
+    assert out.variability_calibrated_probability.tolist()[0] == 0.9552
+    assert out.variability_calibration_method.tolist() == ["rule_precision", None, None]
