@@ -1,0 +1,43 @@
+name: DESI training set for the LS gradient-boosting classifier
+
+# Large DESI DR1 truth (Redrock SPECTYPE) with Legacy Surveys Tractor features
+# for the 2.11.0 coarse classifier; benchmark objects are removed.
+on:
+  workflow_dispatch:
+    inputs:
+      per_class:
+        description: objects per class
+        default: '50000'
+  push:
+    branches: [claude/code-review-7ox8zn]
+    paths:
+      - v2/benchmark/build_desi_gbm_truth.py
+
+concurrency:
+  group: desi-gbm-truth-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pandas numpy scipy astropy pyvo
+      - name: Build
+        run: python -u v2/benchmark/build_desi_gbm_truth.py --per-class "${{ inputs.per_class || '50000' }}"
+      - name: Commit
+        if: ${{ !cancelled() }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add v2/benchmark/desi_gbm_truth || true
+          if git diff --cached --quiet; then echo "nothing to commit"; exit 0; fi
+          git commit -m "DESI training set for the LS gradient-boosting classifier"
+          bash .github/scripts/push_with_retry.sh
