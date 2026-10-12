@@ -1,10 +1,50 @@
 name,truth_axis,truth_class,resolved_name,ra,dec,truth_otype,truth_sp,nearest_sep_arcsec,primary_class,blind_class,blind_status,blind_match,catalog_assisted_class,catalog_assisted_match,science_json,collector_json,candidate_json
-GD 71,physical,WD,,,,,,,,ERROR,ValueError('Length of values (2) does not match length of index (1)'),False,ERROR,False,{},[],[]
-RR Lyr,variability,RR_LYRAE,,,,,,,,ERROR,ValueError('Length of values (2) does not match length of index (1)'),False,ERROR,False,{},[],[]
-delta Cep,variability,CEPHEID,,,,,,,,ERROR,ValueError('Length of values (2) does not match length of index (1)'),False,ERROR,False,{},[],[]
-Mira,physical,AGB,,,,,,,,ERROR,ValueError('Length of values (2) does not match length of index (1)'),False,ERROR,False,{},[],[]
-PSR B0531+21,compact,PULSAR,,,,,,,,ERROR,ValueError('Length of values (2) does not match length of index (1)'),False,ERROR,False,{},[],[]
-M 57,phenomenon,PN,,,,,,,,ERROR,ValueError('Length of values (2) does not match length of index (1)'),False,ERROR,False,{},[],[]
-SN 2018fhw,phenomenon,SN,,,,,,,,ERROR,ValueError('Length of values (2) does not match length of index (1)'),False,ERROR,False,{},[],[]
-SN 2011fe,phenomenon,SN,,,,,,,,ERROR,ValueError('Length of values (2) does not match length of index (1)'),False,ERROR,False,{},[],[]
-3C 273,extragalactic,AGN,,,,,,,,ERROR,ValueError('Length of values (2) does not match length of index (1)'),False,ERROR,False,{},[],[]
+GD 71,physical,WD,,,,,,,,ERROR,"DALFormatError: ConnectionError: HTTPSConnectionPool(host='simbad.cds.unistra.fr', port=443): Max retries exceeded with url: /simbad/sim-tap/sync (Caused by NewConnectionError(""HTTPSConnection(host='simbad.cds.unistra.fr', port=443): Failed to establish a new connection: [Errno 111] Connection refused""))",False,ERROR,False,{},[],[]
+RR Lyr,variability,RR_LYRAE,,,,,,,,ERROR,"DALFormatError: ConnectionError: HTTPSConnectionPool(host='simbad.cds.unistra.fr', port=443): Max retries exceeded with url: /simbad/sim-tap/sync (Caused by NewConnectionError(""HTTPSConnection(host='simbad.cds.unistra.fr', port=443): Failed to establish a new connection: [Errno 111] Connection refused""))",False,ERROR,False,{},[],[]
+delta Cep,variability,CEPHEID,,,,,,,,ERROR,"DALFormatError: ConnectionError: HTTPSConnectionPool(host='simbad.cds.unistra.fr', port=443): Max retries exceeded with url: /simbad/sim-tap/sync (Caused by NewConnectionError(""HTTPSConnection(host='simbad.cds.unistra.fr', port=443): Failed to establish a new connection: [Errno 111] Connection refused""))",False,ERROR,False,{},[],[]
+Mira,physical,AGB,,,,,,,,ERROR,"DALFormatError: ConnectionError: HTTPSConnectionPool(host='simbad.cds.unistra.fr', port=443): Max retries exceeded with url: /simbad/sim-tap/sync (Caused by NewConnectionError(""HTTPSConnection(host='simbad.cds.unistra.fr', port=443): Failed to establish a new connection: [Errno 111] Connection refused""))",False,ERROR,False,{},[],[]
+PSR B0531+21,compact,PULSAR,,,,,,,,ERROR,"DALServiceError: Unable to access the capabilities endpoint at:
+- https://simbad.cds.unistra.fr/simbad/sim-tap/capabilities: Connection failed (Possible causes: incorrect URL, DNS issue, or service is down)
+
+This could mean:
+1. The service URL is incorrect
+2. The service is temporarily unavailable
+3. The service doesn't support this protocol
+4. If a 503 was encountered, retry after the suggested delay.
+",False,ERROR,False,{},[],[]
+M 57,phenomenon,PN,,,,,,,,ERROR,"DALServiceError: Unable to access the capabilities endpoint at:
+- https://simbad.cds.unistra.fr/simbad/sim-tap/capabilities: Connection failed (Possible causes: incorrect URL, DNS issue, or service is down)
+
+This could mean:
+1. The service URL is incorrect
+2. The service is temporarily unavailable
+3. The service doesn't support this protocol
+4. If a 503 was encountered, retry after the suggested delay.
+",False,ERROR,False,{},[],[]
+SN 2018fhw,phenomenon,SN,,,,,,,,ERROR,"DALServiceError: Unable to access the capabilities endpoint at:
+- https://simbad.cds.unistra.fr/simbad/sim-tap/capabilities: Connection failed (Possible causes: incorrect URL, DNS issue, or service is down)
+
+This could mean:
+1. The service URL is incorrect
+2. The service is temporarily unavailable
+3. The service doesn't support this protocol
+4. If a 503 was encountered, retry after the suggested delay.
+",False,ERROR,False,{},[],[]
+SN 2011fe,phenomenon,SN,,,,,,,,ERROR,"DALServiceError: Unable to access the capabilities endpoint at:
+- https://simbad.cds.unistra.fr/simbad/sim-tap/capabilities: Connection failed (Possible causes: incorrect URL, DNS issue, or service is down)
+
+This could mean:
+1. The service URL is incorrect
+2. The service is temporarily unavailable
+3. The service doesn't support this protocol
+4. If a 503 was encountered, retry after the suggested delay.
+",False,ERROR,False,{},[],[]
+3C 273,extragalactic,AGN,,,,,,,,ERROR,"DALServiceError: Unable to access the capabilities endpoint at:
+- https://simbad.cds.unistra.fr/simbad/sim-tap/capabilities: Connection failed (Possible causes: incorrect URL, DNS issue, or service is down)
+
+This could mean:
+1. The service URL is incorrect
+2. The service is temporarily unavailable
+3. The service doesn't support this protocol
+4. If a 503 was encountered, retry after the suggested delay.
+",False,ERROR,False,{},[],[]

@@ -1,5 +1,23 @@
 {
   "axes": {
+    "compact": {
+      "PULSAR": {
+        "method": "withheld",
+        "n": 1,
+        "negative": 0,
+        "positive": 1,
+        "reason": "insufficient independent truth support",
+        "truth_independent": true
+      },
+      "PULSAR_CANDIDATE": {
+        "method": "withheld",
+        "n": 1,
+        "negative": 1,
+        "positive": 0,
+        "reason": "insufficient independent truth support",
+        "truth_independent": true
+      }
+    },
     "phenomenon": {
       "PN": {
         "method": "withheld",
@@ -77,8 +95,8 @@
         "truth_independent": true
       },
       "RR_LYRAE": {
-        "coef": 1.7044956231692914,
-        "intercept": -1.9974819085813882,
+        "coef": 1.7044956231692912,
+        "intercept": -1.9974819085813884,
         "method": "platt",
         "n": 192,
         "negative": 168,
@@ -91,7 +109,105 @@
     "method": "platt",
     "min_negatives": 20,
     "min_positives": 20,
+    "min_rule_rows": 20,
     "min_samples": 100
   },
-  "schema_version": 1
+  "rules": {
+    "compact": {},
+    "phenomenon": {
+      "HASH_PN_CATALOG_MATCH|PN": {
+        "correct": 233,
+        "method": "rule_precision",
+        "n": 233,
+        "precision": 1.0,
+        "truth_classes": [
+          "PN",
+          "SN"
+        ],
+        "wilson_lower_95": 0.9838
+      }
+    },
+    "physical": {},
+    "variability": {
+      "GAIA_DR3_SOS_CEPHEID|CEPHEID": {
+        "correct": 225,
+        "method": "rule_precision",
+        "n": 225,
+        "precision": 1.0,
+        "truth_classes": [
+          "CEPHEID",
+          "LPV",
+          "MIRA",
+          "RR_LYRAE"
+        ],
+        "wilson_lower_95": 0.9832
+      },
+      "GAIA_DR3_SOS_LPV_LARGE_AMPLITUDE|MIRA": {
+        "correct": 173,
+        "method": "rule_precision",
+        "n": 184,
+        "precision": 0.9402,
+        "truth_classes": [
+          "CEPHEID",
+          "LPV",
+          "MIRA",
+          "RR_LYRAE"
+        ],
+        "wilson_lower_95": 0.8961
+      },
+      "GAIA_DR3_SOS_RRLYRAE|RR_LYRAE": {
+        "correct": 200,
+        "method": "rule_precision",
+        "n": 200,
+        "precision": 1.0,
+        "truth_classes": [
+          "CEPHEID",
+          "LPV",
+          "MIRA",
+          "RR_LYRAE"
+        ],
+        "wilson_lower_95": 0.9812
+      },
+      "GAIA_DR3_VARIABLE_CANDIDATE|LPV": {
+        "correct": 145,
+        "method": "rule_precision",
+        "n": 148,
+        "precision": 0.9797,
+        "truth_classes": [
+          "CEPHEID",
+          "LPV",
+          "MIRA",
+          "RR_LYRAE"
+        ],
+        "wilson_lower_95": 0.9421
+      },
+      "ZTF_PERIODIC_VARIABLE|LPV": {
+        "correct": 21,
+        "method": "rule_precision",
+        "n": 21,
+        "precision": 1.0,
+        "truth_classes": [
+          "CEPHEID",
+          "LPV",
+          "MIRA",
+          "RR_LYRAE"
+        ],
+        "wilson_lower_95": 0.8454
+      },
+      "ZTF_PERIODIC_VARIABLE|MIRA": {
+        "correct": 64,
+        "method": "rule_precision",
+        "n": 67,
+        "precision": 0.9552,
+        "truth_classes": [
+          "CEPHEID",
+          "LPV",
+          "MIRA",
+          "RR_LYRAE"
+        ],
+        "wilson_lower_95": 0.8764
+      }
+    }
+  },
+  "schema_version": 2
 }

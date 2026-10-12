@@ -7,8 +7,8 @@ Truth-catalog rows are used only as coordinates/labels. The same catalog is excl
 | compact | PULSAR | 250 | 1 | 0.4% | 0.0% | 0.0% | 0.4% | 100.0% |
 | phenomenon | PN | 250 | 233 | 93.2% | 93.2% | 100.0% | 93.2% | 100.0% |
 | phenomenon | SN | 250 | 2 | 0.8% | 0.8% | 100.0% | 0.8% | 100.0% |
-| physical | AGB | 250 | 0 | 0.0% | 0.0% | n/a | 0.0% | n/a |
-| physical | RGB | 203 | 0 | 0.0% | 0.0% | n/a | 0.0% | n/a |
+| physical | AGB | 250 | 3 | 1.2% | 0.0% | 0.0% | 0.0% | 0.0% |
+| physical | RGB | 203 | 12 | 5.9% | 5.9% | 100.0% | 5.9% | 100.0% |
 | variability | CEPHEID | 250 | 240 | 96.0% | 93.2% | 97.1% | 93.2% | 97.1% |
 | variability | LPV | 250 | 182 | 72.8% | 63.6% | 87.4% | 63.6% | 87.4% |
 | variability | MIRA | 250 | 249 | 99.6% | 94.8% | 95.2% | 99.6% | 100.0% |
