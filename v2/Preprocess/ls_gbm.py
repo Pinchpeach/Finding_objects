@@ -56,6 +56,7 @@ def features(df: pd.DataFrame, prefix: str = P) -> np.ndarray:
             s = f * np.sqrt(np.where(iv > 0, iv, np.nan))
             snr[b] = np.where(s > 0, np.log10(s), np.nan)
     typ = df[f"{prefix}type"].astype(str).str.strip().str.upper().to_numpy() if f"{prefix}type" in df else np.array([""] * len(df))
+    typ = np.where(typ == "GPSF", "PSF", typ)        # DR9 Gaia point source = point-source model
     known = np.isin(typ, TYPES)
     onehot = [np.where(known, (typ == t).astype(float), np.nan) for t in TYPES]
     shape = _col(df, f"{prefix}shape_r")
