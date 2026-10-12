@@ -29,6 +29,11 @@ def _num(row,key):
 def _flag(row,key):
  v=_num(row,key)
  return v is not None and int(v)==1
+def _ratio(a,b):
+ """g/r amplitude ratio: ~1.4 for pulsators (temperature change), ~1.0-1.1 for
+ contact binaries (benchmark/evaluate_rr_ew.py).  Reported, not used as a veto:
+ detached binaries with unequal components also reach > 1.2."""
+ return round(a/b,3) if a is not None and b is not None and b>0 else None
 def _clean(value):
  return "".join(ch for ch in str(value or "").upper() if ch.isalnum())
 def _result(label,confidence,status,evidence,subtype=None):
@@ -56,7 +61,7 @@ def classify(row):
  if zt in ZTF_MAP:
   label,sub=ZTF_MAP[zt]
   if label in ("MIRA","LPV") and _flag(row,"gaia_lpv_is_cstar"):sub="C_STAR_CANDIDATE"   # keep the Gaia RP C-star flag
-  ev=[{"kind":"ztf_periodic_variable","type":_text(row,ZTF+"Type"),"period_days":_num(row,ZTF+"Per"),"amplitude_r_mag":_num(row,ZTF+"rAmp"),"amplitude_g_mag":_num(row,ZTF+"gAmp"),"ztf_id":_text(row,ZTF+"catalog_object_id")}]
+  ev=[{"kind":"ztf_periodic_variable","type":_text(row,ZTF+"Type"),"period_days":_num(row,ZTF+"Per"),"amplitude_r_mag":_num(row,ZTF+"rAmp"),"amplitude_g_mag":_num(row,ZTF+"gAmp"),"amplitude_ratio_g_r":_ratio(_num(row,ZTF+"gAmp"),_num(row,ZTF+"rAmp")),"ztf_id":_text(row,ZTF+"catalog_object_id")}]
   return _result(label,None,"ZTF_PERIODIC_VARIABLE",ev,sub)
  # LPV SOS has a published C-star-candidate flag.  It does not publish a
  # validated Mira leaf, so no period/amplitude threshold is used to make one.
