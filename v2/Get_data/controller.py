@@ -28,8 +28,24 @@ COLLECTORS = [
 ]
 
 
+_MODULES: dict[str, tuple[tuple, object]] = {}
+
+
 def _load_collector(name: str):
+    """Collector module, executed once per file version (2.19.0: was on every
+    call, and _preload() re-ran all 26 on every collect_all)."""
     path = GET_DATA / f"{name}.py"
+    st = path.stat()
+    key = (st.st_mtime_ns, st.st_size)
+    hit = _MODULES.get(name)
+    if hit is not None and hit[0] == key:
+        return hit[1]
+    module = _exec_collector(name, path)
+    _MODULES[name] = (key, module)
+    return module
+
+
+def _exec_collector(name: str, path: Path):
     spec = importlib.util.spec_from_file_location(f"v2_collector_{name}", path)
     if spec is None or spec.loader is None:
         raise ImportError(f"cannot load collector: {path}")
@@ -128,6 +144,16 @@ def _preload() -> None:
             print(f"[preload] collector {name}: {exc!r}", flush=True)
 
 
+def _disable_astroquery_cache() -> None:
+    """astroquery keeps its own on-disk response cache (~/.astropy/cache) that
+    is never pruned and duplicates archive_cache; turn it off (2.19.0)."""
+    try:
+        from astroquery import cache_conf
+        cache_conf.cache_active = False
+    except Exception:
+        pass
+
+
 def _run_bounded(job, names, workers: int, budget_s: float) -> list[dict]:
     """Run ``job(name, cancelled_event)`` for each name on at most ``workers``
     daemon threads; a job over ``budget_s`` is reported as a timeout and its
@@ -182,6 +208,10 @@ def collect_all(
     out_dir.mkdir(parents=True, exist_ok=True)
     tag = _tag(ra, dec, radius_arcmin)
     started = time.monotonic()
+    _disable_astroquery_cache()
+    pruned = archive_cache.prune({n: GET_DATA / f"{n}.py" for n in COLLECTORS})
+    if any(pruned.values()):
+        print(f"[cache] pruned {pruned}", flush=True)
     if workers > 1:
         _preload()
     results = _run_bounded(lambda n, c: _collect_one(n, ra, dec, radius_arcmin, out_dir, tag, c),

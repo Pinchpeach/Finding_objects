@@ -17,6 +17,29 @@ ATTEMPT_BUDGET_S = 80.0
 ATTEMPTS = 3
 
 
+# pyvo sends requests without a socket timeout, so a stalled Data Lab call
+# blocked its (abandoned) thread forever and threads piled up over a long
+# app session.  One shared session with a default timeout (connect, read)
+# bounds every attempt and reuses connections (2.19.0).
+HTTP_TIMEOUT_S = (15.0, ATTEMPT_BUDGET_S)
+_SERVICE = None
+
+
+def _service():
+    global _SERVICE
+    if _SERVICE is None:
+        import pyvo
+        import requests
+
+        class _TimeoutSession(requests.Session):
+            def request(self, *args, **kwargs):
+                kwargs.setdefault("timeout", HTTP_TIMEOUT_S)
+                return super().request(*args, **kwargs)
+
+        _SERVICE = pyvo.dal.TAPService(TAP_URL, session=_TimeoutSession())
+    return _SERVICE
+
+
 def _query_with_retries(run):
     import threading, time
     last = None
@@ -65,13 +88,16 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
             ra, dec, {float(ra):.10f}, {float(dec):.10f}, {radius_deg:.10f}
         )
     """
-    run = lambda q: _query_with_retries(lambda: pyvo.dal.TAPService(TAP_URL).search(q).to_table().to_pandas())
+    run = lambda q: _query_with_retries(lambda: _service().search(q).to_table().to_pandas())
     try:
         df = run(query.replace("{extra}", extra))
     except RuntimeError:
         # The astrometric columns are optional: never lose the photometry
-        # because a service rejects them.
+        # because a service rejects them.  The status column keeps this
+        # result out of the archive cache (archive_cache.cacheable), so a
+        # transient failure is not stored for 90 days without astrometry.
         df = run(query.replace("{extra}", ""))
+        df["legacy_astrometry_query_status"] = "missing"
     if df.empty:
         return pd.DataFrame(columns=["catalog", "catalog_object_id", "object_name", "ra", "dec"])
     df.columns = [str(c).strip() for c in df.columns]

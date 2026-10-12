@@ -71,10 +71,13 @@ PROFILES = {
     # Legacy Surveys DR10: delivered seeing ~1.3/1.2/1.1" in g/r/z (DECaLS;
     # Dey et al. 2019).  Per-source errors come from ra_ivar/dec_ivar and the
     # epoch from ref_epoch (Gaia-matched stars) when fetched (2.16.0); before
-    # this the main photometry source fell back to DEFAULT_PROFILE.
-    "DESI Legacy Surveys DR10": SurveyProfile(None, 0.10, 1.2, 4.0),
+    # this the main photometry source fell back to DEFAULT_PROFILE.  The
+    # fallback error stays the conservative 0.6" (2.19.0; 0.10" split the
+    # NGC 4522 nucleus from its galaxy), see also LS_RESOLVED_FLOOR_ARCSEC.
+    "DESI Legacy Surveys DR10": SurveyProfile(None, 0.6, 1.2, 4.0),
 }
 DEFAULT_PROFILE = SurveyProfile(None, 0.6, None, 5.0)
+LS_RESOLVED_FLOOR_ARCSEC = 0.6
 
 
 def num(value: Any) -> float | None:
@@ -210,13 +213,22 @@ def infer_poserr_arcsec(catalog: str, row: Mapping[str, Any]) -> float:
         a, b = _first(row, ("ra_ivar",)), _first(row, ("dec_ivar",))
         if a is not None and b is not None and a > 0 and b > 0:
             cosd = abs(math.cos(math.radians(_first(row, ("dec",)) or 0.0)))
-            return max(cosd / math.sqrt(a), 1.0 / math.sqrt(b)) * 3600.0
+            err = max(cosd / math.sqrt(a), 1.0 / math.sqrt(b)) * 3600.0
+            # The ivar error is formal, for the model centre.  For a resolved
+            # Tractor model the centre other surveys measure (a nucleus, a
+            # moment centroid) differs at the arcsec level (2.2" for the
+            # NGC 4522 PS1 / 2MASS nucleus), so resolved sources keep the
+            # conservative floor.
+            typ = str(row.get("type", "")).strip().upper()
+            return max(err, LS_RESOLVED_FLOOR_ARCSEC) if typ and typ not in ("PSF", "GPSF") else err
 
-    # Pan-STARRS mean-coordinate errors are supplied in mas by the MAST table.
+    # Pan-STARRS DR2 raMeanErr / decMeanErr are in arcsec (MAST PS1 DR2
+    # MeanObject schema).  Until 2.19.0 they were divided by 1000 as if in
+    # mas, giving 1e-5" errors that only the PSF/6 floor hid.
     if catalog == "Pan-STARRS1 DR2 MeanObject":
         a, b = _first(row, ("rameanerr",)), _first(row, ("decmeanerr",))
         if a is not None and b is not None and max(a, b) > 0:
-            return max(a, b) / 1000.0
+            return max(a, b)
 
     return profile_for(catalog, row).fallback_poserr_arcsec
 

@@ -34,31 +34,39 @@ VAR_SUMMARY=["in_vari_classification_result","in_vari_rrlyrae","in_vari_cepheid"
 # VizieR answers in seconds, so the base budget is short.
 BASE_TAP_BUDGET_S=30.0
 OPTIONAL_TAP_BUDGET_S=60.0
+# All optional tables together stay well inside the 300 s controller budget
+# (worst case was 30 + 3 tables x ceil(N/500) x 60 s).
+OPTIONAL_TOTAL_BUDGET_S=180.0
 
 def _bounded(fn,budget_s,*args):
     # Daemon thread: an abandoned slow query must not block interpreter exit.
+    # ``fn`` gets the deadline so an abandoned thread stops retrying instead
+    # of running its remaining attempts in the background (2.19.0).
     import threading
-    box={}
+    box={};deadline=time.monotonic()+budget_s
     def target():
-        try:box["value"]=fn(*args)
+        try:box["value"]=fn(*args,deadline=deadline)
         except BaseException as exc:box["error"]=exc
     t=threading.Thread(target=target,daemon=True);t.start();t.join(budget_s)
     if t.is_alive():raise TimeoutError(f"Gaia TAP exceeded {budget_s:.0f} s")
     if "error" in box:raise box["error"]
     return box["value"]
 
-def _tap(query:str,retries:int=4)->pd.DataFrame:
+def _tap(query:str,retries:int=4,deadline:float|None=None)->pd.DataFrame:
     from astroquery.gaia import Gaia
     last=None
+    expired=lambda:deadline is not None and time.monotonic()>=deadline
     for attempt in range(retries):
         try:return Gaia.launch_job_async(query).get_results().to_pandas()
         except Exception as exc:
             last=exc
+            if expired():raise TimeoutError(f"Gaia TAP deadline passed; last={exc!r}") from exc
             if attempt+1<retries:time.sleep(min(8,2**attempt))
+    if expired():raise TimeoutError(f"Gaia TAP deadline passed; last={last!r}")
     try:return Gaia.launch_job(query).get_results().to_pandas()
     except Exception as exc:raise RuntimeError(f"Gaia TAP failed after retries; async={last!r}; sync={exc!r}") from exc
 
-def _merge_optional(base:pd.DataFrame,table:str,columns:list[str],status_name:str)->pd.DataFrame:
+def _merge_optional(base:pd.DataFrame,table:str,columns:list[str],status_name:str,deadline:float|None=None)->pd.DataFrame:
     if base.empty:base[status_name]=pd.Series(dtype="string");return base
     ids=[str(int(x)) for x in pd.to_numeric(base["source_id"],errors="coerce").dropna().unique()]
     if not ids:base[status_name]="missing_source_id";return base
@@ -66,7 +74,11 @@ def _merge_optional(base:pd.DataFrame,table:str,columns:list[str],status_name:st
     try:
         for start in range(0,len(ids),500):
             chunk=ids[start:start+500];select="source_id,"+",".join(columns)
-            pieces.append(_bounded(_tap,OPTIONAL_TAP_BUDGET_S,f"SELECT {select} FROM {table} WHERE source_id IN ({','.join(chunk)})"))
+            # One shared deadline for all optional tables, so a slow archive
+            # cannot push the base astrometry past the controller budget.
+            left=OPTIONAL_TAP_BUDGET_S if deadline is None else min(OPTIONAL_TAP_BUDGET_S,deadline-time.monotonic())
+            if left<=0:raise TimeoutError("optional Gaia tables: shared deadline passed")
+            pieces.append(_bounded(_tap,left,f"SELECT {select} FROM {table} WHERE source_id IN ({','.join(chunk)})"))
         opt=pd.concat(pieces,ignore_index=True,sort=False) if pieces else pd.DataFrame()
         if not opt.empty:
             opt["source_id"]=pd.to_numeric(opt["source_id"],errors="coerce").astype("Int64");base["source_id"]=pd.to_numeric(base["source_id"],errors="coerce").astype("Int64")
@@ -166,9 +178,10 @@ def fetch(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
     try:
         df=_bounded(_tap,BASE_TAP_BUDGET_S,q);df["gaia_base_query_status"]="tap"
         if not df.empty:
-            df=_merge_optional(df,_table(rel,"astrophysical_parameters"),AP+SPEC_AP,"gaia_ap_query_status")
-            df=_merge_optional(df,_table(rel,"vari_classifier_result"),["best_class_name","best_class_score"],"gaia_vari_classifier_query_status")
-            df=_merge_optional(df,_table(rel,"vari_summary"),VAR_SUMMARY,"gaia_vari_summary_query_status")
+            opt_deadline=time.monotonic()+OPTIONAL_TOTAL_BUDGET_S
+            df=_merge_optional(df,_table(rel,"astrophysical_parameters"),AP+SPEC_AP,"gaia_ap_query_status",opt_deadline)
+            df=_merge_optional(df,_table(rel,"vari_classifier_result"),["best_class_name","best_class_score"],"gaia_vari_classifier_query_status",opt_deadline)
+            df=_merge_optional(df,_table(rel,"vari_summary"),VAR_SUMMARY,"gaia_vari_summary_query_status",opt_deadline)
     except Exception:
         # The VizieR mirror is DR3: label the rows DR3 (epoch 2016.0) even
         # when another release was requested, so propagation stays correct.

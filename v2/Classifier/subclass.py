@@ -162,22 +162,37 @@ def spt_label(num: float) -> str:
     return f"{letter}{sub:g}"
 
 
-def _nearest(column: str, value: float, lo=None, hi=None):
+@lru_cache(maxsize=16)
+def _column_arrays(column: str):
+    """(values, spectral numbers) of the dwarf sequence where ``column`` is
+    defined; built once per column (2.19.0: was ~1 ms of pandas per call,
+    about five calls per star)."""
     ref = sequence().dropna(subset=[column])
+    return ref[column].to_numpy(float), ref.num.to_numpy(float)
+
+
+def _nearest(column: str, value: float, lo=None, hi=None):
+    x, num = _column_arrays(column)
+    keep = np.ones(len(x), bool)
     if lo is not None:
-        ref = ref[ref.num >= lo]
+        keep &= num >= lo
     if hi is not None:
-        ref = ref[ref.num <= hi]
-    x = ref[column].to_numpy(float)
+        keep &= num <= hi
+    x, num = x[keep], num[keep]
     if not len(x) or value < x.min() - 0.15 or value > x.max() + 0.15:
         return None                       # outside the calibrated sequence
-    return float(ref.num.to_numpy()[np.abs(x - value).argmin()])
+    return float(num[np.abs(x - value).argmin()])
+
+
+@lru_cache(maxsize=1)
+def _ms_arrays():
+    ref = sequence().dropna(subset=["Bp-Rp", "M_G"]).sort_values("Bp-Rp")
+    return ref["Bp-Rp"].to_numpy(float), ref["M_G"].to_numpy(float)
 
 
 def _ms_abs_g(bprp0: float):
-    ref = sequence().dropna(subset=["Bp-Rp", "M_G"]).sort_values("Bp-Rp")
-    x, y = ref["Bp-Rp"].to_numpy(float), ref["M_G"].to_numpy(float)
-    if bprp0 < x.min() or bprp0 > x.max():
+    x, y = _ms_arrays()
+    if bprp0 < x[0] or bprp0 > x[-1]:
         return None
     return float(np.interp(bprp0, x, y))
 

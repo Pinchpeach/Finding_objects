@@ -25,13 +25,20 @@ AMBIG_SCORE_RATIO = 0.67
 # over MAX_EPOCH_SPAN_YR are always checked, so results equal a full scan.
 PM_MARGIN_ARCSEC = 10.0
 MAX_EPOCH_SPAN_YR = 45.0
+# 2.19.0: the grid cell used to be the largest cap of any detection (an NVSS
+# 30" or IRAS 45" row made every query span ~165"), so dense fields cost
+# O(n^2) assess_pair calls.  The index now uses a small cell; anchors whose
+# own cap exceeds SMALL_CAP_ARCSEC are kept in an always-checked set (as
+# fast movers are), and each detection searches its own cap, which keeps the
+# result identical to a full scan.
+SMALL_CAP_ARCSEC = 8.0
 
 
-def _pm_shift_arcsec(det):
+def _pm_shift_arcsec(det, span_yr=None):
     pmra, pmdec = det.get("pmra"), det.get("pmdec")
     if pmra is None or pmdec is None or det.get("ref_epoch") is None:
         return 0.0
-    return math.hypot(pmra, pmdec) * MAX_EPOCH_SPAN_YR / 1000.0
+    return math.hypot(pmra, pmdec) * (MAX_EPOCH_SPAN_YR if span_yr is None else span_yr) / 1000.0
 
 
 class _SkyIndex:
@@ -106,7 +113,7 @@ def load(raw: Path):
         if not {"ra", "dec"}.issubset(df.columns):
             continue
         density = _density(df)
-        for i, r in df.iterrows():
+        for i, r in zip(df.index, df.to_dict("records")):   # plain dicts: iterrows built a Series per row
             ra, dec = num(r.get("ra")), num(r.get("dec"))
             if ra is None or dec is None:
                 continue
@@ -119,7 +126,7 @@ def load(raw: Path):
                 skipped += 1
                 continue
             seen.add(key)
-            payload = r.to_dict()
+            payload = r
             prof = profile_for(cat, payload)
             rows.append({
                 "detection_id": f"{path.stem}:{i}",
@@ -163,18 +170,27 @@ def run(raw_dir: Path, out: Path):
     # because its filename sorts earlier.
     detections.sort(key=lambda d: (*_anchor_key(d), str(d.get("catalog")), str(d.get("detection_id"))))
     groups, records = [], []
-    reach = max([float(d.get("max_radius_arcsec") or 5.0) for d in detections] + [5.0]) + PM_MARGIN_ARCSEC
-    index = _SkyIndex(reach)
+    epochs = [float(d["ref_epoch"]) for d in detections if d.get("ref_epoch") is not None]
+    # Epoch span from the data (a 1950 catalogue vs Gaia is 66 yr), at least
+    # the historical 45 yr.
+    span = max(MAX_EPOCH_SPAN_YR, (max(epochs) - min(epochs)) if epochs else 0.0)
+    index = _SkyIndex(SMALL_CAP_ARCSEC + PM_MARGIN_ARCSEC)
     fast_movers: set[int] = set()
+    wide: set[int] = set()
     alias_groups: dict[str, set[int]] = {}
+    cap = lambda d: float(d.get("max_radius_arcsec") or 5.0)
 
     def place(gi):
         anchor = groups[gi]["anchor"]
         index.put(gi, anchor["ra"], anchor["dec"])
-        if _pm_shift_arcsec(anchor) > PM_MARGIN_ARCSEC:
+        if _pm_shift_arcsec(anchor, span) > PM_MARGIN_ARCSEC:
             fast_movers.add(gi)
         else:
             fast_movers.discard(gi)
+        if cap(anchor) > SMALL_CAP_ARCSEC:
+            wide.add(gi)
+        else:
+            wide.discard(gi)
 
     dets_in_order = []
     for det in detections:
@@ -185,8 +201,12 @@ def run(raw_dir: Path, out: Path):
             candidates = []
         else:
             candidates = []
-            nearby = index.near(det["ra"], det["dec"], reach + _pm_shift_arcsec(det))
+            # Accepted pairs lie within max(cap_anchor, cap_det) plus the PM
+            # shifts: anchors with a cap above SMALL_CAP are in ``wide``.
+            reach = max(cap(det), SMALL_CAP_ARCSEC) + PM_MARGIN_ARCSEC + _pm_shift_arcsec(det, span)
+            nearby = index.near(det["ra"], det["dec"], reach)
             nearby |= fast_movers
+            nearby |= wide
             for alias in det.get("association_aliases") or ():
                 nearby |= alias_groups.get(alias, set())
             for gi in sorted(nearby):
@@ -196,7 +216,7 @@ def run(raw_dir: Path, out: Path):
                 shared_aliases=set(det.get("association_aliases") or ()) & set(group.get("aliases") or ())
                 if shared_aliases:
                     result=assess_pair(group["anchor"],det,det.get("source_density_arcsec2"))
-                    result.update({"accepted":True,"association_score":1.0,"association_method":"catalog_alias","shared_aliases":"|".join(sorted(shared_aliases))})
+                    result.update({"accepted":True,"association_score":1.0,"association_posterior":1.0,"association_method":"catalog_alias","shared_aliases":"|".join(sorted(shared_aliases))})
                     candidates.append((1.0,0.0,gi,result));continue
                 density = det.get("source_density_arcsec2")
                 result = assess_pair(group["anchor"], det, density)
@@ -245,7 +265,11 @@ def run(raw_dir: Path, out: Path):
                 # Keep the best competing candidate's diagnostics, but the
                 # detection anchors its own object, so its own catalog evidence
                 # is fully its own; the ambiguity is recorded in the status.
-                match = {**candidates[0][3], "association_score": 1.0, "association_method": "new_source_ambiguous"}
+                # (association_posterior too: the confidence read below prefers it,
+                # so the competitor's posterior used to down-weight the
+                # detection's own evidence; fixed 2.19.0.)
+                match = {**candidates[0][3], "association_score": 1.0, "association_posterior": 1.0,
+                         "association_method": "new_source_ambiguous"}
             else:
                 match = {
                     "separation_arcsec": None,

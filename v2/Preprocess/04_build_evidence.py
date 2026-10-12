@@ -90,34 +90,37 @@ def emit(out, rule, cls, score, value=None, note="", reliability=1.0, associatio
 DSC_PRIOR={"STAR":0.988728+0.009887+0.000198,"GALAXY":0.000198,"QSO":0.000989}
 DSC_FLOOR=1e-6
 
+# Per-rule catalogue-quality column and association namespace (module
+# constants since 2.19.0; they were rebuilt for every row x rule).
+RELMAP={
+  "AST-EXT-001":"catalog_confidence_gaia_astrometry","AST-EXT-002":"catalog_confidence_gaia_astrometry",
+  "AST-GAL-001":"catalog_confidence_gaia_astrometry","AST-GAL-002":"catalog_confidence_gaia_astrometry",
+  "SPC-SDSS-001":"catalog_confidence_sdss_spectroscopy","SPC-SDSS-002":"catalog_confidence_sdss_spectroscopy",
+  "SPC-SDSS-003":"catalog_confidence_sdss_spectroscopy","DSC-001":"catalog_confidence_gaia_dsc",
+  "PS1-MORPH-001":"catalog_confidence_ps1_morphology","PS1-MORPH-002":"catalog_confidence_ps1_morphology",
+  "WISE-AGN-001":"catalog_confidence_allwise","SDSS-PHOTO-001":"catalog_confidence_sdss_photometry",
+  "SDSS-PHOTO-002":"catalog_confidence_sdss_photometry","NED-TYPE-001":"catalog_confidence_ned_type",
+  "SIMBAD-TYPE-001":"catalog_confidence_simbad_type",
+  "WISE-AGN-R90-001":"catalog_confidence_allwise",
+}
+ASSOC_PREFIX={
+  "AST-EXT-001":"gaia_dr3","AST-EXT-002":"gaia_dr3","AST-GAL-001":"gaia_dr3","AST-GAL-002":"gaia_dr3",
+  "DSC-001":"gaia_dr3","VAR-001":"gaia_dr3",
+  "SPC-SDSS-001":"sdss_dr18_spectroscopy","SPC-SDSS-002":"sdss_dr18_spectroscopy","SPC-SDSS-003":"sdss_dr18_spectroscopy",
+  "PS1-MORPH-001":"pan_starrs1_dr2_meanobject","PS1-MORPH-002":"pan_starrs1_dr2_meanobject","PS1-QSO-Z6-001":"pan_starrs1_dr2_meanobject",
+  "WISE-AGN-001":"allwise","WISE-AGN-R90-001":"allwise",
+  "SDSS-PHOTO-001":"sdss_dr18_photoobj","SDSS-PHOTO-002":"sdss_dr18_photoobj",
+  "NED-TYPE-001":"ned","SIMBAD-TYPE-001":"simbad",
+  "LS-MORPH-001":"desi_legacy_surveys_dr10","LS-MORPH-002":"desi_legacy_surveys_dr10",
+  "SGA-001":"sga_2020",
+}
+
 def evaluate(rule,row,namespaced=frozenset()):
     rid=rule["rule_id"]; out=[]
-    relmap={
-      "AST-EXT-001":"catalog_confidence_gaia_astrometry","AST-EXT-002":"catalog_confidence_gaia_astrometry",
-      "AST-GAL-001":"catalog_confidence_gaia_astrometry","AST-GAL-002":"catalog_confidence_gaia_astrometry",
-      "SPC-SDSS-001":"catalog_confidence_sdss_spectroscopy","SPC-SDSS-002":"catalog_confidence_sdss_spectroscopy",
-      "SPC-SDSS-003":"catalog_confidence_sdss_spectroscopy","DSC-001":"catalog_confidence_gaia_dsc",
-      "PS1-MORPH-001":"catalog_confidence_ps1_morphology","PS1-MORPH-002":"catalog_confidence_ps1_morphology",
-      "WISE-AGN-001":"catalog_confidence_allwise","SDSS-PHOTO-001":"catalog_confidence_sdss_photometry",
-      "SDSS-PHOTO-002":"catalog_confidence_sdss_photometry","NED-TYPE-001":"catalog_confidence_ned_type",
-      "SIMBAD-TYPE-001":"catalog_confidence_simbad_type",
-      "WISE-AGN-R90-001":"catalog_confidence_allwise",
-    }
-    rcol=relmap.get(rid); reliability=num(row,rcol) if rcol else 1.0
+    rcol=RELMAP.get(rid); reliability=num(row,rcol) if rcol else 1.0
     # Gate only by the association confidence of the catalog that produced
     # this evidence. A weak PS1/NED counterpart must not downweight Gaia/SDSS.
-    assoc_prefix={
-      "AST-EXT-001":"gaia_dr3","AST-EXT-002":"gaia_dr3","AST-GAL-001":"gaia_dr3","AST-GAL-002":"gaia_dr3",
-      "DSC-001":"gaia_dr3","VAR-001":"gaia_dr3",
-      "SPC-SDSS-001":"sdss_dr18_spectroscopy","SPC-SDSS-002":"sdss_dr18_spectroscopy","SPC-SDSS-003":"sdss_dr18_spectroscopy",
-      "PS1-MORPH-001":"pan_starrs1_dr2_meanobject","PS1-MORPH-002":"pan_starrs1_dr2_meanobject","PS1-QSO-Z6-001":"pan_starrs1_dr2_meanobject",
-      "WISE-AGN-001":"allwise","WISE-AGN-R90-001":"allwise",
-      "SDSS-PHOTO-001":"sdss_dr18_photoobj","SDSS-PHOTO-002":"sdss_dr18_photoobj",
-      "NED-TYPE-001":"ned","SIMBAD-TYPE-001":"simbad",
-      "LS-MORPH-001":"desi_legacy_surveys_dr10","LS-MORPH-002":"desi_legacy_surveys_dr10",
-      "SGA-001":"sga_2020",
-    }
-    ap=assoc_prefix.get(rid)
+    ap=ASSOC_PREFIX.get(rid)
     association_reliability=num(row,f"association_confidence__{ap}") if ap else 1.0
     if association_reliability is None: association_reliability=1.0
     src=CatalogFields(row,ap,namespaced)
@@ -136,7 +139,11 @@ def evaluate(rule,row,namespaced=frozenset()):
     elif rid=="AST-GAL-001":
         p,e=num(src,"parallax"),num(src,"parallax_error")
         if p is not None and e and e>0:
-            x=abs(p/e); emit(out,rule,"STAR",x/(x+5),x,"uncalibrated physical support",reliability,association_reliability)
+            # Only a positive parallax is evidence of distance: a significantly
+            # negative one is noise or a spurious solution (e.g. a close
+            # companion; El-Badry et al. 2021), and |plx|/sigma >= 10 used to
+            # trigger the decisive-motion STAR rule (2.19.0).
+            x=max(p,0.0)/e; emit(out,rule,"STAR",x/(x+5),x,"uncalibrated physical support",reliability,association_reliability)
     elif rid=="AST-GAL-002":
         a,ae,d,de=(num(src,x) for x in ("pmra","pmra_error","pmdec","pmdec_error"))
         if None not in (a,ae,d,de) and ae>0 and de>0:

@@ -22,7 +22,8 @@ Correctness rules:
 * several processes (app worker, command line) may share the directory: data
   files are written to a unique temporary name and renamed, and the index is
   updated under a lock file;
-* ``V2_CACHE=0`` disables the cache.
+* ``V2_CACHE=0`` disables the cache; ``prune()`` bounds its size on disk
+  (``V2_CACHE_MAX_MB``, default 2048) and drops superseded code-hash folders.
 """
 from __future__ import annotations
 import hashlib
@@ -34,6 +35,7 @@ import threading
 import time
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 TTL_DAYS = 90.0
@@ -127,10 +129,12 @@ def get(name: str, source: Path, ra: float, dec: float, radius_arcmin: float,
                  and _sep_arcmin(ra, dec, best["ra"], best["dec"]) < SAME_TOL_ARCMIN)
     if df.empty or same_cone:
         return df
-    r = pd.to_numeric(df.get("ra"), errors="coerce")
-    de = pd.to_numeric(df.get("dec"), errors="coerce")
-    sep = [(_sep_arcmin(ra, dec, a, b) if a == a and b == b else math.inf) for a, b in zip(r, de)]
-    out = df[pd.Series(sep, index=df.index) <= radius_arcmin + margin_arcmin].reset_index(drop=True)
+    r = np.radians(pd.to_numeric(df.get("ra"), errors="coerce").to_numpy(float))
+    de = np.radians(pd.to_numeric(df.get("dec"), errors="coerce").to_numpy(float))
+    r0, d0 = math.radians(ra), math.radians(dec)
+    a = np.sin((de - d0) / 2) ** 2 + math.cos(d0) * np.cos(de) * np.sin((r - r0) / 2) ** 2
+    sep = np.degrees(2 * np.arcsin(np.sqrt(np.clip(a, 0.0, 1.0)))) * 60.0      # NaN position -> NaN -> dropped
+    out = df[sep <= radius_arcmin + margin_arcmin].reset_index(drop=True)
     for col in ("query_radius_arcmin", "cone_radius_arcmin"):
         if col in out.columns:
             out[col] = repr(float(radius_arcmin))        # as a fresh fetch of this cone would record
@@ -168,6 +172,7 @@ def put(name: str, source: Path, ra: float, dec: float, radius_arcmin: float, df
     if not enabled() or not cacheable(df):
         return
     d = _dir(name, source)
+    tmp = itmp = None
     try:
         d.mkdir(parents=True, exist_ok=True)
         fname = hashlib.sha1(f"{ra:.7f},{dec:.7f},{radius_arcmin:.5f}".encode()).hexdigest()[:16] + ".csv.gz"
@@ -175,9 +180,12 @@ def put(name: str, source: Path, ra: float, dec: float, radius_arcmin: float, df
         os.close(fd)
         # level 1: write 1.41 -> 0.67 s for 5,000 x 65
         df.to_csv(tmp, index=False, compression={"method": "gzip", "compresslevel": 1})
-        os.replace(tmp, d / fname)
-        now = time.time()
         with _LOCK, _FileLock(d / "index.lock"):
+            # Data file, index and expiry under one lock (2.19.0): a writer
+            # could otherwise delete a file another writer had just renamed.
+            os.replace(tmp, d / fname)
+            tmp = None
+            now = time.time()
             keep, drop = [], []
             for e in _index(d):
                 if e["file"] == fname:
@@ -189,9 +197,68 @@ def put(name: str, source: Path, ra: float, dec: float, radius_arcmin: float, df
             with os.fdopen(fd, "w") as fh:
                 json.dump(keep, fh)
             os.replace(itmp, d / "index.json")
-        live = {e["file"] for e in keep}
-        for e in drop:                       # expired entries: remove their files
-            if e["file"] not in live:
-                (d / e["file"]).unlink(missing_ok=True)
+            itmp = None
+            live = {e["file"] for e in keep}
+            for e in drop:                       # expired entries: remove their files
+                if e["file"] not in live:
+                    (d / e["file"]).unlink(missing_ok=True)
     except Exception as exc:          # a cache problem must never fail a collection
         print(f"[cache] {name}: not stored ({exc!r})", flush=True)
+    finally:
+        for t in (tmp, itmp):
+            if t:
+                Path(t).unlink(missing_ok=True)
+
+
+# Disk bound (2.19.0).  Every change to the collector code moves a collector
+# to a new hash folder; the old folders were never visited again, and inside
+# a folder only a put() removed expired entries.
+MAX_CACHE_MB = float(os.environ.get("V2_CACHE_MAX_MB", "2048"))
+TMP_STALE_S = 3600.0
+
+
+def prune(sources: dict[str, Path] | None = None, max_mb: float | None = None) -> dict:
+    """Remove superseded code-hash folders (when ``sources`` maps collector
+    name -> module path), stale temporary files, and, above ``max_mb``, the
+    oldest data files.  Never raises."""
+    out = {"folders": 0, "tmp": 0, "evicted": 0}
+    if not enabled():
+        return out
+    base = root()
+    try:
+        if not base.is_dir():
+            return out
+        now = time.time()
+        if sources:
+            for name, src in sources.items():
+                folder = base / name
+                if not folder.is_dir():
+                    continue
+                current = _code_hash(src)
+                for sub in folder.iterdir():
+                    if sub.is_dir() and sub.name != current:
+                        _rmtree(sub); out["folders"] += 1
+        files = []
+        for f in base.rglob("*"):
+            if not f.is_file():
+                continue
+            st = f.stat()
+            if f.suffix == ".tmp" and now - st.st_mtime > TMP_STALE_S:
+                f.unlink(missing_ok=True); out["tmp"] += 1
+            elif f.name.endswith(".csv.gz"):
+                files.append((st.st_mtime, st.st_size, f))
+        limit = (MAX_CACHE_MB if max_mb is None else max_mb) * 1e6
+        total = sum(sz for _, sz, _ in files)
+        for _, sz, f in sorted(files):
+            if total <= limit:
+                break
+            f.unlink(missing_ok=True)        # get() of its index entry then misses and re-fetches
+            total -= sz; out["evicted"] += 1
+    except Exception as exc:
+        print(f"[cache] prune: {exc!r}", flush=True)
+    return out
+
+
+def _rmtree(path: Path) -> None:
+    import shutil
+    shutil.rmtree(path, ignore_errors=True)

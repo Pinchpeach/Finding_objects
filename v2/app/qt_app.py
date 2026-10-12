@@ -49,7 +49,7 @@ if __name__ == "__main__" and len(sys.argv) > 1 and sys.argv[1] == "--pipeline":
     raise SystemExit(_worker_main(sys.argv[2:]))
 
 import pandas as pd  # noqa: E402
-from PySide6.QtCore import QModelIndex, QProcess, QProcessEnvironment, QSettings, Qt, QThreadPool, QRunnable, QObject, Signal  # noqa: E402
+from PySide6.QtCore import QModelIndex, QProcess, QProcessEnvironment, QSettings, Qt, QThreadPool, QRunnable, QObject, QTimer, Signal  # noqa: E402
 from PySide6.QtGui import QAction, QKeySequence  # noqa: E402
 from PySide6.QtWidgets import (QApplication, QComboBox, QDoubleSpinBox, QFileDialog, QFormLayout, QGroupBox,  # noqa: E402
                                QHBoxLayout, QHeaderView, QLabel, QLineEdit, QMainWindow, QMessageBox,
@@ -194,7 +194,10 @@ class MainWindow(QMainWindow):
 
         self.cmb_class.currentTextChanged.connect(self._filters_changed)
         self.cmb_status.currentTextChanged.connect(self._filters_changed)
-        self.txt_search.textChanged.connect(self._filters_changed)
+        # Debounced: every keystroke refiltered the table and repainted the map.
+        self._filter_timer = QTimer(self); self._filter_timer.setSingleShot(True); self._filter_timer.setInterval(200)
+        self._filter_timer.timeout.connect(self._filters_changed)
+        self.txt_search.textChanged.connect(self._filter_timer.start)
         self.chk_parts.toggled.connect(self._filters_changed)
         self.table.selectionModel().currentRowChanged.connect(self._row_changed)
         self.sky.objectClicked.connect(self._select_source_row)
@@ -333,7 +336,14 @@ class MainWindow(QMainWindow):
             return
         coords = parse_coordinates(name)
         if coords is not None:                     # typed coordinates: no network needed
+            self._pending_name = None
             self._resolved(*coords, name); return
+        if getattr(self, "_pending_name", None) == name:
+            return                                 # same lookup already running (Return pressed again)
+        # Only the latest lookup may set the position: a slower, older answer
+        # used to overwrite a newer one (Return in the name field bypassed the
+        # disabled button; 2.19.0).
+        self._pending_name = name
         self.btn_resolve.setEnabled(False); self._status(f"Resolving {name}…")
         job = _NameResolver(name)
         job.signals.done.connect(self._resolved)
@@ -348,10 +358,18 @@ class MainWindow(QMainWindow):
             self._status(f"Centre set from map: RA {ra:.6f}, Dec {dec:+.6f}")
 
     def _resolve_failed(self, msg):
+        pending = getattr(self, "_pending_name", None)
+        if pending is not None and not msg.startswith(f"{pending}:"):
+            return                                 # failure of a superseded lookup
+        self._pending_name = None
         self.btn_resolve.setEnabled(True)
         self._status(f"Could not resolve {msg}")
 
     def _resolved(self, ra, dec, name):
+        pending = getattr(self, "_pending_name", None)
+        if pending is not None and name != pending:
+            return                                 # answer of a superseded lookup
+        self._pending_name = None
         self.sp_ra.setValue(ra); self.sp_dec.setValue(dec); self.btn_resolve.setEnabled(True)
         self._status(f"{name}: RA {ra:.6f}, Dec {dec:+.6f}")
 

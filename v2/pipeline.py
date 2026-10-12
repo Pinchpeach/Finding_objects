@@ -37,6 +37,23 @@ def _load(path: Path, name: str):
     return module
 
 
+# Raw folders of earlier searches in the same work folder (2.19.0: they were
+# never removed, so disk use grew with every new position).  The archive
+# cache makes re-collecting a recent position cheap.
+KEEP_RAW_FOLDERS = 10
+
+
+def _prune_raw(base: Path, keep: Path, n: int = KEEP_RAW_FOLDERS) -> None:
+    import shutil
+    try:
+        folders = sorted((d for d in base.iterdir() if d.is_dir() and d.name.startswith("ra") and d != keep),
+                         key=lambda d: d.stat().st_mtime, reverse=True)
+        for d in folders[max(0, n - 1):]:
+            shutil.rmtree(d, ignore_errors=True)
+    except OSError:
+        pass
+
+
 EMPTY_RESULT_COLUMNS = ["object_id", "designation", "ra", "dec", "catalogs", "primary_class", "primary_confidence",
                         "classification_status", "subclass", "subclass_tags", "subclass_status"]
 
@@ -63,6 +80,7 @@ def run(work: Path, raw_dir: Path | None = None, ra: float | None = None, dec: f
         # folder, so a shared folder mixed earlier searches into later results.
         raw_dir = work / "raw" / controller._tag(ra, dec, radius)
         step("collect", controller.collect_all, ra, dec, radius, raw_dir, workers)
+        _prune_raw(work / "raw", keep=raw_dir)
 
     rules = PRE / "classification_rules.csv"
     s1 = _load(PRE / "01_source_association.py", "v2_stage1")
@@ -74,7 +92,7 @@ def run(work: Path, raw_dir: Path | None = None, ra: float | None = None, dec: f
     control = _load(CLS / "control.py", "v2_classifier_control")
 
     step("1_associate", s1.run, Path(raw_dir), work / "source_association.csv")
-    if pd.read_csv(work / "source_association.csv").empty:
+    if pd.read_csv(work / "source_association.csv", nrows=1).empty:
         # Nothing detected (empty sky patch, tiny radius, or every archive
         # down): an empty result, not a failure of the later stages.
         out = pd.DataFrame(columns=EMPTY_RESULT_COLUMNS)
