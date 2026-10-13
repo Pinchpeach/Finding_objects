@@ -32,6 +32,7 @@ jobs:
           pd.DataFrame([
             {"object_id":"s1","primary_class":"STAR","classprob_dsc_combmod_whitedwarf":0.92,"classprob_dsc_combmod_binarystar":0.01,
              "best_class_name":"RR","best_class_score":0.88,"teff_gspphot":11500,"logg_gspphot":8.0,
+             "parallax":20.0,"parallax_error":0.1,"phot_g_mean_mag":14.0,"bp_rp":0.0,
              "wd_xp_subtype_prediction":"DA","wd_xp_subtype_confidence":0.96},
             {"object_id":"s2","primary_class":"STAR","classprob_dsc_combmod_whitedwarf":0.02,"classprob_dsc_combmod_binarystar":0.91,
              "best_class_name":"ECL","best_class_score":0.81},
@@ -52,7 +53,10 @@ jobs:
           python - <<'PY'
           import pandas as pd
           d=pd.read_csv("/tmp/classified.csv")
-          assert list(d.detailed_class)==["WHITE_DWARF_CANDIDATE","BINARY_CANDIDATE","WHITE_DWARF_CANDIDATE","UNRESOLVED","UNRESOLVED","UNRESOLVED","UNRESOLVED"]
+          # 2.17.0: a WD needs the GF21 HR locus (DSC WD purity 0.25) and the DSC
+          # "binary" class only adds to the stellar probability (purity 0.075;
+          # Delchambre et al. 2023), so s2 is STAR_LIKE, not BINARY_CANDIDATE.
+          assert list(d.detailed_class)==["WHITE_DWARF_CANDIDATE","STAR_LIKE","WHITE_DWARF_CANDIDATE","UNRESOLVED","UNRESOLVED","UNRESOLVED","UNRESOLVED"]
           assert d.loc[d.object_id.eq("s1"),"variability_class_legacy"].iloc[0]=="RR"
           assert d.loc[d.object_id.eq("s2"),"variability_class_legacy"].iloc[0]=="ECL"
           assert d.loc[d.object_id.eq("s1"),"variability_class"].iloc[0]=="RR_LYRAE"
