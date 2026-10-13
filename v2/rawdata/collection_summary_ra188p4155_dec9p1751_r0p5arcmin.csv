@@ -1,27 +1,27 @@
 collector,status,rows,elapsed_seconds,output_file,error,cache
-gaia_dr3,ok,3,32.566,rawdata/gaia_dr3_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
-gaia_dr3_variability_sos_vizier,empty,0,2.514,rawdata/gaia_dr3_variability_sos_vizier_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
-sdss_dr18,ok,14,11.708,rawdata/sdss_dr18_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
-panstarrs1,ok,61,0.512,rawdata/panstarrs1_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
-desi_legacy,ok,28,32.154,rawdata/desi_legacy_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
-galex,ok,1,1.205,rawdata/galex_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
-twomass,ok,6,1.101,rawdata/twomass_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
-allwise,ok,1,1.101,rawdata/allwise_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
-lotss,empty,0,0.923,rawdata/lotss_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
-first,empty,0,1.147,rawdata/first_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
-nvss,ok,1,0.948,rawdata/nvss_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
-tgss,empty,0,0.669,rawdata/tgss_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
-vlass,empty,0,0.796,rawdata/vlass_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
-xmm,empty,0,0.988,rawdata/xmm_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
-chandra,empty,0,1.135,rawdata/chandra_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
-erosita,empty,0,0.677,rawdata/erosita_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
-sdss_spectroscopy,ok,1,5.529,rawdata/sdss_spectroscopy_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
-desi_spectroscopy,ok,1,1.12,rawdata/desi_spectroscopy_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
-desi_fastspec,ok,1,31.686,rawdata/desi_fastspec_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
-lamost_spectroscopy,empty,0,1.1,rawdata/lamost_spectroscopy_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
-ztf_periodic,empty,0,0.796,rawdata/ztf_periodic_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
-atnf_pulsar,empty,0,1.861,rawdata/atnf_pulsar_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
-agb_suh2021,empty,0,3.082,rawdata/agb_suh2021_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
-sga2020,ok,7,1.013,rawdata/sga2020_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
-simbad,ok,1,1.956,rawdata/simbad_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
-ned,timeout,0,121.57,,"ReadTimeout(ReadTimeoutError(""HTTPSConnectionPool(host='ned.ipac.caltech.edu', port=443): Read timed out. (read timeout=60)""))",miss
+gaia_dr3,ok,3,113.225,rawdata/gaia_dr3_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
+gaia_dr3_variability_sos_vizier,empty,0,2.407,rawdata/gaia_dr3_variability_sos_vizier_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
+sdss_dr18,error,0,9.751,,HTTPError('503 Server Error: Service Unavailable for url: https://skyserver.sdss.org/dr18/en/tools/search/X_Results.aspx'),miss
+panstarrs1,ok,61,0.413,rawdata/panstarrs1_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
+desi_legacy,ok,28,2.607,rawdata/desi_legacy_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
+galex,ok,1,1.028,rawdata/galex_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
+twomass,ok,6,0.865,rawdata/twomass_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
+allwise,ok,1,1.199,rawdata/allwise_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
+lotss,empty,0,0.787,rawdata/lotss_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
+first,empty,0,0.771,rawdata/first_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
+nvss,ok,1,0.736,rawdata/nvss_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
+tgss,empty,0,0.737,rawdata/tgss_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
+vlass,empty,0,0.574,rawdata/vlass_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
+xmm,empty,0,0.913,rawdata/xmm_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
+chandra,empty,0,0.805,rawdata/chandra_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
+erosita,empty,0,0.85,rawdata/erosita_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
+sdss_spectroscopy,error,0,5.955,,HTTPError('503 Server Error: Service Unavailable for url: https://skyserver.sdss.org/dr18/en/tools/search/X_Results.aspx'),miss
+desi_spectroscopy,ok,1,0.911,rawdata/desi_spectroscopy_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
+desi_fastspec,ok,1,1.922,rawdata/desi_fastspec_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
+lamost_spectroscopy,empty,0,0.805,rawdata/lamost_spectroscopy_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
+ztf_periodic,empty,0,0.733,rawdata/ztf_periodic_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
+atnf_pulsar,empty,0,1.867,rawdata/atnf_pulsar_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
+agb_suh2021,empty,0,3.116,rawdata/agb_suh2021_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
+sga2020,ok,7,0.937,rawdata/sga2020_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
+simbad,ok,1,1.415,rawdata/simbad_ra188p4155_dec9p1751_r0p5arcmin.csv,,miss
+ned,timeout,0,123.203,,"ReadTimeout(ReadTimeoutError(""HTTPSConnectionPool(host='ned.ipac.caltech.edu', port=443): Read timed out. (read timeout=60)""))",miss
