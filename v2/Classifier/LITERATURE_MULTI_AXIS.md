@@ -113,13 +113,20 @@ Variability classification should consume time-series features rather than stati
 photometry alone. AGB and Mira must remain separate axes so an object can be
 physical=AGB and variability=MIRA simultaneously.
 
-### 3.0 Gaia vari_classifier score (2.18.0)
+### 3.0 Gaia vari_classifier score (2.18.0, withdrawn 2.20.0)
 
 `best_class_score` is not calibrated across classes (Rimoldini et al. 2023,
-A&A 674, A14).  On the cross-validation set (192 objects whose variability
-type came from vari_classifier) the type is right for 35 % below score 0.5
-(31 objects) and for 91 % at ≥ 0.5 (161).  Below 0.5 only "variable"
-(OTHER_VARIABLE, status `GAIA_DR3_VARIABLE_LOW_SCORE`) is reported.
+A&A 674, A14).  2.18.0 reported only "variable" below score 0.5, because 35 %
+of the cross-validation labels below 0.5 were right versus 91 % above.  That
+truth set holds only Cepheids, RR Lyrae, LPVs and Miras, so low-score labels
+of other classes (eclipsing, rotation) could never count as right.  On the
+classes it can test, the floor turned 12 correct labels into "variable":
+- Cepheid exact match 93.2 → 90.4 %.
+- RR Lyrae 82.4 → 81.6 %.
+- LPV 63.6 → 62.4 %.
+
+The floor was removed in 2.20.0.  The score stays in the evidence, and a
+label's confidence is the rule precision measured per class (2.15.0).
 
 ### 3.1 ZTF periodic variables (2.8.0)
 

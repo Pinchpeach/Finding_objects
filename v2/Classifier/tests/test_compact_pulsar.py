@@ -134,5 +134,5 @@ def test_literature_review_phenomenon_and_gaia_score():
     assert ph.classify({"catalogs": "Acker PN Spectroscopy"})["label"] == "PN"
     spec = importlib.util.spec_from_file_location("v2_var_s", ROOT / "axes" / "variability.py")
     v = importlib.util.module_from_spec(spec); spec.loader.exec_module(v)
-    assert v.classify({"best_class_name": "RR", "best_class_score": 0.3})["status"] == "GAIA_DR3_VARIABLE_LOW_SCORE"
+    assert v.classify({"best_class_name": "RR", "best_class_score": 0.3})["label"] == "RR_LYRAE"   # no score floor (2.20.0)
     assert v.classify({"best_class_name": "RR", "best_class_score": 0.8})["label"] == "RR_LYRAE"
