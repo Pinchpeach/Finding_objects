@@ -136,3 +136,16 @@ def test_literature_review_phenomenon_and_gaia_score():
     v = importlib.util.module_from_spec(spec); spec.loader.exec_module(v)
     assert v.classify({"best_class_name": "RR", "best_class_score": 0.3})["label"] == "RR_LYRAE"   # no score floor (2.20.0)
     assert v.classify({"best_class_name": "RR", "best_class_score": 0.8})["label"] == "RR_LYRAE"
+
+
+def test_reannotation_replaces_axis_columns():
+    """Re-running the axes on a classified row (blind validation's
+    catalog-assisted step) must not duplicate axis columns (2.20.0)."""
+    import pandas as pd
+    spec = importlib.util.spec_from_file_location("v2_axes_re", ROOT / "control_axes.py")
+    ax = importlib.util.module_from_spec(spec); spec.loader.exec_module(ax)
+    row = ax.annotate(pd.DataFrame([{"primary_class": "STAR", "otype": "RR*"}])).iloc[0].to_dict()
+    row["otype"] = "Ce*"
+    again = ax.annotate(pd.DataFrame([row]))
+    assert not again.columns.duplicated().any()
+    assert again.variability_class.iloc[0] == "CEPHEID"
