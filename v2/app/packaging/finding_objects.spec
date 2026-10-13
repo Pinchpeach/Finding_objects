@@ -28,6 +28,10 @@ for d in INCLUDE_DIRS:
             datas.append((str(path), str(Path("v2") / path.relative_to(V2).parent)))
 for f in INCLUDE_FILES:
     datas.append((str(V2 / f), "v2"))
+# Licence texts travel with the binary (MIT for this code; LGPLv3 notice for
+# the bundled Qt / PySide6 shared libraries and the other components).
+for f in ("LICENSE", "THIRD_PARTY_NOTICES.md"):
+    datas.append((str(V2.parent / f), "."))
 
 datas += collect_data_files("astroquery")
 datas += collect_data_files("pyvo")
