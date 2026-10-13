@@ -1,29 +1,8 @@
-hot_subdwarfs ERROR Traceback (most recent call last):
-  File "/home/runner/work/Finding_objects/Finding_objects/v2/benchmark/new_targets/build_truth.py", line 152, in main
-    fn(out, say)
-  File "/home/runner/work/Finding_objects/Finding_objects/v2/benchmark/new_targets/build_truth.py", line 53, in hot_subdwarfs
-    say("J/A+A/662/A40 tables:", {k: (len(v), v.colnames[:30]) for k, v in cats.items()})
-                                                                           ^^^^^^^^^^
-AttributeError: 'TableList' object has no attribute 'items'
-
+J/A+A/662/A40 tables: {'J/A+A/662/A40/hotsd': (61585, ['recno', 'GaiaEDR3', 'RA_ICRS', 'DE_ICRS', 'GLON', 'GLAT', 'Plx', 'e_Plx', 'GMAG', 'Gmag', 'BP-RP', 'E(BP/RP)c', 'pmRA', 'e_pmRA', 'pmDE', 'e_pmDE', 'pm', 'e_pm', 'RUWE', 'Rpm', 'e_EFlux', 'f_Plx', 'f_pm', '_RA.icrs', '_DE.icrs']), 'J/A+A/662/A40/knownhsd': (6616, ['recno', 'Name', 'GaiaEDR3', 'RA_ICRS', 'DE_ICRS', 'GLON', 'GLAT', 'SpClass', 'SpClassS', 'CSDSS', 'CAPASS', 'CPS1', 'CSKYM', 'Plx', 'PlxZP', 'e_Plx', 'GMAG', 'GGAIA', 'e_GGAIA', 'BPGAIA', 'e_BPGAIA', 'RPGAIA', 'e_RPGAIA', 'pmRAGAIA', 'e_pmRAGAIA', 'pmDEGAIA', 'e_pmDEGAIA', 'RVSDSS', 'e_RVSDSS', 'RVLAMOST'])}
+known table J/A+A/662/A40/knownhsd 6616 id column GaiaEDR3 class columns ['SpClass', 'SpClassS']
+HSD completeness {'known_with_gaia': 2692, 'plx_snr_gt5': 1506, 'selected': 1277, 'completeness': 0.8479, 'completeness_by_class': {'He-s': {'size': 179, 'mean': 0.933}, 'O(H)': {'size': 22, 'mean': 0.591}, 'sd': {'size': 117, 'mean': 0.658}, 'sdB': {'size': 639, 'mean': 0.923}, 'sdB+': {'size': 180, 'mean': 0.594}, 'sdBV': {'size': 26, 'mean': 0.962}, 'sdO': {'size': 96, 'mean': 0.938}, 'sdOB': {'size': 200, 'mean': 0.935}}}
+purity sample after the full rule (C* cut): 3568
+HSD purity {'sample': 3568, 'in_simbad': 3091, 'buckets': {'no_type_info': 2282, 'hot_subdwarf': 655, 'white_dwarf': 55, 'OBA_type': 39, 'CV_or_PN': 32, 'horizontal_branch': 25, 'cooler_FGKM': 3}, 'otypes': {'HS?': 1480, '*': 805, 'HS*': 606, 'WD*': 33, 'CV*': 32, 'HB*': 25, 'V*': 21, 'EB*': 20, 'WD?': 18, 'PN': 11, 'RR*': 7, 'PM*': 4, 'No*': 4, 'Em*': 4, 'BS*': 3}}
 Best+2018 9888 ['_RAJ2000', '_DEJ2000', 'Name', 'SpT', 'Type', 'RAJ2000', 'DEJ2000', 'Binary', 'Young']
 ESP-UCD rows 94158 flags {'00': 40628, '20': 26693, '10': 26687, '11': 108, '21': 37, '01': 5}
-ultracool ERROR Traceback (most recent call last):
-  File "/home/runner/work/Finding_objects/Finding_objects/v2/benchmark/new_targets/build_truth.py", line 152, in main
-    fn(out, say)
-  File "/home/runner/work/Finding_objects/Finding_objects/v2/benchmark/new_targets/build_truth.py", line 127, in ultracool
-    idx, d2, _ = cb.match_to_catalog_sky(cu)
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/astropy/coordinates/sky_coordinate.py", line 1191, in match_to_catalog_sky
-    return match_coordinates_sky(
-           ^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/astropy/coordinates/matching.py", line 198, in match_coordinates_sky
-    idx, sep2d, sep3d = match_coordinates_3d(
-                        ^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/astropy/coordinates/matching.py", line 99, in match_coordinates_3d
-    kdt = _get_cartesian_kdtree(catalogcoord, storekdtree)
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/astropy/coordinates/matching.py", line 452, in _get_cartesian_kdtree
-    from scipy.spatial import KDTree
-ModuleNotFoundError: No module named 'scipy'
-
+UCD {'best_rows': 9888, 'matched_espucd': 641, 'selected': 532, 'selected_type_ge_M7': 0.9267, 'by_numeric_type': {0.0: {'n': 991, 'matched': 0.0, 'selected': 0.0}, 1.0: {'n': 707, 'matched': 0.0, 'selected': 0.0}, 2.0: {'n': 1657, 'matched': 0.0, 'selected': 0.0}, 3.0: {'n': 2107, 'matched': 0.0, 'selected': 0.0}, 4.0: {'n': 1220, 'matched': 0.0, 'selected': 0.0}, 5.0: {'n': 683, 'matched': 0.0, 'selected': 0.0}, 6.0: {'n': 432, 'matched': 0.09, 'selected': 0.09}, 7.0: {'n': 196, 'matched': 0.577, 'selected': 0.577}, 8.0: {'n': 159, 'matched': 0.547, 'selected': 0.541}, 9.0: {'n': 119, 'matched': 0.462, 'selected': 0.445}, 10.0: {'n': 390, 'matched': 0.459, 'selected': 0.318}, 11.0: {'n': 258, 'matched': 0.322, 'selected': 0.233}, 12.0: {'n': 128, 'matched': 0.32, 'selected': 0.203}, 13.0: {'n': 117, 'matched': 0.188, 'selected': 0.137}, 14.0: {'n': 102, 'matched': 0.108, 'selected': 0.078}, 15.0: {'n': 98, 'matched': 0.082, 'selected': 0.051}, 16.0: {'n': 54, 'matched': 0.037, 'selected': 0.037}, 17.0: {'n': 45, 'matched': 0.0, 'selected': 0.0}, 18.0: {'n': 32, 'matched': 0.031, 'selected': 0.0}, 19.0: {'n': 40, 'matched': 0.0, 'selected': 0.0}, 20.0: {'n': 27, 'matched': 0.0, 'selected': 0.0}, 21.0: {'n': 29, 'matched': 0.0, 'selected': 0.0}, 22.0: {'n': 51, 'matched': 0.0, 'selected': 0.0}, 23.0: {'n': 34, 'matched': 0.0, 'selected': 0.0}, 24.0: {'n': 38, 'matched': 0.0, 'selected': 0.0}, 25.0: {'n': 56, 'matched': 0.0, 'selected': 0.0}, 26.0: {'n': 63, 'matched': 0.0, 'selected': 0.0}, 27.0: {'n': 35, 'matched': 0.0, 'selected': 0.0}, 28.0: {'n': 16, 'matched': 0.0, 'selected': 0.0}, 29.0: {'n': 3, 'matched': 0.0, 'selected': 0.0}}}
