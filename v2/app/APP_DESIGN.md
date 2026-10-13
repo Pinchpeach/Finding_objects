@@ -3,12 +3,7 @@
 사용자 허락을 받아 시작한 초안입니다. 목표는 PC(Windows/macOS/Linux)에서 v2 분류기를 GUI로 실행하는 것입니다.
 
 ## 1. 구조
-```
-v2/app/
-  backend.py               GUI와 독립된 실행 계층 (Job → v2/pipeline.run, 백그라운드 스레드, 진행 콜백)
-  finding_objects_app.py   Tkinter GUI (입력 폼 · 실행 · 결과 표/필터 · CSV 내보내기 · 로그)
-  APP_DESIGN.md            이 문서
-```
+Tkinter 초안(`backend.py`, `finding_objects_app.py`)은 2.19.1에서 삭제했습니다. Qt 앱(6절)이 기본이자 유일한 GUI입니다. 초안은 GUI 프로세스 안에서 파이프라인을 실행해 매번 단계 모듈을 다시 불러왔고, 배포 빌드에도 포함되지 않았습니다. git 이력에 남아 있습니다.
 - **분류 로직은 v2 그대로 재사용**합니다(`v2/pipeline.py`). 앱은 감싸기만 하므로 분류기를 개선하면 앱에도 자동으로 반영됩니다.
 - 작업 스레드는 Tk 위젯을 직접 건드리지 않고, 큐를 통해 메인 스레드로 결과를 넘깁니다(Tk는 스레드 안전하지 않음).
 
@@ -16,7 +11,7 @@ v2/app/
 | 항목 | 선택 | 이유 |
 |---|---|---|
 | GUI | Tkinter (ttk) | Python 표준 라이브러리라 추가 설치가 없습니다. Windows/macOS Python 배포판에 기본 포함되어 있습니다. 초안 단계의 의존성을 최소화하려는 선택입니다. |
-| 대안 → 채택 | PySide6(Qt) | 하늘 지도, 상세 패널, 대용량 표를 위해 Qt 프론트엔드를 추가했습니다(6절). Tkinter 초안은 참고용으로 남깁니다. |
+| 대안 → 채택 | PySide6(Qt) | 하늘 지도, 상세 패널, 대용량 표를 위해 Qt 프론트엔드를 추가했습니다(6절). Tkinter 초안은 2.19.1에서 삭제했습니다. |
 | 배포 | PyInstaller(one-folder) | 파이프라인이 단계를 파일 경로로 불러오므로 `v2/` 소스·모델·규칙표를 `<bundle>/_internal/v2`에 데이터로 묶고, 그 파일들이 쓰는 외부 패키지를 hidden import로 지정합니다(`app/packaging/finding_objects.spec`). |
 | 네트워크 | 기존 수집기 그대로(아카이브당 300 s 제한) | 오프라인일 때는 "Raw catalog folder"로 미리 받은 데이터를 분류합니다. |
 
@@ -35,8 +30,8 @@ v2/app/
 
 ## 5. 실행
 ```
-pip install pandas numpy requests astropy astroquery pyvo
-python v2/app/finding_objects_app.py
+pip install -r v2/app/requirements.txt
+python v2/app/qt_app.py
 ```
 
 ## 6. Qt(PySide6) 프론트엔드 (2026-10-09 추가, 기본 GUI)

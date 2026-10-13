@@ -58,20 +58,20 @@ class SkyMap(QWidget):
         # Help text lives in SkyView's bar: a widget tooltip would hide the per-object hover tips.
 
     # ---------------------------------------------------------------- data
-    def set_frame(self, df: pd.DataFrame) -> None:
+    def set_frame(self, df: pd.DataFrame, kinds: list[dict] | None = None) -> None:
         from qt_icons import kind_of
         ra = pd.to_numeric(df["ra"], errors="coerce").to_numpy(float) if "ra" in df else None
         dec = pd.to_numeric(df["dec"], errors="coerce").to_numpy(float) if "dec" in df else None
         self._ra, self._dec = (ra, dec) if ra is not None and dec is not None and len(ra) else (None, None)
-        rows = df.to_dict("records")
-        self._kinds = [kind_of(r) for r in rows]
+        self._kinds = kinds if kinds is not None and len(kinds) == len(df) else [kind_of(r) for r in df.to_dict("records")]
         name_col = "designation" if "designation" in df else "object_id" if "object_id" in df else None
         self._names = df[name_col].astype(str).tolist() if name_col else [""] * len(df)
         subs = df["subclass"].fillna("").astype(str) if "subclass" in df else pd.Series([""] * len(df))
         tags = df["subclass_tags"].fillna("").astype(str) if "subclass_tags" in df else pd.Series([""] * len(df))
         self._subs = [a + (f"\n{b}" if b else "") for a, b in zip(subs.tolist(), tags.tolist())]
         self._hosts = []
-        for i, r in enumerate(rows):
+        sga = [c for c in df.columns if c.startswith(("sga_", "sga_2020__"))]
+        for i, r in enumerate(df[sga].to_dict("records") if sga else ()):
             d26 = _num(r.get("sga_d26_arcmin", r.get("sga_2020__sga_d26_arcmin")))
             if d26 and _num(r.get("sga_2020__catalog_object_id")) is not None:
                 self._hosts.append((i, d26, _num(r.get("sga_pa_deg", r.get("sga_2020__sga_pa_deg"))) or 0.0,

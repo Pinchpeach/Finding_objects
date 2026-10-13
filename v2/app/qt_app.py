@@ -466,7 +466,7 @@ class MainWindow(QMainWindow):
         if "designation" not in df.columns and assoc.exists():   # results written before designations existed
             df = _designations().annotate(df, pd.read_csv(assoc, low_memory=False, dtype={"catalog_object_id": "string"}))
         self.model.set_frame(df)
-        self.sky.set_frame(self.model.frame())
+        self.sky.set_frame(self.model.frame(), self.model.kinds())
         cols = [self.model.column_name(i) for i in range(self.model.columnCount())]
         if "separation_arcmin" in cols:              # nearest to the search centre first
             self.table.sortByColumn(cols.index("separation_arcmin"), Qt.AscendingOrder)

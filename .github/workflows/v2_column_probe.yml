@@ -34,7 +34,7 @@ jobs:
           probes = {
               "IX/57/csc2master": (150.1, 2.2, 10),       # COSMOS
               "J/A+A/682/A34": (150.1, 2.2, 10),
-              "IX/74/4xmmdr13s": (150.1, 2.2, 10),
+              "IX/74/4xmmdr13s": (83.633, 22.014, 10),     # Crab
               "V/163/pnmain": (283.396, 33.029, 30),       # Ring nebula
               "I/358/vlpv": (266.4, -29.0, 5),
           }
@@ -42,12 +42,24 @@ jobs:
               try:
                   t = Vizier(columns=["**"], row_limit=5).query_region(SkyCoord(ra*u.deg, dec*u.deg), radius=r*u.arcmin, catalog=cat)
                   print("==", cat, [len(x) for x in t])
-                  for x in t[:1]:
+                  for x in list(t.values())[:1]:
                       for c in x.colnames:
                           print("   ", c, "|", x[c].unit, "|", (x[c].description or "")[:70])
                       print(x[:3])
               except Exception as exc:
                   print("==", cat, "ERROR", repr(exc))
+          # HASH PNstat code definitions from the VizieR ReadMe
+          try:
+              import requests, re
+              txt = requests.get("https://cdsarc.cds.unistra.fr/ftp/V/163/ReadMe", timeout=60).text
+              i = txt.find("PNstat")
+              print("ReadMe PNstat context:\n", txt[i-200:i+600])
+              for m in re.finditer(r"Note \(\d+\)", txt):
+                  seg = txt[m.start():m.start()+1800]
+                  if "True" in seg or "Likely" in seg or "Possible" in seg:
+                      print("NOTE:\n", seg); break
+          except Exception as exc:
+              print("ReadMe ERROR", repr(exc))
           # HASH status values (what pn_catalog_status holds)
           try:
               t = Vizier(columns=["**"], row_limit=5000).get_catalogs("V/163/pnmain")[0]
@@ -83,7 +95,7 @@ jobs:
           import association_model as am
           import chandra, erosita, xmm, hash_pn, gaia_dr3_variability_sos_vizier as sos
           for mod, cat, args in ((chandra, "Chandra CSC 2.0", (150.1, 2.2, 5)), (erosita, "eROSITA eRASS1", (150.1, 2.2, 10)),
-                                 (xmm, "XMM 4XMM-DR13", (150.1, 2.2, 5)), (hash_pn, "HASH PN Catalog", (283.396, 33.029, 5))):
+                                 (xmm, "XMM 4XMM-DR13", (83.633, 22.014, 5)), (hash_pn, "HASH PN Catalog", (283.396, 33.029, 5))):
               try:
                   d = mod.fetch(*args)
                   errs = [am.infer_poserr_arcsec(cat, r) for r in d.head(200).to_dict("records")]
@@ -93,6 +105,15 @@ jobs:
                         "status" if cat.startswith("HASH") else "", d.get("pn_catalog_status", "").tolist()[:5] if cat.startswith("HASH") else "")
               except Exception as exc:
                   print(cat, "ERROR", repr(exc))
+                  try:
+                      from astroquery.vizier import Vizier
+                      from astropy.coordinates import SkyCoord
+                      import astropy.units as u
+                      t = Vizier(columns=["**"], row_limit=3).query_region(SkyCoord(args[0]*u.deg, args[1]*u.deg), radius=args[2]*u.arcmin, catalog=mod.VIZIER_CATALOG)
+                      for x in t.values():
+                          print("   raw columns", x.colnames)
+                  except Exception as exc2:
+                      print("   raw ERROR", repr(exc2))
           try:
               d = sos.fetch(266.4, -29.0, 5, kinds=("lpv",))
               print("LPV rows", len(d), "mdwlrp filled", int(d["gaia_lpv_median_delta_wl_rp"].notna().sum()) if "gaia_lpv_median_delta_wl_rp" in d else "missing")
