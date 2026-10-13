@@ -65,23 +65,27 @@
   "lamost_vs_cmd": {
    "III": {
     "III": 2,
+    "IV": 0,
     "V": 1
    },
    "IV": {
-    "III": 2,
+    "III": 1,
+    "IV": 1,
     "V": 6
    },
    "V": {
-    "III": 2,
+    "III": 1,
+    "IV": 1,
     "V": 219
    },
    "VI": {
     "III": 0,
+    "IV": 0,
     "V": 4
    }
   },
   "cmd_dwarfs_lamost_dwarf": "219/221",
-  "lamost_giants_found_by_gspphot_logg": "1/22",
+  "lamost_giants_found_by_gspphot_logg": "1/18",
   "luminosity_class_without_parallax": 152,
   "metal_poor": {
    "lamost_feh_lt_-1": 104,

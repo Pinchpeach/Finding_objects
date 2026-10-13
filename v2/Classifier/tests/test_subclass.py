@@ -45,7 +45,7 @@ def test_galaxy_activity_rules():
     sc = _sc()
     assert sc.classify({"primary_class": "GALAXY", "sdss_dr18_spectroscopy__subclass": "STARFORMING"})["code"].startswith("GALAXY:STAR_FORMING")
     sf = sc.classify({"primary_class": "GALAXY", "allwise__W1mag": 14.0, "allwise__W2mag": 13.9,
-                      "allwise__W3mag": 10.4, "allwise__e_W3mag": 0.05})
+                      "allwise__W3mag": 10.2, "allwise__e_W3mag": 0.05})   # W2-W3 = 3.7 > 3.5
     assert sf["activity"] == "STAR_FORMING" and sf["rule"] == "WISE_W23_SF"
     q = sc.classify({"primary_class": "GALAXY", "allwise__W1mag": 14.0, "allwise__W2mag": 13.9, "allwise__W3mag": 12.6})
     assert q["activity"] == "QUIESCENT" and q["rule"] == "WISE_W23_UL"      # W3 upper limit
@@ -192,9 +192,12 @@ def test_agb_chemistry_rules():
     o = dict(base, **phot(10.0, 8.0, 7.0, 5.8, 4.2), gaia_lpv_is_cstar=0)   # dW = 0.42, Ks - W3 = 1.6 -> P(C) = 0.01
     r = sc.classify(o)
     assert r["code"] == "STAR:M:AGB" and "silicate" in r["subclass"]
-    # Near P = 0.5 the chemistry is not decided: C-star flag but dusty, low dW -> P(C) = 0.62.
-    u = dict(o, gaia_lpv_is_cstar=1)
+    # Near P = 0.5 the chemistry is not decided: no C flag, dW = 3.64, Ks - W3 = 0.5 -> P(C) ~ 0.5.
+    u = dict(base, **phot(12.6, 10.5, 7.5, 5.5, 5.0), gaia_lpv_is_cstar=0)
     assert sc.classify(u)["code"] == "STAR:?:AGB"
+    # The Gaia C flag counts only with G_BP < 19 (Lebzelter et al. 2023): a
+    # faint-BP flagged dusty star stays O-rich.
+    assert sc.classify(dict(o, gaia_lpv_is_cstar=1, gaia_dr3__phot_bp_mean_mag=19.5))["code"] == "STAR:M:AGB"
     # Saturated W3 (< 3.8 mag) is not used: the model without Ks - W3 decides.
     assert sc.agb_photometric(dict(c, allwise__W3mag=3.0))[2] == "GAIA_2MASS_CSTAR"
     # Without an AGB candidate gate the photometric models are not applied.
@@ -202,14 +205,14 @@ def test_agb_chemistry_rules():
     assert not str(sc.classify(plain)["rule"]).startswith("AGB_")
     # Catalogue / spectral labels win over photometry.
     assert sc.classify(dict(o, suh_2021_agb_catalog__agb_subclass="CAGB_WISE"))["code"] == "STAR:C:AGB"
-    assert sc.classify(dict(base, gaia_lpv_is_cstar=1))["rule"] == "GAIA_LPV_CSTAR"
+    assert sc.classify(dict(base, gaia_lpv_is_cstar=1, gaia_dr3__phot_bp_mean_mag=15.0))["rule"] == "GAIA_LPV_CSTAR"
     assert sc.classify(dict(base, simbad__sp_type="S4/3"))["code"] == "STAR:S:AGB"
     # A carbon dwarf / CH star from SIMBAD without AGB evidence is not called AGB.
     assert sc.classify({"primary_class": "STAR", "simbad__sp_type": "C-H4"})["code"] == "STAR:C:?"
     # Luminosity veto: with a good parallax, fainter than the red clump is not AGB.
     near = {"gaia_dr3__parallax": 2.0, "gaia_dr3__parallax_error": 0.05, "gaia_dr3__ruwe": 1.0}   # DM = 8.49
     r = sc.classify(dict(c, **near))                                         # M_Ks = 5.5 - 8.49 = -2.99: below the RGB tip
-    assert r["code"] == "STAR:C:III" and "RGB or early AGB" in r["subclass"]
+    assert r["code"] == "STAR:C:III" and "RGB or AGB below the RGB tip" in r["subclass"]
     far = {"gaia_dr3__parallax": 0.3, "gaia_dr3__parallax_error": 0.05, "gaia_dr3__ruwe": 1.0}   # DM = 12.61
     assert sc.classify(dict(c, **far))["code"] == "STAR:C:AGB"              # M_Ks = -7.1: above the tip
     assert sc.agb_chemistry(dict(c, **near, **{"2mass_psc__Kmag": 8.0, "2mass_psc__Jmag": 9.0})) is None   # M_Ks = -0.49
@@ -248,9 +251,13 @@ def test_galaxy_emission_line_rules():
     assert sc.galaxy_lines(g(100, 1, 1, 20, -12.0, err=5))[0] == "STAR_FORMING"
     assert sc.galaxy_lines(g(100, 1, 1, 80, -4.0, err=5))[:2] == ("AGN", "SDSS_WHAN")          # x = -0.10
     assert sc.galaxy_lines(g(100, 1, 1, 45, -12.0, err=5))[0] == "COMPOSITE"                  # x = -0.35 (Stasinska+2006)
-    # The SDSS pipeline subclass keeps precedence.
+    # Line diagnostics decide before the SDSS pipeline subclass (2.18.0) ...
     row = dict(g(100, 30, 150, 120, -20.0), **{P + "subclass": "STARFORMING"})
-    assert sc.classify(row)["activity"] == "STAR_FORMING"
+    assert sc.classify(row)["activity"] == "AGN"
+    # ... except broad lines, which a narrow-line fit misses.
+    assert sc.classify(dict(g(100, 30, 25, 60, -2.0), **{P + "subclass": "AGN BROADLINE"}))["activity"] == "AGN"
+    # Without usable lines the subclass is the fallback.
+    assert sc.classify({"primary_class": "GALAXY", P + "subclass": "STARFORMING"})["activity"] == "STAR_FORMING"
     # Dn4000 alone (no line measurement).
     assert sc.galaxy_lines({P + "d4000_n": 1.8})[1] == "SDSS_D4000"
 

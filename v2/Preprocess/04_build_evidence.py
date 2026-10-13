@@ -24,6 +24,27 @@ def num(row,name):
         return v if math.isfinite(v) else None
     except (TypeError,ValueError): return None
 
+R90_MIN_SNR2=5.0
+# AST-EXT-001 is the Gaia-CRF3 consistency cut |(plx+0.017)/sigma| < 5
+# (Klioner+2022 Eq. 2), which Klioner et al. apply only to filter catalogued
+# QSO candidates.  As positive EXTRAGALACTIC evidence it is informative only
+# when sigma_plx is small: with sigma = 1 mas any star beyond ~0.2 kpc passes.
+# Emitted for sigma_plx <= 0.3 mas (G <~ 19.5 in DR3; Lindegren+2021 A2)
+# (2.16.0; DESI benchmark 89.29 -> 89.50 %, SDSS unchanged).
+AST_EXT_MAX_PLX_ERR=0.3
+def _r90_sky(ra,dec):
+    """Assef+2018 R90 footprint: |b| > 10 deg and > 30 deg from the Galactic
+    Centre.  Unknown position -> allowed (the colour cut still applies)."""
+    if ra is None or dec is None: return True
+    r,d=math.radians(ra),math.radians(dec)
+    # ICRS -> Galactic unit vector (rotation matrix, ESA 1997 Hipparcos vol. 1)
+    x,y,z=math.cos(d)*math.cos(r),math.cos(d)*math.sin(r),math.sin(d)
+    gx=-0.0548755604*x-0.8734370902*y-0.4838350155*z
+    gy=+0.4941094279*x-0.4448296300*y+0.7469822445*z
+    gz=-0.8676661490*x-0.1980763734*y+0.4559837762*z
+    b=math.degrees(math.asin(max(-1.0,min(1.0,gz))))
+    return abs(b)>10.0 and math.degrees(math.acos(max(-1.0,min(1.0,gx))))>30.0
+
 class CatalogFields:
     """Read survey-native fields from the catalog a rule is about.
 
@@ -45,7 +66,7 @@ class CatalogFields:
 RAW_FIELDS={"parallax","parallax_error","pmra","pmra_error","pmdec","pmdec_error",
   "class","zwarning","iMeanPSFMag","rMeanPSFMag","zMeanPSFMag","W1mag","W2mag","snr1","snr2",
   "type","clean","Type","otype","best_class_name","best_class_score",*DSC_MAP.values(),
-  "flux_r","flux_ivar_r","flux_z","flux_ivar_z","catalog_object_id"}
+  "flux_r","flux_ivar_r","flux_z","flux_ivar_z","catalog_object_id","RAJ2000","DEJ2000"}
 DERIVED_PREFIXES=("association_confidence__","catalog_confidence_","ps1_","ls_","catalogs")
 
 def _rule_columns(columns):
@@ -64,41 +85,49 @@ def emit(out, rule, cls, score, value=None, note="", reliability=1.0, associatio
       "origin":rule["threshold_origin"],"feature_group":rule["feature_group"],
       "value":value,"note":note})
 
+# Gaia DR3 DSC-Combmod class prior (Delchambre et al. 2023, Table 2), coarse
+# classes: STAR family = star + binary + white dwarf.
+DSC_PRIOR={"STAR":0.988728+0.009887+0.000198,"GALAXY":0.000198,"QSO":0.000989}
+DSC_FLOOR=1e-6
+
+# Per-rule catalogue-quality column and association namespace (module
+# constants since 2.19.0; they were rebuilt for every row x rule).
+RELMAP={
+  "AST-EXT-001":"catalog_confidence_gaia_astrometry","AST-EXT-002":"catalog_confidence_gaia_astrometry",
+  "AST-GAL-001":"catalog_confidence_gaia_astrometry","AST-GAL-002":"catalog_confidence_gaia_astrometry",
+  "SPC-SDSS-001":"catalog_confidence_sdss_spectroscopy","SPC-SDSS-002":"catalog_confidence_sdss_spectroscopy",
+  "SPC-SDSS-003":"catalog_confidence_sdss_spectroscopy","DSC-001":"catalog_confidence_gaia_dsc",
+  "PS1-MORPH-001":"catalog_confidence_ps1_morphology","PS1-MORPH-002":"catalog_confidence_ps1_morphology",
+  "WISE-AGN-001":"catalog_confidence_allwise","SDSS-PHOTO-001":"catalog_confidence_sdss_photometry",
+  "SDSS-PHOTO-002":"catalog_confidence_sdss_photometry","NED-TYPE-001":"catalog_confidence_ned_type",
+  "SIMBAD-TYPE-001":"catalog_confidence_simbad_type",
+  "WISE-AGN-R90-001":"catalog_confidence_allwise",
+}
+ASSOC_PREFIX={
+  "AST-EXT-001":"gaia_dr3","AST-EXT-002":"gaia_dr3","AST-GAL-001":"gaia_dr3","AST-GAL-002":"gaia_dr3",
+  "DSC-001":"gaia_dr3","VAR-001":"gaia_dr3",
+  "SPC-SDSS-001":"sdss_dr18_spectroscopy","SPC-SDSS-002":"sdss_dr18_spectroscopy","SPC-SDSS-003":"sdss_dr18_spectroscopy",
+  "PS1-MORPH-001":"pan_starrs1_dr2_meanobject","PS1-MORPH-002":"pan_starrs1_dr2_meanobject","PS1-QSO-Z6-001":"pan_starrs1_dr2_meanobject",
+  "WISE-AGN-001":"allwise","WISE-AGN-R90-001":"allwise",
+  "SDSS-PHOTO-001":"sdss_dr18_photoobj","SDSS-PHOTO-002":"sdss_dr18_photoobj",
+  "NED-TYPE-001":"ned","SIMBAD-TYPE-001":"simbad",
+  "LS-MORPH-001":"desi_legacy_surveys_dr10","LS-MORPH-002":"desi_legacy_surveys_dr10",
+  "SGA-001":"sga_2020",
+}
+
 def evaluate(rule,row,namespaced=frozenset()):
     rid=rule["rule_id"]; out=[]
-    relmap={
-      "AST-EXT-001":"catalog_confidence_gaia_astrometry","AST-EXT-002":"catalog_confidence_gaia_astrometry",
-      "AST-GAL-001":"catalog_confidence_gaia_astrometry","AST-GAL-002":"catalog_confidence_gaia_astrometry",
-      "SPC-SDSS-001":"catalog_confidence_sdss_spectroscopy","SPC-SDSS-002":"catalog_confidence_sdss_spectroscopy",
-      "SPC-SDSS-003":"catalog_confidence_sdss_spectroscopy","DSC-001":"catalog_confidence_gaia_dsc",
-      "PS1-MORPH-001":"catalog_confidence_ps1_morphology","PS1-MORPH-002":"catalog_confidence_ps1_morphology",
-      "WISE-AGN-001":"catalog_confidence_allwise","SDSS-PHOTO-001":"catalog_confidence_sdss_photometry",
-      "SDSS-PHOTO-002":"catalog_confidence_sdss_photometry","NED-TYPE-001":"catalog_confidence_ned_type",
-      "SIMBAD-TYPE-001":"catalog_confidence_simbad_type",
-      "WISE-AGN-R90-001":"catalog_confidence_allwise",
-    }
-    rcol=relmap.get(rid); reliability=num(row,rcol) if rcol else 1.0
+    rcol=RELMAP.get(rid); reliability=num(row,rcol) if rcol else 1.0
     # Gate only by the association confidence of the catalog that produced
     # this evidence. A weak PS1/NED counterpart must not downweight Gaia/SDSS.
-    assoc_prefix={
-      "AST-EXT-001":"gaia_dr3","AST-EXT-002":"gaia_dr3","AST-GAL-001":"gaia_dr3","AST-GAL-002":"gaia_dr3",
-      "DSC-001":"gaia_dr3","VAR-001":"gaia_dr3",
-      "SPC-SDSS-001":"sdss_dr18_spectroscopy","SPC-SDSS-002":"sdss_dr18_spectroscopy","SPC-SDSS-003":"sdss_dr18_spectroscopy",
-      "PS1-MORPH-001":"pan_starrs1_dr2_meanobject","PS1-MORPH-002":"pan_starrs1_dr2_meanobject","PS1-QSO-Z6-001":"pan_starrs1_dr2_meanobject",
-      "WISE-AGN-001":"allwise","WISE-AGN-R90-001":"allwise",
-      "SDSS-PHOTO-001":"sdss_dr18_photoobj","SDSS-PHOTO-002":"sdss_dr18_photoobj",
-      "NED-TYPE-001":"ned","SIMBAD-TYPE-001":"simbad",
-      "LS-MORPH-001":"desi_legacy_surveys_dr10","LS-MORPH-002":"desi_legacy_surveys_dr10",
-      "SGA-001":"sga_2020",
-    }
-    ap=assoc_prefix.get(rid)
+    ap=ASSOC_PREFIX.get(rid)
     association_reliability=num(row,f"association_confidence__{ap}") if ap else 1.0
     if association_reliability is None: association_reliability=1.0
     src=CatalogFields(row,ap,namespaced)
     if rcol and reliability is None: reliability=0.0
     if rid=="AST-EXT-001":
         p,e=num(src,"parallax"),num(src,"parallax_error")
-        if p is not None and e and e>0:
+        if p is not None and e and 0<e<=AST_EXT_MAX_PLX_ERR:
             x=abs((p+0.017)/e)
             if x<float(rule["threshold"]): emit(out,rule,"EXTRAGALACTIC",1-x/float(rule["threshold"]),x,reliability=reliability,association_reliability=association_reliability)
     elif rid=="AST-EXT-002":
@@ -110,7 +139,11 @@ def evaluate(rule,row,namespaced=frozenset()):
     elif rid=="AST-GAL-001":
         p,e=num(src,"parallax"),num(src,"parallax_error")
         if p is not None and e and e>0:
-            x=abs(p/e); emit(out,rule,"STAR",x/(x+5),x,"uncalibrated physical support",reliability,association_reliability)
+            # Only a positive parallax is evidence of distance: a significantly
+            # negative one is noise or a spurious solution (e.g. a close
+            # companion; El-Badry et al. 2021), and |plx|/sigma >= 10 used to
+            # trigger the decisive-motion STAR rule (2.19.0).
+            x=max(p,0.0)/e; emit(out,rule,"STAR",x/(x+5),x,"uncalibrated physical support",reliability,association_reliability)
     elif rid=="AST-GAL-002":
         a,ae,d,de=(num(src,x) for x in ("pmra","pmra_error","pmdec","pmdec_error"))
         if None not in (a,ae,d,de) and ae>0 and de>0:
@@ -135,8 +168,14 @@ def evaluate(rule,row,namespaced=frozenset()):
                 score=min(0.65,0.50+min(max(0,0.05-delta),0.15))
                 emit(out,rule,"POINT_SOURCE",score,delta,"weak point-source evidence; unresolved morphology is not STAR-specific",reliability,association_reliability)
     elif rid=="WISE-AGN-R90-001":
+        # Assef+2018 (ApJS 234, 23) sec. 3 build R90 only where it is
+        # calibrated: W2 S/N > 5, W1 > 8 and W2 > 7 mag (saturation), and
+        # outside |b| <= 10 deg and 30 deg of the Galactic Centre (YSOs, AGB
+        # stars, PNe mimic AGN colours there).  cc_flags = 0 is already
+        # enforced by catalog_confidence_allwise.  (2.16.0; was S/N >= 3 only.)
         w1,w2,s1,s2=(num(src,x) for x in ("W1mag","W2mag","snr1","snr2"))
-        if None not in (w1,w2,s1,s2) and s1>=3 and s2>=3:
+        ra,dec=num(src,"RAJ2000"),num(src,"DEJ2000")
+        if None not in (w1,w2,s1,s2) and s1>=3 and s2>R90_MIN_SNR2 and w1>8 and w2>7 and _r90_sky(ra,dec):
             cut=0.650 if w2<=13.86 else 0.650*math.exp(0.153*(w2-13.86)**2)
             color=w1-w2
             if color>cut:
@@ -217,16 +256,24 @@ def evaluate(rule,row,namespaced=frozenset()):
         # Preprocess is intentionally coarse. Gaia DSC white-dwarf and
         # physical-binary posterior mass belongs to the stellar family here;
         # detailed stellar subclassification is deferred to v2/Classifier.
+        # DSC-Combmod posteriors carry a fixed class prior (Delchambre et al.
+        # 2023, A&A 674, A31, Table 2: star 0.9887, binary 0.0099, WD 0.0002,
+        # QSO 0.00099, galaxy 0.0002).  The fusion is fitted on class-balanced
+        # benchmarks, so that prior would be counted twice (it is what made the
+        # unconstrained fit give DSC "STAR" a negative weight).  The prior is
+        # divided out (their App. C) and the evidence is the prior-free
+        # probability over STAR family / GALAXY / QSO (2.16.0).
         pv={cls:num(src,col) for cls,col in DSC_MAP.items()}
         stellar=sum(v for cls,v in pv.items() if cls in {"STAR","WD","BINARY"} and v is not None)
-        if stellar>0:
-            emit(out,rule,"STAR",min(1.0,stellar),stellar,
-                 "Gaia DSC STAR+WD+BINARY coarse stellar-family probability",
-                 reliability=reliability,association_reliability=association_reliability)
-        for cls in ("GALAXY","QSO"):
-            v=pv.get(cls)
-            if v is not None:
-                emit(out,rule,cls,v,v,reliability=reliability,association_reliability=association_reliability)
+        coarse={"STAR":stellar if stellar>0 else None,"GALAXY":pv.get("GALAXY"),"QSO":pv.get("QSO")}
+        if all(v is not None for v in coarse.values()):
+            lr={c:max(v,DSC_FLOOR)/DSC_PRIOR[c] for c,v in coarse.items()}
+            z=sum(lr.values())
+            for cls in ("STAR","GALAXY","QSO"):
+                q=lr[cls]/z
+                emit(out,rule,cls,q,coarse[cls],
+                     "Gaia DSC posterior with its class prior divided out (Delchambre+2023 App. C)",
+                     reliability=reliability,association_reliability=association_reliability)
     elif rid=="VAR-001":
         cls=str(src.get("best_class_name","")).strip()
         score=num(src,"best_class_score")
@@ -254,6 +301,26 @@ def _color_knn_evidence(df,rule_list):
                     emit(empty[i],rule,cls,float(v),round(float(v),4),"colour-space kNN class fraction")
     return empty
 
+def _ls_gbm_evidence(df,rule_list):
+    """LS-GBM-001: gradient-boosting STAR/GALAXY/QSO probabilities from the Legacy Surveys Tractor columns (2.11.0)."""
+    empty=[[] for _ in range(len(df))]
+    rule=next((r for r in rule_list if r["rule_id"]=="LS-GBM-001"),None)
+    if rule is None: return empty
+    import sys
+    here=str(Path(__file__).resolve().parent)
+    if here not in sys.path: sys.path.insert(0,here)
+    import ls_gbm
+    prob=ls_gbm.predict_proba(df)
+    for i,f in enumerate(prob):
+        if f[0]==f[0]:
+            for cls,v in zip(ls_gbm.CLASSES,f):
+                emit(empty[i],rule,cls,float(v),round(float(v),4),"gradient-boosting class probability")
+    return empty
+
+# Soft statistical evidence (class fractions / probabilities over all three
+# classes), weighed by the fitted fusion; never counted as a hard conflict.
+SOFT_SUFFIXES=("-CKNN-001","-GBM-001")
+
 def run(features:Path,rules_path:Path,out:Path)->Path:
     df=pd.read_csv(features); rules=pd.read_csv(rules_path,keep_default_na=False)
     result=df.copy(); payload=[]; counts=[]; conflicts=[]
@@ -261,15 +328,16 @@ def run(features:Path,rules_path:Path,out:Path)->Path:
     # Plain dicts: building a pandas Series per row/rule dominated runtime.
     rule_list=rules.to_dict("records")
     knn=_color_knn_evidence(df,rule_list)
+    gbm=_ls_gbm_evidence(df,rule_list)
     for i,row in enumerate(df[_rule_columns(df.columns)].to_dict("records")):
         ev=[]
         for rule in rule_list: ev.extend(evaluate(rule,row,namespaced))
-        ev.extend(knn[i])
+        ev.extend(knn[i]); ev.extend(gbm[i])
         payload.append(json.dumps(ev,separators=(",",":")))
         counts.append(len(ev))
         # kNN class fractions are soft statistical evidence, weighed by the
         # fitted fusion; they are not independent hard claims that can conflict.
-        strong={e["class"] for e in ev if e["class"] in PRIMARY and e["score"]>=.8 and not e["rule_id"].endswith("-CKNN-001")}
+        strong={e["class"] for e in ev if e["class"] in PRIMARY and e["score"]>=.8 and not e["rule_id"].endswith(SOFT_SUFFIXES)}
         conflicts.append(int(len(strong)>1))
     result["evidence_json"]=payload; result["evidence_count"]=counts; result["evidence_conflict"]=conflicts
     out.parent.mkdir(parents=True,exist_ok=True); result.to_csv(out,index=False)

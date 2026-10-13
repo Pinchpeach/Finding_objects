@@ -34,17 +34,33 @@ PROFILES = {
     "Gaia DR3": SurveyProfile(2016.0, 0.10, 0.18, 5.0),
     "AllWISE": SurveyProfile(2010.5, 0.50, 6.1, 8.0),
     "2MASS PSC": SurveyProfile(2000.0, 0.25, 2.5, 6.0),
-    "Pan-STARRS1 DR2 MeanObject": SurveyProfile(None, 0.12, 0.83, 4.0),
+    # PS1 3pi delivered median PSF FWHM: g 1.47, r 1.31, i 1.19, z 1.14,
+    # y 1.09" (Chambers et al. 2016, Table 11); 0.83" was the site DIMM
+    # seeing, not the delivered image quality (corrected 2.16.0).  The row's
+    # epochMean (MJD) is the epoch of the mean position when fetched.
+    "Pan-STARRS1 DR2 MeanObject": SurveyProfile(None, 0.12, 1.2, 4.0),
+    # GALEX: 0.49/0.59" absolute astrometry (NUV/FUV, S/N >= 10) and 5.3"
+    # NUV FWHM (Morrissey et al. 2007).
     "GALEX AIS": SurveyProfile(None, 0.80, 5.3, 8.0),
-    "FIRST": SurveyProfile(None, 1.0, 5.0, 8.0),
+    # FIRST: 5.4" beam (Becker, White & Helfand 1995).
+    "FIRST": SurveyProfile(None, 1.0, 5.4, 8.0),
+    # NVSS: 45" beam (Condon et al. 1998).
     "NVSS": SurveyProfile(None, 3.0, 45.0, 30.0),
     # TGSS ADR1: 25" beam, astrometry better than 2" (Intema et al. 2017).
     "TGSS ADR1": SurveyProfile(None, 2.0, 25.0, 25.0),
     # ZTF: ~0.1" astrometry, ~2" seeing (Bellm et al. 2019; Masci et al. 2019).
     "ZTF periodic variables": SurveyProfile(None, 0.15, 2.0, 3.0),
+    # Chandra CSC: on-axis PSF ~0.5"; per-source r0 is a 95 % error-ellipse
+    # radius (Evans et al. 2010; CSC column documentation), see
+    # infer_poserr_arcsec.
     "Chandra CSC 2.0": SurveyProfile(None, 0.60, 0.5, 5.0),
+    # 4XMM: POSERR = RADEC_ERR (+) SYSERRCC, 1 sigma; EPIC on-axis PSF ~6"
+    # FWHM (Webb et al. 2020).
     "XMM 4XMM-DR13": SurveyProfile(None, 1.5, 6.0, 10.0),
-    "eROSITA eRASS1": SurveyProfile(2020.5, 4.0, 26.0, 20.0),
+    # eRASS1 (Merloni et al. 2024): POS_ERR is 1 sigma and peaks at ~4.5";
+    # the survey-averaged PSF half-energy width is 30" (an HEW, used here as
+    # the resolution scale); survey Dec 2019 - Jun 2020 (corrected 2.16.0).
+    "eROSITA eRASS1": SurveyProfile(2020.2, 4.5, 30.0, 20.0),
     "ATNF Pulsar Catalog": SurveyProfile(None, 0.5, None, 5.0),
     "HASH PN Catalog": SurveyProfile(None, 1.0, None, 8.0),
     "ASAS-SN Supernova Catalog": SurveyProfile(2000.0, 1.0, None, 5.0, "transient_event"),
@@ -52,8 +68,16 @@ PROFILES = {
     "Acker PN Spectroscopy": SurveyProfile(2000.0, 2.0, None, 8.0),
     # SGA-2020 centres come from Legacy Surveys ellipse fits of large galaxies.
     "SGA-2020": SurveyProfile(None, 1.0, None, 5.0),
+    # Legacy Surveys DR10: delivered seeing ~1.3/1.2/1.1" in g/r/z (DECaLS;
+    # Dey et al. 2019).  Per-source errors come from ra_ivar/dec_ivar and the
+    # epoch from ref_epoch (Gaia-matched stars) when fetched (2.16.0); before
+    # this the main photometry source fell back to DEFAULT_PROFILE.  The
+    # fallback error stays the conservative 0.6" (2.19.0; 0.10" split the
+    # NGC 4522 nucleus from its galaxy), see also LS_RESOLVED_FLOOR_ARCSEC.
+    "DESI Legacy Surveys DR10": SurveyProfile(None, 0.6, 1.2, 4.0),
 }
 DEFAULT_PROFILE = SurveyProfile(None, 0.6, None, 5.0)
+LS_RESOLVED_FLOOR_ARCSEC = 0.6
 
 
 def num(value: Any) -> float | None:
@@ -146,13 +170,21 @@ def infer_epoch(catalog: str, row: Mapping[str, Any]) -> float | None:
     explicit = _first(row, ("ref_epoch", "epoch_jyear", "observation_epoch", "obs_epoch"))
     if explicit is not None and 1800.0 < explicit < 2200.0:
         return explicit
-    mjd = _first(row, ("obs_mjd", "mjd_obs", "observation_mjd"))
+    mjd = _first(row, ("obs_mjd", "mjd_obs", "observation_mjd", "epochmean"))
     if mjd is not None and 10000 < mjd < 100000:
         return 2000.0 + (mjd - 51544.5) / 365.25
     return profile_for(catalog, row).ref_epoch
 
 
 def infer_poserr_arcsec(catalog: str, row: Mapping[str, Any]) -> float:
+    # Chandra CSC: r0 is the major radius of the 95 % confidence ellipse
+    # (statistical only); the 1-sigma error is r0/2.448 (2-D Gaussian) and the
+    # documented 0.16" astrometric systematic is added in quadrature.
+    if catalog == "Chandra CSC 2.0":
+        r0 = _first(row, ("err_ellipse_r0", "r0", "errmaj", "err_maj"))
+        if r0 is not None and r0 > 0:
+            return math.hypot(r0 / 2.448, 0.16)
+
     explicit = _first(row, ("poserr_arcsec", "pos_err", "radec_err", "err_maj", "errmaj"))
     if explicit is not None and explicit > 0:
         return explicit
@@ -169,11 +201,34 @@ def infer_poserr_arcsec(catalog: str, row: Mapping[str, Any]) -> float:
         if a is not None and b is not None and max(a, b) > 0:
             return max(a, b) / 1000.0
 
-    # Pan-STARRS mean-coordinate errors are supplied in mas by the MAST table.
+    # eRASS1 POS_ERR and 4XMM POSERR are 1-sigma (systematics included).
+    if catalog in ("eROSITA eRASS1", "XMM 4XMM-DR13"):
+        e = _first(row, ("pos_err", "poserr", "e_pos"))
+        if e is not None and e > 0:
+            return e
+
+    # Legacy Surveys ra_ivar/dec_ivar are inverse variances in 1/deg^2 (RA
+    # without the cos(dec) term, i.e. along the RA coordinate).
+    if catalog == "DESI Legacy Surveys DR10":
+        a, b = _first(row, ("ra_ivar",)), _first(row, ("dec_ivar",))
+        if a is not None and b is not None and a > 0 and b > 0:
+            cosd = abs(math.cos(math.radians(_first(row, ("dec",)) or 0.0)))
+            err = max(cosd / math.sqrt(a), 1.0 / math.sqrt(b)) * 3600.0
+            # The ivar error is formal, for the model centre.  For a resolved
+            # Tractor model the centre other surveys measure (a nucleus, a
+            # moment centroid) differs at the arcsec level (2.2" for the
+            # NGC 4522 PS1 / 2MASS nucleus), so resolved sources keep the
+            # conservative floor.
+            typ = str(row.get("type", "")).strip().upper()
+            return max(err, LS_RESOLVED_FLOOR_ARCSEC) if typ and typ not in ("PSF", "GPSF") else err
+
+    # Pan-STARRS DR2 raMeanErr / decMeanErr are in arcsec (MAST PS1 DR2
+    # MeanObject schema).  Until 2.19.0 they were divided by 1000 as if in
+    # mas, giving 1e-5" errors that only the PSF/6 floor hid.
     if catalog == "Pan-STARRS1 DR2 MeanObject":
         a, b = _first(row, ("rameanerr",)), _first(row, ("decmeanerr",))
         if a is not None and b is not None and max(a, b) > 0:
-            return max(a, b) / 1000.0
+            return max(a, b)
 
     return profile_for(catalog, row).fallback_poserr_arcsec
 

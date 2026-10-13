@@ -8,17 +8,17 @@ v2의 코드·문서·규칙표가 인용하는 논문, 카탈로그 출판물, 
 |---|---:|
 | [측성·Gaia](#gaia) | 20 |
 | [측광 체계·단위](#phot) | 8 |
-| [탐사·카탈로그 데이터](#survey) | 25 |
+| [탐사·카탈로그 데이터](#survey) | 29 |
 | [데이터 출처 카탈로그 (논문 인용 없음)](#data) | 13 |
-| [교차 대응·통계·분류 방법](#method) | 9 |
-| [별 분류](#star) | 25 |
-| [은하 분류](#galaxy) | 23 |
+| [교차 대응·통계·분류 방법](#method) | 14 |
+| [별 분류](#star) | 35 |
+| [은하 분류](#galaxy) | 25 |
 | [퀘이사·AGN](#qso) | 14 |
-| [전파·X선·밀집성](#radio) | 10 |
-| [행성상성운·초신성·과도 현상](#trans) | 6 |
+| [전파·X선·밀집성](#radio) | 11 |
+| [행성상성운·초신성·과도 현상](#trans) | 8 |
 | [기타 문서](#doc) | 13 |
 | [분광 분류 기준](#spec) | 43 |
-| **합계** | **209** |
+| **합계** | **233** |
 
 <a id="gaia"></a>
 ## 측성·Gaia
@@ -96,6 +96,10 @@ Gaia 데이터 릴리스, Gaia 처리·검증 논문, 측성 품질 기준.
 | Chen et al. 2020 (ZTF periodic variables) | ApJS 249, 18; VizieR J/ApJS/249/18 | — | `Get_data/ztf_periodic.py`<br>`Classifier/axes/variability.py (ZTF_MAP)`<br>`Classifier/LITERATURE_MULTI_AXIS.md §3.1` | ZTF 주기 변광성 78만 개의 유형(Mira, SR, RR, EW 등)·주기·진폭 |
 | Bellm et al. 2019 (ZTF) | PASP 131, 018002 | — | `Preprocess/association_model.py (ZTF periodic variables)`<br>`Classifier/LITERATURE_MULTI_AXIS.md §3.1` | ZTF 관측 체계(시상 ~2″) |
 | Masci et al. 2019 (ZTF data system) | PASP 131, 018003 | — | `Preprocess/association_model.py (ZTF periodic variables)` | ZTF 측성 정밀도(~0.1″) |
+| Becker, White & Helfand 1995 | ApJ 450, 559; DOI 10.1086/176166 | — | `Preprocess/association_model.py (FIRST)` | FIRST 빔 5.4″ |
+| Merloni et al. 2024 | A&A 682, A34; DOI 10.1051/0004-6361/202347165 | — | `Preprocess/association_model.py (eRASS1)` | eRASS1 위치 오차(1σ, 최빈 4.5″)와 PSF HEW 30″ |
+| Evans et al. 2010 | ApJS 189, 37; DOI 10.1088/0067-0049/189/1/37 | — | `Preprocess/association_model.py (Chandra CSC)` | CSC 오차 타원 r0는 95 % 반경, 0.16″ 계통 오차 |
+| Webb et al. 2020 | A&A 641, A136; DOI 10.1051/0004-6361/201937353 | — | `Preprocess/association_model.py (4XMM)` | 4XMM POSERR(1σ, 계통 포함), EPIC PSF |
 
 <a id="data"></a>
 ## 데이터 출처 카탈로그 (논문 인용 없음)
@@ -134,6 +138,11 @@ Gaia 데이터 릴리스, Gaia 처리·검증 논문, 측성 품질 기준.
 | Tachibana & Miller 2018 | PASP 130, 128001; DOI 10.1088/1538-3873/aae3d9 | — | `Preprocess/classification_rules.csv` PS1-MORPH-001/002 (Sec. 4.1)<br>`Preprocess/catalog_reliability.csv` (catalog_confidence_ps1_morphology)<br>`Preprocess/LITERATURE.md` | PS1 iPSF − iKron > 0.05 확장원 판별과 한계 |
 | Farrow et al. 2014 | MNRAS 437, 748–770; DOI 10.1093/mnras/stt1933 | — | `Preprocess/LITERATURE.md` | PS1 별/은하 분리 배경과 검증 |
 | Bovy et al. 2011 (XDQSO) | ApJ 729, 141 | — | `Preprocess/color_knn.py` (MAG_DIMS ls_r_mag_scaled)<br>`Preprocess/LITERATURE.md` | 등급에 따라 색 분포·천체 수가 달라지므로 색 kNN에 r 등급 축 추가 |
+| Friedman 2001 (gradient boosting) | Ann. Stat. 29, 1189 | — | `Preprocess/ls_gbm.py`<br>`Preprocess/LITERATURE.md` | LS-GBM-001 그래디언트 부스팅 분류기 |
+| Ke et al. 2017 (LightGBM) | NeurIPS 30 | — | `Preprocess/ls_gbm.py`<br>`Preprocess/LITERATURE.md` | 히스토그램 기반 그래디언트 부스팅 |
+| Wilson 1927 (score interval) | JASA 22, 209 | — | `Classifier/calibration/fit_axis_calibration.py (wilson_lower)` | 규칙 정밀도의 95 % 하한 |
+| Ball et al. 2007 | ApJ 663, 774; DOI 10.1086/518362 | — | `Preprocess/color_knn.py`<br>`Preprocess/classification_rules.csv LS-CKNN-001, PS1-CKNN-001` | 색 공간 kNN(사례 기반) 별·은하·QSO 분류 (2.16.0에서 인용 수정) |
+| Chow 1970 | IEEE Trans. Inf. Theory 16, 41; DOI 10.1109/TIT.1970.1054406 | — | `Preprocess/05_likelihood_vectors.py`<br>`LITERATURE_REVIEW_2026-10.md` | 확신도 임계 기권(reject option) |
 
 <a id="star"></a>
 ## 별 분류
@@ -167,6 +176,16 @@ Gaia 데이터 릴리스, Gaia 처리·검증 논문, 측성 품질 기준.
 | Mowlavi, Trabucchi & Lebzelter 2019 | arXiv:1907.05359 (저장소 표기 그대로) | — | `Classifier/subclass.py` (AGB_DW_C) | 은하계 LPV의 O/C 경계 ≈ 0.9 mag |
 | Abia et al. 2020 | A&A 633, A135 | — | `Classifier/subclass.py` (AGB_DW_XC) | 은하계 탄소별 Gaia–2MASS 도표, 극단 C-rich 경계 ≈ 1.7 mag |
 | Lian et al. 2014 | A&A 564, A84 | — | `Classifier/subclass.py` (WISE_LIAN14) | AllWISE W1−W2 대 W3−W4 직선으로 O-rich/C-rich AGB 구분 (87 %/86 %) |
+| Jayasinghe et al. 2018–2021 (ASAS-SN Variable Stars) | MNRAS 477, 3145; VizieR II/366 | — | `benchmark/build_rr_ew_truth.py`<br>`benchmark/build_mira_truth.py`<br>`Classifier/truth/build_independent_truth_sets.py` | 변광성 정답(RRAB/RRC/EW/EA/M/SR) |
+| Mowlavi et al. 2018 (Gaia DR2 LPV catalogue) | A&A 618, A58 | — | `Classifier/axes/variability.py (GAIA_MIRA_SEMI_AMP)`<br>`Classifier/LITERATURE_MULTI_AXIS.md §3.2` | Gaia G 진폭 > ~1 mag인 미라형 LPV |
+| Grady et al. 2019 | MNRAS 483, 3022 | — | `Classifier/LITERATURE_MULTI_AXIS.md §3.2` | Gaia 진폭 기반 미라 선택(다른 진폭 통계) |
+| Andriantsaralaza et al. 2022 | A&A 667, A74; DOI 10.1051/0004-6361/202243670 | — | `Classifier/subclass.py (star_tags RUWE)` | AGB 별의 높은 RUWE는 쌍성보다 포화·크기·광심 이동 때문 |
+| Sanders & Matsunaga 2023 | MNRAS 521, 2745; DOI 10.1093/mnras/stad574 | — | `Classifier/subclass.py (agb_chemistry, gaia_lpv_cstar)` | Gaia LPV C/O 판정: 은하면·벌지 소광, is_cstar 사용 권고(Lebzelter+2023 인용) |
+| Zhang & Sanders 2023 | MNRAS 521, 5309; DOI 10.1093/mnras/stad575 | — | `Classifier/axes/variability.py (Mira)` | Gaia DR3 미라 선택: 80 < P < 1000 d, 반진폭 ≥ 0.5 |
+| Kulkarni et al. 2025 | arXiv:2509.03120 | — | `Classifier/axes/variability.py (_ratio)` | RR Lyrae ZTF g/r 진폭비 ≈ 1.4 |
+| Fouesneau et al. 2023 | A&A 674, A28; DOI 10.1051/0004-6361/202243919 | — | `Classifier/branches/evolved_star.py`<br>`Classifier/subclass.py (GSP-Spec)` | FLAME 거성 질량·나이 사용 범위(1 < M < 2, 나이 > 1.5 Gyr), GSP-Spec 보정 권고 |
+| Culpan et al. 2022 | A&A 662, A40; DOI 10.1051/0004-6361/202243337 | — | `Classifier/subclass.py (star_luminosity_class)` | Gaia 고온 준왜성: 주계열 아래 청색 영역 |
+| Górski et al. 2018 | AJ 156, 278; DOI 10.3847/1538-3881/aaeacb | — | `Classifier/subclass.py (RGB_TIP_MKS)` | Ks 적색 거성 가지 끝 등급 −6.28, 색 의존성 |
 
 <a id="galaxy"></a>
 ## 은하 분류
@@ -198,6 +217,8 @@ Gaia 데이터 릴리스, Gaia 처리·검증 논문, 측성 품질 기준.
 | Banerji et al. 2010 (Galaxy Zoo ML) | MNRAS 406, 342; doi:10.1111/j.1365-2966.2010.16713.x | — | `Classifier/LITERATURE.md` | 기계학습으로 Galaxy Zoo 형태 재현 |
 | Walmsley et al. 2020 (Galaxy Zoo Bayesian CNN) | MNRAS 491, 1554; doi:10.1093/mnras/stz2816 | — | `Classifier/LITERATURE.md` | 확률적 형태 분류·능동 학습 |
 | Walmsley et al. 2022 (Galaxy Zoo DECaLS) | MNRAS 509, 3966; doi:10.1093/mnras/stab2093 | — | `Classifier/LITERATURE.md` | 세부 시각 형태 측정 → 계층적 형태 분기 |
+| Norberg et al. 2002 | MNRAS 336, 907; DOI 10.1046/j.1365-8711.2002.05831.x | — | `Classifier/subclass.py (galaxy_tags LUMINOUS)` | 2dFGRS 광도 함수 M*_bJ = −19.66 + 5 log h |
+| Mauch & Sadler 2007 | MNRAS 375, 931; DOI 10.1111/j.1365-2966.2006.11353.x | — | `Classifier/subclass.py (RADIO_AGN_MIN_L14)` | 1.4 GHz 광도 함수: 약 1e23 W/Hz 아래는 별 생성 은하가 우세 |
 
 <a id="qso"></a>
 ## 퀘이사·AGN
@@ -238,6 +259,7 @@ AGN/퀘이사 선택, 전파 세기, 광도, 가려진 퀘이사, 고적색편�
 | Jankowski et al. 2018 | MNRAS 473, 4436 | — | `Classifier/LITERATURE_MULTI_AXIS.md §4.1`<br>`benchmark/build_pulsar_truth.py` | 펄서 평균 전파 스펙트럼 지수 −1.60 ± 0.54 |
 | Bates et al. 2013 | MNRAS 431, 1352 | — | `Classifier/LITERATURE_MULTI_AXIS.md §4.1`<br>`benchmark/build_pulsar_truth.py` | 펄서 스펙트럼 지수 분포 −1.4 ± 1.0 |
 | Intema et al. 2017 (TGSS ADR1) | A&A 598, A78 | — | `Get_data/tgss.py` (J/A+A/598/A78/table3)<br>`Preprocess/association_model.py` (TGSS ADR1) | 150 MHz 전파 카탈로그(25″ 빔) |
+| Lorimer et al. 2006 (pulsar Galactic distribution) | MNRAS 372, 777 | — | `Classifier/axes/compact.py (PSR_LR_PLANE)` | 보통 펄서의 은하면 집중(척도 높이 330 pc) |
 
 <a id="trans"></a>
 ## 행성상성운·초신성·과도 현상
@@ -252,6 +274,8 @@ PN 진단, 광도곡선 기반 초신성/과도 현상 분류.
 | Möller & de Boissière 2020 (SuperNNova) | — | — | `Classifier/LITERATURE_MULTI_AXIS.md` | RNN 광도곡선 초신성 분류(극대 이전 곡선 포함) |
 | "HSC transient ML work (2020)" (저장소 표기 그대로) | — | — | `Classifier/LITERATURE_MULTI_AXIS.md` | 시간 자료가 늘수록 성능 향상 |
 | "Recent 4MOST transient classifier comparison (2025): SNID, DASH and NGSF" (저장소 표기 그대로) | — | — | `Classifier/LITERATURE_MULTI_AXIS.md` | 분광 과도 현상 유형 분류 도구 비교 |
+| Parker, Bojičić & Frew 2016 | J. Phys. Conf. Ser. 728, 032008; arXiv:1603.07042 | — | `Classifier/axes/phenomenon.py (_hash_grade)` | HASH 등급 True/Likely/Possible, 모방체·post-AGB 수록 |
+| Frew & Parker 2010 | PASA 27, 129; DOI 10.1071/AS09040 | — | `Classifier/axes/phenomenon.py (Acker)`<br>`Classifier/LITERATURE_SPECTROSCOPY.md §5` | PN과 모방체 구분 선비([S II]/Hα, [O III]/Hβ) |
 
 <a id="doc"></a>
 ## 기타 문서

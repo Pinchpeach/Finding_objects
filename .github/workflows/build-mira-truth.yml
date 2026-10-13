@@ -1,0 +1,39 @@
+name: Mira vs SR truth (ASAS-SN x Gaia DR3 LPV)
+
+# ASAS-SN Mira and SR stars matched to the Gaia DR3 LPV table (2.13.0).
+# for a Gaia G-amplitude Mira criterion.
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/code-review-7ox8zn]
+    paths:
+      - v2/benchmark/build_mira_truth.py
+
+concurrency:
+  group: mira-truth-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pandas numpy astropy astroquery
+      - name: Build
+        run: python -u v2/benchmark/build_mira_truth.py
+      - name: Commit
+        if: ${{ !cancelled() }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add v2/benchmark/mira_truth || true
+          if git diff --cached --quiet; then echo "nothing to commit"; exit 0; fi
+          git commit -m "Mira vs SR truth (ASAS-SN x Gaia DR3 LPV)"
+          bash .github/scripts/push_with_retry.sh

@@ -161,6 +161,21 @@ class SkyMap(QWidget):
     def _shown(self, i) -> bool:
         return self._x is not None and self._x[i] == self._x[i] and (self._visible is None or i in self._visible)
 
+    def _screen_all(self):
+        """Screen x, y of every object and the shown mask, as numpy arrays
+        (2.19.0: hover and paint looped over all objects in Python)."""
+        import numpy as np
+        x, y = np.asarray(self._x, float), np.asarray(self._y, float)
+        cx, cy, s = self._scale()
+        sx, sy = cx - (x - self._pan[0]) * s, cy - (y - self._pan[1]) * s
+        shown = np.isfinite(x)
+        if self._visible is not None:
+            vis = np.zeros(len(x), bool)
+            idx = np.fromiter((i for i in self._visible if 0 <= i < len(x)), int)
+            vis[idx] = True
+            shown &= vis
+        return sx, sy, shown
+
     # ------------------------------------------------------------- painting
     def paintEvent(self, event):
         from qt_icons import draw
@@ -192,13 +207,10 @@ class SkyMap(QWidget):
             p.setPen(QPen(QColor("#4f8fdc"), 1.2, Qt.DashDotLine)); p.setBrush(QColor(79, 143, 220, 25))
             p.drawEllipse(QPointF(0, 0), a * ba, a)
             p.restore()
-        in_view = []
-        for i in range(len(self._kinds)):
-            if not self._shown(i):
-                continue
-            sx, sy = self._to_screen(self._x[i], self._y[i])
-            if -20 <= sx <= self.width() + 20 and -20 <= sy <= self.height() + 20:
-                in_view.append((i, sx, sy))
+        import numpy as np
+        ax, ay, shown = self._screen_all()
+        keep = shown & (ax >= -20) & (ax <= self.width() + 20) & (ay >= -20) & (ay <= self.height() + 20)
+        in_view = [(int(i), float(ax[i]), float(ay[i])) for i in np.flatnonzero(keep)]
         # draw unclassified first so classified glyphs stay on top
         for i, sx, sy in sorted(in_view, key=lambda t: self._kinds[t[0]].get("cls") != "UNKNOWN"):
             draw(p, self._kinds[i], QPointF(sx, sy), self.ICON, selected=(i == self._selected))
@@ -237,15 +249,13 @@ class SkyMap(QWidget):
         self._press = event.position(); self._dragging = False
 
     def _nearest(self, pos, radius=12.0):
-        best, best_d = None, radius ** 2
-        for i in range(len(self._kinds)):
-            if not self._shown(i):
-                continue
-            sx, sy = self._to_screen(self._x[i], self._y[i])
-            d = (sx - pos.x()) ** 2 + (sy - pos.y()) ** 2
-            if d < best_d:
-                best, best_d = i, d
-        return best
+        import numpy as np
+        if self._x is None or not len(self._kinds):
+            return None
+        sx, sy, shown = self._screen_all()
+        d = np.where(shown, (sx - pos.x()) ** 2 + (sy - pos.y()) ** 2, np.inf)
+        i = int(np.argmin(d))
+        return i if d[i] < radius ** 2 else None
 
     def mouseMoveEvent(self, event):
         if self._press is None:
@@ -413,8 +423,10 @@ class DetailPanel(QWidget):
         if isinstance(sub, str) and sub:
             conf = _num(row.get("subclass_confidence"))
             basis = row.get("subclass_basis")
-            self.lbl_sub.setText(f"<b>{sub}</b>" + (f"  (rule precision {conf:.2f})" if conf is not None else "")
-                                 + (f"<br><span style='color:gray'>{basis}</span>" if isinstance(basis, str) else ""))
+            # Escaped: basis strings contain "<" ("|b| < 5", "< 100 pc"),
+            # which the rich-text label read as a tag and cut off (2.19.0).
+            self.lbl_sub.setText(f"<b>{html.escape(sub)}</b>" + (f"  (rule precision {conf:.2f})" if conf is not None else "")
+                                 + (f"<br><span style='color:gray'>{html.escape(basis)}</span>" if isinstance(basis, str) else ""))
             self.title.setText(f"{name} — {sub}")
         else:
             status = row.get("subclass_status")
@@ -480,7 +492,8 @@ def _tags_html(raw) -> str:
         tags = []
     if not tags:
         return "–"
-    return "<br>".join(f"{t.get('label', '')} <span style='color:gray'>— {t.get('basis', '')}</span>" for t in tags)
+    return "<br>".join(f"{html.escape(str(t.get('label', '')))} <span style='color:gray'>— {html.escape(str(t.get('basis', '')))}</span>"
+                       for t in tags)
 
 
 def _paper_html(row) -> str:

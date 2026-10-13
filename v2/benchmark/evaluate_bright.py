@@ -70,11 +70,17 @@ def apogee(sc) -> dict:
                        "giant_recall": round(float((p[m & gi] == "III").mean()), 4) if (m & gi).any() else None,
                        "giant_precision": round(float((d.truth_lum[m & p.eq("III")] == "III").mean()), 4) if (m & p.eq("III")).any() else None}
     out["luminosity_class"] = rules
+    out["luminosity_class_strict"] = strict_giants(sc, d)
     # metal-poor ([Fe/H] < -1) by source
     mp = {}
     flags = d["ap_Flags"].map(flags41)
     ok_mh = flags.map(lambda f: f is not None and sc._gspspec_ok(f, "mh"))
-    for name, col, sel in (("GSPSPEC", "ap_[M/H]-S", ok_mh), ("LAMOST", "lam_[Fe/H]", d["lam_[Fe/H]"].notna()),
+    # GSP-Spec [M/H] as subclass.spectro_params returns it (calibrated since
+    # 2.17.0, Recio-Blanco et al. 2023 Eq. 2).
+    d["gsp_mh_used"] = [
+        (sc.gspspec_mh_calibrated(mh, lg) if hasattr(sc, "gspspec_mh_calibrated") else mh)
+        if mh == mh and lg == lg else np.nan for mh, lg in zip(d["ap_[M/H]-S"], d["ap_logg-S"])]
+    for name, col, sel in (("GSPSPEC", "gsp_mh_used", ok_mh), ("LAMOST", "lam_[Fe/H]", d["lam_[Fe/H]"].notna()),
                            ("GSPPHOT", "ap_[Fe/H]", d["ap_[Fe/H]"].notna())):
         m = sel & d[col].notna() & d.apo_feh.notna()
         flag = d[col] < -1
@@ -84,6 +90,42 @@ def apogee(sc) -> dict:
                     "recall": round(float(flag[m & t].mean()), 4) if (m & t).any() else None,
                     "median_offset": round(float((d[col] - d.apo_feh)[m].median()), 3) if m.any() else None}
     out["metal_poor"] = mp
+    return out
+
+
+def strict_giants(sc, d) -> dict:
+    """Giants proper (APOGEE log g < 3.5 and below the Ciardi boundary)
+    against the class-III call of each route, including the Gaia CMD route
+    (2.17.0).  APOGEE stars carry no extinction here, so the CMD route runs
+    on observed BP-RP and G (reddening moves stars down and to the red)."""
+    lim = np.where(d.apo_teff <= 4250, 4.0, np.where(d.apo_teff < 6000, 5.2 - 2.8e-4 * d.apo_teff, 3.5))
+    truth = pd.Series(np.where((d.apo_logg <= lim) & (d.apo_logg < 3.5), "III",
+                               np.where(d.apo_logg <= lim, "IV", "V")), index=d.index)
+    routes = {
+        "GAIA_CMD": {"gaia_dr3__parallax": "g_Plx", "gaia_dr3__parallax_error": "g_e_Plx",
+                     "gaia_dr3__phot_g_mean_mag": "g_Gmag", "gaia_dr3__bp_rp": None},
+        "GSPSPEC_LOGG": {"gaia_dr3__teff_gspspec": "ap_Teff-S", "gaia_dr3__logg_gspspec": "ap_logg-S",
+                         "gaia_dr3__mh_gspspec": "ap_[M/H]-S", "gaia_dr3__flags_gspspec": "ap_Flags"},
+        "LAMOST_LOGG": {"lamost_dr_catalog__lasp_teff": "lam_Teff", "lamost_dr_catalog__lasp_logg": "lam_logg"},
+        "GAIA_LOGG": {"gaia_dr3__teff_gspphot": "ap_Teff", "gaia_dr3__logg_gspphot": "ap_logg"},
+    }
+    out = {}
+    for name, cols in routes.items():
+        x = pd.DataFrame({k: (d[v] if v else d.g_BPmag - d.g_RPmag) for k, v in cols.items()})
+        if "gaia_dr3__flags_gspspec" in x:
+            x["gaia_dr3__flags_gspspec"] = x["gaia_dr3__flags_gspspec"].map(flags41)
+        pred = []
+        for r in x.to_dict("records"):
+            lum, rule, _ = sc.star_luminosity_class(_clean(r), None)
+            pred.append(lum if rule == name else None)
+        p = pd.Series(pred, index=d.index)
+        m = p.notna()
+        gi = truth.eq("III")
+        called = m & p.eq("III")
+        out[name] = {"n": int(m.sum()), "called_III": int(called.sum()),
+                     "III_precision": round(float(gi[called].mean()), 4) if called.any() else None,
+                     "III_recall": round(float(p[m & gi].eq("III").mean()), 4) if (m & gi).any() else None,
+                     "truth_of_III_calls": {k: int(v) for k, v in truth[called].value_counts().items()}}
     return out
 
 

@@ -49,8 +49,8 @@ def test_ztf_periodic_variable_types():
     Z = "ztf_periodic_variables__"
     r = v.classify({Z + "Type": "Mira", Z + "Per": 320.0, Z + "rAmp": 3.1})
     assert (r["label"], r["status"]) == ("MIRA", "ZTF_PERIODIC_VARIABLE")
-    assert v.classify({Z + "Type": "Mira", "gaia_lpv_is_cstar": 1})["subtype"] == "C_STAR_CANDIDATE"
-    assert v.classify({Z + "Type": "SR", "gaia_lpv_is_cstar": 1})["subtype"] == "C_STAR_CANDIDATE"
+    assert v.classify({Z + "Type": "Mira", "gaia_lpv_is_cstar": 1, "gaia_dr3__phot_bp_mean_mag": 15.0})["subtype"] == "C_STAR_CANDIDATE"
+    assert v.classify({Z + "Type": "SR", "gaia_lpv_is_cstar": 1, "gaia_dr3__phot_bp_mean_mag": 15.0})["subtype"] == "C_STAR_CANDIDATE"
     assert v.classify({Z + "Type": "RRc"})["subtype"] == "RRC"
     assert v.classify({Z + "Type": "EW"})["label"] == "ECLIPSING"
     # Gaia SOS RR Lyrae fit keeps precedence over ZTF.
@@ -72,3 +72,64 @@ def test_gaia_release_switch(monkeypatch):
     import pytest
     with pytest.raises(ValueError):
         gr.current()
+
+
+def test_gaia_lpv_mira_amplitude():
+    spec = importlib.util.spec_from_file_location("v2_var_m", ROOT / "axes" / "variability.py")
+    v = importlib.util.module_from_spec(spec); spec.loader.exec_module(v)
+    r = v.classify({"gaia_lpv_amplitude": 1.1, "gaia_lpv_frequency": 1 / 300.0, "best_class_name": "LPV"})
+    assert (r["label"], r["status"]) == ("MIRA", "GAIA_DR3_SOS_LPV_LARGE_AMPLITUDE")
+    assert v.classify({"gaia_lpv_amplitude": 0.2, "gaia_lpv_frequency": 1 / 60.0, "best_class_name": "LPV"})["label"] == "LPV"
+    assert v.classify({"gaia_lpv_amplitude": 0.9, "gaia_lpv_frequency": 1 / 50.0, "best_class_name": "LPV"})["label"] == "LPV"   # P < 80 d
+    mira_c = {"gaia_lpv_amplitude": 1.0, "gaia_lpv_frequency": 1 / 300.0, "gaia_lpv_is_cstar": 1, "gaia_dr3__phot_bp_mean_mag": 15.0}
+    assert v.classify(mira_c)["subtype"] == "C_STAR_CANDIDATE"
+    # Lebzelter+2023 reliability window: faint in BP or outside 7-11 nm -> no C flag.
+    assert v.classify(dict(mira_c, gaia_dr3__phot_bp_mean_mag=19.5))["subtype"] is None
+    assert v.classify(dict(mira_c, gaia_lpv_median_delta_wl_rp=12.0))["subtype"] is None
+    # A period is required, and P < 1000 d (Zhang & Sanders 2023).
+    assert v.classify({"gaia_lpv_amplitude": 1.0, "best_class_name": "LPV"})["label"] == "LPV"
+    assert v.classify({"gaia_lpv_amplitude": 1.0, "gaia_lpv_frequency": 1 / 1500.0, "best_class_name": "LPV"})["label"] == "LPV"
+
+
+def test_pulsar_candidate_posterior():
+    c = _compact()
+    base = {"nvss__S1.4": 3.0, "tgss_adr1__Stotal": 150.0, "tgss_adr1__Speak": 130.0}
+    plane_pol = c.classify(dict(base, **{"nvss__polFlux": 0.6, "nvss__e_polFlux": 0.15, "ra": 266.4, "dec": -28.9}))   # Galactic centre
+    off = c.classify(dict(base, **{"ra": 192.86, "dec": 27.13}))                                                       # NGP
+    assert plane_pol["confidence"] > 0.2 and off["confidence"] < 0.01
+    assert plane_pol["label"] == off["label"] == "PULSAR_CANDIDATE"
+
+
+
+def test_rule_precision_calibration(tmp_path):
+    import json
+    import pandas as pd
+    spec = importlib.util.spec_from_file_location("v2_cal_t", ROOT / "calibration" / "per_axis.py")
+    cal = importlib.util.module_from_spec(spec); spec.loader.exec_module(cal)
+    m = {"axes": {}, "rules": {"variability": {"ZTF_PERIODIC_VARIABLE|MIRA": {"method": "rule_precision", "n": 67, "precision": 0.9552}}}}
+    path = tmp_path / "m.json"; path.write_text(json.dumps(m))
+    df = pd.DataFrame({"variability_class": ["MIRA", "MIRA", "LPV"], "variability_confidence": [None, None, None],
+                       "variability_status": ["ZTF_PERIODIC_VARIABLE", "GAIA_DR3_SOS_LPV_LARGE_AMPLITUDE", "ZTF_PERIODIC_VARIABLE"]})
+    out = cal.annotate(df, path, axes=("variability",))
+    assert out.variability_calibrated_probability.tolist()[0] == 0.9552
+    assert out.variability_calibration_method.tolist()[0] == "rule_precision"
+    assert out.variability_calibration_method.isna().tolist()[1:] == [True, True]
+
+
+def test_literature_review_phenomenon_and_gaia_score():
+    """2.18.0: HASH grades, SN epoch, Acker identity, Gaia classifier score."""
+    s = importlib.util.spec_from_file_location("phen_t", ROOT / "axes" / "phenomenon.py")
+    ph = importlib.util.module_from_spec(s); s.loader.exec_module(ph)
+    hash_row = lambda st: {"catalogs": "HASH PN Catalog", "pn_catalog_status": st}
+    assert ph.classify(hash_row("T"))["status"] == "HASH_PN_CATALOG_MATCH"
+    assert ph.classify(hash_row("Possible PN"))["status"] == "HASH_POSSIBLE_PN"
+    assert ph.classify(hash_row("Mimic"))["label"] == "OTHER_PHENOMENON"
+    assert ph.classify(hash_row(None))["label"] == "PN"
+    sn = {"catalogs": "ASAS-SN Supernova Catalog", "event_mjd": 58000.0}
+    assert ph.classify(dict(sn, obs_mjd=58100.0))["label"] == "SN"
+    assert ph.classify(dict(sn, obs_mjd=59500.0))["status"] == "SN_HOST_PAST_EVENT"
+    assert ph.classify({"catalogs": "Acker PN Spectroscopy"})["label"] == "PN"
+    spec = importlib.util.spec_from_file_location("v2_var_s", ROOT / "axes" / "variability.py")
+    v = importlib.util.module_from_spec(spec); spec.loader.exec_module(v)
+    assert v.classify({"best_class_name": "RR", "best_class_score": 0.3})["status"] == "GAIA_DR3_VARIABLE_LOW_SCORE"
+    assert v.classify({"best_class_name": "RR", "best_class_score": 0.8})["label"] == "RR_LYRAE"

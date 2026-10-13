@@ -25,7 +25,7 @@ CATALOG = "Gaia DR3 variability SOS"
 TABLES = {
     "rr": ("I/358/vrrlyr", ["Source", "Class", "PF", "P1O", "ptpG", "RA_ICRS", "DE_ICRS"]),
     "cep": ("I/358/vcep", ["Source", "Class", "SubClass", "ModeClass", "PF", "P1O", "ptpG", "RA_ICRS", "DE_ICRS"]),
-    "lpv": ("I/358/vlpv", ["Source", "Freq", "Amp", "isCstar", "RA_ICRS", "DE_ICRS"]),
+    "lpv": ("I/358/vlpv", ["Source", "Freq", "Amp", "isCstar", "mdwlrp", "RA_ICRS", "DE_ICRS"]),
 }
 
 
@@ -83,6 +83,8 @@ def _lpv(df: pd.DataFrame, radius_arcmin: float) -> pd.DataFrame:
     out["gaia_lpv_frequency"] = _number(df, pick(df, ["Freq", "frequency"]))
     out["gaia_lpv_amplitude"] = _number(df, pick(df, ["Amp", "amplitude"]))
     out["gaia_lpv_is_cstar"] = _number(df, pick(df, ["isCstar", "is_cstar"]))
+    # Reliability window of is_cstar (Lebzelter et al. 2023; 2.17.0).
+    out["gaia_lpv_median_delta_wl_rp"] = _number(df, pick(df, ["mdwlrp", "median_delta_wl_rp"]))
     return out
 
 

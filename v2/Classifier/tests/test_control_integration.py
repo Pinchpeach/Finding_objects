@@ -15,6 +15,7 @@ rows=[
         "object_uid":"wd1","primary_class":"STAR",
         "classprob_dsc_combmod_whitedwarf":0.95,
         "classprob_dsc_combmod_star":0.02,
+        "parallax":20.0,"parallax_error":0.1,"phot_g_mean_mag":14.0,"bp_rp":0.0,
     },
     {
         "object_uid":"rgb_rr","primary_class":"STAR",
@@ -34,7 +35,7 @@ with tempfile.TemporaryDirectory() as td:
     control.run(inp,out)
     d=pd.read_csv(out).set_index("object_uid")
     assert d.loc["wd1","physical_class"]=="WD",d.loc["wd1"].to_dict()
-    assert d.loc["rgb_rr","physical_class"]=="RGB",d.loc["rgb_rr"].to_dict()
+    assert d.loc["rgb_rr","physical_class"]=="RED_GIANT",d.loc["rgb_rr"].to_dict()
     assert d.loc["rgb_rr","variability_class"]=="RR_LYRAE",d.loc["rgb_rr"].to_dict()
     assert "variability_subtype" in d.columns
     assert d.loc["sn1","phenomenon_class"]=="SN",d.loc["sn1"].to_dict()

@@ -116,13 +116,36 @@ def main():
         Xfit,yfit,wfit=augment(Xfit,yfit); Xcal,ycal,wcal=augment(Xcal,ycal)
     else:
         wfit=np.ones(len(yfit)); wcal=np.ones(len(ycal))
-    best=None
-    for C in (0.01,0.03,0.1,0.3,1.0,3.0):
-        m=LogisticRegression(C=C,max_iter=2000).fit(Xfit,yfit,sample_weight=wfit)
-        ll=log_loss(ycal,m.predict_proba(Xcal),labels=list(m.classes_),sample_weight=wcal)
-        if best is None or ll<best[0]: best=(ll,C,m)
-    ll,C,m=best
-    order=[list(m.classes_).index(c) for c in CLASSES]
+    groups_of={"EXTRAGALACTIC":("GALAXY","QSO"),"POINT_SOURCE":("STAR","QSO")}
+    def fit_best(cols):
+        best=None
+        for C in (0.01,0.03,0.1,0.3,1.0,3.0):
+            m=LogisticRegression(C=C,max_iter=2000).fit(Xfit[:,cols],yfit,sample_weight=wfit)
+            ll=log_loss(ycal,m.predict_proba(Xcal[:,cols]),labels=list(m.classes_),sample_weight=wcal)
+            if best is None or ll<best[0]: best=(ll,C,m)
+        return best
+    # Sign constraint (2.11.0): evidence for class c ("RULE:c", logit of its
+    # score) must raise the odds of c (or of its class group) above every
+    # other class.  Collinear benchmark evidence can make the unconstrained fit
+    # learn the opposite (Gaia DSC "STAR" got a negative STAR weight, so a
+    # Gaia-only star was called GALAXY).  Violating keys are removed and the
+    # fit repeated; they keep the literature prior weights in Stage 5.
+    cols=list(range(len(kept))); sign_dropped=[]
+    while True:
+        ll,C,m=fit_best(cols)
+        order=[list(m.classes_).index(c) for c in CLASSES]
+        bad=[]
+        for jj,j in enumerate(cols):
+            key=kept[j]; cls=key.rsplit(":",1)[-1]
+            if kinds.get(key)=="linear_feature": continue
+            own=groups_of.get(cls,(cls,)) if cls in CLASSES or cls in groups_of else None
+            if not own: continue
+            w={c:m.coef_[order[i],jj] for i,c in enumerate(CLASSES)}
+            if max(w[c] for c in own)<=max((w[c] for c in CLASSES if c not in own),default=-np.inf): bad.append(j)
+        if not bad: break
+        sign_dropped+= [kept[j] for j in bad]; cols=[j for j in cols if j not in bad]
+    print("sign-constraint dropped:",sign_dropped)
+    Xk=Xk[:,cols]; kept=[kept[j] for j in cols]
     coef={k:{c:float(m.coef_[order[i],j]) for i,c in enumerate(CLASSES)} for j,k in enumerate(kept)}
     model={"version":1,"classes":CLASSES,
       "intercept":{c:float(m.intercept_[order[i]]) for i,c in enumerate(CLASSES)},
@@ -132,7 +155,7 @@ def main():
       "provenance":{"benchmarks":[str(t) for t in a.truth],"dropped_keys":a.drop_keys,
         "train_rows":int(fit_rows.sum()),"augment_drop":a.augment_drop,"augment_weight":a.augment_weight,"augmented_train_rows":int(len(yfit)),"calibration_rows":int((ca&used).sum()),"C":C,"calibration_log_loss":float(ll),
         "min_support":a.min_support,"support":{k:int(s) for k,s in zip(keys,support)},
-        "prior_weight_keys":[k for k,mk in zip(keys,keep) if not mk]}}
+        "prior_weight_keys":[k for k,mk in zip(keys,keep) if not mk]+sign_dropped,"sign_dropped_keys":sign_dropped}}
     # Probabilities exactly as Stage 5 will compute them.
     def probs(mask,drop=()):
         P=[]

@@ -95,34 +95,35 @@ def classify(row):
     hr=_wd_hr_signal(row)
 
     dsc_wd=wd is not None and wd>=0.80
-    dsc_star=star is not None and star>=0.80
-    dsc_binary=binary is not None and binary>=0.80
+    # Gaia DSC "binary" is not a usable binary class (purity 0.075,
+    # completeness 0.002; Delchambre et al. 2023, Table 3), so it only adds to
+    # the stellar probability (2.17.0); no BINARY_CANDIDATE family any more.
+    stellar=(star or 0.0)+(binary or 0.0) if (star is not None or binary is not None) else None
+    dsc_star=stellar is not None and stellar>=0.80
 
     family="UNRESOLVED"
     family_score=None
     family_basis="insufficient or conflicting stellar-family evidence"
 
-    if hr is True and (dsc_star or dsc_binary) and not dsc_wd:
+    if hr is True and dsc_star and not dsc_wd:
         family_basis="Gaia HR WD-locus conflicts with strong Gaia DSC non-WD stellar-family evidence"
     elif dsc_wd and hr is False:
         family_basis="strong Gaia DSC WD posterior conflicts with usable Gaia HR-locus evidence"
-    elif dsc_wd or hr is True:
+    elif dsc_wd and hr is None:
+        # DSC WD alone: completeness 0.43 but purity 0.25 at the all-sky
+        # prior (Delchambre et al. 2023, Table 3); require the GF21 HR locus.
+        family_basis="Gaia DSC white-dwarf posterior without a usable HR locus (DSC WD purity 0.25; Delchambre+2023)"
+    elif hr is True:
         family="WHITE_DWARF_CANDIDATE"
         family_score=wd if dsc_wd else None
-        if dsc_wd and hr is True:
+        if dsc_wd:
             family_basis="Gaia DSC and literature Gaia HR-locus both support WD candidate"
-        elif dsc_wd:
-            family_basis="Gaia DR3 DSC white-dwarf posterior; HR-locus unavailable"
         else:
             family_basis="Gentile Fusillo+2021 broad Gaia HR-locus WD candidate evidence"
-    elif dsc_binary:
-        family="BINARY_CANDIDATE"
-        family_score=binary
-        family_basis="Gaia DR3 DSC physical-binary posterior"
     elif dsc_star:
         family="STAR_LIKE"
-        family_score=star
-        family_basis="Gaia DR3 DSC stellar posterior"
+        family_score=stellar
+        family_basis="Gaia DR3 DSC stellar posterior (star + binary)"
 
     var_class=_text(row,"best_class_name")
     var_score=_num(row,"best_class_score")

@@ -13,7 +13,7 @@
 7. **버전별 변경 이력**: main에 병합할 때마다 `v2/VERSION`을 올리고 `v2/CHANGELOG.md`에 그 버전의 변경 사항·이유·측정치를 적는다(MINOR: 결과·기능 변화, PATCH: 결과가 같은 수정·정리).
 
 ## 작업 메모 (개발 환경)
-- 테스트: `cd v2 && python -m pytest -q Preprocess/tests Classifier/tests`
+- 테스트: `cd v2 && python -m pytest -q Preprocess/tests Classifier/tests app/tests` (앱 시험 포함: 연관 회귀를 잡는 유일한 통합 시험)
 - Coarse 벤치마크(로컬, 네트워크 불필요): 보존된 특징 `v2/benchmark/catalog_features/*.gz` 사용
   - `python v2/benchmark/validate_catalog_truth.py --truth v2/benchmark/truth_data/ground_truth.csv --catalog-root v2/benchmark/catalog_features --out /tmp/ready`
   - `python v2/benchmark/evaluate_rule_baseline.py --truth v2/benchmark/truth_data/ground_truth.csv --catalog-root v2/benchmark/catalog_features --manifest /tmp/ready/benchmark_manifest.csv --out /tmp/eval`

@@ -27,7 +27,7 @@ def expect(module,row,label,status):
 expect(physical,{
     "primary_class":"STAR","classprob_dsc_combmod_star":0.96,
     "evolstage_flame":700,"logg_gspphot":2.4,"mass_flame":1.2,"age_flame":5.0,
-},"RGB","GAIA_FLAME_RGB")
+},"RED_GIANT","GAIA_FLAME_GIANT")
 
 r=physical.classify({
     "primary_class":"STAR","classprob_dsc_combmod_star":0.96,
@@ -49,7 +49,7 @@ rr_sos=expect(variability,{"gaia_rrlyrae_best_classification":"RRab","gaia_rrlyr
 assert rr_sos["subtype"]=="RRAB",rr_sos
 cep_sos=expect(variability,{"gaia_cepheid_best_classification":"DCEP","gaia_cepheid_subclassification":"F","gaia_cepheid_pf":5.4},"CEPHEID","GAIA_DR3_SOS_CEPHEID")
 assert cep_sos["subtype"]=="DCEP_F",cep_sos
-lpv_sos=expect(variability,{"gaia_lpv_is_cstar":1,"gaia_lpv_frequency":0.004},"LPV","GAIA_DR3_SOS_LPV_CSTAR_CANDIDATE")
+lpv_sos=expect(variability,{"gaia_lpv_is_cstar":1,"gaia_lpv_frequency":0.004,"gaia_dr3__phot_bp_mean_mag":15.0},"LPV","GAIA_DR3_SOS_LPV_CSTAR_CANDIDATE")
 assert lpv_sos["subtype"]=="C_STAR_CANDIDATE",lpv_sos
 
 expect(variability,{"best_class_name":"SN","best_class_score":0.93},"UNKNOWN","ROUTED_TO_PHENOMENON")

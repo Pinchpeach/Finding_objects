@@ -22,8 +22,12 @@ def fetch(ra,dec,radius_arcmin):
  df=t.to_pandas();low={str(c).lower():c for c in df.columns};idc=low.get("main_id");rac=low.get("ra");dcc=low.get("dec")
  if not all([idc,rac,dcc]):raise KeyError(f"SIMBAD required columns missing; got {list(df.columns)}")
  rv=pd.to_numeric(df[rac],errors="coerce");dv=pd.to_numeric(df[dcc],errors="coerce")
- if rv.isna().any() or dv.isna().any():
-  coord=SkyCoord(df[rac].astype(str).to_numpy(),df[dcc].astype(str).to_numpy(),unit=(u.hourangle,u.deg));rv=coord.ra.deg;dv=coord.dec.deg
+ bad=rv.isna()|dv.isna()
+ if bad.any():
+  # Only the rows that are not numeric degrees are sexagesimal: re-parsing
+  # every row as hours turned "150.1" into 150.1 h (2.19.0).
+  coord=SkyCoord(df.loc[bad,rac].astype(str).to_numpy(),df.loc[bad,dcc].astype(str).to_numpy(),unit=(u.hourangle,u.deg))
+  rv=rv.copy();dv=dv.copy();rv[bad]=coord.ra.deg;dv[bad]=coord.dec.deg
  df["ra_raw"]=df[rac];df["dec_raw"]=df[dcc];df[rac]=rv;df[dcc]=dv
  df.insert(0,"catalog",CATALOG);df.insert(1,"catalog_object_id",df[idc].astype("string"));df.insert(2,"object_name",df[idc].astype("string"))
  if rac!="ra":df.insert(3,"ra",rv)
@@ -33,10 +37,27 @@ def fetch(ra,dec,radius_arcmin):
   df=_attach_references(s,df)
  except Exception as exc:  # reference metadata is optional
   df["simbad_reference_status"]="error:"+type(exc).__name__
+ # *_query_status is what archive_cache.cacheable() checks: a failed
+ # reference / object-type lookup must not be cached for LIVE_TTL_DAYS.
+ st=df["simbad_reference_status"].astype(str)
+ df["simbad_reference_query_status"]=st.where(st.str.startswith("error"),"ok")
  return df
 
 def _adql_list(values):
  return ",".join("'"+str(v).replace("'","''")+"'" for v in values)
+
+_OTYPE_LABELS=None
+
+
+def _otype_labels(s):
+ """SIMBAD otypedef table (static): fetched once per process; a failure
+ raises so the result is marked partial and not cached."""
+ global _OTYPE_LABELS
+ if _OTYPE_LABELS is None:
+  od=s.query_tap("SELECT otype, label, description FROM otypedef").to_pandas()
+  _OTYPE_LABELS=dict(zip(od["otype"].astype(str),od["description"].astype(str)))
+ return _OTYPE_LABELS
+
 
 def _attach_references(s,df,chunk=300,per_object=3):
  ids=df["catalog_object_id"].astype(str).tolist()
@@ -48,11 +69,7 @@ def _attach_references(s,df,chunk=300,per_object=3):
      f"WHERE b.main_id IN ({part})")
   t=s.query_tap(q)
   if t is not None and len(t):rows.append(t.to_pandas())
- try:
-  od=s.query_tap("SELECT otype, label, description FROM otypedef").to_pandas()
-  labels=dict(zip(od["otype"].astype(str),od["description"].astype(str)))
- except Exception:
-  pass
+ labels=_otype_labels(s)
  df["simbad_otype_label"]=df.get("otype",pd.Series(index=df.index,dtype=object)).astype(str).map(labels)
  if not rows:
   df["simbad_reference_status"]="no_references";return df

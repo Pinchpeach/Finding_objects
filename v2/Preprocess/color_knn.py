@@ -6,8 +6,8 @@ galaxies and quasars used by DESI target selection, Zhou et al. 2023 and
 Chaussidon et al. 2023).  A linear model on colours cannot follow the stellar
 locus, so it learns whatever split the training set rewards (e.g. "red point
 source = star"), which breaks for faint objects without a morphology
-measurement.  kNN classification in colour space (Ball et al. 2006, ApJ 650,
-497) has no such shape restriction.
+measurement.  kNN classification in colour space (Ball et al. 2007, ApJ 663,
+774; instance-based star/galaxy/QSO classification of SDSS) has no such shape restriction.
 
 The reference set holds Legacy Surveys colours of spectroscopically classified
 benchmark objects (train split only).  An object is compared only with

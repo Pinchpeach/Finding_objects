@@ -52,6 +52,10 @@ category,citation,journal_ref,bibcode,used_in,purpose
 탐사·카탈로그 데이터,Chen et al. 2020 (ZTF periodic variables),"ApJS 249, 18; VizieR J/ApJS/249/18",—,Get_data/ztf_periodic.py; Classifier/axes/variability.py (ZTF_MAP); Classifier/LITERATURE_MULTI_AXIS.md §3.1,"ZTF 주기 변광성 78만 개의 유형(Mira, SR, RR, EW 등)·주기·진폭"
 탐사·카탈로그 데이터,Bellm et al. 2019 (ZTF),"PASP 131, 018002",—,Preprocess/association_model.py (ZTF periodic variables); Classifier/LITERATURE_MULTI_AXIS.md §3.1,ZTF 관측 체계(시상 ~2″)
 탐사·카탈로그 데이터,Masci et al. 2019 (ZTF data system),"PASP 131, 018003",—,Preprocess/association_model.py (ZTF periodic variables),ZTF 측성 정밀도(~0.1″)
+탐사·카탈로그 데이터,"Becker, White & Helfand 1995","ApJ 450, 559; DOI 10.1086/176166",—,Preprocess/association_model.py (FIRST),FIRST 빔 5.4″
+탐사·카탈로그 데이터,Merloni et al. 2024,"A&A 682, A34; DOI 10.1051/0004-6361/202347165",—,Preprocess/association_model.py (eRASS1),"eRASS1 위치 오차(1σ, 최빈 4.5″)와 PSF HEW 30″"
+탐사·카탈로그 데이터,Evans et al. 2010,"ApJS 189, 37; DOI 10.1088/0067-0049/189/1/37",—,Preprocess/association_model.py (Chandra CSC),"CSC 오차 타원 r0는 95 % 반경, 0.16″ 계통 오차"
+탐사·카탈로그 데이터,Webb et al. 2020,"A&A 641, A136; DOI 10.1051/0004-6361/201937353",—,Preprocess/association_model.py (4XMM),"4XMM POSERR(1σ, 계통 포함), EPIC PSF"
 데이터 출처 카탈로그 (논문 인용 없음),AllWISE — 저장소에 논문 인용 없음,VizieR II/328/allwise,—,Get_data/allwise.py; benchmark/build_agb_chemistry_truth.py,중적외선 W1–W4 측광
 데이터 출처 카탈로그 (논문 인용 없음),2MASS Point Source Catalog — 저장소에 논문 인용 없음,VizieR II/246/out,—,Get_data/twomass.py; benchmark/build_agb_chemistry_truth.py,근적외선 J/H/Ks 측광
 데이터 출처 카탈로그 (논문 인용 없음),FIRST (first14) — 저장소에 논문 인용 없음,VizieR VIII/92/first14,—,Get_data/first.py; benchmark/RADIO_XRAY_BENCHMARK_RESULTS.md,"1.4 GHz 전파 플럭스, 전파 선택 벤치마크"
@@ -74,6 +78,11 @@ category,citation,journal_ref,bibcode,used_in,purpose
 교차 대응·통계·분류 방법,Tachibana & Miller 2018,"PASP 130, 128001; DOI 10.1088/1538-3873/aae3d9",—,Preprocess/classification_rules.csv PS1-MORPH-001/002 (Sec. 4.1); Preprocess/catalog_reliability.csv (catalog_confidence_ps1_morphology); Preprocess/LITERATURE.md,PS1 iPSF − iKron > 0.05 확장원 판별과 한계
 교차 대응·통계·분류 방법,Farrow et al. 2014,"MNRAS 437, 748–770; DOI 10.1093/mnras/stt1933",—,Preprocess/LITERATURE.md,PS1 별/은하 분리 배경과 검증
 교차 대응·통계·분류 방법,Bovy et al. 2011 (XDQSO),"ApJ 729, 141",—,Preprocess/color_knn.py (MAG_DIMS ls_r_mag_scaled); Preprocess/LITERATURE.md,등급에 따라 색 분포·천체 수가 달라지므로 색 kNN에 r 등급 축 추가
+교차 대응·통계·분류 방법,Friedman 2001 (gradient boosting),"Ann. Stat. 29, 1189",—,Preprocess/ls_gbm.py; Preprocess/LITERATURE.md,LS-GBM-001 그래디언트 부스팅 분류기
+교차 대응·통계·분류 방법,Ke et al. 2017 (LightGBM),NeurIPS 30,—,Preprocess/ls_gbm.py; Preprocess/LITERATURE.md,히스토그램 기반 그래디언트 부스팅
+교차 대응·통계·분류 방법,Wilson 1927 (score interval),"JASA 22, 209",—,Classifier/calibration/fit_axis_calibration.py (wilson_lower),규칙 정밀도의 95 % 하한
+교차 대응·통계·분류 방법,Ball et al. 2007,"ApJ 663, 774; DOI 10.1086/518362",—,"Preprocess/color_knn.py; Preprocess/classification_rules.csv LS-CKNN-001, PS1-CKNN-001",색 공간 kNN(사례 기반) 별·은하·QSO 분류 (2.16.0에서 인용 수정)
+교차 대응·통계·분류 방법,Chow 1970,"IEEE Trans. Inf. Theory 16, 41; DOI 10.1109/TIT.1970.1054406",—,Preprocess/05_likelihood_vectors.py; LITERATURE_REVIEW_2026-10.md,확신도 임계 기권(reject option)
 별 분류,Pecaut & Mamajek 2013,"ApJS 208, 9",—,"Classifier/subclass.py (분광형 GAIA_BPRP0/LS_GR0/PS1_IZ/GAIA_TEFF, 주계열 M_G); Preprocess/units.py; Classifier/LITERATURE_SUBCLASS.md; WORK_REPORT_2026-10-10.md",왜성 색–Teff 계열(분광형 척도)
 별 분류,"Mamajek, ""A Modern Mean Dwarf Stellar Color and Effective Temperature Sequence"", v2022.04.16",—,—,Classifier/reference/mamajek_dwarf_sequence.csv; Classifier/subclass.py; Classifier/LITERATURE_SUBCLASS.md; WORK_REPORT_2026-10-10.md (E1),"Pecaut & Mamajek 계열의 유지 판 표(SpT, Teff, BP−RP, M_G, g−r, i−z 등)"
 별 분류,Ciardi et al. 2010/2011 (저장소 표기 그대로),—,—,"Classifier/subclass.py (star_luminosity_class, GAIA_LOGG); Classifier/LITERATURE_SUBCLASS.md; WORK_REPORT_2026-10-10.md",Kepler 대상의 Teff–log g 거성 경계(시차 없을 때 광도 계급)
@@ -118,6 +127,8 @@ category,citation,journal_ref,bibcode,used_in,purpose
 은하 분류,Banerji et al. 2010 (Galaxy Zoo ML),"MNRAS 406, 342; doi:10.1111/j.1365-2966.2010.16713.x",—,Classifier/LITERATURE.md,기계학습으로 Galaxy Zoo 형태 재현
 은하 분류,Walmsley et al. 2020 (Galaxy Zoo Bayesian CNN),"MNRAS 491, 1554; doi:10.1093/mnras/stz2816",—,Classifier/LITERATURE.md,확률적 형태 분류·능동 학습
 은하 분류,Walmsley et al. 2022 (Galaxy Zoo DECaLS),"MNRAS 509, 3966; doi:10.1093/mnras/stab2093",—,Classifier/LITERATURE.md,세부 시각 형태 측정 → 계층적 형태 분기
+은하 분류,Norberg et al. 2002,"MNRAS 336, 907; DOI 10.1046/j.1365-8711.2002.05831.x",—,Classifier/subclass.py (galaxy_tags LUMINOUS),2dFGRS 광도 함수 M*_bJ = −19.66 + 5 log h
+은하 분류,Mauch & Sadler 2007,"MNRAS 375, 931; DOI 10.1111/j.1365-2966.2006.11353.x",—,Classifier/subclass.py (RADIO_AGN_MIN_L14),1.4 GHz 광도 함수: 약 1e23 W/Hz 아래는 별 생성 은하가 우세
 퀘이사·AGN,Stern et al. 2012,"ApJ 753, 30",—,Preprocess/classification_rules.csv WISE-AGN-001 (Sec. 3.5 / Fig. 6); Preprocess/04_build_evidence.py; Preprocess/03_extract_features.py; Preprocess/catalog_reliability.csv (catalog_confidence_allwise); Classifier/subclass.py (galaxy_activity); Classifier/LITERATURE_SUBCLASS.md; WORK_REPORT_2026-10-10.md,"W1−W2 ≥ 0.8, W2 < 15.05 (Vega) 중적외선 AGN; COSMOS 신뢰도 ~95 %, 완전도 ~78 %"
 퀘이사·AGN,Assef et al. 2018 (The WISE AGN Catalog),"ApJS 234, 23; DOI 10.3847/1538-4365/aaa00a",—,Preprocess/classification_rules.csv WISE-AGN-R90-001 (Eq. 4); Preprocess/04_build_evidence.py; Preprocess/LITERATURE.md,"AllWISE R90 경계 (α, β, γ) = (0.650, 0.153, 13.86)"
 퀘이사·AGN,Bañados et al. 2016 (PS1 distant z > 5.6 quasar survey),"ApJS 227, 11; DOI 10.3847/0067-0049/227/1/11",—,"Preprocess/classification_rules.csv PS1-QSO-Z6-001 (Sec. 2.1.1, Eq. 1–3); Preprocess/04_build_evidence.py; Preprocess/LITERATURE.md",i-dropout 선택(i−z > 2.0 등) z ≈ 6 퀘이사 후보
@@ -142,12 +153,15 @@ category,citation,journal_ref,bibcode,used_in,purpose
 전파·X선·밀집성,Jankowski et al. 2018,"MNRAS 473, 4436",—,Classifier/LITERATURE_MULTI_AXIS.md §4.1; benchmark/build_pulsar_truth.py,펄서 평균 전파 스펙트럼 지수 −1.60 ± 0.54
 전파·X선·밀집성,Bates et al. 2013,"MNRAS 431, 1352",—,Classifier/LITERATURE_MULTI_AXIS.md §4.1; benchmark/build_pulsar_truth.py,펄서 스펙트럼 지수 분포 −1.4 ± 1.0
 전파·X선·밀집성,Intema et al. 2017 (TGSS ADR1),"A&A 598, A78",—,Get_data/tgss.py (J/A+A/598/A78/table3); Preprocess/association_model.py (TGSS ADR1),150 MHz 전파 카탈로그(25″ 빔)
+전파·X선·밀집성,Lorimer et al. 2006 (pulsar Galactic distribution),"MNRAS 372, 777",—,Classifier/axes/compact.py (PSR_LR_PLANE),보통 펄서의 은하면 집중(척도 높이 330 pc)
 행성상성운·초신성·과도 현상,Akras et al. 2019,"MNRAS 488, 3238",—,Classifier/LITERATURE_MULTI_AXIS.md,2MASS/WISE 색 진단과 분류 트리로 조밀 PN과 흉내 천체 구분
 행성상성운·초신성·과도 현상,Akyuz et al. 2024,"MNRAS 527, 1481",—,Classifier/LITERATURE_MULTI_AXIS.md,방출선 비·SMB/BPT 진단으로 PN 분광 확인
 행성상성운·초신성·과도 현상,Lochner et al. 2016,—,—,Classifier/LITERATURE_MULTI_AXIS.md,"광도곡선 특징 추출 + ML, 대표성 있는 학습 집합의 중요성"
 행성상성운·초신성·과도 현상,Möller & de Boissière 2020 (SuperNNova),—,—,Classifier/LITERATURE_MULTI_AXIS.md,RNN 광도곡선 초신성 분류(극대 이전 곡선 포함)
 행성상성운·초신성·과도 현상,"""HSC transient ML work (2020)"" (저장소 표기 그대로)",—,—,Classifier/LITERATURE_MULTI_AXIS.md,시간 자료가 늘수록 성능 향상
 행성상성운·초신성·과도 현상,"""Recent 4MOST transient classifier comparison (2025): SNID, DASH and NGSF"" (저장소 표기 그대로)",—,—,Classifier/LITERATURE_MULTI_AXIS.md,분광 과도 현상 유형 분류 도구 비교
+행성상성운·초신성·과도 현상,"Parker, Bojičić & Frew 2016","J. Phys. Conf. Ser. 728, 032008; arXiv:1603.07042",—,Classifier/axes/phenomenon.py (_hash_grade),"HASH 등급 True/Likely/Possible, 모방체·post-AGB 수록"
+행성상성운·초신성·과도 현상,Frew & Parker 2010,"PASA 27, 129; DOI 10.1071/AS09040",—,Classifier/axes/phenomenon.py (Acker); Classifier/LITERATURE_SPECTROSCOPY.md §5,"PN과 모방체 구분 선비([S II]/Hα, [O III]/Hβ)"
 기타 문서,"STScI/MAST Pan-STARRS Public Archive, ""How to separate stars and galaxies""",URL: https://outerspace.stsci.edu/spaces/PANSTARRS/pages/298812369/How+to+separate+stars+and+galaxies,—,Preprocess/classification_rules.csv PS1-MORPH-001/002; Preprocess/catalog_reliability.csv (catalog_confidence_ps1_morphology); Preprocess/LITERATURE.md,"PSF−Kron 0.05(i), i ≈ 21보다 어두우면 불안정, i ≈ 14보다 밝으면 포화"
 기타 문서,SDSS DR14 flux-calibration notes,—,—,Preprocess/units.py; Preprocess/LITERATURE.md,"SDSS u_AB = u − 0.04, z_AB = z + 0.02"
 기타 문서,"WISE Explanatory Supplement, Sec. IV.4.h",—,—,Preprocess/units.py; Preprocess/LITERATURE.md,WISE Vega→AB 보정값
@@ -165,6 +179,16 @@ category,citation,journal_ref,bibcode,used_in,purpose
 별 분류,"Mowlavi, Trabucchi & Lebzelter 2019",arXiv:1907.05359 (저장소 표기 그대로),—,Classifier/subclass.py (AGB_DW_C),은하계 LPV의 O/C 경계 ≈ 0.9 mag
 별 분류,Abia et al. 2020,"A&A 633, A135",—,Classifier/subclass.py (AGB_DW_XC),"은하계 탄소별 Gaia–2MASS 도표, 극단 C-rich 경계 ≈ 1.7 mag"
 별 분류,Lian et al. 2014,"A&A 564, A84",—,Classifier/subclass.py (WISE_LIAN14),AllWISE W1−W2 대 W3−W4 직선으로 O-rich/C-rich AGB 구분(87 %/86 %)
+별 분류,Jayasinghe et al. 2018–2021 (ASAS-SN Variable Stars),"MNRAS 477, 3145; VizieR II/366",—,benchmark/build_rr_ew_truth.py; benchmark/build_mira_truth.py; Classifier/truth/build_independent_truth_sets.py,변광성 정답(RRAB/RRC/EW/EA/M/SR)
+별 분류,Mowlavi et al. 2018 (Gaia DR2 LPV catalogue),"A&A 618, A58",—,Classifier/axes/variability.py (GAIA_MIRA_SEMI_AMP); Classifier/LITERATURE_MULTI_AXIS.md §3.2,Gaia G 진폭 > ~1 mag인 미라형 LPV
+별 분류,Grady et al. 2019,"MNRAS 483, 3022",—,Classifier/LITERATURE_MULTI_AXIS.md §3.2,Gaia 진폭 기반 미라 선택(다른 진폭 통계)
+별 분류,Andriantsaralaza et al. 2022,"A&A 667, A74; DOI 10.1051/0004-6361/202243670",—,Classifier/subclass.py (star_tags RUWE),AGB 별의 높은 RUWE는 쌍성보다 포화·크기·광심 이동 때문
+별 분류,Sanders & Matsunaga 2023,"MNRAS 521, 2745; DOI 10.1093/mnras/stad574",—,"Classifier/subclass.py (agb_chemistry, gaia_lpv_cstar)","Gaia LPV C/O 판정: 은하면·벌지 소광, is_cstar 사용 권고(Lebzelter+2023 인용)"
+별 분류,Zhang & Sanders 2023,"MNRAS 521, 5309; DOI 10.1093/mnras/stad575",—,Classifier/axes/variability.py (Mira),"Gaia DR3 미라 선택: 80 < P < 1000 d, 반진폭 ≥ 0.5"
+별 분류,Kulkarni et al. 2025,arXiv:2509.03120,—,Classifier/axes/variability.py (_ratio),RR Lyrae ZTF g/r 진폭비 ≈ 1.4
+별 분류,Fouesneau et al. 2023,"A&A 674, A28; DOI 10.1051/0004-6361/202243919",—,Classifier/branches/evolved_star.py; Classifier/subclass.py (GSP-Spec),"FLAME 거성 질량·나이 사용 범위(1 < M < 2, 나이 > 1.5 Gyr), GSP-Spec 보정 권고"
+별 분류,Culpan et al. 2022,"A&A 662, A40; DOI 10.1051/0004-6361/202243337",—,Classifier/subclass.py (star_luminosity_class),Gaia 고온 준왜성: 주계열 아래 청색 영역
+별 분류,Górski et al. 2018,"AJ 156, 278; DOI 10.3847/1538-3881/aaeacb",—,Classifier/subclass.py (RGB_TIP_MKS),"Ks 적색 거성 가지 끝 등급 −6.28, 색 의존성"
 분광 분류 기준,"Morgan, Keenan & Kellman 1943",An Atlas of Stellar Spectra (Univ. Chicago Press),—,Classifier/LITERATURE_SPECTROSCOPY.md,MK 분광 분류 체계(분광형·광도 계급)
 분광 분류 기준,Gray & Corbally 2009,Stellar Spectral Classification (Princeton Univ. Press),—,Classifier/LITERATURE_SPECTROSCOPY.md,MK 분류 기준 교과서
 분광 분류 기준,"Luo et al. 2015 (LAMOST DR1, LASP)","RAA 15, 1095",—,"Classifier/LITERATURE_SPECTROSCOPY.md; Get_data/lamost_spectroscopy.py (V/164/stellar5); Classifier/subclass.py (spectro_params, LAMOST_LOGG, LAMOST_FEH)","LAMOST LASP Teff·log g·[Fe/H]와 오차(110 K, 0.2 dex, 0.1 dex)"

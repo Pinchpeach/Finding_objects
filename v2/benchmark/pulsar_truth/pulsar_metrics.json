@@ -28,5 +28,27 @@
  "rule_hits_abs_b_lt_10": {
   "pulsar": 12,
   "control": 1
+ },
+ "candidate_posterior": {
+  "plane=False,polarised=False": {
+   "pulsars": 9,
+   "controls": 2,
+   "posterior": 0.003
+  },
+  "plane=False,polarised=True": {
+   "pulsars": 4,
+   "controls": 0,
+   "posterior": 0.0266
+  },
+  "plane=True,polarised=False": {
+   "pulsars": 10,
+   "controls": 1,
+   "posterior": 0.0423
+  },
+  "plane=True,polarised=True": {
+   "pulsars": 2,
+   "controls": 0,
+   "posterior": 0.2899
+  }
  }
 }

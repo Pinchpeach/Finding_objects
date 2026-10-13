@@ -22,6 +22,13 @@ Literature:
 - Gaia DR3 synthetic photometry paper (Montegriffo et al. 2023, A&A 674 A33):
   XP spectra support synthetic photometry and a WD DA/non-DA catalogue.
 
+Gaia DSC (2.17.0): the Combmod white-dwarf class has completeness 0.43 and
+purity 0.25 at the all-sky prior, and the physical-binary class purity 0.075
+(Delchambre et al. 2023, A&A 674, A31, Table 3).  A WD needs the Gentile
+Fusillo et al. (2021, Eq. 1) HR locus; DSC WD alone no longer routes WD, and
+the DSC binary class only adds to the stellar probability (no
+BINARY_CANDIDATE family).
+
 Implementation implication:
 Keep the already validated WD routing and Gaia-XP DA/DB path. Expand only when
 external truth exists for DC/DO/DQ/DZ/magnetic/composite subclasses.
@@ -48,6 +55,42 @@ Implementation implication:
 Do not make hard RGB/AGB labels from a single colour cut. Use a hierarchical
 evidence model and abstain when only broad red-giant evidence is available.
 
+### 2.1 RED_GIANT on the physical axis (2.13.0)
+
+RGB and AGB stars cannot be separated without asteroseismology (Vrard et al.
+2025, the truth set) or luminosity.  "Cool giant" can: the luminosity class
+of the sub-class classifier (Gaia CMD with parallax S/N ≥ 5; else LAMOST /
+GSP-Spec log g; else GSP-Phot log g, against the Ciardi et al. 2011 giant
+boundary) agrees with APOGEE DR17 for 96.9–98.3 % (2.6.2).  RED_GIANT =
+luminosity class III and Teff < 5500 K.  Gaia FLAME was not usable for these
+stars: for the Kepler giants its masses and ages are unphysical (median
+3.3 M☉, 0.3 Gyr; `benchmark/probe_flame_giants.py`), as the Gaia DR3
+documentation and Fouesneau et al. (2023) warn for giants.
+
+2.17.0 (literature review):
+- Luminosity class III is stricter (`LITERATURE_SUBCLASS.md`): ΔM ≤ −3 or
+  M_G < 4 on the CMD (Ruiz-Dern et al. 2018), log g < 3.5 below the Ciardi
+  boundary (subgiants become IV), and GSP-Spec log g calibrated
+  (Recio-Blanco et al. 2023).  Teff for the 5500 K cut comes only from
+  flag-checked spectroscopy or GSP-Phot.
+- Gaia FLAME giants: the documented guardrails are 1.0 ≤ M < 2.0 M☉,
+  age > 1.5 Gyr, evolstage 490–1300, and second flags_flame digit 0
+  (Fouesneau et al. 2023, Sect. 3.3.2; DR3 documentation 11.3.6).
+  - The FLAME tracks end at the RGB tip, so red-clump and AGB stars are
+    forced onto an "RGB" stage.  A passing star is therefore RED_GIANT, not
+    RGB.
+  - On the 180 Kepler stars, 9 pass the new guardrails (8 RGB, 1 AGB).  The
+    old guardrails passed 10 (8 RGB, 2 AGB).
+- Suh (2021) match: with a good parallax and M_Ks > −1 (fainter than the
+  red clump) it is not AGB.  The catalogue includes visual carbon stars from
+  general lists.
+
+Cross-validation (Vrard+2025 Kepler RGB 203, AGB 250): RGB family accuracy
+0 → 51.7 %, AGB 0 → 41.2 %; none labelled a non-giant.  The rest have no
+GSP-Phot log g in the validation collector.  Before 2.11.0 these stars never
+reached the axis: the coarse fusion called them GALAXY (wrong-signed Gaia
+weights).
+
 ## 3. Variable stars (variability axis)
 
 Recommended observables:
@@ -69,6 +112,14 @@ Implementation implication:
 Variability classification should consume time-series features rather than static
 photometry alone. AGB and Mira must remain separate axes so an object can be
 physical=AGB and variability=MIRA simultaneously.
+
+### 3.0 Gaia vari_classifier score (2.18.0)
+
+`best_class_score` is not calibrated across classes (Rimoldini et al. 2023,
+A&A 674, A14).  On the cross-validation set (192 objects whose variability
+type came from vari_classifier) the type is right for 35 % below score 0.5
+(31 objects) and for 91 % at ≥ 0.5 (161).  Below 0.5 only "variable"
+(OTHER_VARIABLE, status `GAIA_DR3_VARIABLE_LOW_SCORE`) is reported.
 
 ### 3.1 ZTF periodic variables (2.8.0)
 
@@ -96,6 +147,57 @@ The RR → eclipsing cases are the known RRc / EW ambiguity (near-sinusoidal
 light curves; an EW at twice the period looks alike) and partly matches
 3–6″ away (blends). These objects had no correct label before either, so
 the RR Lyrae exact rate is unchanged.
+
+#### 3.1.1 RR Lyrae vs eclipsing binaries in ZTF (2.11.1)
+
+ASAS-SN RRAB/RRC/EW/EA stars (II/366) matched to Chen et al. (2020) ZTF
+types (`benchmark/build_rr_ew_truth.py`, `evaluate_rr_ew.py`).  The ZTF g/r
+amplitude ratio is a physical arbiter: a pulsator changes temperature over
+its cycle, so its amplitude grows towards the blue; a contact binary of two
+similar-temperature stars varies nearly achromatically.
+
+| ASAS-SN → ZTF | n | A_g/A_r median | P_ZTF / P_ASAS-SN |
+|---|---:|---:|---:|
+| RRC → RRc (agree) | 1,612 | 1.42 | 1.0 |
+| EW → EW (agree) | 1,670 | 1.07 | 1.0 |
+| RRC → EW | 182 | **1.05** | 2.0 |
+| EW → RRc | 41 | **1.40** | 0.5 |
+
+In both directions of disagreement the amplitude ratio sides with ZTF: the
+ASAS-SN single-band (V) type is the error.  A veto on the ratio (pulsator
+label with A_g/A_r < 1.15–1.20, eclipsing label > 1.20–1.25) would reject
+only labels that ASAS-SN also confirms (detached binaries with unequal
+components are chromatic too), so the rule is unchanged and the ratio is
+reported in the ZTF evidence (`amplitude_ratio_g_r`).  Part of the
+"RR Lyrae → eclipsing" cross-validation errors are therefore truth errors.
+
+### 3.2 Mira from the Gaia DR3 LPV amplitude (2.12.0)
+
+Miras are the large-amplitude long-period variables (GCVS: ΔV > 2.5 mag).
+Gaia DR3 LPV `amplitude` is half the peak-to-peak range of the fitted G
+model (Lebzelter et al. 2023, A&A 674, A15).  In Gaia DR2 the Mira-like LPVs
+sit at G ranges of ~1–2.5 mag and the semi-regulars below ~1 mag (Mowlavi et
+al. 2018, A&A 618, A58); Grady et al. (2019) cut ΔG > 0.433 mag on a
+different amplitude statistic.
+
+Rule: semi-amplitude ≥ 0.6 mag (G range ≥ 1.2 mag) and, when a period is
+published, P ≥ 80 d (GCVS Mira range).  Fitted on even-numbered ASAS-SN
+M/SR stars matched to the Gaia LPV table (3,681 M, 2,592 SR), checked on the
+odd half: precision 0.934, recall 0.968 (precision levels off at 0.93–0.95
+for any threshold: a tail of large-amplitude ASAS-SN SR stars).
+
+2.17.0: a published period with 80 ≤ P < 1000 d is required.  This is the
+Gaia DR3 Mira selection of Zhang & Sanders (2023, MNRAS 521, 5309): 80 < P <
+1000 d, semi-amplitude ≥ 0.5.  It made no change on the truth set, where
+every star has a period.  Their alias windows (170–200 d with amplitude >
+1.3, 350–400 d with amplitude > 1.6) are not excluded: they mark unreliable
+periods, and excluding them removed 30 Miras for 6 SRs.  The C-star subtype
+uses the gated `is_cstar` (G_BP < 19, 7 < median_delta_wl_rp < 11; Lebzelter
+et al. 2023).
+
+Cross-validation (250 ASAS-SN Miras, 250 SR): Mira exact 25.6 → 94.8 %.
+The rule labelled 184 objects Mira, 173 correctly (precision 0.94); the 11
+SR stars it called Mira lower LPV exact 68.0 → 63.6 %.
 
 ## 4. Neutron stars / pulsars (compact axis)
 
@@ -159,6 +261,36 @@ pulsar sources). With ~3,000 pulsars among ~1.8 M NVSS sources the sky-wide
 purity is low (an FPR of 0.12 % is ~2,000 sources), so the label is a
 candidate, not an identification.
 
+### 4.2 Pulsar-candidate posterior (2.14.0)
+
+The candidate label is kept (no recall loss); its confidence is a sky-level
+posterior from naive Bayes with likelihood ratios measured per NVSS source
+(`benchmark/evaluate_pulsar.py`):
+
+| factor | pulsar sources | ordinary sources | LR present / absent |
+|---|---|---|---|
+| prior | 116 known pulsar sources among 1.77 M NVSS sources | | odds 6.6 × 10⁻⁵ |
+| steep + compact | 25/116 | 3/2531 (Laplace 4/2533) | 137 |
+| Galactic plane, \|b\| < 10° | 0.621 | 0.099 | 6.3 / 0.42 |
+| significant polarisation (P/σ ≥ 3, > 5 %) | 28/116 | 84/2531 | 7.3 / 0.79 |
+
+Normal pulsars concentrate to the plane (scale height 330 pc; Lorimer et al.
+2006); millisecond pulsars are nearly isotropic, so the plane factor
+under-rates them.  The factors are combined assuming independence.  Posterior
+by group, with the candidates of the sample:
+
+| group | pulsars | controls | posterior |
+|---|---:|---:|---:|
+| plane, polarised | 2 | 0 | 0.29 |
+| plane, not polarised | 10 | 1 | 0.042 |
+| off-plane, polarised | 4 | 0 | 0.027 |
+| off-plane, not polarised | 9 | 2 | 0.003 |
+
+Not done: LoTSS 144 MHz as a second spectral index (only 5 of the 116 pulsar
+sources are in LoTSS); Fermi 4FGL (only γ-ray pulsars, ~10 %, and a full
+rebuild of the sample); circular polarisation surveys (Sobey et al. 2022;
+Wang et al. 2022) -- the most promising next step.
+
 ## 5. Planetary nebulae (phenomenon/nebular axis)
 
 Recommended observables:
@@ -180,6 +312,13 @@ Literature:
 Implementation implication:
 PN should not be inferred from IR colour alone. Spectroscopic evidence should
 receive the strongest weight; photometry is candidate-level evidence.
+
+2.18.0: HASH grades (Parker, Bojičić & Frew 2016): True / Likely → PN,
+Possible → PN with status `HASH_POSSIBLE_PN`, mimics / post-AGB / other
+non-PN entries → not PN.  The Acker et al. (1992) catalogue is a PN
+catalogue: its counterpart is identity evidence (the old "≥ 2 lines" check
+only tested that data existed); [O III]/Hα and [S II]/Hα are reported for
+mimic checks (Frew & Parker 2010).
 
 ## 6. Supernovae / transients (phenomenon axis)
 
@@ -203,6 +342,23 @@ Literature:
 Implementation implication:
 SN classification belongs to a temporal/event pipeline. A single static catalogue
 row without multi-epoch evidence should not produce a confident SN subtype.
+
+SN catalogue match (2.18.0): when the observation epoch is known and lies
+more than a year after the event, the source is the host galaxy, not the
+supernova (status `SN_HOST_PAST_EVENT`), as in the time-domain branch that
+needs an event epoch.
+
+## Confidence of axis labels (2.15.0)
+
+Most axis labels come from rules without a score.  Their calibrated
+probability is the measured precision of the rule that produced them on the
+independent truth sets (`calibration/fit_axis_calibration.py`,
+`rule_precision`): the share of rows with that (status, label) whose truth is
+that label (a broader family label counts as right for its members), only for
+labels among the axis's truth classes and with ≥ 20 rows; the Wilson (1927)
+95 % lower bound is stored with it.  The truth sets are class-balanced (250
+per class), so this is a precision for that mix, not a sky-prior posterior.
+Labels without truth (e.g. ECLIPSING) stay uncalibrated.
 
 ## Implementation order
 

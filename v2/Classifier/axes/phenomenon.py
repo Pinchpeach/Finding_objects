@@ -32,22 +32,62 @@ def _pn_lines(row):
         ratio=vals["pn_oiii_5007"]/vals["pn_halpha"]
     return detected,ratio
 
+# HASH grades its entries True / Likely / Possible PN and also lists mimics,
+# post-AGB stars and pre-PNe (Parker, Bojicic & Frew 2016).  True / Likely
+# are PN, Possible is a PN candidate, explicit non-PN entries are not PN
+# (2.18.0).  An unrecognised or missing status keeps the PN label.
+HASH_NON_PN=("NOT","MIMIC","POST","PRE","SYMB","HII","H II","EM*","STAR","GALAXY","SNR","CLUSTER","OTHER")
+
+
+def _hash_grade(status):
+    s=(status or "").strip().upper()
+    if not s:return None
+    if s in ("T","TRUE") or s.startswith("TRUE"):return "TRUE"
+    if s in ("L","LIKELY") or s.startswith("LIKELY"):return "LIKELY"
+    if s in ("P","POSSIBLE") or s.startswith("POSSIBLE"):return "POSSIBLE"
+    if any(k in s for k in HASH_NON_PN):return "NOT_PN"
+    return None
+
+
+def _sn_epoch_status(ev):
+    """Catalogue SN matched long after the event is the host, not the SN."""
+    dt=ev.get("delta_days")
+    return dt is not None and dt>SN_MAX_DELTA_DAYS
+
+
+# A catalogued SN is the transient only near its event: an observation more
+# than a year after discovery sees the host galaxy (same rule as the
+# time-domain branch, which needs an event epoch; 2.18.0).
+SN_MAX_DELTA_DAYS=365.0
+
+
 def classify(row):
     catalogs=_text(row,"catalogs") or ""
     if "Acker PN Spectroscopy" in catalogs:
+        # The Strasbourg-ESO catalogue is itself a PN catalogue (Acker et al.
+        # 1992): a counterpart is identity evidence, like HASH.  The old
+        # ">= 2 positive lines" test only checked that data existed; the
+        # ratios used against PN mimics (Frew & Parker 2010) are reported.
         detected,ratio=_pn_lines(row)
         assoc=_num(row,"association_confidence__acker_pn_spectroscopy")
-        if len(detected)>=2:
-            return {"axis":AXIS,"label":"PN","confidence":assoc,"status":"PN_SPECTROSCOPY_EVIDENCE","evidence":[{"kind":"pn_emission_line_spectrum","association_confidence":assoc,"detected_lines":detected,"oiii5007_to_halpha":ratio,"note":"Independent Acker V/84 PN spectrum provides multiple nebular emission-line measurements; score remains uncalibrated."}]}
+        sii=sum(v for k,v in detected.items() if k.startswith("pn_sii"))
+        ha=detected.get("pn_halpha")
+        return {"axis":AXIS,"label":"PN","confidence":assoc,"status":"PN_SPECTROSCOPY_EVIDENCE","evidence":[{"kind":"pn_emission_line_spectrum","association_confidence":assoc,"detected_lines":detected,"oiii5007_to_halpha":ratio,"sii_to_halpha":(sii/ha if sii and ha else None),"note":"Acker et al. (1992) Strasbourg-ESO PN catalogue counterpart (identity evidence); [S II]/Ha and [O III]/Ha reported for mimic checks (Frew & Parker 2010)."}]}
     if "HASH PN Catalog" in catalogs:
-        assoc=_num(row,"association_confidence__hash_pn_catalog")
-        return {"axis":AXIS,"label":"PN","confidence":assoc,"status":"HASH_PN_CATALOG_MATCH","evidence":[{"kind":"hash_pn_catalog_counterpart","association_confidence":assoc,"pn_catalog_status":_text(row,"pn_catalog_status"),"note":"Independent counterpart in HASH; identity evidence, not a generic spectroscopic classifier."}]}
-    if "ASAS-SN Supernova Catalog" in catalogs:
-        assoc,ev=_event_evidence(row,"ASAS-SN Supernova Catalog","asas_sn_supernova_event")
-        return {"axis":AXIS,"label":"SN","confidence":assoc,"status":"ASASSN_SUPERNOVA_EVENT_MATCH","evidence":[ev]}
-    if "Asiago Supernova Catalog" in catalogs:
-        assoc,ev=_event_evidence(row,"Asiago Supernova Catalog","asiago_supernova_event")
-        return {"axis":AXIS,"label":"SN","confidence":assoc,"status":"ASIAGO_SUPERNOVA_EVENT_MATCH","evidence":[ev]}
+        assoc=_num(row,"association_confidence__hash_pn_catalog");status=_text(row,"pn_catalog_status");grade=_hash_grade(status)
+        ev=[{"kind":"hash_pn_catalog_counterpart","association_confidence":assoc,"pn_catalog_status":status,"hash_grade":grade,"note":"Independent counterpart in HASH; identity evidence, not a generic spectroscopic classifier."}]
+        if grade=="NOT_PN":
+            return {"axis":AXIS,"label":"OTHER_PHENOMENON","confidence":assoc,"status":"HASH_NON_PN_ENTRY","evidence":ev}
+        if grade=="POSSIBLE":
+            return {"axis":AXIS,"label":"PN","confidence":assoc,"status":"HASH_POSSIBLE_PN","evidence":ev}
+        return {"axis":AXIS,"label":"PN","confidence":assoc,"status":"HASH_PN_CATALOG_MATCH","evidence":ev}
+    for cat,kind,status in (("ASAS-SN Supernova Catalog","asas_sn_supernova_event","ASASSN_SUPERNOVA_EVENT_MATCH"),
+                            ("Asiago Supernova Catalog","asiago_supernova_event","ASIAGO_SUPERNOVA_EVENT_MATCH")):
+        if cat in catalogs:
+            assoc,ev=_event_evidence(row,cat,kind)
+            if _sn_epoch_status(ev):
+                return {"axis":AXIS,"label":"OTHER_PHENOMENON","confidence":assoc,"status":"SN_HOST_PAST_EVENT","evidence":[ev]}
+            return {"axis":AXIS,"label":"SN","confidence":assoc,"status":status,"evidence":[ev]}
 
     # Generic time-domain branch: only promote an explicit SN light-curve class
     # if an event epoch is present. This avoids treating a host detection as SN.

@@ -39,7 +39,13 @@ def annotate(df:pd.DataFrame,model_path:Path,axes=("physical","variability","com
         probs=[];statuses=[];methods=[]
         labels=out[f"{axis}_class"] if f"{axis}_class" in out else pd.Series("UNKNOWN",index=out.index)
         scores=out[f"{axis}_confidence"] if f"{axis}_confidence" in out else pd.Series(None,index=out.index)
-        for label,score in zip(labels.astype(str),scores):
+        rule_models=models.get("rules",{}).get(axis,{})
+        stat=out[f"{axis}_status"].astype(str) if f"{axis}_status" in out else pd.Series("",index=out.index)
+        for label,score,st in zip(labels.astype(str),scores,stat):
+            rm=rule_models.get(f"{st}|{label}")
+            if rm and rm.get("method")=="rule_precision":
+                # Measured precision of the rule that produced this label (2.15.0).
+                probs.append(float(rm["precision"]));statuses.append("CALIBRATED");methods.append("rule_precision");continue
             model=axis_models.get(label)
             p=calibrate_score(score,model)
             probs.append(p)

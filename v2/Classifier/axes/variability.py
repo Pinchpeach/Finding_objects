@@ -17,6 +17,8 @@ ZTF_MAP={"RR":("RR_LYRAE","RRAB"),"RRC":("RR_LYRAE","RRC"),"CEP":("CEPHEID","DCE
  "MIRA":("MIRA",None),"SR":("LPV","SR"),"EW":("ECLIPSING","EW"),"EA":("ECLIPSING","EA"),
  "BYDRA":("ROTATIONAL","BY_DRA"),"RSCVN":("ROTATIONAL","RS_CVN"),"DSCT":("PULSATING","DSCT")}
 ZTF="ztf_periodic_variables__"
+GAIA_VARI_MIN_SCORE=0.5
+GAIA_MIRA_SEMI_AMP=0.6;MIRA_MIN_PERIOD_D=80.0;MIRA_MAX_PERIOD_D=1000.0
 EVENT_CLASSES={"SN","MICROLENSING"};NON_STELLAR={"AGN","GALAXY"};OTHER_SPECIAL={"EP","WD"}
 def _text(row,key):
  v=row.get(key)
@@ -26,9 +28,22 @@ def _num(row,key):
  try:
   v=float(row.get(key));return v if math.isfinite(v) else None
  except Exception:return None
+def _cstar(row):
+ """Gaia LPV C-star flag gated as Lebzelter et al. (2023) advise (G_BP < 19,
+ 7 < median_delta_wl_rp < 11); same rule as subclass.gaia_lpv_cstar (2.17.0)."""
+ if not _flag(row,"gaia_lpv_is_cstar"):return False
+ bp=_num(row,"gaia_dr3__phot_bp_mean_mag");wl=_num(row,"gaia_lpv_median_delta_wl_rp")
+ if bp is None:bp=_num(row,"phot_bp_mean_mag")
+ return bp is not None and bp<19.0 and (wl is None or 7.0<wl<11.0)
 def _flag(row,key):
  v=_num(row,key)
  return v is not None and int(v)==1
+def _ratio(a,b):
+ """g/r amplitude ratio: ~1.4 for pulsators (temperature change; RR Lyrae ZTF
+ A_g/A_r = 1.38/0.98, Kulkarni et al. 2025, arXiv:2509.03120), ~1.0-1.1 for
+ contact binaries (benchmark/evaluate_rr_ew.py).  Reported, not used as a veto:
+ detached binaries with unequal components also reach > 1.2."""
+ return round(a/b,3) if a is not None and b is not None and b>0 else None
 def _clean(value):
  return "".join(ch for ch in str(value or "").upper() if ch.isalnum())
 def _result(label,confidence,status,evidence,subtype=None):
@@ -55,15 +70,37 @@ def classify(row):
  zt=_clean(_text(row,ZTF+"Type"))
  if zt in ZTF_MAP:
   label,sub=ZTF_MAP[zt]
-  if label in ("MIRA","LPV") and _flag(row,"gaia_lpv_is_cstar"):sub="C_STAR_CANDIDATE"   # keep the Gaia RP C-star flag
-  ev=[{"kind":"ztf_periodic_variable","type":_text(row,ZTF+"Type"),"period_days":_num(row,ZTF+"Per"),"amplitude_r_mag":_num(row,ZTF+"rAmp"),"amplitude_g_mag":_num(row,ZTF+"gAmp"),"ztf_id":_text(row,ZTF+"catalog_object_id")}]
+  if label in ("MIRA","LPV") and _cstar(row):sub="C_STAR_CANDIDATE"   # keep the Gaia RP C-star flag
+  ev=[{"kind":"ztf_periodic_variable","type":_text(row,ZTF+"Type"),"period_days":_num(row,ZTF+"Per"),"amplitude_r_mag":_num(row,ZTF+"rAmp"),"amplitude_g_mag":_num(row,ZTF+"gAmp"),"amplitude_ratio_g_r":_ratio(_num(row,ZTF+"gAmp"),_num(row,ZTF+"rAmp")),"ztf_id":_text(row,ZTF+"catalog_object_id")}]
   return _result(label,None,"ZTF_PERIODIC_VARIABLE",ev,sub)
+ # Mira from the Gaia DR3 LPV SOS G amplitude (2.12.0).  ``amplitude`` is half
+ # the peak-to-peak range of the fitted G model (Lebzelter et al. 2023); Miras
+ # are the large-amplitude LPVs (GCVS: dV > 2.5 mag; Mira-like in Gaia DR2:
+ # G range > ~1 mag, Mowlavi et al. 2018).  Semi-amplitude >= 0.6 mag (range
+ # >= 1.2 mag), with the GCVS Mira period range (>= 80 d) when a period is
+ # published.  ASAS-SN M vs SR (benchmark/build_mira_truth.py), threshold
+ # chosen on one half, other half: precision 0.934, recall 0.968.
+ amp=_num(row,"gaia_lpv_amplitude");freq=_num(row,"gaia_lpv_frequency")
+ # 2.17.0: a published period in 80-1000 d is required, as in the Gaia DR3
+ # Mira selection of Zhang & Sanders (2023: 80 < P < 1000 d, semi-amplitude
+ # >= 0.5); every ASAS-SN M/SR star in the truth set has one.  Their alias
+ # windows (170-200 d, 350-400 d) are not excluded: they flag unreliable
+ # periods, and excluding them removed 30 Miras for 6 SRs here.
+ if amp is not None and amp>=GAIA_MIRA_SEMI_AMP and freq is not None and freq>0 and MIRA_MIN_PERIOD_D<=1/freq<MIRA_MAX_PERIOD_D:
+  sub="C_STAR_CANDIDATE" if _cstar(row) else None
+  return _result("MIRA",None,"GAIA_DR3_SOS_LPV_LARGE_AMPLITUDE",[{"kind":"gaia_dr3_vari_long_period_variable","semi_amplitude_g_mag":amp,"period_days":round(1/freq,1) if freq else None,"is_cstar":_cstar(row)}],sub)
  # LPV SOS has a published C-star-candidate flag.  It does not publish a
  # validated Mira leaf, so no period/amplitude threshold is used to make one.
- if _flag(row,"gaia_lpv_is_cstar"):
+ if _cstar(row):
   return _result("LPV",None,"GAIA_DR3_SOS_LPV_CSTAR_CANDIDATE",[{"kind":"gaia_dr3_vari_long_period_variable","is_cstar":True,"frequency_per_day":_num(row,"gaia_lpv_frequency"),"amplitude_mag":_num(row,"gaia_lpv_amplitude")}],"C_STAR_CANDIDATE")
  raw=_text(row,"best_class_name");score=_num(row,"best_class_score")
  evidence=[] if raw is None else [{"kind":"gaia_dr3_vari_classifier_result","best_class_name":raw,"best_class_score":score,"score_semantics":"raw Gaia normalized-rank score; not calibrated probability"}]
+ # Gaia vari_classifier scores are not calibrated across classes (Rimoldini
+ # et al. 2023).  On the cross-validation set (192 objects) the type is
+ # right for 35 % below score 0.5 and 91 % at >= 0.5, so below it only
+ # "variable" is reported (2.18.0).
+ if raw in GAIA_MAP and score is not None and score<GAIA_VARI_MIN_SCORE:
+  return _result("OTHER_VARIABLE",score,"GAIA_DR3_VARIABLE_LOW_SCORE",evidence)
  if raw in GAIA_MAP:return _result(GAIA_MAP[raw],score,"GAIA_DR3_VARIABLE_CANDIDATE",evidence)
  if raw in EVENT_CLASSES:return _result("UNKNOWN",None,"ROUTED_TO_PHENOMENON",evidence)
  if raw in NON_STELLAR:return _result("UNKNOWN",None,"NON_STELLAR_VARIABILITY_LABEL",evidence)

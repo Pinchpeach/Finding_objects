@@ -7,11 +7,11 @@
     "cst"
    ],
    "coef": [
-    0.6865,
-    -2.2672,
-    4.7308
+    0.6934,
+    -1.0447,
+    5.7275
    ],
-   "intercept": -0.897,
+   "intercept": -2.0031,
    "abstain_band": 0.15
   },
   "GAIA_2MASS_CSTAR": {
@@ -21,11 +21,11 @@
     "cst"
    ],
    "coef": [
-    0.5827,
-    -1.9921,
-    5.9939
+    0.2829,
+    0.582,
+    6.7599
    ],
-   "intercept": -0.8995,
+   "intercept": -4.8845,
    "abstain_band": 0.15
   },
   "GAIA_2MASS": {
@@ -60,22 +60,22 @@
  "abstain_band": 0.15,
  "test": {
   "test_n": 7567,
-  "coverage": 0.83,
-  "accuracy": 0.946,
-  "C_precision": 0.87,
-  "C_recall": 0.885,
+  "coverage": 0.849,
+  "accuracy": 0.958,
+  "C_precision": 0.919,
+  "C_recall": 0.887,
   "O_precision": 0.968,
-  "O_recall": 0.963,
+  "O_recall": 0.978,
   "per_model": {
    "GAIA_2MASS_WISE_CSTAR": {
     "n": 3761,
-    "decided": 3656,
-    "accuracy": 0.96
+    "decided": 3760,
+    "accuracy": 0.971
    },
    "GAIA_2MASS_CSTAR": {
     "n": 2042,
-    "decided": 1987,
-    "accuracy": 0.969
+    "decided": 2027,
+    "accuracy": 0.985
    },
    "GAIA_2MASS": {
     "n": 1346,
@@ -91,21 +91,21 @@
   "by_source": {
    "agb_chemistry_truth": {
     "test_n": 4286,
-    "decided": 3258,
-    "accuracy": 0.912,
+    "decided": 3377,
+    "accuracy": 0.931,
     "C_fraction_true": 0.395
    },
    "agb_gcvs_truth": {
     "test_n": 3281,
-    "decided": 3025,
-    "accuracy": 0.983,
+    "decided": 3050,
+    "accuracy": 0.987,
     "C_fraction_true": 0.124
    }
   },
   "field_lpv_sample": {
    "n": 23969,
-   "decided": 21231,
-   "C_fraction_predicted": 0.257,
+   "decided": 21771,
+   "C_fraction_predicted": 0.033,
    "is_cstar_fraction": 0.244
   },
   "O_rich_Ks_W3_gt_1": 0.518
