@@ -38,7 +38,11 @@ def test_gui_runs_pipeline_and_shows_results(tmp_path):
     from PySide6.QtWidgets import QApplication
     import qt_app
     app = QApplication.instance() or QApplication([])
+    log_path = tmp_path / "logs" / "finding_objects.log"
+    import os
+    os.environ["FINDING_OBJECTS_LOG"] = str(log_path)
     w = qt_app.MainWindow()
+    assert w.applog.path == log_path and not hasattr(w, "log")         # no log panel in the main window
     w.rb_raw.setChecked(True); w.chk_area.setChecked(False)
     w.txt_raw.setText(str(raw)); w.txt_work.setText(str(tmp_path / "run"))
     assert "--ra" not in w.pipeline_args()
@@ -46,7 +50,9 @@ def test_gui_runs_pipeline_and_shows_results(tmp_path):
     proc = w.proc
     loop = QEventLoop(); proc.finished.connect(loop.quit); QTimer.singleShot(120000, loop.quit); loop.exec()
     app.processEvents()
-    assert w.proc is None and w.statusBar().currentMessage().startswith("Done"), w.log.toPlainText()[-2000:]
+    assert w.proc is None and w.statusBar().currentMessage().startswith("Done"), w.applog.read_tail()[-2000:]
+    text = log_path.read_text(encoding="utf-8")
+    assert "==== run Finding Objects" in text and "$ pipeline" in text and "[pipeline]" in text   # run output in the one file
     n = w.model.rowCount()
     names = w.model.frame().designation
     assert not names.str.match(r"OBJ\d+$").any() and names.is_unique      # real catalogue names only
@@ -175,3 +181,40 @@ def test_pipeline_on_an_empty_field_returns_no_objects(tmp_path):
     (tmp_path / "raw").mkdir()
     out = mod.run(tmp_path / "work", raw_dir=tmp_path / "raw")
     assert len(out) == 0 and (tmp_path / "work" / "classified_objects.csv").exists()
+
+
+def test_single_log_file_appends_and_recreates(tmp_path):
+    sys.path.insert(0, str(V2 / "app"))
+    from app_log import AppLog
+    log = AppLog(tmp_path / "sub" / "finding_objects.log")
+    log.start_run("run 1"); log.write("line a")
+    log.start_run("run 2"); log.write_lines(["line b", "line c"])
+    text = log.path.read_text(encoding="utf-8")
+    assert text.count("==== run") == 2 and text.index("line a") < text.index("run 2") < text.index("line c")
+    assert len(list(log.path.parent.iterdir())) == 1                       # one file, no per-run files
+    log.path.unlink()                                                      # deleted while the app runs
+    log.write("after delete")
+    assert log.path.exists() and "after delete" in log.path.read_text(encoding="utf-8")
+    log.path.write_bytes(b"x" * 300 + b"\n" + b"y" * 300 + b"\n")          # size cap keeps the newest lines
+    log.trim(max_bytes=400, keep_bytes=310)
+    tail = log.path.read_text(encoding="utf-8")
+    assert "y" * 300 in tail and "x" * 300 not in tail and "older entries removed" in tail
+
+
+def test_log_window_follows_file(tmp_path):
+    pytest.importorskip("PySide6")
+    from PySide6.QtWidgets import QApplication
+    sys.path.insert(0, str(V2 / "app"))
+    from app_log import AppLog
+    import qt_widgets
+    app = QApplication.instance() or QApplication([])
+    log = AppLog(tmp_path / "finding_objects.log")
+    win = qt_widgets.LogWindow(log)
+    win.show()
+    assert log.path.exists()                                               # created when shown
+    log.write("first"); win.poll()
+    log.write("second"); win.poll()
+    assert "first" in win.text.toPlainText() and "second" in win.text.toPlainText()
+    log.path.unlink(); win.poll()                                          # deleted: re-created, view reset
+    assert log.path.exists() and "first" not in win.text.toPlainText()
+    win.close()

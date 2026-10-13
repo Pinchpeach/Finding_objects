@@ -546,3 +546,85 @@ def _json(v):
         return out if isinstance(out, list) else []
     except json.JSONDecodeError:
         return []
+
+
+class LogWindow(QWidget):
+    """Separate window showing the app's single log file (2.21.0).
+
+    It follows the file live: new bytes are appended once a second while the
+    window is visible; if the file shrank (trimmed, cleared, deleted and
+    re-created) it is reloaded."""
+
+    def __init__(self, log, parent=None):
+        from PySide6.QtCore import QTimer
+        from PySide6.QtWidgets import QPlainTextEdit
+        super().__init__(parent, Qt.Window)
+        self.setWindowTitle("Finding Objects — log")
+        self.resize(900, 520)
+        self._log = log
+        self._offset = 0
+        lay = QVBoxLayout(self)
+        self.path_label = QLabel(str(log.path)); self.path_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        lay.addWidget(self.path_label)
+        self.text = QPlainTextEdit(); self.text.setReadOnly(True); self.text.setLineWrapMode(QPlainTextEdit.NoWrap)
+        f = self.text.font(); f.setFamily("Monospace"); f.setStyleHint(f.StyleHint.TypeWriter); self.text.setFont(f)
+        lay.addWidget(self.text)
+        row = QHBoxLayout()
+        self.chk_follow = QCheckBox("Follow"); self.chk_follow.setChecked(True)
+        b_reload = QPushButton("Reload"); b_reload.clicked.connect(self.reload)
+        b_folder = QPushButton("Open folder"); b_folder.clicked.connect(self._open_folder)
+        b_clear = QPushButton("Clear log"); b_clear.clicked.connect(self._clear)
+        for wdg in (self.chk_follow, b_reload, b_folder, b_clear):
+            row.addWidget(wdg)
+        row.addStretch(1)
+        lay.addLayout(row)
+        self._timer = QTimer(self); self._timer.setInterval(1000); self._timer.timeout.connect(self.poll)
+
+    def showEvent(self, event):
+        self.reload(); self._timer.start()
+        super().showEvent(event)
+
+    def hideEvent(self, event):
+        self._timer.stop()
+        super().hideEvent(event)
+
+    def reload(self):
+        self.text.setPlainText(self._log.read_tail())
+        try:
+            self._offset = self._log.path.stat().st_size
+        except OSError:
+            self._offset = 0
+        self._scroll_end()
+
+    def poll(self):
+        try:
+            size = self._log.path.stat().st_size
+        except OSError:                      # deleted: re-create and start over
+            self._log.ensure(); self.reload(); return
+        if size < self._offset:
+            self.reload(); return
+        if size == self._offset:
+            return
+        try:
+            with open(self._log.path, "rb") as fh:
+                fh.seek(self._offset); new = fh.read()
+        except OSError:
+            return
+        cut = new.rfind(b"\n") + 1          # only whole lines; the rest is read next time
+        if cut <= 0:
+            return
+        self._offset += cut
+        bar = self.text.verticalScrollBar(); at_end = bar.value() >= bar.maximum() - 2
+        self.text.appendPlainText(new[:cut].decode("utf-8", "replace").rstrip("\n"))
+        if self.chk_follow.isChecked() or at_end:
+            self._scroll_end()
+
+    def _scroll_end(self):
+        bar = self.text.verticalScrollBar(); bar.setValue(bar.maximum())
+
+    def _open_folder(self):
+        self._log.ensure()
+        QDesktopServices.openUrl(QUrl.fromLocalFile(str(self._log.path.parent)))
+
+    def _clear(self):
+        self._log.clear(); self.reload()
