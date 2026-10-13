@@ -86,6 +86,36 @@ jobs:
               err = 3600 / np.sqrt(l["dec_ivar"].astype(float))
               print("LS dec error arcsec median", float(np.nanmedian(err)), "ref_epoch values", l["ref_epoch"].value_counts().head().to_dict())
           PY
+      - name: Every collector at two fields (live column check)
+        continue-on-error: true
+        run: |
+          cd v2/Get_data
+          python - <<'PY2'
+          import sys, time, importlib, traceback
+          sys.path.insert(0, ".")
+          import controller
+          fields = {"COSMOS": (150.1, 2.2, 3.0), "HETDEX/LoTSS": (180.0, 50.0, 3.0)}
+          for fname, (ra, dec, r) in fields.items():
+              for name in controller.COLLECTORS:
+                  t = time.monotonic()
+                  try:
+                      mod = controller._load_collector(name)
+                      d = mod.fetch(ra, dec, r)
+                      print(f"{fname:13s} {name:34s} ok rows={len(d):5d} {time.monotonic()-t:6.1f}s", flush=True)
+                  except Exception as exc:
+                      print(f"{fname:13s} {name:34s} ERROR {exc!r:.300}", flush=True)
+                      cat = getattr(mod, "VIZIER_CATALOG", None)
+                      if cat:
+                          try:
+                              from astroquery.vizier import Vizier
+                              from astropy.coordinates import SkyCoord
+                              import astropy.units as u
+                              tt = Vizier(columns=["**"], row_limit=2).query_region(SkyCoord(ra*u.deg, dec*u.deg), radius=r*u.arcmin, catalog=cat)
+                              for k in tt.keys():
+                                  print("      raw", k, tt[k].colnames[:25], flush=True)
+                          except Exception as exc2:
+                              print("      raw ERROR", repr(exc2)[:200], flush=True)
+          PY2
       - name: 4XMM catalogue identifiers on VizieR
         continue-on-error: true
         run: |

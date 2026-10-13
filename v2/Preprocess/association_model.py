@@ -201,9 +201,11 @@ def infer_poserr_arcsec(catalog: str, row: Mapping[str, Any]) -> float:
         if a is not None and b is not None and max(a, b) > 0:
             return max(a, b) / 1000.0
 
-    # eRASS1 POS_ERR and 4XMM POSERR are 1-sigma (systematics included).
+    # eRASS1 POS_ERR (VizieR posErr) and 4XMM SC_POSERR (VizieR ePos) are
+    # 1-sigma with systematics included (Merloni+2024; Webb+2020).  Column
+    # names checked on the live VizieR tables (2.19.1 probe).
     if catalog in ("eROSITA eRASS1", "XMM 4XMM-DR13"):
-        e = _first(row, ("pos_err", "poserr", "e_pos"))
+        e = _first(row, ("pos_err", "poserr", "e_pos", "epos", "sc_poserr"))
         if e is not None and e > 0:
             return e
 
