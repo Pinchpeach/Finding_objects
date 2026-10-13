@@ -1,6 +1,6 @@
 collector,status,rows,max_sep_arcmin,file,error
 gaia_dr3,ok,3,0.44607406034638597,rawdata/gaia_dr3_ngc4522_r0p5arcmin.csv,
-sdss_dr18,ok,14,0.4335197565332262,rawdata/sdss_dr18_ngc4522_r0p5arcmin.csv,
+sdss_dr18,error,0,,,HTTPError('503 Server Error: Service Unavailable for url: https://skyserver.sdss.org/dr18/en/tools/search/X_Results.aspx')
 panstarrs1,ok,61,0.46846925649675963,rawdata/panstarrs1_ngc4522_r0p5arcmin.csv,
 desi_legacy,ok,28,0.498749713164462,rawdata/desi_legacy_ngc4522_r0p5arcmin.csv,
 galex,ok,1,0.05542638021656091,rawdata/galex_ngc4522_r0p5arcmin.csv,
@@ -10,7 +10,7 @@ lotss,ok,0,,rawdata/lotss_ngc4522_r0p5arcmin.csv,
 first,ok,0,,rawdata/first_ngc4522_r0p5arcmin.csv,
 nvss,ok,1,0.06933808497082088,rawdata/nvss_ngc4522_r0p5arcmin.csv,
 vlass,ok,0,,rawdata/vlass_ngc4522_r0p5arcmin.csv,
-xmm,ok,0,,rawdata/xmm_ngc4522_r0p5arcmin.csv,
+xmm,ok,2,0.23130476044375364,rawdata/xmm_ngc4522_r0p5arcmin.csv,
 chandra,ok,0,,rawdata/chandra_ngc4522_r0p5arcmin.csv,
 erosita,ok,0,,rawdata/erosita_ngc4522_r0p5arcmin.csv,
 sdss_spectroscopy,ok,1,0.00674498165569649,rawdata/sdss_spectroscopy_ngc4522_r0p5arcmin.csv,
@@ -18,4 +18,4 @@ desi_spectroscopy,ok,1,0.043355301443576647,rawdata/desi_spectroscopy_ngc4522_r0
 lamost_spectroscopy,ok,0,,rawdata/lamost_spectroscopy_ngc4522_r0p5arcmin.csv,
 sga2020,radius_error,7,9.485225339043911,rawdata/sga2020_ngc4522_r0p5arcmin.csv,
 simbad,ok,1,0.020701049365056436,rawdata/simbad_ngc4522_r0p5arcmin.csv,
-ned,error,0,,,"RemoteServiceError(""The remote service returned the following error message.\nERROR: We can't start the database search program /ned/ops/util/bin/nedexec. start_exec() returned status=-4"")"
+ned,ok,13,0.47688636578212423,rawdata/ned_ngc4522_r0p5arcmin.csv,
