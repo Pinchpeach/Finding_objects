@@ -56,7 +56,7 @@ NUCLEUS_ARCSEC = 5.0
 FOREGROUND_RULES = {"AST-GAL-001", "AST-GAL-002"}
 NAME_CATALOGS = ("SIMBAD", "NED")
 EVENT_CATALOGS = ("ASAS-SN Supernova Catalog", "Asiago Supernova Catalog")
-Z_COLUMNS = ("sdss_dr18_spectroscopy__z", "desi_dr1_spectroscopy__z", "lamost_dr10_spectroscopy__z",
+Z_COLUMNS = ("sdss_dr18_spectroscopy__z", "desi_dr1_spectroscopy__z", "lamost_dr_catalog__z",
              "ned__Redshift", "simbad__rvz_redshift")
 SPEC_Z_COLUMNS = Z_COLUMNS[:3]
 
@@ -81,12 +81,18 @@ def _redshift(row, cols=Z_COLUMNS):
     return None
 
 
+CSTAR_MAX_SIGMA = 5.0
+
+
 def _foreground_star(row) -> bool:
     try:
         ev = json.loads(row.get("evidence_json") or "[]")
     except (TypeError, json.JSONDecodeError):
         return False
-    return any(e.get("rule_id") in FOREGROUND_RULES and (_num(e.get("raw_score")) or 0) >= 0.5 for e in ev)
+    # Extended / blended Gaia sources (C* > 5 sigma, Stage 4 ``cstar_sigma``)
+    # have spurious motions: not a foreground star (same gate as Stage 5).
+    return any(e.get("rule_id") in FOREGROUND_RULES and (_num(e.get("raw_score")) or 0) >= 0.5
+               and not ((_num(e.get("cstar_sigma")) or 0) > CSTAR_MAX_SIGMA) for e in ev)
 
 
 def _sep_arcsec(ra1, dec1, ra2, dec2) -> float:

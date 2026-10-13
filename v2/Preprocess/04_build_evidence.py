@@ -66,11 +66,35 @@ class CatalogFields:
 RAW_FIELDS={"parallax","parallax_error","pmra","pmra_error","pmdec","pmdec_error",
   "class","zwarning","iMeanPSFMag","rMeanPSFMag","zMeanPSFMag","W1mag","W2mag","snr1","snr2",
   "type","clean","Type","otype","best_class_name","best_class_score",*DSC_MAP.values(),
-  "flux_r","flux_ivar_r","flux_z","flux_ivar_z","catalog_object_id","RAJ2000","DEJ2000"}
+  "flux_r","flux_ivar_r","flux_z","flux_ivar_z","catalog_object_id","RAJ2000","DEJ2000",
+  "phot_bp_rp_excess_factor","bp_rp","phot_g_mean_mag"}
 DERIVED_PREFIXES=("association_confidence__","catalog_confidence_","ps1_","ls_","catalogs")
 
 def _rule_columns(columns):
     return [c for c in columns if c.startswith(DERIVED_PREFIXES) or c.split("__",1)[-1] in RAW_FIELDS]
+
+# Riello et al. (2021, A&A 649, A3) corrected BP/RP flux excess C* (Eq. 6,
+# Table 2) and its 1-sigma scatter for isolated point sources (Eq. 18); same
+# formulae as Classifier/branches/star.py.  |C*| > 5 sigma means the BP/RP
+# flux comes from more than one point source: an extended source (galaxy
+# nucleus, HII region) or a blend, whose Gaia astrometry is not that of a
+# single star (2.22.0).
+CSTAR_MAX_SIGMA=5.0
+def cstar_sigma(src):
+    c,x,g=num(src,"phot_bp_rp_excess_factor"),num(src,"bp_rp"),num(src,"phot_g_mean_mag")
+    if None in (c,x,g): return None
+    if x<0.5: f=1.154360+0.033772*x+0.032277*x*x
+    elif x<4.0: f=1.162004+0.011464*x+0.049255*x*x-0.005879*x**3
+    else: f=1.057572+0.140537*x
+    return abs(c-f)/(0.0059898+8.817481e-12*g**7.618399)
+
+def _tag_cstar(out,rid,src):
+    """Record C* significance on the astrometric evidence just emitted; Stage
+    5 and host grouping do not let it override the in-galaxy status or the
+    fusion when the source is extended."""
+    if out and out[-1].get("rule_id")==rid:
+        cs=cstar_sigma(src)
+        if cs is not None: out[-1]["cstar_sigma"]=round(cs,2)
 
 def emit(out, rule, cls, score, value=None, note="", reliability=1.0, association_reliability=1.0):
     raw=float(max(0,min(1,score)))
@@ -144,10 +168,12 @@ def evaluate(rule,row,namespaced=frozenset()):
             # companion; El-Badry et al. 2021), and |plx|/sigma >= 10 used to
             # trigger the decisive-motion STAR rule (2.19.0).
             x=max(p,0.0)/e; emit(out,rule,"STAR",x/(x+5),x,"uncalibrated physical support",reliability,association_reliability)
+            _tag_cstar(out,rid,src)
     elif rid=="AST-GAL-002":
         a,ae,d,de=(num(src,x) for x in ("pmra","pmra_error","pmdec","pmdec_error"))
         if None not in (a,ae,d,de) and ae>0 and de>0:
             x=math.sqrt((a/ae)**2+(d/de)**2); emit(out,rule,"STAR",x/(x+5),x,"uncalibrated physical support",reliability,association_reliability)
+            _tag_cstar(out,rid,src)
     elif rid.startswith("SPC-SDSS-"):
         c=str(src.get("class","")).strip().upper()
         target=rule["target_class"]

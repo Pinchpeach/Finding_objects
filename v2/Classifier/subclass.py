@@ -216,7 +216,7 @@ def _parse_mk(sp: str):
     """Spectral letter/subtype and luminosity class from an MK string."""
     s = sp.replace(" ", "")
     lum = None
-    m = re.search(r"(Ia|Ib|III|II|IV|VI|V)(?![a-z])", s[1:]) if s else None
+    m = re.search(r"(Ia|Ib|III|II|IV|VI|V)(?![IV])", s[1:]) if s else None  # 2.22.0: qualifiers (b, e, n, CN) may follow
     if m:
         lum = m.group(1)
     num = spt_number(s)
@@ -836,7 +836,11 @@ def classify_star(row):
     else:
         lrule, lbasis = "SIMBAD_SPTYPE", "luminosity class from the SIMBAD MK type"
     letter = LETTERS[int(num // 10)]
-    if phys in {"RGB", "AGB"}:
+    # The physical axis' evolved-giant label (RGB / AGB / RED_GIANT; the last
+    # since 2.13.0) sets class III unless a spectrum already gives a giant or
+    # supergiant class (II, Ib, Ia are more specific than "giant").  2.22.0:
+    # RED_GIANT was missing, so a FLAME / CMD giant could read "IV subgiant".
+    if phys in {"RGB", "AGB", "RED_GIANT"} and lum not in {"III", "II", "Ib", "Ia"}:
         lum, lrule, lbasis = "III", "PHYSICAL_AXIS", f"physical axis {phys}"
     label = spt_label(num) + (f" {lum}" if lum else "")
     name = f"{letter}-type " + (LUM_NAME.get(lum, "star") if lum else "star")
