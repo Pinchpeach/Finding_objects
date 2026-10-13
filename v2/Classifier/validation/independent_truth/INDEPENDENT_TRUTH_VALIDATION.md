@@ -5,10 +5,10 @@ Truth-catalog rows are used only as coordinates/labels. The same catalog is excl
 | axis | class | n | classified | coverage | exact all | exact classified | family all | family classified |
 |---|---|---:|---:|---:|---:|---:|---:|---:|
 | compact | PULSAR | 250 | 1 | 0.4% | 0.0% | 0.0% | 0.4% | 100.0% |
-| phenomenon | PN | 250 | 233 | 93.2% | 93.2% | 100.0% | 93.2% | 100.0% |
+| phenomenon | PN | 250 | 233 | 93.2% | 89.2% | 95.7% | 89.2% | 95.7% |
 | phenomenon | SN | 250 | 2 | 0.8% | 0.8% | 100.0% | 0.8% | 100.0% |
-| physical | AGB | 250 | 106 | 42.4% | 0.0% | 0.0% | 41.2% | 97.2% |
-| physical | RGB | 203 | 105 | 51.7% | 5.9% | 11.4% | 51.7% | 100.0% |
+| physical | AGB | 250 | 106 | 42.4% | 0.0% | 0.0% | 42.4% | 100.0% |
+| physical | RGB | 203 | 105 | 51.7% | 0.0% | 0.0% | 51.7% | 100.0% |
 | variability | CEPHEID | 250 | 240 | 96.0% | 93.2% | 97.1% | 93.2% | 97.1% |
 | variability | LPV | 250 | 182 | 72.8% | 63.6% | 87.4% | 63.6% | 87.4% |
 | variability | MIRA | 250 | 249 | 99.6% | 94.8% | 95.2% | 99.6% | 100.0% |

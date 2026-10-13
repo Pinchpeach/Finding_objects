@@ -1,10 +1,181 @@
-name,truth_axis,truth_class,resolved_name,ra,dec,truth_otype,truth_sp,nearest_sep_arcsec,primary_class,blind_class,blind_status,blind_match,catalog_assisted_class,catalog_assisted_match,science_json,collector_json,candidate_json
-GD 71,physical,WD,,,,,,,,ERROR,ValueError('Length of values (2) does not match length of index (1)'),False,ERROR,False,{},[],[]
-RR Lyr,variability,RR_LYRAE,,,,,,,,ERROR,ValueError('Length of values (2) does not match length of index (1)'),False,ERROR,False,{},[],[]
-delta Cep,variability,CEPHEID,,,,,,,,ERROR,ValueError('Length of values (2) does not match length of index (1)'),False,ERROR,False,{},[],[]
-Mira,physical,AGB,,,,,,,,ERROR,ValueError('Length of values (2) does not match length of index (1)'),False,ERROR,False,{},[],[]
-PSR B0531+21,compact,PULSAR,,,,,,,,ERROR,ValueError('Length of values (2) does not match length of index (1)'),False,ERROR,False,{},[],[]
-M 57,phenomenon,PN,,,,,,,,ERROR,ValueError('Length of values (2) does not match length of index (1)'),False,ERROR,False,{},[],[]
-SN 2018fhw,phenomenon,SN,,,,,,,,ERROR,ValueError('Length of values (2) does not match length of index (1)'),False,ERROR,False,{},[],[]
-SN 2011fe,phenomenon,SN,,,,,,,,ERROR,ValueError('Length of values (2) does not match length of index (1)'),False,ERROR,False,{},[],[]
-3C 273,extragalactic,AGN,,,,,,,,ERROR,ValueError('Length of values (2) does not match length of index (1)'),False,ERROR,False,{},[],[]
+name,truth_axis,truth_class,resolved_name,ra,dec,truth_otype,truth_sp,nearest_sep_arcsec,primary_class,blind_class,blind_status,error_traceback,blind_match,catalog_assisted_class,catalog_assisted_match,science_json,collector_json,candidate_json
+GD 71,physical,WD,,,,,,,,ERROR,ValueError('Length of values (2) does not match length of index (1)'),"ne 131, in classify_assisted
+    payload[""otype""]=truth_otype;annotated=axes.annotate(pd.DataFrame([payload])).iloc[0];return as_text(annotated.get(f""{axis}_class"")) or ""UNKNOWN""
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/control_axes.py"", line 20, in annotate
+    return cal.annotate(result,ROOT/""calibration""/""models.json"",AXES)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/calibration/per_axis.py"", line 57, in annotate
+    out[f""{axis}_calibrated_probability""]=probs
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/frame.py"", line 4672, in __setitem__
+    self._set_item(key, value)
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/frame.py"", line 4874, in _set_item
+    value, refs = self._sanitize_column(value)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/frame.py"", line 5756, in _sanitize_column
+    com.require_length_match(value, self.index)
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/common.py"", line 601, in require_length_match
+    raise ValueError(
+ValueError: Length of values (2) does not match length of index (1)
+",False,ERROR,False,{},[],[]
+RR Lyr,variability,RR_LYRAE,,,,,,,,ERROR,ValueError('Length of values (2) does not match length of index (1)'),"ne 131, in classify_assisted
+    payload[""otype""]=truth_otype;annotated=axes.annotate(pd.DataFrame([payload])).iloc[0];return as_text(annotated.get(f""{axis}_class"")) or ""UNKNOWN""
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/control_axes.py"", line 20, in annotate
+    return cal.annotate(result,ROOT/""calibration""/""models.json"",AXES)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/calibration/per_axis.py"", line 57, in annotate
+    out[f""{axis}_calibrated_probability""]=probs
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/frame.py"", line 4672, in __setitem__
+    self._set_item(key, value)
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/frame.py"", line 4874, in _set_item
+    value, refs = self._sanitize_column(value)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/frame.py"", line 5756, in _sanitize_column
+    com.require_length_match(value, self.index)
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/common.py"", line 601, in require_length_match
+    raise ValueError(
+ValueError: Length of values (2) does not match length of index (1)
+",False,ERROR,False,{},[],[]
+delta Cep,variability,CEPHEID,,,,,,,,ERROR,ValueError('Length of values (2) does not match length of index (1)'),"ne 131, in classify_assisted
+    payload[""otype""]=truth_otype;annotated=axes.annotate(pd.DataFrame([payload])).iloc[0];return as_text(annotated.get(f""{axis}_class"")) or ""UNKNOWN""
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/control_axes.py"", line 20, in annotate
+    return cal.annotate(result,ROOT/""calibration""/""models.json"",AXES)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/calibration/per_axis.py"", line 57, in annotate
+    out[f""{axis}_calibrated_probability""]=probs
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/frame.py"", line 4672, in __setitem__
+    self._set_item(key, value)
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/frame.py"", line 4874, in _set_item
+    value, refs = self._sanitize_column(value)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/frame.py"", line 5756, in _sanitize_column
+    com.require_length_match(value, self.index)
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/common.py"", line 601, in require_length_match
+    raise ValueError(
+ValueError: Length of values (2) does not match length of index (1)
+",False,ERROR,False,{},[],[]
+Mira,physical,AGB,,,,,,,,ERROR,ValueError('Length of values (2) does not match length of index (1)'),"ne 131, in classify_assisted
+    payload[""otype""]=truth_otype;annotated=axes.annotate(pd.DataFrame([payload])).iloc[0];return as_text(annotated.get(f""{axis}_class"")) or ""UNKNOWN""
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/control_axes.py"", line 20, in annotate
+    return cal.annotate(result,ROOT/""calibration""/""models.json"",AXES)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/calibration/per_axis.py"", line 57, in annotate
+    out[f""{axis}_calibrated_probability""]=probs
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/frame.py"", line 4672, in __setitem__
+    self._set_item(key, value)
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/frame.py"", line 4874, in _set_item
+    value, refs = self._sanitize_column(value)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/frame.py"", line 5756, in _sanitize_column
+    com.require_length_match(value, self.index)
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/common.py"", line 601, in require_length_match
+    raise ValueError(
+ValueError: Length of values (2) does not match length of index (1)
+",False,ERROR,False,{},[],[]
+PSR B0531+21,compact,PULSAR,,,,,,,,ERROR,ValueError('Length of values (2) does not match length of index (1)'),"ne 131, in classify_assisted
+    payload[""otype""]=truth_otype;annotated=axes.annotate(pd.DataFrame([payload])).iloc[0];return as_text(annotated.get(f""{axis}_class"")) or ""UNKNOWN""
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/control_axes.py"", line 20, in annotate
+    return cal.annotate(result,ROOT/""calibration""/""models.json"",AXES)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/calibration/per_axis.py"", line 57, in annotate
+    out[f""{axis}_calibrated_probability""]=probs
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/frame.py"", line 4672, in __setitem__
+    self._set_item(key, value)
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/frame.py"", line 4874, in _set_item
+    value, refs = self._sanitize_column(value)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/frame.py"", line 5756, in _sanitize_column
+    com.require_length_match(value, self.index)
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/common.py"", line 601, in require_length_match
+    raise ValueError(
+ValueError: Length of values (2) does not match length of index (1)
+",False,ERROR,False,{},[],[]
+M 57,phenomenon,PN,,,,,,,,ERROR,ValueError('Length of values (2) does not match length of index (1)'),"ne 131, in classify_assisted
+    payload[""otype""]=truth_otype;annotated=axes.annotate(pd.DataFrame([payload])).iloc[0];return as_text(annotated.get(f""{axis}_class"")) or ""UNKNOWN""
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/control_axes.py"", line 20, in annotate
+    return cal.annotate(result,ROOT/""calibration""/""models.json"",AXES)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/calibration/per_axis.py"", line 57, in annotate
+    out[f""{axis}_calibrated_probability""]=probs
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/frame.py"", line 4672, in __setitem__
+    self._set_item(key, value)
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/frame.py"", line 4874, in _set_item
+    value, refs = self._sanitize_column(value)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/frame.py"", line 5756, in _sanitize_column
+    com.require_length_match(value, self.index)
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/common.py"", line 601, in require_length_match
+    raise ValueError(
+ValueError: Length of values (2) does not match length of index (1)
+",False,ERROR,False,{},[],[]
+SN 2018fhw,phenomenon,SN,,,,,,,,ERROR,ValueError('Length of values (2) does not match length of index (1)'),"ne 131, in classify_assisted
+    payload[""otype""]=truth_otype;annotated=axes.annotate(pd.DataFrame([payload])).iloc[0];return as_text(annotated.get(f""{axis}_class"")) or ""UNKNOWN""
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/control_axes.py"", line 20, in annotate
+    return cal.annotate(result,ROOT/""calibration""/""models.json"",AXES)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/calibration/per_axis.py"", line 57, in annotate
+    out[f""{axis}_calibrated_probability""]=probs
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/frame.py"", line 4672, in __setitem__
+    self._set_item(key, value)
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/frame.py"", line 4874, in _set_item
+    value, refs = self._sanitize_column(value)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/frame.py"", line 5756, in _sanitize_column
+    com.require_length_match(value, self.index)
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/common.py"", line 601, in require_length_match
+    raise ValueError(
+ValueError: Length of values (2) does not match length of index (1)
+",False,ERROR,False,{},[],[]
+SN 2011fe,phenomenon,SN,,,,,,,,ERROR,ValueError('Length of values (2) does not match length of index (1)'),"ne 131, in classify_assisted
+    payload[""otype""]=truth_otype;annotated=axes.annotate(pd.DataFrame([payload])).iloc[0];return as_text(annotated.get(f""{axis}_class"")) or ""UNKNOWN""
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/control_axes.py"", line 20, in annotate
+    return cal.annotate(result,ROOT/""calibration""/""models.json"",AXES)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/calibration/per_axis.py"", line 57, in annotate
+    out[f""{axis}_calibrated_probability""]=probs
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/frame.py"", line 4672, in __setitem__
+    self._set_item(key, value)
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/frame.py"", line 4874, in _set_item
+    value, refs = self._sanitize_column(value)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/frame.py"", line 5756, in _sanitize_column
+    com.require_length_match(value, self.index)
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/common.py"", line 601, in require_length_match
+    raise ValueError(
+ValueError: Length of values (2) does not match length of index (1)
+",False,ERROR,False,{},[],[]
+3C 273,extragalactic,AGN,,,,,,,,ERROR,ValueError('Length of values (2) does not match length of index (1)'),"ne 131, in classify_assisted
+    payload[""otype""]=truth_otype;annotated=axes.annotate(pd.DataFrame([payload])).iloc[0];return as_text(annotated.get(f""{axis}_class"")) or ""UNKNOWN""
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/control_axes.py"", line 20, in annotate
+    return cal.annotate(result,ROOT/""calibration""/""models.json"",AXES)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/calibration/per_axis.py"", line 57, in annotate
+    out[f""{axis}_calibrated_probability""]=probs
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/frame.py"", line 4672, in __setitem__
+    self._set_item(key, value)
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/frame.py"", line 4874, in _set_item
+    value, refs = self._sanitize_column(value)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/frame.py"", line 5756, in _sanitize_column
+    com.require_length_match(value, self.index)
+  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/pandas/core/common.py"", line 601, in require_length_match
+    raise ValueError(
+ValueError: Length of values (2) does not match length of index (1)
+",False,ERROR,False,{},[],[]
