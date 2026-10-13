@@ -822,7 +822,7 @@ def classify_star(row):
     if phys == "HOT_SUBDWARF":
         # 2.22.0: Gaia CMD hot subluminous star (Culpan et al. 2022) or SIMBAD HS*;
         # the "below the dwarf sequence" class VI does not apply to these.
-        return _result("Hot subdwarf (sdO/sdB candidate)", "STAR:SD:HOT", _num(row, "physical_confidence"),
+        return _result("Hot subdwarf (sdO/sdB candidate)", "STAR:O:SD", _num(row, "physical_confidence"),
                        "HOT_SUBLUMINOUS", "physical axis: Gaia colour - absolute magnitude (Culpan+2022) / SIMBAD HS*")
     agb = agb_chemistry(row)
     if agb is not None:

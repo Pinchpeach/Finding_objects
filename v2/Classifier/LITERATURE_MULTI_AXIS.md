@@ -384,9 +384,20 @@ unreliable), galaxy clusters (needs a multi-object entity), E+A galaxies (Hδ /
   binaries (BP−RP ~ 0.5, G_abs ~ 3) are mostly missed, as in the paper.
 - Before 2.22.0 these stars fell in the "below the dwarf sequence" zone and got
   luminosity class VI or nothing (LITERATURE_SUBCLASS.md).
-- Validation: `benchmark/new_targets/build_truth.py` (Actions): completeness on
-  the Culpan+2022 known (spectroscopic) hot subdwarfs; purity from SIMBAD types
-  of a sky-random Gaia sample passing the rule.
+- Validation (`benchmark/new_targets/build_truth.py`, Actions, 2026-10-13;
+  products in `benchmark/new_targets/truth/`):
+  - completeness on the Culpan+2022 *known* (spectroscopic) hot subdwarfs with
+    a Gaia DR3 parallax_over_error > 5: 1277 / 1506 = **84.8 %** (sdB 92.3 %,
+    sdO 93.8 %, sdOB 93.5 %, He-sdB 93.3 %; composite sdB+ 59.4 %, as the
+    paper warns).  Not independent of the cut design (Culpan tuned the trough
+    on known stars), so it checks the implementation, matching their 80–90 %.
+  - purity: 3568 sky-random Gaia DR3 sources passing the full rule, SIMBAD
+    types (candidate codes such as HS? excluded; they come from the Geier /
+    Culpan candidate lists themselves): of 809 with a definite type or spectral
+    type, **655 hot subdwarfs (81.0 %, Wilson 95 % lower 78.1 %)**, 55 WDs
+    (6.8 %), 39 O/B/A (4.8 %), 32 CV / PN (4.0 %), 25 HB (3.1 %), 3 FGKM
+    (0.4 %).  Spectroscopically typed objects are a biased subset; the number
+    is used as the label's rule precision (calibration/models.json).
 
 ### 7.2 Ultracool dwarfs (physical axis, ULTRACOOL_DWARF)
 
@@ -400,7 +411,11 @@ unreliable), galaxy clusters (needs a multi-object entity), E+A galaxies (Hδ /
 - Their completeness against the GUCDS literature list: 4206 of 5180 eligible
   known UCDs (losses: missing measurements 11 %, Teff > 2700 K 6 %, quality 8 %).
 - Validation: Best et al. 2018, ApJS 234, 1 (J/ApJS/234/1), 9888
-  spectroscopic M/L/T dwarfs, matched to ESP-UCD (Actions).
+  spectroscopic M/L/T dwarfs matched (5″) to the 94 158 ESP-UCD rows:
+  532 selected, **493 (92.7 %, Wilson lower 90.1 %) of spectral type ≥ M7**
+  (the rest M6, at the 2700 K edge).  Completeness by adopted type: M7 57.7 %,
+  M8 54.1 %, M9 44.5 %, L0 31.8 %, L1–L3 14–23 %, L4–L6 4–8 %, T 0 % (Gaia RP
+  is too faint for late L / T dwarfs).
 
 ### 7.3 Young stellar objects (variability axis, YSO)
 

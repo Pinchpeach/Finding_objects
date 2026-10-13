@@ -51,6 +51,17 @@ def fit(inp:Path,out:Path):
     if not required.issubset(df.columns):raise KeyError(f"missing columns: {required-set(df.columns)}")
     if "leakage" in df:df=df[~df["leakage"].fillna(False).astype(bool)].copy()
     rules=rule_precision(df)
+    # Rule precisions measured by separate truth jobs (e.g. 2.22.0
+    # benchmark/new_targets) carry "external_source" and are kept on refit.
+    if out.exists():
+        try:
+            prev=json.loads(out.read_text(encoding="utf-8")).get("rules",{})
+            for axis,entries in prev.items():
+                for key,rm in entries.items():
+                    if rm.get("external_source") and key not in rules.get(axis,{}):
+                        rules.setdefault(axis,{})[key]=rm
+        except (OSError,ValueError):
+            pass
     df["raw_score"]=pd.to_numeric(df["raw_score"],errors="coerce");df=df.dropna(subset=["raw_score"])
     result={"schema_version":2,"policy":{"method":"platt","min_samples":MIN_SAMPLES,"min_positives":MIN_POSITIVES,"min_negatives":MIN_NEGATIVES,"min_rule_rows":MIN_RULE_ROWS},"axes":{},"rules":rules}
     for axis,g in df.groupby("axis"):
