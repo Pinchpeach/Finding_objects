@@ -64,7 +64,7 @@ expect(compact,{"in_vari_compact_companion":True},"COMPACT_COMPANION_CANDIDATE",
 expect(compact,{},"UNKNOWN","NO_VALIDATED_COMPACT_EVIDENCE")
 
 expect(physical,{"catalogs":"Suh 2021 AGB Catalog","agb_subclass":"OAGB_WISE","association_confidence__suh_2021_agb_catalog":0.93},"AGB","SUH2021_AGB_CATALOG_MATCH")
-expect(physical,{"otype":"AGB*","primary_class":"STAR"},"AGB","SIMBAD_CURATED_AGB")
+expect(physical,{"otype":"AB*","primary_class":"STAR"},"AGB","SIMBAD_CURATED_AGB")  # SIMBAD code (label "AGB*")
 expect(phenomenon,{"catalogs":"HASH PN Catalog","association_confidence__hash_pn_catalog":0.95},"PN","HASH_PN_CATALOG_MATCH")
 expect(phenomenon,{"catalogs":"ASAS-SN Supernova Catalog","association_confidence__asas_sn_supernova_catalog":0.95,"sn_subtype":"Ia"},"SN","ASASSN_SUPERNOVA_EVENT_MATCH")
 expect(phenomenon,{"otype":"SN*"},"SN","SIMBAD_CURATED_SN")

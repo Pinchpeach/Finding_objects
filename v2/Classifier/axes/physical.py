@@ -25,6 +25,7 @@ def _num(row,key):
   v=float(row.get(key));return v if math.isfinite(v) else None
  except Exception:return None
 STAR=_load_branch("star");EVOLVED=_load_branch("evolved_star")
+_os=importlib.util.spec_from_file_location("v2_simbad_otypes_phys",ROOT/"simbad_otypes.py");OTYPES=importlib.util.module_from_spec(_os);_os.loader.exec_module(OTYPES)
 _SUB=None
 def _subclass():
  global _SUB
@@ -105,9 +106,11 @@ def classify(row):
   assoc=_num(row,"association_confidence__suh_2021_agb_catalog");sub=_text(row,"agb_subclass")
   return {"axis":AXIS,"label":"AGB","confidence":assoc,"status":"SUH2021_AGB_CATALOG_MATCH","evidence":[{"kind":"suh2021_agb_catalog_counterpart","agb_subclass":sub,"position_basis":_text(row,"position_basis"),"association_confidence":assoc,"score_semantics":"raw association score; not calibrated posterior"}]}
  simbad=_text(row,"otype")
- if simbad=="HS*":return {"axis":AXIS,"label":"HOT_SUBDWARF","confidence":None,"status":"SIMBAD_CURATED_HOT_SUBDWARF","evidence":[{"kind":"simbad_physical_type","otype":"HS*"}]}
- if simbad=="BD*":return {"axis":AXIS,"label":"ULTRACOOL_DWARF","confidence":None,"status":"SIMBAD_CURATED_BROWN_DWARF","evidence":[{"kind":"simbad_physical_type","otype":"BD*"}]}
- if simbad=="AGB*":return {"axis":AXIS,"label":"AGB","confidence":None,"status":"SIMBAD_CURATED_AGB","evidence":[{"kind":"simbad_physical_type","otype":"AGB*"}]}
+ # SIMBAD codes through the hierarchy (2.22.0): the AGB code is AB* ("AGB*"
+ # is its label, so the old test never fired); Mira (Mi*) is an AB* child.
+ if OTYPES.is_a(simbad,"HS*"):return {"axis":AXIS,"label":"HOT_SUBDWARF","confidence":None,"status":"SIMBAD_CURATED_HOT_SUBDWARF","evidence":[{"kind":"simbad_physical_type","otype":"HS*"}]}
+ if OTYPES.is_a(simbad,"BD*"):return {"axis":AXIS,"label":"ULTRACOOL_DWARF","confidence":None,"status":"SIMBAD_CURATED_BROWN_DWARF","evidence":[{"kind":"simbad_physical_type","otype":"BD*"}]}
+ if OTYPES.is_a(simbad,"AB*"):return {"axis":AXIS,"label":"AGB","confidence":None,"status":"SIMBAD_CURATED_AGB","evidence":[{"kind":"simbad_physical_type","otype":simbad}]}
  coarse=str(row.get("primary_class","")).strip().upper()
  if coarse in {"GALAXY","QSO"}:return {"axis":AXIS,"label":"UNKNOWN","confidence":None,"status":"NOT_STELLAR_ROUTE","evidence":[{"kind":"coarse_route","primary_class":coarse}]}
  ucd=ultracool_evidence(row)

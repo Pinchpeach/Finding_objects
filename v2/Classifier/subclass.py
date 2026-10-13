@@ -44,6 +44,9 @@ import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parent
+import importlib.util as _ilu
+_s = _ilu.spec_from_file_location("v2_simbad_otypes_sub", ROOT / "simbad_otypes.py")
+OTYPES = _ilu.module_from_spec(_s); _s.loader.exec_module(OTYPES)
 LETTERS = "OBAFGKMLTY"
 # Measured on the spectroscopic benchmark (evaluate_subclass.py); see
 # LITERATURE_SUBCLASS.md.  Used as the reported confidence of each rule.
@@ -594,7 +597,8 @@ RGB_TIP_MKS = -6.2
 A_KS_PER_A_G = 0.137      # A_K/A_V = 0.114 (Cardelli et al. 1989), A_G/A_V = 0.83
 AGB_VARIABILITY = {"LPV", "MIRA"}
 WISE_SAT_VEGA = (8.0, 6.7, 3.8, -0.4)
-SIMBAD_AGB = {"AGB*", "C*", "S*", "Mi*", "LP*", "OH*", "pA*"}
+# SIMBAD codes: AB* is the AGB code ("AGB*" is its label; 2.22.0), Mi* is its child.
+SIMBAD_AGB = {"AB*", "C*", "S*", "Mi*", "LP*", "OH*", "pA*"}
 
 
 @lru_cache(maxsize=1)
@@ -658,7 +662,7 @@ def agb_candidate(row):
     if _num(row, "gaia_lpv_frequency", "gaia_lpv_amplitude", "gaia_lpv_is_cstar") is not None:
         return "Gaia DR3 long-period variable"
     ot = _text(row, "simbad__otype")
-    if ot in SIMBAD_AGB:
+    if any(c in SIMBAD_AGB for c in OTYPES.lineage(ot)):
         return f"SIMBAD type {ot}"
     return None
 
@@ -984,8 +988,9 @@ def galaxy_activity(row):
         if "STARFORMING" in sub:
             return "STAR_FORMING", "SDSS_BPT", f"SDSS spectrum subclass {sub} (BPT)"
     ot = _text(row, "simbad__otype")
-    if ot in SIMBAD_GALAXY:
-        act, name = SIMBAD_GALAXY[ot]
+    hit, _c = OTYPES.resolve(ot, SIMBAD_GALAXY)
+    if hit is not None:
+        act, name = hit
         return act, "SIMBAD_OTYPE", f"SIMBAD type {ot} ({name})"
     w1, w2, w3 = (_wise_vega(row, k) for k in (1, 2, 3))
     ew3 = _num(row, "std_magerr__wise_w3", "allwise__e_W3mag")
@@ -1234,8 +1239,9 @@ def spectroscopic_z(row):
 def classify_qso(row):
     parts, rules, basis = [], [], []
     ot = _text(row, "simbad__otype")
-    if ot in SIMBAD_QSO and ot != "QSO":
-        parts.append(SIMBAD_QSO[ot]); rules.append("SIMBAD_OTYPE"); basis.append(f"SIMBAD type {ot}")
+    qhit, qcode = OTYPES.resolve(ot, SIMBAD_QSO)
+    if qhit is not None and qcode != "QSO":
+        parts.append(qhit); rules.append("SIMBAD_OTYPE"); basis.append(f"SIMBAD type {ot}")
     flux, src = radio_14ghz_mjy(row)
     i = qso_i_mag(row)
     radio = None
@@ -1306,8 +1312,8 @@ def qso_tags(row):
             tags.append({"tag": "OBSCURED", "label": "obscured (red) quasar candidate", "rule": "HICKOX07",
                          "basis": f"R - W2 = {rv - w2:.2f} > 6.1 (Vega; Hickox+2007)"})
     ot = _text(row, "simbad__otype")
-    if ot in ("BLL", "Bla"):
-        tags.append({"tag": "BLAZAR", "label": SIMBAD_QSO[ot], "rule": "SIMBAD_OTYPE", "basis": f"SIMBAD type {ot}"})
+    if OTYPES.is_a(ot, "Bla"):
+        tags.append({"tag": "BLAZAR", "label": SIMBAD_QSO.get(ot, "blazar"), "rule": "SIMBAD_OTYPE", "basis": f"SIMBAD type {ot}"})
     return tags
 
 

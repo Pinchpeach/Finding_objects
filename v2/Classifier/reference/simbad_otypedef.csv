@@ -1,0 +1,227 @@
+otype,label,is_candidate,path
+PCG?,protoClG_Candidate,1,PCG
+WR?,WolfRayet*_Candidate,1,* > Ma* > sg* > s*b > WR*
+Sy2,Seyfert2,0,G > AGN > SyG > Sy2
+EmO,EmObj,0,Opt > EmO
+Ce?,Cepheid_Candidate,1,* > Ev* > Ce*
+s?y,YellowSG_Candidate,1,* > Ma* > sg* > s*y
+s*y,YellowSG,0,* > Ma* > sg* > s*y
+Lev,LensingEv,0,grv > Lev
+ULX,ULX,0,X > ULX
+gLe,GravLens,0,grv > gLS > gLe
+SN?,Supernova_Candidate,1,* > SN*
+Sy1,Seyfert1,0,G > AGN > SyG > Sy1
+Y*O,YSO,0,* > Y*O
+HVC,HVCld,0,ISM > Cld > HVC
+HX?,HighMassXBin_Candidate,1,* > ** > XB* > HXB
+out,Outflow,0,* > Y*O > out
+DNe,DarkNeb,0,ISM > Cld > DNe
+bC?,bCepV*_Candidate,1,* > Ma* > bC*
+bub,Bubble,0,ISM > bub
+RNe,RefNeb,0,ISM > Cld > GNe > RNe
+gD*,gammaDorV*,0,* > MS* > gD*
+var,Variable,0,
+EB?,EclBin_Candidate,1,* > ** > EB*
+LeI,LensedImage,0,grv > gLS > LeI
+Pe?,ChemPec*_Candidate,1,* > Pe*
+HII,HIIReg,0,ISM > HII
+mm,mmRad,0,Rad > mm
+IR,Infrared,0,IR
+RC?,RCrBV*_Candidate,1,* > Pe* > RC*
+Rad,Radio,0,Rad
+SFR,StarFormingReg,0,ISM > SFR
+Ir*,IrregularV*,0,* > V* > Ir*
+FIR,FarIR,0,IR > FIR
+Sy?,Symbiotic*_Candidate,1,* > ** > Sy*
+*,Star,0,*
+RV?,RVTauV*_Candidate,1,* > Ev* > RV*
+RR*,RRLyrae,0,* > Ev* > HB* > RR*
+X,X,0,X
+C*,C*,0,* > Ev* > C*
+Pl,Planet,0,* > Pl
+GrG,GroupG,0,GrG
+SX*,SXPheV*,0,* > MS* > BS* > SX*
+LXB,LowMassXBin,0,* > ** > XB* > LXB
+BL?,BLLac_Candidate,1,G > AGN > QSO > Bla > BLL
+Psr,Pulsar,0,* > Ma* > N* > Psr
+NIR,NearIR,0,IR > NIR
+BS*,BlueStraggler,0,* > MS* > BS*
+AB*,AGB*,0,* > Ev* > AB*
+AB?,AGB*_Candidate,1,* > Ev* > AB*
+smm,smmRad,0,Rad > smm
+EB*,EclBin,0,* > ** > EB*
+BH?,BlackHole_Candidate,1,grv > BH
+LM*,Low-Mass*,0,* > LM*
+cC*,ClassicalCep,0,* > Ev* > Ce* > cC*
+glb,Globule,0,ISM > Cld > glb
+St*,Stream,0,As* > St*
+SBG,StarburstG,0,G > SBG
+vid,Void,0,vid
+Ma?,Massiv*_Candidate,1,* > Ma*
+MGr,MouvGroup,0,As* > MGr
+El*,EllipVar,0,* > ** > El*
+N*,Neutron*,0,* > Ma* > N*
+GlC,GlobCluster,0,Cl* > GlC
+cm,cmRad,0,Rad > cm
+PoG,PartofG,0,PoG
+AGN,AGN,0,G > AGN
+Mi?,Mira_Candidate,1,* > Ev* > AB* > Mi*
+GiC,GtowardsCl,0,G > GiC
+s?r,RedSG_Candidate,1,* > Ma* > sg* > s*r
+PN,PlanetaryNeb,0,* > Ev* > PN
+Cl?,Cluster*_Candidate,1,Cl*
+CV?,CataclyV*_Candidate,1,* > ** > CV*
+SR?,SNRemnant_Candidate,1,ISM > SNR
+bC*,bCepV*,0,* > Ma* > bC*
+sg*,Supergiant,0,* > Ma* > sg*
+BD?,BrownD*_Candidate,1,* > LM* > BD*
+OH*,OH/IR*,0,* > Ev* > OH*
+LeQ,LensedQ,0,grv > gLS > LeI > LeQ
+UX?,ULX_Candidate,1,X > ULX
+mul,Blend,0,mul
+No?,Nova_Candidate,1,* > ** > CV* > No*
+OpC,OpenCluster,0,Cl* > OpC
+V*,Variable*,0,* > V*
+mR,metricRad,0,Rad > mR
+Q?,QSO_Candidate,1,G > AGN > QSO
+HB?,HorBranch*_Candidate,1,* > Ev* > HB*
+sh,HIshell,0,ISM > sh
+Ma*,Massiv*,0,* > Ma*
+PaG,PairG,0,PaG
+Em*,EmLine*,0,* > Em*
+Gl?,GlobCluster_Candidate,1,Cl* > GlC
+blu,blue,0,Opt > blu
+IG,InteractingG,0,IG
+HS*,HotSubdwarf,0,* > Ev* > HS*
+TT?,TTauri*_Candidate,1,* > Y*O > TT*
+gam,gamma,0,gam
+S*?,S*_Candidate,1,* > Ev* > S*
+RV*,RVTauV*,0,* > Ev* > RV*
+pA?,post-AGB*_Candidate,1,* > Ev* > pA*
+BY?,BYDraV*_Candidate,1,* > ** > BY*
+Ev?,Evolved*_Candidate,1,* > Ev*
+ev,Transient,0,ev
+RB?,RGB*_Candidate,1,* > Ev* > RG*
+Ro?,RotV*_Candidate,1,* > V* > Ro*
+**?,**_Candidate,1,* > **
+H2G,HIIG,0,G > H2G
+GNe,GalNeb,0,ISM > Cld > GNe
+As?,Association_Candidate,1,As*
+OH?,OH/IR*_Candidate,1,* > Ev* > OH*
+V*?,Variable*_Candidate,1,* > V*
+PN?,PlanetaryNeb_Candidate,1,* > Ev* > PN
+WD*,WhiteDwarf,0,* > Ev* > WD*
+HV*,HighVel*,0,* > HV*
+Ce*,Cepheid,0,* > Ev* > Ce*
+PM*,HighPM*,0,* > PM*
+Mi*,Mira,0,* > Ev* > AB* > Mi*
+Pu?,PulsV*_Candidate,1,* > V* > Pu*
+CGb,ComGlob,0,ISM > Cld > CGb
+Er?,Eruptive*_Candidate,1,* > V* > Er*
+BS?,BlueStraggler_Candidate,1,* > MS* > BS*
+Ev*,Evolved*,0,* > Ev*
+sg?,Supergiant_Candidate,1,* > Ma* > sg*
+QSO,QSO,0,G > AGN > QSO
+N*?,Neutron*_Candidate,1,* > Ma* > N*
+RR?,RRLyrae_Candidate,1,* > Ev* > HB* > RR*
+G?,Galaxy_Candidate,1,G
+dS*,delSctV*,0,* > MS* > dS*
+UV,UV,0,UV
+As*,Association,0,As*
+HXB,HighMassXBin,0,* > ** > XB* > HXB
+C*?,C*_Candidate,1,* > Ev* > C*
+a2?,alf2CVnV*_Candidate,1,* > Pe* > a2*
+Er*,Eruptive*,0,* > V* > Er*
+SCG,SuperClG,0,SCG
+LIN,LINER,0,G > AGN > LIN
+Pl?,Planet_Candidate,1,* > Pl
+WV*,Type2Cep,0,* > Ev* > WV*
+BD*,BrownD*,0,* > LM* > BD*
+PoC,PartofCloud,0,PoC
+LP?,LongPeriodV*_Candidate,1,* > Ev* > LP*
+PCG,protoClG,0,PCG
+Ae?,Ae*_Candidate,1,* > Y*O > Ae*
+LS?,GravLensSystem_Candidate,1,grv > gLS
+RS*,RSCVnV*,0,* > ** > RS*
+Gr?,GroupG_Candidate,1,GrG
+Bz?,Blazar_Candidate,1,G > AGN > QSO > Bla
+MIR,MidIR,0,IR > MIR
+Cld,Cloud,0,ISM > Cld
+Be?,Be*_Candidate,1,* > MS* > Be*
+XB?,XrayBin_Candidate,1,* > ** > XB*
+Pe*,ChemPec*,0,* > Pe*
+s?b,BlueSG_Candidate,1,* > Ma* > sg* > s*b
+bCG,BlueCompactG,0,G > bCG
+RC*,RCrBV*,0,* > Pe* > RC*
+rG,RadioG,0,G > AGN > rG
+LX?,LowMassXBin_Candidate,1,* > ** > XB* > LXB
+SyG,Seyfert,0,G > AGN > SyG
+BY*,BYDraV*,0,* > ** > BY*
+SB*,SB*,0,* > ** > SB*
+MoC,MolCld,0,ISM > Cld > MoC
+flt,Filament,0,ISM > flt
+LI?,LensedImage_Candidate,1,grv > gLS > LeI
+LP*,LongPeriodV*,0,* > Ev* > LP*
+Mas,Maser,0,Rad > Mas
+Bla,Blazar,0,G > AGN > QSO > Bla
+CV*,CataclyV*,0,* > ** > CV*
+LM?,Low-Mass*_Candidate,1,* > LM*
+Y*?,YSO_Candidate,1,* > Y*O
+CGG,Compact_Gr_G,0,GrG > CGG
+gB,gammaBurst,0,gam > gB
+G,Galaxy,0,G
+HB*,HorBranch*,0,* > Ev* > HB*
+RS?,RSCVnV*_Candidate,1,* > ** > RS*
+pA*,post-AGB*,0,* > Ev* > pA*
+WD?,WhiteDwarf_Candidate,1,* > Ev* > WD*
+Ae*,Ae*,0,* > Y*O > Ae*
+SC?,SuperClG_Candidate,1,SCG
+s*r,RedSG,0,* > Ma* > sg* > s*r
+?,Unknown,0,
+ISM,ISM,0,ISM
+MS*,MainSequence*,0,* > MS*
+GiP,GinPair,0,G > GiP
+Opt,Optical,0,Opt
+Be*,Be*,0,* > MS* > Be*
+No*,Nova,0,* > ** > CV* > No*
+BLL,BLLac,0,G > AGN > QSO > Bla > BLL
+SNR,SNRemnant,0,ISM > SNR
+err,Inexistent,0,err
+HI,HI,0,Rad > HI
+XB*,XrayBin,0,* > ** > XB*
+Or*,OrionV*,0,* > Y*O > Or*
+LeG,LensedG,0,grv > gLS > LeI > LeG
+Pu*,PulsV*,0,* > V* > Pu*
+S*,S*,0,* > Ev* > S*
+of?,Outflow_Candidate,1,* > Y*O > out
+HS?,HotSubdwarf_Candidate,1,* > Ev* > HS*
+Le?,GravLens_Candidate,1,grv > gLS > gLe
+C?G,ClG_Candidate,1,ClG
+HH,HerbigHaroObj,0,* > Y*O > out > HH
+a2*,alf2CVnV*,0,* > Pe* > a2*
+MS?,MainSequence*_Candidate,1,* > MS*
+TT*,TTauri*,0,* > Y*O > TT*
+grv,Gravitation,0,grv
+Sy*,Symbiotic*,0,* > ** > Sy*
+GiG,GtowardsGroup,0,G > GiG
+cor,denseCore,0,ISM > cor
+BiC,BrightestCG,0,G > GiC > BiC
+SN*,Supernova,0,* > SN*
+BH,BlackHole,0,grv > BH
+s*b,BlueSG,0,* > Ma* > sg* > s*b
+El?,EllipVar_Candidate,1,* > ** > El*
+ClG,ClG,0,ClG
+AG?,AGN_Candidate,1,G > AGN
+GWE,GravWaveEvent,0,grv > GWE
+gLS,GravLensSystem,0,grv > gLS
+reg,Region,0,reg
+Cl*,Cluster*,0,Cl*
+WR*,WolfRayet*,0,* > Ma* > sg* > s*b > WR*
+**,**,0,* > **
+rB,radioBurst,0,Rad > rB
+RG*,RGB*,0,* > Ev* > RG*
+EmG,EmissionG,0,G > EmG
+WV?,Type2Cep_Candidate,1,* > Ev* > WV*
+LSB,LowSurfBrghtG,0,G > LSB
+SB?,SB*_Candidate,1,* > ** > SB*
+Ro*,RotV*,0,* > V* > Ro*

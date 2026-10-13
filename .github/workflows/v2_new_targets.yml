@@ -29,7 +29,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install pandas numpy astropy astroquery pyvo requests
+      - run: pip install pandas numpy scipy astropy astroquery pyvo requests
       - name: Probe catalogues
         continue-on-error: true
         run: python -u v2/benchmark/new_targets/probe_catalogs.py --out v2/benchmark/new_targets/probe

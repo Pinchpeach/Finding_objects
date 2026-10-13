@@ -1,5 +1,9 @@
 """Extragalactic refinement axis using coarse routing and Gaia AGN evidence."""
 from __future__ import annotations
+import importlib.util as _ilu
+from pathlib import Path as _P
+_s=_ilu.spec_from_file_location("v2_simbad_otypes",_P(__file__).resolve().parents[1]/"simbad_otypes.py")
+OTYPES=_ilu.module_from_spec(_s);_s.loader.exec_module(OTYPES)
 AXIS="extragalactic"
 CLASSES=("GALAXY","AGN","QSO","BLAZAR","OTHER_EXTRAGALACTIC","UNKNOWN")
 # BLAZAR (2.22.0): Roma-BZCAT 5th edition membership (Massaro et al. 2015,
@@ -37,8 +41,8 @@ def classify(row):
                              "score_semantics":"raw association score; not calibrated posterior"}]}
     ot=row.get("otype") or row.get("simbad__otype")
     ot=str(ot).strip() if ot is not None else ""
-    if ot in SIMBAD_BLAZAR:
-        return {"axis":AXIS,"label":"BLAZAR","subtype":SIMBAD_BLAZAR[ot],"confidence":None,"status":"SIMBAD_CURATED_BLAZAR",
+    if OTYPES.is_a(ot,"Bla"):
+        return {"axis":AXIS,"label":"BLAZAR","subtype":SIMBAD_BLAZAR.get(ot),"confidence":None,"status":"SIMBAD_CURATED_BLAZAR",
                 "evidence":[{"kind":"simbad_physical_type","otype":ot}]}
     raw=_text(row,"best_class_name")
     coarse=_text(row,"primary_class")

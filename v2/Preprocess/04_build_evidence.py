@@ -8,6 +8,14 @@ from __future__ import annotations
 import argparse,json,math
 from pathlib import Path
 import pandas as pd
+import importlib.util as _ilu
+_s=_ilu.spec_from_file_location("v2_simbad_otypes_s4",Path(__file__).resolve().parents[1]/"Classifier"/"simbad_otypes.py")
+OTYPES=_ilu.module_from_spec(_s);_s.loader.exec_module(OTYPES)
+# SIMBAD-TYPE-001 through the otype hierarchy (2.22.0; the old exact-code map
+# missed every child type, e.g. BLL, Sy1, cC*, Mi*, and listed "Star", which
+# is not a code).  Most specific first: QSO (incl. blazars) before AGN before
+# galaxy; anything under "*" is a star.  Candidate codes ("?") give nothing.
+SIMBAD_COARSE={"QSO":"QSO","AGN":"EXTRAGALACTIC","G":"GALAXY","*":"STAR"}
 
 PRIMARY=("STAR","GALAXY","QSO")
 # Unresolved morphology cannot separate stars from quasars (both are point
@@ -276,8 +284,8 @@ def evaluate(rule,row,namespaced=frozenset()):
         if typ in mp: emit(out,rule,mp[typ],0.85,typ,"curated NED preferred physical type",reliability,association_reliability)
     elif rid=="SIMBAD-TYPE-001":
         typ=str(src.get("otype","")).strip()
-        mp={"G":"GALAXY","GiG":"GALAXY","QSO":"QSO","AGN":"EXTRAGALACTIC","Star":"STAR","*":"STAR","WD*":"STAR"}
-        if typ in mp: emit(out,rule,mp[typ],0.85,typ,"curated SIMBAD hierarchical physical type",reliability,association_reliability)
+        cls,_hit=OTYPES.resolve(typ,SIMBAD_COARSE)
+        if cls: emit(out,rule,cls,0.85,typ,"curated SIMBAD hierarchical physical type",reliability,association_reliability)
     elif rid=="DSC-001":
         # Preprocess is intentionally coarse. Gaia DSC white-dwarf and
         # physical-binary posterior mass belongs to the stellar family here;

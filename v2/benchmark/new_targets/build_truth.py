@@ -50,7 +50,7 @@ def rows_pass(df, fn):
 def hot_subdwarfs(out, say):
     from astroquery.vizier import Vizier
     cats = Vizier(columns=["**"], row_limit=-1).get_catalogs("J/A+A/662/A40")
-    say("J/A+A/662/A40 tables:", {k: (len(v), v.colnames[:30]) for k, v in cats.items()})
+    say("J/A+A/662/A40 tables:", {k: (len(cats[k]), cats[k].colnames[:30]) for k in cats.keys()})
     key = next((k for k in cats.keys() if "known" in k.lower()), None)
     if key is None:
         say("no known-hot-subdwarf table found"); return

@@ -1,6 +1,10 @@
 """Compact-object axis with conservative catalog evidence."""
 from __future__ import annotations
 import math
+import importlib.util as _ilu
+from pathlib import Path as _P
+_s=_ilu.spec_from_file_location("v2_simbad_otypes",_P(__file__).resolve().parents[1]/"simbad_otypes.py")
+OTYPES=_ilu.module_from_spec(_s);_s.loader.exec_module(OTYPES)
 AXIS="compact";CLASSES=("NS","PULSAR","PULSAR_CANDIDATE","XRB","COMPACT_COMPANION_CANDIDATE","OTHER_COMPACT","UNKNOWN")
 # Radio pulsar candidate without the ATNF catalogue (2.6.3; revised 2.10.0).
 # Pulsars have steep spectra (alpha ~ -1.6; Jankowski et al. 2018, Bates et
@@ -68,9 +72,10 @@ def classify(row):
   assoc=_num(row,"association_confidence__atnf_pulsar_catalog")
   return {"axis":AXIS,"label":"PULSAR","confidence":assoc,"status":"ATNF_CATALOG_MATCH","evidence":[{"kind":"atnf_pulsar_catalog_counterpart","association_confidence":assoc,"score_semantics":"raw association score; not calibrated posterior"}]}
  simbad=_text(row,"otype")
- if simbad=="N*":return {"axis":AXIS,"label":"NS","confidence":None,"status":"SIMBAD_CURATED_NS","evidence":[{"kind":"simbad_physical_type","otype":"N*"}]}
- if simbad=="Psr":return {"axis":AXIS,"label":"PULSAR","confidence":None,"status":"SIMBAD_CURATED_PULSAR","evidence":[{"kind":"simbad_physical_type","otype":"Psr"}]}
- if simbad in {"XB*","LXB","HXB"}:return {"axis":AXIS,"label":"XRB","confidence":None,"status":"SIMBAD_CURATED_XRB","evidence":[{"kind":"simbad_physical_type","otype":simbad}]}
+ hit,_c=OTYPES.resolve(simbad,{"Psr":"PULSAR","N*":"NS","XB*":"XRB"})   # hierarchy (2.22.0)
+ if hit=="NS":return {"axis":AXIS,"label":"NS","confidence":None,"status":"SIMBAD_CURATED_NS","evidence":[{"kind":"simbad_physical_type","otype":simbad}]}
+ if hit=="PULSAR":return {"axis":AXIS,"label":"PULSAR","confidence":None,"status":"SIMBAD_CURATED_PULSAR","evidence":[{"kind":"simbad_physical_type","otype":simbad}]}
+ if hit=="XRB":return {"axis":AXIS,"label":"XRB","confidence":None,"status":"SIMBAD_CURATED_XRB","evidence":[{"kind":"simbad_physical_type","otype":simbad}]}
  psr=radio_pulsar_evidence(row)
  if psr is not None:return {"axis":AXIS,"label":"PULSAR_CANDIDATE","confidence":pulsar_posterior(row,psr),"status":"RADIO_STEEP_COMPACT_POLARISED" if psr["significantly_polarised"] else "RADIO_STEEP_COMPACT","evidence":[psr]}
  if _bool(row,"in_vari_compact_companion"):return {"axis":AXIS,"label":"COMPACT_COMPANION_CANDIDATE","confidence":None,"status":"GAIA_DR3_COMPACT_COMPANION_CANDIDATE","evidence":[{"kind":"gaia_dr3_vari_summary","in_vari_compact_companion":True}]}
