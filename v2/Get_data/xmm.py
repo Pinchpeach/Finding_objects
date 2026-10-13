@@ -7,7 +7,7 @@ names made every query raise, so this catalogue never reached a result.
 from pathlib import Path
 import pandas as pd
 from _catalog_utils import pick, coordinates
-CATALOG="XMM 4XMM-DR13"; VIZIER_CATALOG="IX/74/4xmmdr13s"
+CATALOG="XMM 4XMM-DR13"; VIZIER_CATALOG="IX/69"     # 4XMM-DR13 (Webb+ 2023); IX/74 never existed
 ID_COLUMNS=['4XMM', 'IAUName', 'IAUNAME', 'Name', 'SrcID']
 RA_COLUMNS=['RA_ICRS', 'RAJ2000', '_RAJ2000']
 DEC_COLUMNS=['DE_ICRS', 'DEJ2000', '_DEJ2000']
