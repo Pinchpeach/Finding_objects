@@ -1,5 +1,5 @@
 collector,status,rows,max_sep_arcmin,file,error
-gaia_dr3,ok,3,0.4460740601091497,rawdata/gaia_dr3_ngc4522_r0p5arcmin.csv,
+gaia_dr3,ok,3,0.44607406034638597,rawdata/gaia_dr3_ngc4522_r0p5arcmin.csv,
 sdss_dr18,ok,14,0.4335197565332262,rawdata/sdss_dr18_ngc4522_r0p5arcmin.csv,
 panstarrs1,ok,61,0.46846925649675963,rawdata/panstarrs1_ngc4522_r0p5arcmin.csv,
 desi_legacy,ok,28,0.498749713164462,rawdata/desi_legacy_ngc4522_r0p5arcmin.csv,
@@ -18,4 +18,4 @@ desi_spectroscopy,ok,1,0.043355301443576647,rawdata/desi_spectroscopy_ngc4522_r0
 lamost_spectroscopy,ok,0,,rawdata/lamost_spectroscopy_ngc4522_r0p5arcmin.csv,
 sga2020,radius_error,7,9.485225339043911,rawdata/sga2020_ngc4522_r0p5arcmin.csv,
 simbad,ok,1,0.020701049365056436,rawdata/simbad_ngc4522_r0p5arcmin.csv,
-ned,ok,13,0.47688636578212423,rawdata/ned_ngc4522_r0p5arcmin.csv,
+ned,error,0,,,"RemoteServiceError(""The remote service returned the following error message.\nERROR: We can't start the database search program /ned/ops/util/bin/nedexec. start_exec() returned status=-4"")"
