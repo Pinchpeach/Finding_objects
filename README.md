@@ -11,7 +11,7 @@
 
 - 관측 가능한 전 파장대역(전파 ~ X선)의 카탈로그를 모아 대상 천체를 식별하고 분류한다.
   - ㄴ 1차 분류 : STAR / GALAXY / QSO / UNKNOWN
-  - ㄴ 세부 분류 : 분광형, 백색왜성, 적색거성 · AGB, 변광성(Mira, 세페이드, RR Lyrae ...), 펄서, AGN, 행성상성운 등
+  - ㄴ 세부 분류 : 분광형, 백색왜성, 뜨거운 준왜성, 초저온 왜성, 적색거성 · AGB, 변광성(Mira, 세페이드, RR Lyrae, 젊은 별 ...), 펄서, AGN, 블레이자, 행성상성운 등
 - ★ 확신이 없으면 고르지 않는다 → **UNKNOWN**으로 남기고 그 이유를 적는다.
 - ★ 모든 임계값과 규칙은 문헌 근거가 먼저다. 근거는 `v2/` 아래 `LITERATURE*.md`에 남긴다.
 
@@ -26,8 +26,8 @@
 ```
 (RA, Dec, 반경)
   │
-  ├─ 수집   아카이브 26곳을 병렬로 질의 (Gaia, SDSS, PS1, Legacy Surveys, WISE, 2MASS,
-  │         GALEX, 전파 5종, X선 3종, 분광 4종, ZTF, ATNF, SIMBAD, NED ...)
+  ├─ 수집   아카이브 27곳을 병렬로 질의 (Gaia, SDSS, PS1, Legacy Surveys, WISE, 2MASS,
+  │         GALEX, 전파 5종, X선 3종, 분광 4종, ZTF, ATNF, BZCAT, SIMBAD, NED ...)
   ├─ 연관   같은 천체의 검출끼리 묶는다 (위치 · 관측 시기 · 오차, 고유운동 보정)
   ├─ 통합   천체 하나 = 한 행, 단위 통일 (AB 등급, mJy, z)
   ├─ 증거   규칙 25개가 각자 STAR / GALAXY / QSO 쪽 증거를 낸다
@@ -54,7 +54,7 @@ classified_objects.csv
 
 | 검증 | 결과 |
 |---|---|
-| SDSS 분광 정답, 1차 분류 | 97.69 % |
+| SDSS 분광 정답, 1차 분류 | 97.59 % |
 | DESI 분광 정답 (어두운 천체), 1차 분류 | 90.96 % |
 | Mira / 세페이드 / RR Lyrae | 94.8 / 93.2 / 82.4 % |
 | 행성상성운 | 89.2 % |

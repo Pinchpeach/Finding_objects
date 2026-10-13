@@ -1,14 +1,14 @@
 # Finding Objects v2 — 분류 알고리즘 설명
 
-이 문서는 v2 분류기가 **하늘의 한 영역을 받아 각 천체를 무엇으로 판정하는지** 처음부터 끝까지 설명합니다. 각 단계의 근거 문헌은 `Preprocess/LITERATURE.md`, `Classifier/LITERATURE_*.md`, `LITERATURE_REVIEW_2026-10.md`에 있고, 버전별 측정치는 `CHANGELOG.md`에 있습니다. 숫자는 2.21.0 기준입니다.
+이 문서는 v2 분류기가 **하늘의 한 영역을 받아 각 천체를 무엇으로 판정하는지** 처음부터 끝까지 설명합니다. 각 단계의 근거 문헌은 `Preprocess/LITERATURE.md`, `Classifier/LITERATURE_*.md`, `LITERATURE_REVIEW_2026-10.md`에 있고, 버전별 측정치는 `CHANGELOG.md`에 있습니다. 숫자는 2.22.0 기준입니다.
 
 ## 0. 한눈에 보기
 
 ```
 입력: (RA, Dec, 반경)  또는  이미 받은 카탈로그 폴더
  │
- ├─ 수집   26개 아카이브를 병렬 질의 (Gaia, SDSS, PS1, Legacy Surveys, WISE, 2MASS, GALEX,
- │         전파 5종, X선 3종, 분광 4종, ZTF, ATNF, Suh AGB, SGA, SIMBAD, NED) + 로컬 캐시
+ ├─ 수집   27개 아카이브를 병렬 질의 (Gaia, SDSS, PS1, Legacy Surveys, WISE, 2MASS, GALEX,
+ │         전파 5종, X선 3종, 분광 4종, ZTF, ATNF, BZCAT, Suh AGB, SGA, SIMBAD, NED) + 로컬 캐시
  ├─ 1 연관  같은 천체의 검출을 위치·시기·오차로 묶음 (고유운동 전파, 우도비, 우연 일치 확률)
  ├─ 2 통합  천체 하나 = 한 행, 카탈로그별 열 + 단위 통일(AB 등급, mJy, z)
  ├─ 3 특징  색, 형태, 신호대잡음, 품질 플래그
@@ -27,7 +27,7 @@
 
 ## 1. 수집 (`Get_data/`)
 
-- **수집기 26개**가 각자 원뿔 검색을 하고 `catalog, catalog_object_id, object_name, ra, dec` + 카탈로그 원래 열을 CSV로 저장합니다(`controller.collect_all`).
+- **수집기 27개**(2.22.0: Roma-BZCAT 추가)가 각자 원뿔 검색을 하고 `catalog, catalog_object_id, object_name, ra, dec` + 카탈로그 원래 열을 CSV로 저장합니다(`controller.collect_all`).
 - 병렬 6개, 아카이브당 300 s 예산입니다. 한 아카이브가 멈춰도 나머지는 계속합니다.
 - 요청마다 시간 제한이 있어 멈춘 스레드가 쌓이지 않습니다. Gaia는 마감 시각이 지나면 재시도를 멈춥니다(2.19.0).
 - VizieR 열 이름은 후보 목록에서 대소문자를 무시하고 고릅니다. 실제 아카이브로 확인했습니다(2.20.0).
@@ -100,9 +100,10 @@
 
   | 벤치마크 | 정확도(기권 = 오답) | 기권률 |
   |---|---:|---:|
-  | SDSS | 97.69 % | 0.75 % |
+  | SDSS | 97.59 % | 0.85 % |
   | DESI(어두운 천체) | 90.96 % | 2.6 % |
 
+- 2.22.0부터 SDSS 벤치마크에도 Gaia DSC가 들어갑니다(이전에는 열 이름 차이로 빠져 있었음, 97.69 → 97.59 %). DSC를 넣고 융합을 다시 학습하면 SDSS 97.34 %·DESI 90.12 %로 더 나빠서 기존 가중치를 유지했습니다.
 - **실제 영역**(DESI 분광 대조): 판정한 것의 정확도 96.8–100 %, 판정률 92.6–97.6 %.
 
 ## 6. 세부 분류 (`Classifier/subclass.py`)
@@ -158,14 +159,16 @@
 
 ## 7. 독립 축 (`Classifier/axes/`)
 
+SIMBAD 유형은 SIMBAD `otypedef` 계층(`Classifier/reference/simbad_otypedef.csv`, `simbad_otypes.py`)을 따라 가장 구체적인 코드부터 위로 찾아 판정합니다(2.22.0). 예: `cC*`(고전 세페이드) → `Ce*`, `Mi*`(미라) → `AB*`(AGB), `BLL` → `Bla` → `QSO`. 후보 코드(`?`)는 판정에 쓰지 않습니다. 1차 분류의 SIMBAD 증거(SIMBAD-TYPE-001)도 같은 계층을 씁니다(QSO > AGN > 은하, `*` 아래는 별).
+
 1차 클래스와 별개로, 천체의 다른 성질을 다섯 축에서 따로 판정합니다. 각 축은 근거가 없으면 UNKNOWN입니다.
 
 | 축 | 클래스 | 주요 근거 |
 |---|---|---|
-| 물리 상태 | WD, RGB, AGB, RED_GIANT | Gaia HR 위치(GF21) + DSC. Suh 2021 AGB(광도 확인). SIMBAD. 광도 계급 III + Teff < 5500 K → RED_GIANT. FLAME 거성(1 ≤ M < 2 M☉, 나이 > 1.5 Gyr) |
-| 변광 | RR_LYRAE, CEPHEID, MIRA, LPV, ECLIPSING, ROTATIONAL, ERUPTIVE, PULSATING, OTHER_VARIABLE | SIMBAD 유형 → Gaia SOS(RR, 세페이드). ZTF 주기 변광성(g/r 진폭비 표시). Gaia LPV 반진폭 ≥ 0.6 mag이고 80 ≤ P < 1000 d → 미라. Gaia 변광 분류기 |
+| 물리 상태 | WD, HOT_SUBDWARF, ULTRACOOL_DWARF, RGB, AGB, RED_GIANT | Gaia HR 위치(GF21) + DSC. **뜨거운 준왜성**: Culpan+2022 Gaia 색–절대등급 선택(−0.7 ≤ BP−RP ≤ 0.7, 시차 S/N > 5, \|C*\| < 0.6, 주계열 제거 다항식). **초저온 왜성**: Gaia ESP-UCD Teff < 2700 K, 품질 0·1(Sarro+2023). Suh 2021 AGB(광도 확인). SIMBAD(HS*, BD*, AB*). 광도 계급 III + Teff < 5500 K → RED_GIANT. FLAME 거성(1 ≤ M < 2 M☉, 나이 > 1.5 Gyr) |
+| 변광 | RR_LYRAE, CEPHEID, MIRA, LPV, ECLIPSING, ROTATIONAL, ERUPTIVE, PULSATING, YSO, OTHER_VARIABLE | SIMBAD 유형(계층: cC*·WV* → 세페이드, TT*·Or* → YSO) → Gaia SOS(RR, 세페이드). ZTF 주기 변광성(g/r 진폭비 표시). Gaia LPV 반진폭 ≥ 0.6 mag이고 80 ≤ P < 1000 d → 미라. Gaia 변광 분류기 |
 | 밀집성 | NS, PULSAR, PULSAR_CANDIDATE, XRB, COMPACT_COMPANION_CANDIDATE | ATNF, SIMBAD. 전파: TGSS–NVSS 스펙트럼 지수 ≤ −1.5이고 점광원(+유의한 편광) → 펄서 후보. 하늘 전체 사후확률(은하면·편광 우도비)이 확신도. Gaia 밀집 동반성 후보 |
-| 외부은하 | GALAXY, AGN, QSO | Gaia 변광 AGN, 1차 분류 |
+| 외부은하 | GALAXY, AGN, QSO, BLAZAR | **블레이자**: Roma-BZCAT 5판 일치(수집기 `bzcat.py`, 유형 BL Lac/FSRQ/모은하 우세/불확실), SIMBAD Bla·BLL. Gaia 변광 AGN, 1차 분류 |
 | 현상 | SN, PN, NOVA, MICROLENSING | HASH(T/L → PN, P → 가능, 모방체 제외). Acker PN 목록. ASAS-SN·Asiago 초신성 목록 일치(사건 시각과 관측 시각이 둘 다 있을 때만 1년 이후면 모은하로 보는데, 지금 수집기는 관측 시각을 주지 않아 목록 일치는 SN으로 남음). SIMBAD. Gaia |
 
 **확신도 보정** (`calibration/`):

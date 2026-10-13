@@ -355,6 +355,86 @@ more than a year after the event, the source is the host galaxy, not the
 supernova (status `SN_HOST_PAST_EVENT`), as in the time-domain branch that
 needs an event epoch.
 
+## 7. Targets added in 2.22.0
+
+Candidates were ranked by (a) data the pipeline already collects, (b) an
+independent truth set separate from the evidence source and (c) whether the
+label fixes an existing error.  Deferred, with reasons, in
+`v2/WORK_REPORT_2026-10-13.md`: X-ray binaries (lookup only, no rule to
+validate), CVs, Wolf-Rayet stars (only route was ESP-ELS, already measured as
+unreliable), galaxy clusters (needs a multi-object entity), E+A galaxies (Hδ /
+[O II] not collected), symbiotic / hypervelocity stars, lensed quasars.
+
+### 7.1 Hot subdwarfs (physical axis, HOT_SUBDWARF)
+
+- Culpan, Geier, Reindl et al. 2022, A&A 662, A40 (arXiv:2203.07938), Table 1,
+  parallax selection on Gaia EDR3 (same astrometry and photometry as DR3):
+  - −0.7 ≤ BP−RP ≤ 0.7 and −5 ≤ G_abs ≤ 7;
+  - parallax > 0, parallax_over_error > 5 (astrometric_sigma5d_max < 1.5 is
+    not collected and not applied);
+  - |phot_bp_rp_excess_factor_corrected| < 0.6 (Riello et al. 2021 C*);
+  - main-sequence rejection: the region G_abs < 17.7c³ − 6.9c² + 7.35c + 1.95
+    (c = BP−RP) is removed, i.e. candidates lie fainter than this trough;
+  - no extinction or parallax zero-point correction (as in the paper);
+  - their 5″ crowding filter is not applied (it needs all Gaia neighbours).
+- Expected quality: parallax selection 80–90 % complete for single sdO/Bs;
+  ~10 % contamination by cooler stars, ~5 % WDs and MS B/O stars (Geier et al.
+  2019, A&A 621, A38, the DR2 version).  The reduced-proper-motion selection
+  (50 % complete, 28 % contaminated) is not used.  Composite sdB + F/G/K
+  binaries (BP−RP ~ 0.5, G_abs ~ 3) are mostly missed, as in the paper.
+- Before 2.22.0 these stars fell in the "below the dwarf sequence" zone and got
+  luminosity class VI or nothing (LITERATURE_SUBCLASS.md).
+- Validation: `benchmark/new_targets/build_truth.py` (Actions): completeness on
+  the Culpan+2022 known (spectroscopic) hot subdwarfs; purity from SIMBAD types
+  of a sky-random Gaia sample passing the rule.
+
+### 7.2 Ultracool dwarfs (physical axis, ULTRACOOL_DWARF)
+
+- Sarro et al. 2023, A&A 669, A139 (arXiv:2211.03641): Gaia DR3 ESP-UCD
+  candidates have Teff < 2700 K from the RP spectrum (M7 ≈ 2656 K, Stephens et
+  al. 2009); 94 158 sources in quality categories 0 (best), 1, 2.  Their
+  science sample uses categories 0 and 1.  The first digit of
+  `flags_espucd` is the category (archive values 00/01/10/11/20/21).
+- Rule: teff_espucd < 2700 K and category 0 or 1.  Brown dwarf vs very-low-mass
+  star needs an age, so only "ultracool dwarf" is claimed.
+- Their completeness against the GUCDS literature list: 4206 of 5180 eligible
+  known UCDs (losses: missing measurements 11 %, Teff > 2700 K 6 %, quality 8 %).
+- Validation: Best et al. 2018, ApJS 234, 1 (J/ApJS/234/1), 9888
+  spectroscopic M/L/T dwarfs, matched to ESP-UCD (Actions).
+
+### 7.3 Young stellar objects (variability axis, YSO)
+
+- Gaia DR3 variability classifier class YSO, checked by Marton et al. 2023,
+  A&A 674, A21 against nine YSO catalogues: ~10 % contamination on average
+  (up to 26.7 % against single catalogues).  Before 2.22.0 it was mapped to
+  OTHER_VARIABLE.  SIMBAD TT* (T Tauri) and Or* (Orion variable), both under
+  Y*O in the SIMBAD hierarchy, are the curated route.
+- Not used: Gaia ESP-ELS T Tauri / Herbig labels (2 % / 30 % SIMBAD agreement,
+  2.6.2); Koenig & Leisawitz 2014 WISE cuts (no published contamination for
+  our depth; would add a rule without independent truth).
+
+### 7.4 Blazars (extragalactic axis, BLAZAR)
+
+- Roma-BZCAT 5th edition, Massaro et al. 2015, Ap&SS 357, 75 (VizieR
+  VII/274/bzcat5): 3561 sources, each radio-detected with an optical spectrum.
+  Name prefix → subtype: 5BZB BL Lac, 5BZQ FSRQ, 5BZG BL Lac with dominant host
+  galaxy, 5BZU uncertain.  New collector `Get_data/bzcat.py` (positions ~1″).
+- Membership is identity evidence (like ATNF for pulsars); SIMBAD Bla / BLL
+  through the hierarchy is the curated route.
+- Not added: the WISE blazar strip (WIBRaLS2 / KDEBLLACS, D'Abrusco et al.
+  2019, ApJS 242, 4) as a rule; 4LAC-DR3 (its associations draw on BZCAT, not
+  independent).
+
+### 7.5 SIMBAD object-type hierarchy
+
+- SIMBAD returns the most specific code; the `path` column of its `otypedef`
+  table (fetched in Actions, `reference/simbad_otypedef.csv`, 226 codes) gives
+  each code's lineage.  Rules now map through it (`simbad_otypes.py`).
+- Corrections found with it: the AGB code is `AB*` (`AGB*` is the label, so the
+  SIMBAD AGB route never fired); `Star` is not a code; `cC*` / `WV*` (classical
+  / type II Cepheids) were not mapped; BLL, Sy1, Sy2 and all variable-star
+  codes gave no coarse SIMBAD evidence.  Candidate codes (`?`) are not used.
+
 ## Confidence of axis labels (2.15.0)
 
 Most axis labels come from rules without a score.  Their calibrated
