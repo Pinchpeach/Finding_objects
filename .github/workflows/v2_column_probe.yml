@@ -24,6 +24,7 @@ jobs:
           python-version: "3.11"
       - run: pip install pandas numpy astropy astroquery pyvo requests
       - name: VizieR columns (Chandra CSC 2, eRASS1, 4XMM, HASH, Gaia LPV)
+        if: false
         continue-on-error: true
         run: |
           python - <<'PY'
@@ -85,6 +86,25 @@ jobs:
               err = 3600 / np.sqrt(l["dec_ivar"].astype(float))
               print("LS dec error arcsec median", float(np.nanmedian(err)), "ref_epoch values", l["ref_epoch"].value_counts().head().to_dict())
           PY
+      - name: 4XMM catalogue identifiers on VizieR
+        continue-on-error: true
+        run: |
+          python - <<'PY2'
+          from astroquery.vizier import Vizier
+          from astropy.coordinates import SkyCoord
+          import astropy.units as u
+          for kw in ("4XMM-DR13", "4XMM-DR14", "4XMM"):
+              c = Vizier.find_catalogs(kw)
+              print(kw, "->", [(k, (v.description or "")[:80]) for k, v in c.items()][:15])
+          for cat in ("IX/74/4xmmdr13s", "IX/74", "IX/69", "IX/69/xmm4d13s", "IX/72", "IX/73", "IX/75"):
+              try:
+                  t = Vizier(columns=["**"], row_limit=3).query_region(SkyCoord(83.633*u.deg, 22.014*u.deg), radius=10*u.arcmin, catalog=cat)
+                  print("==", cat, {k: len(v) for k, v in t.items()})
+                  for k, v in t.items():
+                      print("   ", k, v.colnames[:40])
+              except Exception as exc:
+                  print("==", cat, "ERROR", repr(exc))
+          PY2
       - name: Collectors end to end (association profiles read these columns)
         continue-on-error: true
         run: |

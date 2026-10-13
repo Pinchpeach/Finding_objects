@@ -122,8 +122,11 @@ def test_literature_review_phenomenon_and_gaia_score():
     ph = importlib.util.module_from_spec(s); s.loader.exec_module(ph)
     hash_row = lambda st: {"catalogs": "HASH PN Catalog", "pn_catalog_status": st}
     assert ph.classify(hash_row("T"))["status"] == "HASH_PN_CATALOG_MATCH"
-    assert ph.classify(hash_row("Possible PN"))["status"] == "HASH_POSSIBLE_PN"
-    assert ph.classify(hash_row("Mimic"))["label"] == "OTHER_PHENOMENON"
+    assert ph.classify(hash_row("L"))["label"] == "PN"
+    assert ph.classify(hash_row("P"))["status"] == "HASH_POSSIBLE_PN"
+    assert ph.classify(hash_row("c"))["status"] == "HASH_UNGRADED_ENTRY"         # new candidate
+    for mimic in ("HII", "Sy*", "N", "X", "G", "Y*O"):
+        assert ph.classify(hash_row(mimic))["label"] == "OTHER_PHENOMENON", mimic
     assert ph.classify(hash_row(None))["label"] == "PN"
     sn = {"catalogs": "ASAS-SN Supernova Catalog", "event_mjd": 58000.0}
     assert ph.classify(dict(sn, obs_mjd=58100.0))["label"] == "SN"
