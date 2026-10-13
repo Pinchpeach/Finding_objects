@@ -25,7 +25,11 @@ AP=["teff_gspphot","logg_gspphot","mh_gspphot","distance_gspphot","ag_gspphot","
 # the archive metadata, 2026-10-10): a second query would leave one more
 # abandoned daemon thread when TAP is slow, and abandoned threads crashed the
 # interpreter at exit (scientific cross-validation, compact-pulsar shard).
-SPEC_AP=["teff_gspspec","logg_gspspec","mh_gspspec","flags_gspspec","classlabel_espels","classlabel_espels_flag"]
+# ESP-UCD (2.22.0): Teff of ultracool-dwarf candidates (< 2700 K, ~M7 and
+# later) from the RP spectrum and its quality category (Sarro et al. 2023,
+# A&A 669, A139); names checked against the archive (v2_new_targets.yml).
+# Not in the VizieR fallback (left empty there).
+SPEC_AP=["teff_gspspec","logg_gspspec","mh_gspspec","flags_gspspec","classlabel_espels","classlabel_espels_flag","teff_espucd","flags_espucd"]
 VAR_SUMMARY=["in_vari_classification_result","in_vari_rrlyrae","in_vari_cepheid","in_vari_long_period_variable","in_vari_eclipsing_binary","in_vari_rotation_modulation","in_vari_agn","in_vari_microlensing","in_vari_compact_companion"]
 
 # Wall-clock budgets: a slow Gaia archive previously held a field for ~26 min

@@ -61,7 +61,10 @@ def _sn_epoch_status(ev):
 
 # A catalogued SN is the transient only near its event: an observation more
 # than a year after discovery sees the host galaxy (same rule as the
-# time-domain branch, which needs an event epoch; 2.18.0).
+# time-domain branch, which needs an event epoch; 2.18.0).  It applies only
+# when the row carries both event_mjd and observation_mjd: the survey
+# collectors do not set an observation epoch, so a catalogue SN match stays SN
+# (2.22.0 review; ALGORITHM.md section 7 says so).
 SN_MAX_DELTA_DAYS=365.0
 
 

@@ -41,7 +41,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add v2/benchmark/new_targets/probe v2/benchmark/new_targets/truth 2>/dev/null || true
+          git add -A v2/benchmark/new_targets
           git diff --cached --quiet && exit 0
           git commit -m "new targets: reference tables and truth sets (Actions)"
           bash .github/scripts/push_with_retry.sh "${{ github.ref_name }}"

@@ -811,6 +811,15 @@ def classify_star(row):
         sub = row.get("physical_subtype")
         return _result("White dwarf" + (f" ({sub})" if isinstance(sub, str) and sub else ""), "STAR:WD",
                        _num(row, "physical_confidence"), "WD_LOCUS", "physical axis: Gaia WD locus / DSC")
+    if phys == "ULTRACOOL_DWARF":
+        teff = _num(row, "gaia_dr3__teff_espucd", "teff_espucd")
+        return _result("Ultracool dwarf (M7 or later)" + (f", Teff {teff:.0f} K" if teff else ""), "STAR:M:UCD",
+                       _num(row, "physical_confidence"), "ESP_UCD", "physical axis: Gaia DR3 ESP-UCD (Sarro+2023) / SIMBAD BD*")
+    if phys == "HOT_SUBDWARF":
+        # 2.22.0: Gaia CMD hot subluminous star (Culpan et al. 2022) or SIMBAD HS*;
+        # the "below the dwarf sequence" class VI does not apply to these.
+        return _result("Hot subdwarf (sdO/sdB candidate)", "STAR:SD:HOT", _num(row, "physical_confidence"),
+                       "HOT_SUBLUMINOUS", "physical axis: Gaia colour - absolute magnitude (Culpan+2022) / SIMBAD HS*")
     agb = agb_chemistry(row)
     if agb is not None:
         name, code = AGB_NAME[agb["chem"]]
@@ -1081,12 +1090,16 @@ def galaxy_tags(row, activity, activity_rule=None):
                      "rule": "FIBRE_APERTURE", "basis": f"{src} fibre at z = {z_spec:.4f} < {APERTURE_MIN_Z[src]} (Kewley+2005)"})
     sub = (_text(row, "sdss_dr18_spectroscopy__subclass") or "").upper()
     ot = _text(row, "simbad__otype")
-    if "BROADLINE" in sub and "AGN" in sub or ot == "Sy1":
-        tags.append({"tag": "AGN_TYPE1", "label": "type 1 (broad-line) AGN", "rule": "SDSS_BROADLINE" if sub else "SIMBAD_OTYPE",
-                     "basis": f"SDSS subclass {sub}" if sub else "SIMBAD Sy1"})
-    elif sub == "AGN" or ot == "Sy2":
-        tags.append({"tag": "AGN_TYPE2", "label": "type 2 (narrow-line) AGN", "rule": "SDSS_BPT" if sub else "SIMBAD_OTYPE",
-                     "basis": "BPT AGN without broad lines" if sub else "SIMBAD Sy2"})
+    # 2.22.0: the rule / basis name the source that actually fired (a SIMBAD
+    # Sy1 / Sy2 with an unrelated SDSS subclass was reported as SDSS).
+    sdss1 = "BROADLINE" in sub and "AGN" in sub
+    sdss2 = sub == "AGN"
+    if sdss1 or ot == "Sy1":
+        tags.append({"tag": "AGN_TYPE1", "label": "type 1 (broad-line) AGN", "rule": "SDSS_BROADLINE" if sdss1 else "SIMBAD_OTYPE",
+                     "basis": f"SDSS subclass {sub}" if sdss1 else "SIMBAD Sy1"})
+    elif sdss2 or ot == "Sy2":
+        tags.append({"tag": "AGN_TYPE2", "label": "type 2 (narrow-line) AGN", "rule": "SDSS_BPT" if sdss2 else "SIMBAD_OTYPE",
+                     "basis": "BPT AGN without broad lines" if sdss2 else "SIMBAD Sy2"})
     elif ot == "LIN":
         tags.append({"tag": "LINER", "label": "LINER", "rule": "SIMBAD_OTYPE", "basis": "SIMBAD LIN"})
     if ot in SIMBAD_ENVIRONMENT:

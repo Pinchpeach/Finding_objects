@@ -23,7 +23,7 @@
 설계 원칙 세 가지:
 1. **증거는 출처별로 따로 냄**: 한 카탈로그의 판정을 그대로 믿지 않고 "이 카탈로그의 이 측정은 STAR 쪽으로 이만큼"이라는 증거로 바꾼 뒤 합칩니다.
 2. **모르면 UNKNOWN**: 증거가 약하거나 서로 충돌하면 억지로 고르지 않고 기권하며, 그 이유를 기록합니다(`unknown_reason`).
-3. **분광은 정답 확인에만**: 벤치마크·현장 검증에서는 분광 분류를 정답으로만 쓰고, 분류 증거에서는 뺍니다.
+3. **검증에서 분광은 정답으로만**: 벤치마크·현장 검증에서는 분광 분류를 정답으로만 쓰고 증거에서 뺍니다. 실제 실행에서는 그 자리의 분광 분류(SPC-SDSS)도 증거로 들어가며, 학습 가중치가 없어 사전 가중치(목록 판정 1.5)를 씁니다.
 
 ## 1. 수집 (`Get_data/`)
 
@@ -72,7 +72,7 @@
 | 종류 | 규칙 | 내용 |
 |---|---|---|
 | 천체측정 | AST-GAL-001/002 | Gaia 시차·고유운동이 유의함 → 별(우리은하 안). 양의 시차만 씀 |
-| | AST-EXT-001/002 | 시차·고유운동이 0과 같음 → 외부은하 쪽(Klioner+2022). 시차 오차 ≤ 0.3 mas일 때만 |
+| | AST-EXT-001/002 | 시차·고유운동이 0과 같음 → 외부은하 쪽(Klioner+2022). 시차(001)는 오차 ≤ 0.3 mas일 때만 |
 | 분광(벤치마크 밖) | SPC-SDSS-001/2/3 | SDSS 분광 분류 |
 | Gaia 분류기 | DSC-001 | Gaia DSC 확률에서 DSC의 사전확률을 나눠 제거한 값(Delchambre+2023 부록 C) |
 | 형태 | PS1-MORPH, LS-MORPH, SDSS-PHOTO | 퍼진 천체 → 은하, 점광원 → 별 또는 QSO |
@@ -150,7 +150,7 @@
 **QSO**
 - 전파 강도 R_i > 1(Ivezić+2002).
 - 고적색편이(z ≥ 2.1).
-- 광도 M_i(z = 2) < −22, X선.
+- 광도 M_i(z = 0) < −22(Schneider+2010 DR7Q 기준; M_i(z = 0) = M_i(z = 2) + 0.596), X선.
 
 **그 밖**
 - 문헌 정보(SIMBAD 참고문헌 상위 3편, "from paper").
@@ -166,7 +166,7 @@
 | 변광 | RR_LYRAE, CEPHEID, MIRA, LPV, ECLIPSING, ROTATIONAL, ERUPTIVE, PULSATING, OTHER_VARIABLE | SIMBAD 유형 → Gaia SOS(RR, 세페이드). ZTF 주기 변광성(g/r 진폭비 표시). Gaia LPV 반진폭 ≥ 0.6 mag이고 80 ≤ P < 1000 d → 미라. Gaia 변광 분류기 |
 | 밀집성 | NS, PULSAR, PULSAR_CANDIDATE, XRB, COMPACT_COMPANION_CANDIDATE | ATNF, SIMBAD. 전파: TGSS–NVSS 스펙트럼 지수 ≤ −1.5이고 점광원(+유의한 편광) → 펄서 후보. 하늘 전체 사후확률(은하면·편광 우도비)이 확신도. Gaia 밀집 동반성 후보 |
 | 외부은하 | GALAXY, AGN, QSO | Gaia 변광 AGN, 1차 분류 |
-| 현상 | SN, PN, NOVA, MICROLENSING | HASH(T/L → PN, P → 가능, 모방체 제외). Acker PN 목록. ASAS-SN·Asiago 초신성(사건 1년 이후 관측이면 모은하). SIMBAD. Gaia |
+| 현상 | SN, PN, NOVA, MICROLENSING | HASH(T/L → PN, P → 가능, 모방체 제외). Acker PN 목록. ASAS-SN·Asiago 초신성 목록 일치(사건 시각과 관측 시각이 둘 다 있을 때만 1년 이후면 모은하로 보는데, 지금 수집기는 관측 시각을 주지 않아 목록 일치는 SN으로 남음). SIMBAD. Gaia |
 
 **확신도 보정** (`calibration/`):
 - 각 축 판정의 확신도는 그 규칙이 독립 정답(교차 검증)에서 보인 **실측 정밀도**입니다.

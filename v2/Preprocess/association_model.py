@@ -62,6 +62,8 @@ PROFILES = {
     # the resolution scale); survey Dec 2019 - Jun 2020 (corrected 2.16.0).
     "eROSITA eRASS1": SurveyProfile(2020.2, 4.5, 30.0, 20.0),
     "ATNF Pulsar Catalog": SurveyProfile(None, 0.5, None, 5.0),
+    # Roma-BZCAT: radio (VLA/ATCA) or optical positions, ~1" (Massaro+2015).
+    "Roma-BZCAT": SurveyProfile(2000.0, 1.0, None, 5.0),
     "HASH PN Catalog": SurveyProfile(None, 1.0, None, 8.0),
     "ASAS-SN Supernova Catalog": SurveyProfile(2000.0, 1.0, None, 5.0, "transient_event"),
     "Asiago Supernova Catalog": SurveyProfile(2000.0, 1.0, None, 5.0, "transient_event"),
