@@ -48,6 +48,27 @@ def as_num(v):
  except Exception:return None
 
 def resolve(name):
+ # SIMBAD query_object with extra votable fields has raised "Length of values
+ # (2) does not match length of index (1)" on every source since 2026-10-09
+ # (astroquery SIMBAD TAP rewrite); fall back to Sesame coordinates and a
+ # SIMBAD TAP type lookup so the blind validation runs again (2.20.0).
+ try:
+  return _resolve_votable(name)
+ except Exception as exc:
+  first=exc
+ c=SkyCoord.from_name(name)
+ otype=sp=main=None
+ try:
+  q=("SELECT b.main_id, b.otype, b.sp_type FROM basic AS b JOIN ident AS i ON i.oidref=b.oid "
+     "WHERE i.id='"+name.replace("'","''")+"'")
+  t=Simbad().query_tap(q)
+  if t is not None and len(t):
+   r=t.to_pandas().iloc[0];main,otype,sp=as_text(r.get("main_id")),as_text(r.get("otype")),as_text(r.get("sp_type"))
+ except Exception:
+  pass
+ return {"resolved_name":main or name,"ra":float(c.icrs.ra.deg),"dec":float(c.icrs.dec.deg),"truth_otype":otype,"truth_sp":sp,"resolve_note":f"votable path failed: {first!r}"[:300]}
+
+def _resolve_votable(name):
  simbad=Simbad();simbad.add_votable_fields("otype","sp");t=simbad.query_object(name)
  if t is None or len(t)==0:raise RuntimeError(f"SIMBAD cannot resolve {name}")
  row=t.to_pandas().iloc[0];low={str(k).lower():k for k in row.index};rac,decc=low.get("ra"),low.get("dec")
@@ -118,7 +139,11 @@ def validate_one(spec,base,radius):
  axis=sample["truth_axis"];blind=as_text(row.get(f"{axis}_class")) or "UNKNOWN";status=as_text(row.get(f"{axis}_status"));assisted=classify_assisted(row,sample["truth_otype"],axis)
  return {**sample,"nearest_sep_arcsec":separation,"primary_class":as_text(row.get("primary_class")),"blind_class":blind,"blind_status":status,"blind_match":blind==sample["truth_class"],"catalog_assisted_class":assisted,"catalog_assisted_match":assisted==sample["truth_class"],"science_json":json.dumps(science_snapshot(row),ensure_ascii=False,default=str),"collector_json":json.dumps(logs,ensure_ascii=False),"candidate_json":json.dumps(candidates,ensure_ascii=False)}
 
-def error_row(spec,exc):return {**spec,"resolved_name":None,"ra":math.nan,"dec":math.nan,"truth_otype":None,"truth_sp":None,"nearest_sep_arcsec":math.nan,"primary_class":None,"blind_class":"ERROR","blind_status":repr(exc),"blind_match":False,"catalog_assisted_class":"ERROR","catalog_assisted_match":False,"science_json":"{}","collector_json":"[]","candidate_json":"[]"}
+def error_row(spec,exc):
+ import traceback
+ # The traceback is kept: a bare repr hid the failing line for days.
+ tb="".join(traceback.format_exception(type(exc),exc,exc.__traceback__))[-1500:]
+ return {**spec,"resolved_name":None,"ra":math.nan,"dec":math.nan,"truth_otype":None,"truth_sp":None,"nearest_sep_arcsec":math.nan,"primary_class":None,"blind_class":"ERROR","blind_status":repr(exc),"error_traceback":tb,"blind_match":False,"catalog_assisted_class":"ERROR","catalog_assisted_match":False,"science_json":"{}","collector_json":"[]","candidate_json":"[]"}
 def write_report(frame,out):
  out.mkdir(parents=True,exist_ok=True);frame.to_csv(out/"real_sample_validation.csv",index=False);valid=frame["blind_class"].ne("ERROR");matches=frame.loc[valid,"blind_match"].astype(bool)
  lines=["# Real-sample multi-axis validation","","SIMBAD supplies only validation coordinates/reference type; no SIMBAD row enters the blind pipeline.","Transient event rows are associated in a separate entity layer from persistent hosts.","",f"- requested samples: **{len(frame)}**",f"- successfully executed: **{int(valid.sum())}/{len(frame)}**",f"- blind exact-axis matches: **{int(matches.sum())}/{len(matches)} ({matches.mean() if len(matches) else 0:.1%})**","","| sample | axis | expected | blind | status | sep_arcsec |","|---|---|---|---|---|---:|"]
@@ -137,7 +162,8 @@ def main():
    for f in as_completed(futs):
     spec=futs[f]
     try:r=f.result()
-    except Exception as exc:r=error_row(spec,exc)
+    except Exception as exc:
+     r=error_row(spec,exc);print(r["error_traceback"],flush=True)
     by[spec["name"]]=r;print(f"{spec['name']}: expected={spec['truth_class']} blind={r['blind_class']} status={r['blind_status']}",flush=True)
  frame=pd.DataFrame([by[s["name"]] for s in SAMPLES]);write_report(frame,a.out_dir);print(frame[["name","truth_axis","truth_class","blind_class","blind_status","blind_match"]].to_string(index=False))
 if __name__=="__main__":main()

@@ -34,6 +34,8 @@ class DataFrameModel(QAbstractTableModel):
         self.beginResetModel()
         self._df = df.reset_index(drop=True)
         self._icons = None
+        self._kinds = None
+        self._sort_keys: dict[str, object] = {}
         cols = [c for c in TABLE_COLUMNS if c in self._df.columns]
         if "designation" not in cols and "object_id" in self._df.columns:   # very old results only
             cols.insert(0, "object_id")
@@ -43,12 +45,41 @@ class DataFrameModel(QAbstractTableModel):
     def frame(self) -> pd.DataFrame:
         return self._df
 
+    # Columns kind_of() reads: converting only these (not the several hundred
+    # result columns) to records, once per result set, for the table icons
+    # and the sky map alike (2.19.1: done twice, on the whole frame).
+    KIND_COLUMNS = ("primary_class", "subclass_code", "subclass_tags", "n_components")
+
+    def kinds(self) -> list[dict]:
+        if self._kinds is None:
+            from qt_icons import kind_of
+            cols = [c for c in self.KIND_COLUMNS if c in self._df.columns]
+            self._kinds = [kind_of(r) for r in self._df[cols].to_dict("records")] if cols else \
+                [kind_of({}) for _ in range(len(self._df))]
+        return self._kinds
+
+    def sort_keys(self, col: int):
+        """Per-column sort keys as one array (numeric: NaN lowest; else text),
+        so sorting compares array items instead of calling data() twice per
+        comparison (2.19.1)."""
+        import numpy as np
+        name = self._cols[col]
+        keys = self._sort_keys.get(name)
+        if keys is None:
+            s = self._df[name]
+            num = pd.to_numeric(s, errors="coerce")
+            if s.notna().any() and num.notna().sum() == s.notna().sum():
+                keys = num.fillna(-np.inf).to_numpy(float)
+            else:
+                keys = s.fillna("").astype(str).to_numpy(dtype=object)
+            self._sort_keys[name] = keys
+        return keys
+
     def _icon(self, row: int):
         if getattr(self, "_icons", None) is None:
-            from qt_icons import icon, kind_of
+            from qt_icons import icon
             cache, icons = {}, []
-            for r in self._df.to_dict("records"):
-                k = kind_of(r)
+            for k in self.kinds():
                 key = repr(sorted(k.items()))
                 if key not in cache:
                     cache[key] = icon(k, 16)
@@ -174,6 +205,10 @@ class ResultsFilter(QSortFilterProxyModel):
         return True
 
     def lessThan(self, left, right):
+        src = self.sourceModel()
+        if hasattr(src, "sort_keys") and left.column() == right.column():
+            keys = src.sort_keys(left.column())
+            return bool(keys[left.row()] < keys[right.row()])
         a, b = left.data(SORT_ROLE), right.data(SORT_ROLE)
         try:
             return bool(a < b)

@@ -15,7 +15,11 @@ def annotate(df:pd.DataFrame,rows=None)->pd.DataFrame:
  for name,module in modules.items():
   results=[module.classify(row) for row in rows]
   additions[f"{name}_class"]=[r["label"] for r in results];additions[f"{name}_subtype"]=[r.get("subtype") for r in results];additions[f"{name}_confidence"]=[r["confidence"] for r in results];additions[f"{name}_status"]=[r["status"] for r in results];additions[f"{name}_evidence_json"]=[json.dumps(r["evidence"],ensure_ascii=False,separators=(",",":")) for r in results]
- result=pd.concat([df.reset_index(drop=True),pd.DataFrame(additions)],axis=1)
+ # Re-annotating an already classified frame must replace, not duplicate, the
+ # axis columns: duplicate names made per_axis read a 2-column frame as one
+ # column (every named-source blind validation failed since 2026-10-09).
+ stale=[c for c in df.columns if any(c.startswith(f"{a}_") for a in AXES) and c.split("_",1)[1] in ("class","subtype","confidence","status","evidence_json","calibrated_probability","calibration_status","calibration_method")]
+ result=pd.concat([df.drop(columns=stale).reset_index(drop=True),pd.DataFrame(additions)],axis=1)
  cal=load_module(ROOT/"calibration"/"per_axis.py","classifier_per_axis_calibration")
  return cal.annotate(result,ROOT/"calibration"/"models.json",AXES)
 def run(inp:Path,out:Path):

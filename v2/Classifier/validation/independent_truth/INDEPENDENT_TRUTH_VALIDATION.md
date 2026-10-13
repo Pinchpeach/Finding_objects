@@ -5,13 +5,13 @@ Truth-catalog rows are used only as coordinates/labels. The same catalog is excl
 | axis | class | n | classified | coverage | exact all | exact classified | family all | family classified |
 |---|---|---:|---:|---:|---:|---:|---:|---:|
 | compact | PULSAR | 250 | 1 | 0.4% | 0.0% | 0.0% | 0.4% | 100.0% |
-| phenomenon | PN | 250 | 233 | 93.2% | 92.8% | 99.6% | 92.8% | 99.6% |
+| phenomenon | PN | 250 | 233 | 93.2% | 89.2% | 95.7% | 89.2% | 95.7% |
 | phenomenon | SN | 250 | 2 | 0.8% | 0.8% | 100.0% | 0.8% | 100.0% |
 | physical | AGB | 250 | 106 | 42.4% | 0.0% | 0.0% | 42.4% | 100.0% |
 | physical | RGB | 203 | 105 | 51.7% | 0.0% | 0.0% | 51.7% | 100.0% |
-| variability | CEPHEID | 250 | 240 | 96.0% | 90.4% | 94.2% | 90.4% | 94.2% |
-| variability | LPV | 250 | 182 | 72.8% | 62.4% | 85.7% | 62.4% | 85.7% |
+| variability | CEPHEID | 250 | 240 | 96.0% | 93.2% | 97.1% | 93.2% | 97.1% |
+| variability | LPV | 250 | 182 | 72.8% | 63.6% | 87.4% | 63.6% | 87.4% |
 | variability | MIRA | 250 | 249 | 99.6% | 94.8% | 95.2% | 99.6% | 100.0% |
-| variability | RR_LYRAE | 250 | 235 | 94.0% | 81.6% | 86.8% | 81.6% | 86.8% |
+| variability | RR_LYRAE | 250 | 235 | 94.0% | 82.4% | 87.7% | 82.4% | 87.7% |
 
 Exact accuracy requires the requested leaf label. Family accuracy additionally credits a Mira truth object classified as the broader Gaia LPV family, and a pulsar classified as a radio pulsar candidate, and an RGB or AGB star classified as a red giant; it is reported separately and never substituted for the exact value. UNKNOWN is abstention. Low coverage is therefore reported separately from errors. Pulsar truth explicitly excludes ATNF evidence, and SN truth excludes Asiago evidence; those rows test whether another evidence family can independently recover the identity.

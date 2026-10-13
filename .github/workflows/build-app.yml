@@ -3,9 +3,13 @@ name: Build desktop app
 # PyInstaller one-folder builds of the Finding Objects app for Windows, macOS
 # and Linux, each smoke-tested offline (frozen pipeline == source pipeline on
 # the committed NGC 4522 raw catalogues) and uploaded as an artifact.
+# A pushed tag "v<VERSION>" (e.g. v2.20.0) also publishes the three builds as
+# zip files on a GitHub Release, so a version stays downloadable after the
+# 30-day artifact retention.
 on:
   workflow_dispatch:
   push:
+    tags: ['v*']
     branches: [main, claude/code-review-7ox8zn]
     paths:
       - 'v2/app/**'
@@ -47,3 +51,32 @@ jobs:
           name: FindingObjects-${{ runner.os }}
           path: dist/FindingObjects
           retention-days: 30
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tag matches v2/VERSION
+        run: |
+          v="$(tr -d '[:space:]' < v2/VERSION)"
+          [ "${GITHUB_REF_NAME}" = "v$v" ] || { echo "tag ${GITHUB_REF_NAME} != v$v"; exit 1; }
+      - uses: actions/download-artifact@v4
+        with:
+          path: builds
+      - name: Zip each build
+        run: |
+          cd builds
+          for d in FindingObjects-*; do (cd "$d" && zip -qr "../../$d-${GITHUB_REF_NAME}.zip" .); done
+          ls -l ..
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          v="$(tr -d '[:space:]' < v2/VERSION)"
+          notes="$(awk -v v="$v" '$0 ~ "^## "v" " {on=1; print; next} on && /^## / {exit} on {print}' v2/CHANGELOG.md)"
+          gh release create "${GITHUB_REF_NAME}" FindingObjects-*-"${GITHUB_REF_NAME}".zip \
+            --title "Finding Objects ${GITHUB_REF_NAME}" --notes "${notes:-See v2/CHANGELOG.md}"

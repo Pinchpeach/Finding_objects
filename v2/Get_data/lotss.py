@@ -1,6 +1,7 @@
 """Independent LoTSS DR2 cone-search collector via VizieR. No cross-match/classification."""
 from pathlib import Path
 import pandas as pd
+from _catalog_utils import pick
 CATALOG="LoTSS DR2"; VIZIER_CATALOG="J/A+A/659/A1"
 def fetch(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
  from astroquery.vizier import Vizier
@@ -10,8 +11,11 @@ def fetch(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
  tables=v.query_region(SkyCoord(ra*u.deg,dec*u.deg,frame="icrs"),radius=radius_arcmin*u.arcmin,catalog=VIZIER_CATALOG)
  if not tables:return pd.DataFrame(columns=["catalog","catalog_object_id","object_name","ra","dec"])
  df=tables[0].to_pandas()
- if "Source_Name" not in df.columns: raise KeyError("catalog identifier column missing")
- df.insert(0,"catalog",CATALOG);df.insert(1,"catalog_object_id",df["Source_Name"].astype("string"))
+ # The live VizieR table names the identifier "Source" (2.20.0; the old exact
+ # "Source_Name" made every query with rows raise, so LoTSS never contributed).
+ idc=pick(df,["Source","Source_Name","LoTSS"])
+ if idc is None: raise KeyError(f"catalog identifier column missing; got {list(df.columns)[:25]}")
+ df.insert(0,"catalog",CATALOG);df.insert(1,"catalog_object_id",df[idc].astype("string"))
  df.insert(2,"object_name",CATALOG+" "+df["catalog_object_id"].astype("string"))
  df.insert(3,"ra",pd.to_numeric(df["RAJ2000"],errors="coerce"));df.insert(4,"dec",pd.to_numeric(df["DEJ2000"],errors="coerce"))
  return df.drop_duplicates("catalog_object_id",keep="last").reset_index(drop=True)

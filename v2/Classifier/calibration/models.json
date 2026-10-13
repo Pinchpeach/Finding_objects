@@ -62,8 +62,8 @@
         "truth_independent": true
       },
       "LPV": {
-        "coef": 3.1077850367661237,
-        "intercept": -0.7307345932438073,
+        "coef": 3.2531572551698504,
+        "intercept": -0.8379675587248294,
         "method": "platt",
         "n": 197,
         "negative": 50,
@@ -94,9 +94,17 @@
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
+      "ROTATIONAL": {
+        "method": "withheld",
+        "n": 197,
+        "negative": 197,
+        "positive": 0,
+        "reason": "insufficient independent truth support",
+        "truth_independent": true
+      },
       "RR_LYRAE": {
-        "coef": 1.4050484109995318,
-        "intercept": -2.0045501306118503,
+        "coef": 1.7205885697282604,
+        "intercept": -2.0264311851771293,
         "method": "platt",
         "n": 197,
         "negative": 173,
@@ -116,15 +124,15 @@
     "compact": {},
     "phenomenon": {
       "HASH_PN_CATALOG_MATCH|PN": {
-        "correct": 230,
+        "correct": 221,
         "method": "rule_precision",
-        "n": 230,
+        "n": 221,
         "precision": 1.0,
         "truth_classes": [
           "PN",
           "SN"
         ],
-        "wilson_lower_95": 0.9836
+        "wilson_lower_95": 0.9829
       }
     },
     "physical": {},
@@ -169,17 +177,17 @@
         "wilson_lower_95": 0.9812
       },
       "GAIA_DR3_VARIABLE_CANDIDATE|LPV": {
-        "correct": 147,
+        "correct": 150,
         "method": "rule_precision",
-        "n": 150,
-        "precision": 0.98,
+        "n": 153,
+        "precision": 0.9804,
         "truth_classes": [
           "CEPHEID",
           "LPV",
           "MIRA",
           "RR_LYRAE"
         ],
-        "wilson_lower_95": 0.9429
+        "wilson_lower_95": 0.9439
       },
       "ZTF_PERIODIC_VARIABLE|LPV": {
         "correct": 21,

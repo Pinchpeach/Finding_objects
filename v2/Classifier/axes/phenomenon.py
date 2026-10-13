@@ -32,21 +32,25 @@ def _pn_lines(row):
         ratio=vals["pn_oiii_5007"]/vals["pn_halpha"]
     return detected,ratio
 
-# HASH grades its entries True / Likely / Possible PN and also lists mimics,
-# post-AGB stars and pre-PNe (Parker, Bojicic & Frew 2016).  True / Likely
-# are PN, Possible is a PN candidate, explicit non-PN entries are not PN
-# (2.18.0).  An unrecognised or missing status keeps the PN label.
-HASH_NON_PN=("NOT","MIMIC","POST","PRE","SYMB","HII","H II","EM*","STAR","GALAXY","SNR","CLUSTER","OTHER")
+# HASH PNstat codes (VizieR V/163 ReadMe, Note 3; Parker, Bojicic & Frew
+# 2016): T = True, L = Likely, P = Possible PN.  c (new candidates), s
+# (objects to check), o (interesting object), ooun (unknown nature), k
+# (transition object) are not yet graded.  Every other code is a PN mimic or
+# non-PN entry (HII region, symbiotic star, galaxy, YSO, artefact, ...; X /
+# N = "Not PN").  2.19.1: the 2.18.0 parser guessed words; the live column
+# holds these codes, and unknown letters were kept as PN.
+HASH_PN={"T":"TRUE","L":"LIKELY"}
+HASH_POSSIBLE={"P"}
+HASH_UNGRADED={"c","s","o","ooun","k","test"}
 
 
 def _hash_grade(status):
-    s=(status or "").strip().upper()
-    if not s:return None
-    if s in ("T","TRUE") or s.startswith("TRUE"):return "TRUE"
-    if s in ("L","LIKELY") or s.startswith("LIKELY"):return "LIKELY"
-    if s in ("P","POSSIBLE") or s.startswith("POSSIBLE"):return "POSSIBLE"
-    if any(k in s for k in HASH_NON_PN):return "NOT_PN"
-    return None
+    s=(status or "").strip()
+    if not s:return None                       # no status column: identity evidence as before
+    if s in HASH_PN:return HASH_PN[s]
+    if s in HASH_POSSIBLE:return "POSSIBLE"
+    if s in HASH_UNGRADED:return "UNGRADED"
+    return "NOT_PN"
 
 
 def _sn_epoch_status(ev):
@@ -78,6 +82,8 @@ def classify(row):
         ev=[{"kind":"hash_pn_catalog_counterpart","association_confidence":assoc,"pn_catalog_status":status,"hash_grade":grade,"note":"Independent counterpart in HASH; identity evidence, not a generic spectroscopic classifier."}]
         if grade=="NOT_PN":
             return {"axis":AXIS,"label":"OTHER_PHENOMENON","confidence":assoc,"status":"HASH_NON_PN_ENTRY","evidence":ev}
+        if grade=="UNGRADED":
+            return {"axis":AXIS,"label":"UNKNOWN","confidence":None,"status":"HASH_UNGRADED_ENTRY","evidence":ev}
         if grade=="POSSIBLE":
             return {"axis":AXIS,"label":"PN","confidence":assoc,"status":"HASH_POSSIBLE_PN","evidence":ev}
         return {"axis":AXIS,"label":"PN","confidence":assoc,"status":"HASH_PN_CATALOG_MATCH","evidence":ev}

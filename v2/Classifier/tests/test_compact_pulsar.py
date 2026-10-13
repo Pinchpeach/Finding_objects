@@ -122,8 +122,11 @@ def test_literature_review_phenomenon_and_gaia_score():
     ph = importlib.util.module_from_spec(s); s.loader.exec_module(ph)
     hash_row = lambda st: {"catalogs": "HASH PN Catalog", "pn_catalog_status": st}
     assert ph.classify(hash_row("T"))["status"] == "HASH_PN_CATALOG_MATCH"
-    assert ph.classify(hash_row("Possible PN"))["status"] == "HASH_POSSIBLE_PN"
-    assert ph.classify(hash_row("Mimic"))["label"] == "OTHER_PHENOMENON"
+    assert ph.classify(hash_row("L"))["label"] == "PN"
+    assert ph.classify(hash_row("P"))["status"] == "HASH_POSSIBLE_PN"
+    assert ph.classify(hash_row("c"))["status"] == "HASH_UNGRADED_ENTRY"         # new candidate
+    for mimic in ("HII", "Sy*", "N", "X", "G", "Y*O"):
+        assert ph.classify(hash_row(mimic))["label"] == "OTHER_PHENOMENON", mimic
     assert ph.classify(hash_row(None))["label"] == "PN"
     sn = {"catalogs": "ASAS-SN Supernova Catalog", "event_mjd": 58000.0}
     assert ph.classify(dict(sn, obs_mjd=58100.0))["label"] == "SN"
@@ -131,5 +134,18 @@ def test_literature_review_phenomenon_and_gaia_score():
     assert ph.classify({"catalogs": "Acker PN Spectroscopy"})["label"] == "PN"
     spec = importlib.util.spec_from_file_location("v2_var_s", ROOT / "axes" / "variability.py")
     v = importlib.util.module_from_spec(spec); spec.loader.exec_module(v)
-    assert v.classify({"best_class_name": "RR", "best_class_score": 0.3})["status"] == "GAIA_DR3_VARIABLE_LOW_SCORE"
+    assert v.classify({"best_class_name": "RR", "best_class_score": 0.3})["label"] == "RR_LYRAE"   # no score floor (2.20.0)
     assert v.classify({"best_class_name": "RR", "best_class_score": 0.8})["label"] == "RR_LYRAE"
+
+
+def test_reannotation_replaces_axis_columns():
+    """Re-running the axes on a classified row (blind validation's
+    catalog-assisted step) must not duplicate axis columns (2.20.0)."""
+    import pandas as pd
+    spec = importlib.util.spec_from_file_location("v2_axes_re", ROOT / "control_axes.py")
+    ax = importlib.util.module_from_spec(spec); spec.loader.exec_module(ax)
+    row = ax.annotate(pd.DataFrame([{"primary_class": "STAR", "otype": "RR*"}])).iloc[0].to_dict()
+    row["otype"] = "Ce*"
+    again = ax.annotate(pd.DataFrame([row]))
+    assert not again.columns.duplicated().any()
+    assert again.variability_class.iloc[0] == "CEPHEID"
