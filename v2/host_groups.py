@@ -222,7 +222,21 @@ def _attach_identity(out: pd.DataFrame, priority) -> None:
             cats.update(c.split("|"))
         out.at[h, "catalogs"] = "|".join(sorted(x for x in cats if x and x != "nan"))
     # An identity entry that lent its name to the host keeps a distinct label.
+    # Designations were numbered for uniqueness before consolidation ("NGC
+    # 4522 [1]" / "[2]" when a nucleus entry and the host both carry the
+    # name); once the entry is a part of the host, the host takes the plain
+    # name back unless another top-level object still shares it (2.20.0).
+    base = lambda v: re.sub(r" \[\d+\]$", "", str(v))
+    top = out.parent_object_id.isna()
     for i in out.index[out.component_role.eq("identity")]:
         host = out.index[out.object_id.eq(out.at[i, "parent_object_id"])]
-        if len(host) and out.at[i, "designation"] == out.at[host[0], "designation"]:
-            out.at[i, "designation"] = f"{out.at[i, 'designation']} ({out.at[i, 'designation_catalog']} entry)"
+        if not len(host):
+            continue
+        h = host[0]
+        b = base(out.at[h, "designation"])
+        if base(out.at[i, "designation"]) != b:
+            continue
+        others = top & out.designation.astype(str).map(base).eq(b) & (out.index != h)
+        if not others.any():
+            out.at[h, "designation"] = b
+        out.at[i, "designation"] = f"{b} ({out.at[i, 'designation_catalog']} entry)"
