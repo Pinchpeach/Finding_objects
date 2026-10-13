@@ -1,0 +1,29 @@
+hot_subdwarfs ERROR Traceback (most recent call last):
+  File "/home/runner/work/Finding_objects/Finding_objects/v2/benchmark/new_targets/build_truth.py", line 152, in main
+    fn(out, say)
+  File "/home/runner/work/Finding_objects/Finding_objects/v2/benchmark/new_targets/build_truth.py", line 53, in hot_subdwarfs
+    say("J/A+A/662/A40 tables:", {k: (len(v), v.colnames[:30]) for k, v in cats.items()})
+                                                                           ^^^^^^^^^^
+AttributeError: 'TableList' object has no attribute 'items'
+
+Best+2018 9888 ['_RAJ2000', '_DEJ2000', 'Name', 'SpT', 'Type', 'RAJ2000', 'DEJ2000', 'Binary', 'Young']
+ESP-UCD rows 94158 flags {'00': 40628, '20': 26693, '10': 26687, '11': 108, '21': 37, '01': 5}
+ultracool ERROR Traceback (most recent call last):
+  File "/home/runner/work/Finding_objects/Finding_objects/v2/benchmark/new_targets/build_truth.py", line 152, in main
+    fn(out, say)
+  File "/home/runner/work/Finding_objects/Finding_objects/v2/benchmark/new_targets/build_truth.py", line 127, in ultracool
+    idx, d2, _ = cb.match_to_catalog_sky(cu)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/astropy/coordinates/sky_coordinate.py", line 1191, in match_to_catalog_sky
+    return match_coordinates_sky(
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/astropy/coordinates/matching.py", line 198, in match_coordinates_sky
+    idx, sep2d, sep3d = match_coordinates_3d(
+                        ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/astropy/coordinates/matching.py", line 99, in match_coordinates_3d
+    kdt = _get_cartesian_kdtree(catalogcoord, storekdtree)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/astropy/coordinates/matching.py", line 452, in _get_cartesian_kdtree
+    from scipy.spatial import KDTree
+ModuleNotFoundError: No module named 'scipy'
+
