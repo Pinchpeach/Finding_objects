@@ -149,6 +149,8 @@ def classify(row):
     # independently routed as a WD candidate. The 0.90 gate was fixed before
     # the independent SDSS DR14 external evaluation; unsupported/low-confidence
     # cases remain UNRESOLVED.
+    # Written only by the offline apply_wd_subtype_xp.py (Gaia XP spectra are
+    # not fetched by the pipeline), so pipeline runs give no DA/DB subtype.
     xp_subtype=_text(row,"wd_xp_subtype_prediction")
     xp_conf=_num(row,"wd_xp_subtype_confidence")
     spectral_type="UNRESOLVED"

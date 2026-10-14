@@ -165,6 +165,9 @@ class SkyMap(QWidget):
         """Screen x, y of every object and the shown mask, as numpy arrays
         (2.19.0: hover and paint looped over all objects in Python)."""
         import numpy as np
+        if self._x is None:              # no positions yet (empty result, filter before results)
+            e = np.zeros(0)
+            return e, e, np.zeros(0, bool)
         x, y = np.asarray(self._x, float), np.asarray(self._y, float)
         cx, cy, s = self._scale()
         sx, sy = cx - (x - self._pan[0]) * s, cy - (y - self._pan[1]) * s
@@ -178,8 +181,16 @@ class SkyMap(QWidget):
 
     # ------------------------------------------------------------- painting
     def paintEvent(self, event):
-        from qt_icons import draw
+        # The painter is always ended: an exception between begin and end in
+        # paintEvent took the whole process down (segfault; 2.23.0).
         p = QPainter(self)
+        try:
+            self._paint(p)
+        finally:
+            p.end()
+
+    def _paint(self, p):
+        from qt_icons import draw
         p.setRenderHint(QPainter.Antialiasing)
         p.fillRect(self.rect(), self.palette().base())
         if self._c0 is None:

@@ -104,6 +104,8 @@ def classify(row):
 
     # Generic time-domain branch: only promote an explicit SN light-curve class
     # if an event epoch is present. This avoids treating a host detection as SN.
+    # Offline hook: no collector writes transient_lightcurve_class / event_mjd
+    # yet, so this branch fires only for inputs that provide them (2.23.0 review).
     lc=_text(row,"transient_lightcurve_class")
     event_mjd=_num(row,"event_mjd")
     if lc and lc.upper().startswith("SN") and event_mjd is not None:

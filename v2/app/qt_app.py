@@ -121,11 +121,12 @@ class _NameResolver(QRunnable):
     """Resolve an object name to ICRS coordinates (CDS Sesame) off the GUI thread."""
 
     class Signals(QObject):
-        done = Signal(float, float, str)
-        failed = Signal(str)
+        done = Signal(int, float, float, str)
+        failed = Signal(int, str)
 
-    def __init__(self, name: str):
+    def __init__(self, request: int, name: str):
         super().__init__()
+        self.request = request
         self.name = name
         self.signals = self.Signals()
 
@@ -133,9 +134,9 @@ class _NameResolver(QRunnable):
         try:
             from astropy.coordinates import SkyCoord
             c = SkyCoord.from_name(self.name)
-            self.signals.done.emit(float(c.icrs.ra.deg), float(c.icrs.dec.deg), self.name)
+            self.signals.done.emit(self.request, float(c.icrs.ra.deg), float(c.icrs.dec.deg), self.name)
         except Exception as exc:  # network / unknown name
-            self.signals.failed.emit(f"{self.name}: {exc}")
+            self.signals.failed.emit(self.request, f"{self.name}: {exc}")
 
 
 class MainWindow(QMainWindow):
@@ -153,6 +154,8 @@ class MainWindow(QMainWindow):
         self.applog = AppLog()
         self.log_window = None
         self.bookmarks = BookmarkStore()
+        self._lookup_id = 0                 # latest name / coordinate request
+        self._pending_name: str | None = None
         self.results_path: Path | None = None
         self._build_ui()
         self._build_menu()
@@ -365,17 +368,18 @@ class MainWindow(QMainWindow):
         if not name:
             return
         coords = parse_coordinates(name)
+        # Every request, typed coordinates included, gets a new number; only
+        # the answer to the latest one is applied (2.19.0 for names; 2.23.0:
+        # an older name lookup no longer overwrites coordinates typed after it).
         if coords is not None:                     # typed coordinates: no network needed
-            self._pending_name = None
-            self._resolved(*coords, name); return
-        if getattr(self, "_pending_name", None) == name:
+            self._lookup_id += 1; self._pending_name = None
+            self._apply_position(*coords, name); return
+        if self._pending_name == name:
             return                                 # same lookup already running (Return pressed again)
-        # Only the latest lookup may set the position: a slower, older answer
-        # used to overwrite a newer one (Return in the name field bypassed the
-        # disabled button; 2.19.0).
+        self._lookup_id += 1
         self._pending_name = name
         self.btn_resolve.setEnabled(False); self._status(f"Resolving {name}…")
-        job = _NameResolver(name)
+        job = _NameResolver(self._lookup_id, name)
         job.signals.done.connect(self._resolved)
         # Bound methods, not lambdas: the runnable's signal object is deleted
         # after run(), and queued calls to a lambda slot were then dropped.
@@ -387,19 +391,20 @@ class MainWindow(QMainWindow):
             self.sp_ra.setValue(ra); self.sp_dec.setValue(dec)
             self._status(f"Centre set from map: RA {ra:.6f}, Dec {dec:+.6f}")
 
-    def _resolve_failed(self, msg):
-        pending = getattr(self, "_pending_name", None)
-        if pending is not None and not msg.startswith(f"{pending}:"):
+    def _resolve_failed(self, request, msg):
+        if request != self._lookup_id:
             return                                 # failure of a superseded lookup
         self._pending_name = None
         self.btn_resolve.setEnabled(True)
         self._status(f"Could not resolve {msg}")
 
-    def _resolved(self, ra, dec, name):
-        pending = getattr(self, "_pending_name", None)
-        if pending is not None and name != pending:
+    def _resolved(self, request, ra, dec, name):
+        if request != self._lookup_id:
             return                                 # answer of a superseded lookup
         self._pending_name = None
+        self._apply_position(ra, dec, name)
+
+    def _apply_position(self, ra, dec, name):
         self.sp_ra.setValue(ra); self.sp_dec.setValue(dec); self.btn_resolve.setEnabled(True)
         self._status(f"{name}: RA {ra:.6f}, Dec {dec:+.6f}")
 
@@ -436,6 +441,10 @@ class MainWindow(QMainWindow):
         self.proc = QProcess(self)
         self.proc.setProcessChannelMode(QProcess.MergedChannels)
         env = QProcessEnvironment.systemEnvironment(); env.insert("PYTHONUNBUFFERED", "1")
+        # The worker writes UTF-8, which _read_output decodes: on Windows a pipe
+        # otherwise uses the ANSI code page (mojibake, or a UnicodeEncodeError
+        # on a non-ASCII path after the results were written; 2.23.0).
+        env.insert("PYTHONIOENCODING", "utf-8")
         self.proc.setProcessEnvironment(env)
         self.proc.readyReadStandardOutput.connect(self._read_output)
         self.proc.finished.connect(self._finished)
@@ -475,6 +484,7 @@ class MainWindow(QMainWindow):
             self._read_output()
             if self._out_buf:
                 self._log(self._out_buf.decode("utf-8", "replace")); self._out_buf = b""
+            self._log(f"worker exited: code {code}, {'crashed' if status == QProcess.CrashExit else 'normal exit'}")
             self.proc.deleteLater()              # one QProcess per run, released when it ends
             self.proc = None
         self.btn_run.setEnabled(True); self.btn_cancel.setEnabled(False); self.progress.setVisible(False)
@@ -618,7 +628,10 @@ class MainWindow(QMainWindow):
         path, _ = QFileDialog.getSaveFileName(self, "Export", str(Path.home() / "classified.csv"), "CSV (*.csv)")
         if path:
             rows = [self.proxy.mapToSource(self.proxy.index(i, 0)).row() for i in range(self.proxy.rowCount())]
-            df.iloc[rows].to_csv(path, index=False)
+            try:
+                df.iloc[rows].to_csv(path, index=False)
+            except OSError as exc:              # e.g. the file is open in Excel
+                QMessageBox.warning(self, APP_NAME, f"Could not write {path}:\n{exc}"); return
             self._status(f"Exported {len(rows)} rows to {path}")
 
     def _about(self):

@@ -341,3 +341,24 @@ def test_red_giant_physical_axis_sets_class_iii():
     assert sc.classify_star(row)["luminosity_class"] == "III"
     row["simbad__sp_type"] = "K1II"          # a spectroscopic bright-giant class is kept
     assert sc.classify_star(row)["luminosity_class"] == "II"
+
+
+def test_review_2_23_simbad_wd_mk_precedence_and_paper_vetoes():
+    import importlib.util
+    sc = _sc()
+    p = ROOT / "axes" / "physical.py"
+    s = importlib.util.spec_from_file_location("phys_rev_t", p); phys = importlib.util.module_from_spec(s); s.loader.exec_module(phys)
+    # curated white dwarf: WD on the physical axis and in the sub-class, not "B9.5"
+    wd = {"primary_class": "STAR", "otype": "WD*", "simbad__otype": "WD*", "simbad__sp_type": "DA3",
+          "gaia_dr3__bp_rp": -0.1, "gaia_dr3__parallax": 3.0, "gaia_dr3__parallax_error": 1.0}
+    assert phys.classify(wd)["label"] == "WD"
+    assert sc.classify_star(wd)["code"] == "STAR:WD"
+    # a SIMBAD dwarf class is not replaced by a photometric giant label
+    assert sc.classify_star({"physical_class": "RED_GIANT", "simbad__sp_type": "K2V"})["luminosity_class"] == "V"
+    # a HASH entry graded "not a PN" gets no "from paper: Planetary nebula"
+    lit = sc._literature()
+    row = {"catalogs": "HASH PN Catalog", "phenomenon_status": "HASH_NON_PN_ENTRY"}
+    assert lit.from_paper(row) is None
+    assert lit.from_paper({"catalogs": "HASH PN Catalog", "phenomenon_status": "HASH_PN_CATALOG_MATCH"})["paper_class"] == "Planetary nebula"
+    # vetoed O-rich star: no "AGB" left in its name
+    assert "AGB" not in sc.NON_AGB_NAME["O"]

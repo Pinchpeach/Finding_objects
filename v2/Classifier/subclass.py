@@ -210,6 +210,49 @@ def _ebv(row):
     return _num(row, "galex_ais__E(B-V)")
 
 
+# SFD-type E(B-V) is the whole line of sight; a star inside the dust layer
+# sees only the part in front of it.  Exponential dust disc with scale height
+# 134 pc (Drimmel & Spergel 2001, ApJ 556, 181): fraction in front of a star
+# at distance d and latitude b = 1 - exp(-d |sin b| / h).  Applied only with a
+# parallax (2.23.0: a 20 pc star was dereddened by the full column, 0.4 mag in
+# BP-RP); without one the full column is kept, as before.
+DUST_SCALE_HEIGHT_PC = 134.0
+
+
+def _galactic_b(row):
+    ra, dec = _num(row, "ra"), _num(row, "dec")
+    if ra is None or dec is None:
+        return None
+    r, d = math.radians(ra), math.radians(dec)
+    x, y, z = math.cos(d) * math.cos(r), math.cos(d) * math.sin(r), math.sin(d)
+    gz = -0.8676661490 * x - 0.1980763734 * y + 0.4559837762 * z   # ICRS -> Galactic (Hipparcos)
+    return math.degrees(math.asin(max(-1.0, min(1.0, gz))))
+
+
+def _dust_fraction(row):
+    """Fraction of the total line-of-sight E(B-V) in front of the star (1 without a parallax)."""
+    plx, eplx = _num(row, "gaia_dr3__parallax", "parallax"), _num(row, "gaia_dr3__parallax_error", "parallax_error")
+    b = _galactic_b(row)
+    if None in (plx, eplx, b) or plx <= 0 or eplx <= 0 or plx / eplx < 5:
+        return 1.0
+    d_pc = 1000.0 / plx
+    return 1.0 - math.exp(-d_pc * abs(math.sin(math.radians(b))) / DUST_SCALE_HEIGHT_PC) if abs(b) > 0 else 1.0
+
+
+def _sfd_ebv_in_front(row):
+    ebv = _ebv(row)
+    return None if ebv is None else ebv * _dust_fraction(row)
+
+
+def _ag(row):
+    """A_G: GSP-Phot, else the SFD column in front of the star x 2.74 (one fallback for all callers)."""
+    ag = _num(row, "gaia_dr3__ag_gspphot", "ag_gspphot")
+    if ag is not None:
+        return ag
+    ebv = _sfd_ebv_in_front(row)
+    return A_G_PER_EBV * ebv if ebv is not None else 0.0
+
+
 def _result(subclass, code, conf, rule, basis, **extra):
     return {"subclass": subclass, "code": code, "confidence": conf, "rule": rule, "basis": basis, **extra}
 
@@ -233,9 +276,9 @@ def _bprp0(row):
     e = _num(row, "gaia_dr3__ebpminrp_gspphot", "ebpminrp_gspphot")
     if e is not None:
         return bprp - e, "Gaia GSP-Phot E(BP-RP)"
-    ebv = _ebv(row)
+    ebv = _sfd_ebv_in_front(row)
     if ebv is not None:
-        return bprp - E_BPRP_PER_EBV * ebv, "SFD E(B-V) x 1.339"
+        return bprp - E_BPRP_PER_EBV * ebv, "SFD E(B-V) x 1.339 (part in front of the star)"
     return bprp, "not dereddened"
 
 
@@ -297,10 +340,7 @@ def cmd_position(row):
     bprp0, _ = _bprp0(row)
     if None in (plx, eplx, gmag, bprp0) or plx <= 0 or eplx <= 0 or plx / eplx < 5:
         return None
-    ag = _num(row, "gaia_dr3__ag_gspphot")
-    if ag is None:
-        ebv = _ebv(row); ag = A_G_PER_EBV * ebv if ebv is not None else 0.0
-    mg = gmag + 5 * math.log10(plx) - 10 - ag
+    mg = gmag + 5 * math.log10(plx) - 10 - _ag(row)
     ms = _ms_abs_g(bprp0)
     return None if ms is None else (mg, mg - ms, bprp0)
 
@@ -682,7 +722,7 @@ def abs_mags(row):
     if plx is None:
         return None
     dm = 5 * math.log10(plx) - 10
-    ag = _num(row, "gaia_dr3__ag_gspphot", "ag_gspphot") or 0.0
+    ag = _ag(row)                     # same extinction as cmd_position (2.23.0)
     k = _num(row, "2mass_psc__Kmag", "allwise__Kmag")
     g = _num(row, "gaia_dr3__phot_g_mean_mag", "phot_g_mean_mag")
     return (None if k is None else k + dm - A_KS_PER_A_G * ag), (None if g is None else g + dm - ag)
@@ -716,7 +756,7 @@ def agb_photometric(row):
         if any(v is None for v in x):
             continue
         z = m["intercept"] + sum(c * v for c, v in zip(m["coef"], x))
-        p = 1.0 / (1.0 + math.exp(-z))
+        p = 1.0 / (1.0 + math.exp(-max(-700.0, min(700.0, z))))   # no overflow on extreme inputs
         vals = ", ".join(f"{k} = {v:.2f}" for k, v in zip(m["features"], x))
         if abs(p - 0.5) < m.get("abstain_band", model.get("abstain_band", 0.15)):
             return None, p, name, f"{vals}; P(C-rich) = {p:.2f} (uncertain)"
@@ -795,6 +835,11 @@ AGB_NAME = {"C": ("Carbon star (C-rich AGB)", "STAR:C:AGB"), "O": ("O-rich AGB s
             "S": ("S-type star (C/O ~ 1, AGB)", "STAR:S:AGB"), None: ("AGB star (chemistry uncertain)", "STAR:?:AGB")}
 
 
+# Chemistry names without "AGB", for stars the luminosity veto rejects (2.23.0:
+# "O-rich AGB star" has no "(...)" suffix, so the split left "AGB" in the name).
+NON_AGB_NAME = {"C": "Carbon star", "O": "O-rich (M-type) star", "S": "S-type star", None: "Red star"}
+
+
 LUM_NAME = {"V": "dwarf", "IV": "subgiant", "III": "giant", "II": "bright giant", "Ib": "supergiant",
             "Ia": "supergiant", "VI": "subdwarf"}
 
@@ -811,6 +856,9 @@ def classify_star(row):
             return _result("Cataclysmic variable", "STAR:CV", None, f"{src}_SUBCLASS", f"{src} spectrum subclass {label}")
         if u.startswith(("WD", "DA", "DB", "DC", "DQ", "DZ", "DO")):
             return _result(f"White dwarf ({label})", "STAR:WD", None, f"{src}_SUBCLASS", f"{src} spectrum subclass {label}")
+    sp_simbad = _text(row, "simbad__sp_type") or ""
+    if re.match(r"^D[ABCOQZX]", sp_simbad):         # MK white-dwarf type (DA3, DB, DQ ...; 2.23.0)
+        return _result(f"White dwarf ({sp_simbad})", "STAR:WD", None, "SIMBAD_SPTYPE", f"SIMBAD spectral type {sp_simbad}")
     if phys == "WD":
         sub = row.get("physical_subtype")
         return _result("White dwarf" + (f" ({sub})" if isinstance(sub, str) and sub else ""), "STAR:WD",
@@ -831,9 +879,9 @@ def classify_star(row):
             name = "O-rich AGB star with silicate dust"
         spectral = agb["rule"].startswith(("SIMBAD", "SDSS", "LAMOST"))
         if agb.get("dwarf"):
-            name, code = ("Dwarf carbon star (dC)", "STAR:C:V") if agb["chem"] == "C" else (name.split(" (")[0] + " (dwarf)", code.replace(":AGB", ":V"))
+            name, code = ("Dwarf carbon star (dC)", "STAR:C:V") if agb["chem"] == "C" else (NON_AGB_NAME[agb["chem"]] + " (dwarf)", code.replace(":AGB", ":V"))
         elif agb.get("not_agb") or (agb["chem"] in ("C", "S") and not agb.get("agb_candidate") and spectral):
-            name = name.split(" (")[0]                     # carbon dwarfs / CH stars are not AGB stars
+            name = NON_AGB_NAME[agb["chem"]]               # carbon dwarfs / CH stars are not AGB stars
             code = code.replace(":AGB", ":?")
         elif agb.get("below_tip"):
             name = {"C": "Carbon giant", "O": "O-rich red giant", "S": "S-type giant", None: "Red giant"}[agb["chem"]]
@@ -853,7 +901,9 @@ def classify_star(row):
     # since 2.13.0) sets class III unless a spectrum already gives a giant or
     # supergiant class (II, Ib, Ia are more specific than "giant").  2.22.0:
     # RED_GIANT was missing, so a FLAME / CMD giant could read "IV subgiant".
-    if phys in {"RGB", "AGB", "RED_GIANT"} and lum not in {"III", "II", "Ib", "Ia"}:
+    # 2.23.0: a SIMBAD MK class (from a spectrum) is never replaced by the
+    # photometric giant label; spectroscopy outranks photometry here.
+    if phys in {"RGB", "AGB", "RED_GIANT"} and lum not in {"III", "II", "Ib", "Ia"} and lrule != "SIMBAD_SPTYPE":
         lum, lrule, lbasis = "III", "PHYSICAL_AXIS", f"physical axis {phys}"
     label = spt_label(num) + (f" {lum}" if lum else "")
     name = f"{letter}-type " + (LUM_NAME.get(lum, "star") if lum else "star")
@@ -1362,8 +1412,8 @@ def annotate(df: pd.DataFrame, rows=None) -> pd.DataFrame:
     import json
     rows = rows if rows is not None else df.to_dict("records")
     # The subclass needs the physical-axis result (WD / giant) of the same row.
-    for col in ("physical_class", "physical_subtype", "physical_confidence",
-                "variability_class", "variability_subtype", "variability_status"):
+    for col in ("physical_class", "physical_subtype", "physical_confidence", "physical_status",
+                "variability_class", "variability_subtype", "variability_status", "phenomenon_status"):
         if col in df:
             for r, v in zip(rows, df[col]):
                 r[col] = v

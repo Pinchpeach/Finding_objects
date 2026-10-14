@@ -122,6 +122,7 @@ def _vizier_fallback(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
         "Source":"source_id","RA_ICRS":"ra","DE_ICRS":"dec","e_RA_ICRS":"ra_error","e_DE_ICRS":"dec_error",
         "Plx":"parallax","e_Plx":"parallax_error","pmRA":"pmra","e_pmRA":"pmra_error","pmDE":"pmdec","e_pmDE":"pmdec_error",
         "RUWE":"ruwe","Gmag":"phot_g_mean_mag","BPmag":"phot_bp_mean_mag","RPmag":"phot_rp_mean_mag","BP-RP":"bp_rp",
+        "E(BP/RP)":"phot_bp_rp_excess_factor",   # C* gates (WD locus, hot subdwarfs) need it (2.23.0)
         "RV":"radial_velocity","e_RV":"radial_velocity_error","Teff":"teff_gspphot","logg":"logg_gspphot","[Fe/H]":"mh_gspphot","Dist":"distance_gspphot",
         # GSP-Phot extinction (used to deredden colours and absolute magnitudes downstream).
         "AG":"ag_gspphot","E(BP-RP)":"ebpminrp_gspphot",

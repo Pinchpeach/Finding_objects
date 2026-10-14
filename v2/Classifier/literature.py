@@ -83,10 +83,24 @@ def ads(bibcode: str) -> str:
     return f"https://ui.adsabs.harvard.edu/abs/{bibcode}"
 
 
+# A catalogue match the axes rejected is not the object's class (2.23.0):
+# a HASH entry graded "not a PN" (or ungraded), a Suh "AGB" star fainter than
+# the red clump, a supernova matched long after the event.
+VETOED = {
+    "HASH PN Catalog": ("phenomenon_status", {"HASH_NON_PN_ENTRY", "HASH_UNGRADED_ENTRY"}),
+    "Suh 2021 AGB Catalog": ("physical_status", {"SUH2021_MATCH_BELOW_RED_CLUMP"}),
+    "Asiago Supernova Catalog": ("phenomenon_status", {"SN_HOST_PAST_EVENT"}),
+    "ASAS-SN Supernova Catalog": ("phenomenon_status", {"SN_HOST_PAST_EVENT"}),
+}
+
+
 def from_paper(row) -> dict | None:
     """The literature classification of one object, or None."""
     cats = set(str(row.get("catalogs") or "").split("|"))
     for cat, (cls, bib, cite) in PAPER_CATALOGS.items():
+        col, rejected = VETOED.get(cat, (None, ()))
+        if cat in cats and col and _text(row, col) in rejected:
+            continue
         if cat in cats:
             return {"paper_class": cls, "paper_source": f"{cat} ({cite})", "paper_refs": f"{bib} ({cite})",
                     "paper_ads": ads(bib), "detection_only": False}

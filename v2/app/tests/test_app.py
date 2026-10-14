@@ -264,3 +264,23 @@ def test_bookmark_store_dedups_persists_and_survives_corruption(tmp_path):
     assert list(df.name) == ["NGC 4522"] and math.isclose(df.ra[0], 188.4155)
     path.write_text("{not json", encoding="utf-8")
     assert BookmarkStore(path).items == [] and path.with_suffix(".json.corrupt").exists()
+
+
+def test_sky_map_paints_without_positions_and_stale_lookups_are_ignored(tmp_path, monkeypatch):
+    """2.23.0: a filter before any results segfaulted the sky map; a late name
+    lookup overwrote coordinates typed after it."""
+    pytest.importorskip("PySide6")
+    from PySide6.QtWidgets import QApplication
+    import qt_app
+    app = QApplication.instance() or QApplication([])
+    monkeypatch.setenv("FINDING_OBJECTS_BOOKMARKS", str(tmp_path / "b.json"))
+    monkeypatch.setenv("FINDING_OBJECTS_LOG", str(tmp_path / "l.log"))
+    w = qt_app.MainWindow(); w.resize(900, 600)
+    w.tabs.setCurrentWidget(w.sky_view); w.show()
+    w.cmb_class.setCurrentText("STAR"); app.processEvents()
+    w.sky.grab()                                            # paints: no crash
+    w.txt_name.setText("M31"); w._lookup_id += 1; stale = w._lookup_id; w._pending_name = "M31"
+    w.txt_name.setText("10 20"); w._resolve_name()
+    w._resolved(stale, 10.684, 41.269, "M31")               # the old answer arrives late
+    assert (round(w.sp_ra.value(), 3), round(w.sp_dec.value(), 3)) == (10.0, 20.0)
+    w.close()
