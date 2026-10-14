@@ -325,3 +325,19 @@ def test_gspspec_flags_in_float_notation_are_rejected():
     assert sc._gspspec_ok(1.2e33, "teff") is False          # digits lost in float: unknown -> not usable
     assert sc._gspspec_ok("0" * 41, "teff") is True
 
+
+
+def test_mk_luminosity_with_qualifiers():
+    # 2.22.0: suffixes (b, e, n, CN) after the class no longer drop it or turn III into II
+    sc = _sc()
+    for sp, lum in (("K2IIIb", "III"), ("M5IIIe", "III"), ("K1IIIbCN", "III"), ("B1Ve", "V"),
+                    ("A0Vn", "V"), ("B2IVne", "IV"), ("K0IIb", "II"), ("G2V", "V"), ("M3", None)):
+        assert sc._parse_mk(sp)[1] == lum, sp
+
+
+def test_red_giant_physical_axis_sets_class_iii():
+    sc = _sc()
+    row = {"physical_class": "RED_GIANT", "simbad__sp_type": "K1", "sp_type": "K1"}
+    assert sc.classify_star(row)["luminosity_class"] == "III"
+    row["simbad__sp_type"] = "K1II"          # a spectroscopic bright-giant class is kept
+    assert sc.classify_star(row)["luminosity_class"] == "II"

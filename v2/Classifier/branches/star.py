@@ -16,6 +16,10 @@ def _num(row,key):
     except Exception:
         return None
 
+def _gaia_num(row,key):
+    v=_num(row,"gaia_dr3__"+key)
+    return v if v is not None else _num(row,key)
+
 def _text(row,key):
     v=row.get(key)
     if v is None: return None
@@ -71,8 +75,9 @@ def _wd_hr_signal(row,gate=None):
     if None in (p,pe,g,color) or p<=0 or pe<=0 or p/pe<=cfg["min_parallax_over_error"]:
         return None
     if "strong_parallax_over_error" in cfg and p/pe<cfg["strong_parallax_over_error"]:
-        pmra,epmra=_num(row,"pmra"),_num(row,"pmra_error")
-        pmdec,epmdec=_num(row,"pmdec"),_num(row,"pmdec_error")
+        # Gaia's own namespaced motion first: SIMBAD also supplies bare
+        # pmra / pmdec (2.22.0 review).
+        pmra,epmra,pmdec,epmdec=(_gaia_num(row,k) for k in ("pmra","pmra_error","pmdec","pmdec_error"))
         if None in (pmra,epmra,pmdec,epmdec) or epmra<=0 or epmdec<=0:
             return None
         if math.hypot(pmra/epmra,pmdec/epmdec)<=cfg["min_pm_significance"]:

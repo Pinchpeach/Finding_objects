@@ -107,3 +107,6 @@ python v2/app/packaging/smoke_test.py dist/FindingObjects/FindingObjects   # Win
 - 학습·검증 전용 패키지(scikit-learn, joblib)와 `benchmark/`, `rawdata/`는 묶지 않습니다.
 - 빌드 환경에 pytest가 있으면 PyInstaller의 astropy 훅이 실패합니다(astropy의 시각화 하위 모듈이 pytest로 matplotlib을 건너뜀). 실행에 필요한 패키지만 있는 깨끗한 환경에서 빌드합니다.
 
+
+## 로그 (2.21.0)
+메인 화면에는 로그 패널이 없습니다. 실행 출력은 사용자별 로그 파일 하나(`app_log.py`)에 시간과 함께 계속 쌓입니다. View > Log(Ctrl+L) 또는 Log 버튼으로 별도 창에서 실시간으로 봅니다. 파일이 없으면 새로 만들고, 5 MB를 넘으면 최근 2 MB만 남깁니다.

@@ -125,6 +125,12 @@ def science_snapshot(row):
    v=row[c];result[c]=v.item() if hasattr(v,"item") else v
  return result
 
+# A more specific label of the same family counts (2.22.0: BLAZAR is an AGN,
+# e.g. 3C 273 = SIMBAD BLL; the truth list names the family).
+SUBCLASS_OF={"BLAZAR":"AGN"}
+def _same(pred,truth):
+ return pred==truth or SUBCLASS_OF.get(pred)==truth
+
 def classify_assisted(row,truth_otype,axis):
  axes=load_module(CLS/"control_axes.py","realval_axes");payload=row.to_dict()
  for suffix in ("class","confidence","status","evidence_json","calibrated_probability","calibration_status","calibration_method"):payload.pop(f"{axis}_{suffix}",None)
@@ -137,7 +143,7 @@ def validate_one(spec,base,radius):
  run_cmd([PRE/"01_source_association.py","--raw-dir",raw,"--out",pre/"source_association.csv"]);run_cmd([PRE/"02_integrate_objects.py","--associations",pre/"source_association.csv","--raw-dir",raw,"--out",pre/"integrated_objects.csv"]);run_cmd([PRE/"03_extract_features.py","--objects",pre/"integrated_objects.csv","--rules",PRE/"classification_rules.csv","--out",pre/"features.csv"]);run_cmd([PRE/"04_build_evidence.py","--features",pre/"features.csv","--rules",PRE/"classification_rules.csv","--out",pre/"evidence.csv"]);run_cmd([PRE/"05_likelihood_vectors.py","--evidence",pre/"evidence.csv","--out",pre/"likelihood_vectors.csv"]);run_cmd([CLS/"01_prepare_input.py","--input",pre/"likelihood_vectors.csv","--out",cls/"classifier_input.csv"]);run_cmd([CLS/"control.py","--input",cls/"classifier_input.csv","--out",cls/"classified.csv"])
  classified=pd.read_csv(cls/"classified.csv");candidates=candidate_snapshot(classified,sample["ra"],sample["dec"],radius);preferred="transient_event" if sample["truth_axis"]=="phenomenon" and sample["truth_class"]=="SN" else None;row,separation=select_target(classified,sample["ra"],sample["dec"],radius,preferred)
  axis=sample["truth_axis"];blind=as_text(row.get(f"{axis}_class")) or "UNKNOWN";status=as_text(row.get(f"{axis}_status"));assisted=classify_assisted(row,sample["truth_otype"],axis)
- return {**sample,"nearest_sep_arcsec":separation,"primary_class":as_text(row.get("primary_class")),"blind_class":blind,"blind_status":status,"blind_match":blind==sample["truth_class"],"catalog_assisted_class":assisted,"catalog_assisted_match":assisted==sample["truth_class"],"science_json":json.dumps(science_snapshot(row),ensure_ascii=False,default=str),"collector_json":json.dumps(logs,ensure_ascii=False),"candidate_json":json.dumps(candidates,ensure_ascii=False)}
+ return {**sample,"nearest_sep_arcsec":separation,"primary_class":as_text(row.get("primary_class")),"blind_class":blind,"blind_status":status,"blind_match":_same(blind,sample["truth_class"]),"catalog_assisted_class":assisted,"catalog_assisted_match":_same(assisted,sample["truth_class"]),"science_json":json.dumps(science_snapshot(row),ensure_ascii=False,default=str),"collector_json":json.dumps(logs,ensure_ascii=False),"candidate_json":json.dumps(candidates,ensure_ascii=False)}
 
 def error_row(spec,exc):
  import traceback

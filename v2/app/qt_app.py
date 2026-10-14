@@ -53,12 +53,13 @@ from PySide6.QtCore import QModelIndex, QProcess, QProcessEnvironment, QSettings
 from PySide6.QtGui import QAction, QKeySequence  # noqa: E402
 from PySide6.QtWidgets import (QApplication, QComboBox, QDoubleSpinBox, QFileDialog, QFormLayout, QGroupBox,  # noqa: E402
                                QHBoxLayout, QHeaderView, QLabel, QLineEdit, QMainWindow, QMessageBox,
-                               QPlainTextEdit, QProgressBar, QPushButton, QRadioButton, QSplitter,
+                               QProgressBar, QPushButton, QRadioButton, QSplitter,
                                QTableView, QTabWidget, QVBoxLayout, QWidget, QAbstractItemView, QCheckBox)
 
 from progress import ProgressTracker  # noqa: E402
 from qt_models import DataFrameModel, ResultsFilter  # noqa: E402
-from qt_widgets import DetailPanel, SkyView  # noqa: E402
+from qt_widgets import DetailPanel, LogWindow, SkyView  # noqa: E402
+from app_log import AppLog  # noqa: E402
 
 APP_NAME = f"Finding Objects {version()}"
 RESULT_FILE = "classified_objects.csv"
@@ -147,6 +148,8 @@ class MainWindow(QMainWindow):
         self.work_dir: Path | None = None
         self.model = DataFrameModel(parent=self)
         self.proxy = ResultsFilter(self); self.proxy.setSourceModel(self.model)
+        self.applog = AppLog()
+        self.log_window = None
         self._build_ui()
         self._build_menu()
         self._restore()
@@ -179,9 +182,8 @@ class MainWindow(QMainWindow):
         self.table.horizontalHeader().setStretchLastSection(True)
         tl.addWidget(self.table)
         center.addWidget(table_box)
-        self.log = QPlainTextEdit(); self.log.setReadOnly(True); self.log.setMaximumBlockCount(5000)
-        center.addWidget(self.log)
-        center.setStretchFactor(0, 4); center.setStretchFactor(1, 1)
+        # No log panel in the main window (2.21.0): run output goes to one
+        # persistent log file, shown in its own window (View > Log).
         root.addWidget(center)
 
         tabs = QTabWidget()
@@ -256,7 +258,8 @@ class MainWindow(QMainWindow):
         run_row = QHBoxLayout()
         self.btn_run = QPushButton("Run"); self.btn_run.setDefault(True)
         self.btn_cancel = QPushButton("Cancel"); self.btn_cancel.setEnabled(False)
-        run_row.addWidget(self.btn_run); run_row.addWidget(self.btn_cancel)
+        self.btn_log = QPushButton("Log"); self.btn_log.setToolTip(f"Show the log file\n{self.applog.path}")
+        run_row.addWidget(self.btn_run); run_row.addWidget(self.btn_cancel); run_row.addWidget(self.btn_log)
         lay.addLayout(run_row)
         self.lbl_state = QLabel(""); self.lbl_state.setWordWrap(True)
         lay.addWidget(self.lbl_state)
@@ -264,6 +267,7 @@ class MainWindow(QMainWindow):
 
         self.btn_run.clicked.connect(self.start_run)
         self.btn_cancel.clicked.connect(self.cancel_run)
+        self.btn_log.clicked.connect(self.show_log)
         self.btn_resolve.clicked.connect(self._resolve_name)
         self.txt_name.returnPressed.connect(self._resolve_name)
         self.rb_sky.toggled.connect(self._mode_changed)
@@ -283,6 +287,8 @@ class MainWindow(QMainWindow):
         for a in (a_open, a_exp):
             m.addAction(a)
         m.addSeparator(); m.addAction(a_quit)
+        v = self.menuBar().addMenu("&View")
+        a_log = QAction("&Log", self); a_log.setShortcut("Ctrl+L"); a_log.triggered.connect(self.show_log); v.addAction(a_log)
         h = self.menuBar().addMenu("&Help")
         a_about = QAction("&About", self); a_about.triggered.connect(self._about); h.addAction(a_about)
 
@@ -400,7 +406,8 @@ class MainWindow(QMainWindow):
         self._save()
         self.work_dir = Path(args[1])
         self.tracker = ProgressTracker(collecting=self.rb_sky.isChecked())
-        self.log.clear(); self._log("$ pipeline " + " ".join(args))
+        self.applog.start_run(f"run {APP_NAME}")
+        self._log("$ pipeline " + " ".join(args))
         self._out_buf = b""
         self.proc = QProcess(self)
         self.proc.setProcessChannelMode(QProcess.MergedChannels)
@@ -432,9 +439,9 @@ class MainWindow(QMainWindow):
         # Keep partial lines (and split UTF-8 sequences) until the newline arrives.
         self._out_buf += bytes(self.proc.readAllStandardOutput())
         *complete, self._out_buf = self._out_buf.split(b"\n")
-        for raw in complete:
-            line = raw.decode("utf-8", "replace").rstrip("\r")
-            self._log(line)
+        lines = [raw.decode("utf-8", "replace").rstrip("\r") for raw in complete]
+        self.applog.write_lines(lines)            # one file write per output chunk
+        for line in lines:
             msg = self.tracker.feed(line) if self.tracker else None
             if msg:
                 self.progress.setValue(int(self.tracker.fraction * 1000)); self._status(msg)
@@ -453,7 +460,7 @@ class MainWindow(QMainWindow):
             note = f" — unavailable archives: {', '.join(failed)}" if failed else ""
             self._status(f"Done{note}")
         else:
-            self._status("Run failed or was cancelled; see the log.")
+            self._status("Run failed or was cancelled; see View > Log.")
 
     # ---------------------------------------------------------- results
     def load_results(self, path: Path):
@@ -529,7 +536,14 @@ class MainWindow(QMainWindow):
 
     # ------------------------------------------------------------ misc
     def _log(self, text):
-        self.log.appendPlainText(text)
+        self.applog.write(text)
+
+    def show_log(self):
+        """Open (or raise) the separate log window; the file is created if missing."""
+        if self.log_window is None:
+            self.log_window = LogWindow(self.applog, self)
+        self.applog.ensure()
+        self.log_window.show(); self.log_window.raise_(); self.log_window.activateWindow()
 
     def _status(self, text):
         self.lbl_state.setText(text); self.statusBar().showMessage(text)

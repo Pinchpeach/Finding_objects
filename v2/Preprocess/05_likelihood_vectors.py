@@ -106,15 +106,26 @@ def fuse(items,model=None):
     m=max(logit.values()); p={c:math.exp(v-m) for c,v in logit.items()}; z=sum(p.values())
     return {c:p[c]/z for c in CLASSES},used
 
+# Astrometry of a source whose Gaia BP/RP flux excess is > 5 sigma from that
+# of an isolated point source (Riello et al. 2021 C*; ``cstar_sigma`` from
+# Stage 4) belongs to an extended or blended source -- e.g. a galaxy nucleus,
+# where spurious 14-sigma "proper motions" occur (NGC 4522, 2.22.0) -- and is
+# not used to override the in-galaxy status or the fusion.
+CSTAR_MAX_SIGMA=5.0
+def _point_like(e):
+    try: return float(e.get("cstar_sigma"))<=CSTAR_MAX_SIGMA
+    except (TypeError,ValueError): return True   # not measured: keep the old behaviour
+
 def _gaia_foreground_star(items):
-    """Significant Gaia parallax or proper motion (S/N >= 5; Stage-4 score >= 0.5)."""
-    return any(e.get("rule_id") in {"AST-GAL-001","AST-GAL-002"} and float(e.get("raw_score",0))>=0.5 for e in items)
+    """Significant Gaia parallax or proper motion (S/N >= 5; Stage-4 score >= 0.5)
+    of a point-like source."""
+    return any(e.get("rule_id") in {"AST-GAL-001","AST-GAL-002"} and float(e.get("raw_score",0))>=0.5 and _point_like(e) for e in items)
 
 def _decisive_motion(items):
     """Gaia parallax or proper motion at >= DECISIVE_MOTION_SIGMA with a good
     astrometric solution and a reliable association."""
     for e in items:
-        if e.get("rule_id") not in {"AST-GAL-001","AST-GAL-002"}: continue
+        if e.get("rule_id") not in {"AST-GAL-001","AST-GAL-002"} or not _point_like(e): continue
         try:
             if (float(e.get("value"))>=DECISIVE_MOTION_SIGMA and float(e.get("reliability",0))>=DECISIVE_MIN_RELIABILITY
                     and float(e.get("association_reliability",0))>=DECISIVE_MIN_RELIABILITY):

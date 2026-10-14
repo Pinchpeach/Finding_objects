@@ -1,0 +1,227 @@
+otype,label,description,comment,is_candidate,otype_shortname,otype_longname,path
+PCG?,protoClG_Candidate,Proto Cluster of Galaxies Candidate,,1,PCG?,Proto Cluster of Galaxies Candidate,PCG
+WR?,WolfRayet*_Candidate,Wolf-Rayet Candidate,,1,WR?,Wolf-Rayet Candidate,* > Ma* > sg* > s*b > WR*
+Sy2,Seyfert2,Seyfert 2 Galaxy,,0,Sy2,Seyfert 2 Galaxy,G > AGN > SyG > Sy2
+EmO,EmObj,Emission Object,"Mostly YSO, Em*, PNe, WR*, Sy*, Galaxies, AGN, QSO",0,EmO,Emission Object,Opt > EmO
+Ce?,Cepheid_Candidate,Cepheid Variable Candidate,,1,Ce?,Cepheid Variable Candidate,* > Ev* > Ce*
+s?y,YellowSG_Candidate,Yellow Supergiant Candidate,,1,s?y,Yellow Supergiant Candidate,* > Ma* > sg* > s*y
+s*y,YellowSG,Yellow Supergiant,"SpT like F/G 0,Ia,Iab,(I)",0,s*y,Yellow Supergiant,* > Ma* > sg* > s*y
+Lev,LensingEv,(Micro)Lensing Event,,0,Lev,(Micro)Lensing Event,grv > Lev
+ULX,ULX,Ultra-luminous X-ray Source,,0,ULX,Ultra-luminous X-ray Source,X > ULX
+gLe,GravLens,Gravitational Lens,,0,gLe,Gravitational Lens,grv > gLS > gLe
+SN?,Supernova_Candidate,SuperNova Candidate,,1,SN?,SuperNova Candidate,* > SN*
+Sy1,Seyfert1,Seyfert 1 Galaxy,,0,Sy1,Seyfert 1 Galaxy,G > AGN > SyG > Sy1
+Y*O,YSO,Young Stellar Object,Pre-Main Sequence,0,Y*O,Young Stellar Object,* > Y*O
+HVC,HVCld,High-velocity Cloud,Vlsr > ~90 km/s,0,HVC,High-velocity Cloud,ISM > Cld > HVC
+HX?,HighMassXBin_Candidate,High Mass X-ray Binary Candidate,,1,HX?,High Mass X-ray Binary Candidate,* > ** > XB* > HXB
+out,Outflow,Outflow,,0,out,Outflow,* > Y*O > out
+DNe,DarkNeb,Dark Cloud (nebula),,0,DNe,Dark Cloud (nebula),ISM > Cld > DNe
+bC?,bCepV*_Candidate,beta Cep Variable Candidate,,1,bC?,beta Cep Variable Candidate,* > Ma* > bC*
+bub,Bubble,Bubble,,0,bub,Bubble,ISM > bub
+RNe,RefNeb,Reflection Nebula,,0,RNe,Reflection Nebula,ISM > Cld > GNe > RNe
+gD*,gammaDorV*,gamma Dor Variable,See Pu* for candidate,0,gD*,gamma Dor Variable,* > MS* > gD*
+var,Variable,Variable source,,0,var,Variable source,
+EB?,EclBin_Candidate,Eclipsing Binary Candidate,,1,EB?,Eclipsing Binary Candidate,* > ** > EB*
+LeI,LensedImage,Gravitationally Lensed Image,,0,LeI,Gravitationally Lensed Image,grv > gLS > LeI
+Pe?,ChemPec*_Candidate,Chemically Peculiar Star Candidate,,1,Pe?,Chemically Peculiar Star Candidate,* > Pe*
+HII,HIIReg,HII Region,,0,HII,HII Region,ISM > HII
+mm,mmRad,Millimetric Radio Source,,0,mm,Millimetric Radio Source,Rad > mm
+IR,Infrared,Infra-Red Source,,0,IR,Infra-Red Source,IR
+RC?,RCrBV*_Candidate,R CrB Variable Candidate,,1,RC?,R CrB Variable Candidate,* > Pe* > RC*
+Rad,Radio,Radio Source,,0,Rad,Radio Source,Rad
+SFR,StarFormingReg,Star Forming Region,,0,SFR,Star Forming Region,ISM > SFR
+Ir*,IrregularV*,Irregular Variable,,0,Ir*,Irregular Variable,* > V* > Ir*
+FIR,FarIR,Far-IR source (λ >= 30 µm),"e.g. IRAS 60/100, AKARI-FIS, Hershel",0,FIR,Far-IR source (λ >= 30 µm),IR > FIR
+Sy?,Symbiotic*_Candidate,Symbiotic Star Candidate,,1,Sy?,Symbiotic Star Candidate,* > ** > Sy*
+*,Star,Star,,0,*,Star,*
+RV?,RVTauV*_Candidate,RV Tauri Variable Candidate,,1,RV?,RV Tauri Variable Candidate,* > Ev* > RV*
+RR*,RRLyrae,RR Lyrae Variable,,0,RR*,RR Lyrae Variable,* > Ev* > HB* > RR*
+X,X,X-ray Source,,0,X,X-ray Source,X
+C*,C*,Carbon Star,"Mostly AGB or RGB. SpT like C,N,R C-N,C-R, or C-rich",0,C*,Carbon Star,* > Ev* > C*
+Pl,Planet,Extra-solar Planet,,0,Pl,Extra-solar Planet,* > Pl
+GrG,GroupG,Group of Galaxies,,0,GrG,Group of Galaxies,GrG
+SX*,SXPheV*,SX Phe Variable,See Pu* for candidate,0,SX*,SX Phe Variable,* > MS* > BS* > SX*
+LXB,LowMassXBin,Low Mass X-ray Binary,,0,LXB,Low Mass X-ray Binary,* > ** > XB* > LXB
+BL?,BLLac_Candidate,BL Lac Candidate,,1,BL?,BL Lac Candidate,G > AGN > QSO > Bla > BLL
+Psr,Pulsar,Pulsar,,0,Psr,Pulsar,* > Ma* > N* > Psr
+NIR,NearIR,Near-IR Source (λ < 3 µm),"JHK, 2MASS, UKIDSS, ...",0,NIR,Near-IR Source (λ < 3 µm),IR > NIR
+BS*,BlueStraggler,Blue Straggler,,0,BS*,Blue Straggler,* > MS* > BS*
+AB*,AGB*,Asymptotic Giant Branch Star,,0,AB*,Asymptotic Giant Branch Star,* > Ev* > AB*
+AB?,AGB*_Candidate,Asymptotic Giant Branch Star Candidate,,1,AB?,Asymptotic Giant Branch Star Candidate,* > Ev* > AB*
+smm,smmRad,Sub-Millimetric Source,,0,smm,Sub-Millimetric Source,Rad > smm
+EB*,EclBin,Eclipsing Binary,,0,EB*,Eclipsing Binary,* > ** > EB*
+BH?,BlackHole_Candidate,Black Hole Candidate,,1,BH?,Black Hole Candidate,grv > BH
+LM*,Low-Mass*,Low-mass Star,M ~< 1 Mo,0,LM*,Low-mass Star,* > LM*
+cC*,ClassicalCep,Classical Cepheid Variable,delta Cep type,0,cC*,Classical Cepheid Variable,* > Ev* > Ce* > cC*
+glb,Globule,Globule (low-mass dark cloud),,0,glb,Globule (low-mass dark cloud),ISM > Cld > glb
+St*,Stream,Stellar Stream,,0,St*,Stellar Stream,As* > St*
+SBG,StarburstG,Starburst Galaxy,,0,SBG,Starburst Galaxy,G > SBG
+vid,Void,Underdense Region of the Universe,,0,vid,Underdense Region of the Universe,vid
+Ma?,Massiv*_Candidate,Massive Star Candidate,,1,Ma?,Massive Star Candidate,* > Ma*
+MGr,MouvGroup,Moving Group,,0,MGr,Moving Group,As* > MGr
+El*,EllipVar,Ellipsoidal Variable,,0,El*,Ellipsoidal Variable,* > ** > El*
+N*,Neutron*,Neutron Star,,0,N*,Neutron Star,* > Ma* > N*
+GlC,GlobCluster,Globular Cluster,,0,GlC,Globular Cluster,Cl* > GlC
+cm,cmRad,Centimetric Radio Source,,0,cm,Centimetric Radio Source,Rad > cm
+PoG,PartofG,Part of a Galaxy,,0,PoG,Part of a Galaxy,PoG
+AGN,AGN,Active Galaxy Nucleus,,0,AGN,Active Galaxy Nucleus,G > AGN
+Mi?,Mira_Candidate,Mira Variable Candidate,,1,Mi?,Mira Variable Candidate,* > Ev* > AB* > Mi*
+GiC,GtowardsCl,Galaxy towards a Cluster of Galaxies,Check hierarchical links,0,GiC,Galaxy towards a Cluster of Galaxies,G > GiC
+s?r,RedSG_Candidate,Red Supergiant Candidate,,1,s?r,Red Supergiant Candidate,* > Ma* > sg* > s*r
+PN,PlanetaryNeb,Planetary Nebula,Includes the progenitor Star when knwon,0,PN,Planetary Nebula,* > Ev* > PN
+Cl?,Cluster*_Candidate,Cluster of Stars Candidate,,1,Cl?,Cluster of Stars Candidate,Cl*
+CV?,CataclyV*_Candidate,Cataclysmic Binary Candidate,,1,CV?,Cataclysmic Binary Candidate,* > ** > CV*
+SR?,SNRemnant_Candidate,SuperNova Remnant Candidate,,1,SR?,SuperNova Remnant Candidate,ISM > SNR
+bC*,bCepV*,beta Cep Variable,,0,bC*,beta Cep Variable,* > Ma* > bC*
+sg*,Supergiant,Evolved Supergiant,"Luminosity type 0,Ia,Iab,(I). Includes A-type SG",0,sg*,Evolved Supergiant,* > Ma* > sg*
+BD?,BrownD*_Candidate,Brown Dwarf Candidate,,1,BD?,Brown Dwarf Candidate,* > LM* > BD*
+OH*,OH/IR*,OH/IR Star,"O-rich AGB or PAGB, doubled-peaked OH maser profile",0,OH*,OH/IR Star,* > Ev* > OH*
+LeQ,LensedQ,Gravitationally Lensed Image of a Quasar,,0,LeQ,Gravitationally Lensed Image of a Quasar,grv > gLS > LeI > LeQ
+UX?,ULX_Candidate,Ultra-luminous X-ray Source Candidate,,1,UX?,Ultra-luminous X-ray Source Candidate,X > ULX
+mul,Blend,"Composite Object, Blend",,0,mul,"Composite Object, Blend",mul
+No?,Nova_Candidate,Classical Nova Candidate,,1,No?,Classical Nova Candidate,* > ** > CV* > No*
+OpC,OpenCluster,Open Cluster,,0,OpC,Open Cluster,Cl* > OpC
+V*,Variable*,Variable Star,,0,V*,Variable Star,* > V*
+mR,metricRad,Metric Radio Source,,0,mR,Metric Radio Source,Rad > mR
+Q?,QSO_Candidate,Quasar Candidate,,1,Q?,Quasar Candidate,G > AGN > QSO
+HB?,HorBranch*_Candidate,Horizontal Branch Star Candidate,,1,HB?,Horizontal Branch Star Candidate,* > Ev* > HB*
+sh,HIshell,Interstellar Shell,,0,sh,Interstellar Shell,ISM > sh
+Ma*,Massiv*,Massive Star,Initial mass > 8-10 Mo,0,Ma*,Massive Star,* > Ma*
+PaG,PairG,Pair of Galaxies,,0,PaG,Pair of Galaxies,PaG
+Em*,EmLine*,Emission-line Star,"Can be sg*, YSO, Be*, AB*, Sy*, etc...",0,Em*,Emission-line Star,* > Em*
+Gl?,GlobCluster_Candidate,Globular Cluster Candidate,,1,Gl?,Globular Cluster Candidate,Cl* > GlC
+blu,blue,Blue Object,"Mostly WD*, HS*, blue HB*, QSO",0,blu,Blue Object,Opt > blu
+IG,InteractingG,Interacting Galaxies,,0,IG,Interacting Galaxies,IG
+HS*,HotSubdwarf,Hot Subdwarf,"SpT like sdB, sdO",0,HS*,Hot Subdwarf,* > Ev* > HS*
+TT?,TTauri*_Candidate,T Tauri Star Candidate,,1,TT?,T Tauri Star Candidate,* > Y*O > TT*
+gam,gamma,Gamma-ray Source,,0,gam,Gamma-ray Source,gam
+S*?,S*_Candidate,S Star Candidate,,1,S*?,S Star Candidate,* > Ev* > S*
+RV*,RVTauV*,RV Tauri Variable,,0,RV*,RV Tauri Variable,* > Ev* > RV*
+pA?,post-AGB*_Candidate,Post-AGB Star Candidate,,1,pA?,Post-AGB Star Candidate,* > Ev* > pA*
+BY?,BYDraV*_Candidate,BY Dra Variable Candidate,,1,BY?,BY Dra Variable Candidate,* > ** > BY*
+Ev?,Evolved*_Candidate,Evolved Star Candidate,,1,Ev?,Evolved Star Candidate,* > Ev*
+ev,Transient,Transient Event,,0,ev,Transient Event,ev
+RB?,RGB*_Candidate,Red Giant Branch star Candidate,,1,RB?,Red Giant Branch star Candidate,* > Ev* > RG*
+Ro?,RotV*_Candidate,Rotating Variable Candidate,,1,Ro?,Rotating Variable Candidate,* > V* > Ro*
+**?,**_Candidate,Double or Multiple Star Candidate,,1,**?,Double or Multiple Star Candidate,* > **
+H2G,HIIG,HII Galaxy,,0,H2G,HII Galaxy,G > H2G
+GNe,GalNeb,Nebula,,0,GNe,Nebula,ISM > Cld > GNe
+As?,Association_Candidate,Association of Stars Candidate,,1,As?,Association of Stars Candidate,As*
+OH?,OH/IR*_Candidate,OH/IR Star Candidate,,1,OH?,OH/IR Star Candidate,* > Ev* > OH*
+V*?,Variable*_Candidate,Variable Star Candidate,,1,V*?,Variable Star Candidate,* > V*
+PN?,PlanetaryNeb_Candidate,Planetary Nebula Candidate,,1,PN?,Planetary Nebula Candidate,* > Ev* > PN
+WD*,WhiteDwarf,White Dwarf,SpT like D and PG1159,0,WD*,White Dwarf,* > Ev* > WD*
+HV*,HighVel*,High Velocity Star,,0,HV*,High Velocity Star,* > HV*
+Ce*,Cepheid,Cepheid Variable,Includes anomalous Cepheids,0,Ce*,Cepheid Variable,* > Ev* > Ce*
+PM*,HighPM*,High Proper Motion Star,Total proper motion >= 50 mas/yr,0,PM*,High Proper Motion Star,* > PM*
+Mi*,Mira,Mira Variable,,0,Mi*,Mira Variable,* > Ev* > AB* > Mi*
+Pu?,PulsV*_Candidate,Pulsating Variable Candidate,,1,Pu?,Pulsating Variable Candidate,* > V* > Pu*
+CGb,ComGlob,Cometary Globule / Pillar,,0,CGb,Cometary Globule / Pillar,ISM > Cld > CGb
+Er?,Eruptive*_Candidate,Eruptive Variable Candidate,,1,Er?,Eruptive Variable Candidate,* > V* > Er*
+BS?,BlueStraggler_Candidate,Blue Straggler Candidate,,1,BS?,Blue Straggler Candidate,* > MS* > BS*
+Ev*,Evolved*,Evolved Star,Post-Main Sequence,0,Ev*,Evolved Star,* > Ev*
+sg?,Supergiant_Candidate,Evolved Supergiant Candidate,,1,sg?,Evolved Supergiant Candidate,* > Ma* > sg*
+QSO,QSO,Quasar,,0,QSO,Quasar,G > AGN > QSO
+N*?,Neutron*_Candidate,Neutron Star Candidate,,1,N*?,Neutron Star Candidate,* > Ma* > N*
+RR?,RRLyrae_Candidate,RR Lyrae Variable Candidate,,1,RR?,RR Lyrae Variable Candidate,* > Ev* > HB* > RR*
+G?,Galaxy_Candidate,Galaxy Candidate,,1,G?,Galaxy Candidate,G
+dS*,delSctV*,delta Sct Variable,See Pu* for candidate,0,dS*,delta Sct Variable,* > MS* > dS*
+UV,UV,UV-emission Source,,0,UV,UV-emission Source,UV
+As*,Association,Association of Stars,,0,As*,Association of Stars,As*
+HXB,HighMassXBin,High Mass X-ray Binary,,0,HXB,High Mass X-ray Binary,* > ** > XB* > HXB
+C*?,C*_Candidate,Carbon Star Candidate,,1,C*?,Carbon Star Candidate,* > Ev* > C*
+a2?,alf2CVnV*_Candidate,alpha2 CVn Variable Candidate,,1,a2?,alpha2 CVn Variable Candidate,* > Pe* > a2*
+Er*,Eruptive*,Eruptive Variable,,0,Er*,Eruptive Variable,* > V* > Er*
+SCG,SuperClG,Supercluster of Galaxies,,0,SCG,Supercluster of Galaxies,SCG
+LIN,LINER,LINER-type Active Galaxy Nucleus,,0,LIN,LINER-type Active Galaxy Nucleus,G > AGN > LIN
+Pl?,Planet_Candidate,Extra-solar Planet Candidate,,1,Pl?,Extra-solar Planet Candidate,* > Pl
+WV*,Type2Cep,Type II Cepheid Variable,Includes W Wir and BL Her subtypes,0,WV*,Type II Cepheid Variable,* > Ev* > WV*
+BD*,BrownD*,Brown Dwarf,"SpT L,T or Y",0,BD*,Brown Dwarf,* > LM* > BD*
+PoC,PartofCloud,Part of Cloud,,0,PoC,Part of Cloud,PoC
+LP?,LongPeriodV*_Candidate,Long-Period Variable Candidate,,1,LP?,Long-Period Variable Candidate,* > Ev* > LP*
+PCG,protoClG,Proto Cluster of Galaxies,,0,PCG,Proto Cluster of Galaxies,PCG
+Ae?,Ae*_Candidate,Herbig Ae/Be Star Candidate,,1,Ae?,Herbig Ae/Be Star Candidate,* > Y*O > Ae*
+LS?,GravLensSystem_Candidate,Gravitational Lens System (lens+images) Candidate,,1,LS?,Gravitational Lens System (lens+images) Candidate,grv > gLS
+RS*,RSCVnV*,RS CVn Variable,,0,RS*,RS CVn Variable,* > ** > RS*
+Gr?,GroupG_Candidate,Group of Galaxies Candidate,,1,Gr?,Group of Galaxies Candidate,GrG
+Bz?,Blazar_Candidate,Blazar Candidate,,1,Bz?,Blazar Candidate,G > AGN > QSO > Bla
+MIR,MidIR,Mid-IR Source (3 to 30 µm),"e.g. IRAS 12/25, AKARI-IRC, WISE, Spitzer-IRAC-MIPS",0,MIR,Mid-IR Source (3 to 30 µm),IR > MIR
+Cld,Cloud,Cloud,,0,Cld,Cloud,ISM > Cld
+Be?,Be*_Candidate,Be Star Candidate,,1,Be?,Be Star Candidate,* > MS* > Be*
+XB?,XrayBin_Candidate,X-ray Binary Candidate,,1,XB?,X-ray Binary Candidate,* > ** > XB*
+Pe*,ChemPec*,Chemically Peculiar Star,Includes metal-poor stars,0,Pe*,Chemically Peculiar Star,* > Pe*
+s?b,BlueSG_Candidate,Blue Supergiant Candidate,,1,s?b,Blue Supergiant Candidate,* > Ma* > sg* > s*b
+bCG,BlueCompactG,Blue Compact Galaxy,,0,bCG,Blue Compact Galaxy,G > bCG
+RC*,RCrBV*,R CrB Variable,,0,RC*,R CrB Variable,* > Pe* > RC*
+rG,RadioG,Radio Galaxy,,0,rG,Radio Galaxy,G > AGN > rG
+LX?,LowMassXBin_Candidate,Low Mass X-ray Binary Candidate,,1,LX?,Low Mass X-ray Binary Candidate,* > ** > XB* > LXB
+SyG,Seyfert,Seyfert Galaxy,,0,SyG,Seyfert Galaxy,G > AGN > SyG
+BY*,BYDraV*,BY Dra Variable,,0,BY*,BY Dra Variable,* > ** > BY*
+SB*,SB*,Spectroscopic Binary,,0,SB*,Spectroscopic Binary,* > ** > SB*
+MoC,MolCld,Molecular Cloud,,0,MoC,Molecular Cloud,ISM > Cld > MoC
+flt,Filament,Interstellar Filament,,0,flt,Interstellar Filament,ISM > flt
+LI?,LensedImage_Candidate,Gravitationally Lensed Image Candidate,,1,LI?,Gravitationally Lensed Image Candidate,grv > gLS > LeI
+LP*,LongPeriodV*,Long-Period Variable,"AB*, RG*, or s*r. Includes L, SR, and OSARG",0,LP*,Long-Period Variable,* > Ev* > LP*
+Mas,Maser,Maser,,0,Mas,Maser,Rad > Mas
+Bla,Blazar,Blazar,,0,Bla,Blazar,G > AGN > QSO > Bla
+CV*,CataclyV*,Cataclysmic Binary,,0,CV*,Cataclysmic Binary,* > ** > CV*
+LM?,Low-Mass*_Candidate,Low-mass Star Candidate,,1,LM?,Low-mass Star Candidate,* > LM*
+Y*?,YSO_Candidate,Young Stellar Object Candidate,,1,Y*?,Young Stellar Object Candidate,* > Y*O
+CGG,Compact_Gr_G,Compact Group of Galaxies,,0,CGG,Compact Group of Galaxies,GrG > CGG
+gB,gammaBurst,Gamma-ray Burst,,0,gB,Gamma-ray Burst,gam > gB
+G,Galaxy,Galaxy,,0,G,Galaxy,G
+HB*,HorBranch*,Horizontal Branch Star,,0,HB*,Horizontal Branch Star,* > Ev* > HB*
+RS?,RSCVnV*_Candidate,RS CVn Variable Candidate,,1,RS?,RS CVn Variable Candidate,* > ** > RS*
+pA*,post-AGB*,Post-AGB Star,,0,pA*,Post-AGB Star,* > Ev* > pA*
+WD?,WhiteDwarf_Candidate,White Dwarf Candidate,,1,WD?,White Dwarf Candidate,* > Ev* > WD*
+Ae*,Ae*,Herbig Ae/Be Star,,0,Ae*,Herbig Ae/Be Star,* > Y*O > Ae*
+SC?,SuperClG_Candidate,Supercluster of Galaxies Candidate,,1,SC?,Supercluster of Galaxies Candidate,SCG
+s*r,RedSG,Red Supergiant,"SpT like K/M 0,Ia,Iab,(I)",0,s*r,Red Supergiant,* > Ma* > sg* > s*r
+?,Unknown,Object of Unknown Nature,,0,?,Object of Unknown Nature,
+ISM,ISM,Interstellar Medium Object,,0,ISM,Interstellar Medium Object,ISM
+MS*,MainSequence*,Main Sequence Star,Main Sequence,0,MS*,Main Sequence Star,* > MS*
+GiP,GinPair,Galaxy in Pair of Galaxies,,0,GiP,Galaxy in Pair of Galaxies,G > GiP
+Opt,Optical,Optical Source,Corresponding to BVRI range,0,Opt,Optical Source,Opt
+Be*,Be*,Be Star,,0,Be*,Be Star,* > MS* > Be*
+No*,Nova,Classical Nova,,0,No*,Classical Nova,* > ** > CV* > No*
+BLL,BLLac,BL Lac,,0,BLL,BL Lac,G > AGN > QSO > Bla > BLL
+SNR,SNRemnant,SuperNova Remnant,,0,SNR,SuperNova Remnant,ISM > SNR
+err,Inexistent,"Not an Object (Error, Artefact, ...)",,0,err,"Not an Object (Error, Artefact, ...)",err
+HI,HI,HI (21cm) Source,,0,HI,HI (21cm) Source,Rad > HI
+XB*,XrayBin,X-ray Binary,,0,XB*,X-ray Binary,* > ** > XB*
+Or*,OrionV*,Orion Variable,,0,Or*,Orion Variable,* > Y*O > Or*
+LeG,LensedG,Gravitationally Lensed Image of a Galaxy,,0,LeG,Gravitationally Lensed Image of a Galaxy,grv > gLS > LeI > LeG
+Pu*,PulsV*,Pulsating Variable,Non LPV Pulsating Star,0,Pu*,Pulsating Variable,* > V* > Pu*
+S*,S*,S Star,"Mostly AGB or RGB. SpT like S,SC,MS",0,S*,S Star,* > Ev* > S*
+of?,Outflow_Candidate,Outflow Candidate,,1,of?,Outflow Candidate,* > Y*O > out
+HS?,HotSubdwarf_Candidate,Hot Subdwarf Candidate,,1,HS?,Hot Subdwarf Candidate,* > Ev* > HS*
+Le?,GravLens_Candidate,Gravitational Lens Candidate,,1,Le?,Gravitational Lens Candidate,grv > gLS > gLe
+C?G,ClG_Candidate,Cluster of Galaxies Candidate,,1,C?G,Cluster of Galaxies Candidate,ClG
+HH,HerbigHaroObj,Herbig-Haro Object,,0,HH,Herbig-Haro Object,* > Y*O > out > HH
+a2*,alf2CVnV*,alpha2 CVn Variable,Ap stars; magnetic,0,a2*,alpha2 CVn Variable,* > Pe* > a2*
+MS?,MainSequence*_Candidate,Main Sequence Star Candidate,,1,MS?,Main Sequence Star Candidate,* > MS*
+TT*,TTauri*,T Tauri Star,Includes classical and weak-line T Tauri,0,TT*,T Tauri Star,* > Y*O > TT*
+grv,Gravitation,Gravitational Source,,0,grv,Gravitational Source,grv
+Sy*,Symbiotic*,Symbiotic Star,,0,Sy*,Symbiotic Star,* > ** > Sy*
+GiG,GtowardsGroup,Galaxy towards a Group of Galaxies,Check hierarchical links,0,GiG,Galaxy towards a Group of Galaxies,G > GiG
+cor,denseCore,Dense Core,"N(H) > ~1D23 at/cm2, or detection of NH3,HCN,CS,HCO,..",0,cor,Dense Core,ISM > cor
+BiC,BrightestCG,Brightest Galaxy in a Cluster (BCG),,0,BiC,Brightest Galaxy in a Cluster (BCG),G > GiC > BiC
+SN*,Supernova,SuperNova,,0,SN*,SuperNova,* > SN*
+BH,BlackHole,Black Hole,,0,BH,Black Hole,grv > BH
+s*b,BlueSG,Blue Supergiant,"SpT like O/B 0,Ia,Iab,(I)",0,s*b,Blue Supergiant,* > Ma* > sg* > s*b
+El?,EllipVar_Candidate,Ellipsoidal Variable Candidate,,1,El?,Ellipsoidal Variable Candidate,* > ** > El*
+ClG,ClG,Cluster of Galaxies,,0,ClG,Cluster of Galaxies,ClG
+AG?,AGN_Candidate,Active Galaxy Nucleus Candidate,,1,AG?,Active Galaxy Nucleus Candidate,G > AGN
+GWE,GravWaveEvent,Gravitational Wave Event,,0,GWE,Gravitational Wave Event,grv > GWE
+gLS,GravLensSystem,Gravitational Lens System (lens+images),,0,gLS,Gravitational Lens System (lens+images),grv > gLS
+reg,Region,Region defined in the Sky,,0,reg,Region defined in the Sky,reg
+Cl*,Cluster*,Cluster of Stars,,0,Cl*,Cluster of Stars,Cl*
+WR*,WolfRayet*,Wolf-Rayet,SpT like W,0,WR*,Wolf-Rayet,* > Ma* > sg* > s*b > WR*
+**,**,Double or Multiple Star,Interacting binaries and close CPM systems,0,**,Double or Multiple Star,* > **
+rB,radioBurst,Radio Burst,,0,rB,Radio Burst,Rad > rB
+RG*,RGB*,Red Giant Branch star,,0,RG*,Red Giant Branch star,* > Ev* > RG*
+EmG,EmissionG,Emission-line galaxy,,0,EmG,Emission-line galaxy,G > EmG
+WV?,Type2Cep_Candidate,Type II Cepheid Variable Candidate,,1,WV?,Type II Cepheid Variable Candidate,* > Ev* > WV*
+LSB,LowSurfBrghtG,Low Surface Brightness Galaxy,,0,LSB,Low Surface Brightness Galaxy,G > LSB
+SB?,SB*_Candidate,Spectroscopic Binary Candidate,,1,SB?,Spectroscopic Binary Candidate,* > ** > SB*
+Ro*,RotV*,Rotating Variable,,0,Ro*,Rotating Variable,* > V* > Ro*

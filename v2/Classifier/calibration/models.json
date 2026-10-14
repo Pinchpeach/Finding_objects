@@ -62,8 +62,8 @@
         "truth_independent": true
       },
       "LPV": {
-        "coef": 3.2531572551698513,
-        "intercept": -0.8379675587248301,
+        "coef": 3.253157255169851,
+        "intercept": -0.8379675587248299,
         "method": "platt",
         "n": 197,
         "negative": 50,
@@ -103,7 +103,7 @@
         "truth_independent": true
       },
       "RR_LYRAE": {
-        "coef": 1.7205885697282608,
+        "coef": 1.7205885697282604,
         "intercept": -2.0264311851771293,
         "method": "platt",
         "n": 197,
@@ -135,7 +135,30 @@
         "wilson_lower_95": 0.9829
       }
     },
-    "physical": {},
+    "physical": {
+      "GAIA_CMD_HOT_SUBLUMINOUS|HOT_SUBDWARF": {
+        "correct": 655,
+        "external_source": "benchmark/new_targets/build_truth.py (2.22.0)",
+        "method": "rule_precision",
+        "n": 809,
+        "precision": 0.8096,
+        "truth_classes": [
+          "SIMBAD otype / spectral type of a sky-random Gaia sample passing the rule"
+        ],
+        "wilson_lower_95": 0.7811
+      },
+      "GAIA_DR3_ESP_UCD|ULTRACOOL_DWARF": {
+        "correct": 493,
+        "external_source": "benchmark/new_targets/build_truth.py (2.22.0)",
+        "method": "rule_precision",
+        "n": 532,
+        "precision": 0.9267,
+        "truth_classes": [
+          "Best+2018 spectral type >= M7"
+        ],
+        "wilson_lower_95": 0.9014
+      }
+    },
     "variability": {
       "GAIA_DR3_SOS_CEPHEID|CEPHEID": {
         "correct": 225,

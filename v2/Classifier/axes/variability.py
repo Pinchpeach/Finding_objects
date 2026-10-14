@@ -6,9 +6,20 @@ family-level labels and their independent calibration remain stable.
 """
 from __future__ import annotations
 import math
-AXIS="variability";CLASSES=("RR_LYRAE","CEPHEID","MIRA","LPV","ECLIPSING","ROTATIONAL","ERUPTIVE","PULSATING","OTHER_VARIABLE","UNKNOWN")
-SIMBAD_MAP={"RR*":"RR_LYRAE","Ce*":"CEPHEID","Mi*":"MIRA","LP*":"LPV","EB*":"ECLIPSING","Ro*":"ROTATIONAL","Er*":"ERUPTIVE","Pu*":"PULSATING"}
-GAIA_MAP={"RR":"RR_LYRAE","CEP":"CEPHEID","LPV":"LPV","ECL":"ECLIPSING","ELL":"ECLIPSING","SOLAR_LIKE":"ROTATIONAL","ACV|CP|MCP|ROAM|ROAP|SXARI":"ROTATIONAL","CV":"ERUPTIVE","RCB":"ERUPTIVE","BCEP":"PULSATING","DSCT|GDOR|SXPHE":"PULSATING","SPB":"PULSATING","ACYG":"PULSATING","SDB":"PULSATING","RS":"OTHER_VARIABLE","S":"OTHER_VARIABLE","SYST":"OTHER_VARIABLE","YSO":"OTHER_VARIABLE","BE|GCAS|SDOR|WR":"OTHER_VARIABLE"}
+import importlib.util as _ilu
+from pathlib import Path as _P
+_s=_ilu.spec_from_file_location("v2_simbad_otypes",_P(__file__).resolve().parents[1]/"simbad_otypes.py")
+OTYPES=_ilu.module_from_spec(_s);_s.loader.exec_module(OTYPES)
+AXIS="variability";CLASSES=("RR_LYRAE","CEPHEID","MIRA","LPV","ECLIPSING","ROTATIONAL","ERUPTIVE","PULSATING","YSO","OTHER_VARIABLE","UNKNOWN")
+# YSO (2.22.0): the Gaia DR3 variability classifier's YSO class was checked
+# against 9 independent YSO catalogues by Marton et al. (2023, A&A 674, A21):
+# ~10 % contamination on average (up to 26.7 % against single catalogues),
+# so it is a leaf of its own rather than OTHER_VARIABLE.  SIMBAD T Tauri (TT*)
+# and Orion-type (Or*) variables are the curated route.
+SIMBAD_MAP={"TT*":"YSO","Or*":"YSO","RR*":"RR_LYRAE","Ce*":"CEPHEID","Mi*":"MIRA","LP*":"LPV","EB*":"ECLIPSING","Ro*":"ROTATIONAL","Er*":"ERUPTIVE","Pu*":"PULSATING","WV*":"CEPHEID"}
+# SIMBAD codes resolve through the otype hierarchy (2.22.0): cC* -> Ce*, Mi* before its parent AB*.
+SIMBAD_SUBTYPE={"cC*":"DCEP","WV*":"T2CEP"}
+GAIA_MAP={"RR":"RR_LYRAE","CEP":"CEPHEID","LPV":"LPV","ECL":"ECLIPSING","ELL":"ECLIPSING","SOLAR_LIKE":"ROTATIONAL","ACV|CP|MCP|ROAM|ROAP|SXARI":"ROTATIONAL","CV":"ERUPTIVE","RCB":"ERUPTIVE","BCEP":"PULSATING","DSCT|GDOR|SXPHE":"PULSATING","SPB":"PULSATING","ACYG":"PULSATING","SDB":"PULSATING","RS":"OTHER_VARIABLE","S":"OTHER_VARIABLE","SYST":"OTHER_VARIABLE","YSO":"YSO","BE|GCAS|SDOR|WR":"OTHER_VARIABLE"}
 # ZTF periodic variables (Chen et al. 2020, ApJS 249, 18): types from period,
 # g/r amplitude and light-curve shape (Fourier R21 / phi21); Mira and SR are
 # separated by amplitude among the long-period stars.  This is the only
@@ -49,7 +60,8 @@ def _result(label,confidence,status,evidence,subtype=None):
  return {"axis":AXIS,"label":label,"subtype":subtype,"confidence":confidence,"status":status,"evidence":evidence}
 def classify(row):
  simbad=_text(row,"otype")
- if simbad in SIMBAD_MAP:return _result(SIMBAD_MAP[simbad],None,"SIMBAD_CURATED_VARIABLE_TYPE",[{"kind":"simbad_physical_type","otype":simbad}])
+ label,_hit=OTYPES.resolve(simbad,SIMBAD_MAP)
+ if label is not None:return _result(label,None,"SIMBAD_CURATED_VARIABLE_TYPE",[{"kind":"simbad_physical_type","otype":simbad,"matched_type":_hit}],SIMBAD_SUBTYPE.get(simbad))
  # Gaia SOS RR Lyrae classifications are based on fitted multi-band time
  # series.  Do not derive subtype from a period threshold when this published
  # subtype is unavailable.

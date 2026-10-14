@@ -11,14 +11,14 @@ v2의 코드·문서·규칙표가 인용하는 논문, 카탈로그 출판물, 
 | [탐사·카탈로그 데이터](#survey) | 29 |
 | [데이터 출처 카탈로그 (논문 인용 없음)](#data) | 13 |
 | [교차 대응·통계·분류 방법](#method) | 14 |
-| [별 분류](#star) | 35 |
+| [별 분류](#star) | 39 |
 | [은하 분류](#galaxy) | 25 |
-| [퀘이사·AGN](#qso) | 14 |
+| [퀘이사·AGN](#qso) | 15 |
 | [전파·X선·밀집성](#radio) | 11 |
 | [행성상성운·초신성·과도 현상](#trans) | 8 |
 | [기타 문서](#doc) | 13 |
 | [분광 분류 기준](#spec) | 43 |
-| **합계** | **233** |
+| **합계** | **238** |
 
 <a id="gaia"></a>
 ## 측성·Gaia
@@ -82,7 +82,7 @@ Gaia 데이터 릴리스, Gaia 처리·검증 논문, 측성 품질 기준.
 | DESI Collaboration 2025 (DESI DR1) | VizieR V/161/zcatdr1 | — | `Get_data/desi_spectroscopy.py`<br>`benchmark/build_desi_truth.py` | DESI DR1 적색편이 카탈로그: 분광 증거와 SDSS 독립 정답 집합 |
 | Bianchi et al. 2017 (GUVcat_AIS) | VizieR II/335 | — | `Preprocess/catalog_reliability.csv` (catalog_confidence_galex)<br>`Get_data/galex.py` (II/335/galex_ais) | GALEX AIS 자외선 카탈로그와 등급 오차·결함 플래그 |
 | Condon et al. 1998 (NVSS) | — | — | `Preprocess/catalog_reliability.csv` (catalog_confidence_nvss)<br>`Get_data/nvss.py` (VIII/65/nvss) | NVSS 1.4 GHz 카탈로그; 전파 검출만으로 1차 분류 규칙을 만들지 않음 |
-| Wenger et al. 2000 (SIMBAD) | A&AS 143, 9 | — | `designations.py`<br>`Classifier/literature.py`<br>`Classifier/LITERATURE_SUBCLASS.md` | SIMBAD 주 식별자와 큐레이터 지정 천체 유형(문헌 기반) |
+| Wenger et al. 2000 (SIMBAD) | A&AS 143, 9 | — | `designations.py`<br>`Classifier/literature.py`<br>`Classifier/LITERATURE_SUBCLASS.md`<br>`Classifier/simbad_otypes.py` | SIMBAD 주 식별자와 큐레이터 지정 천체 유형(문헌 기반); otypedef 유형 계층(AB*, cC*, BLL 등, 2.22.0) |
 | Oberto et al. 2018 (SIMBAD object types) (저장소 표기 그대로) | — | — | `Preprocess/classification_rules.csv` SIMBAD-TYPE-001<br>`Preprocess/catalog_reliability.csv` (catalog_confidence_simbad_type) | SIMBAD 계층적 천체 유형 체계 |
 | Suh 2021 (Galactic AGB catalogue) | ApJS 256, 43; VizieR J/ApJS/256/43 | `2021ApJS..256...43S` | `Get_data/agb_suh2021.py` (table9–12)<br>`Classifier/literature.py`<br>`Classifier/axes/physical.py`<br>`Preprocess/association_model.py`<br>`benchmark/build_agb_chemistry_truth.py` (table11/12)<br>`Classifier/VALIDATION_REPORT_2026-09-28.md` | O-rich/C-rich AGB 목록: 물리 축 AGB 증거, AGB 화학형 정답, 'from paper' 분류 |
 | Parker, Bojicic & Frew 2016 (HASH PN database) | — | `2016JPhCS.728c2008P` | `Classifier/literature.py`<br>`Classifier/LITERATURE_MULTI_AXIS.md`<br>`Get_data/hash_pn.py` (V/163/pnmain, 'HASH PN Catalog') | 흉내 천체를 걸러낸 은하계 행성상성운 DB; 외부 정답·출처 |
@@ -184,8 +184,12 @@ Gaia 데이터 릴리스, Gaia 처리·검증 논문, 측성 품질 기준.
 | Zhang & Sanders 2023 | MNRAS 521, 5309; DOI 10.1093/mnras/stad575 | — | `Classifier/axes/variability.py (Mira)` | Gaia DR3 미라 선택: 80 < P < 1000 d, 반진폭 ≥ 0.5 |
 | Kulkarni et al. 2025 | arXiv:2509.03120 | — | `Classifier/axes/variability.py (_ratio)` | RR Lyrae ZTF g/r 진폭비 ≈ 1.4 |
 | Fouesneau et al. 2023 | A&A 674, A28; DOI 10.1051/0004-6361/202243919 | — | `Classifier/branches/evolved_star.py`<br>`Classifier/subclass.py (GSP-Spec)` | FLAME 거성 질량·나이 사용 범위(1 < M < 2, 나이 > 1.5 Gyr), GSP-Spec 보정 권고 |
-| Culpan et al. 2022 | A&A 662, A40; DOI 10.1051/0004-6361/202243337 | — | `Classifier/subclass.py (star_luminosity_class)` | Gaia 고온 준왜성: 주계열 아래 청색 영역 |
+| Culpan et al. 2022 | A&A 662, A40; DOI 10.1051/0004-6361/202243337 | — | `Classifier/subclass.py (star_luminosity_class)`<br>`Classifier/axes/physical.py (hot_subdwarf_evidence)` | Gaia 고온 준왜성: 주계열 아래 청색 영역; HOT_SUBDWARF 선택 기준(Table 1 기준 1–4)과 알려진 준왜성 목록(2.22.0) |
 | Górski et al. 2018 | AJ 156, 278; DOI 10.3847/1538-3881/aaeacb | — | `Classifier/subclass.py (RGB_TIP_MKS)` | Ks 적색 거성 가지 끝 등급 −6.28, 색 의존성 |
+| Geier et al. 2019 | A&A 621, A38; arXiv:1810.09321 | — | `Classifier/LITERATURE_MULTI_AXIS.md §7.1` | 준왜성 선택의 오염률 ~10 %(차가운 별), 백색왜성·주계열 B/O ~5 % |
+| Sarro et al. 2023 | A&A 669, A139; arXiv:2211.03641 | — | `Classifier/axes/physical.py (ultracool_evidence)`<br>`Get_data/gaia_dr3.py` | Gaia ESP-UCD Teff < 2700 K 초저온 왜성 후보, 품질 범주 0·1 |
+| Best et al. 2018 | ApJS 234, 1 | — | `benchmark/new_targets/build_truth.py` | 초저온 왜성 판정의 독립 분광 정답(M/L/T 9888개) |
+| Marton et al. 2023 | A&A 674, A21 | — | `Classifier/axes/variability.py (YSO)` | Gaia 변광 분류 YSO의 오염률 ~10 % |
 
 <a id="galaxy"></a>
 ## 은하 분류
@@ -241,6 +245,7 @@ AGN/퀘이사 선택, 전파 세기, 광도, 가려진 퀘이사, 고적색편�
 | Fan et al. 2001 | — | — | `Classifier/subclass.py` (VERY_HIGH_Z)<br>`Classifier/LITERATURE_SUBCLASS.md` | z ≥ 5 재이온화 시대 퀘이사 |
 | Fan et al. 2006 | — | — | `Classifier/subclass.py` (VERY_HIGH_Z)<br>`Classifier/LITERATURE_SUBCLASS.md` | z ≥ 5 재이온화 시대 퀘이사 |
 | Joshi & Shinde 2026 | Eur. Phys. J. C 86, 766; doi:10.1140/epjc/s10052-026-15968-7 | — | `Classifier/LITERATURE.md` | SDSS DR16Q 전파 세기 ML 분류; 불균형 문제·QSO 라우팅 후에만 평가 |
+| Massaro et al. 2015 (Roma-BZCAT 5th ed.) | Ap&SS 357, 75 | — | `Get_data/bzcat.py`<br>`Classifier/axes/extragalactic.py (BLAZAR)` | 블레이자 목록과 유형(BL Lac/FSRQ/모은하 우세/불확실) |
 
 <a id="radio"></a>
 ## 전파·X선·밀집성

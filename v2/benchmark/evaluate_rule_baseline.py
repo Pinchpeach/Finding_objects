@@ -40,6 +40,13 @@ def read_catalogs(root):
   cat=f.name.split("_trd.csv")[0]
   d=pd.read_csv(f,low_memory=False)
   # Mirror collector-side quality cuts so benchmark features match production.
+  # VizieR I/355/gaiadr3 carries the gaia_source DSC-Combmod probabilities
+  # as PQSO / PGal / PSS (PSS = star incl. WD and binary); the paramp join of
+  # collect_catalog_truth.py failed, so DSC never reached Stage 4 here
+  # (2.22.0 review).
+  if cat=="gaia_dr3":
+   for old,new in (("PQSO","classprob_dsc_combmod_quasar"),("PGal","classprob_dsc_combmod_galaxy"),("PSS","classprob_dsc_combmod_star")):
+    if old in d.columns and new not in d.columns: d=d.rename(columns={old:new})
   if cat=="panstarrs1" and "nDetections" in d.columns:
    d=d[pd.to_numeric(d["nDetections"],errors="coerce")>=2]
   if cat not in out or len(d)>len(out[cat]): out[cat]=d

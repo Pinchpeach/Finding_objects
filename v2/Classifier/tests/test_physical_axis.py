@@ -58,3 +58,19 @@ check("qso_route",{"primary_class":"QSO"},"UNKNOWN","NOT_STELLAR_ROUTE")
 
 # No evidence must abstain.
 check("missing_evidence",{"primary_class":"STAR"},"UNKNOWN","INSUFFICIENT_PHYSICAL_EVIDENCE")
+
+
+def test_hot_subdwarf_gaia_cmd_culpan2022():
+    import importlib.util
+    from pathlib import Path
+    p = Path(__file__).resolve().parents[1] / "axes" / "physical.py"
+    s = importlib.util.spec_from_file_location("phys_hsd_t", p); m = importlib.util.module_from_spec(s); s.loader.exec_module(m)
+    base = {"primary_class": "STAR", "gaia_dr3__parallax_error": 0.05, "gaia_dr3__phot_bp_rp_excess_factor": 1.15}
+    sdo = dict(base, gaia_dr3__bp_rp=-0.35, gaia_dr3__phot_g_mean_mag=11.6, gaia_dr3__parallax=2.5)   # M_G 3.6
+    r = m.classify(sdo)
+    assert r["label"] == "HOT_SUBDWARF" and r["status"] == "GAIA_CMD_HOT_SUBLUMINOUS"
+    # main-sequence A0V (M_G 0.6), white dwarf (M_G 11), poor parallax, blended photometry: not selected
+    assert m.hot_subdwarf_evidence(dict(base, gaia_dr3__bp_rp=0.0, gaia_dr3__phot_g_mean_mag=7.1, gaia_dr3__parallax=5)) is None
+    assert m.hot_subdwarf_evidence(dict(base, gaia_dr3__bp_rp=0.0, gaia_dr3__phot_g_mean_mag=17.5, gaia_dr3__parallax=5)) is None
+    assert m.hot_subdwarf_evidence(dict(sdo, gaia_dr3__parallax_error=1.0)) is None
+    assert m.hot_subdwarf_evidence(dict(sdo, gaia_dr3__phot_bp_rp_excess_factor=1.9)) is None

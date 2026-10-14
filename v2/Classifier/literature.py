@@ -41,7 +41,7 @@ SIMBAD_LABEL = {
     "BLL": "BL Lac object", "Bla": "Blazar", "rG": "Radio galaxy", "ClG": "Cluster of galaxies",
     "GrG": "Group of galaxies", "*": "Star", "Star": "Star", "WD*": "White dwarf", "PM*": "High proper-motion star",
     "EB*": "Eclipsing binary", "RR*": "RR Lyrae variable", "V*": "Variable star", "LP*": "Long-period variable",
-    "YSO": "Young stellar object", "BD*": "Brown dwarf", "C*": "Carbon star", "AGB*": "AGB star", "PN": "Planetary nebula",
+    "Y*O": "Young stellar object", "BD*": "Brown dwarf", "C*": "Carbon star", "AB*": "AGB star", "HS*": "Hot subdwarf", "PN": "Planetary nebula",
     "SN*": "Supernova", "Psr": "Pulsar", "XB*": "X-ray binary", "CV*": "Cataclysmic variable",
     "IR": "Infrared source", "X": "X-ray source", "Rad": "Radio source", "UV": "UV-emission source",
     "mR": "Metric radio source", "cm": "Centimetric radio source", "smm": "Sub-millimetric source",

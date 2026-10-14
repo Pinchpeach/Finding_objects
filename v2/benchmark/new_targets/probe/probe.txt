@@ -1,0 +1,700 @@
+otypedef (226, 8) ['otype', 'label', 'description', 'comment', 'is_candidate', 'otype_shortname', 'otype_longname', 'path']
+
+=== J/A+A/662/A40  Culpan+2022 hot subluminous stars (EDR3) + known hot subdwarfs
+  table J/A+A/662/A40/hotsd  rows(sample)=3
+    recno                    | None       | Record number assigned by the VizieR team. Should Not be used for identification.
+    GaiaEDR3                 | None       | Gaia EDR3 source_id
+    RA_ICRS                  | deg        | Right ascension (ICRS) at Ep=2016.0
+    DE_ICRS                  | deg        | Declination (ICRS) at Ep=2016.0
+    GLON                     | deg        | Galactic longitude
+    GLAT                     | deg        | Galactic latitude
+    Plx                      | mas        | Gaia EDR3 parallax
+    e_Plx                    | mas        | Error on Gaia parallax
+    GMAG                     | mag        | ? Absolute G magnitude
+    Gmag                     | mag        | Gaia apparent G magnitude
+    BP-RP                    | mag        | Gaia G(BP)-G(RP) colour
+    E(BP/RP)c                | None       | ? Gaia colour excess corrected (Riello et al., 2021A&A...649A...3R, Cat. J/A+A/649/A3)
+    pmRA                     | mas / yr   | Proper motion along RA vector, pmRA*cosDE
+    e_pmRA                   | mas / yr   | Error in proper motion along RA vector
+    pmDE                     | mas / yr   | Proper motion along DE vector
+    e_pmDE                   | mas / yr   | Error in proper motion along DE vector
+    pm                       | mas / yr   | Total proper motion
+    e_pm                     | mas / yr   | Error in total proper motion
+    RUWE                     | None       | Renormalised unit weight error
+    Rpm                      | None       | Reduced proper motion
+    e_EFlux                  | None       | ? Excess flux error
+    f_Plx                    | None       | [0/1] Parallax selection flag
+    f_pm                     | None       | [0/1] Proper motion selection flag
+    _RA.icrs                 | deg        | Right ascension (ICRS) at Epoch=J2016. (computed by VizieR, not part of the original data.
+    _DE.icrs                 | deg        | Declination (ICRS) at Epoch=J2016. (computed by VizieR, not part of the original data. The
+   sample: [{'recno': '1', 'GaiaEDR3': '604474251290699776', 'RA_ICRS': '136.42052174522', 'DE_ICRS': '12.20783770682', 'GLON': '217.01810821386104', 'GLAT': '35.261114530036195', 'Plx': '0.8616437578295871', 'e_Plx': '0.039159648', 'GMAG': '4.27411187512071', 'Gmag': '14.597474', 'BP-RP': '-0.39427567', 'E(BP/RP)c': '0.0034852116355184037', 'pmRA': '7.589607955795868', 'e_pmRA': '0.04441256', 'pmDE': '1.5718485850847639', 'e_pmDE': '0.04292657', 'pm': '7.750668', 'e_pm': '22.546680756300983', 'RUWE': '1.0253948', 'Rpm': '9.044168843165785', 'e_EFlux': '0.0', 'f_Plx': '1', 'f_pm': '0', '_RA.icrs': '136.42052174522', '_DE.icrs': '12.20783770682'}, {'recno': '2', 'GaiaEDR3': '619153556155078272', 'RA_ICRS': '143.9221274216', 'DE_ICRS': '16.35276403826', 'GLON': '215.8464837917122', 'GLAT': '43.57878199170471', 'Plx': '1.1424778105487023', 'e_Plx': '0.054620832', 'GMAG': '4.994595467212289', 'Gmag': '14.705356', 'BP-RP': '0.028137207', 'E(BP/RP)c': '0.015960596466257693', 'pmRA': '0.5803674743024485', 'e_pmRA': '0.06318959', 'pmDE': '6.857952479211372', 'e_pmDE': '0.059171177', 'pm': '6.882466', 'e_pm': '16.891687585269153', 'RUWE': '1.6026855', 'Rpm': '8.894076942641874', 'e_EFlux': '0.6019229292869568', 'f_Plx': '1', 'f_pm': '0', '_RA.icrs': '143.9221274216', '_DE.icrs': '16.35276403826'}]
+  table J/A+A/662/A40/knownhsd  rows(sample)=3
+    recno                    | None       | Record number assigned by the VizieR team. Should Not be used for identification.
+    Name                     | None       | Name
+    GaiaEDR3                 | None       | ? Gaia EDR3 source_id
+    RA_ICRS                  | deg        | Right ascension (ICRS) at Ep=2016.0
+    DE_ICRS                  | deg        | Declination (ICRS) at Ep=2016.0
+    GLON                     | deg        | ? Galactic longitude
+    GLAT                     | deg        | ? Galactic latitude
+    SpClass                  | None       | Spectral classification
+    SpClassS                 | None       | Simbad spectral classification
+    CSDSS                    | None       | SDSS colours
+    CAPASS                   | None       | APASS colours
+    CPS1                     | None       | PS1 colours
+    CSKYM                    | None       | SKYM colours
+    Plx                      | mas        | ? Parallax
+    PlxZP                    | mas        | ? Parallax ZP
+    e_Plx                    | mas        | ? Parallax error
+    GMAG                     | mag        | ? Absolute Gaia G magnitude
+    GGAIA                    | mag        | ? Gaia G magnitude
+    e_GGAIA                  | mag        | ? Gaia G magnitude error
+    BPGAIA                   | mag        | ? Gaia BP magnitude
+    e_BPGAIA                 | mag        | ? Gaia BP magnitude error
+    RPGAIA                   | mag        | ? Gaia RP magnitude
+    e_RPGAIA                 | mag        | ? Gaia RP magnitude error
+    pmRAGAIA                 | mas / yr   | ? Gaia proper motion along RA, pmRA*cosDE
+    e_pmRAGAIA               | mas / yr   | ? Gaia proper motion along RA error
+    pmDEGAIA                 | mas / yr   | ? Gaia proper motion along DE
+    e_pmDEGAIA               | mas / yr   | ? Gaia proper motion along DE error
+    RVSDSS                   | km / s     | ? SDSS radial velocity
+    e_RVSDSS                 | km / s     | ? SDSS radial velocity error
+    RVLAMOST                 | km / s     | ? LAMOS radial velocity
+    e_RVLAMOST               | km / s     | ? LAMOS radial velocity error
+    Teff                     | K          | ? Effective temperature
+    e_Teff                   | K          | ? Effective temperature error
+    logg                     | log(cm.s**-2) | ? Surface gravity
+    e_logg                   | log(cm.s**-2) | ? Surface gravity error
+    logY                     | None       | ? Stellar surface He abundance, Y=n(He)/n(H)
+    e_logY                   | None       | []? Stellar surface He abundance error
+    Ref                      | None       | Parameters references
+    E(B-V)                   | mag        | Interstellar redenning
+    e_E(B-V)                 | mag        | Interstellar redenning error
+    AV                       | mag        | Absorption in V band
+    FUVGALEX                 | mag        | ? FUV GALEX magnitude
+    e_FUVGALEX               | mag        | ? FUV GALEX magnitude error
+    NUVGALEX                 | mag        | ? NUV GALEX magnitude
+    e_NUVGALEX               | mag        | ? NUV GALEX magnitude error
+    VAPASS                   | mag        | ? V APASS magnitude
+    e_VAPASS                 | mag        | ? V APASS magnitude error
+    BAPASS                   | mag        | ? B APASS magnitude
+    e_BAPASS                 | mag        | ? B APASS magnitude error
+    gAPASS                   | mag        | ? g APASS magnitude
+    e_gAPASS                 | mag        | ? g APASS magnitude error
+    rAPASS                   | mag        | ? r APASS magnitude
+    e_rAPASS                 | mag        | ? r APASS magnitude error
+    iAPASS                   | mag        | ? i APASS magnitude
+    e_iAPASS                 | mag        | ? i APASS magnitude error
+    uSDSS                    | mag        | ? u SDSS magnitude
+    e_uSDSS                  | mag        | ? u SDSS magnitude error
+    gSDSS                    | mag        | ? g SDSS magnitude
+    e_gSDSS                  | mag        | ? g SDSS magnitude error
+    rSDSS                    | mag        | ? r SDSS magnitude
+    e_rSDSS                  | mag        | ? r SDSS magnitude error
+    iSDSS                    | mag        | ? i SDSS magnitude
+    e_iSDSS                  | mag        | ? i SDSS magnitude error
+    zSDSS                    | mag        | ? z SDSS magnitude
+    e_zSDSS                  | mag        | ? z SDSS magnitude error
+    uVST                     | mag        | ? u VST magnitude
+    e_uVST                   | mag        | ? u VST magnitude error
+    gVST                     | mag        | ? g VST magnitude
+    e_gVST                   | mag        | ? g VST magnitude error
+    rVST                     | mag        | ? r VST magnitude
+    e_rVST                   | mag        | ? r VST magnitude error
+    iVST                     | mag        | ? i VST magnitude
+    e_iVST                   | mag        | ? i VST magnitude error
+    zVST                     | mag        | ? z VST magnitude
+    e_zVST                   | mag        | ? z VST magnitude error
+    uSKYM                    | mag        | ? u SKYM magnitude
+    e_uSKYM                  | mag        | ? u SKYM magnitude error
+    vSKYM                    | mag        | ? v SKYM magnitude
+    e_vSKYM                  | mag        | ? v SKYM magnitude error
+    gSKYM                    | mag        | ? g SKYM magnitude
+    e_gSKYM                  | mag        | ? g SKYM magnitude error
+    rSKYM                    | mag        | ? r SKYM magnitude
+    e_rSKYM                  | mag        | ? r SKYM magnitude error
+    iSKYM                    | mag        | ? i SKYM magnitude
+    e_iSKYM                  | mag        | ? i SKYM magnitude error
+    zSKYM                    | mag        | ? z SKYM magnitude
+    e_zSKYM                  | mag        | ? z SKYM magnitude error
+    gPS1                     | mag        | ? g PS1 magnitude
+    e_gPS1                   | mag        | ? g PS1 magnitude error
+    rPS1                     | mag        | ? r PS1 magnitude
+    e_rPS1                   | mag        | ? r PS1 magnitude error
+    iPS1                     | mag        | ? i PS1 magnitude
+    e_iPS1                   | mag        | ? i PS1 magnitude error
+    zPS1                     | mag        | ? z PS1 magnitude
+    e_zPS1                   | mag        | ? z PS1 magnitude error
+    yPS1                     | mag        | ? y PS1 magnitude
+    e_yPS1                   | mag        | ? y PS1 magnitude error
+    J2MASS                   | mag        | ? J 2MASS magnitude
+    e_J2MASS                 | mag        | ? J 2MASS magnitude error
+    H2MASS                   | mag        | ? H 2MASS magnitude
+    e_H2MASS                 | mag        | ? H 2MASS magnitude error
+    K2MASS                   | mag        | ? K 2MASS magnitude
+    e_K2MASS                 | mag        | ? K 2MASS magnitude error
+    YUKIDSS                  | mag        | ? Y UKIDSS magnitude
+    e_YUKIDSS                | mag        | ? Y UKIDSS magnitude error
+    JUKIDSS                  | mag        | ? J UKIDSS magnitude
+    e_JUKIDSS                | mag        | ? J UKIDSS magnitude error
+    HUKIDSS                  | mag        | ? H UKIDSS magnitude
+    e_HUKIDSS                | mag        | ? H UKIDSS magnitude error
+    KUKIDSS                  | mag        | ? K UKIDSS magnitude
+    e_KUKIDSS                | mag        | ? K UKIDSS magnitude error
+    ZVISTA                   | mag        | ? Z VISTA magnitude
+    e_ZVISTA                 | mag        | ? Z VISTA magnitude error
+    YVISTA                   | mag        | ? Y VISTA magnitude
+    e_YVISTA                 | mag        | ? Y VISTA magnitude error
+    JVISTA                   | mag        | ? J VISTA magnitude
+    e_JVISTA                 | mag        | ? J VISTA magnitude error
+    HVISTA                   | mag        | ? H VISTA magnitude
+    e_HVISTA                 | mag        | ? H VISTA magnitude error
+    KsVISTA                  | mag        | ? Ks VISTA magnitude
+    e_KsVISTA                | mag        | ? Ks VISTA magnitude error
+    W1                       | mag        | ? W1 magnitude
+    e_W1                     | mag        | ? W1 magnitude error
+    W2                       | mag        | ? W2 magnitude
+    e_W2                     | mag        | ? W2 magnitude error
+    W3                       | mag        | ? W3 magnitude
+    e_W3                     | mag        | ? W3 magnitude error
+    W4                       | mag        | ? W4 magnitude
+    e_W4                     | mag        | ? W4 magnitude error
+    _RA.icrs                 | deg        | Right ascension (ICRS) at Epoch=J2000, proper motions taken into account
+    _DE.icrs                 | deg        | Declination (ICRS) at Epoch=J2000, proper motions taken into account
+   sample: [{'recno': '1', 'Name': 'MCT2357-1725', 'GaiaEDR3': '2414485448212792064', 'RA_ICRS': '0.02166608891', 'DE_ICRS': '-17.1476708234', 'GLON': '70.34819481544', 'GLAT': '-74.49526906514', 'SpClass': 'sdO', 'SpClassS': 'sdO5He4', 'CSDSS': '-', 'CAPASS': '-', 'CPS1': 'sdO/B', 'CSKYM': 'sdO', 'Plx': '0.3585', 'PlxZP': '0.3494', 'e_Plx': '0.0774', 'GMAG': '--', 'GGAIA': '16.7698', 'e_GGAIA': '0.0029', 'BPGAIA': '16.6132', 'e_BPGAIA': '0.0046', 'RPGAIA': '17.0884', 'e_RPGAIA': '0.0113', 'pmRAGAIA': '8.1917', 'e_pmRAGAIA': '0.0771', 'pmDEGAIA': '-10.1588', 'e_pmDEGAIA': '0.0611', 'RVSDSS': '--', 'e_RVSDSS': '--', 'RVLAMOST': '--', 'e_RVLAMOST': '--', 'Teff': '--', 'e_Teff': '--', 'logg': '--', 'e_logg': '--', 'logY': '--', 'e_logY': '--', 'Ref': '-', 'E(B-V)': '0.019', 'e_E(B-V)': '0.0', 'AV': '0.06', 'FUVGALEX': '15.085', 'e_FUVGALEX': '0.016', 'NUVGALEX': '15.572', 'e_NUVGALEX': '0.016', 'VAPASS': '--', 'e_VAPASS': '--', 'BAPASS': '--', 'e_BAPASS': '--', 'gAPASS': '--', 'e_gAPASS': '--', 'rAPASS': '--', 'e_rAPASS': '--', 'iAPASS': '--', 'e_iAPASS': '--', 'uSDSS': '--', 'e_uSDSS': '--', 'gSDSS': '--', 'e_gSDSS': '--', 'rSDSS': '--', 'e_rSDSS': '--', 'iSDSS': '--', 'e_iSDSS': '--', 'zSDSS': '--', 'e_zSDSS': '--', 'uVST': '15.84', 'e_uVST': '0.0037', 'gVST': '16.6357', 'e_gVST': '0.0019', 'rVST': '17.0468', 'e_rVST': '0.0029', 'iVST': '17.368', 'e_iVST': '0.0054', 'zVST': '17.624', 'e_zVST': '0.01273', 'uSKYM': '16.195', 'e_uSKYM': '0.013', 'vSKYM': '16.313', 'e_vSKYM': '0.02', 'gSKYM': '16.636', 'e_gSKYM': '0.004', 'rSKYM': '16.957', 'e_rSKYM': '0.02', 'iSKYM': '17.462', 'e_iSKYM': '0.045', 'zSKYM': '17.788', 'e_zSKYM': '0.075', 'gPS1': '16.602', 'e_gPS1': '0.003', 'rPS1': '17.034', 'e_rPS1': '0.005', 'iPS1': '17.42', 'e_iPS1': '0.004', 'zPS1': '17.689', 'e_zPS1': '0.004', 'yPS1': '17.859', 'e_yPS1': '0.006', 'J2MASS': '--', 'e_J2MASS': '--', 'H2MASS': '--', 'e_H2MASS': '--', 'K2MASS': '--', 'e_K2MASS': '--', 'YUKIDSS': '--', 'e_YUKIDSS': '--', 'JUKIDSS': '--', 'e_JUKIDSS': '--', 'HUKIDSS': '--', 'e_HUKIDSS': '--', 'KUKIDSS': '--', 'e_KUKIDSS': '--', 'ZVISTA': '--', 'e_ZVISTA': '--', 'YVISTA': '17.38', 'e_YVISTA': '0.0137', 'JVISTA': '17.538', 'e_JVISTA': '0.0259', 'HVISTA': '--', 'e_HVISTA': '--', 'KsVISTA': '17.7897', 'e_KsVISTA': '0.15', 'W1': '--', 'e_W1': '--', 'W2': '--', 'e_W2': '--', 'W3': '--', 'e_W3': '--', 'W4': '--', 'e_W4': '--', '_RA.icrs': '0.02162798769', '_DE.icrs': '-17.14762567317'}, {'recno': '2', 'Name': 'PG2357+174', 'GaiaEDR3': '2773760665114010880', 'RA_ICRS': '0.0656893531', 'DE_ICRS': '17.6480325781', 'GLON': '106.00896059575', 'GLAT': '-43.53573253463', 'SpClass': 'sdOB', 'SpClassS': 'sdB', 'CSDSS': 'sdB', 'CAPASS': 'sdO/B', 'CPS1': 'sdO/B', 'CSKYM': '-', 'Plx': '0.31', 'PlxZP': '0.3077', 'e_Plx': '0.0746', 'GMAG': '--', 'GGAIA': '16.5199', 'e_GGAIA': '0.0029', 'BPGAIA': '16.385', 'e_BPGAIA': '0.0047', 'RPGAIA': '16.8064', 'e_RPGAIA': '0.0078', 'pmRAGAIA': '6.7125', 'e_pmRAGAIA': '0.0669', 'pmDEGAIA': '-2.6579', 'e_pmDEGAIA': '0.0422', 'RVSDSS': '--', 'e_RVSDSS': '--', 'RVLAMOST': '-51', 'e_RVLAMOST': '1', 'Teff': '38462', 'e_Teff': '184', 'logg': '6.02', 'e_logg': '0.03', 'logY': '-1.92', 'e_logY': '0.05', 'Ref': '2021ApJS..256...28L', 'E(B-V)': '0.024', 'e_E(B-V)': '0.001', 'AV': '0.075', 'FUVGALEX': '15.286', 'e_FUVGALEX': '0.018', 'NUVGALEX': '15.479', 'e_NUVGALEX': '0.01', 'VAPASS': '16.62', 'e_VAPASS': '0.212', 'BAPASS': '16.401', 'e_BAPASS': '0.067', 'gAPASS': '16.348', 'e_gAPASS': '0.046', 'rAPASS': '16.764', 'e_rAPASS': '0.046', 'iAPASS': '--', 'e_iAPASS': '--', 'uSDSS': '15.99', 'e_uSDSS': '0.006', 'gSDSS': '16.321', 'e_gSDSS': '0.004', 'rSDSS': '16.797', 'e_rSDSS': '0.004', 'iSDSS': '17.157', 'e_iSDSS': '0.006', 'zSDSS': '17.445', 'e_zSDSS': '0.016', 'uVST': '--', 'e_uVST': '--', 'gVST': '--', 'e_gVST': '--', 'rVST': '--', 'e_rVST': '--', 'iVST': '--', 'e_iVST': '--', 'zVST': '--', 'e_zVST': '--', 'uSKYM': '--', 'e_uSKYM': '--', 'vSKYM': '--', 'e_vSKYM': '--', 'gSKYM': '--', 'e_gSKYM': '--', 'rSKYM': '--', 'e_rSKYM': '--', 'iSKYM': '--', 'e_iSKYM': '--', 'zSKYM': '--', 'e_zSKYM': '--', 'gPS1': '16.349', 'e_gPS1': '0.001', 'rPS1': '16.759', 'e_rPS1': '0.004', 'iPS1': '17.129', 'e_iPS1': '0.002', 'zPS1': '17.387', 'e_zPS1': '0.005', 'yPS1': '17.578', 'e_yPS1': '0.009', 'J2MASS': '--', 'e_J2MASS': '--', 'H2MASS': '--', 'e_H2MASS': '--', 'K2MASS': '--', 'e_K2MASS': '--', 'YUKIDSS': '--', 'e_YUKIDSS': '--', 'JUKIDSS': '--', 'e_JUKIDSS': '--', 'HUKIDSS': '--', 'e_HUKIDSS': '--', 'KUKIDSS': '--', 'e_KUKIDSS': '--', 'ZVISTA': '--', 'e_ZVISTA': '--', 'YVISTA': '--', 'e_YVISTA': '--', 'JVISTA': '--', 'e_JVISTA': '--', 'HVISTA': '--', 'e_HVISTA': '--', 'KsVISTA': '--', 'e_KsVISTA': '--', 'W1': '--', 'e_W1': '--', 'W2': '--', 'e_W2': '--', 'W3': '--', 'e_W3': '--', 'W4': '--', 'e_W4': '--', '_RA.icrs': '0.06565804637', '_DE.icrs': '17.64804439099'}]
+  find: [('I/16', 'Catalog of 3356 Faint Stars, 1950 (Larink+ 1955)'), ('I/44', 'Second Cat of Fundamental Stars (SPF2) (Baturina+ 1986)'), ('I/68A', 'Positions and Proper Motions in alpha Per cluster (Fresneau, 1980)'), ('I/82', 'SPF1 Catalogue (Anguita+ 1975)'), ('I/85', 'Cape Photographic Catalogue 2 (Nicholson+ 1984)')]
+
+=== J/A+A/621/A38  Geier+2019 hot subluminous star candidates (DR2)
+  table J/A+A/621/A38/catalog  rows(sample)=3
+    recno                    | None       | Record number assigned by the VizieR team. Should Not be used for identification.
+    Name                     | None       | Target name (SIMBAD) (NAME_SIMBAD)
+    Gaia                     | None       | Gaia designation (GAIA DR2 name) (GAIA_DESIG)
+    RAJ2000                  | deg        | Right ascension (J2000) CDS (RAJ2000)
+    DEJ2000                  | deg        | Declination (J2000) CDS (DEJ2000)
+    RAGdeg                   | deg        | Gaia right ascension ICRS (J2015.5) (RA_ICRS)
+    DEGdeg                   | deg        | Gaia declination ICRS (J2015.5) (RA_ICRS)
+    GLON                     | deg        | Galactic longitude (GLON)
+    GLAT                     | deg        | Galactic latitude (GLAT)
+    Select                   | None       | Selection method (SELECTION)
+    SpTypeSim                | None       | Spectroscopic classification from SIMBAD (SPEC_SIMBAD)
+    SpTypeSD                 | None       | Spectroscopic classification from SDCAT (SPEC_SDCAT)
+    Plx                      | mas        | Gaia parallax (PLX)
+    e_Plx                    | mas        | ? Error on PLX (e_PLX)
+    GMAG                     | mag        | ? Absolute magnitude in the G-band (M_G)
+    e_GMAG                   | mag        | ? Error on GMAG (e_M_G)
+    Gmag                     | mag        | Gaia magnitude in G-band (G_GAIA)
+    e_Gmag                   | mag        | Error on Gmag (CDS) (e_G_GAIA)
+    BPmag                    | mag        | Gaia magnitude in BP-band (BP_GAIA)
+    e_BPmag                  | mag        | Error on BPmag (CDS) (e_BP_GAIA)
+    RPmag                    | mag        | Gaia magnitude in RP-band (RP_GAIA)
+    e_RPmag                  | mag        | Error on RPmag (CDS) (e_RP_GAIA)
+    BP-RP                    | mag        | BP-RP colour index (BP-RP_GAIA)
+    pmRA                     | mas / yr   | Gaia proper motion in RA, pmRA*cosDE (PMRA_GAIA)
+    e_pmRA                   | mas / yr   | ? Error on pmRA (e_PMRA_GAIA)
+    pmDE                     | mas / yr   | Gaia proper motion in DE (PMDE_GAIA)
+    e_pmDE                   | mas / yr   | ? Error on pmDE (e_PMDE_GAIA)
+    E(B-V)                   | mag        | Insterstellar reddening E(B-V) (EB-V)
+    e_E(B-V)                 | mag        | ? Error on E(B-V) (e_EB-V)
+    AV                       | mag        | Interstellar extinction (AV)
+    FUVmag                   | mag        | ? GALEX FUV-band magnitude (FUV_GALEX)
+    e_FUVmag                 | mag        | ? Error on FUVmag (e_FUV_GALEX)
+    NUVmag                   | mag        | ? GALEX NUV-band magnitude (NUV_GALEX)
+    e_NUVmag                 | mag        | ? Error on NUVmag (e_NUV_GALEX)
+    VAPASS                   | mag        | ? APASS V-band magnitude (V_APASS)
+    e_VAPASS                 | mag        | ? Error on V_APASS (e_V_APASS)
+    BAPASS                   | mag        | ? APASS B-band magnitude (B_APASS)
+    e_BAPASS                 | mag        | ? Error on B_APASS (e_B_APASS)
+    gAPASS                   | mag        | ? APASS g-band magnitude (g_APASS)
+    e_gAPASS                 | mag        | ? Error on g_APASS (e_g_APASS)
+    rAPASS                   | mag        | ? APASS r-band magnitude (r_APASS)
+    e_rAPASS                 | mag        | ? Error on r_APASS (e_r_APASS)
+    iAPASS                   | mag        | ? APASS i-band magnitude (i_APASS)
+    e_iAPASS                 | mag        | ? Error on i_APASS (e_i_APASS)
+    uSDSS                    | mag        | ? SDSS u-band magnitude (u_SDSS)
+    e_uSDSS                  | mag        | ? Error on u_SDSS (e_u_SDSS)
+    gSDSS                    | mag        | ? SDSS g-band magnitude (g_SDSS)
+    e_gSDSS                  | mag        | ? Error on g_SDSS (e_g_SDSS)
+    rSDSS                    | mag        | ? SDSS r-band magnitude (r_SDSS)
+    e_rSDSS                  | mag        | ? Error on r_SDSS (e_r_SDSS)
+    iSDSS                    | mag        | ? SDSS i-band magnitude (i_SDSS)
+    e_iSDSS                  | mag        | ? Error on i_SDSS (e_i_SDSS)
+    zSDSS                    | mag        | ? SDSS z-band magnitude (z_SDSS)
+    e_zSDSS                  | mag        | ? Error on z_SDSS (e_z_SDSS)
+    uSKYM                    | mag        | ? SkyMapper u-band magnitude (u_SKYM)
+    e_uSKYM                  | mag        | ? Error on u_SKYM (e_u_SKYM)
+    vSKYM                    | mag        | ? SkyMapper v-band magnitude (v_SKYM)
+    e_vSKYM                  | mag        | ? Error on v_SKYM (e_v_SKYM)
+    gSKYM                    | mag        | ? SkyMapper g-band magnitude (g_SKYM)
+    e_gSKYM                  | mag        | ? Error on g_SKYM (e_g_SKYM)
+    rSKYM                    | mag        | ? SkyMapper r-band magnitude (r_SKYM)
+    e_rSKYM                  | mag        | ? Error on r_SKYM (e_r_SKYM)
+    iSKYM                    | mag        | ? SkyMapper i-band magnitude (i_SKYM)
+    e_iSKYM                  | mag        | ? Error on i_SKYM (e_i_SKYM)
+    zSKYM                    | mag        | ? SkyMapper z-band magnitude (z_SKYM)
+    e_zSKYM                  | mag        | ? Error on z_SKYM (e_z_SKYM)
+    uATLAS                   | mag        | ? ATLAS u-band magnitude (u_ATLAS)
+    e_uATLAS                 | mag        | ? Error on u_ATLAS (e_u_ATLAS)
+    gATLAS                   | mag        | ? ATLAS g-band magnitude (g_ATLAS)
+    e_gATLAS                 | mag        | ? Error on g_ATLAS (e_g_ATLAS)
+    rATLAS                   | mag        | ? ATLAS r-band magnitude (r_ATLAS)
+    e_rATLAS                 | mag        | ? Error on r_ATLAS (e_r_ATLAS)
+    iATLAS                   | mag        | ? ATLAS i-band magnitude (i_ATLAS)
+    e_iATLAS                 | mag        | ? Error on i_ATLAS (e_i_ATLAS)
+    zATLAS                   | mag        | ? ATLAS z-band magnitude (z_ATLAS)
+    e_zATLAS                 | mag        | ? Error on z_ATLAS (e_z_ATLAS)
+    uVPHAS                   | mag        | ? VPHAS u-band magnitude (u_VPHAS)
+    e_uVPHAS                 | mag        | ? Error on u_VPHAS (e_u_VPHAS)
+    gVPHAS                   | mag        | ? VPHAS g-band magnitude (g_VPHAS)
+    e_gVPHAS                 | mag        | ? Error on g_VPHAS (e_g_VPHAS)
+    r2VPHAS                  | mag        | ? VPHAS r2-band magnitude (2nd epoch) (r2_VPHAS)
+    e_r2VPHAS                | mag        | ? Error on r2_VPHAS (e_r2_VPHAS)
+    HaVPHAS                  | mag        | ? VPHAS Ha-band magnitude (Ha_VPHAS)
+    e_HaVPHAS                | mag        | ? Error on Ha_VPHAS (e_Ha_VPHAS)
+    rVPHAS                   | mag        | ? VPHAS r-band magnitude (1st epoch) (r_VPHAS)
+    e_rVPHAS                 | mag        | ? Error on r_VPHAS (e_r_VPHAS)
+    iVPHAS                   | mag        | ? VPHAS i-band magnitude (i_VPHAS)
+    e_iVPHAS                 | mag        | ? Error on i_VPHAS (e_i_VPHAS)
+    uKiDS                    | mag        | ? KiDS u-band magnitude (u_KiDS)
+    e_uKiDS                  | mag        | ? Error on u_KiDS (e_u_KiDS)
+    gKiDS                    | mag        | ? KiDS g-band magnitude (g_KiDS)
+    e_gKiDS                  | mag        | ? Error on g_KiDS (e_g_KiDS)
+    rKiDS                    | mag        | ? KiDS r-band magnitude (r_KiDS)
+    e_rKiDS                  | mag        | ? Error on r_KiDS (e_r_KiDS)
+    iKiDS                    | mag        | ? KiDS i-band magnitude (i_KiDS)
+    e_iKiDS                  | mag        | ? Error on i_KiDS (e_i_KiDS)
+    gPS1                     | mag        | ? PS1 g-band magnitude (g_PS1)
+    e_gPS1                   | mag        | ? Error on g_PS1 (e_g_PS1)
+    rPS1                     | mag        | ? PS1 r-band magnitude (r_PS1)
+    e_rPS1                   | mag        | ? Error on r_PS1 (e_r_PS1)
+    iPS1                     | mag        | ? PS1 i-band magnitude (i_PS1)
+    e_iPS1                   | mag        | ? Error on i_PS1 (e_i_PS1)
+    zPS1                     | mag        | ? PS1 z-band magnitude (z_PS1)
+    e_zPS1                   | mag        | ? Error on z_PS1 (e_z_PS1)
+    yPS1                     | mag        | ? PS1 y-band magnitude (y_PS1)
+    e_yPS1                   | mag        | ? Error on y_PS1 (e_y_PS1)
+    rIPHAS                   | mag        | ? IPHAS r-band magnitude (r_IPHAS)
+    e_rIPHAS                 | mag        | ? Error on r_IPHAS (e_r_IPHAS)
+    iIPHAS                   | mag        | ? IPHAS i-band magnitude (i_IPHAS)
+    e_iIPHAS                 | mag        | ? Error on i_IPHAS (e_i_IPHAS)
+    HaIPHAS                  | mag        | ? IPHAS Ha-band magnitude (Ha_IPHAS)
+    e_HaIPHAS                | mag        | ? Error on Ha_IPHAS (e_Ha_IPHAS)
+    J2MASS                   | mag        | ? 2MASS J-band magnitude (J_2MASS)
+    e_J2MASS                 | mag        | ? Error on J_2MASS (e_J_2MASS)
+    H2MASS                   | mag        | ? 2MASS H-band magnitude (H_2MASS)
+    e_H2MASS                 | mag        | ? Error on H_2MASS (e_H_2MASS)
+    K2MASS                   | mag        | ? 2MASS K-band magnitude (K_2MASS)
+    e_K2MASS                 | mag        | ? Error on K_2MASS (e_K_2MASS)
+    YUKIDSS                  | mag        | ? UKIDSS Y-band magnitude (Y_UKIDSS)
+    e_YUKIDSS                | mag        | ? Error on Y_UKIDSS (e_Y_UKIDSS)
+    JUKIDSS                  | mag        | ? UKIDSS J-band magnitude (J_UKIDSS)
+    e_JUKIDSS                | mag        | ? Error on J_UKIDSS (e_J_UKIDSS)
+    HUKIDSS                  | mag        | ? UKIDSS H-band magnitude (H_UKIDSS)
+    e_HUKIDSS                | mag        | ? Error on H_UKIDSS (e_H_UKIDSS)
+    KUKIDSS                  | mag        | ? UKIDSS K-band magnitude (K_UKIDSS)
+    e_KUKIDSS                | mag        | ? Error on K_UKIDSS (e_K_UKIDSS)
+    YVHS                     | mag        | ? VHS Y-band magnitude (Y_VHS)
+    e_YVHS                   | mag        | ? Error on Y_VHS (e_Y_VHS)
+    JVHS                     | mag        | ? VHS J-band magnitude (J_VHS)
+    e_JVHS                   | mag        | ? Error on J_VHS (e_J_VHS)
+    HVHS                     | mag        | ? VHS H-band magnitude (H_VHS)
+    e_HVHS                   | mag        | ? Error on H_VHS (e_H_VHS)
+    KsVHS                    | mag        | ? VHS Ks-band magnitude (Ks_VHS)
+    e_KsVHS                  | mag        | ? Error on Ks_VHS (e_Ks_VHS)
+    ZVVV                     | mag        | ? VVV Z-band magnitude (Z_VVV)
+    e_ZVVV                   | mag        | ? Error on Z_VVV (e_Z_VVV)
+    YVVV                     | mag        | ? VVV Y-band magnitude (Y_VVV)
+    e_YVVV                   | mag        | ? Error on Y_VVV (e_Y_VVV)
+    JVVV                     | mag        | ? VVV J-band magnitude (J_VVV)
+    e_JVVV                   | mag        | ? Error on J_VVV (e_J_VVV)
+    HVVV                     | mag        | ? VVV H-band magnitude (H_VVV)
+    e_HVVV                   | mag        | ? Error on H_VVV (e_H_VVV)
+    KsVVV                    | mag        | ? VVV Ks-band magnitude (Ks_VVV)
+    e_KsVVV                  | mag        | ? Error on Ks_VVV (e_Ks_VVV)
+    ZVIKING                  | mag        | ? VIKING Z-band magnitude (Z_VIKING)
+    e_ZVIKING                | mag        | ? Error on Z_VIKING (e_Z_VIKING)
+    YVIKING                  | mag        | ? VIKING Y-band magnitude (Y_VIKING)
+    e_YVIKING                | mag        | ? Error on Y_VIKING (e_Y_VIKING)
+    JVIKING                  | mag        | ? VIKING J-band magnitude (J_VIKING)
+    e_JVIKING                | mag        | ? Error on J_VIKING (e_J_VIKING)
+    HVIKING                  | mag        | ? VIKING H-band magnitude (H_VIKING)
+    e_HVIKING                | mag        | ? Error on H_VIKING (e_H_VIKING)
+    KsVIKING                 | mag        | ? VIKING Ks-band magnitude (Ks_VIKING)
+    e_KsVIKING               | mag        | ? Error on Ks_VIKING (e_Ks_VIKING)
+    W1mag                    | mag        | ? WISE W1-band magnitude (W1)
+    e_W1mag                  | mag        | ? Error on W1 (e_W1)
+    W2mag                    | mag        | ? WISE W2-band magnitude (W2)
+    e_W2mag                  | mag        | ? Error on W2 (e_W2)
+    W3mag                    | mag        | ? WISE W3-band magnitude (W3)
+    e_W3mag                  | mag        | ? Error on W3 (e_W3)
+    W4mag                    | mag        | ? WISE W4-band magnitude (W4)
+    e_W4mag                  | mag        | ? Error on W4 (e_W4)
+    Dens                     | None       | Density parameter (DENSITY)
+    epsi                     | mas        | Astrometric excess noise (GAIA_ASTROMETRIC_EXCESS_NOISE)
+    sepsi                    | None       | Significance of excess noise (GAIA_ASTROMETRIC_EXCESS_NOISE_SIG)
+    amax                     | mas        | Astrometric_sigma_5D_max (GAIA_ASTROMETRIC_SIGMA_5D_MAX)
+    E(BR/RP)                 | None       | BP/RP excess factor (GAIA_PHOT_BP_RP_EXCESS_FACTOR)
+    SED                      | None       | SED plot of this star
+   sample: [{'recno': '1', 'Name': 'SB937', 'Gaia': 'Gaia DR2 2313054538477276160', 'RAJ2000': '0.0167821772', 'DEJ2000': '-33.5886542541', 'RAGdeg': '0.0168059176', 'DEGdeg': '-33.5887095265', 'GLON': '359.5474073376', 'GLAT': '-77.1880844961', 'Select': 'COLOUR_REDPM', 'SpTypeSim': 'A0', 'SpTypeSD': '', 'Plx': '0.2431', 'e_Plx': '0.0514', 'GMAG': '1.1628', 'e_GMAG': '0.4591', 'Gmag': '14.2339', 'e_Gmag': '0.0004', 'BPmag': '14.1852', 'e_BPmag': '0.0036', 'RPmag': '14.2468', 'e_RPmag': '0.0022', 'BP-RP': '-0.0616', 'pmRA': '4.593', 'e_pmRA': '0.096', 'pmDE': '-12.837', 'e_pmDE': '0.067', 'E(B-V)': '0.0125', 'e_E(B-V)': '0.0004', 'AV': '0.0387', 'FUVmag': '16.002', 'e_FUVmag': '0.021', 'NUVmag': '15.593', 'e_NUVmag': '0.009', 'VAPASS': '14.182', 'e_VAPASS': '0.038', 'BAPASS': '14.182', 'e_BAPASS': '0.055', 'gAPASS': '14.086', 'e_gAPASS': '0.033', 'rAPASS': '14.301', 'e_rAPASS': '0.027', 'iAPASS': '14.546', 'e_iAPASS': '0.129', 'uSDSS': '--', 'e_uSDSS': '--', 'gSDSS': '--', 'e_gSDSS': '--', 'rSDSS': '--', 'e_rSDSS': '--', 'iSDSS': '--', 'e_iSDSS': '--', 'zSDSS': '--', 'e_zSDSS': '--', 'uSKYM': '15.177', 'e_uSKYM': '0.032', 'vSKYM': '14.394', 'e_vSKYM': '0.01', 'gSKYM': '14.11', 'e_gSKYM': '0.012', 'rSKYM': '14.302', 'e_rSKYM': '0.008', 'iSKYM': '14.607', 'e_iSKYM': '0.011', 'zSKYM': '14.745', 'e_zSKYM': '0.012', 'uATLAS': '14.7445', 'e_uATLAS': '0.0021', 'gATLAS': '14.13', 'e_gATLAS': '0.0006', 'rATLAS': '14.3948', 'e_rATLAS': '0.0007', 'iATLAS': '14.5877', 'e_iATLAS': '0.0011', 'zATLAS': '14.6403', 'e_zATLAS': '0.0021', 'uVPHAS': '--', 'e_uVPHAS': '--', 'gVPHAS': '--', 'e_gVPHAS': '--', 'r2VPHAS': '--', 'e_r2VPHAS': '--', 'HaVPHAS': '--', 'e_HaVPHAS': '--', 'rVPHAS': '--', 'e_rVPHAS': '--', 'iVPHAS': '--', 'e_iVPHAS': '--', 'uKiDS': '14.99557', 'e_uKiDS': '0.00074', 'gKiDS': '--', 'e_gKiDS': '--', 'rKiDS': '--', 'e_rKiDS': '--', 'iKiDS': '--', 'e_iKiDS': '--', 'gPS1': '14.34', 'e_gPS1': '--', 'rPS1': '14.498', 'e_rPS1': '--', 'iPS1': '14.5978', 'e_iPS1': '0.0017', 'zPS1': '14.819', 'e_zPS1': '--', 'yPS1': '14.873', 'e_yPS1': '--', 'rIPHAS': '--', 'e_rIPHAS': '--', 'iIPHAS': '--', 'e_iIPHAS': '--', 'HaIPHAS': '--', 'e_HaIPHAS': '--', 'J2MASS': '14.248', 'e_J2MASS': '0.033', 'H2MASS': '14.17', 'e_H2MASS': '0.052', 'K2MASS': '14.177', 'e_K2MASS': '0.066', 'YUKIDSS': '--', 'e_YUKIDSS': '--', 'JUKIDSS': '--', 'e_JUKIDSS': '--', 'HUKIDSS': '--', 'e_HUKIDSS': '--', 'KUKIDSS': '--', 'e_KUKIDSS': '--', 'YVHS': '--', 'e_YVHS': '--', 'JVHS': '--', 'e_JVHS': '--', 'HVHS': '--', 'e_HVHS': '--', 'KsVHS': '--', 'e_KsVHS': '--', 'ZVVV': '--', 'e_ZVVV': '--', 'YVVV': '--', 'e_YVVV': '--', 'JVVV': '--', 'e_JVVV': '--', 'HVVV': '--', 'e_HVVV': '--', 'KsVVV': '--', 'e_KsVVV': '--', 'ZVIKING': '14.19539', 'e_ZVIKING': '0.00106', 'YVIKING': '14.20024', 'e_YVIKING': '0.00182', 'JVIKING': '14.24117', 'e_JVIKING': '0.00159', 'HVIKING': '14.28746', 'e_HVIKING': '0.00268', 'KsVIKING': '14.28081', 'e_KsVIKING': '0.00396', 'W1mag': '14.289', 'e_W1mag': '0.027', 'W2mag': '14.28', 'e_W2mag': '0.047', 'W3mag': '12.644', 'e_W3mag': '--', 'W4mag': '8.75', 'e_W4mag': '--', 'Dens': '2484.7498', 'epsi': '0.277', 'sepsi': '14.5205443866', 'amax': '0.09258567', 'E(BR/RP)': '1.188', 'SED': 'SED'}, {'recno': '2', 'Name': 'PHL615', 'Gaia': 'Gaia DR2 2414485448212792064', 'RAJ2000': '0.0216285801', 'DEJ2000': '-17.1476248442', 'RAGdeg': '0.0216648491', 'DEGdeg': '-17.1476694231', 'GLON': '70.3481957084', 'GLAT': '-74.4952672465', 'Select': 'COLOUR_REDPM', 'SpTypeSim': 'sdO5He4', 'SpTypeSD': 'sdO', 'Plx': '0.2363', 'e_Plx': '0.1071', 'GMAG': '--', 'e_GMAG': '--', 'Gmag': '16.7984', 'e_Gmag': '0.0015', 'BPmag': '16.5503', 'e_BPmag': '0.008', 'RPmag': '17.1028', 'e_RPmag': '0.0098', 'BP-RP': '-0.5526', 'pmRA': '8.049', 'e_pmRA': '0.157', 'pmDE': '-10.354', 'e_pmDE': '0.142', 'E(B-V)': '0.0193', 'e_E(B-V)': '0.0003', 'AV': '0.0597', 'FUVmag': '--', 'e_FUVmag': '--', 'NUVmag': '15.673', 'e_NUVmag': '0.021', 'VAPASS': '--', 'e_VAPASS': '--', 'BAPASS': '--', 'e_BAPASS': '--', 'gAPASS': '--', 'e_gAPASS': '--', 'rAPASS': '--', 'e_rAPASS': '--', 'iAPASS': '--', 'e_iAPASS': '--', 'uSDSS': '--', 'e_uSDSS': '--', 'gSDSS': '--', 'e_gSDSS': '--', 'rSDSS': '--', 'e_rSDSS': '--', 'iSDSS': '--', 'e_iSDSS': '--', 'zSDSS': '--', 'e_zSDSS': '--', 'uSKYM': '16.195', 'e_uSKYM': '0.013', 'vSKYM': '16.313', 'e_vSKYM': '0.02', 'gSKYM': '16.636', 'e_gSKYM': '0.004', 'rSKYM': '16.957', 'e_rSKYM': '0.02', 'iSKYM': '17.462', 'e_iSKYM': '0.045', 'zSKYM': '17.788', 'e_zSKYM': '0.075', 'uATLAS': '--', 'e_uATLAS': '--', 'gATLAS': '--', 'e_gATLAS': '--', 'rATLAS': '--', 'e_rATLAS': '--', 'iATLAS': '--', 'e_iATLAS': '--', 'zATLAS': '--', 'e_zATLAS': '--', 'uVPHAS': '--', 'e_uVPHAS': '--', 'gVPHAS': '--', 'e_gVPHAS': '--', 'r2VPHAS': '--', 'e_r2VPHAS': '--', 'HaVPHAS': '--', 'e_HaVPHAS': '--', 'rVPHAS': '--', 'e_rVPHAS': '--', 'iVPHAS': '--', 'e_iVPHAS': '--', 'uKiDS': '--', 'e_uKiDS': '--', 'gKiDS': '--', 'e_gKiDS': '--', 'rKiDS': '--', 'e_rKiDS': '--', 'iKiDS': '--', 'e_iKiDS': '--', 'gPS1': '16.602', 'e_gPS1': '0.0027', 'rPS1': '17.034', 'e_rPS1': '0.0046', 'iPS1': '17.4196', 'e_iPS1': '0.0039', 'zPS1': '17.6887', 'e_zPS1': '0.0036', 'yPS1': '17.8594', 'e_yPS1': '0.0058', 'rIPHAS': '--', 'e_rIPHAS': '--', 'iIPHAS': '--', 'e_iIPHAS': '--', 'HaIPHAS': '--', 'e_HaIPHAS': '--', 'J2MASS': '--', 'e_J2MASS': '--', 'H2MASS': '--', 'e_H2MASS': '--', 'K2MASS': '--', 'e_K2MASS': '--', 'YUKIDSS': '--', 'e_YUKIDSS': '--', 'JUKIDSS': '--', 'e_JUKIDSS': '--', 'HUKIDSS': '--', 'e_HUKIDSS': '--', 'KUKIDSS': '--', 'e_KUKIDSS': '--', 'YVHS': '17.38003', 'e_YVHS': '0.01372', 'JVHS': '17.53805', 'e_JVHS': '0.02586', 'HVHS': '--', 'e_HVHS': '--', 'KsVHS': '17.78974', 'e_KsVHS': '0.15003', 'ZVVV': '--', 'e_ZVVV': '--', 'YVVV': '--', 'e_YVVV': '--', 'JVVV': '--', 'e_JVVV': '--', 'HVVV': '--', 'e_HVVV': '--', 'KsVVV': '--', 'e_KsVVV': '--', 'ZVIKING': '--', 'e_ZVIKING': '--', 'YVIKING': '--', 'e_YVIKING': '--', 'JVIKING': '--', 'e_JVIKING': '--', 'HVIKING': '--', 'e_HVIKING': '--', 'KsVIKING': '--', 'e_KsVIKING': '--', 'W1mag': '--', 'e_W1mag': '--', 'W2mag': '--', 'e_W2mag': '--', 'W3mag': '--', 'e_W3mag': '--', 'W4mag': '--', 'e_W4mag': '--', 'Dens': '3024.4438', 'epsi': '0.316', 'sepsi': '3.5372078333', 'amax': '0.1610344', 'E(BR/RP)': '1.243', 'SED': 'SED'}]
+  find: [('I/16', 'Catalog of 3356 Faint Stars, 1950 (Larink+ 1955)'), ('I/44', 'Second Cat of Fundamental Stars (SPF2) (Baturina+ 1986)'), ('I/68A', 'Positions and Proper Motions in alpha Per cluster (Fresneau, 1980)'), ('I/82', 'SPF1 Catalogue (Anguita+ 1975)'), ('I/85', 'Cape Photographic Catalogue 2 (Nicholson+ 1984)')]
+
+=== VII/274  Roma-BZCAT 5th edition (Massaro+2015)
+  table VII/274/bzcat5  rows(sample)=3
+    recno                    | None       | Record number assigned by the VizieR team. Should Not be used for identification.
+    Seq                      | None       | Sequential number
+    Name                     | None       | Source name (based on J2000 position), 5BZA JHHMM+DDMM (G1)
+    RAJ2000                  | None       | Right ascension (J2000.0)
+    DEJ2000                  | None       | Declination (J2000.0)
+    GLON                     | deg        | Galactic longitude
+    GLAT                     | deg        | Galactic latitude
+    z                        | None       | Redshift
+    u_z                      | None       | [?] uncertainty flag on z
+    Rmag                     | mag        | ? R magnitude
+    Class                    | None       | Source classification
+    FR                       | mJy        | ? Flux density at 1.4/0.843GHz
+    F143                     | mJy        | ? Flux density at 143GHz
+    FX                       | fW / m2    | ? X-ray flux 0.1-2.4keV
+    FF                       | cm2 / s    | ? Fermi flux1-100GeV (in ph/cm2/s)
+    aro                      | None       | Spectral index radio-optical
+    Simbad                   | None       | Simbad column added by the CDS
+   sample: [{'recno': '1', 'Seq': '1', 'Name': '5BZQ J0000-3221', 'RAJ2000': '00 00 20.39', 'DEJ2000': '-32 21 01.00', 'GLON': '4.64', 'GLAT': '-77.76', 'z': '1.275', 'u_z': '', 'Rmag': '18.2', 'Class': 'QSO RLoud flat radio sp.', 'FR': '521.0', 'F143': '--', 'FX': '0.05', 'FF': '--', 'aro': '0.707', 'Simbad': 'Simbad'}, {'recno': '2', 'Seq': '2', 'Name': '5BZQ J0001-1551', 'RAJ2000': '00 01 05.29', 'DEJ2000': '-15 51 06.98', 'GLON': '74.36', 'GLAT': '-73.77', 'z': '2.044', 'u_z': '', 'Rmag': '18.1', 'Class': 'QSO RLoud flat radio sp.', 'FR': '348.0', 'F143': '--', 'FX': '--', 'FF': '--', 'aro': '0.661', 'Simbad': 'Simbad'}]
+  find: [('VII/274/bzcat5', 'The Roma BZCAT - 5th edition (Massaro+, 2015)\n    The Roma BZCAT - 5th')]
+
+=== J/ApJS/263/24  4LAC-DR3 (Ajello+2022)
+  table J/ApJS/263/24/4lacdr3  rows(sample)=3
+    recno                    | None       | Record number assigned by the VizieR team. Should Not be used for identification.
+    Group                    | None       | VizieR added column, not part of original data
+    4FGL                     | None       | 4FGL name (JHHMM.m+DDMMa) (Source_Name) (1)
+    DR                       | None       | [1/3] Data release (DataRelease) (2)
+    RAJ2000                  | deg        | Right ascension in decimal degrees (J2000)
+    DEJ2000                  | deg        | Declination in decimal degrees (J2000)
+    GLON                     | deg        | Galactic longitude
+    GLAT                     | deg        | Galactic latitude
+    Sig                      | None       | [2.6/455] Source significance in {sigma} units over the 50MeV to 1TeV band (Signif_Avg)
+    F1000i                   | ph / (s cm2) | [8.9e-12/7.5e-8] Integral photon flux from 1 to 100GeV (Flux1000)
+    e_F1000i                 | ph / (s cm2) | [7.5e-12/4.5e-10] F1000i 1{sigma} error (Unc_Flux1000)
+    EF100                    | mW / m2    | [3.7e-13/8.5e-10] Energy flux from 100MeV to 100GeV obtained by spectral fitting in erg/cm
+    e_EF100                  | mW / m2    | [1e-13/6.8e-12] EF100 1{sigma} error (Unc_Energy_Flux100)
+    Mod                      | None       | Spectral type in the global model; PowerLaw, LogParabola or PLSuperExpCutoff (SpectrumType
+    PLGam                    | None       | [1.4/3.2] Photon index when fitting with PowerLaw (PL_Index)
+    e_PLGam                  | None       | [0.003/0.3] PLGam 1{sigma} error (Unc_PL_Index)
+    Epiv                     | MeV        | [241/34572] Pivot energy (Pivot_Energy)
+    LPalpha                  | None       | [-0.05/3.3] Photon index at Pivot_Energy ({alpha}) when fitting with LogParabola (LP_Index
+    e_LPalpha                | None       | [0.004/3] LPalpha 1{sigma} error (Unc_LP_Index)
+    LPbeta                   | None       | [-0.12/1] Curvature parameter ({beta}) when fitting with LogParabola (LP_beta)
+    e_LPbeta                 | None       | [0.002/1.8]? LPbeta 1{sigma} error (Unc_LP_beta)
+    Flags                    | None       | [0/6144] Analysis flags (Flags)
+    Class                    | None       | Class designation for associated source
+    Assoc1                   | None       | Name of identified or likely associated source
+    ProbBY                   | None       | [0/1]? Probability of association according to the Bayesian method (ASSOC_PROB_BAY)
+    ProbLR                   | None       | [0/1] Probability of association according to the likelihood-ratio method (ASSOC_PROB_LR)
+    CCat                     | None       | Counterpart catalog driving the association (Counterpart_Catalog) (3)
+    RACdeg                   | deg        | Right ascension of the counterpart Assoc1 (J2000) (RA_Counterpart)
+    DECdeg                   | deg        | Declination of the counterpart Assoc1 (J2000) (DEC_Counterpart)
+    errCPos                  | deg        | [3.8e-8/2.5] 95% precision of the counterpart localization (Unc_Counterpart)
+    RFC                      | None       | Name of the very long baseline interferometry counterpart (VLBI_Counterpart)
+    z                        | None       | [1.7e-5/4.4]? Redshift (Redshift)
+    SEDCl                    | None       | SED-based class (SED_class)
+    EpkHE                    | MeV        | [0.04/1.2e+8]? Energy in the observer frame of the high-energy SED peak (HE_EPeak)
+    e_EpkHE                  | MeV        | [0.5/5.5e+9]? EpkHE 1{sigma} error (Unc_HE_EPeak)
+    nuFnuPk                  | MeV / (s cm2) | [7e-8/0.0002]? {nu}F{nu} at high-energy-peak frequency in MeV/cm^2^/s (HE_nuFnuPeak)
+    e_nuFnuPk                | MeV / (s cm2) | [2.4e-8/0.00011]? nuFnuPk 1{sigma} error (Unc_HE_nuFnuPeak)
+    nu                       | Hz         | [0/1.8e+20] Synchrotron-peak frequency in the observer frame (nu_syn)
+    nuFnu                    | mW / m2    | [0/8e-10] {nu}F{nu} at synchrotron-peak frequency in erg/cm^2^/s (nuFnu_syn)
+    Var                      | None       | [1.6/84341] Variability index (Variability_Index)
+    fVar                     | None       | [0/3] Fractional variability (Frac_Variability)
+    e_fVar                   | None       | [0.01/10] fVar 1{sigma} error (Unc_Frac_Variability)
+    Emax                     | GeV        | [10/913]? Energy (if greater than 10GeV) of the highest-energy ULTRACLEANVETO photon with 
+    Simbad                   | None       | Simbad column added by the CDS
+   sample: [{'recno': '1', 'Group': 'h', '4FGL': 'J0001.2+4741', 'DR': '1', 'RAJ2000': '0.3126', 'DEJ2000': '47.6859', 'GLON': '114.2502', 'GLAT': '-14.3381', 'Sig': '4.6926', 'F1000i': '1.2598e-10', 'e_F1000i': '2.8772e-11', 'EF100': '1.49945e-12', 'e_EF100': '3.96849e-13', 'Mod': 'PowerLaw', 'PLGam': '2.2717', 'e_PLGam': '0.1791', 'Epiv': '2420.575', 'LPalpha': '2.2541', 'e_LPalpha': '0.2264', 'LPbeta': '0.0122', 'e_LPbeta': '0.1089', 'Flags': '0', 'Class': 'bcu', 'Assoc1': 'B3 2358+474', 'ProbBY': '0.9961', 'ProbLR': '0.9386', 'CCat': 'crates', 'RACdeg': '0.3293408', 'DECdeg': '47.7002009', 'errCPos': '8.4e-07', 'RFC': 'J0001+4742', 'z': '--', 'SEDCl': 'ISP', 'EpkHE': '--', 'e_EpkHE': '--', 'nuFnuPk': '--', 'e_nuFnuPk': '--', 'nu': '100000000000000.0', 'nuFnu': '3.71646e-13', 'Var': '25.3139', 'fVar': '0.6759', 'e_fVar': '0.3128', 'Emax': '65.5752', 'Simbad': 'Simbad'}, {'recno': '2', 'Group': 'h', '4FGL': 'J0001.2-0747', 'DR': '1', 'RAJ2000': '0.3151', 'DEJ2000': '-7.7971', 'GLON': '89.03272', 'GLAT': '-67.305', 'Sig': '23.78249', 'F1000i': '7.47122e-10', 'e_F1000i': '5.04194e-11', 'EF100': '8.33917e-12', 'e_EF100': '5.49945e-13', 'Mod': 'PowerLaw', 'PLGam': '2.1167', 'e_PLGam': '0.0498', 'Epiv': '1721.604', 'LPalpha': '2.0789', 'e_LPalpha': '0.066', 'LPbeta': '0.0512', 'e_LPbeta': '0.0337', 'Flags': '0', 'Class': 'bll', 'Assoc1': 'PMN J0001-0746', 'ProbBY': '0.997', 'ProbLR': '0.9329', 'CCat': 'bzcat', 'RACdeg': '0.3251038', 'DECdeg': '-7.774145', 'errCPos': '1.8e-07', 'RFC': 'J0001-0746', 'z': '--', 'SEDCl': 'LSP', 'EpkHE': '796.298', 'e_EpkHE': '766.797', 'nuFnuPk': '8.68625e-07', 'e_nuFnuPk': '7.49292e-08', 'nu': '91201100000000.0', 'nuFnu': '1.93677e-12', 'Var': '46.7807', 'fVar': '0.4066', 'e_fVar': '0.1119', 'Emax': '86.9752', 'Simbad': 'Simbad'}]
+  find: [('I/57', 'Abbadia Catalogue of 14263 Stars, +16 to +24{deg} (Hendaye 1915)'), ('II/242', 'Differential V photometry of V350 Peg (Vidal-Sainz+, 2003)'), ('V/27', 'Proper Motions and UBV Photometry in h+{chi} Per (Muminov 1980)'), ('V/28', 'Proper Motions, UBV Photometry, Four Open Clusters (Frolov 1980)'), ('VII/240', 'Millennium Galaxy Catalogue (Liske+, 2003)')]
+
+=== J/ApJS/242/4  WIBRaLS2 / KDEBLLACS (D'Abrusco+2019)
+  table J/ApJS/242/4/table3  rows(sample)=3
+    recno                    | None       | Record number assigned by the VizieR team. Should Not be used for identification.
+    WISE                     | None       | AllWISE name
+    RAJ2000                  | deg        | Right Ascension of AllWISE source (J2000)
+    DEJ2000                  | deg        | Declination of AllWISE source (J2000)
+    W1-W2                    | mag        | W1-W2 AllWISE color index
+    W2-W3                    | mag        | W2-W3 AllWISE color index
+    W3-W4                    | mag        | W3-W4 AllWISE color index
+    SBZB                     | None       | Score for the BZB (BL Lac) region of the locus (1)
+    SMIX                     | None       | Score for the Mixed region of the locus (1)
+    SBZQ                     | None       | Score for the BZQ (FSRQ) region of the locus (1)
+    Class                    | None       | [ABCD] Class (2)
+    Type                     | None       | Spectral type (3)
+    Radio                    | None       | Name of the radio counterpart (NVSS, FIRST or SUMSS)
+    S                        | mJy        | Radio flux density (G1)
+    q22                      | None       | Radio-loudness parameter q22 (q22=log(S_22um_/S_radio_)
+    Rcat                     | None       | Cross-match with NVSS (VIII/65), SUMSS (VIII/81) and FIRST (VIII/90) within 10.5"
+    Simbad                   | None       | Simbad column added by the CDS
+   sample: [{'recno': '1', 'WISE': 'J082220.56-080056.9', 'RAJ2000': '125.5856737', 'DEJ2000': '-8.0158072', 'W1-W2': '1.2', 'W2-W3': '2.91', 'W3-W4': '2.43', 'SBZB': '0.0', 'SMIX': '0.0', 'SBZQ': '0.53', 'Class': 'C', 'Type': 'BZQ', 'Radio': 'NVSSJ082220-080056', 'S': '36.4', 'q22': '-1.04', 'Rcat': '1', 'Simbad': 'Simbad'}, {'recno': '2', 'WISE': 'J045703.18-232451.9', 'RAJ2000': '74.2632542', 'DEJ2000': '-23.4144361', 'W1-W2': '1.12', 'W2-W3': '3.11', 'W3-W4': '2.4', 'SBZB': '0.0', 'SMIX': '0.0', 'SBZQ': '0.94', 'Class': 'A', 'Type': 'BZQ', 'Radio': 'NVSSJ045703-232452', 'S': '1726.6', 'q22': '-1.67', 'Rcat': '1', 'Simbad': 'Simbad'}]
+  table J/ApJS/242/4/table5  rows(sample)=3
+    recno                    | None       | Record number assigned by the VizieR team. Should Not be used for identification.
+    WISE                     | None       | AllWISE name
+    RAJ2000                  | deg        | Right Ascension of AllWISE source (J2000)
+    DEJ2000                  | deg        | Declination of AllWISE source (J2000)
+    W1-W2                    | mag        | W1-W2 AllWISE color index
+    W2-W3                    | mag        | W2-W3 AllWISE color index
+    Radio                    | None       | Name of the radio counterpart (NVSS, FIRST or SUMSS)
+    S                        | mJy        | Radio flux density (G1)
+    q12                      | None       | Radio-loudness parameter q12 (q12=log(S_12um_/S_radio_)
+    Rcat                     | None       | Cross-match with NVSS (VIII/65), SUMSS (VIII/81) and FIRST (VIII/90) within 10.5"
+   sample: [{'recno': '1', 'WISE': 'J020555.02+185438.6', 'RAJ2000': '31.4792548', 'DEJ2000': '18.9107356', 'W1-W2': '0.6', 'W2-W3': '1.99', 'Radio': 'NVSSJ020555+185443', 'S': '6.9', 'q12': '-1.06', 'Rcat': '1'}, {'recno': '2', 'WISE': 'J135154.45+285008.0', 'RAJ2000': '207.9768932', 'DEJ2000': '28.8355658', 'W1-W2': '0.61', 'W2-W3': '1.99', 'Radio': 'NVSSJ135154+285009', 'S': '11.3', 'q12': '-1.34', 'Rcat': '2'}]
+  find: [('J/A+A/473/429/table5', 'HST VI photometry of Bol 514 in M31 (Federici+, 2007)\n    Stellar Phot')]
+
+=== J/ApJS/254/33  SPICY YSO candidates (Kuhn+2021)
+  table J/ApJS/254/33/table1  rows(sample)=3
+    recno                    | None       | Record number assigned by the VizieR team. Should Not be used for identification.
+    SPICY                    | None       | [1/117446]? SPICY designation
+    RA_ICRS                  | deg        | [125.6/346.5] Right ascension (ICRS)
+    DE_ICRS                  | deg        | [-64/62.4] Declination (ICRS)
+    GLON                     | deg        | Galactic longitude (GLON)
+    GLAT                     | deg        | Galactic latitude (GLAT)
+    p1                       | None       | [0/1]? YSO random forest score from IRAC+2MASS photometry (1)
+    p2                       | None       | [0/1]? YSO random forest score from IRAC+UKIDSS photometry (1)
+    p3                       | None       | [0/1]? YSO random forest score from IRAC+VVV photometry (1)
+    class                    | None       | YSO class (2)
+    Si                       | None       | [0/1] Flag for a possible strong silicate feature (silicate)
+    PAH                      | None       | [0/1] Flag for a possible strong PAH feature
+    alpha                    | None       | [-3.1/6.1]? Spectral index used for YSO class (3)
+    alpha8                   | None       | [-2.4/6.1]? Spectral index derived from the [4.5]-[8.0] color (alpha8)
+    alpha24                  | None       | [-3.1/3.2]? Spectral index derived from the [4.5]-[24] color (alpha24)
+    alphaW4                  | None       | [-2.3/3.5]? Spectral index derived from the [4.5]-W4 color (alphaW4)
+    Env                      | None       | Classification of the YSO environment from the 3'x3' IRAC cutout (4)
+    Group                    | None       | HDBSCAN group (as in Table 2) to which the star is assigned
+    var                      | None       | [1/3]? ZTF light-curve variability flag (3=high variability) (5)
+    o_ZTFrmag                | None       | [10/319]? Number of good ZTF r-band observations used (n_ZTFrmag)
+    ZTFrmag                  | None       | [12.4/21.5]? ZTF mean magnitude in the r-band
+    e_ZTFrmag                | None       | [0.009/1.2]? ZTF light-curve {sigma}_var_ standard deviation in the rband
+    skew                     | None       | [-10/11.1]? ZTF light-curve skew in the rband (skewness)
+    Spitzer                  | None       | Spitzer source designation from GLIMPSE ("SSTCYGXC", "SSTGLMC", "SSTSMOGC" or "SSTVELC" so
+    3.6mag                   | mag        | [7/17] Spitzer/IRAC 3.6um band magnitude
+    e_3.6mag                 | mag        | [0.016/0.4] Uncertainty on the 3.6mag
+    4.5mag                   | mag        | [6.5/14.5] Spitzer/IRAC 4.5um band magnitude
+    e_4.5mag                 | mag        | [0.014/0.4] Uncertainty on the 4.5mag
+    5.8mag                   | mag        | [4.5/14.1]? Spitzer/IRAC 5.8um band magnitude
+    e_5.8mag                 | mag        | [0.01/0.4]? Uncertainty on the 5.8mag
+    8.0mag                   | mag        | [4/13.3]? Spitzer/IRAC 8um band magnitude
+    e_8.0mag                 | mag        | [0.009/0.4]? Uncertainty on the 8.0mag
+    csf                      | None       | [0/2]? GLIMPSE close source flag (6)
+    o_3.6mag                 | None       | [1/24]? Number of detections in the 3.6um band (n_3.6mag)
+    o_4.5mag                 | None       | [1/18]? Number of detections in the 4.5um band (n_4.5mag)
+    o_5.8mag                 | None       | [0/24]? Number of detections in the 5.8um band (n_5.8mag)
+    o_8.0mag                 | None       | [0/20]? Number of detections in the 8.0um band (n_8.0mag)
+    2MASS                    | None       | 2MASS source name (HHMMSSss+DDMMSSs; J2000)
+    UKIDSS                   | None       | UKIDSS source designation (JHHMMSS.ss+DDMMSS.s)
+    VIRAC                    | None       | ? VIRAC DR1 source designation
+    GaiaDR2                  | None       | ? Gaia DR2 source designation
+    MIPS                     | None       | Spitzer/MIPS source designation
+    WISEA                    | None       | AllWISE source designation (JHHMMSS.ss+DDMMSS.s) (AllWISE)
+    ZTFDR3                   | None       | ? ZTF DR3 source designation
+    Np                       | None       | Number of photometry measurements for this star (link to fig25.dat)
+    LC                       | None       | Interactive LC Plot
+   sample: [{'recno': '1', 'SPICY': '1', 'RA_ICRS': '125.664811', 'DE_ICRS': '-37.551349', 'GLON': '255.975183', 'GLAT': '-0.253369', 'p1': '0.71', 'p2': '--', 'p3': '--', 'class': 'ClassII', 'Si': '0', 'PAH': '0', 'alpha': '-1.517', 'alpha8': '-1.517', 'alpha24': '--', 'alphaW4': '--', 'Env': 'EnvI', 'Group': '', 'var': '--', 'o_ZTFrmag': '--', 'ZTFrmag': '--', 'e_ZTFrmag': '--', 'skew': '--', 'Spitzer': 'SSTVELC G255.9751-00.2533', '3.6mag': '13.158', 'e_3.6mag': '0.063', '4.5mag': '12.8', 'e_4.5mag': '0.104', '5.8mag': '12.47', 'e_5.8mag': '0.153', '8.0mag': '12.009', 'e_8.0mag': '0.083', 'csf': '0', 'o_3.6mag': '2', 'o_4.5mag': '2', 'o_5.8mag': '2', 'o_8.0mag': '2', '2MASS': '08223956-3733048', 'UKIDSS': '', 'VIRAC': '--', 'GaiaDR2': '5541983493883598976', 'MIPS': '', 'WISEA': 'J082239.55-373304.5', 'ZTFDR3': '--', 'Np': '0', 'LC': 'LC'}, {'recno': '2', 'SPICY': '2', 'RA_ICRS': '125.795513', 'DE_ICRS': '-37.585', 'GLON': '256.06207', 'GLAT': '-0.187675', 'p1': '0.69', 'p2': '--', 'p3': '--', 'class': 'ClassII', 'Si': '0', 'PAH': '0', 'alpha': '-0.64321', 'alpha8': '-0.6432', 'alpha24': '--', 'alphaW4': '--', 'Env': 'EnvI', 'Group': '', 'var': '--', 'o_ZTFrmag': '--', 'ZTFrmag': '--', 'e_ZTFrmag': '--', 'skew': '--', 'Spitzer': 'SSTVELC G256.0620-00.1876', '3.6mag': '13.18', 'e_3.6mag': '0.059', '4.5mag': '12.727', 'e_4.5mag': '0.097', '5.8mag': '12.241', 'e_5.8mag': '0.12', '8.0mag': '11.404', 'e_8.0mag': '0.059', 'csf': '0', 'o_3.6mag': '2', 'o_4.5mag': '2', 'o_5.8mag': '2', 'o_8.0mag': '2', '2MASS': '08231092-3735060', 'UKIDSS': '', 'VIRAC': '--', 'GaiaDR2': '5541980848188474496', 'MIPS': '', 'WISEA': 'J082310.90-373505.9', 'ZTFDR3': '--', 'Np': '0', 'LC': 'LC'}]
+  table J/ApJS/254/33/table2  rows(sample)=3
+    recno                    | None       | Record number assigned by the VizieR team. Should Not be used for identification.
+    Group                    | None       | Group designation (GLL.l+B.b)
+    GLON                     | deg        | Central Galactic longitude (l0) (1)
+    GLAT                     | deg        | [-2.62/3.63] Central Galactic latitude (b0) (1)
+    plx                      | mas        | [0.05/1.7]? Mean parallax (1)
+    e_plx                    | mas        | [0.04/0.7]? Parallax uncertainty (1)
+    pmGLON                   | None       | [-14/1]? Mean proper motion in GLON (pml) (1)
+    e_pmGLON                 | None       | [0.07/3.1]? pmGLON uncertainty (e_pml) (1)
+    pmGLAT                   | None       | [-4.3/6.6]? Mean proper motion in GLAT (pmb) (1)
+    e_pmGLAT                 | None       | [0.07/2.6]? pmGLAT uncertainty (e_pmb) (1)
+    Ntot                     | None       | [30/3662]? Total number of constituents (n)
+    N5G                      | None       | [0/412]? Number of constituents with five-parameter Gaia astrometric solutions (nG)
+    Flag                     | None       | [f] Flag for potential model problems (see Section 7.1)
+    _RA.icrs                 | deg        | Right ascension (ICRS) at Epoch=J2000, proper motions taken into account
+    _DE.icrs                 | deg        | Declination (ICRS) at Epoch=J2000, proper motions taken into account
+   sample: [{'recno': '1', 'Group': 'G257.2-0.0', 'GLON': '257.25755', 'GLAT': '-0.0506', 'plx': '0.231', 'e_plx': '0.051', 'pmGLON': '-4.419', 'e_pmGLON': '0.123', 'pmGLAT': '0.02', 'e_pmGLAT': '0.09', 'Ntot': '62', 'N5G': '22', 'Flag': '', '_RA.icrs': '126.81389', '_DE.icrs': '-38.48199'}, {'recno': '2', 'Group': 'G259.9-0.0', 'GLON': '259.93625', 'GLAT': '-0.02537', 'plx': '1.046', 'e_plx': '0.042', 'pmGLON': '-6.129', 'e_pmGLON': '0.083', 'pmGLAT': '-2.778', 'e_pmGLAT': '0.086', 'Ntot': '68', 'N5G': '42', 'Flag': '', '_RA.icrs': '128.89402', '_DE.icrs': '-40.6279'}]
+  table J/ApJS/254/33/fig25  rows(sample)=3
+    recno                    | None       | Record number assigned by the VizieR team. Should Not be used for identification.
+    ID                       | None       | ? Object identifier (oid)
+    ExpID                    | None       | [44350541/109212187]? Exposure ID
+    HJD                      | d          | Heliocentric Julian Date
+    MJD                      | d          | [58197.5/58846.2] Modified Julian Date (HJD-24000000.5)
+    mag                      | mag        | [12.22/22.23] ZTF magnitude
+    e_mag                    | mag        | [0/0.5] Uncertainty in mag (magerr)
+    Flags                    | None       | [0/4352]? Catalog flags for source from PSF-fitting catalog (catflags)
+    Filt                     | None       | [zr] Catalog filter code; always "zr" = R-band observations (filtercode)
+    RAJ2000                  | deg        | Right ascension (J2000) (ra)
+    DEJ2000                  | deg        | Declination (J2000) (dec)
+    chi2                     | None       | [0.03/35] Chi-squared statistic for PSF fit (chi)
+    sharp                    | None       | [-2/3.3] Sharpness of source
+    FracDay                  | None       | ? Exposure file time stamp, with decimal representation YYYYMMDDdddddd: year, month, day, 
+    Field                    | None       | [280/1861]? Field identifier
+    CCD                      | None       | [1/16]? CCD number (ccdid)
+    qID                      | None       | [1/4]? Quadrant ID
+    magLim                   | mag        | [17.7/22.1] Approximate 5-sigma limiting magnitude corresponding to epoch-based PSF-fit ca
+    magZP                    | mag        | [25.39/26.5] Magnitude zeropoint from photometric calibration
+    e_magZP                  | mag        | [0.01/0.05] RMS deviation in magnitude zeropoint (magzprms)
+    Col                      | None       | [-0.016/0.2] Color coefficient from linear fit (clrcoeff)
+    e_Col                    | None       | [1.3e-6/0.0007] Color coefficient uncertainty from linear fit (clrcounc)
+    Exp                      | s          | [30] Exposure time from scheduler (always "30") (exptime)
+    Airmass                  | None       | [1/2.91] Airmass at approximately the center of the focal plane at time of exposure
+    PID                      | None       | [1/3]? Program ID (programid)
+    SPICY                    | None       | [53590/117446] SPICY designation
+    Spitzer                  | None       | Designation of the Spitzer source (sst_desig)
+   sample: [{'recno': '1', 'ID': '540208300020771', 'ExpID': '46450805', 'HJD': '2458219.00808394', 'MJD': '58218.5080556', 'mag': '20.5751', 'e_mag': '0.1527', 'Flags': '0', 'Filt': 'zr', 'RAJ2000': '288.7945738', 'DEJ2000': '10.317556', 'chi2': '0.722', 'sharp': '-0.146', 'FracDay': '20180410508044', 'Field': '540', 'CCD': '8', 'qID': '3', 'magLim': '20.38', 'magZP': '26.064548', 'e_magZP': '0.0244', 'Col': '0.118', 'e_Col': '7.3438e-06', 'Exp': '30', 'Airmass': '1.193', 'PID': '1', 'SPICY': '100018', 'Spitzer': 'SSTGLMC G044.8078-00.5083'}, {'recno': '2', 'ID': '540208300020771', 'ExpID': '49347912', 'HJD': '2458247.98149384', 'MJD': '58247.4791204', 'mag': '20.1909', 'e_mag': '0.1169', 'Flags': '0', 'Filt': 'zr', 'RAJ2000': '288.7943745', 'DEJ2000': '10.3175402', 'chi2': '1.04', 'sharp': '-0.101', 'FracDay': '20180509479120', 'Field': '540', 'CCD': '8', 'qID': '3', 'magLim': '20.28', 'magZP': '26.187042', 'e_magZP': '0.0278', 'Col': '0.131', 'e_Col': '9.5324e-06', 'Exp': '30', 'Airmass': '1.089', 'PID': '1', 'SPICY': '100018', 'Spitzer': 'SSTGLMC G044.8078-00.5083'}]
+  find: [('V/61', "Almagest (Ptolemy's Star Catalog)"), ('VII/100', 'MCG Vol.5 (Vorontsov-Velyaminov+, 1974)'), ('J/ApJ/424/599', 'Abundances in barred spiral galaxies (Martin+ 1994)'), ('J/ApJ/449/164', 'Variable Stars in MC Clusters. II (Sebo+ 1995)'), ('J/ApJ/459/110', 'Line strengths and gradients in S0 galaxies (Fisher+ 1996)')]
+
+=== J/MNRAS/487/2522  Marton+2019 Gaia DR2 x AllWISE YSO probabilities
+  table II/360/catalog  rows(sample)=3
+    Source                   | None       | Gaia DR2 source ID (gid)
+    RA_ICRS                  | deg        | Barycentric right ascension (ICRS) at Ep=2015.5 (ra)
+    DE_ICRS                  | deg        | Barycentric declination (ICRS) at Ep=2015.5 (dec)
+    LE                       | None       | Probability of the source being an evolved star using all WISE bands (LE)
+    e_LE                     | None       | Error of the LE probability (LEerr)
+    LEG                      | None       | Probability of the source being an extragalactic object using all WISE bands (LEG)
+    e_LEG                    | None       | Error of the LEG probability (LEGerr)
+    LMS                      | None       | Probability of the source being a main-sequence star using all WISE bands (LMS)
+    e_LMS                    | None       | Error of the LMS probability (LMSerr)
+    LY                       | None       | Probability of the source being a YSO using all WISE bands (LY)
+    e_LY                     | None       | Error of the LY probability (LYerr)
+    Gmag                     | mag        | G-band mean magnitude (Vega) (gmean)
+    tau                      | None       | 353GHz R2.01 Planck dust opacity value (tau)
+    AllWISE                  | None       | AllWISE designation (wid)
+    RAAdeg                   | deg        | AllWISE Right ascension (J2000) (raw)
+    DEAdeg                   | deg        | AllWISE Declination (J2000) (decw)
+    W1mag                    | mag        | AllWISE W1 magnitude (W1mag)
+    W2mag                    | mag        | AllWISE W2 magnitude (W2mag)
+    W3mag                    | mag        | AllWISE W3 magnitude (W3mag)
+    W4mag                    | mag        | AllWISE W4 magnitude (W4mag)
+    Jmag                     | mag        | 2MASS J magnitude (Jmag)
+    Hmag                     | mag        | 2MASS H magnitude (Hmag)
+    Kmag                     | mag        | 2MASS K magnitude (Kmag)
+    e_W1mag                  | mag        | ? AllWISE W1 Magnitude error (e_W1mag)
+    e_W2mag                  | mag        | ? AllWISE W2 Magnitude error (e_W2mag)
+    e_W3mag                  | mag        | ? AllWISE W3 Magnitude error (e_W3mag)
+    e_W4mag                  | mag        | ? AllWISE W4 Magnitude error (e_W4mag)
+    e_Jmag                   | mag        | ? 2MASS J magnitude error (e_Jmag)
+    e_Hmag                   | mag        | ? 2MASS H magnitude error (e_Hmag)
+    e_Kmag                   | mag        | ? 2MASS K magnitude error (e_Kmag)
+    R                        | None       | Probability that WISE W3 and W4 detections are real (R)
+    SE                       | None       | Probability of the source being an evolved star without W3 and W4 WISE bands (SE)
+    e_SE                     | None       | Error of the SE probability (SEerr)
+    SEG                      | None       | Probability of the source being an extragalactic object without W3 and W4 WISE bands (SEG)
+    e_SEG                    | None       | Error of the SEG probability (SEGerr)
+    SMS                      | None       | Probability of the source being a main-sequence star without W3 and W4 WISE bands (SMS)
+    e_SMS                    | None       | Error of the SMS probability (SMSerr)
+    SY                       | None       | Probability of the source being a YSO without W3 and W4 WISE bands (SY)
+    e_SY                     | None       | Error of the SY probability (SYerr)
+   sample: [{'Source': '3633336174332288', 'RA_ICRS': '47.336435', 'DE_ICRS': '4.975011', 'LE': '0.4606', 'e_LE': '0.05574', 'LEG': '0.4402', 'e_LEG': '0.05951', 'LMS': '0.0002', 'e_LMS': '0.00063', 'LY': '0.099', 'e_LY': '0.02736', 'Gmag': '18.719963', 'tau': '2e-05', 'AllWISE': 'J030920.74+045829.7', 'RAAdeg': '47.33643', 'DEAdeg': '4.974942', 'W1mag': '16.36', 'W2mag': '16.216', 'W3mag': '12.361', 'W4mag': '8.745', 'Jmag': '16.547', 'Hmag': '16.284', 'Kmag': '15.674', 'e_W1mag': '0.064', 'e_W2mag': '0.187', 'e_W3mag': '--', 'e_W4mag': '--', 'e_Jmag': '0.105', 'e_Hmag': '0.142', 'e_Kmag': '0.196', 'R': '0.404', 'SE': '0.506', 'e_SE': '0.06902', 'SEG': '0.4232', 'e_SEG': '0.06282', 'SMS': '0.0006', 'e_SMS': '0.00097', 'SY': '0.0702', 'e_SY': '0.02593'}, {'Source': '3633370534072832', 'RA_ICRS': '47.340973', 'DE_ICRS': '4.981955', 'LE': '0.0548', 'e_LE': '0.02863', 'LEG': '0.7272', 'e_LEG': '0.09337', 'LMS': '0.0002', 'e_LMS': '0.00063', 'LY': '0.2178', 'e_LY': '0.08858', 'Gmag': '18.328425', 'tau': '2e-05', 'AllWISE': 'J030921.82+045855.0', 'RAAdeg': '47.340921', 'DEAdeg': '4.981962', 'W1mag': '14.271', 'W2mag': '14.098', 'W3mag': '12.377', 'W4mag': '8.93', 'Jmag': '15.392', 'Hmag': '14.687', 'Kmag': '14.488', 'e_W1mag': '0.028', 'e_W2mag': '0.039', 'e_W3mag': '--', 'e_W4mag': '--', 'e_Jmag': '0.043', 'e_Hmag': '0.022', 'e_Kmag': '0.071', 'R': '0.41', 'SE': '0.0428', 'e_SE': '0.01926', 'SEG': '0.6926', 'e_SEG': '0.12386', 'SMS': '0.0014', 'e_SMS': '0.00267', 'SY': '0.2632', 'e_SY': '0.10972'}]
+  find: [(None, '')]
+
+=== J/ApJS/234/1  Best+2018 PS1 M/L/T dwarfs
+  table J/ApJS/234/1/dwarfs  rows(sample)=3
+    recno                    | None       | Record number assigned by the VizieR team. Should Not be used for identification.
+    Name                     | None       | Name used in the object's discovery or spectral confirmation paper
+    SpTopt                   | None       | Optical spectral type (G1)
+    Topt                     | None       | [0/29]? Numeric optical spectral type (G3)
+    SpTnir                   | None       | Near-IR spectral type (G1)
+    Tnir                     | None       | [4.8/29]? Numeric near-IR spectral type (G3)
+    SpT                      | None       | Adopted spectral type (G1)
+    Type                     | None       | [0/29]? Numeric adopted spectral type (G3)
+    GravOpt                  | None       | Low-gravity classification from an optical spectrum (G2)
+    GravNIR                  | None       | Low-gravity classification from an near-IR spectrum (G2)
+    GFlag                    | None       | [f] Flag on Grav-opt/Grav-nir (G4)
+    Binary                   | None       | "Y" or "triple" for known binary or triple systems not resolved in PS1
+    Young                    | None       | "Y" for known young objects (G5)
+    PS1                      | None       | PS1 Designation (Jddd.dddd+dd.dddd) (1)
+    PS1gmag                  | mag        | [14.7/23.3]? PS1 g magnitude (1)
+    e_PS1gmag                | mag        | [0.01/0.2]? Error in PS1 g magnitude
+    o_PS1gmag                | None       | [2/33]? Number of measurements used to calculate the PS1 g photometry
+    n_PS1gmag                | None       | [CRW] Source of the PS1 g photometry (2)
+    f_PS1gmag                | None       | [ghji] Flag on PS1gmag (3)
+    PS1rmag                  | mag        | [14.6/23.4]? PS1 r magnitude (1)
+    e_PS1rmag                | mag        | [0.01/0.2]? Error in PS1 r magnitude
+    o_PS1rmag                | None       | [2/36]? Number of measurements used to calculate the PS1 r photometry
+    n_PS1rmag                | None       | [CRW] Source of the PS1 r photometry (2)
+    f_PS1rmag                | None       | [ghj] Flag on PS1rmag (3)
+    PS1imag                  | mag        | [14.5/23.2]? PS1 i magnitude (1)
+    e_PS1imag                | mag        | [0.01/0.2]? Error in PS1 i magnitude
+    o_PS1imag                | None       | [2/58]? Number of measurements used to calculate the PS1 i photometry
+    n_PS1imag                | None       | [CRW] Source of the PS1 i photometry (2)
+    f_PS1imag                | None       | [ghj] Flag on PS1imag (3)
+    PS1zmag                  | mag        | [13.5/22.3]? PS1 z magnitude (1)
+    e_PS1zmag                | mag        | [0.01/0.2]? Error in PS1 z magnitude
+    o_PS1zmag                | None       | [2/27]? Number of measurements used to calculate the PS1 z photometry
+    n_PS1zmag                | None       | [CRW] Source of the PS1 z photometry (2)
+    f_PS1zmag                | None       | [ghj] Flag on PS1zmag (3)
+    PS1ymag                  | mag        | [12.5/21.4]? PS1 y magnitude (1)
+    e_PS1ymag                | mag        | [0.01/0.2]? Error in PS1 y magnitude
+    o_PS1ymag                | None       | [2/31]? Number of measurements used to calculate the PS1 y photometry
+    n_PS1ymag                | None       | [CRW] Source of the PS1 y photometry (2)
+    2MCat                    | None       | 2MASS_ or 2MASSA_ (21 occurrences)
+    2MASS                    | None       | 2MASS catalog designation (JHHMMSSss+DDMMSSs)
+    Jmag                     | mag        | [8/18.7]? 2MASS J magnitude or upper limit (4)
+    e_Jmag                   | mag        | [0.02/0.6]? Error on Jmag (4)
+    Hmag                     | mag        | [7.6/18.3]? 2MASS H magnitude or upper limit (4)
+    e_Hmag                   | mag        | [0.01/0.7]? Error on Hmag (4)
+    Ksmag                    | mag        | [7.2/19]? 2MASS Ks magnitude or upper limit (4)
+    e_Ksmag                  | mag        | [0.01/0.4]? Error on Ksmag (4)
+    f_2MASS                  | None       | 2MASS contamination and confusion flags (5)
+    AllWISE                  | None       | AllWISE designation (JHHMMSS.ss+DDMMSS.s)
+    W1mag                    | mag        | [6.9/18.8]? AllWISE W1 magnitude or upper limit (4)
+    e_W1mag                  | mag        | [0.02/0.6]? Error on W4mag (4)
+    W2mag                    | mag        | [6.7/17.2]? AllWISE W2 magnitude or upper limit (4)
+    e_W2mag                  | mag        | [0.02/0.5]? Error on W4mag (4)
+    W3mag                    | mag        | [6.6/14]? AllWISE W3 magnitude or upper limit (4)
+    e_W3mag                  | mag        | [0.02/0.6]? Error on W4mag (4)
+    W4mag                    | mag        | [5/10.3]? AllWISE W4 magnitude or upper limit (4)
+    e_W4mag                  | mag        | [0.03/0.6]? Error on W4mag (4)
+    f_AllWISE                | None       | AllWISE contamination and confusion flags (5)
+    Ngh                      | None       | [0/1]? Number of AllWISE neighbors within 8"
+    Gmag                     | mag        | [13.8/21]? Gaia DR1 G magnitude
+    e_Gmag                   | mag        | [0.01/0.2]? Uncertainty in Gmag
+    Ref1                     | None       | Discovery reference(s) (6)
+    Ref2                     | None       | Spectral Type reference(s) (6)
+    Ref3                     | None       | Gravity reference(s) (6)
+    Ref4                     | None       | Binarity reference(s) (6)
+    Ref5                     | None       | 2MASS photometry reference(s) (6)
+    Ref6                     | None       | [89/127]? AllWISE photometry (6)
+    RAJ2000                  | deg        | Right Ascension (Eq=J2000, Ep=PS1ep) (7)
+    DEJ2000                  | deg        | Declination (Eq=J2000, Ep=PS1ep) (7)
+    PS1ep                    | yr         | Mean PS1 epoch converted in decimal years from Epoch column in MJD (=JD-2400000.5); column
+    Epoch                    | d          | Mean PS1 epoch (MJD)
+    pmRA                     | mas / yr   | [-3023/2558]? PS1 proper motion in RA
+    e_pmRA                   | mas / yr   | [0.6/156]? Error in pmRA
+    pmDE                     | mas / yr   | [-1964/1695]? PS1 proper motion in DEC
+    e_pmDE                   | mas / yr   | [0.6/99]? Error in pmDE
+    pm                       | mas / yr   | [0.4/3507]? PS1 proper motion amplitude
+    e_pm                     | mas / yr   | [0.6/119]? Error in pm
+    pmPA                     | deg        | [0.1/360]? PS1 proper motion position angle
+    e_pmPA                   | deg        | [0/108]? Error in pmPA
+    rchi2                    | None       | [0/283]? Reduced chi-squared of the astrometric fit
+    Nep                      | None       | [5/169]? Number of epochs used in the astrometric fit
+    BTime                    | yr         | [1/17.6]? Time baseline of the astrometric fit
+    plx                      | mas        | [3/310]? Parallax, from the literature
+    e_plx                    | mas        | [0.05/42]? Error in parallax
+    Dist                     | pc         | [3/1057]? Distance based on parallax or photometry (8)
+    e_Dist                   | pc         | [0.01/152]? Error in distance
+    vtan                     | km / s     | [0.4/1170]? Tangential velocity
+    e_vtan                   | km / s     | [0.1/277]? Error in tangential velocity
+    pmRAlit                  | mas / yr   | [-3022/2549]? Literature proper motion in RA
+    e_pmRAlit                | mas / yr   | [0.1/1175]? Error in pmRAlit
+    pmDElit                  | mas / yr   | [-1964/1694]? Literature proper motion in DEC
+    e_pmDElit                | mas / yr   | [0/1237]? Error in pmDE-lit
+    Ref7                     | None       | ? References for Parallax distance (9)
+    Ref8                     | None       | ? References for Literature proper motion (9)
+    Gaia                     | None       | Display the Gaia DR1 data (I/337) within 3"
+    Simbad                   | None       | Simbad column added by the CDS
+   sample: [{'recno': '1', 'Name': 'SDSS_J000013.54+255418.6', 'SpTopt': 'T5', 'Topt': '25.0', 'SpTnir': 'T4.5', 'Tnir': '24.5', 'SpT': 'T4.5', 'Type': '24.5', 'GravOpt': '', 'GravNIR': '', 'GFlag': '', 'Binary': '', 'Young': '', 'PS1': 'J000.0563+25.9054', 'PS1gmag': '--', 'e_PS1gmag': '--', 'o_PS1gmag': '--', 'n_PS1gmag': '', 'f_PS1gmag': '', 'PS1rmag': '--', 'e_PS1rmag': '--', 'o_PS1rmag': '--', 'n_PS1rmag': '', 'f_PS1rmag': '', 'PS1imag': '--', 'e_PS1imag': '--', 'o_PS1imag': '--', 'n_PS1imag': '', 'f_PS1imag': '', 'PS1zmag': '19.17', 'e_PS1zmag': '0.01', 'o_PS1zmag': '10', 'n_PS1zmag': 'C', 'f_PS1zmag': '', 'PS1ymag': '17.42', 'e_PS1ymag': '0.01', 'o_PS1ymag': '11', 'n_PS1ymag': 'C', '2MCat': '2MASS_', '2MASS': 'J00001354+2554180', 'Jmag': '15.06', 'e_Jmag': '0.04', 'Hmag': '14.73', 'e_Hmag': '0.12', 'Ksmag': '14.84', 'e_Ksmag': '0.12', 'f_2MASS': 'ccc', 'AllWISE': '', 'W1mag': '--', 'e_W1mag': '--', 'W2mag': '--', 'e_W2mag': '--', 'W3mag': '--', 'e_W3mag': '--', 'W4mag': '--', 'e_W4mag': '--', 'f_AllWISE': '', 'Ngh': '--', 'Gmag': '--', 'e_Gmag': '--', 'Ref1': '175', 'Ref2': '247,51', 'Ref3': '', 'Ref4': '', 'Ref5': '88', 'Ref6': '--', 'RAJ2000': '0.0564', 'DEJ2000': '25.905389', 'PS1ep': '2010.3542231', 'Epoch': '55326.38', 'pmRA': '-18.4', 'e_pmRA': '5.5', 'pmDE': '123.1', 'e_pmDE': '3.3', 'pm': '124.5', 'e_pm': '3.4', 'pmPA': '351.5', 'e_pmPA': '2.5', 'rchi2': '1.4', 'Nep': '28', 'BTime': '15.2', 'plx': '70.8', 'e_plx': '1.9', 'Dist': '14.12', 'e_Dist': '0.38', 'vtan': '8.3', 'e_vtan': '0.3', 'pmRAlit': '-19.1', 'e_pmRAlit': '1.5', 'pmDElit': '126.7', 'e_pmDElit': '1.3', 'Ref7': '7043', 'Ref8': '7043', 'Gaia': 'Gaia', 'Simbad': 'Simbad'}, {'recno': '2', 'Name': 'SDSS_J000112.18+153535.5', 'SpTopt': '', 'Topt': '--', 'SpTnir': 'L3.7INT-G', 'Tnir': '13.7', 'SpT': 'L3.7INT-G', 'Type': '13.7', 'GravOpt': '', 'GravNIR': 'INT-G', 'GFlag': '', 'Binary': '', 'Young': 'Y', 'PS1': 'J000.3012+15.5925', 'PS1gmag': '--', 'e_PS1gmag': '--', 'o_PS1gmag': '--', 'n_PS1gmag': '', 'f_PS1gmag': '', 'PS1rmag': '--', 'e_PS1rmag': '--', 'o_PS1rmag': '--', 'n_PS1rmag': '', 'f_PS1rmag': '', 'PS1imag': '20.37', 'e_PS1imag': '0.01', 'o_PS1imag': '13', 'n_PS1imag': 'C', 'f_PS1imag': '', 'PS1zmag': '18.85', 'e_PS1zmag': '0.02', 'o_PS1zmag': '7', 'n_PS1zmag': 'C', 'f_PS1zmag': '', 'PS1ymag': '17.81', 'e_PS1ymag': '0.01', 'o_PS1ymag': '10', 'n_PS1ymag': 'C', '2MCat': '2MASS_', '2MASS': 'J00011217+1535355', 'Jmag': '15.52', 'e_Jmag': '0.06', 'Hmag': '14.51', 'e_Hmag': '0.04', 'Ksmag': '13.71', 'e_Ksmag': '0.04', 'f_2MASS': '000', 'AllWISE': 'J000112.27+153533.6', 'W1mag': '12.97', 'e_W1mag': '0.02', 'W2mag': '12.54', 'e_W2mag': '0.02', 'W3mag': '11.67', 'e_W3mag': '0.24', 'W4mag': '8.93', 'e_W4mag': '--', 'f_AllWISE': '0000', 'Ngh': '0', 'Gmag': '--', 'e_Gmag': '--', 'Ref1': '175', 'Ref2': '124', 'Ref3': '124', 'Ref4': '', 'Ref5': '88', 'Ref6': '89', 'RAJ2000': '0.301175', 'DEJ2000': '15.592648', 'PS1ep': '2011.5166324', 'Epoch': '55750.95', 'pmRA': '137.3', 'e_pmRA': '2.2', 'pmDE': '-181.2', 'e_pmDE': '2.8', 'pm': '227.3', 'e_pm': '2.6', 'pmPA': '142.8', 'e_pmPA': '0.6', 'rchi2': '1.6', 'Nep': '34', 'BTime': '14.1', 'plx': '--', 'e_plx': '--', 'Dist': '24.34', 'e_Dist': '2.93', 'vtan': '26.2', 'e_vtan': '3.2', 'pmRAlit': '135.2', 'e_pmRAlit': '10.7', 'pmDElit': '-169.6', 'e_pmDElit': '13.7', 'Ref7': '--', 'Ref8': '7054', 'Gaia': 'Gaia', 'Simbad': 'Simbad'}]
+  table J/ApJS/234/1/refs  rows(sample)=3
+    recno                    | None       | Record number assigned by the VizieR team. Should Not be used for identification.
+    Ref                      | None       | Reference code
+    Auth                     | None       | First author's name(s)
+    BibCode                  | None       | Bibcode of the reference
+    Comm                     | None       | Comment
+   sample: [{'recno': '1', 'Ref': '1', 'Auth': '', 'BibCode': '', 'Comm': 'This work;'}, {'recno': '2', 'Ref': '2', 'Auth': 'Aberasturi et al.', 'BibCode': '2014AJ....148..129A', 'Comm': ''}]
+  find: [('I/82', 'SPF1 Catalogue (Anguita+ 1975)'), ('I/96', 'Astrographic Catalogue, +01 to +31 Degrees (Fresneau 1983)'), ('I/224', 'Oxford 1 AC Zone Data Reduced to ACRS (Urban+ 1996)'), ('I/256', 'Carlsberg Meridian Catalogs (CMC, 1999)'), ('I/310', "AGK1 catalog, -2{deg} 10'=<DE<=+1{deg} 10' (Kortazzi+, 1900)")]
+
+=== gaiadr3.astrophysical_parameters ESP-UCD columns: ['teff_espucd', 'teff_espucd_uncertainty', 'flags_espucd']
+   source_id     teff_espucd flags_espucd
+                      K                  
+---------------- ----------- ------------
+ 188016489534208   2684.8477           00
+1577597323028864   2675.7231           00
+3036954195695616   2521.4438           00
+4205361393839232   2528.4126           20
+6033570057616896     2469.27           00

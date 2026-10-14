@@ -1,0 +1,47 @@
+name: v2 new targets (reference data and truth)
+
+# 2.22.0 target additions: fetches reference tables (SIMBAD otype hierarchy,
+# column lists of the truth catalogues) and builds the independent truth
+# sets, committing them to the branch it runs on.
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/code-review-7ox8zn]
+    paths:
+      - .github/workflows/v2_new_targets.yml
+      - v2/benchmark/new_targets/*.py
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v2-new-targets-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pandas numpy scipy astropy astroquery pyvo requests
+      - name: Probe catalogues
+        continue-on-error: true
+        run: python -u v2/benchmark/new_targets/probe_catalogs.py --out v2/benchmark/new_targets/probe
+      - name: Build truth sets
+        if: hashFiles('v2/benchmark/new_targets/build_truth.py') != ''
+        continue-on-error: true
+        run: python -u v2/benchmark/new_targets/build_truth.py --out v2/benchmark/new_targets/truth
+      - name: Commit results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A v2/benchmark/new_targets
+          git diff --cached --quiet && exit 0
+          git commit -m "new targets: reference tables and truth sets (Actions)"
+          bash .github/scripts/push_with_retry.sh "${{ github.ref_name }}"

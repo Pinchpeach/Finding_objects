@@ -81,8 +81,14 @@ def reason(row) -> str | None:
             ev = json.loads(row.get("evidence_json") or "[]")
         except (TypeError, ValueError):
             ev = []
-        strong = sorted({f"{e.get('class')} ({e.get('rule_id')})" for e in ev
-                         if float(e.get("score") or 0) >= 0.8 and e.get("class") in ("STAR", "GALAXY", "QSO")})
+        # Same set as Stage 5's conflict test: WD / BINARY count as STAR, and
+        # colour-kNN / GBM fractions are soft evidence, not claims (2.22.0).
+        def _cls(e):
+            c = e.get("class")
+            return "STAR" if c in ("WD", "BINARY") else c
+        strong = sorted({f"{_cls(e)} ({e.get('rule_id')})" for e in ev
+                         if float(e.get("score") or 0) >= 0.8 and _cls(e) in ("STAR", "GALAXY", "QSO")
+                         and not str(e.get("rule_id", "")).endswith(("-CKNN-001", "-GBM-001"))})
         return "conflicting evidence: " + ", ".join(strong) if strong else "conflicting evidence"
     if status == "LOW_CONFIDENCE":
         p = {c: _num(row, f"p_{c.lower()}") for c in ("STAR", "GALAXY", "QSO")}

@@ -1,0 +1,72 @@
+{
+ "completeness": {
+  "known_with_gaia": 2692,
+  "plx_snr_gt5": 1506,
+  "selected": 1277,
+  "completeness": 0.8479,
+  "completeness_by_class": {
+   "He-s": {
+    "size": 179,
+    "mean": 0.933
+   },
+   "O(H)": {
+    "size": 22,
+    "mean": 0.591
+   },
+   "sd": {
+    "size": 117,
+    "mean": 0.658
+   },
+   "sdB": {
+    "size": 639,
+    "mean": 0.923
+   },
+   "sdB+": {
+    "size": 180,
+    "mean": 0.594
+   },
+   "sdBV": {
+    "size": 26,
+    "mean": 0.962
+   },
+   "sdO": {
+    "size": 96,
+    "mean": 0.938
+   },
+   "sdOB": {
+    "size": 200,
+    "mean": 0.935
+   }
+  }
+ },
+ "purity": {
+  "sample": 3568,
+  "in_simbad": 3091,
+  "buckets": {
+   "no_type_info": 2282,
+   "hot_subdwarf": 655,
+   "white_dwarf": 55,
+   "OBA_type": 39,
+   "CV_or_PN": 32,
+   "horizontal_branch": 25,
+   "cooler_FGKM": 3
+  },
+  "otypes": {
+   "HS?": 1480,
+   "*": 805,
+   "HS*": 606,
+   "WD*": 33,
+   "CV*": 32,
+   "HB*": 25,
+   "V*": 21,
+   "EB*": 20,
+   "WD?": 18,
+   "PN": 11,
+   "RR*": 7,
+   "PM*": 4,
+   "No*": 4,
+   "Em*": 4,
+   "BS*": 3
+  }
+ }
+}

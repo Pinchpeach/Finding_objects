@@ -5,6 +5,10 @@ reported as calibrated posterior probabilities; calibration is a separate stage.
 """
 from __future__ import annotations
 import math
+import importlib.util as _ilu
+from pathlib import Path as _P
+_s=_ilu.spec_from_file_location("v2_simbad_otypes",_P(__file__).resolve().parents[1]/"simbad_otypes.py")
+OTYPES=_ilu.module_from_spec(_s);_s.loader.exec_module(OTYPES)
 AXIS="phenomenon"
 CLASSES=("SN","PN","NOVA","MICROLENSING","OTHER_TRANSIENT","OTHER_PHENOMENON","NONE","UNKNOWN")
 
@@ -61,7 +65,10 @@ def _sn_epoch_status(ev):
 
 # A catalogued SN is the transient only near its event: an observation more
 # than a year after discovery sees the host galaxy (same rule as the
-# time-domain branch, which needs an event epoch; 2.18.0).
+# time-domain branch, which needs an event epoch; 2.18.0).  It applies only
+# when the row carries both event_mjd and observation_mjd: the survey
+# collectors do not set an observation epoch, so a catalogue SN match stays SN
+# (2.22.0 review; ALGORITHM.md section 7 says so).
 SN_MAX_DELTA_DAYS=365.0
 
 
@@ -104,6 +111,8 @@ def classify(row):
         return {"axis":AXIS,"label":"SN","confidence":score,"status":"TIME_DOMAIN_SN_CANDIDATE","evidence":[{"kind":"event_time_aware_lightcurve","class":lc,"score":score,"event_mjd":event_mjd,"score_semantics":"raw time-domain classifier score; requires per-axis calibration"}]}
 
     simbad=_text(row,"otype")
+    _hit,_c=OTYPES.resolve(simbad,{"SN*":"SN*","PN":"PN","No*":"No*"})   # hierarchy (2.22.0)
+    simbad=_hit or simbad
     if simbad=="SN*":return {"axis":AXIS,"label":"SN","confidence":None,"status":"SIMBAD_CURATED_SN","evidence":[{"kind":"simbad_physical_type","otype":"SN*"}]}
     if simbad=="PN":return {"axis":AXIS,"label":"PN","confidence":None,"status":"SIMBAD_CURATED_PN","evidence":[{"kind":"simbad_physical_type","otype":"PN"}]}
     if simbad=="No*":return {"axis":AXIS,"label":"NOVA","confidence":None,"status":"SIMBAD_CURATED_NOVA","evidence":[{"kind":"simbad_physical_type","otype":"No*"}]}

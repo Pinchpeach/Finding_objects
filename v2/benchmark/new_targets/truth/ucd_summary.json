@@ -1,0 +1,158 @@
+{
+ "best_rows": 9888,
+ "matched_espucd": 641,
+ "selected": 532,
+ "selected_type_ge_M7": 0.9267,
+ "by_numeric_type": {
+  "0.0": {
+   "n": 991,
+   "matched": 0.0,
+   "selected": 0.0
+  },
+  "1.0": {
+   "n": 707,
+   "matched": 0.0,
+   "selected": 0.0
+  },
+  "2.0": {
+   "n": 1657,
+   "matched": 0.0,
+   "selected": 0.0
+  },
+  "3.0": {
+   "n": 2107,
+   "matched": 0.0,
+   "selected": 0.0
+  },
+  "4.0": {
+   "n": 1220,
+   "matched": 0.0,
+   "selected": 0.0
+  },
+  "5.0": {
+   "n": 683,
+   "matched": 0.0,
+   "selected": 0.0
+  },
+  "6.0": {
+   "n": 432,
+   "matched": 0.09,
+   "selected": 0.09
+  },
+  "7.0": {
+   "n": 196,
+   "matched": 0.577,
+   "selected": 0.577
+  },
+  "8.0": {
+   "n": 159,
+   "matched": 0.547,
+   "selected": 0.541
+  },
+  "9.0": {
+   "n": 119,
+   "matched": 0.462,
+   "selected": 0.445
+  },
+  "10.0": {
+   "n": 390,
+   "matched": 0.459,
+   "selected": 0.318
+  },
+  "11.0": {
+   "n": 258,
+   "matched": 0.322,
+   "selected": 0.233
+  },
+  "12.0": {
+   "n": 128,
+   "matched": 0.32,
+   "selected": 0.203
+  },
+  "13.0": {
+   "n": 117,
+   "matched": 0.188,
+   "selected": 0.137
+  },
+  "14.0": {
+   "n": 102,
+   "matched": 0.108,
+   "selected": 0.078
+  },
+  "15.0": {
+   "n": 98,
+   "matched": 0.082,
+   "selected": 0.051
+  },
+  "16.0": {
+   "n": 54,
+   "matched": 0.037,
+   "selected": 0.037
+  },
+  "17.0": {
+   "n": 45,
+   "matched": 0.0,
+   "selected": 0.0
+  },
+  "18.0": {
+   "n": 32,
+   "matched": 0.031,
+   "selected": 0.0
+  },
+  "19.0": {
+   "n": 40,
+   "matched": 0.0,
+   "selected": 0.0
+  },
+  "20.0": {
+   "n": 27,
+   "matched": 0.0,
+   "selected": 0.0
+  },
+  "21.0": {
+   "n": 29,
+   "matched": 0.0,
+   "selected": 0.0
+  },
+  "22.0": {
+   "n": 51,
+   "matched": 0.0,
+   "selected": 0.0
+  },
+  "23.0": {
+   "n": 34,
+   "matched": 0.0,
+   "selected": 0.0
+  },
+  "24.0": {
+   "n": 38,
+   "matched": 0.0,
+   "selected": 0.0
+  },
+  "25.0": {
+   "n": 56,
+   "matched": 0.0,
+   "selected": 0.0
+  },
+  "26.0": {
+   "n": 63,
+   "matched": 0.0,
+   "selected": 0.0
+  },
+  "27.0": {
+   "n": 35,
+   "matched": 0.0,
+   "selected": 0.0
+  },
+  "28.0": {
+   "n": 16,
+   "matched": 0.0,
+   "selected": 0.0
+  },
+  "29.0": {
+   "n": 3,
+   "matched": 0.0,
+   "selected": 0.0
+  }
+ }
+}
