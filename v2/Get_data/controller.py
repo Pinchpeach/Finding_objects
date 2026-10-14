@@ -1,4 +1,5 @@
 """Run every v2 catalog collector independently for one sky position."""
+
 from __future__ import annotations
 
 import argparse
@@ -22,10 +23,33 @@ if str(GET_DATA) not in sys.path:
 import archive_cache  # noqa: E402  (local cache / mirror of collector results, 2.9.1)
 
 COLLECTORS = [
-    "gaia_dr3", "gaia_dr3_variability_sos_vizier", "sdss_dr18", "panstarrs1", "desi_legacy", "galex",
-    "twomass", "allwise", "lotss", "first", "nvss", "tgss", "vlass", "xmm",
-    "chandra", "erosita", "sdss_spectroscopy", "desi_spectroscopy", "desi_fastspec",
-    "lamost_spectroscopy", "ztf_periodic", "atnf_pulsar", "bzcat", "agb_suh2021", "sga2020", "simbad", "ned",
+    "gaia_dr3",
+    "gaia_dr3_variability_sos_vizier",
+    "sdss_dr18",
+    "panstarrs1",
+    "desi_legacy",
+    "galex",
+    "twomass",
+    "allwise",
+    "lotss",
+    "first",
+    "nvss",
+    "tgss",
+    "vlass",
+    "xmm",
+    "chandra",
+    "erosita",
+    "sdss_spectroscopy",
+    "desi_spectroscopy",
+    "desi_fastspec",
+    "lamost_spectroscopy",
+    "ztf_periodic",
+    "atnf_pulsar",
+    "bzcat",
+    "agb_suh2021",
+    "sga2020",
+    "simbad",
+    "ned",
 ]
 
 
@@ -62,6 +86,7 @@ def _exec_collector(name: str, path: Path):
 def _tag(ra: float, dec: float, radius_arcmin: float) -> str:
     def clean(value: float) -> str:
         return f"{value:.6f}".rstrip("0").rstrip(".").replace("-", "m").replace(".", "p")
+
     return f"ra{clean(ra)}_dec{clean(dec)}_r{clean(radius_arcmin)}arcmin"
 
 
@@ -70,16 +95,18 @@ def _tag(ra: float, dec: float, radius_arcmin: float) -> str:
 COLLECTOR_BUDGET_S = 300.0
 
 
-def _collect_one(name: str, ra: float, dec: float, radius_arcmin: float, out_dir: Path, tag: str,
-                 cancelled=None) -> dict:
+def _collect_one(
+    name: str, ra: float, dec: float, radius_arcmin: float, out_dir: Path, tag: str, cancelled=None
+) -> dict:
     started = time.monotonic()
     output = out_dir / f"{name}_{tag}.csv"
     cache = "off"
     try:
         module = _load_collector(name)
         source = GET_DATA / f"{name}.py"
-        df = archive_cache.get(name, source, ra, dec, radius_arcmin,
-                               float(getattr(module, "CACHE_FILTER_MARGIN_ARCMIN", 0.0)))
+        df = archive_cache.get(
+            name, source, ra, dec, radius_arcmin, float(getattr(module, "CACHE_FILTER_MARGIN_ARCMIN", 0.0))
+        )
         if df is not None:
             cache = "hit"
         else:
@@ -135,9 +162,19 @@ def _collect_one(name: str, ra: float, dec: float, radius_arcmin: float, out_dir
 # Imported once in the main thread before parallel collection: concurrent
 # first imports of astropy/astroquery fail ("partially initialized module").
 _SHARED_IMPORTS = (
-    "astropy", "astropy.units", "astropy.coordinates", "astropy.table", "requests", "pyvo",
-    "astroquery.vizier", "astroquery.gaia", "astroquery.sdss", "astroquery.simbad",
-    "astroquery.ipac.ned", "astroquery.heasarc", "astroquery.xmatch",
+    "astropy",
+    "astropy.units",
+    "astropy.coordinates",
+    "astropy.table",
+    "requests",
+    "pyvo",
+    "astroquery.vizier",
+    "astroquery.gaia",
+    "astroquery.sdss",
+    "astroquery.simbad",
+    "astroquery.ipac.ned",
+    "astroquery.heasarc",
+    "astroquery.xmatch",
 )
 
 
@@ -159,6 +196,7 @@ def _disable_astroquery_cache() -> None:
     is never pruned and duplicates archive_cache; turn it off (2.19.0)."""
     try:
         from astroquery import cache_conf
+
         cache_conf.cache_active = False
     except Exception:
         pass
@@ -169,15 +207,16 @@ def _run_bounded(job, names, workers: int, budget_s: float) -> list[dict]:
     daemon threads; a job over ``budget_s`` is reported as a timeout and its
     slot reused (the thread cannot be killed, but its late result is dropped)."""
     import threading
+
     results: dict[str, dict] = {}
-    lock = threading.Lock()   # the job's result and the timeout record never both win
+    lock = threading.Lock()  # the job's result and the timeout record never both win
     pending = list(names)
     running: dict[str, tuple[threading.Thread, float, threading.Event]] = {}
 
     def target(name, event):
         out = job(name, event)
         with lock:
-            if not event.is_set():      # a late result never replaces the timeout record
+            if not event.is_set():  # a late result never replaces the timeout record
                 results[name] = out
 
     while pending or running:
@@ -197,9 +236,14 @@ def _run_bounded(job, names, workers: int, budget_s: float) -> list[dict]:
                 del running[name]
             elif event.is_set():
                 del running[name]
-                results[name] = {"collector": name, "status": "timeout", "rows": 0,
-                                 "elapsed_seconds": round(now - t0, 3), "output_file": "",
-                                 "error": f"exceeded {budget_s:.0f} s collector budget"}
+                results[name] = {
+                    "collector": name,
+                    "status": "timeout",
+                    "rows": 0,
+                    "elapsed_seconds": round(now - t0, 3),
+                    "output_file": "",
+                    "error": f"exceeded {budget_s:.0f} s collector budget",
+                }
                 print(f"[{name}] timeout: abandoned after {budget_s:.0f} s", flush=True)
         if running:
             time.sleep(0.2)
@@ -230,14 +274,18 @@ def collect_all(
         print(f"[cache] pruned {pruned}", flush=True)
     if workers > 1:
         _preload()
-    results = _run_bounded(lambda n, c: _collect_one(n, ra, dec, radius_arcmin, out_dir, tag, c),
-                           COLLECTORS, workers, budget_s)
+    results = _run_bounded(
+        lambda n, c: _collect_one(n, ra, dec, radius_arcmin, out_dir, tag, c), COLLECTORS, workers, budget_s
+    )
 
     summary = pd.DataFrame(results)
     summary_path = out_dir / f"collection_summary_{tag}.csv"
     summary.to_csv(summary_path, index=False)
-    print(f"Completed: {len(summary)}/{len(COLLECTORS)} collectors attempted in "
-          f"{time.monotonic() - started:.1f} s (workers={workers})", flush=True)
+    print(
+        f"Completed: {len(summary)}/{len(COLLECTORS)} collectors attempted in "
+        f"{time.monotonic() - started:.1f} s (workers={workers})",
+        flush=True,
+    )
     print(f"Summary: {summary_path}", flush=True)
     return summary
 

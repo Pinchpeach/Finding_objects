@@ -1,9 +1,11 @@
 """NED cone-search collector. Extragalactic reference metadata."""
+
 from pathlib import Path
 import time
 import pandas as pd
 
 CATALOG = "NED"
+
 
 def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     from astroquery.ipac.ned import Ned
@@ -17,7 +19,7 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
         try:
             t = Ned.query_region(center, radius=radius_arcmin * u.arcmin)
             if t is None:
-                return pd.DataFrame(columns=["catalog","catalog_object_id","object_name","ra","dec"])
+                return pd.DataFrame(columns=["catalog", "catalog_object_id", "object_name", "ra", "dec"])
             df = t.to_pandas()
             n = "Object Name"
             df.insert(0, "catalog", CATALOG)
@@ -30,8 +32,9 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
             last_error = exc
             if attempt == attempts - 1:
                 raise
-            time.sleep(2 ** attempt)
+            time.sleep(2**attempt)
     raise last_error
+
 
 def save(df, path):
     Path(path).parent.mkdir(parents=True, exist_ok=True)

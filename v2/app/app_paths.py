@@ -1,5 +1,6 @@
 """Locate the v2 package both from a source checkout and from a PyInstaller
 bundle (where data files live under ``sys._MEIPASS``)."""
+
 from __future__ import annotations
 import sys
 from pathlib import Path

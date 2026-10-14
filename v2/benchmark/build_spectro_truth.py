@@ -16,6 +16,7 @@ All catalogue columns are kept (the column names are checked here, not
 assumed).  Runs in GitHub Actions (.github/workflows/build-spectro-truth.yml);
 output: v2/benchmark/spectro_truth/*.csv.gz
 """
+
 from __future__ import annotations
 import argparse
 import sys
@@ -38,9 +39,10 @@ PORT_SQL = "SELECT * FROM emissionLinesPort WHERE specobjid IN ({ids})"
 
 def sdss_sql(template: str, ids: list[str], name: str, chunk: int = 80) -> pd.DataFrame:
     from astroquery.sdss import SDSS
+
     parts = []
     for s0 in range(0, len(ids), chunk):
-        q = template.format(ids=",".join(ids[s0:s0 + chunk]))
+        q = template.format(ids=",".join(ids[s0 : s0 + chunk]))
         t0 = time.time()
         try:
             t = retry(lambda: SDSS.query_sql(q, data_release=18, timeout=600), tries=3, wait=20)
@@ -63,10 +65,11 @@ def asu_all(df: pd.DataFrame, table: str, radius: float, chunk: int = 500) -> pd
     from astroquery.vizier import Vizier
     from astropy.coordinates import SkyCoord
     import astropy.units as u
+
     v = Vizier(columns=["**", "+_r"], row_limit=-1, timeout=600)
     parts = []
     for s0 in range(0, len(df), chunk):
-        sub = df.iloc[s0:s0 + chunk]
+        sub = df.iloc[s0 : s0 + chunk]
         coords = SkyCoord(sub.ra.to_numpy() * u.deg, sub.dec.to_numpy() * u.deg)
         t0 = time.time()
         try:
@@ -103,18 +106,35 @@ def main() -> None:
         port = sdss_sql(PORT_SQL, ids, "emissionLinesPort")
         out = gal[["benchmark_id", "specobjid", "subclass", "z"]]
         if not mpa.empty:
-            out = out.merge(mpa.drop_duplicates("specobjid").add_prefix("mpa_").rename(columns={"mpa_specobjid": "specobjid"}),
-                            on="specobjid", how="left")
+            out = out.merge(
+                mpa.drop_duplicates("specobjid").add_prefix("mpa_").rename(columns={"mpa_specobjid": "specobjid"}),
+                on="specobjid",
+                how="left",
+            )
         if not port.empty:
             keep = ["specobjid"] + [c for c in port.columns if c.startswith(("flux_", "ew_", "sigma_", "bpt"))]
-            out = out.merge(port[keep].drop_duplicates("specobjid").add_prefix("port_").rename(columns={"port_specobjid": "specobjid"}),
-                            on="specobjid", how="left")
+            out = out.merge(
+                port[keep]
+                .drop_duplicates("specobjid")
+                .add_prefix("port_")
+                .rename(columns={"port_specobjid": "specobjid"}),
+                on="specobjid",
+                how="left",
+            )
             print("Portsmouth columns:", " ".join(port.columns), flush=True)
         out.to_csv(a.out / "sdss_galaxy_lines.csv.gz", index=False, compression="gzip")
         print("galaxies ->", out.shape, flush=True)
-    pos = pd.read_csv(BENCH / "catalog_features" / "gaia_dr3_trd.csv.gz", usecols=["benchmark_id", "truth_class", "ra", "dec", "source_id"],
-                      low_memory=False)
-    stars = pos[pos.truth_class.eq("STAR")].dropna(subset=["ra", "dec"]).drop_duplicates("benchmark_id").reset_index(drop=True)
+    pos = pd.read_csv(
+        BENCH / "catalog_features" / "gaia_dr3_trd.csv.gz",
+        usecols=["benchmark_id", "truth_class", "ra", "dec", "source_id"],
+        low_memory=False,
+    )
+    stars = (
+        pos[pos.truth_class.eq("STAR")]
+        .dropna(subset=["ra", "dec"])
+        .drop_duplicates("benchmark_id")
+        .reset_index(drop=True)
+    )
     print(f"{len(stars)} benchmark stars with Gaia positions", flush=True)
     if "gaia" in parts:
         ap = asu_all(stars, "I/355/paramp", 1.0)

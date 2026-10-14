@@ -16,13 +16,16 @@ Examples::
 Every stage writes its CSV into ``--work`` so intermediate products stay
 inspectable; per-stage wall time is written to ``pipeline_summary.csv``.
 """
+
 from __future__ import annotations
 import argparse, importlib.util, sys, time
 from pathlib import Path
 import pandas as pd
 import importlib.util as _tio_u
-_tio_s=_tio_u.spec_from_file_location("v2_table_io",Path(__file__).resolve().parent/"Preprocess"/"table_io.py")
-TABLE_IO=_tio_u.module_from_spec(_tio_s);_tio_s.loader.exec_module(TABLE_IO)
+
+_tio_s = _tio_u.spec_from_file_location("v2_table_io", Path(__file__).resolve().parent / "Preprocess" / "table_io.py")
+TABLE_IO = _tio_u.module_from_spec(_tio_s)
+_tio_s.loader.exec_module(TABLE_IO)
 
 V2 = Path(__file__).resolve().parent
 PRE = V2 / "Preprocess"
@@ -48,22 +51,44 @@ KEEP_RAW_FOLDERS = 10
 
 def _prune_raw(base: Path, keep: Path, n: int = KEEP_RAW_FOLDERS) -> None:
     import shutil
+
     try:
-        folders = sorted((d for d in base.iterdir() if d.is_dir() and d.name.startswith("ra") and d != keep),
-                         key=lambda d: d.stat().st_mtime, reverse=True)
-        for d in folders[max(0, n - 1):]:
+        folders = sorted(
+            (d for d in base.iterdir() if d.is_dir() and d.name.startswith("ra") and d != keep),
+            key=lambda d: d.stat().st_mtime,
+            reverse=True,
+        )
+        for d in folders[max(0, n - 1) :]:
             shutil.rmtree(d, ignore_errors=True)
     except OSError:
         pass
 
 
-EMPTY_RESULT_COLUMNS = ["object_id", "designation", "ra", "dec", "catalogs", "primary_class", "primary_confidence",
-                        "classification_status", "subclass", "subclass_tags", "subclass_status"]
+EMPTY_RESULT_COLUMNS = [
+    "object_id",
+    "designation",
+    "ra",
+    "dec",
+    "catalogs",
+    "primary_class",
+    "primary_confidence",
+    "classification_status",
+    "subclass",
+    "subclass_tags",
+    "subclass_status",
+]
 
 
-def run(work: Path, raw_dir: Path | None = None, ra: float | None = None, dec: float | None = None,
-        radius: float | None = None, min_confidence: float | None = None, workers: int = 6,
-        field_prior: bool = False) -> pd.DataFrame:
+def run(
+    work: Path,
+    raw_dir: Path | None = None,
+    ra: float | None = None,
+    dec: float | None = None,
+    radius: float | None = None,
+    min_confidence: float | None = None,
+    workers: int = 6,
+    field_prior: bool = False,
+) -> pd.DataFrame:
     work = Path(work)
     work.mkdir(parents=True, exist_ok=True)
     timings = []
@@ -106,7 +131,15 @@ def run(work: Path, raw_dir: Path | None = None, ra: float | None = None, dec: f
     step("2_integrate", s2.run, work / "source_association.csv", Path(raw_dir), work / "integrated_objects.csv")
     step("3_features", s3.run, work / "integrated_objects.csv", rules, work / "features.csv")
     step("4_evidence", s4.run, work / "features.csv", rules, work / "evidence.csv")
-    step("5_coarse", s5.run, work / "evidence.csv", work / "likelihood_vectors.csv", s5.MODEL_PATH, min_confidence, field_prior)
+    step(
+        "5_coarse",
+        s5.run,
+        work / "evidence.csv",
+        work / "likelihood_vectors.csv",
+        s5.MODEL_PATH,
+        min_confidence,
+        field_prior,
+    )
     step("6_prepare", prep.run, work / "likelihood_vectors.csv", work / "classifier_input.csv")
     step("7_classify", control.run, work / "classifier_input.csv", work / "classified_objects.csv")
 
@@ -118,15 +151,18 @@ def run(work: Path, raw_dir: Path | None = None, ra: float | None = None, dec: f
     assoc = pd.read_csv(work / "source_association.csv", low_memory=False, dtype={"catalog_object_id": "string"})
     out = names.annotate(TABLE_IO.read_table(work / "classified_objects.csv"), assoc)
     out = hosts.consolidate(out, names.PRIORITY)
-    if out.n_components.gt(0).any():        # hosts may have inherited a nucleus spectrum
+    if out.n_components.gt(0).any():  # hosts may have inherited a nucleus spectrum
         out = _load(CLS / "subclass.py", "v2_subclass").annotate(out)
     out = names.annotate(out, assoc, None if None in (ra, dec) else (ra, dec), None if collect else radius)
     out.to_csv(work / "classified_objects.csv", index=False)
 
     summary = pd.DataFrame(timings)
     summary.to_csv(work / "pipeline_summary.csv", index=False)
-    print(f"[pipeline] {len(out)} objects; primary classes {out.primary_class.value_counts().to_dict()}; "
-          f"total {summary.seconds.sum():.1f} s -> {work / 'classified_objects.csv'}", flush=True)
+    print(
+        f"[pipeline] {len(out)} objects; primary classes {out.primary_class.value_counts().to_dict()}; "
+        f"total {summary.seconds.sum():.1f} s -> {work / 'classified_objects.csv'}",
+        flush=True,
+    )
     return out
 
 
@@ -136,13 +172,21 @@ def main():
     p.add_argument("--raw-dir", type=Path, help="use already-collected raw catalog CSVs instead of querying")
     p.add_argument("--ra", type=float, help="ICRS RA in degrees")
     p.add_argument("--dec", type=float, help="ICRS Dec in degrees")
-    p.add_argument("--radius", type=float, help="cone radius in arcminutes (with --raw-dir: keep only objects inside it)")
-    p.add_argument("--min-confidence", type=float,
-                   help="coarse abstention threshold; higher = fewer but more reliable labels "
-                        "(e.g. 0.8: ~94%% accuracy at ~73%% coverage on faint DESI objects)")
+    p.add_argument(
+        "--radius", type=float, help="cone radius in arcminutes (with --raw-dir: keep only objects inside it)"
+    )
+    p.add_argument(
+        "--min-confidence",
+        type=float,
+        help="coarse abstention threshold; higher = fewer but more reliable labels "
+        "(e.g. 0.8: ~94%% accuracy at ~73%% coverage on faint DESI objects)",
+    )
     p.add_argument("--workers", type=int, default=6, help="parallel archive queries during collection")
-    p.add_argument("--field-prior", action="store_true",
-                   help="re-weight coarse classes by this field's EM-estimated class mix (off by default)")
+    p.add_argument(
+        "--field-prior",
+        action="store_true",
+        help="re-weight coarse classes by this field's EM-estimated class mix (off by default)",
+    )
     a = p.parse_args()
     if a.raw_dir is None and None in (a.ra, a.dec, a.radius):
         p.error("give --raw-dir, or all of --ra/--dec/--radius")
@@ -163,7 +207,9 @@ def exit_now(code: int = 0) -> None:
     thread left alive, i.e. in a C extension's cleanup.  Callers use this
     only after success; errors still raise and exit normally."""
     import os
-    sys.stdout.flush(); sys.stderr.flush()
+
+    sys.stdout.flush()
+    sys.stderr.flush()
     os._exit(code)
 
 

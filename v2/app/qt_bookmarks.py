@@ -5,15 +5,30 @@ object with its classes, position and a note.  From here an object can be
 opened in the results it came from, used as the centre of a new search,
 copied, removed or exported.  Storage is bookmarks.BookmarkStore.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
 
 from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtGui import QGuiApplication
-from PySide6.QtWidgets import (QAbstractItemView, QFileDialog, QFormLayout, QHBoxLayout, QHeaderView, QLabel,
-                               QLineEdit, QMessageBox, QPlainTextEdit, QPushButton, QSplitter, QTableWidget,
-                               QTableWidgetItem, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (
+    QAbstractItemView,
+    QFileDialog,
+    QFormLayout,
+    QHBoxLayout,
+    QHeaderView,
+    QLabel,
+    QLineEdit,
+    QMessageBox,
+    QPlainTextEdit,
+    QPushButton,
+    QSplitter,
+    QTableWidget,
+    QTableWidgetItem,
+    QVBoxLayout,
+    QWidget,
+)
 
 from bookmarks import BookmarkStore
 from qt_models import class_color
@@ -36,8 +51,8 @@ class _NumberItem(QTableWidgetItem):
 
 
 class BookmarksPage(QWidget):
-    openRequested = Signal(dict)            # show the bookmark in its results
-    searchRequested = Signal(float, float, str)   # use as the centre of a new search
+    openRequested = Signal(dict)  # show the bookmark in its results
+    searchRequested = Signal(float, float, str)  # use as the centre of a new search
 
     def __init__(self, store: BookmarkStore, parent=None):
         super().__init__(parent)
@@ -131,8 +146,15 @@ class BookmarksPage(QWidget):
         self.table.setRowCount(len(self.store.items))
         for r, b in enumerate(self.store.items):
             cls = b.get("primary_class") or ""
-            values = (b.get("name") or b.get("object_id") or "?", cls, b.get("subclass") or "",
-                      b.get("ra"), b.get("dec"), (b.get("note") or "").replace("\n", " "), b.get("added") or "")
+            values = (
+                b.get("name") or b.get("object_id") or "?",
+                cls,
+                b.get("subclass") or "",
+                b.get("ra"),
+                b.get("dec"),
+                (b.get("note") or "").replace("\n", " "),
+                b.get("added") or "",
+            )
             for c, v in enumerate(values):
                 item = _NumberItem(v) if c in (3, 4) else QTableWidgetItem(str(v))
                 item.setData(ID_ROLE, b["id"])
@@ -192,8 +214,11 @@ class BookmarksPage(QWidget):
         self.title.setText(f"{b.get('name') or b.get('object_id') or '?'} — {cls}")
         self.title.setStyleSheet(f"font-weight: 600; font-size: 14px; color: {class_color(cls).name()};")
         self.lbl_pos.setText(self._coords(b) or "–")
-        axes = [f"{k}: {b[k]}" for k in ("physical", "variability", "compact", "extragalactic", "phenomenon")
-                if b.get(k) and b[k] != "UNKNOWN"]
+        axes = [
+            f"{k}: {b[k]}"
+            for k in ("physical", "variability", "compact", "extragalactic", "phenomenon")
+            if b.get(k) and b[k] != "UNKNOWN"
+        ]
         sub = b.get("subclass")
         self.lbl_axes.setText("\n".join(([sub] if sub else []) + axes) or "–")
         src = b.get("source")
@@ -249,6 +274,8 @@ class BookmarksPage(QWidget):
         if not self.store.items:
             QMessageBox.information(self, "Bookmarks", "No bookmarks yet.")
             return
-        path, _ = QFileDialog.getSaveFileName(self, "Export bookmarks", str(Path.home() / "bookmarks.csv"), "CSV (*.csv)")
+        path, _ = QFileDialog.getSaveFileName(
+            self, "Export bookmarks", str(Path.home() / "bookmarks.csv"), "CSV (*.csv)"
+        )
         if path:
             self.store.to_frame().to_csv(path, index=False)

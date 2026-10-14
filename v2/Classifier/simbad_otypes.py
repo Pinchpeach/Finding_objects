@@ -9,6 +9,7 @@ and returns the first mapped one, so every child type inherits its parent's
 class.  Candidate codes (``is_candidate``, e.g. ``Ce?``) are not resolved
 unless asked: a candidate type is not a curated classification.
 """
+
 from __future__ import annotations
 import csv
 from functools import lru_cache

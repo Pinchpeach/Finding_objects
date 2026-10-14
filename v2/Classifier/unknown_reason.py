@@ -16,12 +16,13 @@ The coarse classifier abstains for four reasons (Preprocess/05 status):
 * LOW_CONFIDENCE - the fused probabilities of two classes overlap.
 * CONFLICT - strong evidence points at different classes.
 """
+
 from __future__ import annotations
 import json
 import math
 
-LS_MORPH_SNR = 10.0       # LS-MORPH-001/002 threshold
-SDSS_R_LIMIT = 22.2       # SDSS 95% point-source completeness (r)
+LS_MORPH_SNR = 10.0  # LS-MORPH-001/002 threshold
+SDSS_R_LIMIT = 22.2  # SDSS 95% point-source completeness (r)
 
 
 def _num(row, key):
@@ -46,12 +47,16 @@ def _single(row, cat):
         valid = any(_num(row, f"std_mag__ps1_{b}") is not None for b in "grizy")
         n = _num(row, "pan_starrs1_dr2_meanobject__nDetections")
         if not valid:
-            return "Pan-STARRS1 detection without valid mean photometry" + (f" ({int(n)} detections)" if n is not None else "")
+            return "Pan-STARRS1 detection without valid mean photometry" + (
+                f" ({int(n)} detections)" if n is not None else ""
+            )
         bands = [b for b in "grizy" if _num(row, f"std_mag__ps1_{b}") is not None]
         i = _num(row, "std_mag__ps1_i")
         if len(bands) < 3:
-            return (f"Pan-STARRS1 only, measured in {len(bands)} band{'s' if len(bands) != 1 else ''} ({''.join(bands)})"
-                    + (f", {int(n)} detections" if n is not None else ""))
+            return (
+                f"Pan-STARRS1 only, measured in {len(bands)} band{'s' if len(bands) != 1 else ''} ({''.join(bands)})"
+                + (f", {int(n)} detections" if n is not None else "")
+            )
         if i is None or not 14 <= i <= 21:
             return "Pan-STARRS1 only, i outside 14-21 (morphology not used); colours inconclusive"
         return "Pan-STARRS1 only; morphology and colours inconclusive"
@@ -81,14 +86,22 @@ def reason(row) -> str | None:
             ev = json.loads(row.get("evidence_json") or "[]")
         except (TypeError, ValueError):
             ev = []
+
         # Same set as Stage 5's conflict test: WD / BINARY count as STAR, and
         # colour-kNN / GBM fractions are soft evidence, not claims (2.22.0).
         def _cls(e):
             c = e.get("class")
             return "STAR" if c in ("WD", "BINARY") else c
-        strong = sorted({f"{_cls(e)} ({e.get('rule_id')})" for e in ev
-                         if float(e.get("score") or 0) >= 0.8 and _cls(e) in ("STAR", "GALAXY", "QSO")
-                         and not str(e.get("rule_id", "")).endswith(("-CKNN-001", "-GBM-001"))})
+
+        strong = sorted(
+            {
+                f"{_cls(e)} ({e.get('rule_id')})"
+                for e in ev
+                if float(e.get("score") or 0) >= 0.8
+                and _cls(e) in ("STAR", "GALAXY", "QSO")
+                and not str(e.get("rule_id", "")).endswith(("-CKNN-001", "-GBM-001"))
+            }
+        )
         return "conflicting evidence: " + ", ".join(strong) if strong else "conflicting evidence"
     if status == "LOW_CONFIDENCE":
         p = {c: _num(row, f"p_{c.lower()}") for c in ("STAR", "GALAXY", "QSO")}

@@ -11,6 +11,7 @@ DESI FastSpecFit emission-line route against the established SDSS one.
 
 Output: v2/benchmark/desi_lines_truth/overlap.csv.gz
 """
+
 from __future__ import annotations
 import argparse
 import sys
@@ -36,7 +37,12 @@ def xmatch_key(s) -> tuple[str, str, str]:
     sample = s.search(f"SELECT TOP 3 id1, id2 FROM {XM}").to_table()
     print(sample, flush=True)
     v = sample["id1"][0]
-    zc = [str(x) for x in s.search("SELECT column_name FROM tap_schema.columns WHERE table_name = 'desi_dr1.zpix'").to_table()["column_name"]]
+    zc = [
+        str(x)
+        for x in s.search("SELECT column_name FROM tap_schema.columns WHERE table_name = 'desi_dr1.zpix'").to_table()[
+            "column_name"
+        ]
+    ]
     cand = [n for n in zc if "id" in n.lower() and n.lower() != "targetid"] + ["targetid"]
     print("zpix id-like columns:", cand, flush=True)
     lit = f"'{v}'" if isinstance(v, str) else str(int(v))
@@ -54,6 +60,7 @@ def xmatch_key(s) -> tuple[str, str, str]:
 
 def main() -> None:
     import pyvo
+
     p = argparse.ArgumentParser()
     p.add_argument("--random-max", type=float, default=3.0, help="random_id cut (0-100) on agngal")
     p.add_argument("--limit", type=int, default=4000)
@@ -61,13 +68,24 @@ def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     s = pyvo.dal.TAPService(df_.TAP_URL)
     tid, sid, zkey = xmatch_key(s)
-    cols = ["targetid", "target_ra", "target_dec", "z", "spectype", "zcat_primary",
-            *[f"{v}_{x}" for v in df_.LINES.values() for x in ("flux", "flux_ivar")],
-            "halpha_ew", "halpha_ew_ivar", *df_.EXTRA]
-    q = (f"SELECT TOP {a.limit} " + ", ".join("a." + c for c in cols) + f", x.{sid} AS specobjid "
-         f"FROM desi_dr1.agngal AS a JOIN desi_dr1.zpix AS zp ON zp.targetid = a.targetid "
-         f"JOIN {XM} AS x ON x.{tid} = zp.{zkey} "
-         f"WHERE a.spectype = 'GALAXY' AND a.z < 0.3 AND a.random_id < {a.random_max}")
+    cols = [
+        "targetid",
+        "target_ra",
+        "target_dec",
+        "z",
+        "spectype",
+        "zcat_primary",
+        *[f"{v}_{x}" for v in df_.LINES.values() for x in ("flux", "flux_ivar")],
+        "halpha_ew",
+        "halpha_ew_ivar",
+        *df_.EXTRA,
+    ]
+    q = (
+        f"SELECT TOP {a.limit} " + ", ".join("a." + c for c in cols) + f", x.{sid} AS specobjid "
+        f"FROM desi_dr1.agngal AS a JOIN desi_dr1.zpix AS zp ON zp.targetid = a.targetid "
+        f"JOIN {XM} AS x ON x.{tid} = zp.{zkey} "
+        f"WHERE a.spectype = 'GALAXY' AND a.z < 0.3 AND a.random_id < {a.random_max}"
+    )
     print(q, flush=True)
     d = s.search(q).to_table().to_pandas()
     print("DESI x SDSS galaxies:", len(d), flush=True)

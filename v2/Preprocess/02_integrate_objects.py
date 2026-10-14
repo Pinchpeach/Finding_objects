@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
 """Stage 2: build one-row-per-object records from Stage-1 associations."""
+
 from __future__ import annotations
 import argparse, math, re
 from pathlib import Path
 import numpy as np
 import pandas as pd
 import importlib.util as _tio_u
-_tio_s=_tio_u.spec_from_file_location("v2_table_io",Path(__file__).resolve().parents[1]/"Preprocess"/"table_io.py")
-TABLE_IO=_tio_u.module_from_spec(_tio_s);_tio_s.loader.exec_module(TABLE_IO)
+
+_tio_s = _tio_u.spec_from_file_location(
+    "v2_table_io", Path(__file__).resolve().parents[1] / "Preprocess" / "table_io.py"
+)
+TABLE_IO = _tio_u.module_from_spec(_tio_s)
+_tio_s.loader.exec_module(TABLE_IO)
 
 
 def prefix(catalog):
@@ -44,15 +49,28 @@ def _num(v):
 
 def _units():
     import importlib.util
+
     spec = importlib.util.spec_from_file_location("v2_preprocess_units", Path(__file__).resolve().parent / "units.py")
-    m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m); return m
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    return m
 
 
 def flag_large_galaxy_hosts(rows):
     """Mark objects inside an SGA-2020 D26 ellipse that are not that galaxy."""
-    hosts = [(r["object_id"], r["ra"], r["dec"], _num(r.get("sga_d26_arcmin")), _num(r.get("sga_pa_deg")),
-              _num(r.get("sga_ba")), r.get("sga_2020__catalog_object_id"))
-             for r in rows if "SGA-2020" in str(r.get("catalogs", "")).split("|")]
+    hosts = [
+        (
+            r["object_id"],
+            r["ra"],
+            r["dec"],
+            _num(r.get("sga_d26_arcmin")),
+            _num(r.get("sga_pa_deg")),
+            _num(r.get("sga_ba")),
+            r.get("sga_2020__catalog_object_id"),
+        )
+        for r in rows
+        if "SGA-2020" in str(r.get("catalogs", "")).split("|")
+    ]
     for r in rows:
         best = (None, None)
         for oid, ra0, dec0, d26, pa, ba, name in hosts:
@@ -92,11 +110,29 @@ def run(associations, raw_dir, out):
         finite = [c for c in conf if c == c]
         rec = {
             "object_id": oid,
-            "ra": _first_valid_value(a.get("object_ra") for a in g) if "object_ra" in assoc else sum(a["ra"] for a in g) / len(g),
-            "dec": _first_valid_value(a.get("object_dec") for a in g) if "object_dec" in assoc else sum(a["dec"] for a in g) / len(g),
-            "ref_epoch": _first_valid_value(a.get("object_ref_epoch") for a in g) if "object_ref_epoch" in assoc else pd.NA,
-            "anchor_catalog": _first_valid_value(a.get("object_anchor_catalog") for a in g) if "object_anchor_catalog" in assoc else pd.NA,
-            "entity_kind": _first_valid_value(a.get("object_entity_kind") for a in g) if "object_entity_kind" in assoc else "persistent_source",
+            "ra": (
+                _first_valid_value(a.get("object_ra") for a in g)
+                if "object_ra" in assoc
+                else sum(a["ra"] for a in g) / len(g)
+            ),
+            "dec": (
+                _first_valid_value(a.get("object_dec") for a in g)
+                if "object_dec" in assoc
+                else sum(a["dec"] for a in g) / len(g)
+            ),
+            "ref_epoch": (
+                _first_valid_value(a.get("object_ref_epoch") for a in g) if "object_ref_epoch" in assoc else pd.NA
+            ),
+            "anchor_catalog": (
+                _first_valid_value(a.get("object_anchor_catalog") for a in g)
+                if "object_anchor_catalog" in assoc
+                else pd.NA
+            ),
+            "entity_kind": (
+                _first_valid_value(a.get("object_entity_kind") for a in g)
+                if "object_entity_kind" in assoc
+                else "persistent_source"
+            ),
             "association_members": len(g),
             "association_ambiguous": int(any(a["association_status"] == "ambiguous_new" for a in g)),
             "association_confidence_min": min(finite) if finite else float("nan"),
@@ -112,7 +148,9 @@ def run(associations, raw_dir, out):
             fn = a["input_file"]
             if fn not in raw_cache:
                 try:
-                    raw_cache[fn] = TABLE_IO.read_table(raw_dir / fn, dtype={"catalog_object_id": "string"}).to_dict("records")
+                    raw_cache[fn] = TABLE_IO.read_table(raw_dir / fn, dtype={"catalog_object_id": "string"}).to_dict(
+                        "records"
+                    )
                 except Exception:
                     continue
             src = raw_cache[fn]
@@ -138,10 +176,26 @@ def run(associations, raw_dir, out):
                 if col not in object_keys and (col not in rec or pd.isna(rec[col])):
                     rec[col] = val
             for col in (
-                "parallax", "parallax_error", "pmra", "pmra_error", "pmdec", "pmdec_error", "class", "zwarning",
-                "classprob_dsc_combmod_quasar", "classprob_dsc_combmod_galaxy", "classprob_dsc_combmod_star",
-                "classprob_dsc_combmod_whitedwarf", "classprob_dsc_combmod_binarystar", "best_class_name", "best_class_score",
-                "event_mjd", "event_discovery_date", "sn_subtype", "pn_spectroscopic_score", "pn_spectroscopic_basis",
+                "parallax",
+                "parallax_error",
+                "pmra",
+                "pmra_error",
+                "pmdec",
+                "pmdec_error",
+                "class",
+                "zwarning",
+                "classprob_dsc_combmod_quasar",
+                "classprob_dsc_combmod_galaxy",
+                "classprob_dsc_combmod_star",
+                "classprob_dsc_combmod_whitedwarf",
+                "classprob_dsc_combmod_binarystar",
+                "best_class_name",
+                "best_class_score",
+                "event_mjd",
+                "event_discovery_date",
+                "sn_subtype",
+                "pn_spectroscopic_score",
+                "pn_spectroscopic_basis",
             ):
                 if col in r and pd.notna(r[col]) and (col not in rec or pd.isna(rec[col])):
                     rec[col] = r[col]

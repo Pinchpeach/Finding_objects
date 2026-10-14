@@ -8,6 +8,7 @@ does not have, and the reference epoch the archive reports.
 Exit code 1 if a table or a required column is missing, so the switch to a
 new release (``V2_GAIA_RELEASE``) is a checked step, not a guess.
 """
+
 from __future__ import annotations
 import argparse
 import sys
@@ -27,6 +28,7 @@ NEEDED = {
 
 def main() -> None:
     from astroquery.gaia import Gaia
+
     p = argparse.ArgumentParser()
     p.add_argument("--release", default="DR4", choices=sorted(RELEASES))
     a = p.parse_args()

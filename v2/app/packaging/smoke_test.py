@@ -8,6 +8,7 @@ identical to the same pipeline run from source.
 
     python v2/app/packaging/smoke_test.py dist/FindingObjects/FindingObjects[.exe]
 """
+
 from __future__ import annotations
 import subprocess
 import sys
@@ -23,13 +24,21 @@ def main() -> int:
     exe = Path(sys.argv[1]).resolve()
     with tempfile.TemporaryDirectory() as tmp:
         frozen, source = Path(tmp) / "frozen", Path(tmp) / "source"
-        p = subprocess.run([str(exe), "--pipeline", "--raw-dir", str(V2 / "rawdata"), "--work", str(frozen)],
-                           capture_output=True, text=True, timeout=900)
+        p = subprocess.run(
+            [str(exe), "--pipeline", "--raw-dir", str(V2 / "rawdata"), "--work", str(frozen)],
+            capture_output=True,
+            text=True,
+            timeout=900,
+        )
         print(p.stdout[-2000:], p.stderr[-2000:], sep="\n")
         assert p.returncode == 0, f"frozen pipeline exit code {p.returncode}"
         assert "[pipeline]" in p.stdout, "no progress on stdout (GUI progress would stay empty)"
-        subprocess.run([sys.executable, str(V2 / "pipeline.py"), "--raw-dir", str(V2 / "rawdata"),
-                        "--work", str(source)], check=True, capture_output=True, timeout=900)
+        subprocess.run(
+            [sys.executable, str(V2 / "pipeline.py"), "--raw-dir", str(V2 / "rawdata"), "--work", str(source)],
+            check=True,
+            capture_output=True,
+            timeout=900,
+        )
         a = pd.read_csv(frozen / "classified_objects.csv", low_memory=False).fillna("").astype(str)
         b = pd.read_csv(source / "classified_objects.csv", low_memory=False).fillna("").astype(str)
         assert len(a) > 0, "no objects classified"

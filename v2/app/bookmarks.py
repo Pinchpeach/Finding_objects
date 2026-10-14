@@ -15,6 +15,7 @@ Writes go to a temporary file that replaces the old one, so a crash cannot
 leave a half-written file.  An unreadable file is kept as ``*.corrupt`` and
 the store starts empty instead of failing.
 """
+
 from __future__ import annotations
 
 import json
@@ -162,8 +163,7 @@ class BookmarkStore:
             old.update({k: v for k, v in snap.items() if v is not None})
             self.save()
             return old
-        item = {"id": uuid.uuid4().hex, **snap, "note": note,
-                "added": time.strftime("%Y-%m-%d %H:%M:%S")}
+        item = {"id": uuid.uuid4().hex, **snap, "note": note, "added": time.strftime("%Y-%m-%d %H:%M:%S")}
         self.items.append(item)
         self.save()
         return item
@@ -195,6 +195,21 @@ class BookmarkStore:
     def to_frame(self):
         import pandas as pd
 
-        cols = ["name", "ra", "dec", "primary_class", "confidence", "subclass", "physical", "variability",
-                "compact", "extragalactic", "phenomenon", "note", "added", "source", "object_id"]
+        cols = [
+            "name",
+            "ra",
+            "dec",
+            "primary_class",
+            "confidence",
+            "subclass",
+            "physical",
+            "variability",
+            "compact",
+            "extragalactic",
+            "phenomenon",
+            "note",
+            "added",
+            "source",
+            "object_id",
+        ]
         return pd.DataFrame([{c: b.get(c) for c in cols} for b in self.items], columns=cols)

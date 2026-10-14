@@ -19,6 +19,7 @@ row's own ``ref_epoch`` for proper-motion propagation.
 Run ``python v2/Get_data/check_gaia_release.py --release DR4`` when DR4 is
 public: it lists the columns the collector needs that the archive lacks.
 """
+
 from __future__ import annotations
 import os
 from dataclasses import dataclass

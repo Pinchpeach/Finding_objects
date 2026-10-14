@@ -237,3 +237,4 @@ category,citation,journal_ref,bibcode,used_in,purpose
 별 분류,Best et al. 2018 (PS1 M/L/T dwarfs),"ApJS 234, 1",—,benchmark/new_targets/build_truth.py,초저온 왜성 판정의 독립 분광 정답
 별 분류,Marton et al. 2023 (Gaia DR3 YSO candidates),"A&A 674, A21",—,Classifier/axes/variability.py (YSO),Gaia 변광 분류 YSO의 오염률 ~10 %
 퀘이사·AGN,Massaro et al. 2015 (Roma-BZCAT 5th edition),"Ap&SS 357, 75",—,Get_data/bzcat.py; Classifier/axes/extragalactic.py (BLAZAR),블레이자 목록과 유형(BL Lac/FSRQ/모은하 우세/불확실)
+별 분류,Drimmel & Spergel 2001 (three-dimensional Galactic dust model),"ApJ 556, 181",—,"Classifier/subclass.py (DUST_SCALE_HEIGHT_PC, _dust_fraction)",먼지 원반 척도 높이 134 pc: 시차가 있는 별에 SFD 적색화 중 앞쪽 몫만 적용(2.23.0)

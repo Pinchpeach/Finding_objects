@@ -92,11 +92,19 @@ python v2/app/qt_app.py
 ```
 
 - 실행 로그는 사용자별 로그 파일 하나에 계속 쌓인다 (View > Log, Ctrl+L).
+- ★ 북마크 : 관심 있는 천체를 Ctrl+D 로 저장한다.
+  - ㄴ 위쪽 **Bookmarks** 탭(Ctrl+B)이 별도 페이지다. 메모, 검색, 원래 결과로 열기, 그 위치를 새 검색 중심으로.
 
-### [3.3] 시험
+### [3.3] 시험과 코드 모양
 
 ```bash
 cd v2 && python -m pytest -q Preprocess/tests Classifier/tests app/tests
+```
+
+- 코드 모양은 `black`으로 맞춘다 (한 줄 120자, 한 줄에 한 문장). 설정은 `pyproject.toml`.
+
+```bash
+black v2
 ```
 
 ---

@@ -10,6 +10,7 @@ fetched directly: ``SELECT ... FROM ls_dr10.tractor WHERE ls_id IN (...)``,
 
     python v2/benchmark/augment_ls_columns.py
 """
+
 from __future__ import annotations
 import sys
 import time
@@ -18,18 +19,21 @@ from pathlib import Path
 import pandas as pd
 
 BENCH = Path(__file__).resolve().parent
-FILES = [BENCH / "catalog_features" / "desi_legacy_trd.csv.gz",
-         BENCH / "desi_external" / "catalog_features" / "desi_legacy_trd.csv.gz"]
+FILES = [
+    BENCH / "catalog_features" / "desi_legacy_trd.csv.gz",
+    BENCH / "desi_external" / "catalog_features" / "desi_legacy_trd.csv.gz",
+]
 COLS = ["sersic", "shape_r", "flux_ivar_w1", "flux_ivar_w2"]
 TAP = "https://datalab.noirlab.edu/tap"
 
 
 def fetch(ids: list[str]) -> pd.DataFrame:
     import pyvo
+
     s = pyvo.dal.TAPService(TAP)
     parts = []
     for i in range(0, len(ids), 500):
-        chunk = ids[i:i + 500]
+        chunk = ids[i : i + 500]
         q = f"SELECT ls_id, {', '.join(COLS)} FROM ls_dr10.tractor WHERE ls_id IN ({','.join(chunk)})"
         for attempt in range(4):
             try:

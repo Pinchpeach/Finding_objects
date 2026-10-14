@@ -5,6 +5,7 @@ DESI TARGETID are 64-bit integers.  Read as float64 they lose their last
 digits (3902903753300361600 -> 3.9029037533003617e+18 -> ...728), so every
 stage reads these columns as text.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -12,8 +13,18 @@ from pathlib import Path
 import pandas as pd
 
 # Column (or the part after "<catalog>__") that holds a 64-bit identifier.
-ID_NAMES = {"catalog_object_id", "source_id", "objid", "specobjid", "bestobjid", "targetid", "ls_id",
-            "parent_object_id", "object_id", "designation"}
+ID_NAMES = {
+    "catalog_object_id",
+    "source_id",
+    "objid",
+    "specobjid",
+    "bestobjid",
+    "targetid",
+    "ls_id",
+    "parent_object_id",
+    "object_id",
+    "designation",
+}
 
 
 def id_columns(columns) -> list[str]:

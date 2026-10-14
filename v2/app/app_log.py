@@ -16,6 +16,7 @@ The file is kept to about MAX_BYTES: when a run starts and the file is
 larger, its oldest part is dropped (the same file is rewritten, no rotated
 copies), so it cannot grow without bound over months of use.
 """
+
 from __future__ import annotations
 import os
 import sys
@@ -65,7 +66,7 @@ class AppLog:
         try:
             self.path.parent.mkdir(parents=True, exist_ok=True)
             t = _stamp()
-            with open(self.path, "a", encoding="utf-8", newline="\n") as fh:   # "a" creates a missing file
+            with open(self.path, "a", encoding="utf-8", newline="\n") as fh:  # "a" creates a missing file
                 fh.write("".join(f"{t}  {x}\n" for x in lines))
         except OSError:
             pass
@@ -86,9 +87,12 @@ class AppLog:
                 fh.seek(-keep_bytes, os.SEEK_END)
                 tail = fh.read()
             cut = tail.find(b"\n")
-            tail = tail[cut + 1:] if cut >= 0 else tail
+            tail = tail[cut + 1 :] if cut >= 0 else tail
             tmp = self.path.with_suffix(".log.tmp")
-            tmp.write_bytes(f"{_stamp()}  (older entries removed to keep the log under {max_bytes // 1_000_000} MB)\n".encode() + tail)
+            tmp.write_bytes(
+                f"{_stamp()}  (older entries removed to keep the log under {max_bytes // 1_000_000} MB)\n".encode()
+                + tail
+            )
             os.replace(tmp, self.path)
         except OSError:
             pass
@@ -103,7 +107,7 @@ class AppLog:
                     fh.seek(-max_bytes, os.SEEK_END)
                 data = fh.read()
             if size > max_bytes:
-                data = data[data.find(b"\n") + 1:]
+                data = data[data.find(b"\n") + 1 :]
             return data.decode("utf-8", "replace")
         except OSError as exc:
             return f"(log file unavailable: {exc})"

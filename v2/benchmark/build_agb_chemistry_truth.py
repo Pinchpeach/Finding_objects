@@ -16,12 +16,15 @@ a designation-string join scanned the full 2MASS table):
 Run by .github/workflows/build-agb-chemistry-truth.yml (archives are not
 reachable from every environment); output: v2/benchmark/agb_truth/agb_chemistry_truth.csv.gz
 """
+
 from __future__ import annotations
 import argparse, time
 from pathlib import Path
 import pandas as pd
 
 TABLES = {"J/ApJS/256/43/table11": "O", "J/ApJS/256/43/table12": "C"}
+
+
 def retry(fn, tries=6, wait=30):
     for i in range(tries):
         try:
@@ -35,6 +38,7 @@ def retry(fn, tries=6, wait=30):
 
 def labels() -> pd.DataFrame:
     from astroquery.vizier import Vizier
+
     frames = []
     for table, chem in TABLES.items():
         t = retry(lambda: Vizier(columns=["**"], row_limit=-1).get_catalogs(table))[0].to_pandas()
@@ -44,11 +48,12 @@ def labels() -> pd.DataFrame:
         if out.ra.isna().all():  # sexagesimal columns
             from astropy.coordinates import SkyCoord
             import astropy.units as u
+
             c = SkyCoord(t[ra].astype(str), t[de].astype(str), unit=(u.hourangle, u.deg))
             out = pd.DataFrame({"ra": c.ra.deg, "dec": c.dec.deg})
         out["chem"] = chem
         out["suh_table"] = table.split("/")[-1]
-        for col in t.columns:      # keep the catalogue's own identifiers / classes
+        for col in t.columns:  # keep the catalogue's own identifiers / classes
             if col in {"WISEA", "2MASS", "OW-N", "CW-N", "AType", "APer", "Var", "Simbad", "Ref"}:
                 out[f"suh_{col}"] = t[col].astype(str).to_numpy()
         frames.append(out)
@@ -85,9 +90,14 @@ def _run(query: str, table: pd.DataFrame, name: str, chunk: int = 2000):
     query error shows up in seconds.  Returns a DataFrame or None."""
     from astroquery.gaia import Gaia
     from astropy.table import Table
+
     def one(part):
-        return Gaia.launch_job_async(query, upload_resource=Table.from_pandas(part),
-                                     upload_table_name="ids").get_results().to_pandas()
+        return (
+            Gaia.launch_job_async(query, upload_resource=Table.from_pandas(part), upload_table_name="ids")
+            .get_results()
+            .to_pandas()
+        )
+
     try:
         probe = one(table.head(50))
         print(f"{name}: probe ok ({len(probe)} rows from 50)", flush=True)
@@ -96,7 +106,7 @@ def _run(query: str, table: pd.DataFrame, name: str, chunk: int = 2000):
         return None
     parts = []
     for s0 in range(0, len(table), chunk):
-        part = table.iloc[s0:s0 + chunk]
+        part = table.iloc[s0 : s0 + chunk]
         t0 = time.time()
         try:
             res = retry(lambda: one(part), tries=3)
@@ -152,12 +162,13 @@ def vizier_tap(df: pd.DataFrame, chunk: int = 2000) -> pd.DataFrame:
     Gaia DR3 LPV I/358/vlpv by Gaia source id).  Fallback when the Gaia archive is down."""
     import pyvo
     from astropy.table import Table
+
     svc = pyvo.dal.TAPService(VIZIER_TAP)
 
     def run(query, table, name):
         parts = []
         for s0 in range(0, len(table), chunk):
-            part = Table.from_pandas(table.iloc[s0:s0 + chunk])
+            part = Table.from_pandas(table.iloc[s0 : s0 + chunk])
             t0 = time.time()
             try:
                 res = retry(lambda: svc.run_async(query, uploads={"ids": part}).to_table().to_pandas(), tries=3)
@@ -185,17 +196,48 @@ def vizier_tap(df: pd.DataFrame, chunk: int = 2000) -> pd.DataFrame:
     return df
 
 
-ASU_CATALOGS = {   # name: (VizieR table, radius arcsec, columns, renames)
-    "gaia": ("I/355/gaiadr3", 2.0, ["Source", "Gmag", "BPmag", "RPmag", "Plx", "e_Plx", "RUWE"],
-             {"Source": "g_source_id", "Gmag": "g_gmag", "BPmag": "g_bp", "RPmag": "g_rp", "Plx": "g_plx",
-              "e_Plx": "g_eplx", "RUWE": "g_ruwe"}),
-    "2mass": ("II/246/out", 2.0, ["Jmag", "Hmag", "Kmag", "Qflg"],
-              {"Jmag": "tm_j", "Hmag": "tm_h", "Kmag": "tm_ks", "Qflg": "tm_qual"}),
-    "allwise": ("II/328/allwise", 1.0, ["W1mag", "e_W1mag", "W2mag", "e_W2mag", "W3mag", "e_W3mag", "W4mag", "e_W4mag"],
-                {"W1mag": "aw_w1", "e_W1mag": "aw_ew1", "W2mag": "aw_w2", "e_W2mag": "aw_ew2", "W3mag": "aw_w3",
-                 "e_W3mag": "aw_ew3", "W4mag": "aw_w4", "e_W4mag": "aw_ew4"}),
-    "lpv": ("I/358/vlpv", 2.0, ["isCstar", "Freq", "Amp"],
-            {"isCstar": "lpv_is_cstar", "Freq": "lpv_frequency", "Amp": "lpv_amplitude"}),
+ASU_CATALOGS = {  # name: (VizieR table, radius arcsec, columns, renames)
+    "gaia": (
+        "I/355/gaiadr3",
+        2.0,
+        ["Source", "Gmag", "BPmag", "RPmag", "Plx", "e_Plx", "RUWE"],
+        {
+            "Source": "g_source_id",
+            "Gmag": "g_gmag",
+            "BPmag": "g_bp",
+            "RPmag": "g_rp",
+            "Plx": "g_plx",
+            "e_Plx": "g_eplx",
+            "RUWE": "g_ruwe",
+        },
+    ),
+    "2mass": (
+        "II/246/out",
+        2.0,
+        ["Jmag", "Hmag", "Kmag", "Qflg"],
+        {"Jmag": "tm_j", "Hmag": "tm_h", "Kmag": "tm_ks", "Qflg": "tm_qual"},
+    ),
+    "allwise": (
+        "II/328/allwise",
+        1.0,
+        ["W1mag", "e_W1mag", "W2mag", "e_W2mag", "W3mag", "e_W3mag", "W4mag", "e_W4mag"],
+        {
+            "W1mag": "aw_w1",
+            "e_W1mag": "aw_ew1",
+            "W2mag": "aw_w2",
+            "e_W2mag": "aw_ew2",
+            "W3mag": "aw_w3",
+            "e_W3mag": "aw_ew3",
+            "W4mag": "aw_w4",
+            "e_W4mag": "aw_ew4",
+        },
+    ),
+    "lpv": (
+        "I/358/vlpv",
+        2.0,
+        ["isCstar", "Freq", "Amp"],
+        {"isCstar": "lpv_is_cstar", "Freq": "lpv_frequency", "Amp": "lpv_amplitude"},
+    ),
 }
 
 
@@ -205,11 +247,12 @@ def vizier_asu(df: pd.DataFrame, chunk: int = 500, catalogs: dict | None = None)
     from astroquery.vizier import Vizier
     from astropy.coordinates import SkyCoord
     import astropy.units as u
+
     for name, (table, radius, cols, ren) in (catalogs or ASU_CATALOGS).items():
         v = Vizier(columns=cols + ["+_r"], row_limit=-1, timeout=600)
         parts = []
         for s0 in range(0, len(df), chunk):
-            sub = df.iloc[s0:s0 + chunk]
+            sub = df.iloc[s0 : s0 + chunk]
             coords = SkyCoord(sub.ra.to_numpy() * u.deg, sub.dec.to_numpy() * u.deg)
             t0 = time.time()
             try:
@@ -220,9 +263,11 @@ def vizier_asu(df: pd.DataFrame, chunk: int = 500, catalogs: dict | None = None)
             if not res:
                 continue
             t = res[0].to_pandas()
-            t["agb_id"] = sub.agb_id.to_numpy()[t["_q"].astype(int).to_numpy() - 1]   # _q: 1-based input row
+            t["agb_id"] = sub.agb_id.to_numpy()[t["_q"].astype(int).to_numpy() - 1]  # _q: 1-based input row
             parts.append(t.sort_values("_r").drop_duplicates("agb_id"))
-            print(f"{name}: rows {s0}-{s0 + len(sub)}: {len(parts[-1])} matched in {time.time() - t0:.0f} s", flush=True)
+            print(
+                f"{name}: rows {s0}-{s0 + len(sub)}: {len(parts[-1])} matched in {time.time() - t0:.0f} s", flush=True
+            )
         if parts:
             t = pd.concat(parts, ignore_index=True).rename(columns=ren)
             t = t.rename(columns={"_r": f"{name}_sep"})
@@ -233,9 +278,15 @@ def vizier_asu(df: pd.DataFrame, chunk: int = 500, catalogs: dict | None = None)
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument("--out", type=Path, default=Path(__file__).resolve().parent / "agb_truth" / "agb_chemistry_truth.csv.gz")
-    p.add_argument("--source", choices=("gaia", "vizier", "asu"), default="asu",
-                   help="photometry service: VizieR cone searches (asu), TAPVizieR uploads (vizier) or the Gaia archive")
+    p.add_argument(
+        "--out", type=Path, default=Path(__file__).resolve().parent / "agb_truth" / "agb_chemistry_truth.csv.gz"
+    )
+    p.add_argument(
+        "--source",
+        choices=("gaia", "vizier", "asu"),
+        default="asu",
+        help="photometry service: VizieR cone searches (asu), TAPVizieR uploads (vizier) or the Gaia archive",
+    )
     a = p.parse_args()
     df = {"gaia": gaia_tap, "vizier": vizier_tap, "asu": vizier_asu}[a.source](labels())
     phot = [c for c in df.columns if c.startswith(("g_", "tm_", "aw_"))]
