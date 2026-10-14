@@ -41,6 +41,7 @@ def test_gui_runs_pipeline_and_shows_results(tmp_path):
     log_path = tmp_path / "logs" / "finding_objects.log"
     import os
     os.environ["FINDING_OBJECTS_LOG"] = str(log_path)
+    os.environ["FINDING_OBJECTS_BOOKMARKS"] = str(tmp_path / "bm" / "bookmarks.json")
     w = qt_app.MainWindow()
     assert w.applog.path == log_path and not hasattr(w, "log")         # no log panel in the main window
     w.rb_raw.setChecked(True); w.chk_area.setChecked(False)
@@ -73,6 +74,27 @@ def test_gui_runs_pipeline_and_shows_results(tmp_path):
     w.table.sortByColumn(ci, qt_app.Qt.DescendingOrder)            # confidence, numeric sort
     top, bottom = float(w.proxy.index(0, ci).data()), float(w.proxy.index(w.proxy.rowCount() - 1, ci).data() or 0)
     assert top >= bottom
+
+    # Bookmarks page (2.23.0): bookmark the selected object, see it on its own
+    # page with a note, open it again from there, use it as a search centre.
+    w.table.selectRow(0); app.processEvents()
+    row = w.selected_row(); name = w.bookmarks.snapshot(row)["name"]
+    w.toggle_bookmark()
+    assert w.detail.btn_bookmark.text().startswith("★") and len(w.bookmarks.items) == 1
+    w.pages.setCurrentWidget(w.bookmark_page); app.processEvents()
+    page = w.bookmark_page
+    assert page.table.rowCount() == 1 and page.table.item(0, 0).text() == name
+    page.table.selectRow(0); page.note.setPlainText("check spectrum"); page._save_note()
+    from bookmarks import BookmarkStore
+    saved = BookmarkStore(w.bookmarks.path).items
+    assert saved[0]["note"] == "check spectrum" and saved[0]["source"].endswith("classified_objects.csv")
+    w.cmb_class.setCurrentText("QSO")                                 # hide it, then open from the page
+    page._open(); app.processEvents()
+    assert w.pages.currentIndex() == 0 and w.bookmarks.snapshot(w.selected_row())["name"] == name
+    w.search_bookmark(saved[0]["ra"], saved[0]["dec"], name)
+    assert abs(w.sp_ra.value() - saved[0]["ra"]) < 1e-6 and w.rb_sky.isChecked()
+    w.toggle_bookmark()                                                # same object: removed again
+    assert not w.bookmarks.items and w.detail.btn_bookmark.text().startswith("☆")
     w.close()
 
 
@@ -218,3 +240,27 @@ def test_log_window_follows_file(tmp_path):
     log.path.unlink(); win.poll()                                          # deleted: re-created, view reset
     assert log.path.exists() and "first" not in win.text.toPlainText()
     win.close()
+
+
+def test_bookmark_store_dedups_persists_and_survives_corruption(tmp_path):
+    import math
+    from bookmarks import BookmarkStore
+    path = tmp_path / "b" / "bookmarks.json"
+    st = BookmarkStore(path)
+    assert st.items == [] and not path.exists()                      # created on first save
+    row = {"designation": "NGC 4522", "ra": 188.4155, "dec": 9.1751, "primary_class": "GALAXY",
+           "subclass": float("nan"), "primary_confidence": 0.98}
+    b = st.add(row, source="/x/classified_objects.csv", note="host")
+    assert b["subclass"] is None and b["confidence"] == 0.98 and path.exists()
+    again = st.add(dict(row, primary_class="QSO"))                    # same object: refreshed, note kept
+    assert again["id"] == b["id"] and again["note"] == "host" and again["primary_class"] == "QSO" and len(st.items) == 1
+    nameless = {"ra": 10.0, "dec": -5.0}
+    assert st.toggle(nameless) and st.find({"ra": 10.0 + 0.5 / 3600, "dec": -5.0}) is not None   # 0.5" away: same
+    assert st.find({"ra": 10.0 + 3 / 3600, "dec": -5.0}) is None
+    st.set_note(b["id"], "edited")
+    assert BookmarkStore(path).get(b["id"])["note"] == "edited"          # persisted
+    assert not st.toggle(nameless) and len(BookmarkStore(path).items) == 1
+    df = st.to_frame()
+    assert list(df.name) == ["NGC 4522"] and math.isclose(df.ra[0], 188.4155)
+    path.write_text("{not json", encoding="utf-8")
+    assert BookmarkStore(path).items == [] and path.with_suffix(".json.corrupt").exists()

@@ -52,7 +52,7 @@ import pandas as pd  # noqa: E402
 from PySide6.QtCore import QModelIndex, QProcess, QProcessEnvironment, QSettings, Qt, QThreadPool, QRunnable, QObject, QTimer, Signal  # noqa: E402
 from PySide6.QtGui import QAction, QKeySequence  # noqa: E402
 from PySide6.QtWidgets import (QApplication, QComboBox, QDoubleSpinBox, QFileDialog, QFormLayout, QGroupBox,  # noqa: E402
-                               QHBoxLayout, QHeaderView, QLabel, QLineEdit, QMainWindow, QMessageBox,
+                               QHBoxLayout, QHeaderView, QLabel, QLineEdit, QMainWindow, QMenu, QMessageBox,
                                QProgressBar, QPushButton, QRadioButton, QSplitter,
                                QTableView, QTabWidget, QVBoxLayout, QWidget, QAbstractItemView, QCheckBox)
 
@@ -60,6 +60,8 @@ from progress import ProgressTracker  # noqa: E402
 from qt_models import DataFrameModel, ResultsFilter  # noqa: E402
 from qt_widgets import DetailPanel, LogWindow, SkyView  # noqa: E402
 from app_log import AppLog  # noqa: E402
+from bookmarks import BookmarkStore  # noqa: E402
+from qt_bookmarks import BookmarksPage  # noqa: E402
 
 APP_NAME = f"Finding Objects {version()}"
 RESULT_FILE = "classified_objects.csv"
@@ -150,14 +152,25 @@ class MainWindow(QMainWindow):
         self.proxy = ResultsFilter(self); self.proxy.setSourceModel(self.model)
         self.applog = AppLog()
         self.log_window = None
+        self.bookmarks = BookmarkStore()
+        self.results_path: Path | None = None
         self._build_ui()
         self._build_menu()
         self._restore()
 
     # ---------------------------------------------------------------- UI
     def _build_ui(self):
-        root = QSplitter(Qt.Horizontal, self)
-        self.setCentralWidget(root)
+        # Two pages (2.23.0): the classifier and the bookmarks.
+        self.pages = QTabWidget(self)
+        self.pages.setDocumentMode(True)
+        self.setCentralWidget(self.pages)
+        root = QSplitter(Qt.Horizontal)
+        self.pages.addTab(root, "Classifier")
+        self.bookmark_page = BookmarksPage(self.bookmarks)
+        self.pages.addTab(self.bookmark_page, "Bookmarks")
+        self.pages.currentChanged.connect(self._page_changed)
+        self.bookmark_page.openRequested.connect(self.open_bookmark)
+        self.bookmark_page.searchRequested.connect(self.search_bookmark)
         root.addWidget(self._build_controls())
 
         center = QSplitter(Qt.Vertical)
@@ -180,6 +193,8 @@ class MainWindow(QMainWindow):
         self.table.setAlternatingRowColors(True); self.table.verticalHeader().setVisible(False)
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
         self.table.horizontalHeader().setStretchLastSection(True)
+        self.table.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.table.customContextMenuRequested.connect(self._table_menu)
         tl.addWidget(self.table)
         center.addWidget(table_box)
         # No log panel in the main window (2.21.0): run output goes to one
@@ -204,6 +219,7 @@ class MainWindow(QMainWindow):
         self.table.selectionModel().currentRowChanged.connect(self._row_changed)
         self.sky.objectClicked.connect(self._select_source_row)
         self.sky.centerPicked.connect(self._center_from_map)
+        self.detail.btn_bookmark.clicked.connect(self.toggle_bookmark)
 
         self.progress = QProgressBar(); self.progress.setMaximumWidth(260); self.progress.setVisible(False)
         self.statusBar().addPermanentWidget(self.progress)
@@ -289,6 +305,14 @@ class MainWindow(QMainWindow):
         m.addSeparator(); m.addAction(a_quit)
         v = self.menuBar().addMenu("&View")
         a_log = QAction("&Log", self); a_log.setShortcut("Ctrl+L"); a_log.triggered.connect(self.show_log); v.addAction(a_log)
+        b = self.menuBar().addMenu("&Bookmarks")
+        self.a_bookmark = QAction("&Bookmark selected object", self)
+        self.a_bookmark.setShortcut("Ctrl+D")
+        self.a_bookmark.triggered.connect(self.toggle_bookmark)
+        a_pages = QAction("&Show bookmarks", self)
+        a_pages.setShortcut("Ctrl+B")
+        a_pages.triggered.connect(lambda: self.pages.setCurrentWidget(self.bookmark_page))
+        b.addAction(self.a_bookmark); b.addAction(a_pages)
         h = self.menuBar().addMenu("&Help")
         a_about = QAction("&About", self); a_about.triggered.connect(self._about); h.addAction(a_about)
 
@@ -473,6 +497,7 @@ class MainWindow(QMainWindow):
         if "designation" not in df.columns and assoc.exists():   # results written before designations existed
             df = _designations().annotate(df, pd.read_csv(assoc, low_memory=False, dtype={"catalog_object_id": "string"}))
         self.model.set_frame(df)
+        self.results_path = path
         self.sky.set_frame(self.model.frame(), self.model.kinds())
         cols = [self.model.column_name(i) for i in range(self.model.columnCount())]
         if "separation_arcmin" in cols:              # nearest to the search centre first
@@ -504,8 +529,76 @@ class MainWindow(QMainWindow):
         if not current.isValid():
             self.detail.show_object(None); self.sky.set_selected(None); return
         src = self.proxy.mapToSource(current).row()
-        self.detail.show_object(self.model.frame().iloc[src])
+        row = self.model.frame().iloc[src]
+        self.detail.show_object(row)
+        self.detail.set_bookmarked(self.bookmarks.find(row) is not None)
         self.sky.set_selected(src)
+
+    # -------------------------------------------------------- bookmarks
+    def selected_row(self):
+        idx = self.table.selectionModel().currentIndex() if self.table.selectionModel() else QModelIndex()
+        if not idx.isValid():
+            return None
+        return self.model.frame().iloc[self.proxy.mapToSource(idx).row()]
+
+    def toggle_bookmark(self):
+        """Bookmark the selected object, or remove its bookmark."""
+        row = self.selected_row()
+        if row is None:
+            self._status("Select an object to bookmark."); return
+        on = self.bookmarks.toggle(row, str(self.results_path) if self.results_path else None)
+        self.detail.set_bookmarked(on)
+        self.bookmark_page.refresh()
+        name = self.bookmarks.snapshot(row)["name"] or "object"
+        self._status(f"Bookmarked {name}" if on else f"Removed bookmark of {name}")
+
+    def _table_menu(self, pos):
+        idx = self.table.indexAt(pos)
+        if not idx.isValid():
+            return
+        self.table.selectRow(idx.row())
+        row = self.selected_row()
+        menu = QMenu(self)
+        on = row is not None and self.bookmarks.find(row) is not None
+        act = menu.addAction("Remove bookmark" if on else "Bookmark")
+        act.triggered.connect(self.toggle_bookmark)
+        menu.exec(self.table.viewport().mapToGlobal(pos))
+
+    def _page_changed(self, index):
+        if self.pages.widget(index) is self.bookmark_page:
+            self.bookmark_page.refresh()
+        else:
+            row = self.selected_row()
+            self.detail.set_bookmarked(row is not None and self.bookmarks.find(row) is not None)
+
+    def open_bookmark(self, b: dict):
+        """Load the results the bookmark came from and select the object."""
+        path = Path(b["source"])
+        if self.results_path is None or Path(self.results_path) != path:
+            self.load_results(path)
+        df = self.model.frame()
+        hit = None
+        for col, key in (("designation", "name"), ("object_name", "name"), ("object_id", "object_id")):
+            if col in df and b.get(key):
+                m = df.index[df[col].astype(str) == str(b[key])]
+                if len(m):
+                    hit = df.index.get_loc(m[0]); break
+        self.pages.setCurrentIndex(0)
+        if hit is None:
+            self._status(f"{b.get('name') or 'Object'} is not in {path.name} any more."); return
+        if not self.chk_parts.isChecked() and "parent_object_id" in df and pd.notna(df.iloc[hit].get("parent_object_id")):
+            self.chk_parts.setChecked(True)          # a bookmarked galaxy part is hidden by default
+        self.cmb_class.setCurrentText("ALL"); self.cmb_status.setCurrentText("ALL"); self.txt_search.clear()
+        self._filters_changed()
+        self._select_source_row(hit)
+
+    def search_bookmark(self, ra: float, dec: float, name: str):
+        """Use a bookmark's position as the centre of a new search."""
+        self.rb_sky.setChecked(True)
+        self.sp_ra.setValue(ra); self.sp_dec.setValue(dec)
+        self.txt_name.setText(name or f"{ra:.6f} {dec:+.6f}")
+        self.pages.setCurrentIndex(0)
+        self._status(f"Search centre set to {name or 'bookmark'} — press Run.")
 
     def _select_source_row(self, src_row: int):
         idx = self.proxy.mapFromSource(self.model.index(src_row, 0))

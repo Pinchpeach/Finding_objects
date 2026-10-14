@@ -389,19 +389,28 @@ class DetailPanel(QWidget):
         links = QHBoxLayout()
         self.btn_ls = QPushButton("Legacy Surveys viewer"); self.btn_simbad = QPushButton("SIMBAD")
         self.btn_copy = QPushButton("Copy coordinates")
-        for b in (self.btn_ls, self.btn_simbad, self.btn_copy):
+        # Bookmark toggle (2.23.0); the main window owns the bookmark store.
+        self.btn_bookmark = QPushButton("☆ Bookmark")
+        self.btn_bookmark.setToolTip("Add this object to the Bookmarks page (Ctrl+D)")
+        for b in (self.btn_bookmark, self.btn_ls, self.btn_simbad, self.btn_copy):
             b.setEnabled(False); links.addWidget(b)
         self.btn_ls.clicked.connect(lambda: self._open("ls"))
         self.btn_simbad.clicked.connect(lambda: self._open("simbad"))
         self.btn_copy.clicked.connect(self._copy)
         lay.addLayout(links)
 
+    def set_bookmarked(self, on: bool) -> None:
+        self.btn_bookmark.setText("★ Bookmarked" if on else "☆ Bookmark")
+        self.btn_bookmark.setToolTip("Remove from the Bookmarks page (Ctrl+D)" if on
+                                     else "Add this object to the Bookmarks page (Ctrl+D)")
+
     def show_object(self, row: pd.Series | None) -> None:
         self._row = row
         self.evidence.clear(); self.axes.clear()
         enabled = row is not None
-        for b in (self.btn_ls, self.btn_simbad, self.btn_copy):
+        for b in (self.btn_bookmark, self.btn_ls, self.btn_simbad, self.btn_copy):
             b.setEnabled(enabled)
+        self.set_bookmarked(False)
         if row is None:
             self.title.setText("Select an object")
             self.title.setStyleSheet("font-weight: 600; font-size: 14px;")
