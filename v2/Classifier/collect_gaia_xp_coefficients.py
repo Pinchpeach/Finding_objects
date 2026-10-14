@@ -47,11 +47,14 @@ def run(features: Path, out: Path, batch_size: int = 40):
         last = None
         for attempt in range(4):
             try:
+                # The archive retired data_structure="RAW" (2026-10: "use
+                # DATAMODEL_GAIA"); INDIVIDUAL (one table per source) is
+                # astroquery's default and parsed by the same loop below.
                 result = Gaia.load_data(
                     ids=batch,
                     data_release="Gaia DR3",
                     retrieval_type="XP_CONTINUOUS",
-                    data_structure="RAW",
+                    data_structure="INDIVIDUAL",
                     format="votable",
                     verbose=False,
                 )
