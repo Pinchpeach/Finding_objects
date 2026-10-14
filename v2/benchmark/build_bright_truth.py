@@ -18,6 +18,7 @@ benchmark cannot test (2.6.2):
 
 Output: v2/benchmark/bright_truth/{apogee,els,lpv_lamost}.csv.gz
 """
+
 from __future__ import annotations
 import argparse
 import sys
@@ -40,15 +41,18 @@ SIMBAD_Q = """SELECT t.rid, b.main_id, b.otype, b.sp_type,
  ON 1 = CONTAINS(POINT('ICRS', b.ra, b.dec), CIRCLE('ICRS', t.ra, t.dec, 2.0 / 3600))"""
 
 
-def nearest(df: pd.DataFrame, table: str, radius: float, cols: list[str], prefix: str, chunk: int = 500) -> pd.DataFrame:
+def nearest(
+    df: pd.DataFrame, table: str, radius: float, cols: list[str], prefix: str, chunk: int = 500
+) -> pd.DataFrame:
     """Nearest row of a VizieR table for each (rid, ra, dec); columns prefixed."""
     from astroquery.vizier import Vizier
     from astropy.coordinates import SkyCoord
     import astropy.units as u
+
     v = Vizier(columns=cols + ["+_r"], row_limit=-1, timeout=600)
     parts = []
     for s0 in range(0, len(df), chunk):
-        sub = df.iloc[s0:s0 + chunk]
+        sub = df.iloc[s0 : s0 + chunk]
         coords = SkyCoord(sub.ra.to_numpy() * u.deg, sub.dec.to_numpy() * u.deg)
         t0 = time.time()
         try:
@@ -82,13 +86,17 @@ def nearest(df: pd.DataFrame, table: str, radius: float, cols: list[str], prefix
 def simbad(df: pd.DataFrame, chunk: int = 2000) -> pd.DataFrame:
     import pyvo
     from astropy.table import Table
+
     svc = pyvo.dal.TAPService(SIMBAD_TAP)
     parts = []
     for s0 in range(0, len(df), chunk):
-        up = Table.from_pandas(df.iloc[s0:s0 + chunk][["rid", "ra", "dec"]])
+        up = Table.from_pandas(df.iloc[s0 : s0 + chunk][["rid", "ra", "dec"]])
         try:
-            r = retry(lambda: svc.run_sync(SIMBAD_Q, uploads={"t": up}, maxrec=10 * chunk).to_table().to_pandas(),
-                      tries=3, wait=30)
+            r = retry(
+                lambda: svc.run_sync(SIMBAD_Q, uploads={"t": up}, maxrec=10 * chunk).to_table().to_pandas(),
+                tries=3,
+                wait=30,
+            )
         except Exception as exc:
             print(f"simbad rows {s0}+: failed {str(exc)[:160]}", flush=True)
             continue
@@ -99,8 +107,11 @@ def simbad(df: pd.DataFrame, chunk: int = 2000) -> pd.DataFrame:
     s = pd.concat(parts, ignore_index=True)
     for c in ("main_id", "otype", "sp_type"):
         s[c] = s[c].astype(str).str.strip()
-    return df.merge(s.rename(columns={"main_id": "simbad_main_id", "otype": "simbad_otype", "sp_type": "simbad_sp_type"}),
-                    on="rid", how="left")
+    return df.merge(
+        s.rename(columns={"main_id": "simbad_main_id", "otype": "simbad_otype", "sp_type": "simbad_sp_type"}),
+        on="rid",
+        how="left",
+    )
 
 
 def _pick(cols, *cands):
@@ -113,14 +124,20 @@ def _pick(cols, *cands):
 
 def apogee(per_slice: int, slices: int) -> pd.DataFrame:
     from astroquery.vizier import Vizier
+
     cat = "III/286/catalog"
     meta = retry(lambda: Vizier(columns=["**"], row_limit=1, timeout=300).get_catalogs(cat), tries=3, wait=20)[0]
     cols = list(meta.colnames)
     print("APOGEE columns:", " ".join(cols), flush=True)
     ra_c = _pick(cols, "RAJ2000", "RAdeg", "RA_ICRS", "_RAJ2000")
     de_c = _pick(cols, "DEJ2000", "DEdeg", "DE_ICRS", "_DEJ2000")
-    want = {"apo_teff": _pick(cols, "Teff"), "apo_logg": _pick(cols, "logg"), "apo_feh": _pick(cols, "[Fe/H]", "[M/H]"),
-            "apo_snr": _pick(cols, "S/N", "SNR", "snr"), "apo_id": _pick(cols, "APOGEE", "APOGEE_ID", "ID")}
+    want = {
+        "apo_teff": _pick(cols, "Teff"),
+        "apo_logg": _pick(cols, "logg"),
+        "apo_feh": _pick(cols, "[Fe/H]", "[M/H]"),
+        "apo_snr": _pick(cols, "S/N", "SNR", "snr"),
+        "apo_id": _pick(cols, "APOGEE", "APOGEE_ID", "ID"),
+    }
     print("APOGEE picked:", ra_c, de_c, want, flush=True)
     keep = [c for c in [ra_c, de_c, *want.values()] if c]
     parts = []
@@ -145,18 +162,27 @@ def apogee(per_slice: int, slices: int) -> pd.DataFrame:
         d = d.drop_duplicates("apo_id").reset_index(drop=True)
     d.insert(0, "rid", np.arange(len(d)))
     d = nearest(d, "I/355/gaiadr3", 1.5, ["Source", "Gmag", "BPmag", "RPmag", "Plx", "e_Plx", "RUWE"], "g_")
-    d = nearest(d, "I/355/paramp", 1.5, ["Source", "Teff", "logg", "[Fe/H]", "Teff-S", "logg-S", "[M/H]-S", "Flags",
-                                          "ClassELS", "f_ClassELS"], "ap_")
+    d = nearest(
+        d,
+        "I/355/paramp",
+        1.5,
+        ["Source", "Teff", "logg", "[Fe/H]", "Teff-S", "logg-S", "[M/H]-S", "Flags", "ClassELS", "f_ClassELS"],
+        "ap_",
+    )
     d = nearest(d, "V/164/stellar5", 3.0, ["ObsID", "Teff", "logg", "[Fe/H]"], "lam_")
     return d
 
 
 def els(per_class: int) -> pd.DataFrame:
     from astroquery.vizier import Vizier
+
     parts = []
     for lab in ELS_LABELS:
-        v = Vizier(columns=["Source", "RA_ICRS", "DE_ICRS", "ClassELS", "f_ClassELS", "EWHa", "Teff", "logg"],
-                   row_limit=per_class, timeout=600)
+        v = Vizier(
+            columns=["Source", "RA_ICRS", "DE_ICRS", "ClassELS", "f_ClassELS", "EWHa", "Teff", "logg"],
+            row_limit=per_class,
+            timeout=600,
+        )
         try:
             res = retry(lambda: v.query_constraints(catalog="I/355/paramp", ClassELS=f"={lab}"), tries=3, wait=20)
         except Exception as exc:
@@ -198,7 +224,9 @@ def main() -> None:
     if "lpv" in parts:
         d = lpv_lamost()
         d.to_csv(OUT / "lpv_lamost.csv.gz", index=False, compression="gzip")
-        print("lpv ->", d.shape, d.get("lam_SubClass", pd.Series(dtype=str)).value_counts().head(15).to_dict(), flush=True)
+        print(
+            "lpv ->", d.shape, d.get("lam_SubClass", pd.Series(dtype=str)).value_counts().head(15).to_dict(), flush=True
+        )
 
 
 if __name__ == "__main__":

@@ -25,6 +25,7 @@ Correctness rules:
 * ``V2_CACHE=0`` disables the cache; ``prune()`` bounds its size on disk
   (``V2_CACHE_MAX_MB``, default 2048) and drops superseded code-hash folders.
 """
+
 from __future__ import annotations
 import hashlib
 import json
@@ -65,7 +66,8 @@ def _code_hash(source: Path) -> str:
     if sig not in _HASH:
         h = hashlib.sha1()
         for f in files:
-            h.update(f.name.encode()); h.update(f.read_bytes())
+            h.update(f.name.encode())
+            h.update(f.read_bytes())
         _HASH[sig] = h.hexdigest()[:12]
     return _HASH[sig] + "-" + os.environ.get("V2_GAIA_RELEASE", "DR3").strip().upper()
 
@@ -103,41 +105,49 @@ def cacheable(df: pd.DataFrame) -> bool:
     return True
 
 
-def get(name: str, source: Path, ra: float, dec: float, radius_arcmin: float,
-        margin_arcmin: float = 0.0) -> pd.DataFrame | None:
+def get(
+    name: str, source: Path, ra: float, dec: float, radius_arcmin: float, margin_arcmin: float = 0.0
+) -> pd.DataFrame | None:
     """Rows inside the requested cone from a containing cached cone, or None."""
     if not enabled():
         return None
     d = _dir(name, source)
     now = time.time()
-    best = None
-    for e in _index(d):
-        if now - e["t"] > _ttl(name, e["rows"]) * 86400:
+    candidates = [
+        e
+        for e in _index(d)
+        if now - e["t"] <= _ttl(name, e["rows"]) * 86400
+        and _sep_arcmin(ra, dec, e["ra"], e["dec"]) + radius_arcmin <= e["r"] + SAME_TOL_ARCMIN
+    ]
+    # Smallest containing cone first; one whose file was pruned or is
+    # unreadable falls through to the next instead of forcing a re-fetch (2.23.0).
+    df = best = None
+    for e in sorted(candidates, key=lambda e: e["r"]):
+        try:
+            # Text in, text out: 64-bit IDs (SDSS specObjID, DESI TARGETID) must
+            # not pass through float; the collector's save() writes them back as read.
+            df = pd.read_csv(d / e["file"], dtype=str, keep_default_na=False, na_filter=False)
+            best = e
+            break
+        except Exception:
             continue
-        if _sep_arcmin(ra, dec, e["ra"], e["dec"]) + radius_arcmin <= e["r"] + SAME_TOL_ARCMIN:
-            if best is None or e["r"] < best["r"]:
-                best = e
     if best is None:
         return None
-    try:
-        # Text in, text out: 64-bit IDs (SDSS specObjID, DESI TARGETID) must
-        # not pass through float; the collector's save() writes them back as read.
-        df = pd.read_csv(d / best["file"], dtype=str, keep_default_na=False, na_filter=False)
-    except Exception:
-        return None
-    same_cone = (abs(best["r"] - radius_arcmin) < SAME_TOL_ARCMIN
-                 and _sep_arcmin(ra, dec, best["ra"], best["dec"]) < SAME_TOL_ARCMIN)
+    same_cone = (
+        abs(best["r"] - radius_arcmin) < SAME_TOL_ARCMIN
+        and _sep_arcmin(ra, dec, best["ra"], best["dec"]) < SAME_TOL_ARCMIN
+    )
     if df.empty or same_cone:
         return df
     r = np.radians(pd.to_numeric(df.get("ra"), errors="coerce").to_numpy(float))
     de = np.radians(pd.to_numeric(df.get("dec"), errors="coerce").to_numpy(float))
     r0, d0 = math.radians(ra), math.radians(dec)
     a = np.sin((de - d0) / 2) ** 2 + math.cos(d0) * np.cos(de) * np.sin((r - r0) / 2) ** 2
-    sep = np.degrees(2 * np.arcsin(np.sqrt(np.clip(a, 0.0, 1.0)))) * 60.0      # NaN position -> NaN -> dropped
+    sep = np.degrees(2 * np.arcsin(np.sqrt(np.clip(a, 0.0, 1.0)))) * 60.0  # NaN position -> NaN -> dropped
     out = df[sep <= radius_arcmin + margin_arcmin].reset_index(drop=True)
     for col in ("query_radius_arcmin", "cone_radius_arcmin"):
         if col in out.columns:
-            out[col] = repr(float(radius_arcmin))        # as a fresh fetch of this cone would record
+            out[col] = repr(float(radius_arcmin))  # as a fresh fetch of this cone would record
     return out
 
 
@@ -191,18 +201,26 @@ def put(name: str, source: Path, ra: float, dec: float, radius_arcmin: float, df
                 if e["file"] == fname:
                     continue
                 (drop if now - e["t"] > _ttl(name, e["rows"]) * 86400 else keep).append(e)
-            keep.append({"ra": float(ra), "dec": float(dec), "r": float(radius_arcmin), "rows": int(len(df)),
-                         "t": now, "file": fname})
+            keep.append(
+                {
+                    "ra": float(ra),
+                    "dec": float(dec),
+                    "r": float(radius_arcmin),
+                    "rows": int(len(df)),
+                    "t": now,
+                    "file": fname,
+                }
+            )
             fd, itmp = tempfile.mkstemp(dir=d, suffix=".json.tmp")
             with os.fdopen(fd, "w") as fh:
                 json.dump(keep, fh)
             os.replace(itmp, d / "index.json")
             itmp = None
             live = {e["file"] for e in keep}
-            for e in drop:                       # expired entries: remove their files
+            for e in drop:  # expired entries: remove their files
                 if e["file"] not in live:
                     (d / e["file"]).unlink(missing_ok=True)
-    except Exception as exc:          # a cache problem must never fail a collection
+    except Exception as exc:  # a cache problem must never fail a collection
         print(f"[cache] {name}: not stored ({exc!r})", flush=True)
     finally:
         for t in (tmp, itmp):
@@ -237,14 +255,16 @@ def prune(sources: dict[str, Path] | None = None, max_mb: float | None = None) -
                 current = _code_hash(src)
                 for sub in folder.iterdir():
                     if sub.is_dir() and sub.name != current:
-                        _rmtree(sub); out["folders"] += 1
+                        _rmtree(sub)
+                        out["folders"] += 1
         files = []
         for f in base.rglob("*"):
             if not f.is_file():
                 continue
             st = f.stat()
             if f.suffix == ".tmp" and now - st.st_mtime > TMP_STALE_S:
-                f.unlink(missing_ok=True); out["tmp"] += 1
+                f.unlink(missing_ok=True)
+                out["tmp"] += 1
             elif f.name.endswith(".csv.gz"):
                 files.append((st.st_mtime, st.st_size, f))
         limit = (MAX_CACHE_MB if max_mb is None else max_mb) * 1e6
@@ -252,8 +272,9 @@ def prune(sources: dict[str, Path] | None = None, max_mb: float | None = None) -
         for _, sz, f in sorted(files):
             if total <= limit:
                 break
-            f.unlink(missing_ok=True)        # get() of its index entry then misses and re-fetches
-            total -= sz; out["evicted"] += 1
+            f.unlink(missing_ok=True)  # get() of its index entry then misses and re-fetches
+            total -= sz
+            out["evicted"] += 1
     except Exception as exc:
         print(f"[cache] prune: {exc!r}", flush=True)
     return out
@@ -261,4 +282,5 @@ def prune(sources: dict[str, Path] | None = None, max_mb: float | None = None) -
 
 def _rmtree(path: Path) -> None:
     import shutil
+
     shutil.rmtree(path, ignore_errors=True)

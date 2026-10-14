@@ -6,6 +6,7 @@ Writes into the directory given by --out:
   probe.txt             VizieR table / column lists of the truth catalogues
                         and the Gaia DR3 ESP-UCD columns
 """
+
 from __future__ import annotations
 import argparse, sys, traceback
 from pathlib import Path
@@ -26,14 +27,17 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
     a = ap.parse_args()
-    out = Path(a.out); out.mkdir(parents=True, exist_ok=True)
+    out = Path(a.out)
+    out.mkdir(parents=True, exist_ok=True)
     log = open(out / "probe.txt", "w", encoding="utf-8")
 
     def say(*x):
-        print(*x, file=log, flush=True); print(*x, flush=True)
+        print(*x, file=log, flush=True)
+        print(*x, flush=True)
 
     try:
         from astroquery.simbad import Simbad
+
         od = Simbad().query_tap("SELECT * FROM otypedef").to_pandas()
         od.to_csv(out / "simbad_otypedef.csv", index=False)
         say("otypedef", od.shape, list(od.columns))
@@ -41,6 +45,7 @@ def main():
         say("otypedef ERROR", traceback.format_exc())
 
     from astroquery.vizier import Vizier
+
     for cat, desc in CATALOGS.items():
         say(f"\n=== {cat}  {desc}")
         try:
@@ -61,10 +66,13 @@ def main():
 
     try:
         from astroquery.gaia import Gaia
+
         t = Gaia.load_table("gaiadr3.astrophysical_parameters")
         cols = [c.name for c in t.columns]
         say("\n=== gaiadr3.astrophysical_parameters ESP-UCD columns:", [c for c in cols if "ucd" in c.lower()])
-        j = Gaia.launch_job("SELECT TOP 5 source_id, teff_espucd, flags_espucd FROM gaiadr3.astrophysical_parameters WHERE teff_espucd IS NOT NULL")
+        j = Gaia.launch_job(
+            "SELECT TOP 5 source_id, teff_espucd, flags_espucd FROM gaiadr3.astrophysical_parameters WHERE teff_espucd IS NOT NULL"
+        )
         say(j.get_results())
     except Exception:
         say("gaia ERROR", traceback.format_exc()[-800:])

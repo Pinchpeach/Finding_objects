@@ -19,6 +19,7 @@ RUWE < 1.4), M_Ks = Ks + 5 log10(plx) - 10:
 The classifier gets the pipeline columns of each star (Gaia, 2MASS, AllWISE,
 Gaia LPV) and the AGB label it gives is counted per luminosity group.
 """
+
 from __future__ import annotations
 import json, sys, warnings
 from pathlib import Path
@@ -29,11 +30,23 @@ BENCH = Path(__file__).resolve().parent
 sys.path.insert(0, str(BENCH))
 import evaluate_subclass as ev  # noqa: E402
 
-MAP = {"g_bp": "gaia_dr3__phot_bp_mean_mag", "g_rp": "gaia_dr3__phot_rp_mean_mag", "g_gmag": "gaia_dr3__phot_g_mean_mag",
-       "g_plx": "gaia_dr3__parallax", "g_eplx": "gaia_dr3__parallax_error", "g_ruwe": "gaia_dr3__ruwe",
-       "tm_j": "2mass_psc__Jmag", "tm_ks": "2mass_psc__Kmag", "aw_w1": "allwise__W1mag", "aw_w2": "allwise__W2mag",
-       "aw_w3": "allwise__W3mag", "aw_w4": "allwise__W4mag", "lpv_is_cstar": "gaia_lpv_is_cstar",
-       "lpv_frequency": "gaia_lpv_frequency", "lpv_amplitude": "gaia_lpv_amplitude"}
+MAP = {
+    "g_bp": "gaia_dr3__phot_bp_mean_mag",
+    "g_rp": "gaia_dr3__phot_rp_mean_mag",
+    "g_gmag": "gaia_dr3__phot_g_mean_mag",
+    "g_plx": "gaia_dr3__parallax",
+    "g_eplx": "gaia_dr3__parallax_error",
+    "g_ruwe": "gaia_dr3__ruwe",
+    "tm_j": "2mass_psc__Jmag",
+    "tm_ks": "2mass_psc__Kmag",
+    "aw_w1": "allwise__W1mag",
+    "aw_w2": "allwise__W2mag",
+    "aw_w3": "allwise__W3mag",
+    "aw_w4": "allwise__W4mag",
+    "lpv_is_cstar": "gaia_lpv_is_cstar",
+    "lpv_frequency": "gaia_lpv_frequency",
+    "lpv_amplitude": "gaia_lpv_amplitude",
+}
 
 
 def main() -> None:
@@ -42,8 +55,11 @@ def main() -> None:
     d = pd.read_csv(BENCH / "agb_truth" / "agb_gate_sample.csv.gz", low_memory=False)
     good = (d.g_plx > 0) & (d.g_eplx > 0) & (d.g_plx / d.g_eplx >= 5) & (d.g_ruwe < 1.4)
     mk = d.tm_ks + 5 * np.log10(d.g_plx.where(d.g_plx > 0)) - 10
-    d["group"] = np.select([~good | mk.isna(), mk > -1, mk > -6.2, mk + 2.6 < -8.0],
-                           ["no good parallax", "below red clump", "below RGB tip", "RSG luminosity"], "above RGB tip")
+    d["group"] = np.select(
+        [~good | mk.isna(), mk > -1, mk > -6.2, mk + 2.6 < -8.0],
+        ["no good parallax", "below red clump", "below RGB tip", "RSG luminosity"],
+        "above RGB tip",
+    )
     # M_bol = M_Ks + BC_K: RSG luminosity M_bol < -8 means M_Ks < -10.6
     rows = d.rename(columns=MAP)[list(MAP.values())]
     codes = []
@@ -53,11 +69,18 @@ def main() -> None:
         codes.append(sc.classify(r)["code"])
     d["code"] = codes
     d["agb"] = d.code.astype(str).str.endswith(":AGB")
-    out = {"n": int(len(d)), "cones": int(d.cone.nunique()),
-           "simbad_types": {k: int(v) for k, v in d.simbad_otype.value_counts().head(12).items()}, "groups": {}}
+    out = {
+        "n": int(len(d)),
+        "cones": int(d.cone.nunique()),
+        "simbad_types": {k: int(v) for k, v in d.simbad_otype.value_counts().head(12).items()},
+        "groups": {},
+    }
     for gname, x in d.groupby("group"):
-        out["groups"][gname] = {"n": int(len(x)), "agb_label": int(x.agb.sum()),
-                                "codes": {k: int(v) for k, v in x.code.value_counts().head(6).items()}}
+        out["groups"][gname] = {
+            "n": int(len(x)),
+            "agb_label": int(x.agb.sum()),
+            "codes": {k: int(v) for k, v in x.code.value_counts().head(6).items()},
+        }
     print(json.dumps(out, indent=1))
     (BENCH / "agb_truth" / "agb_contamination_metrics.json").write_text(json.dumps(out, indent=1))
 

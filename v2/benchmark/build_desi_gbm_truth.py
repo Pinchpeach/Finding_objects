@@ -14,6 +14,7 @@ stay independent.
 
 Output: v2/benchmark/desi_gbm_truth/train.csv.gz
 """
+
 from __future__ import annotations
 import argparse
 import time
@@ -25,9 +26,30 @@ import pandas as pd
 BENCH = Path(__file__).resolve().parent
 OUT = BENCH / "desi_gbm_truth"
 TAP = "https://datalab.noirlab.edu/tap"
-WANT = ["targetid", "target_ra", "target_dec", "ra", "dec", "flux_g", "flux_r", "flux_z", "flux_w1", "flux_w2",
-        "flux_ivar_g", "flux_ivar_r", "flux_ivar_z", "flux_ivar_w1", "flux_ivar_w2", "ebv", "morphtype",
-        "sersic", "shape_r", "maskbits", "release", "photsys"]
+WANT = [
+    "targetid",
+    "target_ra",
+    "target_dec",
+    "ra",
+    "dec",
+    "flux_g",
+    "flux_r",
+    "flux_z",
+    "flux_w1",
+    "flux_w2",
+    "flux_ivar_g",
+    "flux_ivar_r",
+    "flux_ivar_z",
+    "flux_ivar_w1",
+    "flux_ivar_w2",
+    "ebv",
+    "morphtype",
+    "sersic",
+    "shape_r",
+    "maskbits",
+    "release",
+    "photsys",
+]
 
 
 def columns(s, table: str) -> list[str]:
@@ -51,6 +73,7 @@ def query(s, q: str, tries: int = 3):
 
 def main() -> None:
     import pyvo
+
     p = argparse.ArgumentParser()
     p.add_argument("--per-class", type=int, default=50000)
     p.add_argument("--step", type=float, default=0.5, help="random_id slice per query (0-100 scale)")
@@ -68,10 +91,12 @@ def main() -> None:
         got, lo = 0, 0.0
         while got < a.per_class and lo < 100:
             hi = lo + a.step
-            q = (f"SELECT {', '.join('z.' + c for c in zsel)}, {', '.join('p.' + c + ' AS p_' + c for c in sel)} "
-                 f"FROM desi_dr1.zpix AS z JOIN desi_dr1.photometry AS p ON p.targetid = z.targetid "
-                 f"WHERE z.spectype = '{cls}' AND z.zwarn = 0 AND z.deltachi2 > 25 "
-                 f"AND p.random_id >= {lo} AND p.random_id < {hi}")
+            q = (
+                f"SELECT {', '.join('z.' + c for c in zsel)}, {', '.join('p.' + c + ' AS p_' + c for c in sel)} "
+                f"FROM desi_dr1.zpix AS z JOIN desi_dr1.photometry AS p ON p.targetid = z.targetid "
+                f"WHERE z.spectype = '{cls}' AND z.zwarn = 0 AND z.deltachi2 > 25 "
+                f"AND p.random_id >= {lo} AND p.random_id < {hi}"
+            )
             d = query(s, q)
             if "zcat_primary" in d:
                 d = d[d.zcat_primary.astype(str).str.lower().isin(["true", "t", "1"])]
@@ -96,6 +121,7 @@ def main() -> None:
     def xyz(r, dd):
         r, dd = np.radians(r), np.radians(dd)
         return np.c_[np.cos(dd) * np.cos(r), np.cos(dd) * np.sin(r), np.sin(dd)]
+
     tree = cKDTree(xyz(gt.ra.to_numpy(), gt.dec.to_numpy()))
     ok = np.isfinite(ra) & np.isfinite(de)
     near = np.zeros(len(d), bool)

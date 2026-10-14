@@ -110,3 +110,12 @@ python v2/app/packaging/smoke_test.py dist/FindingObjects/FindingObjects   # Win
 
 ## 로그 (2.21.0)
 메인 화면에는 로그 패널이 없습니다. 실행 출력은 사용자별 로그 파일 하나(`app_log.py`)에 시간과 함께 계속 쌓입니다. View > Log(Ctrl+L) 또는 Log 버튼으로 별도 창에서 실시간으로 봅니다. 파일이 없으면 새로 만들고, 5 MB를 넘으면 최근 2 MB만 남깁니다.
+
+## 북마크 페이지 (2.23.0)
+- 창 위쪽 탭으로 **Classifier**(기존 화면)와 **Bookmarks**(별도 페이지)를 오갑니다. Ctrl+B로 북마크 페이지를 엽니다.
+- 북마크 추가·해제: 표에서 천체를 고르고 Ctrl+D, 상세 패널의 ☆ Bookmark 버튼, 표 오른쪽 클릭 메뉴. 이미 있으면 해제합니다.
+- 북마크는 천체의 **스냅숏**(이름, 위치, 1차·세부 분류, 각 축의 판정, 결과 파일 경로)과 메모를 저장합니다. 결과 폴더를 지워도 페이지에 남습니다.
+- 같은 천체 판단: 이름이 같으면 같은 천체. 이름이 없으면 1″ 안의 위치. 다시 추가하면 분류를 새 결과로 갱신하고 메모·날짜는 유지합니다.
+- 페이지에서 할 수 있는 것: 검색(이름·분류·메모), 메모 편집(입력이 멈추면 0.4초 뒤 저장), **Open in results**(원래 결과 파일을 열고 그 천체를 선택; 숨겨진 은하 조각이면 표시를 켬), **Search here**(그 위치를 새 검색의 중심으로), 좌표 복사, 삭제, CSV 내보내기.
+- 저장 위치(사용자당 파일 하나): Windows `%LOCALAPPDATA%\FindingObjects\bookmarks.json`, macOS `~/Library/Application Support/FindingObjects/`, Linux `~/.local/share/finding_objects/`. `FINDING_OBJECTS_BOOKMARKS`로 바꿀 수 있습니다.
+- 설계 이유: 임시 파일에 쓴 뒤 교체해 저장 중 종료돼도 파일이 깨지지 않습니다. 읽을 수 없는 파일은 `*.corrupt`로 남기고 빈 목록으로 시작합니다(앱이 멈추지 않게). JSON은 사람이 읽고 옮기기 쉬우며, 북마크 수(수백 개)에서는 매 변경마다 전체를 다시 써도 1 ms 수준입니다. 저장소(`bookmarks.py`)는 Qt를 쓰지 않아 GUI 없이 시험합니다.

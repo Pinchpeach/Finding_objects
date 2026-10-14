@@ -7,6 +7,7 @@ g/r amplitudes, Fourier parameters R21 / phi21 and a type from period,
 amplitude and light-curve shape: EW, EA, BYDra, RSCVN, SR, Mira, RR, RRc,
 DSCT, CEP, CEPII.  Classifier/axes/variability.py maps the type.
 """
+
 from pathlib import Path
 import pandas as pd
 
@@ -19,8 +20,10 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     from astroquery.vizier import Vizier
     from astropy.coordinates import SkyCoord
     import astropy.units as u
+
     tables = Vizier(columns=COLUMNS, row_limit=-1).query_region(
-        SkyCoord(ra * u.deg, dec * u.deg, frame="icrs"), radius=radius_arcmin * u.arcmin, catalog=VIZIER_CATALOG)
+        SkyCoord(ra * u.deg, dec * u.deg, frame="icrs"), radius=radius_arcmin * u.arcmin, catalog=VIZIER_CATALOG
+    )
     if not tables:
         return pd.DataFrame(columns=["catalog", "catalog_object_id", "object_name", "ra", "dec"])
     df = tables[0].to_pandas()

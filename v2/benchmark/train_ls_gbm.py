@@ -16,6 +16,7 @@ run through the full pipeline after the fusion refit.
 
     python v2/benchmark/train_ls_gbm.py [--out v2/Preprocess/ls_gbm_model.npz]
 """
+
 from __future__ import annotations
 import argparse
 import json
@@ -60,23 +61,38 @@ def export(clf, path: Path) -> None:
             n = pred.nodes
             if n["is_categorical"].any():
                 raise ValueError("categorical splits are not exported")
-            start.append(offset); tcls.append(k)
-            feat.append(n["feature_idx"].astype(np.int64)); thr.append(n["num_threshold"].astype(float))
-            mleft.append(n["missing_go_to_left"].astype(bool)); left.append(n["left"].astype(np.int64))
-            right.append(n["right"].astype(np.int64)); leaf.append(n["is_leaf"].astype(bool))
+            start.append(offset)
+            tcls.append(k)
+            feat.append(n["feature_idx"].astype(np.int64))
+            thr.append(n["num_threshold"].astype(float))
+            mleft.append(n["missing_go_to_left"].astype(bool))
+            left.append(n["left"].astype(np.int64))
+            right.append(n["right"].astype(np.int64))
+            leaf.append(n["is_leaf"].astype(bool))
             value.append(n["value"].astype(float))
             offset += len(n)
     base = np.asarray(clf._baseline_prediction, float).ravel()
-    np.savez_compressed(path, feature=np.concatenate(feat), threshold=np.concatenate(thr),
-                        missing_left=np.concatenate(mleft), left=np.concatenate(left), right=np.concatenate(right),
-                        is_leaf=np.concatenate(leaf), value=np.concatenate(value),
-                        tree_start=np.array(start, np.int64), tree_class=np.array(tcls, np.int64),
-                        baseline=base, n_classes=np.int64(len(clf.classes_)),
-                        classes=np.array(list(clf.classes_)), features=np.array(ls_gbm.FEATURES))
+    np.savez_compressed(
+        path,
+        feature=np.concatenate(feat),
+        threshold=np.concatenate(thr),
+        missing_left=np.concatenate(mleft),
+        left=np.concatenate(left),
+        right=np.concatenate(right),
+        is_leaf=np.concatenate(leaf),
+        value=np.concatenate(value),
+        tree_start=np.array(start, np.int64),
+        tree_class=np.array(tcls, np.int64),
+        baseline=base,
+        n_classes=np.int64(len(clf.classes_)),
+        classes=np.array(list(clf.classes_)),
+        features=np.array(ls_gbm.FEATURES),
+    )
 
 
 def main() -> None:
     from sklearn.ensemble import HistGradientBoostingClassifier
+
     p = argparse.ArgumentParser()
     p.add_argument("--out", type=Path, default=ls_gbm.MODEL_PATH)
     p.add_argument("--seed", type=int, default=7)
@@ -89,27 +105,43 @@ def main() -> None:
     X, y = X[keep], y[keep]
     rng = np.random.default_rng(a.seed)
     hold = rng.random(len(y)) < 0.1
-    clf = HistGradientBoostingClassifier(max_iter=400, learning_rate=0.08, max_leaf_nodes=31, min_samples_leaf=40,
-                                         l2_regularization=1.0, early_stopping=True, validation_fraction=0.1,
-                                         n_iter_no_change=20, random_state=a.seed)
+    clf = HistGradientBoostingClassifier(
+        max_iter=400,
+        learning_rate=0.08,
+        max_leaf_nodes=31,
+        min_samples_leaf=40,
+        l2_regularization=1.0,
+        early_stopping=True,
+        validation_fraction=0.1,
+        n_iter_no_change=20,
+        random_state=a.seed,
+    )
     clf.fit(X[~hold], y[~hold])
     assert list(clf.classes_) == [0, 1, 2]
     export(clf, a.out)
     ls_gbm.load_model.cache_clear()
     model = ls_gbm.load_model(str(a.out))
     z = ls_gbm.raw_scores(X[hold], model)
-    p_np = np.exp(z - z.max(1, keepdims=True)); p_np /= p_np.sum(1, keepdims=True)
+    p_np = np.exp(z - z.max(1, keepdims=True))
+    p_np /= p_np.sum(1, keepdims=True)
     p_sk = clf.predict_proba(X[hold])
     acc = float((p_sk.argmax(1) == y[hold]).mean())
-    rep = {"train_rows": int((~hold).sum()), "holdout_rows": int(hold.sum()), "iterations": int(clf.n_iter_),
-           "holdout_accuracy": round(acc, 4),
-           "numpy_vs_sklearn_max_abs_diff": float(np.abs(p_np - p_sk).max()),
-           "holdout_accuracy_by_r": {}}
+    rep = {
+        "train_rows": int((~hold).sum()),
+        "holdout_rows": int(hold.sum()),
+        "iterations": int(clf.n_iter_),
+        "holdout_accuracy": round(acc, 4),
+        "numpy_vs_sklearn_max_abs_diff": float(np.abs(p_np - p_sk).max()),
+        "holdout_accuracy_by_r": {},
+    }
     r = X[hold, 0]
     for lo, hi in ((0, 19), (19, 21), (21, 22), (22, 23), (23, 30)):
         m = (r >= lo) & (r < hi)
         if m.any():
-            rep["holdout_accuracy_by_r"][f"{lo}-{hi}"] = {"n": int(m.sum()), "acc": round(float((p_sk[m].argmax(1) == y[hold][m]).mean()), 4)}
+            rep["holdout_accuracy_by_r"][f"{lo}-{hi}"] = {
+                "n": int(m.sum()),
+                "acc": round(float((p_sk[m].argmax(1) == y[hold][m]).mean()), 4),
+            }
     print(json.dumps(rep, indent=1))
     (BENCH / "desi_gbm_truth" / "train_report.json").write_text(json.dumps(rep, indent=1))
 

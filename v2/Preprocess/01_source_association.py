@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Stage 1: survey-aware, epoch-aware conservative counterpart association."""
+
 from __future__ import annotations
 
 import argparse
@@ -14,6 +15,7 @@ from association_model import (
     infer_epoch,
     infer_poserr_arcsec,
     infer_psf_arcsec,
+    sep_arcsec,
     num,
     profile_for,
 )
@@ -88,13 +90,21 @@ def _density(frame: pd.DataFrame) -> float | None:
         # No recorded cone radius: use the rows' own footprint (distance of
         # the outermost source from the median position; cone searches are
         # circular, so this recovers the query radius to within a few %).
-        ra = pd.to_numeric(frame.get("ra"), errors="coerce"); dec = pd.to_numeric(frame.get("dec"), errors="coerce")
+        ra = pd.to_numeric(frame.get("ra"), errors="coerce")
+        dec = pd.to_numeric(frame.get("dec"), errors="coerce")
         ok = ra.notna() & dec.notna()
         if ok.sum() < 5:
             return None
-        r0, d0 = float(ra[ok].median()), float(dec[ok].median())
-        dx = (ra[ok] - r0) * math.cos(math.radians(d0)); dy = dec[ok] - d0
-        radius = float((dx * dx + dy * dy).pow(0.5).max()) * 3600.0
+        # Centre = mean unit vector, radius = largest great-circle distance:
+        # a median RA and flat (dRA cos dec, dDec) offsets broke at RA 0/360
+        # (density ~1e-12) and near the poles (2.23.0).
+        import numpy as np
+
+        a, d = np.radians(ra[ok].to_numpy(float)), np.radians(dec[ok].to_numpy(float))
+        x, y, z = (np.cos(d) * np.cos(a)).mean(), (np.cos(d) * np.sin(a)).mean(), np.sin(d).mean()
+        r0 = math.degrees(math.atan2(y, x)) % 360.0
+        d0 = math.degrees(math.atan2(z, math.hypot(x, y)))
+        radius = max(sep_arcsec(r0, d0, r, dd) for r, dd in zip(ra[ok], dec[ok]))
         if radius <= 0:
             return None
     return float(len(frame)) / (math.pi * radius * radius)
@@ -113,7 +123,7 @@ def load(raw: Path):
         if not {"ra", "dec"}.issubset(df.columns):
             continue
         density = _density(df)
-        for i, r in zip(df.index, df.to_dict("records")):   # plain dicts: iterrows built a Series per row
+        for i, r in zip(df.index, df.to_dict("records")):  # plain dicts: iterrows built a Series per row
             ra, dec = num(r.get("ra")), num(r.get("dec"))
             if ra is None or dec is None:
                 continue
@@ -121,34 +131,40 @@ def load(raw: Path):
             cat = path.stem if pd.isna(cat) or not str(cat).strip() else str(cat)
             cid = r.get("catalog_object_id")
             cid = "" if pd.isna(cid) else str(cid).strip()
-            key = (cat, "id", cid) if cid and cid.lower() not in {"nan", "none"} else (cat, "sky", round(ra, 7), round(dec, 7))
+            key = (
+                (cat, "id", cid)
+                if cid and cid.lower() not in {"nan", "none"}
+                else (cat, "sky", round(ra, 7), round(dec, 7))
+            )
             if key in seen:
                 skipped += 1
                 continue
             seen.add(key)
             payload = r
             prof = profile_for(cat, payload)
-            rows.append({
-                "detection_id": f"{path.stem}:{i}",
-                "input_file": path.name,
-                "catalog": cat,
-                "catalog_object_id": cid or str(i),
-                "object_name": str(r.get("object_name", "")),
-                "ra": ra,
-                "dec": dec,
-                "poserr_arcsec": infer_poserr_arcsec(cat, payload),
-                "psf_fwhm_arcsec": infer_psf_arcsec(cat, payload),
-                "ref_epoch": infer_epoch(cat, payload),
-                "entity_kind": infer_entity_kind(cat, payload),
-                "pmra": num(r.get("pmra")),
-                "pmra_error": num(r.get("pmra_error")),
-                "pmdec": num(r.get("pmdec")),
-                "pmdec_error": num(r.get("pmdec_error")),
-                "max_radius_arcsec": prof.max_radius_arcsec,
-                "source_density_arcsec2": density,
-                "association_aliases": canonical_aliases(cat, payload, cid),
-                "source_row": int(i),
-            })
+            rows.append(
+                {
+                    "detection_id": f"{path.stem}:{i}",
+                    "input_file": path.name,
+                    "catalog": cat,
+                    "catalog_object_id": cid or str(i),
+                    "object_name": str(r.get("object_name", "")),
+                    "ra": ra,
+                    "dec": dec,
+                    "poserr_arcsec": infer_poserr_arcsec(cat, payload),
+                    "psf_fwhm_arcsec": infer_psf_arcsec(cat, payload),
+                    "ref_epoch": infer_epoch(cat, payload),
+                    "entity_kind": infer_entity_kind(cat, payload),
+                    "pmra": num(r.get("pmra")),
+                    "pmra_error": num(r.get("pmra_error")),
+                    "pmdec": num(r.get("pmdec")),
+                    "pmdec_error": num(r.get("pmdec_error")),
+                    "max_radius_arcsec": prof.max_radius_arcsec,
+                    "source_density_arcsec2": density,
+                    "association_aliases": canonical_aliases(cat, payload, cid),
+                    "source_row": int(i),
+                }
+            )
     return rows, skipped
 
 
@@ -159,8 +175,19 @@ def _anchor_key(det):
     return (0 if gaia and has_motion else 1 if has_motion else 2, float(det.get("poserr_arcsec") or 99.0))
 
 
-EMPTY_COLUMNS = ["object_id", "catalog", "catalog_object_id", "ra", "dec", "input_file", "source_row",
-                 "association_status", "association_confidence", "object_ra", "object_dec"]
+EMPTY_COLUMNS = [
+    "object_id",
+    "catalog",
+    "catalog_object_id",
+    "ra",
+    "dec",
+    "input_file",
+    "source_row",
+    "association_status",
+    "association_confidence",
+    "object_ra",
+    "object_dec",
+]
 
 
 def run(raw_dir: Path, out: Path):
@@ -213,14 +240,24 @@ def run(raw_dir: Path, out: Path):
                 group = groups[gi]
                 if group["entity_kind"] == "transient_event" or det["catalog"] in group["catalogs"]:
                     continue
-                shared_aliases=set(det.get("association_aliases") or ()) & set(group.get("aliases") or ())
+                shared_aliases = set(det.get("association_aliases") or ()) & set(group.get("aliases") or ())
                 if shared_aliases:
-                    result=assess_pair(group["anchor"],det,det.get("source_density_arcsec2"))
-                    result.update({"accepted":True,"association_score":1.0,"association_posterior":1.0,"association_method":"catalog_alias","shared_aliases":"|".join(sorted(shared_aliases))})
-                    candidates.append((1.0,0.0,gi,result));continue
+                    result = assess_pair(group["anchor"], det, det.get("source_density_arcsec2"))
+                    result.update(
+                        {
+                            "accepted": True,
+                            "association_score": 1.0,
+                            "association_posterior": 1.0,
+                            "association_method": "catalog_alias",
+                            "shared_aliases": "|".join(sorted(shared_aliases)),
+                        }
+                    )
+                    candidates.append((1.0, 0.0, gi, result))
+                    continue
                 density = det.get("source_density_arcsec2")
                 result = assess_pair(group["anchor"], det, density)
-                result["association_method"]="position_epoch_likelihood";result["shared_aliases"]=""
+                result["association_method"] = "position_epoch_likelihood"
+                result["shared_aliases"] = ""
                 if result["accepted"]:
                     candidates.append((result["association_score"], result["normalized_separation"], gi, result))
             candidates.sort(key=lambda x: (-x[0], x[1]))
@@ -230,10 +267,7 @@ def run(raw_dir: Path, out: Path):
         alias_hits = [c for c in candidates if c[3].get("association_method") == "catalog_alias"]
         if len(alias_hits) == 1:
             candidates = alias_hits
-        ambiguous = (
-            len(candidates) > 1
-            and candidates[1][0] >= candidates[0][0] * AMBIG_SCORE_RATIO
-        )
+        ambiguous = len(candidates) > 1 and candidates[1][0] >= candidates[0][0] * AMBIG_SCORE_RATIO
 
         if candidates and not ambiguous:
             _, _, gi, match = candidates[0]
@@ -250,14 +284,16 @@ def run(raw_dir: Path, out: Path):
             status = "matched"
         else:
             oid = f"OBJ{len(groups)+1:06d}"
-            groups.append({
-                "id": oid,
-                "anchor": det,
-                "catalogs": {det["catalog"]},
-                "members": 1,
-                "entity_kind": det["entity_kind"],
-                "aliases": set(det.get("association_aliases") or ()),
-            })
+            groups.append(
+                {
+                    "id": oid,
+                    "anchor": det,
+                    "catalogs": {det["catalog"]},
+                    "members": 1,
+                    "entity_kind": det["entity_kind"],
+                    "aliases": set(det.get("association_aliases") or ()),
+                }
+            )
             place(len(groups) - 1)
             for alias in det.get("association_aliases") or ():
                 alias_groups.setdefault(alias, set()).add(len(groups) - 1)
@@ -268,8 +304,12 @@ def run(raw_dir: Path, out: Path):
                 # (association_posterior too: the confidence read below prefers it,
                 # so the competitor's posterior used to down-weight the
                 # detection's own evidence; fixed 2.19.0.)
-                match = {**candidates[0][3], "association_score": 1.0, "association_posterior": 1.0,
-                         "association_method": "new_source_ambiguous"}
+                match = {
+                    **candidates[0][3],
+                    "association_score": 1.0,
+                    "association_posterior": 1.0,
+                    "association_method": "new_source_ambiguous",
+                }
             else:
                 match = {
                     "separation_arcsec": None,
@@ -285,28 +325,32 @@ def run(raw_dir: Path, out: Path):
                     "association_method": "new_source",
                     "shared_aliases": "",
                 }
-            status = "ambiguous_new" if ambiguous else ("event_new" if det["entity_kind"] == "transient_event" else "new")
+            status = (
+                "ambiguous_new" if ambiguous else ("event_new" if det["entity_kind"] == "transient_event" else "new")
+            )
 
         confidence = match.get("association_posterior", match.get("association_score"))
-        records.append({
-            **{**det,"association_aliases":"|".join(sorted(det.get("association_aliases") or ()))},
-            "object_id": oid,
-            "association_status": status,
-            "match_separation_arcsec": match.get("separation_arcsec"),
-            "comparison_epoch": match.get("comparison_epoch"),
-            "proper_motion_propagated": bool(match.get("proper_motion_propagated")),
-            "propagation_direction": match.get("propagation_direction"),
-            "combined_sigma_arcsec": match.get("combined_sigma_arcsec"),
-            "match_radius_arcsec": match.get("match_radius_arcsec"),
-            "normalized_separation": match.get("normalized_separation"),
-            "positional_likelihood": match.get("positional_likelihood"),
-            "chance_probability": match.get("chance_probability"),
-            "association_confidence": confidence,
-            "association_probability_calibrated": False,
-            "association_method": match.get("association_method","position_epoch_likelihood"),
-            "shared_aliases": match.get("shared_aliases",""),
-            "candidate_count": len(candidates),
-        })
+        records.append(
+            {
+                **{**det, "association_aliases": "|".join(sorted(det.get("association_aliases") or ()))},
+                "object_id": oid,
+                "association_status": status,
+                "match_separation_arcsec": match.get("separation_arcsec"),
+                "comparison_epoch": match.get("comparison_epoch"),
+                "proper_motion_propagated": bool(match.get("proper_motion_propagated")),
+                "propagation_direction": match.get("propagation_direction"),
+                "combined_sigma_arcsec": match.get("combined_sigma_arcsec"),
+                "match_radius_arcsec": match.get("match_radius_arcsec"),
+                "normalized_separation": match.get("normalized_separation"),
+                "positional_likelihood": match.get("positional_likelihood"),
+                "chance_probability": match.get("chance_probability"),
+                "association_confidence": confidence,
+                "association_probability_calibrated": False,
+                "association_method": match.get("association_method", "position_epoch_likelihood"),
+                "shared_aliases": match.get("shared_aliases", ""),
+                "candidate_count": len(candidates),
+            }
+        )
 
     group_by_id = {g["id"]: g for g in groups}
     for rec, det in zip(records, dets_in_order):

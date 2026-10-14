@@ -12,10 +12,11 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 def test_progress_tracker_counts_archives_and_stages():
     from progress import ProgressTracker, STAGES
+
     t = ProgressTracker(collecting=True, n_collectors=2)
     assert t.feed("[gaia_dr3] ok: 114 rows (33.2 s)") == "gaia_dr3: ok"
     assert t.feed("[ned] timeout: abandoned after 300 s") == "ned: timeout"
-    assert t.feed("[pipeline] collect: 47.6 s") is None          # not one of the counted stages
+    assert t.feed("[pipeline] collect: 47.6 s") is None  # not one of the counted stages
     for s in STAGES:
         t.feed(f"[pipeline] {s}: 0.1 s")
     assert t.fraction == 1.0 and t.failed_archives == ["ned"]
@@ -25,6 +26,7 @@ def test_progress_tracker_counts_archives_and_stages():
 def test_worker_command_points_at_this_app():
     pytest.importorskip("PySide6")
     import qt_app
+
     program, pre = qt_app.worker_command()
     assert program == sys.executable and pre and pre[0].endswith("qt_app.py")
 
@@ -37,42 +39,82 @@ def test_gui_runs_pipeline_and_shows_results(tmp_path):
     from PySide6.QtCore import QEventLoop, QTimer
     from PySide6.QtWidgets import QApplication
     import qt_app
+
     app = QApplication.instance() or QApplication([])
     log_path = tmp_path / "logs" / "finding_objects.log"
     import os
+
     os.environ["FINDING_OBJECTS_LOG"] = str(log_path)
+    os.environ["FINDING_OBJECTS_BOOKMARKS"] = str(tmp_path / "bm" / "bookmarks.json")
     w = qt_app.MainWindow()
-    assert w.applog.path == log_path and not hasattr(w, "log")         # no log panel in the main window
-    w.rb_raw.setChecked(True); w.chk_area.setChecked(False)
-    w.txt_raw.setText(str(raw)); w.txt_work.setText(str(tmp_path / "run"))
+    assert w.applog.path == log_path and not hasattr(w, "log")  # no log panel in the main window
+    w.rb_raw.setChecked(True)
+    w.chk_area.setChecked(False)
+    w.txt_raw.setText(str(raw))
+    w.txt_work.setText(str(tmp_path / "run"))
     assert "--ra" not in w.pipeline_args()
     w.start_run()
     proc = w.proc
-    loop = QEventLoop(); proc.finished.connect(loop.quit); QTimer.singleShot(120000, loop.quit); loop.exec()
+    loop = QEventLoop()
+    proc.finished.connect(loop.quit)
+    QTimer.singleShot(120000, loop.quit)
+    loop.exec()
     app.processEvents()
     assert w.proc is None and w.statusBar().currentMessage().startswith("Done"), w.applog.read_tail()[-2000:]
     text = log_path.read_text(encoding="utf-8")
-    assert "==== run Finding Objects" in text and "$ pipeline" in text and "[pipeline]" in text   # run output in the one file
+    assert (
+        "==== run Finding Objects" in text and "$ pipeline" in text and "[pipeline]" in text
+    )  # run output in the one file
     n = w.model.rowCount()
     names = w.model.frame().designation
-    assert not names.str.match(r"OBJ\d+$").any() and names.is_unique      # real catalogue names only
+    assert not names.str.match(r"OBJ\d+$").any() and names.is_unique  # real catalogue names only
     assert w.model.headerData(0, qt_app.Qt.Horizontal) == "Name"
     df = w.model.frame()
     top = int(df.parent_object_id.isna().sum())
-    assert n > 0 and top < n and w.proxy.rowCount() == top and w.tracker.fraction == 1.0   # galaxy parts hidden
-    w.chk_parts.setChecked(True); assert w.proxy.rowCount() == n
+    assert n > 0 and top < n and w.proxy.rowCount() == top and w.tracker.fraction == 1.0  # galaxy parts hidden
+    w.chk_parts.setChecked(True)
+    assert w.proxy.rowCount() == n
     w.chk_parts.setChecked(False)
     host = df[df.n_components.gt(0)].iloc[0]
     assert host.designation == "NGC 4522" and isinstance(host.subclass, str) and "galaxy" in host.subclass.lower()
     w.cmb_class.setCurrentText("GALAXY")
     assert 0 < w.proxy.rowCount() < n
-    w.table.selectRow(0); app.processEvents()
+    w.table.selectRow(0)
+    app.processEvents()
     assert "GALAXY" in w.detail.title.text() and w.detail.evidence.topLevelItemCount() > 0
     w.cmb_class.setCurrentText("ALL")
     ci = [w.model.column_name(i) for i in range(w.model.columnCount())].index("primary_confidence")
-    w.table.sortByColumn(ci, qt_app.Qt.DescendingOrder)            # confidence, numeric sort
+    w.table.sortByColumn(ci, qt_app.Qt.DescendingOrder)  # confidence, numeric sort
     top, bottom = float(w.proxy.index(0, ci).data()), float(w.proxy.index(w.proxy.rowCount() - 1, ci).data() or 0)
     assert top >= bottom
+
+    # Bookmarks page (2.23.0): bookmark the selected object, see it on its own
+    # page with a note, open it again from there, use it as a search centre.
+    w.table.selectRow(0)
+    app.processEvents()
+    row = w.selected_row()
+    name = w.bookmarks.snapshot(row)["name"]
+    w.toggle_bookmark()
+    assert w.detail.btn_bookmark.text().startswith("★") and len(w.bookmarks.items) == 1
+    w.pages.setCurrentWidget(w.bookmark_page)
+    app.processEvents()
+    page = w.bookmark_page
+    assert page.table.rowCount() == 1 and page.table.item(0, 0).text() == name
+    page.table.selectRow(0)
+    page.note.setPlainText("check spectrum")
+    page._save_note()
+    from bookmarks import BookmarkStore
+
+    saved = BookmarkStore(w.bookmarks.path).items
+    assert saved[0]["note"] == "check spectrum" and saved[0]["source"].endswith("classified_objects.csv")
+    w.cmb_class.setCurrentText("QSO")  # hide it, then open from the page
+    page._open()
+    app.processEvents()
+    assert w.pages.currentIndex() == 0 and w.bookmarks.snapshot(w.selected_row())["name"] == name
+    w.search_bookmark(saved[0]["ra"], saved[0]["dec"], name)
+    assert abs(w.sp_ra.value() - saved[0]["ra"]) < 1e-6 and w.rb_sky.isChecked()
+    w.toggle_bookmark()  # same object: removed again
+    assert not w.bookmarks.items and w.detail.btn_bookmark.text().startswith("☆")
     w.close()
 
 
@@ -80,6 +122,7 @@ def test_parse_coordinates_and_radius_units():
     pytest.importorskip("PySide6")
     from PySide6.QtWidgets import QApplication
     import qt_app
+
     assert qt_app.parse_coordinates("188.4155 +9.1751") == (188.4155, 9.1751)
     ra, dec = qt_app.parse_coordinates("12:33:39.72 +09:10:30.4")
     assert abs(ra - 188.4155) < 1e-4 and abs(dec - 9.17511) < 1e-4
@@ -89,10 +132,12 @@ def test_parse_coordinates_and_radius_units():
     app = QApplication.instance() or QApplication([])
     w = qt_app.MainWindow()
     w.rb_sky.setChecked(True)
-    w.cmb_rad_unit.setCurrentText("arcmin"); w.sp_rad.setValue(0.5)
+    w.cmb_rad_unit.setCurrentText("arcmin")
+    w.sp_rad.setValue(0.5)
     w.cmb_rad_unit.setCurrentText("arcsec")
     assert abs(w.sp_rad.value() - 30.0) < 1e-6 and abs(w.radius_arcmin() - 0.5) < 1e-9
-    w.txt_name.setText("188.4155 9.1751"); w._resolve_name()
+    w.txt_name.setText("188.4155 9.1751")
+    w._resolve_name()
     args = w.pipeline_args()
     assert args[args.index("--ra") + 1].startswith("188.4155") and float(args[args.index("--radius") + 1]) == 0.5
     w.close()
@@ -101,14 +146,19 @@ def test_parse_coordinates_and_radius_units():
 def test_designations_priority_and_area_cut():
     import importlib.util
     import pandas as pd
+
     spec = importlib.util.spec_from_file_location("v2_designations", V2 / "designations.py")
-    d = importlib.util.module_from_spec(spec); spec.loader.exec_module(d)
-    assoc = pd.DataFrame({
-        "object_id": ["OBJ1", "OBJ1", "OBJ1", "OBJ2", "OBJ2", "OBJ3"],
-        "catalog": ["Pan-STARRS1 DR2 MeanObject", "SIMBAD", "Gaia DR3", "Gaia DR3", "AllWISE", "Mystery Cat"],
-        "catalog_object_id": ["1", "NGC  4522", "7", "8", "J1", "42"],
-        "object_name": ["PSO J1", "NAME  Some  Galaxy", "Gaia DR3 7", "Gaia DR3 8", "AllWISE J1", None],
-        "association_confidence": [0.9, 0.8, 0.9, 0.9, 0.9, 0.5]})
+    d = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(d)
+    assoc = pd.DataFrame(
+        {
+            "object_id": ["OBJ1", "OBJ1", "OBJ1", "OBJ2", "OBJ2", "OBJ3"],
+            "catalog": ["Pan-STARRS1 DR2 MeanObject", "SIMBAD", "Gaia DR3", "Gaia DR3", "AllWISE", "Mystery Cat"],
+            "catalog_object_id": ["1", "NGC  4522", "7", "8", "J1", "42"],
+            "object_name": ["PSO J1", "NAME  Some  Galaxy", "Gaia DR3 7", "Gaia DR3 8", "AllWISE J1", None],
+            "association_confidence": [0.9, 0.8, 0.9, 0.9, 0.9, 0.5],
+        }
+    )
     cls = pd.DataFrame({"object_id": ["OBJ1", "OBJ2", "OBJ3"], "ra": [10.0, 10.0, 10.1], "dec": [0.0, 1 / 60, 0.0]})
     out = d.annotate(cls, assoc).set_index("object_id")
     assert out.loc["OBJ1", "designation"] == "Some Galaxy" and out.loc["OBJ1", "designation_catalog"] == "SIMBAD"
@@ -125,33 +175,57 @@ def test_sky_map_zoom_pan_and_icons():
     from PySide6.QtCore import QPointF
     from PySide6.QtWidgets import QApplication
     import qt_widgets, qt_icons
+
     app = QApplication.instance() or QApplication([])
-    df = pd.DataFrame({"ra": [10.0, 10.01, 9.99], "dec": [0.0, 0.01, -0.01], "designation": ["A", "B", "C"],
-                       "primary_class": ["STAR", "GALAXY", "QSO"],
-                       "subclass_code": ["STAR:K:V", "GALAXY:STAR_FORMING:?", "QSO:RADIO_LOUD:HIGH_Z:X"]})
-    v = qt_widgets.SkyView(); v.resize(500, 500); v.show(); app.processEvents()
+    df = pd.DataFrame(
+        {
+            "ra": [10.0, 10.01, 9.99],
+            "dec": [0.0, 0.01, -0.01],
+            "designation": ["A", "B", "C"],
+            "primary_class": ["STAR", "GALAXY", "QSO"],
+            "subclass_code": ["STAR:K:V", "GALAXY:STAR_FORMING:?", "QSO:RADIO_LOUD:HIGH_Z:X"],
+        }
+    )
+    v = qt_widgets.SkyView()
+    v.resize(500, 500)
+    v.show()
+    app.processEvents()
     m = v.map
-    m.set_frame(df); app.processEvents()
+    m.set_frame(df)
+    app.processEvents()
     sx0, sy0 = m._to_screen(m._x[1], m._y[1])
-    m.zoom_by(4.0, QPointF(sx0, sy0))                     # zoom about object B: it stays under the cursor
+    m.zoom_by(4.0, QPointF(sx0, sy0))  # zoom about object B: it stays under the cursor
     sx1, sy1 = m._to_screen(m._x[1], m._y[1])
     assert m.zoom == 4.0 and abs(sx1 - sx0) < 1e-6 and abs(sy1 - sy0) < 1e-6
     ra, dec = m._to_sky(sx1, sy1)
     assert abs(ra - 10.01) < 1e-6 and abs(dec - 0.01) < 1e-6
-    m.reset_view(); assert m.zoom == 1.0
+    m.reset_view()
+    assert m.zoom == 1.0
     kinds = [qt_icons.kind_of(r) for r in df.to_dict("records")]
-    assert kinds[0]["letter"] == "K" and kinds[1]["activity"] == "STAR_FORMING" and kinds[2]["radio"] == "RADIO_LOUD" and kinds[2]["xray"]
-    img = v.grab().toImage(); assert not img.isNull()
+    assert (
+        kinds[0]["letter"] == "K"
+        and kinds[1]["activity"] == "STAR_FORMING"
+        and kinds[2]["radio"] == "RADIO_LOUD"
+        and kinds[2]["xray"]
+    )
+    img = v.grab().toImage()
+    assert not img.isNull()
     # A parentless widget must be deleted while the QApplication exists;
     # left to the garbage collector at interpreter exit it crashed Qt.
-    v.close(); v.deleteLater(); app.processEvents()
+    v.close()
+    v.deleteLater()
+    app.processEvents()
 
 
 def test_literature_row_links_papers_to_ads():
     pytest.importorskip("PySide6")
     from qt_widgets import _paper_html
-    row = {"paper_class": "Galaxy in a group", "paper_source": "SIMBAD NGC  4522 (otype GiG, 250 papers)",
-           "paper_refs": "2004AJ....127.3361K (2004) Ram pressure <stripping>"}
+
+    row = {
+        "paper_class": "Galaxy in a group",
+        "paper_source": "SIMBAD NGC  4522 (otype GiG, 250 papers)",
+        "paper_refs": "2004AJ....127.3361K (2004) Ram pressure <stripping>",
+    }
     out = _paper_html(row)
     assert "<b>Galaxy in a group</b>" in out and "&lt;stripping&gt;" in out
     assert "href='https://ui.adsabs.harvard.edu/abs/2004AJ....127.3361K'" in out
@@ -163,21 +237,33 @@ def test_filter_proxy_follows_a_larger_new_frame():
     import pandas as pd
     from PySide6.QtWidgets import QApplication
     from qt_models import DataFrameModel, ResultsFilter
+
     app = QApplication.instance() or QApplication([])
     model, proxy = DataFrameModel(), ResultsFilter()
     proxy.setSourceModel(model)
-    frame = lambda n: pd.DataFrame({"object_id": [f"O{i}" for i in range(n)], "primary_class": ["STAR"] * n,
-                                    "classification_status": ["CLASSIFIED"] * n, "parent_object_id": [None] * n})
-    model.set_frame(frame(3)); assert proxy.rowCount() == 3
-    model.set_frame(frame(10)); assert proxy.rowCount() == 10      # used to index the 3-row cache
-    proxy.set_class("GALAXY"); assert proxy.rowCount() == 0
+    frame = lambda n: pd.DataFrame(
+        {
+            "object_id": [f"O{i}" for i in range(n)],
+            "primary_class": ["STAR"] * n,
+            "classification_status": ["CLASSIFIED"] * n,
+            "parent_object_id": [None] * n,
+        }
+    )
+    model.set_frame(frame(3))
+    assert proxy.rowCount() == 3
+    model.set_frame(frame(10))
+    assert proxy.rowCount() == 10  # used to index the 3-row cache
+    proxy.set_class("GALAXY")
+    assert proxy.rowCount() == 0
 
 
 def test_pipeline_on_an_empty_field_returns_no_objects(tmp_path):
     import importlib.util, sys
+
     sys.path.insert(0, str(V2))
     spec = importlib.util.spec_from_file_location("v2_pipeline_empty", V2 / "pipeline.py")
-    mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
     (tmp_path / "raw").mkdir()
     out = mod.run(tmp_path / "work", raw_dir=tmp_path / "raw")
     assert len(out) == 0 and (tmp_path / "work" / "classified_objects.csv").exists()
@@ -186,16 +272,19 @@ def test_pipeline_on_an_empty_field_returns_no_objects(tmp_path):
 def test_single_log_file_appends_and_recreates(tmp_path):
     sys.path.insert(0, str(V2 / "app"))
     from app_log import AppLog
+
     log = AppLog(tmp_path / "sub" / "finding_objects.log")
-    log.start_run("run 1"); log.write("line a")
-    log.start_run("run 2"); log.write_lines(["line b", "line c"])
+    log.start_run("run 1")
+    log.write("line a")
+    log.start_run("run 2")
+    log.write_lines(["line b", "line c"])
     text = log.path.read_text(encoding="utf-8")
     assert text.count("==== run") == 2 and text.index("line a") < text.index("run 2") < text.index("line c")
-    assert len(list(log.path.parent.iterdir())) == 1                       # one file, no per-run files
-    log.path.unlink()                                                      # deleted while the app runs
+    assert len(list(log.path.parent.iterdir())) == 1  # one file, no per-run files
+    log.path.unlink()  # deleted while the app runs
     log.write("after delete")
     assert log.path.exists() and "after delete" in log.path.read_text(encoding="utf-8")
-    log.path.write_bytes(b"x" * 300 + b"\n" + b"y" * 300 + b"\n")          # size cap keeps the newest lines
+    log.path.write_bytes(b"x" * 300 + b"\n" + b"y" * 300 + b"\n")  # size cap keeps the newest lines
     log.trim(max_bytes=400, keep_bytes=310)
     tail = log.path.read_text(encoding="utf-8")
     assert "y" * 300 in tail and "x" * 300 not in tail and "older entries removed" in tail
@@ -204,17 +293,81 @@ def test_single_log_file_appends_and_recreates(tmp_path):
 def test_log_window_follows_file(tmp_path):
     pytest.importorskip("PySide6")
     from PySide6.QtWidgets import QApplication
+
     sys.path.insert(0, str(V2 / "app"))
     from app_log import AppLog
     import qt_widgets
+
     app = QApplication.instance() or QApplication([])
     log = AppLog(tmp_path / "finding_objects.log")
     win = qt_widgets.LogWindow(log)
     win.show()
-    assert log.path.exists()                                               # created when shown
-    log.write("first"); win.poll()
-    log.write("second"); win.poll()
+    assert log.path.exists()  # created when shown
+    log.write("first")
+    win.poll()
+    log.write("second")
+    win.poll()
     assert "first" in win.text.toPlainText() and "second" in win.text.toPlainText()
-    log.path.unlink(); win.poll()                                          # deleted: re-created, view reset
+    log.path.unlink()
+    win.poll()  # deleted: re-created, view reset
     assert log.path.exists() and "first" not in win.text.toPlainText()
     win.close()
+
+
+def test_bookmark_store_dedups_persists_and_survives_corruption(tmp_path):
+    import math
+    from bookmarks import BookmarkStore
+
+    path = tmp_path / "b" / "bookmarks.json"
+    st = BookmarkStore(path)
+    assert st.items == [] and not path.exists()  # created on first save
+    row = {
+        "designation": "NGC 4522",
+        "ra": 188.4155,
+        "dec": 9.1751,
+        "primary_class": "GALAXY",
+        "subclass": float("nan"),
+        "primary_confidence": 0.98,
+    }
+    b = st.add(row, source="/x/classified_objects.csv", note="host")
+    assert b["subclass"] is None and b["confidence"] == 0.98 and path.exists()
+    again = st.add(dict(row, primary_class="QSO"))  # same object: refreshed, note kept
+    assert again["id"] == b["id"] and again["note"] == "host" and again["primary_class"] == "QSO" and len(st.items) == 1
+    nameless = {"ra": 10.0, "dec": -5.0}
+    assert st.toggle(nameless) and st.find({"ra": 10.0 + 0.5 / 3600, "dec": -5.0}) is not None  # 0.5" away: same
+    assert st.find({"ra": 10.0 + 3 / 3600, "dec": -5.0}) is None
+    st.set_note(b["id"], "edited")
+    assert BookmarkStore(path).get(b["id"])["note"] == "edited"  # persisted
+    assert not st.toggle(nameless) and len(BookmarkStore(path).items) == 1
+    df = st.to_frame()
+    assert list(df.name) == ["NGC 4522"] and math.isclose(df.ra[0], 188.4155)
+    path.write_text("{not json", encoding="utf-8")
+    assert BookmarkStore(path).items == [] and path.with_suffix(".json.corrupt").exists()
+
+
+def test_sky_map_paints_without_positions_and_stale_lookups_are_ignored(tmp_path, monkeypatch):
+    """2.23.0: a filter before any results segfaulted the sky map; a late name
+    lookup overwrote coordinates typed after it."""
+    pytest.importorskip("PySide6")
+    from PySide6.QtWidgets import QApplication
+    import qt_app
+
+    app = QApplication.instance() or QApplication([])
+    monkeypatch.setenv("FINDING_OBJECTS_BOOKMARKS", str(tmp_path / "b.json"))
+    monkeypatch.setenv("FINDING_OBJECTS_LOG", str(tmp_path / "l.log"))
+    w = qt_app.MainWindow()
+    w.resize(900, 600)
+    w.tabs.setCurrentWidget(w.sky_view)
+    w.show()
+    w.cmb_class.setCurrentText("STAR")
+    app.processEvents()
+    w.sky.grab()  # paints: no crash
+    w.txt_name.setText("M31")
+    w._lookup_id += 1
+    stale = w._lookup_id
+    w._pending_name = "M31"
+    w.txt_name.setText("10 20")
+    w._resolve_name()
+    w._resolved(stale, 10.684, 41.269, "M31")  # the old answer arrives late
+    assert (round(w.sp_ra.value(), 3), round(w.sp_dec.value(), 3)) == (10.0, 20.0)
+    w.close()

@@ -3,6 +3,7 @@
 Parentless widgets/models created in tests were otherwise destroyed by the
 garbage collector after QApplication at interpreter exit, which crashed Qt
 (segfault / bus error after all tests had passed)."""
+
 import gc
 
 import pytest
@@ -20,7 +21,8 @@ def _qt_cleanup():
     if app is None:
         return
     for w in QApplication.topLevelWidgets():
-        w.close(); w.deleteLater()
+        w.close()
+        w.deleteLater()
     QCoreApplication.sendPostedEvents(None, QEvent.DeferredDelete)
     app.processEvents()
     gc.collect()

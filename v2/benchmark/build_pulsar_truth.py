@@ -21,6 +21,7 @@ measured around that radio position (so the timing positions of pulsars give
 them no advantage): TGSS ADR1 (Intema et al. 2017), LoTSS DR2, FIRST, VLASS,
 Gaia DR3.  Output: v2/benchmark/pulsar_truth/radio_sample.csv.gz
 """
+
 from __future__ import annotations
 import argparse
 import sys
@@ -39,26 +40,40 @@ OUT = BENCH / "pulsar_truth"
 
 def pulsars() -> pd.DataFrame:
     from astroquery.vizier import Vizier
-    t = retry(lambda: Vizier(columns=["PSRJ", "_RAJ2000", "_DEJ2000"], row_limit=-1, timeout=600).get_catalogs("B/psr/psr"),
-              tries=3, wait=30)[0].to_pandas()
+
+    t = retry(
+        lambda: Vizier(columns=["PSRJ", "_RAJ2000", "_DEJ2000"], row_limit=-1, timeout=600).get_catalogs("B/psr/psr"),
+        tries=3,
+        wait=30,
+    )[0].to_pandas()
     print("ATNF rows:", len(t), list(t.columns), flush=True)
-    return pd.DataFrame({"name": t["PSRJ"].astype(str), "ra": pd.to_numeric(t["_RAJ2000"], errors="coerce"),
-                         "dec": pd.to_numeric(t["_DEJ2000"], errors="coerce"), "is_pulsar": 1}).dropna(subset=["ra", "dec"])
+    return pd.DataFrame(
+        {
+            "name": t["PSRJ"].astype(str),
+            "ra": pd.to_numeric(t["_RAJ2000"], errors="coerce"),
+            "dec": pd.to_numeric(t["_DEJ2000"], errors="coerce"),
+            "is_pulsar": 1,
+        }
+    ).dropna(subset=["ra", "dec"])
 
 
 def control(n_cones: int, seed: int) -> pd.DataFrame:
     from astroquery.vizier import Vizier
     from astropy.coordinates import SkyCoord
     import astropy.units as u
+
     rng = np.random.default_rng(seed)
     ra = rng.uniform(0, 360, n_cones)
-    dec = np.degrees(np.arcsin(rng.uniform(np.sin(np.radians(-40)), 1, n_cones)))    # NVSS: dec > -40
+    dec = np.degrees(np.arcsin(rng.uniform(np.sin(np.radians(-40)), 1, n_cones)))  # NVSS: dec > -40
     v = Vizier(columns=["NVSS", "_RAJ2000", "_DEJ2000"], row_limit=-1, timeout=600)
     parts = []
     for r, d in zip(ra, dec):
         try:
-            res = retry(lambda: v.query_region(SkyCoord(r * u.deg, d * u.deg), radius=0.5 * u.deg, catalog="VIII/65/nvss"),
-                        tries=3, wait=20)
+            res = retry(
+                lambda: v.query_region(SkyCoord(r * u.deg, d * u.deg), radius=0.5 * u.deg, catalog="VIII/65/nvss"),
+                tries=3,
+                wait=20,
+            )
         except Exception as exc:
             print("control cone failed", str(exc)[:120], flush=True)
             continue
@@ -66,7 +81,9 @@ def control(n_cones: int, seed: int) -> pd.DataFrame:
             parts.append(res[0].to_pandas())
     t = pd.concat(parts, ignore_index=True).drop_duplicates("NVSS")
     print("control NVSS sources:", len(t), flush=True)
-    return pd.DataFrame({"name": "NVSS " + t["NVSS"].astype(str), "ra": t["_RAJ2000"], "dec": t["_DEJ2000"], "is_pulsar": 0})
+    return pd.DataFrame(
+        {"name": "NVSS " + t["NVSS"].astype(str), "ra": t["_RAJ2000"], "dec": t["_DEJ2000"], "is_pulsar": 0}
+    )
 
 
 def main() -> None:
@@ -81,14 +98,16 @@ def main() -> None:
     print("NVSS detected:", d.groupby("is_pulsar")["nvss_S1.4"].apply(lambda s: s.notna().sum()).to_dict(), flush=True)
     d = d[d["nvss_S1.4"].notna()].copy()
     d["truth_ra"], d["truth_dec"] = d.ra, d.dec
-    d["ra"], d["dec"] = d["nvss__RAJ2000"], d["nvss__DEJ2000"]          # measure everything around the radio position
+    d["ra"], d["dec"] = d["nvss__RAJ2000"], d["nvss__DEJ2000"]  # measure everything around the radio position
     # Column names differ between surveys: keep all, choose in the analysis.
-    for table, radius, cols, prefix in (("J/A+A/598/A78/table3", 25.0, ["**"], "tgss_"),
-                                        ("J/A+A/659/A1", 10.0, ["**"], "lotss_"),
-                                        ("VIII/92/first14", 5.0, ["**"], "first_"),
-                                        ("J/ApJS/255/30", 5.0, ["**"], "vlass_"),
-                                        ("I/355/gaiadr3", 5.0, ["Source", "Gmag", "Plx", "e_Plx"], "gaia_")):
-        try:                     # one failing survey must not lose the others
+    for table, radius, cols, prefix in (
+        ("J/A+A/598/A78/table3", 25.0, ["**"], "tgss_"),
+        ("J/A+A/659/A1", 10.0, ["**"], "lotss_"),
+        ("VIII/92/first14", 5.0, ["**"], "first_"),
+        ("J/ApJS/255/30", 5.0, ["**"], "vlass_"),
+        ("I/355/gaiadr3", 5.0, ["Source", "Gmag", "Plx", "e_Plx"], "gaia_"),
+    ):
+        try:  # one failing survey must not lose the others
             d = nearest(d, table, radius, cols, prefix)
         except Exception as exc:
             print(f"{table}: skipped ({type(exc).__name__}: {str(exc)[:120]})", flush=True)

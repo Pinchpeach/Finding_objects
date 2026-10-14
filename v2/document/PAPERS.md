@@ -11,14 +11,14 @@ v2의 코드·문서·규칙표가 인용하는 논문, 카탈로그 출판물, 
 | [탐사·카탈로그 데이터](#survey) | 29 |
 | [데이터 출처 카탈로그 (논문 인용 없음)](#data) | 13 |
 | [교차 대응·통계·분류 방법](#method) | 14 |
-| [별 분류](#star) | 39 |
+| [별 분류](#star) | 40 |
 | [은하 분류](#galaxy) | 25 |
 | [퀘이사·AGN](#qso) | 15 |
 | [전파·X선·밀집성](#radio) | 11 |
 | [행성상성운·초신성·과도 현상](#trans) | 8 |
 | [기타 문서](#doc) | 13 |
 | [분광 분류 기준](#spec) | 43 |
-| **합계** | **238** |
+| **합계** | **239** |
 
 <a id="gaia"></a>
 ## 측성·Gaia
@@ -190,6 +190,7 @@ Gaia 데이터 릴리스, Gaia 처리·검증 논문, 측성 품질 기준.
 | Sarro et al. 2023 | A&A 669, A139; arXiv:2211.03641 | — | `Classifier/axes/physical.py (ultracool_evidence)`<br>`Get_data/gaia_dr3.py` | Gaia ESP-UCD Teff < 2700 K 초저온 왜성 후보, 품질 범주 0·1 |
 | Best et al. 2018 | ApJS 234, 1 | — | `benchmark/new_targets/build_truth.py` | 초저온 왜성 판정의 독립 분광 정답(M/L/T 9888개) |
 | Marton et al. 2023 | A&A 674, A21 | — | `Classifier/axes/variability.py (YSO)` | Gaia 변광 분류 YSO의 오염률 ~10 % |
+| Drimmel & Spergel 2001 | ApJ 556, 181 | — | `Classifier/subclass.py (_dust_fraction)` | 먼지 원반 척도 높이 134 pc: 시차가 있는 별은 SFD 적색화 중 별 앞쪽 몫만 적용(2.23.0) |
 
 <a id="galaxy"></a>
 ## 은하 분류

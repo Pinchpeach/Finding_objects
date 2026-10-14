@@ -19,6 +19,7 @@ Contamination truth is (a) the SIMBAD type and (b) the Gaia absolute Ks
 magnitude against the RGB tip.  Output:
 v2/benchmark/agb_truth/agb_gate_sample.csv.gz
 """
+
 from __future__ import annotations
 import argparse
 import sys
@@ -42,16 +43,20 @@ def lpv_cones(n: int, radius_deg: float, seed: int) -> pd.DataFrame:
     from astroquery.vizier import Vizier
     from astropy.coordinates import SkyCoord
     import astropy.units as u
+
     rng = np.random.default_rng(seed)
     ra = rng.uniform(0, 360, n)
-    dec = np.degrees(np.arcsin(rng.uniform(-1, 1, n)))       # uniform on the sphere
+    dec = np.degrees(np.arcsin(rng.uniform(-1, 1, n)))  # uniform on the sphere
     v = Vizier(columns=["Source", "RA_ICRS", "DE_ICRS", "isCstar", "Freq", "Amp"], row_limit=-1, timeout=600)
     parts = []
     for i, (r, d) in enumerate(zip(ra, dec)):
         t0 = time.time()
         try:
-            res = retry(lambda: v.query_region(SkyCoord(r * u.deg, d * u.deg), radius=radius_deg * u.deg,
-                                               catalog="I/358/vlpv"), tries=3, wait=20)
+            res = retry(
+                lambda: v.query_region(SkyCoord(r * u.deg, d * u.deg), radius=radius_deg * u.deg, catalog="I/358/vlpv"),
+                tries=3,
+                wait=20,
+            )
         except Exception as exc:
             print(f"cone {i}: failed {str(exc)[:150]}", flush=True)
             continue
@@ -59,10 +64,20 @@ def lpv_cones(n: int, radius_deg: float, seed: int) -> pd.DataFrame:
             t = res[0].to_pandas()
             t["cone"] = i
             parts.append(t)
-        print(f"cone {i} ({r:.1f}, {d:+.1f}): {len(parts[-1]) if res else 0} LPVs in {time.time() - t0:.0f} s", flush=True)
+        print(
+            f"cone {i} ({r:.1f}, {d:+.1f}): {len(parts[-1]) if res else 0} LPVs in {time.time() - t0:.0f} s", flush=True
+        )
     df = pd.concat(parts, ignore_index=True).drop_duplicates("Source")
-    df = df.rename(columns={"Source": "lpv_source_id", "RA_ICRS": "ra", "DE_ICRS": "dec", "isCstar": "lpv_is_cstar",
-                            "Freq": "lpv_frequency", "Amp": "lpv_amplitude"})
+    df = df.rename(
+        columns={
+            "Source": "lpv_source_id",
+            "RA_ICRS": "ra",
+            "DE_ICRS": "dec",
+            "isCstar": "lpv_is_cstar",
+            "Freq": "lpv_frequency",
+            "Amp": "lpv_amplitude",
+        }
+    )
     df.insert(0, "agb_id", np.arange(len(df)))
     return df
 
@@ -70,14 +85,18 @@ def lpv_cones(n: int, radius_deg: float, seed: int) -> pd.DataFrame:
 def simbad(df: pd.DataFrame, chunk: int = 2000) -> pd.DataFrame:
     import pyvo
     from astropy.table import Table
+
     svc = pyvo.dal.TAPService(SIMBAD_TAP)
     parts = []
     for s0 in range(0, len(df), chunk):
-        up = Table.from_pandas(df.iloc[s0:s0 + chunk][["agb_id", "ra", "dec"]])
+        up = Table.from_pandas(df.iloc[s0 : s0 + chunk][["agb_id", "ra", "dec"]])
         t0 = time.time()
         try:
-            r = retry(lambda: svc.run_sync(SIMBAD_Q, uploads={"t": up}, maxrec=10 * chunk).to_table().to_pandas(),
-                      tries=3, wait=30)
+            r = retry(
+                lambda: svc.run_sync(SIMBAD_Q, uploads={"t": up}, maxrec=10 * chunk).to_table().to_pandas(),
+                tries=3,
+                wait=30,
+            )
         except Exception as exc:
             print(f"simbad rows {s0}+: failed {str(exc)[:200]}", flush=True)
             continue
@@ -88,8 +107,11 @@ def simbad(df: pd.DataFrame, chunk: int = 2000) -> pd.DataFrame:
     s = pd.concat(parts, ignore_index=True)
     for c in ("main_id", "otype", "sp_type"):
         s[c] = s[c].astype(str).str.strip()
-    return df.merge(s.rename(columns={"main_id": "simbad_main_id", "otype": "simbad_otype", "sp_type": "simbad_sp_type"}),
-                    on="agb_id", how="left")
+    return df.merge(
+        s.rename(columns={"main_id": "simbad_main_id", "otype": "simbad_otype", "sp_type": "simbad_sp_type"}),
+        on="agb_id",
+        how="left",
+    )
 
 
 def main() -> None:

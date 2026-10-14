@@ -1,0 +1,5 @@
+# Code style for the whole repository (2.23.0): `black .` formats every Python
+# file the same way, one statement per line.
+[tool.black]
+line-length = 120
+target-version = ["py311"]

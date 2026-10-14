@@ -53,10 +53,23 @@ jobs:
           exe=dist/FindingObjects/FindingObjects
           [ -f "$exe.exe" ] && exe="$exe.exe"
           python v2/app/packaging/smoke_test.py "$exe"
+      # Zipped here, before upload: upload-artifact does not keep file modes,
+      # so the Linux / macOS executable and its libraries came back without
+      # the executable bit (2.23.0).  zip -y keeps symlinks (macOS frameworks).
+      - name: Zip build (keeps permissions)
+        shell: bash
+        run: |
+          name="FindingObjects-${{ runner.os }}"
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            (cd dist && 7z a -tzip -bd "../$name.zip" FindingObjects >/dev/null)
+          else
+            (cd dist && zip -qry "../$name.zip" FindingObjects)
+          fi
+          ls -l "$name.zip"
       - uses: actions/upload-artifact@v4
         with:
           name: FindingObjects-${{ runner.os }}
-          path: dist/FindingObjects
+          path: FindingObjects-${{ runner.os }}.zip
           retention-days: 30
 
   release:
@@ -77,11 +90,10 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: builds
-      - name: Zip each build
+      - name: Name each build's zip by the release tag
         run: |
-          cd builds
-          for d in FindingObjects-*; do (cd "$d" && zip -qr "../../$d-${TAG}.zip" .); done
-          ls -l ..
+          for d in builds/FindingObjects-*; do mv "$d/$(basename "$d").zip" "$(basename "$d")-${TAG}.zip"; done
+          ls -l
       - name: Publish release
         env:
           GH_TOKEN: ${{ github.token }}

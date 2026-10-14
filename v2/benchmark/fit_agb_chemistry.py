@@ -22,6 +22,7 @@ before the models are used (Classifier/subclass.py AGB_MAX_MKS).
     python v2/benchmark/fit_agb_chemistry.py            # prints metrics
     python v2/benchmark/fit_agb_chemistry.py --write    # updates the model file
 """
+
 from __future__ import annotations
 import argparse
 import json
@@ -36,10 +37,12 @@ TRUTH = V2 / "benchmark/agb_truth/agb_chemistry_truth.csv.gz"
 GCVS = V2 / "benchmark/agb_truth/agb_gcvs_truth.csv.gz"
 FIELD = V2 / "benchmark/agb_truth/agb_gate_sample.csv.gz"
 MODEL = V2 / "Classifier/agb_chemistry_model.json"
-SPEC = [("GAIA_2MASS_WISE_CSTAR", ["dW", "kw3", "cst"]),
-        ("GAIA_2MASS_CSTAR", ["dW", "jk", "cst"]),
-        ("GAIA_2MASS", ["dW", "jk"]),
-        ("NIR_MIR", ["jk", "kw3", "w12", "w34"])]
+SPEC = [
+    ("GAIA_2MASS_WISE_CSTAR", ["dW", "kw3", "cst"]),
+    ("GAIA_2MASS_CSTAR", ["dW", "jk", "cst"]),
+    ("GAIA_2MASS", ["dW", "jk"]),
+    ("NIR_MIR", ["jk", "kw3", "w12", "w34"]),
+]
 # AllWISE saturation (Cutri et al. 2012, Explanatory Supplement): W1 < 8.0,
 # W2 < 6.7, W3 < 3.8, W4 < -0.4 (Vega).  61 % of the bright GCVS LPVs are
 # saturated in W3; their Ks - W3 is not usable.
@@ -71,8 +74,12 @@ def features(d: pd.DataFrame) -> pd.DataFrame:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("--truth", nargs="+", default=[str(TRUTH)] + ([str(GCVS)] if GCVS.exists() else []),
-                    help="truth files (Suh 2021; GCVS LPVs with spectral types)")
+    ap.add_argument(
+        "--truth",
+        nargs="+",
+        default=[str(TRUTH)] + ([str(GCVS)] if GCVS.exists() else []),
+        help="truth files (Suh 2021; GCVS LPVs with spectral types)",
+    )
     ap.add_argument("--band", type=float, default=0.15, help="abstain band of the models with the Gaia C-star flag")
     ap.add_argument("--band-noflag", type=float, default=0.15, help="abstain band of the models without it")
     ap.add_argument("--seed", type=int, default=42)
@@ -80,8 +87,12 @@ def main() -> None:
     ap.add_argument("--write", action="store_true", help=f"write {MODEL.relative_to(V2)}")
     a = ap.parse_args()
 
-    d = features(pd.concat([pd.read_csv(f, low_memory=False).assign(source=Path(f).name.split(".")[0])
-                            for f in a.truth], ignore_index=True))
+    d = features(
+        pd.concat(
+            [pd.read_csv(f, low_memory=False).assign(source=Path(f).name.split(".")[0]) for f in a.truth],
+            ignore_index=True,
+        )
+    )
     good = (d.g_plx > 0) & (d.g_eplx > 0) & (d.g_plx / d.g_eplx >= 5) & (d.g_ruwe < 1.4)
     faint = good & (d.tm_ks + 5 * np.log10(d.g_plx.where(d.g_plx > 0)) - 10 > -1.0)
     n_faint = {k: int(v) for k, v in d[faint].chem.value_counts().items()}
@@ -94,8 +105,11 @@ def main() -> None:
     for name, f in SPEC:
         m = d[f].notna().all(axis=1).to_numpy()
         clf = LogisticRegression(max_iter=1000).fit(d.loc[m & train, f].to_numpy(), y[m & train])
-        models[name] = {"features": f, "coef": [round(float(c), 4) for c in clf.coef_[0]],
-                        "intercept": round(float(clf.intercept_[0]), 4)}
+        models[name] = {
+            "features": f,
+            "coef": [round(float(c), 4) for c in clf.coef_[0]],
+            "intercept": round(float(clf.intercept_[0]), 4),
+        }
         p = np.full(len(d), np.nan)
         p[m] = clf.predict_proba(d.loc[m, f].to_numpy())[:, 1]
         P[name] = p
@@ -103,7 +117,7 @@ def main() -> None:
     pred = np.full(len(d), np.nan)
     src = np.full(len(d), "", dtype=object)
     feats_of = dict(SPEC)
-    for name, _ in SPEC:                       # first available model wins
+    for name, _ in SPEC:  # first available model wins
         todo = (src == "") & ~np.isnan(P[name])
         src[todo] = name
         band = a.band if "cst" in feats_of[name] else a.band_noflag
@@ -114,23 +128,33 @@ def main() -> None:
     m = te & ~np.isnan(pred)
     pc, yc = pred[m], y[m]
     r = lambda x: round(float(x), 3)
-    res = {"test_n": int(te.sum()), "coverage": r(m.sum() / te.sum()), "accuracy": r((pc == yc).mean()),
-           "C_precision": r(((pc == 1) & (yc == 1)).sum() / max((pc == 1).sum(), 1)),
-           "C_recall": r(((pc == 1) & (yc == 1)).sum() / max((yc == 1).sum(), 1)),
-           "O_precision": r(((pc == 0) & (yc == 0)).sum() / max((pc == 0).sum(), 1)),
-           "O_recall": r(((pc == 0) & (yc == 0)).sum() / max((yc == 0).sum(), 1)),
-           "per_model": {}}
+    res = {
+        "test_n": int(te.sum()),
+        "coverage": r(m.sum() / te.sum()),
+        "accuracy": r((pc == yc).mean()),
+        "C_precision": r(((pc == 1) & (yc == 1)).sum() / max((pc == 1).sum(), 1)),
+        "C_recall": r(((pc == 1) & (yc == 1)).sum() / max((yc == 1).sum(), 1)),
+        "O_precision": r(((pc == 0) & (yc == 0)).sum() / max((pc == 0).sum(), 1)),
+        "O_recall": r(((pc == 0) & (yc == 0)).sum() / max((yc == 0).sum(), 1)),
+        "per_model": {},
+    }
     for name, _ in SPEC:
         mm = te & (src == name)
         ok = mm & ~np.isnan(pred)
-        res["per_model"][name] = {"n": int(mm.sum()), "decided": int(ok.sum()),
-                                  "accuracy": r((pred[ok] == y[ok]).mean()) if ok.any() else None}
+        res["per_model"][name] = {
+            "n": int(mm.sum()),
+            "decided": int(ok.sum()),
+            "accuracy": r((pred[ok] == y[ok]).mean()) if ok.any() else None,
+        }
     res["by_source"] = {}
     for src_name, ms in d.groupby("source").groups.items():
         mm = te & d.index.isin(ms) & ~np.isnan(pred)
-        res["by_source"][src_name] = {"test_n": int((te & d.index.isin(ms)).sum()), "decided": int(mm.sum()),
-                                      "accuracy": r((pred[mm] == y[mm]).mean()) if mm.any() else None,
-                                      "C_fraction_true": r(y[te & d.index.isin(ms)].mean())}
+        res["by_source"][src_name] = {
+            "test_n": int((te & d.index.isin(ms)).sum()),
+            "decided": int(mm.sum()),
+            "accuracy": r((pred[mm] == y[mm]).mean()) if mm.any() else None,
+            "C_fraction_true": r(y[te & d.index.isin(ms)].mean()),
+        }
     if FIELD.exists():
         f = features(pd.read_csv(FIELD, low_memory=False))
         fp = np.full(len(f), np.nan)
@@ -141,14 +165,21 @@ def main() -> None:
             p_ = 1 / (1 + np.exp(-z))
             fp[np.where(m)[0]] = np.where(np.abs(p_ - 0.5) >= models[name]["abstain_band"], p_ >= 0.5, np.nan)
             done |= m
-        res["field_lpv_sample"] = {"n": int(len(f)), "decided": int((~np.isnan(fp)).sum()),
-                                   "C_fraction_predicted": r(np.nanmean(fp)),
-                                   "is_cstar_fraction": r(f.lpv_is_cstar.mean())}
+        res["field_lpv_sample"] = {
+            "n": int(len(f)),
+            "decided": int((~np.isnan(fp)).sum()),
+            "C_fraction_predicted": r(np.nanmean(fp)),
+            "is_cstar_fraction": r(f.lpv_is_cstar.mean()),
+        }
     res["O_rich_Ks_W3_gt_1"] = r((d.kw3[d.chem.eq("O")] > 1.0).mean())
-    out = {"models": models, "abstain_band": a.band, "test": res,
-           "split": f"50/50 random (seed {a.seed}); fitted on train half, metrics on test half",
-           "excluded_sub_red_clump": {} if a.keep_faint else n_faint,
-           "truth": [str(Path(f).relative_to(V2)) if Path(f).is_absolute() else f for f in a.truth]}
+    out = {
+        "models": models,
+        "abstain_band": a.band,
+        "test": res,
+        "split": f"50/50 random (seed {a.seed}); fitted on train half, metrics on test half",
+        "excluded_sub_red_clump": {} if a.keep_faint else n_faint,
+        "truth": [str(Path(f).relative_to(V2)) if Path(f).is_absolute() else f for f in a.truth],
+    }
     print(json.dumps(out, indent=1))
     if a.write:
         MODEL.write_text(json.dumps(out, indent=1))

@@ -14,6 +14,7 @@ Photometry: Gaia DR3, 2MASS, AllWISE and the Gaia DR3 LPV table, nearest
 source (VizieR multi-position cone search, as build_agb_chemistry_truth.py).
 Output: v2/benchmark/agb_truth/agb_gcvs_truth.csv.gz
 """
+
 from __future__ import annotations
 import argparse
 import re
@@ -44,6 +45,7 @@ def chem_of(sp: str) -> str | None:
 
 def labels() -> pd.DataFrame:
     from astroquery.vizier import Vizier
+
     v = Vizier(columns=["GCVS", "VarType", "SpType", "Period", "_RAJ2000", "_DEJ2000"], row_limit=-1, timeout=600)
     t = retry(lambda: v.get_catalogs("B/gcvs/gcvs_cat"), tries=3, wait=30)[0].to_pandas()
     print("GCVS rows:", len(t), "columns:", list(t.columns), flush=True)
@@ -51,12 +53,23 @@ def labels() -> pd.DataFrame:
     t = t[t["var"].str.match(LPV_TYPES)]
     t["chem"] = t["SpType"].map(chem_of)
     t = t.dropna(subset=["chem", "_RAJ2000", "_DEJ2000"])
-    out = pd.DataFrame({"agb_id": range(len(t)), "ra": pd.to_numeric(t["_RAJ2000"]).to_numpy(),
-                        "dec": pd.to_numeric(t["_DEJ2000"]).to_numpy(), "chem": t["chem"].to_numpy(),
-                        "gcvs_name": t["GCVS"].astype(str).str.strip().to_numpy(), "gcvs_type": t["var"].to_numpy(),
-                        "gcvs_sptype": t["SpType"].astype(str).str.strip().to_numpy()})
-    print("GCVS LPVs with spectral types:", out.chem.value_counts().to_dict(),
-          out.gcvs_type.str.extract(r"^([A-Z]+)")[0].value_counts().head(8).to_dict(), flush=True)
+    out = pd.DataFrame(
+        {
+            "agb_id": range(len(t)),
+            "ra": pd.to_numeric(t["_RAJ2000"]).to_numpy(),
+            "dec": pd.to_numeric(t["_DEJ2000"]).to_numpy(),
+            "chem": t["chem"].to_numpy(),
+            "gcvs_name": t["GCVS"].astype(str).str.strip().to_numpy(),
+            "gcvs_type": t["var"].to_numpy(),
+            "gcvs_sptype": t["SpType"].astype(str).str.strip().to_numpy(),
+        }
+    )
+    print(
+        "GCVS LPVs with spectral types:",
+        out.chem.value_counts().to_dict(),
+        out.gcvs_type.str.extract(r"^([A-Z]+)")[0].value_counts().head(8).to_dict(),
+        flush=True,
+    )
     return out
 
 
@@ -65,7 +78,7 @@ def main() -> None:
     p.add_argument("--out", type=Path, default=BENCH / "agb_truth" / "agb_gcvs_truth.csv.gz")
     a = p.parse_args()
     cats = dict(ASU_CATALOGS)
-    cats["gaia"] = (cats["gaia"][0], 3.0, *cats["gaia"][2:])       # GCVS positions are older
+    cats["gaia"] = (cats["gaia"][0], 3.0, *cats["gaia"][2:])  # GCVS positions are older
     df = vizier_asu(labels(), catalogs=cats)
     phot = [c for c in df.columns if c.startswith(("g_", "tm_", "aw_"))]
     if not phot or df[phot].notna().any(axis=1).mean() < 0.2:

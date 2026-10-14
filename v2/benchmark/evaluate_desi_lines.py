@@ -9,6 +9,7 @@ decide, the confusion matrix, and agreement by DESI rule.
 
     python v2/benchmark/evaluate_desi_lines.py [--out metrics.json]
 """
+
 from __future__ import annotations
 import argparse
 import json
@@ -30,7 +31,7 @@ def _row(r: dict, src: str, prefix: str) -> dict:
         if k.startswith(src + "_line_") or k == src + "_d4000_n":
             if isinstance(v, float) and v != v:
                 continue
-            out[prefix + k[len(src) + 1:]] = v
+            out[prefix + k[len(src) + 1 :]] = v
     return out
 
 
@@ -52,8 +53,10 @@ def main() -> None:
     # Adjacent classes on the BPT sequence (SF - composite - AGN) differ by line
     # ratio noise near a boundary; reported separately from the exact match.
     order = {"STAR_FORMING": 0, "COMPOSITE": 1, "AGN": 2}
-    adj = [(a_ == b_) or (a_ in order and b_ in order and abs(order[a_] - order[b_]) == 1)
-           for a_, b_ in zip(d.sdss_class[both], d.desi_class[both])]
+    adj = [
+        (a_ == b_) or (a_ in order and b_ in order and abs(order[a_] - order[b_]) == 1)
+        for a_, b_ in zip(d.sdss_class[both], d.desi_class[both])
+    ]
     out = {
         "n": int(len(d)),
         "z_median": round(float(d.z.median()), 3),
@@ -64,10 +67,14 @@ def main() -> None:
         "agreement": round(float(agree.mean()), 4) if both.any() else None,
         "agreement_within_adjacent": round(float(pd.Series(adj).mean()), 4) if both.any() else None,
         "confusion_sdss_rows_desi_cols": pd.crosstab(d.sdss_class[both], d.desi_class[both]).to_dict(orient="index"),
-        "agreement_by_desi_rule": {k: {"n": int(len(g)), "agreement": round(float((g.sdss_class == g.desi_class).mean()), 4)}
-                                   for k, g in d[both].groupby("desi_rule")},
-        "class_fraction": {"sdss": d.sdss_class[both].value_counts(normalize=True).round(4).to_dict(),
-                           "desi": d.desi_class[both].value_counts(normalize=True).round(4).to_dict()},
+        "agreement_by_desi_rule": {
+            k: {"n": int(len(g)), "agreement": round(float((g.sdss_class == g.desi_class).mean()), 4)}
+            for k, g in d[both].groupby("desi_rule")
+        },
+        "class_fraction": {
+            "sdss": d.sdss_class[both].value_counts(normalize=True).round(4).to_dict(),
+            "desi": d.desi_class[both].value_counts(normalize=True).round(4).to_dict(),
+        },
     }
     print(json.dumps(out, indent=1))
     a.out.write_text(json.dumps(out, indent=1))

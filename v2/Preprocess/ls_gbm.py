@@ -15,6 +15,7 @@ Inference needs only numpy: the fitted trees are exported to
 app does not ship scikit-learn.  Missing features follow the trained
 missing-value direction of each split, as in scikit-learn.
 """
+
 from __future__ import annotations
 from functools import lru_cache
 from pathlib import Path
@@ -57,12 +58,26 @@ def features(df: pd.DataFrame, prefix: str = P) -> np.ndarray:
         with np.errstate(divide="ignore", invalid="ignore"):
             s = f * np.sqrt(np.where(iv > 0, iv, np.nan))
             snr[b] = np.where(s > 0, np.log10(s), np.nan)
-    typ = df[f"{prefix}type"].astype(str).str.strip().str.upper().to_numpy() if f"{prefix}type" in df else np.array([""] * len(df))
-    typ = np.where(typ == "GPSF", "PSF", typ)        # DR9 Gaia point source = point-source model
+    typ = (
+        df[f"{prefix}type"].astype(str).str.strip().str.upper().to_numpy()
+        if f"{prefix}type" in df
+        else np.array([""] * len(df))
+    )
+    typ = np.where(typ == "GPSF", "PSF", typ)  # DR9 Gaia point source = point-source model
     known = np.isin(typ, TYPES)
     onehot = [np.where(known, (typ == t).astype(float), np.nan) for t in TYPES]
-    X = np.column_stack([mag["r"], mag["g"] - mag["r"], mag["r"] - mag["z"], mag["z"] - mag["w1"],
-                         mag["w1"] - mag["w2"], mag["r"] - mag["w1"], snr["r"], *onehot])
+    X = np.column_stack(
+        [
+            mag["r"],
+            mag["g"] - mag["r"],
+            mag["r"] - mag["z"],
+            mag["z"] - mag["w1"],
+            mag["w1"] - mag["w2"],
+            mag["r"] - mag["w1"],
+            snr["r"],
+            *onehot,
+        ]
+    )
     return X
 
 
@@ -101,7 +116,7 @@ def predict_proba(df: pd.DataFrame, prefix: str = P) -> np.ndarray:
     model = load_model()
     X = features(df, prefix)
     probs = np.full((len(df), len(CLASSES)), np.nan)
-    has = np.isfinite(X[:, [0, 6]]).any(axis=1) | np.isfinite(X[:, 3])        # r mag, r S/N or z-W1
+    has = np.isfinite(X[:, [0, 6]]).any(axis=1) | np.isfinite(X[:, 3])  # r mag, r S/N or z-W1
     if model is None or not has.any():
         return probs
     z = raw_scores(X[has], model)
