@@ -12,10 +12,10 @@ def _degrees(df:pd.DataFrame):
   if ra.notna().all() and dec.notna().all():return ra,dec
  ra=pd.to_numeric(df["RAJ2000"],errors="coerce");dec=pd.to_numeric(df["DEJ2000"],errors="coerce")
  if len(df) and (ra.isna().any() or dec.isna().any()):
-  from astropy.coordinates import SkyCoord
-  import astropy.units as u
-  c=SkyCoord(df["RAJ2000"].astype(str).tolist(),df["DEJ2000"].astype(str).tolist(),unit=(u.hourangle,u.deg))
-  ra=pd.Series(c.ra.deg,index=df.index);dec=pd.Series(c.dec.deg,index=df.index)
+  # Row by row (2.23.0): one empty or malformed value made the bulk
+  # SkyCoord parse raise and the whole collector fail.
+  from _catalog_utils import coordinates
+  ra,dec=coordinates(df,["RAJ2000"],["DEJ2000"])
  return ra,dec
 def fetch(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
  from astroquery.vizier import Vizier

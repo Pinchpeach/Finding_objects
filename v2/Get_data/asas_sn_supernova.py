@@ -16,11 +16,12 @@ def fetch(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
     from astropy.coordinates import SkyCoord
     import astropy.units as u
     coord=SkyCoord(float(ra)*u.deg,float(dec)*u.deg,frame="icrs")
-    frames=[]
+    frames=[];failed=[]
     for table in TABLES:
         try:
             result=Vizier(columns=["**"],row_limit=-1).query_region(coord,radius=float(radius_arcmin)*u.arcmin,catalog=table)
-        except Exception:
+        except Exception as exc:
+            failed.append(f"{table}:{type(exc).__name__}")   # recorded, not silently dropped (2.23.0)
             continue
         if not result:continue
         df=result[0].to_pandas()
@@ -44,8 +45,11 @@ def fetch(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
         out.insert(0,"catalog",CATALOG);out.insert(1,"catalog_object_id",out[idc].astype("string"));out.insert(2,"object_name",out[idc].astype("string"))
         out=add_standard_metadata(out,radius_arcmin=radius_arcmin,ref_epoch=2000.0,poserr_arcsec=1.0,entity_kind="transient_event")
         frames.append(out)
+    if failed and not frames:raise RuntimeError("ASAS-SN tables failed: "+", ".join(failed))
     if not frames:return pd.DataFrame(columns=["catalog","catalog_object_id","object_name","ra","dec","sn_subtype","event_mjd","entity_kind"])
-    return pd.concat(frames,ignore_index=True,sort=False).dropna(subset=["ra","dec"]).drop_duplicates("catalog_object_id",keep="last").reset_index(drop=True)
+    out=pd.concat(frames,ignore_index=True,sort=False).dropna(subset=["ra","dec"]).drop_duplicates("catalog_object_id",keep="last").reset_index(drop=True)
+    out["sn_query_status"]="error:"+",".join(failed) if failed else "ok"
+    return out
 
 def save(df:pd.DataFrame,path:str|Path)->None:
     required={"catalog","catalog_object_id","object_name","ra","dec"}

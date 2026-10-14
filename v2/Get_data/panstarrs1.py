@@ -29,7 +29,11 @@ def dedupe_positions(df:pd.DataFrame,radius_arcsec:float=DEDUPE_ARCSEC)->pd.Data
  if len(df)<2:return df
  d=df.assign(_n=pd.to_numeric(df.get("nDetections"),errors="coerce").fillna(0)).sort_values("_n",ascending=False,kind="stable")
  cell=radius_arcsec/3600.0; grid={}; keep=[]
- for idx,ra,dec in zip(d.index,pd.to_numeric(d["ra"],errors="coerce"),pd.to_numeric(d["dec"],errors="coerce")):
+ ras=pd.to_numeric(d["ra"],errors="coerce")
+ # RA relative to one row of the cone, wrapped to (-180, 180]: rows at 359.9999
+ # and 0.0001 deg are neighbours, not 360 deg apart (2.23.0).
+ ref=float(ras.dropna().iloc[0]) if ras.notna().any() else 0.0
+ for idx,ra,dec in zip(d.index,((ras-ref+180.0)%360.0)-180.0,pd.to_numeric(d["dec"],errors="coerce")):
   if ra!=ra or dec!=dec:keep.append(idx);continue
   c=math.cos(math.radians(dec)); kx,ky=int(math.floor(ra*c/cell)),int(math.floor(dec/cell)); dup=False
   for i in (kx-1,kx,kx+1):

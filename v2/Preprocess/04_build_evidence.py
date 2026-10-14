@@ -8,6 +8,9 @@ from __future__ import annotations
 import argparse,json,math
 from pathlib import Path
 import pandas as pd
+import importlib.util as _tio_u
+_tio_s=_tio_u.spec_from_file_location("v2_table_io",Path(__file__).resolve().parents[1]/"Preprocess"/"table_io.py")
+TABLE_IO=_tio_u.module_from_spec(_tio_s);_tio_s.loader.exec_module(TABLE_IO)
 import importlib.util as _ilu
 _s=_ilu.spec_from_file_location("v2_simbad_otypes_s4",Path(__file__).resolve().parents[1]/"Classifier"/"simbad_otypes.py")
 OTYPES=_ilu.module_from_spec(_s);_s.loader.exec_module(OTYPES)
@@ -356,7 +359,7 @@ def _ls_gbm_evidence(df,rule_list):
 SOFT_SUFFIXES=("-CKNN-001","-GBM-001")
 
 def run(features:Path,rules_path:Path,out:Path)->Path:
-    df=pd.read_csv(features); rules=pd.read_csv(rules_path,keep_default_na=False)
+    df=TABLE_IO.read_table(features); rules=pd.read_csv(rules_path,keep_default_na=False)
     result=df.copy(); payload=[]; counts=[]; conflicts=[]
     namespaced=frozenset(c.split("__",1)[0] for c in df.columns if "__" in c)
     # Plain dicts: building a pandas Series per row/rule dominated runtime.

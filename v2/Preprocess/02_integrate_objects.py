@@ -5,6 +5,9 @@ import argparse, math, re
 from pathlib import Path
 import numpy as np
 import pandas as pd
+import importlib.util as _tio_u
+_tio_s=_tio_u.spec_from_file_location("v2_table_io",Path(__file__).resolve().parents[1]/"Preprocess"/"table_io.py")
+TABLE_IO=_tio_u.module_from_spec(_tio_s);_tio_s.loader.exec_module(TABLE_IO)
 
 
 def prefix(catalog):
@@ -101,12 +104,15 @@ def run(associations, raw_dir, out):
             "association_probability_calibrated": False,
             "proper_motion_propagated_any": any(bool(a.get("proper_motion_propagated", False)) for a in g),
         }
+        # Object-level fields are the object's own; a member's raw column of the
+        # same name (e.g. Legacy Surveys ref_epoch = 0) must not fill them (2.23.0).
+        object_keys = set(rec)
         catalogs = []
         for a in g:
             fn = a["input_file"]
             if fn not in raw_cache:
                 try:
-                    raw_cache[fn] = pd.read_csv(raw_dir / fn, dtype={"catalog_object_id": "string"}, low_memory=False).to_dict("records")
+                    raw_cache[fn] = TABLE_IO.read_table(raw_dir / fn, dtype={"catalog_object_id": "string"}).to_dict("records")
                 except Exception:
                     continue
             src = raw_cache[fn]
@@ -129,7 +135,7 @@ def run(associations, raw_dir, out):
                 # is a legacy first-valid convenience shared by many catalogs
                 # (e.g. ``type`` exists in both SDSS PhotoObj and DESI Legacy).
                 rec[f"{pre}__{col}"] = val
-                if col not in rec or pd.isna(rec[col]):
+                if col not in object_keys and (col not in rec or pd.isna(rec[col])):
                     rec[col] = val
             for col in (
                 "parallax", "parallax_error", "pmra", "pmra_error", "pmdec", "pmdec_error", "class", "zwarning",

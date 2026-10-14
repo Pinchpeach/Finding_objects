@@ -58,3 +58,33 @@ def julian_year_from_mjd(value):
         if not math.isfinite(x):return None
         return 2000.0+(x-51544.5)/365.25
     except Exception:return None
+
+
+SDSS_MAX_CONE_ARCMIN = 3.0
+
+
+def sdss_region(ra: float, dec: float, radius_arcmin: float, **kwargs):
+    """``SDSS.query_region`` for any radius (2.23.0).
+
+    astroquery's SDSS cone (cross-ID) mode refuses radii above 3 arcmin, so
+    every larger field lost all SDSS photometry and spectra.  Above that, a
+    rectangle covering the cone is queried (RA width widened by 1/cos(dec);
+    astroquery's rectangle does not) and the rows are cut back to the cone.
+    """
+    import math
+
+    import astropy.units as u
+    from astropy.coordinates import SkyCoord
+    from astroquery.sdss import SDSS
+
+    pos = SkyCoord(ra=float(ra) * u.deg, dec=float(dec) * u.deg, frame="icrs")
+    if radius_arcmin <= SDSS_MAX_CONE_ARCMIN:
+        return SDSS.query_region(pos, radius=radius_arcmin * u.arcmin, **kwargs)
+    r_deg = radius_arcmin / 60.0
+    cosd = math.cos(math.radians(min(abs(dec) + r_deg, 89.999)))
+    width = min(2 * r_deg / cosd, 360.0)
+    t = SDSS.query_region(pos, width=width * u.deg, height=2 * r_deg * u.deg, **kwargs)
+    if t is None or len(t) == 0:
+        return t
+    sep = pos.separation(SkyCoord(ra=t["ra"], dec=t["dec"], unit="deg", frame="icrs")).arcmin
+    return t[sep <= radius_arcmin]

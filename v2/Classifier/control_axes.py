@@ -4,6 +4,9 @@ from __future__ import annotations
 import argparse,importlib.util,json,sys
 from pathlib import Path
 import pandas as pd
+import importlib.util as _tio_u
+_tio_s=_tio_u.spec_from_file_location("v2_table_io",Path(__file__).resolve().parents[1]/"Preprocess"/"table_io.py")
+TABLE_IO=_tio_u.module_from_spec(_tio_s);_tio_s.loader.exec_module(TABLE_IO)
 ROOT=Path(__file__).resolve().parent;AXES=("physical","variability","compact","extragalactic","phenomenon")
 def load_module(path,name):
  s=importlib.util.spec_from_file_location(name,path)
@@ -23,7 +26,7 @@ def annotate(df:pd.DataFrame,rows=None)->pd.DataFrame:
  cal=load_module(ROOT/"calibration"/"per_axis.py","classifier_per_axis_calibration")
  return cal.annotate(result,ROOT/"calibration"/"models.json",AXES)
 def run(inp:Path,out:Path):
- result=annotate(pd.read_csv(inp));out.parent.mkdir(parents=True,exist_ok=True);result.to_csv(out,index=False);print(f"[OK] full multi-axis classification rows={len(result)} axes={len(AXES)} -> {out}");return out
+ result=annotate(TABLE_IO.read_table(inp));out.parent.mkdir(parents=True,exist_ok=True);result.to_csv(out,index=False);print(f"[OK] full multi-axis classification rows={len(result)} axes={len(AXES)} -> {out}");return out
 def main():
  p=argparse.ArgumentParser();p.add_argument("--input",type=Path,default=ROOT/"classifier_input.csv");p.add_argument("--out",type=Path,default=ROOT/"multi_axis_classification.csv");a=p.parse_args();run(a.input,a.out)
 if __name__=="__main__":main()

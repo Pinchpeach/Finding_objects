@@ -41,6 +41,7 @@ OPTIONAL_TAP_BUDGET_S=60.0
 # All optional tables together stay well inside the 300 s controller budget
 # (worst case was 30 + 3 tables x ceil(N/500) x 60 s).
 OPTIONAL_TOTAL_BUDGET_S=180.0
+SYNC_MAX_ROWS=2000
 
 def _bounded(fn,budget_s,*args):
     # Daemon thread: an abandoned slow query must not block interpreter exit.
@@ -67,8 +68,13 @@ def _tap(query:str,retries:int=4,deadline:float|None=None)->pd.DataFrame:
             if expired():raise TimeoutError(f"Gaia TAP deadline passed; last={exc!r}") from exc
             if attempt+1<retries:time.sleep(min(8,2**attempt))
     if expired():raise TimeoutError(f"Gaia TAP deadline passed; last={last!r}")
-    try:return Gaia.launch_job(query).get_results().to_pandas()
+    try:df=Gaia.launch_job(query).get_results().to_pandas()
     except Exception as exc:raise RuntimeError(f"Gaia TAP failed after retries; async={last!r}; sync={exc!r}") from exc
+    # Synchronous Gaia TAP jobs are capped at SYNC_MAX_ROWS (astroquery adds
+    # TOP 2000).  A full page is a cut cone: fail so the caller falls back to
+    # the complete VizieR copy instead of caching a truncated field (2.23.0).
+    if len(df)>=SYNC_MAX_ROWS:raise RuntimeError(f"Gaia sync TAP result truncated at {SYNC_MAX_ROWS} rows; async={last!r}")
+    return df
 
 def _merge_optional(base:pd.DataFrame,table:str,columns:list[str],status_name:str,deadline:float|None=None)->pd.DataFrame:
     if base.empty:base[status_name]=pd.Series(dtype="string");return base

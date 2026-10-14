@@ -20,6 +20,9 @@ from __future__ import annotations
 import argparse, importlib.util, sys, time
 from pathlib import Path
 import pandas as pd
+import importlib.util as _tio_u
+_tio_s=_tio_u.spec_from_file_location("v2_table_io",Path(__file__).resolve().parent/"Preprocess"/"table_io.py")
+TABLE_IO=_tio_u.module_from_spec(_tio_s);_tio_s.loader.exec_module(TABLE_IO)
 
 V2 = Path(__file__).resolve().parent
 PRE = V2 / "Preprocess"
@@ -113,7 +116,7 @@ def run(work: Path, raw_dir: Path | None = None, ra: float | None = None, dec: f
     names = _load(V2 / "designations.py", "v2_designations")
     hosts = _load(V2 / "host_groups.py", "v2_host_groups")
     assoc = pd.read_csv(work / "source_association.csv", low_memory=False, dtype={"catalog_object_id": "string"})
-    out = names.annotate(pd.read_csv(work / "classified_objects.csv", low_memory=False), assoc)
+    out = names.annotate(TABLE_IO.read_table(work / "classified_objects.csv"), assoc)
     out = hosts.consolidate(out, names.PRIORITY)
     if out.n_components.gt(0).any():        # hosts may have inherited a nucleus spectrum
         out = _load(CLS / "subclass.py", "v2_subclass").annotate(out)
@@ -147,6 +150,8 @@ def main():
         p.error("give both --ra and --dec")
     if a.radius is not None and a.radius <= 0:
         p.error("--radius must be > 0")
+    if a.radius is not None and a.ra is None:
+        p.error("--radius needs --ra and --dec (the centre of the area to keep)")
     run(a.work, a.raw_dir, a.ra, a.dec, a.radius, a.min_confidence, max(1, a.workers), a.field_prior)
 
 

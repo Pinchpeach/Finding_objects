@@ -9,13 +9,16 @@ import argparse
 from pathlib import Path
 import numpy as np
 import pandas as pd
+import importlib.util as _tio_u
+_tio_s=_tio_u.spec_from_file_location("v2_table_io",Path(__file__).resolve().parents[1]/"Preprocess"/"table_io.py")
+TABLE_IO=_tio_u.module_from_spec(_tio_s);_tio_s.loader.exec_module(TABLE_IO)
 
 def safe_div(a,b):
     a=pd.to_numeric(a,errors="coerce"); b=pd.to_numeric(b,errors="coerce")
     return a.div(b.where(b.ne(0)))
 
 def run(objects:Path,rules_path:Path,out:Path)->Path:
-    df=pd.read_csv(objects); rules=pd.read_csv(rules_path,keep_default_na=False)
+    df=TABLE_IO.read_table(objects); rules=pd.read_csv(rules_path,keep_default_na=False)
     required=set()
     for cell in rules["feature_columns"]:
         required.update(x for x in str(cell).split("|") if x)
@@ -217,8 +220,15 @@ def run(objects:Path,rules_path:Path,out:Path)->Path:
         physical={"G","QSO","*","WD*"}
         conf["catalog_confidence_ned_type"]=tcol("Type","ned").astype(str).isin(physical).astype(float).mul(0.8).where(hascat("NED"))
     if field("simbad","otype"):
-        physical={"G","GiG","QSO","AGN","Star","*","WD*"}
-        conf["catalog_confidence_simbad_type"]=tcol("otype","simbad").astype(str).isin(physical).astype(float).mul(0.8).where(hascat("SIMBAD"))
+        # Same hierarchy as Stage 4's SIMBAD-TYPE-001 (2.22.0): every child of
+        # a mapped type is curated evidence; the old exact-code set gave the
+        # children reliability 0, so Stage 4 emitted nothing for them (2.23.0).
+        import importlib.util as ilu
+        spec=ilu.spec_from_file_location("v2_simbad_otypes_s3",Path(__file__).resolve().parents[1]/"Classifier"/"simbad_otypes.py")
+        ot=ilu.module_from_spec(spec);spec.loader.exec_module(ot)
+        coarse={"QSO":"QSO","AGN":"EXTRAGALACTIC","G":"GALAXY","*":"STAR"}
+        typed=tcol("otype","simbad").astype(str).map(lambda t:ot.resolve(str(t).strip(),coarse)[0] is not None)
+        conf["catalog_confidence_simbad_type"]=typed.astype(float).mul(0.8).where(hascat("SIMBAD"))
 
     if derived:
         df=pd.concat([df,pd.DataFrame(derived,index=df.index)],axis=1)

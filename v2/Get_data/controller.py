@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import importlib
 import importlib.util
+import os
 import sys
 import time
 import traceback
@@ -93,9 +94,18 @@ def _collect_one(name: str, ra: float, dec: float, radius_arcmin: float, out_dir
         if cancelled is not None and cancelled.is_set():
             raise TimeoutError(f"{name} finished after the {COLLECTOR_BUDGET_S:.0f} s budget; result discarded")
 
-        module.save(df, output)
-        if not output.exists():
-            raise RuntimeError(f"{name}.save() returned without writing {output}")
+        # Written under a temporary name and renamed only if the budget has not
+        # run out meanwhile: Stage 1 reads every *.csv in the folder, so a file
+        # finished after the timeout would be used although reported as a
+        # timeout (2.23.0).
+        part = output.with_name(output.name + ".part")
+        module.save(df, part)
+        if not part.exists():
+            raise RuntimeError(f"{name}.save() returned without writing {part}")
+        if cancelled is not None and cancelled.is_set():
+            part.unlink(missing_ok=True)
+            raise TimeoutError(f"{name} finished after the {COLLECTOR_BUDGET_S:.0f} s budget; result discarded")
+        os.replace(part, output)
         status = "ok" if len(df) else "empty"
         error = ""
         rows = len(df)
@@ -160,12 +170,15 @@ def _run_bounded(job, names, workers: int, budget_s: float) -> list[dict]:
     slot reused (the thread cannot be killed, but its late result is dropped)."""
     import threading
     results: dict[str, dict] = {}
+    lock = threading.Lock()   # the job's result and the timeout record never both win
     pending = list(names)
     running: dict[str, tuple[threading.Thread, float, threading.Event]] = {}
 
     def target(name, event):
         out = job(name, event)
-        results.setdefault(name, out)  # a late result never replaces the timeout record
+        with lock:
+            if not event.is_set():      # a late result never replaces the timeout record
+                results[name] = out
 
     while pending or running:
         while pending and len(running) < max(1, workers):
@@ -176,10 +189,13 @@ def _run_bounded(job, names, workers: int, budget_s: float) -> list[dict]:
             thread.start()
         now = time.monotonic()
         for name, (thread, t0, event) in list(running.items()):
-            if not thread.is_alive():
+            with lock:
+                done = name in results
+                if not done and thread.is_alive() and now - t0 > budget_s:
+                    event.set()
+            if done or not thread.is_alive():
                 del running[name]
-            elif now - t0 > budget_s:
-                event.set()
+            elif event.is_set():
                 del running[name]
                 results[name] = {"collector": name, "status": "timeout", "rows": 0,
                                  "elapsed_seconds": round(now - t0, 3), "output_file": "",

@@ -31,7 +31,11 @@ def fetch(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
         png=str(row[pngc]).strip()
         if not png or png.lower()=="nan":continue
         try:detail=Vizier(columns=["**"],row_limit=-1).query_constraints(catalog=INTENS,PNG=png)
-        except Exception:detail=[]
+        except Exception as exc:
+            # Unknown, not "no spectra": a failed query must not read as zero (2.23.0).
+            records.append({"catalog_object_id":png,"object_name":"PNG "+png,"ra":raval.loc[idx],"dec":decval.loc[idx],
+                            "pn_spectra_count":pd.NA,"pn_query_status":f"error:{type(exc).__name__}"})
+            continue
         spectra=detail[0].to_pandas() if detail else pd.DataFrame()
         if spectra.empty:
             records.append({"catalog_object_id":png,"object_name":"PNG "+png,"ra":raval.loc[idx],"dec":decval.loc[idx],"pn_spectra_count":0})

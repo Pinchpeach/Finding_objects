@@ -24,7 +24,9 @@ def fetch(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
  # One sky object can carry several TARGETIDs (different programs); keep the
  # most confident spectrum per 0.5-arcsec position so one object stays one row.
  import numpy as np
- key=list(zip(np.round(df["ra"]*np.cos(np.radians(df["dec"]))*7200),np.round(df["dec"]*7200)))
+ ref=float(df["ra"].dropna().iloc[0]) if df["ra"].notna().any() else 0.0
+ dra=((df["ra"]-ref+180.0)%360.0)-180.0                       # RA wrap at 0/360 (2.23.0)
+ key=list(zip(np.round(dra*np.cos(np.radians(df["dec"]))*7200),np.round(df["dec"]*7200)))
  order=pd.to_numeric(df["delChi2"],errors="coerce").fillna(-1) if "delChi2" in df.columns else pd.Series(0,index=df.index)
  df=df.assign(_pos=key,_q=order).sort_values("_q",ascending=False).drop_duplicates("_pos").drop(columns=["_pos","_q"])
  return df.reset_index(drop=True)

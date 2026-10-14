@@ -10,6 +10,9 @@ from __future__ import annotations
 import argparse, importlib.util, json
 from pathlib import Path
 import pandas as pd
+import importlib.util as _tio_u
+_tio_s=_tio_u.spec_from_file_location("v2_table_io",Path(__file__).resolve().parents[1]/"Preprocess"/"table_io.py")
+TABLE_IO=_tio_u.module_from_spec(_tio_s);_tio_s.loader.exec_module(TABLE_IO)
 
 ROOT=Path(__file__).resolve().parent
 BRANCH={"STAR":"star.py","GALAXY":"galaxy.py","QSO":"qso.py"}
@@ -62,7 +65,7 @@ def load_subclass():
     m=importlib.util.module_from_spec(s); s.loader.exec_module(m); return m
 
 def run(inp:Path,out:Path):
-    d=pd.read_csv(inp)
+    d=TABLE_IO.read_table(inp)
     if "primary_class" not in d.columns:
         raise KeyError("primary_class is required from v2/Preprocess")
     # One dict conversion shared by the legacy branches and the axes; neither

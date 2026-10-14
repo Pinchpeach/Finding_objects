@@ -40,6 +40,10 @@ def _service():
     return _SERVICE
 
 
+class TapTimeout(RuntimeError):
+    """Every attempt ran out of time (as opposed to a rejected query)."""
+
+
 def _query_with_retries(run):
     import threading, time
     last = None
@@ -57,7 +61,8 @@ def _query_with_retries(run):
         last = box.get("error") or TimeoutError(f"Data Lab TAP exceeded {ATTEMPT_BUDGET_S:.0f} s")
         if attempt + 1 < ATTEMPTS:
             time.sleep(2.0 * (attempt + 1))
-    raise RuntimeError(f"Legacy Surveys TAP failed after {ATTEMPTS} attempts: {last!r}")
+    err = TapTimeout if isinstance(last, TimeoutError) else RuntimeError
+    raise err(f"Legacy Surveys TAP failed after {ATTEMPTS} attempts: {last!r}")
 
 
 def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
@@ -91,6 +96,10 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     run = lambda q: _query_with_retries(lambda: _service().search(q).to_table().to_pandas())
     try:
         df = run(query.replace("{extra}", extra))
+    except TapTimeout:
+        # A second round after three timed-out attempts (~250 s) cannot finish
+        # inside the controller's 300 s budget (2.23.0): fail now.
+        raise
     except RuntimeError:
         # The astrometric columns are optional: never lose the photometry
         # because a service rejects them.  The status column keeps this

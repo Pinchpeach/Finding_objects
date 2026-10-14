@@ -258,12 +258,24 @@ def _pm(row: Mapping[str, Any]) -> tuple[float | None, float | None, float | Non
 
 def propagate_linear(ra_deg: float, dec_deg: float, pmra_masyr: float, pmdec_masyr: float,
                      from_epoch: float, to_epoch: float) -> tuple[float, float]:
-    """Propagate ICRS coordinates with the tangent-plane proper-motion model."""
+    """Propagate ICRS coordinates with a linear proper motion.
+
+    The displacement is applied along the local east / north unit vectors and
+    the result renormalised (2.23.0): the old (dRA / cos dec, dDec) offsets
+    gave Dec > 90 for a mover near a pole.  Identical to first order elsewhere.
+    pmra is mu_alpha* (includes cos dec), as in Gaia.
+    """
     dt = to_epoch - from_epoch
-    cosd = max(abs(math.cos(math.radians(dec_deg))), 1e-8)
-    dra_deg = (pmra_masyr * dt) / (3.6e6 * cosd)
-    ddec_deg = (pmdec_masyr * dt) / 3.6e6
-    return (ra_deg + dra_deg) % 360.0, dec_deg + ddec_deg
+    a, d = math.radians(ra_deg), math.radians(dec_deg)
+    k = math.radians(1.0 / 3.6e6) * dt                 # mas/yr * yr -> radians
+    ue, un = pmra_masyr * k, pmdec_masyr * k
+    sa, ca, sd, cd = math.sin(a), math.cos(a), math.sin(d), math.cos(d)
+    x = cd * ca - ue * sa - un * sd * ca
+    y = cd * sa + ue * ca - un * sd * sa
+    z = sd + un * cd
+    ra = math.degrees(math.atan2(y, x)) % 360.0
+    dec = math.degrees(math.atan2(z, math.hypot(x, y)))
+    return ra, dec
 
 
 def sep_arcsec(ra1: float, dec1: float, ra2: float, dec2: float) -> float:

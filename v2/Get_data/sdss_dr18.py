@@ -7,11 +7,8 @@ COLUMNS=["objid","ra","dec","type","clean","mode","run","rerun","camcol","field"
 "modelMag_u","modelMagErr_u","modelMag_g","modelMagErr_g","modelMag_r","modelMagErr_r","modelMag_i","modelMagErr_i","modelMag_z","modelMagErr_z",
 "petroMag_u","petroMagErr_u","petroMag_g","petroMagErr_g","petroMag_r","petroMagErr_r","petroMag_i","petroMagErr_i","petroMag_z","petroMagErr_z"]
 def fetch(ra:float,dec:float,radius_arcmin:float)->pd.DataFrame:
- from astroquery.sdss import SDSS
- from astropy.coordinates import SkyCoord
- import astropy.units as u
- pos=SkyCoord(ra=ra*u.deg,dec=dec*u.deg,frame="icrs")
- t=SDSS.query_region(pos,radius=radius_arcmin*u.arcmin,photoobj_fields=COLUMNS,data_release=18)
+ from _catalog_utils import sdss_region
+ t=sdss_region(ra,dec,radius_arcmin,photoobj_fields=COLUMNS,data_release=18)
  if t is None:return pd.DataFrame(columns=["catalog","catalog_object_id","object_name",*COLUMNS])
  df=t.to_pandas()
  # PhotoPrimary (mode == 1): secondary detections from overlapping scans

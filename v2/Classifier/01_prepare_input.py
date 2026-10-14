@@ -3,11 +3,14 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 import pandas as pd
+import importlib.util as _tio_u
+_tio_s=_tio_u.spec_from_file_location("v2_table_io",Path(__file__).resolve().parents[1]/"Preprocess"/"table_io.py")
+TABLE_IO=_tio_u.module_from_spec(_tio_s);_tio_s.loader.exec_module(TABLE_IO)
 
 ALLOWED={"STAR","GALAXY","QSO","UNKNOWN"}
 
 def run(inp:Path,out:Path):
-    d=pd.read_csv(inp)
+    d=TABLE_IO.read_table(inp)
     if "primary_class" not in d:
         raise KeyError("primary_class is required from v2/Preprocess")
     bad=sorted(set(d.primary_class.dropna().astype(str))-ALLOWED)

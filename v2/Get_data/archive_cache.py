@@ -110,20 +110,22 @@ def get(name: str, source: Path, ra: float, dec: float, radius_arcmin: float,
         return None
     d = _dir(name, source)
     now = time.time()
-    best = None
-    for e in _index(d):
-        if now - e["t"] > _ttl(name, e["rows"]) * 86400:
+    candidates = [e for e in _index(d)
+                  if now - e["t"] <= _ttl(name, e["rows"]) * 86400
+                  and _sep_arcmin(ra, dec, e["ra"], e["dec"]) + radius_arcmin <= e["r"] + SAME_TOL_ARCMIN]
+    # Smallest containing cone first; one whose file was pruned or is
+    # unreadable falls through to the next instead of forcing a re-fetch (2.23.0).
+    df = best = None
+    for e in sorted(candidates, key=lambda e: e["r"]):
+        try:
+            # Text in, text out: 64-bit IDs (SDSS specObjID, DESI TARGETID) must
+            # not pass through float; the collector's save() writes them back as read.
+            df = pd.read_csv(d / e["file"], dtype=str, keep_default_na=False, na_filter=False)
+            best = e
+            break
+        except Exception:
             continue
-        if _sep_arcmin(ra, dec, e["ra"], e["dec"]) + radius_arcmin <= e["r"] + SAME_TOL_ARCMIN:
-            if best is None or e["r"] < best["r"]:
-                best = e
     if best is None:
-        return None
-    try:
-        # Text in, text out: 64-bit IDs (SDSS specObjID, DESI TARGETID) must
-        # not pass through float; the collector's save() writes them back as read.
-        df = pd.read_csv(d / best["file"], dtype=str, keep_default_na=False, na_filter=False)
-    except Exception:
         return None
     same_cone = (abs(best["r"] - radius_arcmin) < SAME_TOL_ARCMIN
                  and _sep_arcmin(ra, dec, best["ra"], best["dec"]) < SAME_TOL_ARCMIN)

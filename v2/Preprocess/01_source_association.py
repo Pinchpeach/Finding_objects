@@ -14,6 +14,7 @@ from association_model import (
     infer_epoch,
     infer_poserr_arcsec,
     infer_psf_arcsec,
+    sep_arcsec,
     num,
     profile_for,
 )
@@ -92,9 +93,15 @@ def _density(frame: pd.DataFrame) -> float | None:
         ok = ra.notna() & dec.notna()
         if ok.sum() < 5:
             return None
-        r0, d0 = float(ra[ok].median()), float(dec[ok].median())
-        dx = (ra[ok] - r0) * math.cos(math.radians(d0)); dy = dec[ok] - d0
-        radius = float((dx * dx + dy * dy).pow(0.5).max()) * 3600.0
+        # Centre = mean unit vector, radius = largest great-circle distance:
+        # a median RA and flat (dRA cos dec, dDec) offsets broke at RA 0/360
+        # (density ~1e-12) and near the poles (2.23.0).
+        import numpy as np
+        a, d = np.radians(ra[ok].to_numpy(float)), np.radians(dec[ok].to_numpy(float))
+        x, y, z = (np.cos(d) * np.cos(a)).mean(), (np.cos(d) * np.sin(a)).mean(), np.sin(d).mean()
+        r0 = math.degrees(math.atan2(y, x)) % 360.0
+        d0 = math.degrees(math.atan2(z, math.hypot(x, y)))
+        radius = max(sep_arcsec(r0, d0, r, dd) for r, dd in zip(ra[ok], dec[ok]))
         if radius <= 0:
             return None
     return float(len(frame)) / (math.pi * radius * radius)

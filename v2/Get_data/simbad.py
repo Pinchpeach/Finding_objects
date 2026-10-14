@@ -26,8 +26,10 @@ def fetch(ra,dec,radius_arcmin):
  if bad.any():
   # Only the rows that are not numeric degrees are sexagesimal: re-parsing
   # every row as hours turned "150.1" into 150.1 h (2.19.0).
-  coord=SkyCoord(df.loc[bad,rac].astype(str).to_numpy(),df.loc[bad,dcc].astype(str).to_numpy(),unit=(u.hourangle,u.deg))
-  rv=rv.copy();dv=dv.copy();rv[bad]=coord.ra.deg;dv[bad]=coord.dec.deg
+  # Parsed row by row (2.23.0): one empty value failed the whole bulk parse.
+  from _catalog_utils import coordinates
+  pr,pd_=coordinates(df.loc[bad],[rac],[dcc])
+  rv=rv.copy();dv=dv.copy();rv[bad]=pr;dv[bad]=pd_
  df["ra_raw"]=df[rac];df["dec_raw"]=df[dcc];df[rac]=rv;df[dcc]=dv
  df.insert(0,"catalog",CATALOG);df.insert(1,"catalog_object_id",df[idc].astype("string"));df.insert(2,"object_name",df[idc].astype("string"))
  if rac!="ra":df.insert(3,"ra",rv)

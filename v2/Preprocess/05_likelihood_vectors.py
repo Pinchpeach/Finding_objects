@@ -16,6 +16,9 @@ import argparse,json,math
 from pathlib import Path
 import numpy as np
 import pandas as pd
+import importlib.util as _tio_u
+_tio_s=_tio_u.spec_from_file_location("v2_table_io",Path(__file__).resolve().parents[1]/"Preprocess"/"table_io.py")
+TABLE_IO=_tio_u.module_from_spec(_tio_s);_tio_s.loader.exec_module(TABLE_IO)
 CLASSES=("STAR","GALAXY","QSO")
 WEIGHT={"direct_probability":1.0,"catalog_label":1.5,"continuous_score":0.35,"binary_evidence":0.35}
 MIN_CONFIDENCE=.50; MIN_MARGIN=.10
@@ -159,7 +162,7 @@ def run(evidence,out,model_path=MODEL_PATH,min_confidence=None,field_prior=False
     min_conf=float(model.get("min_confidence",MIN_CONFIDENCE)) if model else MIN_CONFIDENCE
     if min_confidence is not None: min_conf=float(min_confidence)  # caller trades coverage for precision
     min_margin=float(model.get("min_margin",MIN_MARGIN)) if model else MIN_MARGIN
-    df=pd.read_csv(evidence,low_memory=False)
+    df=TABLE_IO.read_table(evidence)
     raw_series=df["evidence_json"] if "evidence_json" in df else pd.Series(["[]"]*len(df))
     host_r=pd.to_numeric(df["host_elliptical_radius"],errors="coerce") if "host_elliptical_radius" in df else pd.Series(float("nan"),index=df.index)
     rows=[]

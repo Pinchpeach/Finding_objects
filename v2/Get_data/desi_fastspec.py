@@ -35,6 +35,15 @@ def _query_with_retries(run):
     return q(run)
 
 
+def _service():
+    # The Legacy Surveys collector's TAP service: its HTTP session has a
+    # timeout, so an abandoned attempt thread ends instead of piling up
+    # (pyvo's default session has none; 2.23.0).
+    from desi_legacy import TAP_URL as LS_URL, _service as ls_service
+    import pyvo
+    return ls_service() if LS_URL == TAP_URL else pyvo.dal.TAPService(TAP_URL)
+
+
 def standardise(df: pd.DataFrame) -> pd.DataFrame:
     """FastSpecFit columns -> line_* columns (shared with the SDSS collector)."""
     out = df.copy()
@@ -59,7 +68,7 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
             "halpha_ew", "halpha_ew_ivar", *EXTRA]
     query = (f"SELECT {', '.join(cols)} FROM {TABLE} WHERE 't' = q3c_radial_query(target_ra, target_dec, "
              f"{float(ra):.10f}, {float(dec):.10f}, {float(radius_arcmin) / 60.0:.10f})")
-    df = _query_with_retries(lambda: pyvo.dal.TAPService(TAP_URL).search(query).to_table().to_pandas())
+    df = _query_with_retries(lambda: _service().search(query).to_table().to_pandas())
     if df.empty:
         return pd.DataFrame(columns=["catalog", "catalog_object_id", "object_name", "ra", "dec", *LINE_FIELDS])
     df.columns = [str(c).strip() for c in df.columns]
