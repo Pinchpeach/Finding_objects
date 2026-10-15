@@ -4,17 +4,15 @@ name: Spectroscopic truth products
 # benchmark galaxies and Gaia DR3 GSP-Spec / ESP-ELS and LAMOST LASP
 # parameters for the benchmark stars, to validate the spectroscopic sub-class
 # criteria.  Output: v2/benchmark/spectro_truth/*.csv.gz
+# Manual only (2.24.0): it rewrites preserved benchmark / truth data, which
+# must change only on purpose (an automatic run on a code push replaced the
+# DESI benchmark with a partial re-collection on 2026-10-14).
 on:
   workflow_dispatch:
     inputs:
       parts:
         description: comma-separated parts (galaxies,gaia,lamost)
         default: galaxies,gaia,lamost
-  push:
-    branches: [claude/code-review-7ox8zn]
-    paths:
-      - v2/benchmark/build_spectro_truth.py
-
 concurrency:
   group: spectro-truth-${{ github.ref }}
   cancel-in-progress: true

@@ -5,17 +5,15 @@ name: AGB gate contamination sample
 # (Classifier/subclass.py).  Also prints the columns of spectroscopic
 # catalogue products (LAMOST, Gaia GSP-Spec / ESP-ELS) for the spectroscopic
 # criteria.
+# Manual only (2.24.0): it rewrites preserved benchmark / truth data, which
+# must change only on purpose (an automatic run on a code push replaced the
+# DESI benchmark with a partial re-collection on 2026-10-14).
 on:
   workflow_dispatch:
     inputs:
       cones:
         description: number of random 1-degree cones
         default: "80"
-  push:
-    branches: [claude/code-review-7ox8zn]
-    paths:
-      - v2/benchmark/build_agb_contamination.py
-
 concurrency:
   group: agb-contamination-${{ github.ref }}
   cancel-in-progress: true

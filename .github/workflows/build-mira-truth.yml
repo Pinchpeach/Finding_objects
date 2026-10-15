@@ -2,13 +2,11 @@ name: Mira vs SR truth (ASAS-SN x Gaia DR3 LPV)
 
 # ASAS-SN Mira and SR stars matched to the Gaia DR3 LPV table (2.13.0).
 # for a Gaia G-amplitude Mira criterion.
+# Manual only (2.24.0): it rewrites preserved benchmark / truth data, which
+# must change only on purpose (an automatic run on a code push replaced the
+# DESI benchmark with a partial re-collection on 2026-10-14).
 on:
   workflow_dispatch:
-  push:
-    branches: [claude/code-review-7ox8zn]
-    paths:
-      - v2/benchmark/build_mira_truth.py
-
 concurrency:
   group: mira-truth-${{ github.ref }}
   cancel-in-progress: true

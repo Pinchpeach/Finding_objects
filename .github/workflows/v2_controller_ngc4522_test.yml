@@ -1,13 +1,10 @@
 name: v2 controller NGC4522 test
 
+# Manual only (2.24.0): it rewrites preserved benchmark / truth data, which
+# must change only on purpose (an automatic run on a code push replaced the
+# DESI benchmark with a partial re-collection on 2026-10-14).
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - 'v2/Get_data/**'
-      - '.github/workflows/v2_controller_ngc4522_test.yml'
-
 permissions:
   contents: write
 

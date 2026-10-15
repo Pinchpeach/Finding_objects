@@ -3,13 +3,11 @@ name: AGB chemistry truth (GCVS LPVs)
 # GCVS Miras / semiregulars / irregulars with literature spectral types
 # (M -> O-rich, C/R/N -> C-rich) with Gaia, 2MASS, AllWISE, Gaia LPV
 # photometry: dust-free O-rich giants that the Suh (2021) set lacks.
+# Manual only (2.24.0): it rewrites preserved benchmark / truth data, which
+# must change only on purpose (an automatic run on a code push replaced the
+# DESI benchmark with a partial re-collection on 2026-10-14).
 on:
   workflow_dispatch:
-  push:
-    branches: [claude/code-review-7ox8zn]
-    paths:
-      - v2/benchmark/build_agb_gcvs_truth.py
-
 concurrency:
   group: agb-gcvs-${{ github.ref }}
   cancel-in-progress: true

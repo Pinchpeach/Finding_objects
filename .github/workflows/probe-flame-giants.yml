@@ -1,13 +1,11 @@
 name: Gaia FLAME values of the Kepler giant truth
 
 # Gaia DR3 astrophysical parameters for the Vrard+2025 RGB/AGB truth (2.13.0).
+# Manual only (2.24.0): it rewrites preserved benchmark / truth data, which
+# must change only on purpose (an automatic run on a code push replaced the
+# DESI benchmark with a partial re-collection on 2026-10-14).
 on:
   workflow_dispatch:
-  push:
-    branches: [claude/code-review-7ox8zn]
-    paths:
-      - v2/benchmark/probe_flame_giants.py
-
 concurrency:
   group: flame-giants-${{ github.ref }}
   cancel-in-progress: true

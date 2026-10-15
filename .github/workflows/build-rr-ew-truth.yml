@@ -2,13 +2,11 @@ name: RR Lyrae vs eclipsing truth (ASAS-SN x ZTF)
 
 # ASAS-SN RRAB/RRC/EW/EA stars matched to the ZTF periodic-variable catalogue
 # (2.12.0): measures the RRc / EW confusion and the g/r amplitude ratio.
+# Manual only (2.24.0): it rewrites preserved benchmark / truth data, which
+# must change only on purpose (an automatic run on a code push replaced the
+# DESI benchmark with a partial re-collection on 2026-10-14).
 on:
   workflow_dispatch:
-  push:
-    branches: [claude/code-review-7ox8zn]
-    paths:
-      - v2/benchmark/build_rr_ew_truth.py
-
 concurrency:
   group: rr-ew-truth-${{ github.ref }}
   cancel-in-progress: true

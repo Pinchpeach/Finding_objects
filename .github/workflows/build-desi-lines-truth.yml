@@ -2,13 +2,11 @@ name: DESI x SDSS emission-line overlap
 
 # Galaxies with both a DESI DR1 (FastSpecFit) and an SDSS spectrum (2.7.0):
 # checks the DESI emission-line route against the SDSS one.
+# Manual only (2.24.0): it rewrites preserved benchmark / truth data, which
+# must change only on purpose (an automatic run on a code push replaced the
+# DESI benchmark with a partial re-collection on 2026-10-14).
 on:
   workflow_dispatch:
-  push:
-    branches: [claude/code-review-7ox8zn]
-    paths:
-      - v2/benchmark/build_desi_lines_truth.py
-
 concurrency:
   group: desi-lines-truth-${{ github.ref }}
   cancel-in-progress: true

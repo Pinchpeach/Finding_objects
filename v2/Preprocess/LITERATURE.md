@@ -289,3 +289,11 @@ The benchmark features are already matched, so these do not change the
 benchmark numbers; they change real-field association (larger PSF/6 floor
 for PS1, correct X-ray error circles, proper-motion propagation to PS1/LS
 epochs).
+
+## Rejected after measurement (2.24.0)
+
+| Idea | Source | Why not adopted |
+|---|---|---|
+| Resolved-host AGN: "resolved × max(0, W1−W2 − R75)" feature | Assef et al. 2018 (ApJS 234, 23), R75: W1−W2 > 0.486 Vega (= −0.154 AB with the Jarrett et al. 2011 offsets) at W2 ≤ 13.07 | The QSOs still called GALAXY have a median excess of 0 (below R75), so mid-IR colour does not separate them from their hosts. Correctly classified resolved QSOs already carry the excess. In the fit the feature made the sign constraint drop DSC-001:QSO and LS-CKNN-001:QSO, and DESI STAR recall fell 0.899 → 0.855. A presence indicator ("resolved") was worse: it duplicated LS-MORPH-002 and dropped it. |
+| CatWISE2020 proper motions for faint STAR vs QSO | Marocco et al. 2021 (ApJS 253, 8): motions good to ~20 mas/yr at W1 ≈ 15 and ~100 mas/yr at W1 ≈ 17; formal errors ~2× too small near W1 ≈ 17.2 | The DESI stars misread as QSO have median W1 = 17.5 (Vega); halo-star motions of 5–20 mas/yr are far below that error. |
+| GALEX UV excess (FUV−NUV, NUV−r) | Bianchi et al. 2011; Trammell et al. 2007 (AJ 133, 1780) | 0 % of those stars, and 11 % of the QSOs misread as STAR, have a GALEX AIS detection. |

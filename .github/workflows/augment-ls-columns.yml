@@ -1,13 +1,11 @@
 name: Add LS DR10 morphology columns to benchmark features
 
 # Fetches sersic, shape_r and W1/W2 inverse variances by ls_id (2.11.0).
+# Manual only (2.24.0): it rewrites preserved benchmark / truth data, which
+# must change only on purpose (an automatic run on a code push replaced the
+# DESI benchmark with a partial re-collection on 2026-10-14).
 on:
   workflow_dispatch:
-  push:
-    branches: [claude/code-review-7ox8zn]
-    paths:
-      - v2/benchmark/augment_ls_columns.py
-
 concurrency:
   group: augment-ls-columns-${{ github.ref }}
   cancel-in-progress: true

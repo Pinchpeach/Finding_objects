@@ -1,9 +1,9 @@
 name: Build Balanced Truth Dataset
+# Manual only (2.24.0): it rewrites preserved benchmark / truth data, which
+# must change only on purpose (an automatic run on a code push replaced the
+# DESI benchmark with a partial re-collection on 2026-10-14).
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - 'v2/benchmark/build_truth_sets.py'
 jobs:
   build:
     runs-on: ubuntu-latest
