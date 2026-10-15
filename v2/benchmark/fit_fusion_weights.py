@@ -388,7 +388,12 @@ def main():
             -1, len(CLASSES)
         )
 
-    grid = np.round(np.arange(0.34, 0.991, 0.01), 2)
+    # Floor = Stage 5's MIN_CONFIDENCE (0.50): below it the top class is more
+    # likely wrong than right.  Without the floor the 2.25.0 hybrid model
+    # reached the target at the lowest grid value (0.34) and real fields lost
+    # all LOW_CONFIDENCE abstentions -- mostly LS-only objects at r ~ 24.5,
+    # fainter than any benchmark object (DESI field validation, 3 fields).
+    grid = np.round(np.arange(s5.MIN_CONFIDENCE, 0.991, 0.01), 2)
     pca = probs(ca)
     curve = coverage_curve(pca, y[ca], used[ca], grid)
     if a.target_scope == "each":
