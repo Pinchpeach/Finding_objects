@@ -26,6 +26,9 @@ on:
       workers:
         description: 'parallel queries per job (slow services such as IRSA ZTF need more)'
         default: '8'
+      shards:
+        description: 'JSON list of shards "kofn" (every n-th truth object from k), e.g. ["0of4","1of4","2of4","3of4"]'
+        default: '["0of1"]'
 concurrency:
   group: collect-truth-features-${{ github.ref }}
   cancel-in-progress: false
@@ -64,6 +67,7 @@ jobs:
       matrix:
         catalog: ${{ fromJSON(github.event.inputs.catalogs) }}
         truth: ${{ fromJSON(github.event.inputs.truths) }}
+        shard: ${{ fromJSON(github.event.inputs.shards || '["0of1"]') }}
     runs-on: ubuntu-latest
     timeout-minutes: 340
     steps:
@@ -77,7 +81,7 @@ jobs:
         with:
           name: fusion-truth
           path: v2/benchmark/desi_fusion
-      - name: Cross-query ${{ matrix.catalog }} (${{ matrix.truth }})
+      - name: Cross-query ${{ matrix.catalog }} (${{ matrix.truth }}, shard ${{ matrix.shard }})
         shell: bash  # -eo pipefail: a crashed collector fails the job
         run: |
           case "${{ matrix.truth }}" in
@@ -85,15 +89,16 @@ jobs:
             desi) T=v2/benchmark/desi_external/truth.csv ;;
             fusion) T=v2/benchmark/desi_fusion/truth.csv ;;
           esac
-          python v2/benchmark/collect_catalog_truth.py --truth "$T" --catalog "${{ matrix.catalog }}" --workers "${{ github.event.inputs.workers || 8 }}" --out-dir out 2>&1 | tee out.log | grep -v ERROR | tail -40
+          S="${{ matrix.shard }}"; k=${S%of*}; n=${S#*of}
+          python v2/benchmark/collect_catalog_truth.py --truth "$T" --catalog "${{ matrix.catalog }}" --workers "${{ github.event.inputs.workers || 8 }}" --shard "$k/$n" --out-dir out 2>&1 | tee out.log | grep -v ERROR | tail -40
           mkdir -p out
           echo "errors: $(grep -c ' ERROR ' out.log || true)" | tee out/errors.txt
-          wc -l < "$T" > out/targets.txt
+          python -c "import pandas as pd,sys; print(len(pd.read_csv(sys.argv[1]).iloc[$k::$n]) + 1)" "$T" > out/targets.txt
           grep ' ERROR ' out.log | head -5 || true
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: rx-${{ matrix.truth }}-${{ matrix.catalog }}
+          name: rx-${{ matrix.truth }}-${{ matrix.catalog }}-${{ matrix.shard }}
           path: out/
           if-no-files-found: warn
           retention-days: 14
@@ -106,6 +111,10 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pandas
       - uses: actions/download-artifact@v4
         with:
           pattern: rx-*
@@ -116,25 +125,32 @@ jobs:
           name: fusion-truth
           path: v2/benchmark/desi_fusion
       - name: Copy complete collections
+        # Shards of one truth set x catalogue are concatenated; the collection
+        # is used only when all its shards arrived and under 1 % of all its
+        # queries failed (non-detections are not evidence, so a failed query
+        # only loses a possible match; above 1 % it would bias the benchmark).
         run: |
           shopt -s nullglob
-          for d in dl/rx-*; do
-            n=${d#dl/rx-}; truth=${n%%-*}; cat=${n#*-}
-            f="$d/${cat}_trd.csv"; [ -f "$f" ] || { echo "$n: no output"; continue; }
-            e=$(sed -n 's/errors: //p' "$d/errors.txt")
-            n_t=$(( $(cat "$d/targets.txt" 2>/dev/null || echo 1) - 1 ))
-            rows=$(($(wc -l < "$f") - 1))
-            echo "$n: rows=$rows errors=$e targets=$n_t"
-            # Non-detections are not evidence, so a failed query only loses a
-            # possible match; above 1 % of targets it would bias the benchmark.
-            if [ "${e:-$n_t}" -gt $((n_t / 100)) ]; then echo "  skipped (query errors > 1 %)"; continue; fi
+          for key in $(ls -d dl/rx-* | sed -E 's#dl/rx-(.*)-[0-9]+of[0-9]+$#\1#' | sort -u); do
+            truth=${key%%-*}; cat=${key#*-}
+            parts=(dl/rx-$key-*of*); n=${parts[0]##*of}
+            e=0; n_t=0; files=()
+            for d in "${parts[@]}"; do
+              e=$((e + $(sed -n 's/errors: //p' "$d/errors.txt" 2>/dev/null || echo 0)))
+              n_t=$((n_t + $(cat "$d/targets.txt" 2>/dev/null || echo 1) - 1))
+              [ -f "$d/${cat}_trd.csv" ] && files+=("$d/${cat}_trd.csv")
+            done
+            echo "$key: shards=${#files[@]}/$n errors=$e targets=$n_t"
+            if [ "${#files[@]}" -ne "$n" ]; then echo "  skipped (missing shards)"; continue; fi
+            if [ "$e" -gt $((n_t / 100)) ]; then echo "  skipped (query errors > 1 %)"; continue; fi
             case "$truth" in
               sdss) dst=v2/benchmark/catalog_features ;;
               desi) dst=v2/benchmark/desi_external/catalog_features ;;
               fusion) dst=v2/benchmark/desi_fusion/catalog_features ;;
             esac
             mkdir -p "$dst"
-            gzip -9n -c "$f" > "$dst/${cat}_trd.csv.gz"
+            python -c "import pandas as pd,sys; d=pd.concat([pd.read_csv(f, low_memory=False) for f in sys.argv[2:]], ignore_index=True); d=d.sort_values('benchmark_id') if len(d) else d; d.to_csv(sys.argv[1], index=False)" merged.csv "${files[@]}"
+            gzip -9n -c merged.csv > "$dst/${cat}_trd.csv.gz"
           done
       - name: Commit
         run: |

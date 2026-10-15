@@ -292,10 +292,15 @@ def run_catalog(name, truth, out_dir, workers):
     return _finish(name, out_dir, len(truth), out, matched=ok, empty=empty, errors=errors)
 
 
-def run(truth_path, out_dir, limit=None, catalog=None, workers=8):
+def run(truth_path, out_dir, limit=None, catalog=None, workers=8, shard=None):
     truth = pd.read_csv(truth_path)
     if limit:
         truth = pd.concat([g.head(limit) for _, g in truth.groupby("truth_class")], ignore_index=True)
+    if shard:
+        # k/n: every n-th object from k, so a slow service (IRSA ZTF light
+        # curves, ~minutes per cone at 8 workers) can be split over runners.
+        k, n = map(int, shard.split("/"))
+        truth = truth.iloc[k::n].reset_index(drop=True)
     out_dir.mkdir(parents=True, exist_ok=True)
     names = [catalog] if catalog else COLLECTORS
     summary = [run_catalog(name, truth, out_dir, workers) for name in names]
@@ -310,8 +315,9 @@ def main():
     p.add_argument("--limit-per-class", type=int)
     p.add_argument("--catalog", choices=COLLECTORS)
     p.add_argument("--workers", type=int, default=8)
+    p.add_argument("--shard", help="k/n: collect every n-th truth object starting at k (0-based)")
     a = p.parse_args()
-    run(a.truth, a.out_dir, a.limit_per_class, a.catalog, max(1, a.workers))
+    run(a.truth, a.out_dir, a.limit_per_class, a.catalog, max(1, a.workers), a.shard)
 
 
 if __name__ == "__main__":
