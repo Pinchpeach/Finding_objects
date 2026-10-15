@@ -135,6 +135,9 @@ def run(objects: Path, rules_path: Path, out: Path) -> Path:
         return (22.5 - 2.5 * np.log10((flux / trans).where(ok))).where(ok)
 
     ls_mags = {b: ls_mag(b) for b in ("g", "r", "z", "w1", "w2")}
+    if ls_mags["r"] is not None:
+        # Dereddened r (AB) for flux ratios against radio / X-ray (2.26.0).
+        derived["ls_r_mag"] = ls_mags["r"]
     for b1, b2 in (("g", "r"), ("r", "z"), ("z", "w1"), ("w1", "w2")):
         if ls_mags[b1] is not None and ls_mags[b2] is not None:
             derived[f"ls_{b1}_{b2}_color"] = ls_mags[b1] - ls_mags[b2]

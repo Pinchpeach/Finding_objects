@@ -129,6 +129,13 @@ RAW_FIELDS = {
     "phot_bp_rp_excess_factor",
     "bp_rp",
     "phot_g_mean_mag",
+    # radio flux densities (RADIO-001; same columns as units.py)
+    "Fint",
+    "S1.4",
+    "Stotal",
+    "SpeakTot",
+    "Total_flux",
+    "Ftot",
 }
 DERIVED_PREFIXES = ("association_confidence__", "catalog_confidence_", "ps1_", "ls_", "catalogs")
 
@@ -244,6 +251,33 @@ ASSOC_PREFIX = {
     "LS-MORPH-002": "desi_legacy_surveys_dr10",
     "SGA-001": "sga_2020",
 }
+
+
+# 1.4 GHz flux density (mJy) from the radio surveys, in units.py's order and
+# spectral index (S ~ nu^-0.7): FIRST, NVSS, LoTSS 144 MHz, VLASS 3 GHz.
+RADIO_14GHZ = (
+    (("first__Fint",), 1.0),
+    (("nvss__S1.4",), 1.0),
+    (("lotss_dr2__Stotal", "lotss_dr2__SpeakTot", "lotss_dr2__Total_flux"), (1400 / 144) ** -0.7),
+    (("vlass__Ftot", "vlass__Total_flux"), (1400 / 3000) ** -0.7),
+)
+
+
+def radio_14ghz_mjy(row):
+    for names, scale in RADIO_14GHZ:
+        for n in names:
+            v = num(row, n)
+            if v is not None and v > 0:
+                return v * scale
+    return None
+
+
+def optical_r_mag(row):
+    """Dereddened Legacy Surveys r, else Pan-STARRS1 r (PSF, AB)."""
+    r = num(row, "ls_r_mag")
+    if r is None:
+        r = num(row, "pan_starrs1_dr2_meanobject__rMeanPSFMag")
+    return r if r is not None and 5 < r < 30 else None
 
 
 def evaluate(rule, row, namespaced=frozenset()):
@@ -527,6 +561,32 @@ def evaluate(rule, row, namespaced=frozenset()):
                         "origin": rule["threshold_origin"],
                         "feature_group": rule["feature_group"],
                         "note": "colour available",
+                    }
+                )
+    elif rid == "RADIO-001":
+        # Radio loudness R = 0.4 (r - t), t = -2.5 log10(S_1.4GHz / 3631 Jy)
+        # (Ivezic et al. 2002, AJ 124, 2364; radio-loud R > 1).  Radio-loud
+        # quasars and AGN in galaxies are detected at the survey limits
+        # (FIRST ~1 mJy) while stars almost never are; star-forming galaxies
+        # are radio-detected at low R.  Continuous features; weights come
+        # only from the fitted Stage-5 model.
+        s = radio_14ghz_mjy(row)
+        r = optical_r_mag(row)
+        if s is not None:
+            feats = {"radio_detected": 1.0}
+            if r is not None:
+                t = -2.5 * math.log10(s * 1e-3 / 3631.0)
+                feats["radio_log_r"] = max(-2.0, min(6.0, 0.4 * (r - t)))
+            for name, v in feats.items():
+                out.append(
+                    {
+                        "class": f"FEATURE:{name}",
+                        "rule_id": rid,
+                        "value": v,
+                        "kind": "linear_feature",
+                        "origin": rule["threshold_origin"],
+                        "feature_group": rule["feature_group"],
+                        "note": "radio counterpart",
                     }
                 )
     elif rid == "SGA-001":
