@@ -133,6 +133,11 @@ def fit_gbm(a, ev, s5, keys, keep, y, tr, ca, used):
     assert keys_n == keys
     if a.drop_keys:
         Xn[:, [any(k.startswith(p) for p in a.drop_keys) for k in keys]] = np.nan
+    # Footprint-limited surveys: a missing X-ray / radio counterpart says
+    # where the object is, not what it is (eRASS1 covers half the sky; 33 % of
+    # SDSS-truth but 4 % of DESI-truth QSOs have one), so these keys stay out
+    # of the trees, whose missing-value branches would learn the footprint.
+    keep = keep & ~np.array([k.startswith(tuple(a.linear_only)) for k in keys])
     sup = [k for k, m in zip(keys, keep) if m]
     Xs = Xn[:, keep]
     groups = [[p for p in g.split(",") if p] for g in a.augment_drop]
@@ -213,6 +218,7 @@ def main():
     ap.add_argument("--catalog-root", type=Path, nargs="+", required=True)
     ap.add_argument("--manifest", type=Path, nargs="+", required=True)
     ap.add_argument("--out", type=Path, default=PRE / "fusion_weights.json")
+    ap.add_argument("--linear-only", nargs="*", default=[], help="evidence-key prefixes kept out of the --gbm trees")
     ap.add_argument("--drop-keys", nargs="*", default=[], help="evidence-key prefixes to exclude (ablation)")
     ap.add_argument(
         "--augment-drop",
@@ -355,6 +361,7 @@ def main():
         "provenance": {
             "benchmarks": [str(t) for t in a.truth],
             "dropped_keys": a.drop_keys,
+            "linear_only_keys": a.linear_only,
             "train_rows": int(fit_rows.sum()),
             "augment_drop": a.augment_drop,
             "augment_weight": a.augment_weight,

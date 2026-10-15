@@ -136,6 +136,10 @@ RAW_FIELDS = {
     "SpeakTot",
     "Total_flux",
     "Ftot",
+    # X-ray fluxes (XRAY-001)
+    "Fluxb",
+    "Flux8",
+    "MLFlux1",
     # ZTF light-curve statistics (ZTF-VAR-001; Get_data/ztf_lightcurve.py)
     *(f"ztf_{b}_{k}" for b in ("g", "r") for k in ("n", "mag", "rms", "chi2r", "exvar", "sf_a", "sf_gamma")),
 }
@@ -271,6 +275,30 @@ def radio_14ghz_mjy(row):
             v = num(row, n)
             if v is not None and v > 0:
                 return v * scale
+    return None
+
+
+# X-ray flux (erg/s/cm^2) in the 0.3-3.5 keV band of the X-ray-to-optical
+# flux ratio (Maccacaro et al. 1988, ApJ 326, 680), converted from each
+# survey band with a photon index Gamma = 1.8 (F ~ E2^0.2 - E1^0.2), the mean
+# AGN slope.  Order: Chandra CSC 2.0 broad (0.5-7 keV), 4XMM-DR13 band 8
+# (0.2-12 keV), eRASS1 band 1 (0.2-2.3 keV); the first positive flux is used.
+def _band(e1, e2):
+    return (3.5**0.2 - 0.3**0.2) / (e2**0.2 - e1**0.2)
+
+
+XRAY_FLUX = (
+    ("chandra_csc_2_0__Fluxb", _band(0.5, 7.0)),
+    ("xmm_4xmm_dr13__Flux8", _band(0.2, 12.0)),
+    ("erosita_erass1__MLFlux1", _band(0.2, 2.3)),
+)
+
+
+def xray_flux(row):
+    for name, scale in XRAY_FLUX:
+        v = num(row, name)
+        if v is not None and v > 0:
+            return v * scale
     return None
 
 
@@ -589,6 +617,30 @@ def evaluate(rule, row, namespaced=frozenset()):
                         "origin": rule["threshold_origin"],
                         "feature_group": rule["feature_group"],
                         "note": "radio counterpart",
+                    }
+                )
+    elif rid == "XRAY-001":
+        # X-ray-to-optical flux ratio log(fX/fopt) = log fX + r/2.5 + 5.37
+        # (Maccacaro et al. 1988, Eq. 1; r used for V): AGN and quasars lie
+        # at -1 to +1.2, coronal stars below -1 and normal galaxies below
+        # ~ -2 (Stocke et al. 1991, ApJS 76, 813).  Continuous features;
+        # weights come only from the fitted Stage-5 model.
+        fx = xray_flux(row)
+        r = optical_r_mag(row)
+        if fx is not None:
+            feats = {"xray_detected": 1.0}
+            if r is not None:
+                feats["xray_log_fx_fo"] = max(-4.0, min(3.0, math.log10(fx) + r / 2.5 + 5.37))
+            for name, v in feats.items():
+                out.append(
+                    {
+                        "class": f"FEATURE:{name}",
+                        "rule_id": rid,
+                        "value": v,
+                        "kind": "linear_feature",
+                        "origin": rule["threshold_origin"],
+                        "feature_group": rule["feature_group"],
+                        "note": "X-ray counterpart",
                     }
                 )
     elif rid == "ZTF-VAR-001":
