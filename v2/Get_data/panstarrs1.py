@@ -72,6 +72,11 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
         p["columns"] = "[" + ",".join(COLUMNS) + "]"
         r = requests.get(API, params=p, timeout=120)
     r.raise_for_status()
+    # MAST answers a cone without matching rows with an empty 200 body (no CSV
+    # header); that is "no sources", not a failure (2.26.0: 486 of 8257 faint
+    # DESI benchmark targets were counted as query errors).
+    if not r.text.strip():
+        return pd.DataFrame(columns=["catalog", "catalog_object_id", "object_name", "ra", "dec", *COLUMNS])
     df = pd.read_csv(StringIO(r.text), dtype={"objID": "string", "objName": "string"})
     if df.empty:
         return pd.DataFrame(columns=["catalog", "catalog_object_id", "object_name", "ra", "dec", *COLUMNS])
