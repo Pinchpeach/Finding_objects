@@ -1,35 +1,90 @@
-name: Collect Truth Radio X-ray Features
-# Manual only: adds the radio / X-ray counterparts of the SDSS and DESI
-# benchmark objects to the preserved catalog_features (2.25.0, accuracy item
-# #2: X-ray / radio evidence for host-dominated QSOs).  Existing files are
-# replaced only when under 1 % of the queries failed.
+name: Collect Truth Features
+# Manual only: adds catalogue counterparts of benchmark truth objects to the
+# preserved catalog_features.  (The file keeps its 2.25.0 name because a
+# workflow can be dispatched only once it exists on the default branch.)
+#   2.25.0: radio / X-ray counterparts of the SDSS and DESI truth sets
+#           (accuracy item A: X-ray / radio evidence for host-dominated QSOs).
+#   2.26.0: build_fusion=true builds the DESI fusion-training truth set
+#           (item D) before collecting; truths may include "fusion".
+#   2.27.0: catalog "ztf_lightcurve" (item E: ZTF variability).
+# A collection is used only when under 1 % of its queries failed.
 on:
   workflow_dispatch:
+    inputs:
+      catalogs:
+        description: 'JSON list of collectors'
+        default: '["erosita","xmm","chandra","first","vlass","lotss","nvss"]'
+      truths:
+        description: 'JSON list of truth sets: sdss, desi, fusion'
+        default: '["sdss","desi"]'
+      build_fusion:
+        description: 'build v2/benchmark/desi_fusion/truth.csv first (true/false)'
+        default: 'false'
+      fusion_per_cell:
+        description: 'fusion truth objects per class per r bin'
+        default: '700'
 concurrency:
-  group: collect-truth-radio-xray-${{ github.ref }}
+  group: collect-truth-features-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  collect:
-    strategy:
-      fail-fast: false
-      matrix:
-        catalog: [erosita, xmm, chandra, first, vlass, lotss, nvss]
-        truth: [sdss, desi]
+  fusion_truth:
+    if: github.event.inputs.build_fusion == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 240
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install pandas numpy requests astropy astroquery
+      - run: pip install pandas numpy astropy astroquery
+      - name: Build DESI fusion-training truth
+        # RA windows disjoint from the DESI external benchmark windows and
+        # from the field-validation centres (RA 20, 245, 250); objects of the
+        # external benchmark and of the LS-GBM training set are excluded.
+        run: |
+          python v2/benchmark/build_desi_truth.py --per-cell "${{ github.event.inputs.fusion_per_cell }}" \
+            --ra-windows 22-32,50-60,140-150,165-175,190-200,215-225,255-265,345-355 \
+            --exclude v2/benchmark/desi_external/truth.csv v2/benchmark/desi_gbm_truth/train.csv.gz \
+            --id-prefix DFUS --seed 20261015 --out fusion/truth.csv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fusion-truth
+          path: fusion/truth.csv
+          retention-days: 14
+
+  collect:
+    needs: fusion_truth
+    if: always() && (needs.fusion_truth.result == 'success' || needs.fusion_truth.result == 'skipped')
+    strategy:
+      fail-fast: false
+      matrix:
+        catalog: ${{ fromJSON(github.event.inputs.catalogs) }}
+        truth: ${{ fromJSON(github.event.inputs.truths) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pandas numpy requests astropy astroquery pyvo
+      - uses: actions/download-artifact@v4
+        if: matrix.truth == 'fusion' && github.event.inputs.build_fusion == 'true'
+        with:
+          name: fusion-truth
+          path: v2/benchmark/desi_fusion
       - name: Cross-query ${{ matrix.catalog }} (${{ matrix.truth }})
         run: |
-          if [ "${{ matrix.truth }}" = sdss ]; then T=v2/benchmark/truth_data/ground_truth.csv; else T=v2/benchmark/desi_external/truth.csv; fi
+          case "${{ matrix.truth }}" in
+            sdss) T=v2/benchmark/truth_data/ground_truth.csv ;;
+            desi) T=v2/benchmark/desi_external/truth.csv ;;
+            fusion) T=v2/benchmark/desi_fusion/truth.csv ;;
+          esac
           python v2/benchmark/collect_catalog_truth.py --truth "$T" --catalog "${{ matrix.catalog }}" --workers 8 --out-dir out 2>&1 | tee out.log | grep -v ERROR | tail -40
           mkdir -p out
           echo "errors: $(grep -c ' ERROR ' out.log || true)" | tee out/errors.txt
+          wc -l < "$T" > out/targets.txt
           grep ' ERROR ' out.log | head -5 || true
       - uses: actions/upload-artifact@v4
         if: always()
@@ -38,8 +93,9 @@ jobs:
           path: out/
           if-no-files-found: warn
           retention-days: 14
+
   commit:
-    needs: collect
+    needs: [fusion_truth, collect]
     if: always()
     runs-on: ubuntu-latest
     permissions:
@@ -50,20 +106,30 @@ jobs:
         with:
           pattern: rx-*
           path: dl
+      - uses: actions/download-artifact@v4
+        if: github.event.inputs.build_fusion == 'true'
+        with:
+          name: fusion-truth
+          path: v2/benchmark/desi_fusion
       - name: Copy complete collections
         run: |
+          shopt -s nullglob
           for d in dl/rx-*; do
             n=${d#dl/rx-}; truth=${n%%-*}; cat=${n#*-}
             f="$d/${cat}_trd.csv"; [ -f "$f" ] || { echo "$n: no output"; continue; }
             e=$(sed -n 's/errors: //p' "$d/errors.txt")
+            n_t=$(( $(cat "$d/targets.txt" 2>/dev/null || echo 1) - 1 ))
             rows=$(($(wc -l < "$f") - 1))
-            echo "$n: rows=$rows errors=$e"
-            # Radio / X-ray non-detections are not evidence, so a failed query
-            # only loses a possible match; above 1 % of targets it would bias
-            # the benchmark, so such a collection is not used.
-            n_t=$(($(wc -l < "$( [ "$truth" = sdss ] && echo v2/benchmark/truth_data/ground_truth.csv || echo v2/benchmark/desi_external/truth.csv )") - 1))
+            echo "$n: rows=$rows errors=$e targets=$n_t"
+            # Non-detections are not evidence, so a failed query only loses a
+            # possible match; above 1 % of targets it would bias the benchmark.
             if [ "${e:-$n_t}" -gt $((n_t / 100)) ]; then echo "  skipped (query errors > 1 %)"; continue; fi
-            if [ "$truth" = sdss ]; then dst=v2/benchmark/catalog_features; else dst=v2/benchmark/desi_external/catalog_features; fi
+            case "$truth" in
+              sdss) dst=v2/benchmark/catalog_features ;;
+              desi) dst=v2/benchmark/desi_external/catalog_features ;;
+              fusion) dst=v2/benchmark/desi_fusion/catalog_features ;;
+            esac
+            mkdir -p "$dst"
             gzip -9n -c "$f" > "$dst/${cat}_trd.csv.gz"
           done
       - name: Commit
@@ -71,6 +137,7 @@ jobs:
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add v2/benchmark/catalog_features v2/benchmark/desi_external/catalog_features
+          [ -d v2/benchmark/desi_fusion ] && git add v2/benchmark/desi_fusion
           git diff --cached --quiet && exit 0
-          git commit -m "Benchmark radio / X-ray counterparts (SDSS, DESI truth)"
+          git commit -m "Benchmark truth features: ${{ github.event.inputs.catalogs }} for ${{ github.event.inputs.truths }}"
           bash .github/scripts/push_with_retry.sh "${GITHUB_REF_NAME}"

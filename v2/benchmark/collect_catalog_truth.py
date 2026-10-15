@@ -25,6 +25,7 @@ COLLECTORS = [
     "chandra",
     "xmm",
     "erosita",
+    "ztf_lightcurve",
 ]
 RADII = {
     "gaia_dr3": 0.10,
@@ -40,6 +41,7 @@ RADII = {
     "chandra": 0.15,
     "xmm": 0.20,
     "erosita": 0.30,
+    "ztf_lightcurve": 0.05,
 }
 MATCH_ARCSEC = {
     "gaia_dr3": 2.0,
@@ -55,6 +57,7 @@ MATCH_ARCSEC = {
     "chandra": 5.0,
     "xmm": 8.0,
     "erosita": 10.0,
+    "ztf_lightcurve": 1.5,
 }
 
 
