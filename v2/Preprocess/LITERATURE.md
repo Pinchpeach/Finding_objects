@@ -305,3 +305,13 @@ epochs).
 | Gradient-boosted trees over the evidence keys | Friedman 2001 (Ann. Stat. 29, 1189); Ke et al. 2017 (LightGBM, NeurIPS) | Lets evidence interact (e.g. a colour meaning something different for resolved and unresolved sources), which the linear log-odds sum cannot express. Absent evidence is a missing value, not logit 0. |
 | Temperature scaling | Guo et al. 2017 (ICML, "On Calibration of Modern Neural Networks") | One scalar (T = 1.3) fitted on the calibration split, so the abstention threshold works on calibrated probabilities. |
 | Geometric mean with the linear model (product of experts) | Hinton 2002 (Neural Computation 14, 1771) | The trees alone lowered Gaia-only faint-star recall (0.886 → 0.834, DESI test) for evidence combinations rare in training. The sign-constrained linear model keeps a predictable direction there, and the 0.5 blend was not below the linear model in any missing-evidence case on the calibration split. |
+
+## X-ray, radio and high-redshift quasar evidence (2.26.0)
+
+| Element | Source | Use |
+|---|---|---|
+| X-ray-to-optical flux ratio, log(fX/fopt) = log fX + m/2.5 + 5.37 (XRAY-001) | Maccacaro et al. 1988 (ApJ 326, 680), Eq. 1; Stocke et al. 1991 (ApJS 76, 813) | AGN and quasars lie at −1 to +1.2, coronal stars below −1, normal galaxies below ~ −2. Survey bands (CSC 0.5–7, 4XMM 0.2–12, eRASS1 0.2–2.3 keV) are converted to 0.3–3.5 keV with a photon index Γ = 1.8 (mean AGN slope); r is used for V. |
+| Radio loudness R = 0.4 (r − t), t = −2.5 log10(S1.4 / 3631 Jy) (RADIO-001) | Ivezić et al. 2002 (AJ 124, 2364), Section 4 | Radio-loud quasars and AGN are detected at the survey limits while stars almost never are; LoTSS and VLASS are scaled to 1.4 GHz with S ∝ ν^−0.7. |
+| High-z quasar gri branch (PS1-QSO-HIZ-001) | Richards et al. 2002 (AJ 123, 2945), Section 3.4 | z ≈ 3.5–4.5 quasars are red in g−r from the Lyα forest and move off the stellar locus; benchmark purity 7/8, completeness ~11 % at z > 3. |
+| X-ray and radio keys kept out of the trees (linear only) | eRASS1 footprint: Merloni et al. 2024 (A&A 682, A34), Galactic l > 180°; LoTSS DR2: Shimwell et al. 2022 (A&A 659, A1), northern sky | A missing counterpart reflects the survey footprint, not the class: 33 % of SDSS-truth QSOs but 4 % of DESI-truth QSOs have an X-ray match. Tree missing-value branches learned that difference (DESI STAR recall 0.893 → 0.852); the linear model treats absence as logit 0. |
+| Gaia match at the truth epoch | Gaia DR3 epoch J2016.0 (Gaia Collaboration, Vallenari et al. 2023, A&A 674, A1) | Benchmark Gaia counterparts are searched within 15″ and moved by their proper motion to the spectroscopic epoch (SDSS MJD); 46 high-proper-motion SDSS stars gained their Gaia match. |
