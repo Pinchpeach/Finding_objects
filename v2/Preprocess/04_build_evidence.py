@@ -547,29 +547,30 @@ def evaluate(rule, row, namespaced=frozenset()):
     elif rid == "ZTF-VAR-001":
         # Aperiodic optical variability from ZTF light curves: quasars vary
         # stochastically with a rising structure function (A ~ 0.1 mag at 1 yr,
-        # gamma ~ 0.3-0.5; Schmidt et al. 2010, Palanque-Delabrouille et al.
-        # 2011), most stars are constant at ZTF precision and galaxies show
-        # no nuclear variability.  The r band is used, else g.  Continuous
-        # features; weights come only from the fitted Stage-5 model.
+        # gamma ~ 0.3-0.5; Schmidt et al. 2010), most stars are constant at ZTF
+        # precision.  As in Palanque-Delabrouille et al. (2011) only point
+        # sources are used: PSF photometry of a resolved galaxy changes with
+        # seeing, which reads as variability (benchmark galaxies: median
+        # chi2_red 10.6).  Point-like = Legacy Surveys PSF model or PS1
+        # i(PSF) - i(Kron) < 0.05.  The r band is used, else g; survey-
+        # dependent quantities (epoch count, magnitude) are not features.
+        # Continuous features; weights come only from the fitted Stage-5 model.
         z = "ztf_light_curves__"
+        ls_type = str(row.get("desi_legacy_surveys_dr10__type", "")).strip().upper()
+        pk = num(row, "ps1_i_psf_minus_kron")
+        point = ls_type == "PSF" if ls_type not in {"", "NAN", "NONE"} else (pk is not None and pk < 0.05)
         band = next((b for b in ("r", "g") if (num(row, f"{z}ztf_{b}_n") or 0) >= 10), None)
-        if band is not None:
+        if point and band is not None:
             p = f"{z}ztf_{band}_"
-            feats = {"ztf_n_log": math.log10(num(row, p + "n"))}
             chi2r = num(row, p + "chi2r")
             if chi2r is not None and chi2r > 0:
-                feats["ztf_chi2r_log"] = max(-1.0, min(3.0, math.log10(chi2r)))
+                feature("ztf_chi2r_log", max(-1.0, min(3.0, math.log10(chi2r))), "ZTF light-curve variability")
             sf_a = num(row, p + "sf_a")
             if sf_a is not None:
-                feats["ztf_sf_a_log"] = max(-3.0, min(0.5, math.log10(max(sf_a, 1e-3))))
+                feature("ztf_sf_a_log", max(-3.0, min(0.5, math.log10(max(sf_a, 1e-3)))), "ZTF light-curve variability")
             gamma = num(row, p + "sf_gamma")
             if gamma is not None:
-                feats["ztf_sf_gamma"] = max(-1.0, min(1.5, gamma))
-            mag = num(row, p + "mag")
-            if mag is not None:
-                feats["ztf_mag"] = max(12.0, min(22.0, mag))
-            for name, v in feats.items():
-                feature(name, v, "ZTF light-curve variability")
+                feature("ztf_sf_gamma", max(-1.0, min(1.5, gamma)), "ZTF light-curve variability")
     elif rid == "SGA-001":
         if "SGA-2020" in str(row.get("catalogs", "")).split("|"):
             hit("GALAXY", 0.95, src.get("catalog_object_id"), "Siena Galaxy Atlas 2020 large galaxy")

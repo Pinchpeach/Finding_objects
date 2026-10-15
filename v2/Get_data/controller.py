@@ -44,6 +44,7 @@ COLLECTORS = [
     "desi_fastspec",
     "lamost_spectroscopy",
     "ztf_periodic",
+    "ztf_lightcurve",
     "atnf_pulsar",
     "bzcat",
     "agb_suh2021",

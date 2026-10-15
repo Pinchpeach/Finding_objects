@@ -51,6 +51,7 @@ PROFILES = {
     "TGSS ADR1": SurveyProfile(None, 2.0, 25.0, 25.0),
     # ZTF: ~0.1" astrometry, ~2" seeing (Bellm et al. 2019; Masci et al. 2019).
     "ZTF periodic variables": SurveyProfile(None, 0.15, 2.0, 3.0),
+    "ZTF light curves": SurveyProfile(None, 0.15, 2.0, 3.0),
     # Chandra CSC: on-axis PSF ~0.5"; per-source r0 is a 95 % error-ellipse
     # radius (Evans et al. 2010; CSC column documentation), see
     # infer_poserr_arcsec.
