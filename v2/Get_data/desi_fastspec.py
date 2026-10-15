@@ -14,12 +14,22 @@ FastSpecFit reports 0 there, which must not read as "no emission".
 No classification is done here.
 """
 
+import sys
 from pathlib import Path
 import numpy as np
 import pandas as pd
 
+if str(Path(__file__).resolve().parent) not in sys.path:  # loaded by file path elsewhere
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+# Same Data Lab TAP service and bounded-attempt pattern as desi_legacy.py (Data
+# Lab can stall).  Its HTTP session has a timeout, so an abandoned attempt
+# thread ends instead of piling up (pyvo's default session has none; 2.23.0).
+from desi_legacy import TAP_URL, _query_with_retries, _service  # noqa: F401 (TAP_URL: benchmark)
+from _catalog_utils import empty_frame, save_csv
+
+save = save_csv  # collector API: save(df, path)
+
 CATALOG = "DESI DR1 FastSpecFit"
-TAP_URL = "https://datalab.noirlab.edu/tap"
 TABLE = "desi_dr1.agngal"
 LINES = {"ha": "halpha", "hb": "hbeta", "oiii5007": "oiii_5007", "nii6584": "nii_6584"}
 EXTRA = ["halpha_broad_flux", "halpha_broad_flux_ivar", "halpha_broad_sigma", "opt_uv_type", "agn_maskbits"]
@@ -28,28 +38,6 @@ LINE_FIELDS = [f"line_{k}_{s}" for k in LINES for s in ("flux", "flux_err")] + [
     "line_nii6584_ew",
     "line_source",
 ]
-
-
-def _query_with_retries(run):
-    # Same bounded-attempt pattern as desi_legacy.py (Data Lab can stall).
-    import sys
-
-    here = str(Path(__file__).resolve().parent)
-    if here not in sys.path:  # loaded by file path elsewhere
-        sys.path.insert(0, here)
-    from desi_legacy import _query_with_retries as q
-
-    return q(run)
-
-
-def _service():
-    # The Legacy Surveys collector's TAP service: its HTTP session has a
-    # timeout, so an abandoned attempt thread ends instead of piling up
-    # (pyvo's default session has none; 2.23.0).
-    from desi_legacy import TAP_URL as LS_URL, _service as ls_service
-    import pyvo
-
-    return ls_service() if LS_URL == TAP_URL else pyvo.dal.TAPService(TAP_URL)
 
 
 def standardise(df: pd.DataFrame) -> pd.DataFrame:
@@ -70,8 +58,6 @@ def standardise(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
-    import pyvo
-
     cols = [
         "targetid",
         "target_ra",
@@ -91,7 +77,7 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     )
     df = _query_with_retries(lambda: _service().search(query).to_table().to_pandas())
     if df.empty:
-        return pd.DataFrame(columns=["catalog", "catalog_object_id", "object_name", "ra", "dec", *LINE_FIELDS])
+        return empty_frame(*LINE_FIELDS)
     df.columns = [str(c).strip() for c in df.columns]
     prim = df["zcat_primary"].astype(str).str.strip().str.lower().isin(["true", "t", "1"])
     df = df[prim] if prim.any() else df  # one spectrum per object
@@ -102,8 +88,3 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     df.insert(3, "ra", pd.to_numeric(df["target_ra"], errors="coerce"))
     df.insert(4, "dec", pd.to_numeric(df["target_dec"], errors="coerce"))
     return df.drop_duplicates("catalog_object_id", keep="last").reset_index(drop=True)
-
-
-def save(df: pd.DataFrame, path: str | Path) -> None:
-    Path(path).parent.mkdir(parents=True, exist_ok=True)
-    df.drop_duplicates("catalog_object_id", keep="last").to_csv(path, index=False)

@@ -13,7 +13,6 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     import astropy.units as u
 
     center = SkyCoord(ra * u.deg, dec * u.deg)
-    last_error = None
     attempts = 2  # each attempt already has astroquery's 60 s read timeout
     for attempt in range(attempts):
         try:
@@ -28,12 +27,10 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
             df.insert(3, "ra", pd.to_numeric(df["RA"], errors="coerce"))
             df.insert(4, "dec", pd.to_numeric(df["DEC"], errors="coerce"))
             return df.drop_duplicates("catalog_object_id", keep="last").reset_index(drop=True)
-        except Exception as exc:
-            last_error = exc
+        except Exception:
             if attempt == attempts - 1:
                 raise
             time.sleep(2**attempt)
-    raise last_error
 
 
 def save(df, path):

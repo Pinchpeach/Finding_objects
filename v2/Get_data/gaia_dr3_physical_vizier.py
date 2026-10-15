@@ -6,19 +6,16 @@ transport path is optimized for validation throughput.
 """
 
 from __future__ import annotations
-from pathlib import Path
 import pandas as pd
-from _catalog_utils import pick, coordinates, add_standard_metadata
+from _catalog_utils import add_standard_metadata, coordinates, empty_frame, pick, save_csv, vizier_cone
+
+save = save_csv  # collector API: save(df, path)
 
 CATALOG = "Gaia DR3"
 TABLE = "I/355/paramp"
 
 
 def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
-    from astroquery.vizier import Vizier
-    from astropy.coordinates import SkyCoord
-    import astropy.units as u
-
     cols = [
         "Source",
         "RA_ICRS",
@@ -33,16 +30,9 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
         "Age-Flame",
         "Evol",
     ]
-    tabs = Vizier(columns=cols, row_limit=-1).query_region(
-        SkyCoord(float(ra) * u.deg, float(dec) * u.deg, frame="icrs"),
-        radius=float(radius_arcmin) * u.arcmin,
-        catalog=TABLE,
-    )
-    if not tabs:
-        return pd.DataFrame(columns=["catalog", "catalog_object_id", "object_name", "ra", "dec"])
-    df = tabs[0].to_pandas()
-    if df.empty:
-        return pd.DataFrame(columns=["catalog", "catalog_object_id", "object_name", "ra", "dec"])
+    df = vizier_cone(TABLE, ra, dec, radius_arcmin, cols)
+    if df is None or df.empty:
+        return empty_frame()
     sid = pick(df, ["Source"])
     rav, dev = coordinates(df, ["RA_ICRS", "RAJ2000"], ["DE_ICRS", "DEJ2000"])
 
@@ -75,8 +65,3 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
         out, radius_arcmin=radius_arcmin, ref_epoch=2016.0, poserr_arcsec=0.1, psf_fwhm_arcsec=0.18
     )
     return out.dropna(subset=["ra", "dec"]).drop_duplicates("catalog_object_id", keep="last").reset_index(drop=True)
-
-
-def save(df: pd.DataFrame, path: str | Path) -> None:
-    Path(path).parent.mkdir(parents=True, exist_ok=True)
-    df.drop_duplicates("catalog_object_id", keep="last").to_csv(path, index=False)

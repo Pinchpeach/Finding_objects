@@ -9,9 +9,8 @@ are returned too.
 """
 
 from __future__ import annotations
-from pathlib import Path
 import pandas as pd
-from _catalog_utils import add_standard_metadata, coordinates, numeric, pick
+from _catalog_utils import add_standard_metadata, coordinates, empty_frame, numeric, pick, save_csv, vizier_cone
 
 CATALOG = "SGA-2020"
 VIZIER_CATALOG = "J/ApJS/269/3"
@@ -21,20 +20,9 @@ CACHE_FILTER_MARGIN_ARCMIN = MAX_EXTRA_ARCMIN
 
 
 def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
-    from astroquery.vizier import Vizier
-    from astropy.coordinates import SkyCoord
-    import astropy.units as u
-
-    centre = SkyCoord(float(ra) * u.deg, float(dec) * u.deg, frame="icrs")
-    tabs = Vizier(columns=["**"], row_limit=-1).query_region(
-        centre, radius=(float(radius_arcmin) + MAX_EXTRA_ARCMIN) * u.arcmin, catalog=VIZIER_CATALOG
-    )
-    cols = ["catalog", "catalog_object_id", "object_name", "ra", "dec", "sga_d26_arcmin", "sga_pa_deg", "sga_ba"]
-    if not tabs:
-        return pd.DataFrame(columns=cols)
-    df = tabs[0].to_pandas()
-    if df.empty:
-        return pd.DataFrame(columns=cols)
+    df = vizier_cone(VIZIER_CATALOG, ra, dec, float(radius_arcmin) + MAX_EXTRA_ARCMIN)
+    if df is None or df.empty:
+        return empty_frame("sga_d26_arcmin", "sga_pa_deg", "sga_ba")
     ra_v, dec_v = coordinates(
         df, ["RAdeg", "RA_ICRS", "RAJ2000", "_RAJ2000", "RA"], ["DEdeg", "DE_ICRS", "DEJ2000", "_DEJ2000", "DE"]
     )
@@ -66,8 +54,5 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     )
 
 
-def save(df: pd.DataFrame, path: str | Path) -> None:
-    if not {"catalog", "catalog_object_id", "object_name", "ra", "dec"}.issubset(df.columns):
-        raise ValueError("invalid SGA output")
-    Path(path).parent.mkdir(parents=True, exist_ok=True)
-    df.drop_duplicates("catalog_object_id", keep="last").to_csv(path, index=False)
+def save(df: pd.DataFrame, path) -> None:
+    save_csv(df, path, "SGA")

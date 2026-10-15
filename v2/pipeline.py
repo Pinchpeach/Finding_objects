@@ -21,11 +21,6 @@ from __future__ import annotations
 import argparse, importlib.util, sys, time
 from pathlib import Path
 import pandas as pd
-import importlib.util as _tio_u
-
-_tio_s = _tio_u.spec_from_file_location("v2_table_io", Path(__file__).resolve().parent / "Preprocess" / "table_io.py")
-TABLE_IO = _tio_u.module_from_spec(_tio_s)
-_tio_s.loader.exec_module(TABLE_IO)
 
 V2 = Path(__file__).resolve().parent
 PRE = V2 / "Preprocess"
@@ -34,9 +29,8 @@ GET = V2 / "Get_data"
 
 
 def _load(path: Path, name: str):
-    for p in (str(path.parent),):
-        if p not in sys.path:
-            sys.path.insert(0, p)
+    if str(path.parent) not in sys.path:
+        sys.path.insert(0, str(path.parent))
     spec = importlib.util.spec_from_file_location(name, path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
@@ -149,7 +143,8 @@ def run(
     names = _load(V2 / "designations.py", "v2_designations")
     hosts = _load(V2 / "host_groups.py", "v2_host_groups")
     assoc = pd.read_csv(work / "source_association.csv", low_memory=False, dtype={"catalog_object_id": "string"})
-    out = names.annotate(TABLE_IO.read_table(work / "classified_objects.csv"), assoc)
+    table_io = _load(PRE / "table_io.py", "v2_table_io")
+    out = names.annotate(table_io.read_table(work / "classified_objects.csv"), assoc)
     out = hosts.consolidate(out, names.PRIORITY)
     if out.n_components.gt(0).any():  # hosts may have inherited a nucleus spectrum
         out = _load(CLS / "subclass.py", "v2_subclass").annotate(out)

@@ -90,7 +90,6 @@ def _otype_labels(s):
 def _attach_references(s, df, chunk=300, per_object=3):
     ids = df["catalog_object_id"].astype(str).tolist()
     rows = []
-    labels = {}
     for i in range(0, len(ids), chunk):
         part = _adql_list(ids[i : i + chunk])
         q = (

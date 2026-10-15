@@ -16,6 +16,7 @@ import sys
 if str(Path(__file__).resolve().parent) not in sys.path:  # loaded by file path elsewhere
     sys.path.insert(0, str(Path(__file__).resolve().parent))
 from gaia_release import SLOT_CATALOG, current as _release, table as _table, RELEASES
+from _catalog_utils import BASE, pick, save_csv, vizier_cone
 
 # Pipeline slot name for every Gaia release (see gaia_release.py); each row
 # records the release and epoch it really comes from.
@@ -193,40 +194,20 @@ def _merge_optional(
             opt["source_id"] = pd.to_numeric(opt["source_id"], errors="coerce").astype("Int64")
             base["source_id"] = pd.to_numeric(base["source_id"], errors="coerce").astype("Int64")
             base = base.merge(opt.drop_duplicates("source_id"), on="source_id", how="left")
-        for col in columns:
-            if col not in base.columns:
-                base[col] = pd.NA
-        base[status_name] = "ok"
+        status = "ok"
     except Exception as exc:
-        for col in columns:
-            if col not in base.columns:
-                base[col] = pd.NA
-        base[status_name] = "error:" + type(exc).__name__
+        status = "error:" + type(exc).__name__
+    for col in columns:
+        if col not in base.columns:
+            base[col] = pd.NA
+    base[status_name] = status
     return base
 
 
-def _pick(df, names):
-    low = {str(c).lower(): c for c in df.columns}
-    for n in names:
-        if n in df.columns:
-            return n
-        if n.lower() in low:
-            return low[n.lower()]
-    return None
-
-
 def _vizier_fallback(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
-    from astroquery.vizier import Vizier
-    from astropy.coordinates import SkyCoord
-    import astropy.units as u
-
-    c = SkyCoord(float(ra) * u.deg, float(dec) * u.deg, frame="icrs")
-    tabs = Vizier(columns=["**"], row_limit=-1).query_region(
-        c, radius=float(radius_arcmin) * u.arcmin, catalog="I/355/gaiadr3"
-    )
-    if not tabs:
+    src = vizier_cone(RELEASES["DR3"].vizier_source, ra, dec, radius_arcmin)
+    if src is None:
         return pd.DataFrame()
-    src = tabs[0].to_pandas()
     if src.empty:
         return src
     mapping = {
@@ -280,11 +261,8 @@ def _vizier_fallback(ra: float, dec: float, radius_arcmin: float) -> pd.DataFram
             "ClassELS": "classlabel_espels",
             "f_ClassELS": "classlabel_espels_flag",
         }
-        pt = Vizier(columns=["Source", *dsc], row_limit=-1).query_region(
-            c, radius=float(radius_arcmin) * u.arcmin, catalog="I/355/paramp"
-        )
-        ap = pt[0].to_pandas() if pt else pd.DataFrame()
-        if not ap.empty and "Source" in ap.columns:
+        ap = vizier_cone("I/355/paramp", ra, dec, radius_arcmin, ["Source", *dsc])
+        if ap is not None and not ap.empty and "Source" in ap.columns:
             ap = ap[["Source", *[k for k in dsc if k in ap.columns]]].rename(columns={"Source": "source_id", **dsc})
             ap["source_id"] = pd.to_numeric(ap["source_id"], errors="coerce").astype("Int64")
             out = out.merge(ap.drop_duplicates("source_id"), on="source_id", how="left")
@@ -292,14 +270,11 @@ def _vizier_fallback(ra: float, dec: float, radius_arcmin: float) -> pd.DataFram
         pass
     # Independent variability table fallback. A cone query is cheap for named-source validation.
     try:
-        vt = Vizier(columns=["**"], row_limit=-1).query_region(
-            c, radius=float(radius_arcmin) * u.arcmin, catalog="I/358/vclassre"
-        )
-        var = vt[0].to_pandas() if vt else pd.DataFrame()
-        if not var.empty:
-            sid = _pick(var, ["Source", "source_id"])
-            cl = _pick(var, ["Class", "best_class_name"])
-            sc = _pick(var, ["ClassSc", "best_class_score"])
+        var = vizier_cone("I/358/vclassre", ra, dec, radius_arcmin)
+        if var is not None and not var.empty:
+            sid = pick(var, ["Source", "source_id"])
+            cl = pick(var, ["Class", "best_class_name"])
+            sc = pick(var, ["ClassSc", "best_class_score"])
             if sid:
                 tmp = pd.DataFrame(
                     {
@@ -377,12 +352,7 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
         used = RELEASES["DR3"]
     if df.empty:
         return pd.DataFrame(
-            columns=["catalog", "catalog_object_id", "object_name", "ra", "dec"]
-            + SOURCE[2:]
-            + AP
-            + SPEC_AP
-            + ["best_class_name", "best_class_score"]
-            + VAR_SUMMARY
+            columns=BASE + SOURCE[2:] + AP + SPEC_AP + ["best_class_name", "best_class_score"] + VAR_SUMMARY
         )
     df.insert(0, "catalog", CATALOG)
     sid = pd.to_numeric(df["source_id"], errors="coerce").astype("Int64").astype("string")
@@ -402,9 +372,5 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     return df.drop_duplicates("catalog_object_id", keep="last").reset_index(drop=True)
 
 
-def save(df: pd.DataFrame, path: str | Path) -> None:
-    required = {"catalog", "catalog_object_id", "object_name", "ra", "dec"}
-    if not required.issubset(df.columns):
-        raise ValueError("invalid Gaia output")
-    Path(path).parent.mkdir(parents=True, exist_ok=True)
-    df.drop_duplicates("catalog_object_id", keep="last").to_csv(path, index=False)
+def save(df: pd.DataFrame, path) -> None:
+    save_csv(df, path, "Gaia")

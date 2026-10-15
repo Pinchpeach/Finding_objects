@@ -243,6 +243,7 @@ def _run_bounded(job, names, workers: int, budget_s: float) -> list[dict]:
                     "elapsed_seconds": round(now - t0, 3),
                     "output_file": "",
                     "error": f"exceeded {budget_s:.0f} s collector budget",
+                    "cache": "off",
                 }
                 print(f"[{name}] timeout: abandoned after {budget_s:.0f} s", flush=True)
         if running:
