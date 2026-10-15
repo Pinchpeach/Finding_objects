@@ -400,7 +400,7 @@ def main():
         # Faint objects (e.g. DESI) are harder than bright ones (SDSS); a pooled
         # target lets the larger bright set hide the faint set's errors.
         curves = []
-        for name in ev.dataset.unique():
+        for name in ev.dataset[ca].unique():  # train-only sets (desi_fusion) have no calibration rows
             mk = ca & ev.dataset.eq(name).to_numpy()
             curves.append(coverage_curve(probs(mk), y[mk], used[mk], grid))
         ok = [
@@ -415,7 +415,7 @@ def main():
     model["provenance"]["target_calibration_accuracy"] = a.target_accuracy
     model["provenance"]["target_scope"] = a.target_scope
     test = {}
-    for name in ev.dataset.unique():
+    for name in ev.dataset[te].unique():
         mask = te & ev.dataset.eq(name).to_numpy()
         pte = probs(mask)
         yte = y[mask]
