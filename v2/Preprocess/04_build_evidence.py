@@ -233,6 +233,7 @@ ASSOC_PREFIX = {
     "PS1-MORPH-001": "pan_starrs1_dr2_meanobject",
     "PS1-MORPH-002": "pan_starrs1_dr2_meanobject",
     "PS1-QSO-Z6-001": "pan_starrs1_dr2_meanobject",
+    "PS1-QSO-HIZ-001": "pan_starrs1_dr2_meanobject",
     "WISE-AGN-001": "allwise",
     "WISE-AGN-R90-001": "allwise",
     "SDSS-PHOTO-001": "sdss_dr18_photoobj",
@@ -413,6 +414,28 @@ def evaluate(rule, row, namespaced=frozenset()):
                     0.70,
                     {"i-z": iz, "z-y": zy},
                     "Bañados+2016 PS1 z~6 quasar color-selection candidate; follow-up required",
+                    reliability,
+                    association_reliability,
+                )
+    elif rid == "PS1-QSO-HIZ-001":
+        # z ~ 3.5-4.5 quasars: the Lyman-alpha forest leaves g faint (red
+        # g-r) while r-i and i-z stay blue, off the stellar locus that the
+        # z ~ 2.7 quasars cross.  Richards et al. 2002 (AJ 123, 2945) "gri"
+        # branch, with SDSS ~ PS1 gri (Tonry et al. 2012 offsets < 0.1 mag),
+        # point sources only.  Benchmark: 7 of 8 point sources passing are
+        # quasars (SDSS + DESI), but only ~11 % of z > 3 quasars pass.
+        gr, ri, iz = (num(row, f"ps1_{c}_color") for c in ("g_r", "r_i", "i_z"))
+        er, ei = num(row, "ps1_r_psf_mag_err"), num(row, "ps1_i_psf_mag_err")
+        pk = num(row, "ps1_i_psf_minus_kron")
+        if None not in (gr, ri, iz, er, ei, pk) and er < 0.2 and ei < 0.2 and pk < 0.05:
+            if gr > 1.0 and (ri < 0.08 + 0.42 * (gr - 0.96) or gr > 2.26) and iz < 0.25:
+                emit(
+                    out,
+                    rule,
+                    "QSO",
+                    0.80,
+                    {"g-r": gr, "r-i": ri, "i-z": iz},
+                    "Richards+2002 high-z (gri) quasar colours, point source",
                     reliability,
                     association_reliability,
                 )

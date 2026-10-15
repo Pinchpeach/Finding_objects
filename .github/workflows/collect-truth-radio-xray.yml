@@ -75,6 +75,7 @@ jobs:
           name: fusion-truth
           path: v2/benchmark/desi_fusion
       - name: Cross-query ${{ matrix.catalog }} (${{ matrix.truth }})
+        shell: bash  # -eo pipefail: a crashed collector fails the job
         run: |
           case "${{ matrix.truth }}" in
             sdss) T=v2/benchmark/truth_data/ground_truth.csv ;;

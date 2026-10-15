@@ -2,7 +2,7 @@
 """Cross-query balanced truth coordinates against existing v2 catalog collectors."""
 
 from __future__ import annotations
-import argparse, importlib.util, time
+import argparse, importlib.util, sys, time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 import numpy as np, pandas as pd
@@ -62,6 +62,10 @@ MATCH_ARCSEC = {
 
 
 def load(name):
+    # Collectors import their shared helpers (_catalog_utils) by module name,
+    # as Get_data/controller.py does with Get_data on sys.path.
+    if str(GET) not in sys.path:
+        sys.path.insert(0, str(GET))
     p = GET / f"{name}.py"
     s = importlib.util.spec_from_file_location("trd_" + name, p)
     m = importlib.util.module_from_spec(s)
