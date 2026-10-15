@@ -6,13 +6,14 @@ family-level labels and their independent calibration remain stable.
 """
 
 from __future__ import annotations
-import math
 import importlib.util as _ilu
 from pathlib import Path as _P
 
-_s = _ilu.spec_from_file_location("v2_simbad_otypes", _P(__file__).resolve().parents[1] / "simbad_otypes.py")
-OTYPES = _ilu.module_from_spec(_s)
-_s.loader.exec_module(OTYPES)
+_s = _ilu.spec_from_file_location("v2_classifier_rowutil", _P(__file__).resolve().parents[1] / "_rowutil.py")
+ROW = _ilu.module_from_spec(_s)
+_s.loader.exec_module(ROW)
+OTYPES = ROW.OTYPES
+_num, _text = ROW.num, ROW.text
 AXIS = "variability"
 CLASSES = (
     "RR_LYRAE",
@@ -94,31 +95,13 @@ NON_STELLAR = {"AGN", "GALAXY"}
 OTHER_SPECIAL = {"EP", "WD"}
 
 
-def _text(row, key):
-    v = row.get(key)
-    if v is None:
-        return None
-    v = str(v).strip()
-    return None if not v or v.lower() == "nan" else v
-
-
-def _num(row, key):
-    try:
-        v = float(row.get(key))
-        return v if math.isfinite(v) else None
-    except Exception:
-        return None
-
-
 def _cstar(row):
     """Gaia LPV C-star flag gated as Lebzelter et al. (2023) advise (G_BP < 19,
     7 < median_delta_wl_rp < 11); same rule as subclass.gaia_lpv_cstar (2.17.0)."""
     if not _flag(row, "gaia_lpv_is_cstar"):
         return False
-    bp = _num(row, "gaia_dr3__phot_bp_mean_mag")
+    bp = _num(row, "gaia_dr3__phot_bp_mean_mag", "phot_bp_mean_mag")
     wl = _num(row, "gaia_lpv_median_delta_wl_rp")
-    if bp is None:
-        bp = _num(row, "phot_bp_mean_mag")
     return bp is not None and bp < 19.0 and (wl is None or 7.0 < wl < 11.0)
 
 
@@ -140,14 +123,8 @@ def _clean(value):
 
 
 def _result(label, confidence, status, evidence, subtype=None):
-    return {
-        "axis": AXIS,
-        "label": label,
-        "subtype": subtype,
-        "confidence": confidence,
-        "status": status,
-        "evidence": evidence,
-    }
+    # Always with a subtype key (None without a leaf).
+    return ROW.axis_result(AXIS, label, confidence, status, evidence, subtype)
 
 
 def classify(row):
@@ -245,7 +222,7 @@ def classify(row):
         and freq > 0
         and MIRA_MIN_PERIOD_D <= 1 / freq < MIRA_MAX_PERIOD_D
     ):
-        sub = "C_STAR_CANDIDATE" if _cstar(row) else None
+        cstar = _cstar(row)
         return _result(
             "MIRA",
             None,
@@ -254,11 +231,11 @@ def classify(row):
                 {
                     "kind": "gaia_dr3_vari_long_period_variable",
                     "semi_amplitude_g_mag": amp,
-                    "period_days": round(1 / freq, 1) if freq else None,
-                    "is_cstar": _cstar(row),
+                    "period_days": round(1 / freq, 1),  # freq > 0 checked above
+                    "is_cstar": cstar,
                 }
             ],
-            sub,
+            "C_STAR_CANDIDATE" if cstar else None,
         )
     # LPV SOS has a published C-star-candidate flag.  It does not publish a
     # validated Mira leaf, so no period/amplitude threshold is used to make one.

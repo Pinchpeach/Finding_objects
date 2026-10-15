@@ -554,7 +554,7 @@ def test_review_2_23_simbad_wd_mk_precedence_and_paper_vetoes():
     # a SIMBAD dwarf class is not replaced by a photometric giant label
     assert sc.classify_star({"physical_class": "RED_GIANT", "simbad__sp_type": "K2V"})["luminosity_class"] == "V"
     # a HASH entry graded "not a PN" gets no "from paper: Planetary nebula"
-    lit = sc._literature()
+    lit = sc._load("literature")
     row = {"catalogs": "HASH PN Catalog", "phenomenon_status": "HASH_NON_PN_ENTRY"}
     assert lit.from_paper(row) is None
     assert (

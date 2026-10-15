@@ -5,31 +5,30 @@ reported as calibrated posterior probabilities; calibration is a separate stage.
 """
 
 from __future__ import annotations
-import math
+import functools
 import importlib.util as _ilu
 from pathlib import Path as _P
 
-_s = _ilu.spec_from_file_location("v2_simbad_otypes", _P(__file__).resolve().parents[1] / "simbad_otypes.py")
-OTYPES = _ilu.module_from_spec(_s)
-_s.loader.exec_module(OTYPES)
+_s = _ilu.spec_from_file_location("v2_classifier_rowutil", _P(__file__).resolve().parents[1] / "_rowutil.py")
+ROW = _ilu.module_from_spec(_s)
+_s.loader.exec_module(ROW)
+OTYPES = ROW.OTYPES
+_num, _text = ROW.num, ROW.text
 AXIS = "phenomenon"
+_result = functools.partial(ROW.axis_result, AXIS)
 CLASSES = ("SN", "PN", "NOVA", "MICROLENSING", "OTHER_TRANSIENT", "OTHER_PHENOMENON", "NONE", "UNKNOWN")
-
-
-def _text(row, key):
-    value = row.get(key)
-    if value is None:
-        return None
-    value = str(value).strip()
-    return None if not value or value.lower() == "nan" else value
-
-
-def _num(row, key):
-    try:
-        value = float(row.get(key))
-        return value if math.isfinite(value) else None
-    except Exception:
-        return None
+# Curated SIMBAD types (resolved through the otype hierarchy, 2.22.0):
+# code -> (label, status).
+SIMBAD_CURATED = {
+    "SN*": ("SN", "SIMBAD_CURATED_SN"),
+    "PN": ("PN", "SIMBAD_CURATED_PN"),
+    "No*": ("NOVA", "SIMBAD_CURATED_NOVA"),
+}
+# Gaia DR3 vari_classifier_result event classes -> (label, status).
+GAIA_EVENTS = {
+    "SN": ("SN", "GAIA_DR3_SN_CANDIDATE"),
+    "MICROLENSING": ("MICROLENSING", "GAIA_DR3_MICROLENSING_CANDIDATE"),
+}
 
 
 def _event_evidence(row, catalog, kind):
@@ -122,12 +121,11 @@ def classify(row):
         assoc = _num(row, "association_confidence__acker_pn_spectroscopy")
         sii = sum(v for k, v in detected.items() if k.startswith("pn_sii"))
         ha = detected.get("pn_halpha")
-        return {
-            "axis": AXIS,
-            "label": "PN",
-            "confidence": assoc,
-            "status": "PN_SPECTROSCOPY_EVIDENCE",
-            "evidence": [
+        return _result(
+            "PN",
+            assoc,
+            "PN_SPECTROSCOPY_EVIDENCE",
+            [
                 {
                     "kind": "pn_emission_line_spectrum",
                     "association_confidence": assoc,
@@ -137,7 +135,7 @@ def classify(row):
                     "note": "Acker et al. (1992) Strasbourg-ESO PN catalogue counterpart (identity evidence); [S II]/Ha and [O III]/Ha reported for mimic checks (Frew & Parker 2010).",
                 }
             ],
-        }
+        )
     if "HASH PN Catalog" in catalogs:
         assoc = _num(row, "association_confidence__hash_pn_catalog")
         status = _text(row, "pn_catalog_status")
@@ -152,24 +150,12 @@ def classify(row):
             }
         ]
         if grade == "NOT_PN":
-            return {
-                "axis": AXIS,
-                "label": "OTHER_PHENOMENON",
-                "confidence": assoc,
-                "status": "HASH_NON_PN_ENTRY",
-                "evidence": ev,
-            }
+            return _result("OTHER_PHENOMENON", assoc, "HASH_NON_PN_ENTRY", ev)
         if grade == "UNGRADED":
-            return {
-                "axis": AXIS,
-                "label": "UNKNOWN",
-                "confidence": None,
-                "status": "HASH_UNGRADED_ENTRY",
-                "evidence": ev,
-            }
+            return _result("UNKNOWN", None, "HASH_UNGRADED_ENTRY", ev)
         if grade == "POSSIBLE":
-            return {"axis": AXIS, "label": "PN", "confidence": assoc, "status": "HASH_POSSIBLE_PN", "evidence": ev}
-        return {"axis": AXIS, "label": "PN", "confidence": assoc, "status": "HASH_PN_CATALOG_MATCH", "evidence": ev}
+            return _result("PN", assoc, "HASH_POSSIBLE_PN", ev)
+        return _result("PN", assoc, "HASH_PN_CATALOG_MATCH", ev)
     for cat, kind, status in (
         ("ASAS-SN Supernova Catalog", "asas_sn_supernova_event", "ASASSN_SUPERNOVA_EVENT_MATCH"),
         ("Asiago Supernova Catalog", "asiago_supernova_event", "ASIAGO_SUPERNOVA_EVENT_MATCH"),
@@ -177,14 +163,8 @@ def classify(row):
         if cat in catalogs:
             assoc, ev = _event_evidence(row, cat, kind)
             if _sn_epoch_status(ev):
-                return {
-                    "axis": AXIS,
-                    "label": "OTHER_PHENOMENON",
-                    "confidence": assoc,
-                    "status": "SN_HOST_PAST_EVENT",
-                    "evidence": [ev],
-                }
-            return {"axis": AXIS, "label": "SN", "confidence": assoc, "status": status, "evidence": [ev]}
+                return _result("OTHER_PHENOMENON", assoc, "SN_HOST_PAST_EVENT", [ev])
+            return _result("SN", assoc, status, [ev])
 
     # Generic time-domain branch: only promote an explicit SN light-curve class
     # if an event epoch is present. This avoids treating a host detection as SN.
@@ -194,12 +174,11 @@ def classify(row):
     event_mjd = _num(row, "event_mjd")
     if lc and lc.upper().startswith("SN") and event_mjd is not None:
         score = _num(row, "transient_lightcurve_score")
-        return {
-            "axis": AXIS,
-            "label": "SN",
-            "confidence": score,
-            "status": "TIME_DOMAIN_SN_CANDIDATE",
-            "evidence": [
+        return _result(
+            "SN",
+            score,
+            "TIME_DOMAIN_SN_CANDIDATE",
+            [
                 {
                     "kind": "event_time_aware_lightcurve",
                     "class": lc,
@@ -208,35 +187,14 @@ def classify(row):
                     "score_semantics": "raw time-domain classifier score; requires per-axis calibration",
                 }
             ],
-        }
+        )
 
     simbad = _text(row, "otype")
-    _hit, _c = OTYPES.resolve(simbad, {"SN*": "SN*", "PN": "PN", "No*": "No*"})  # hierarchy (2.22.0)
-    simbad = _hit or simbad
-    if simbad == "SN*":
-        return {
-            "axis": AXIS,
-            "label": "SN",
-            "confidence": None,
-            "status": "SIMBAD_CURATED_SN",
-            "evidence": [{"kind": "simbad_physical_type", "otype": "SN*"}],
-        }
-    if simbad == "PN":
-        return {
-            "axis": AXIS,
-            "label": "PN",
-            "confidence": None,
-            "status": "SIMBAD_CURATED_PN",
-            "evidence": [{"kind": "simbad_physical_type", "otype": "PN"}],
-        }
-    if simbad == "No*":
-        return {
-            "axis": AXIS,
-            "label": "NOVA",
-            "confidence": None,
-            "status": "SIMBAD_CURATED_NOVA",
-            "evidence": [{"kind": "simbad_physical_type", "otype": "No*"}],
-        }
+    _hit, code = OTYPES.resolve(simbad, SIMBAD_CURATED)  # hierarchy (2.22.0)
+    code = code or simbad
+    if code in SIMBAD_CURATED:
+        label, status = SIMBAD_CURATED[code]
+        return _result(label, None, status, [{"kind": "simbad_physical_type", "otype": code}])
 
     raw = _text(row, "best_class_name")
     score = _num(row, "best_class_score")
@@ -252,26 +210,7 @@ def classify(row):
             }
         ]
     )
-    if raw == "SN":
-        return {
-            "axis": AXIS,
-            "label": "SN",
-            "confidence": score,
-            "status": "GAIA_DR3_SN_CANDIDATE",
-            "evidence": evidence,
-        }
-    if raw == "MICROLENSING":
-        return {
-            "axis": AXIS,
-            "label": "MICROLENSING",
-            "confidence": score,
-            "status": "GAIA_DR3_MICROLENSING_CANDIDATE",
-            "evidence": evidence,
-        }
-    return {
-        "axis": AXIS,
-        "label": "UNKNOWN",
-        "confidence": None,
-        "status": "NO_VALIDATED_PHENOMENON_EVIDENCE",
-        "evidence": evidence,
-    }
+    if raw in GAIA_EVENTS:
+        label, status = GAIA_EVENTS[raw]
+        return _result(label, score, status, evidence)
+    return _result("UNKNOWN", None, "NO_VALIDATED_PHENOMENON_EVIDENCE", evidence)

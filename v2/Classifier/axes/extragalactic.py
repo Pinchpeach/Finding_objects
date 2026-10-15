@@ -1,13 +1,17 @@
 """Extragalactic refinement axis using coarse routing and Gaia AGN evidence."""
 
 from __future__ import annotations
+import functools
 import importlib.util as _ilu
 from pathlib import Path as _P
 
-_s = _ilu.spec_from_file_location("v2_simbad_otypes", _P(__file__).resolve().parents[1] / "simbad_otypes.py")
-OTYPES = _ilu.module_from_spec(_s)
-_s.loader.exec_module(OTYPES)
+_s = _ilu.spec_from_file_location("v2_classifier_rowutil", _P(__file__).resolve().parents[1] / "_rowutil.py")
+ROW = _ilu.module_from_spec(_s)
+_s.loader.exec_module(ROW)
+OTYPES = ROW.OTYPES
+_num, _bool = ROW.num, ROW.flag
 AXIS = "extragalactic"
+_result = functools.partial(ROW.axis_result, AXIS)
 CLASSES = ("GALAXY", "AGN", "QSO", "BLAZAR", "OTHER_EXTRAGALACTIC", "UNKNOWN")
 # BLAZAR (2.22.0): Roma-BZCAT 5th edition membership (Massaro et al. 2015,
 # Ap&SS 357, 75; every source radio-detected with an optical spectrum), type
@@ -17,30 +21,9 @@ SIMBAD_BLAZAR = {"BLL": "BL_LAC", "Bla": None}
 
 
 def _text(row, key):
-    value = row.get(key)
-    if value is None:
-        return None
-    value = str(value).strip()
-    return None if not value or value.lower() == "nan" else value.upper()
-
-
-def _bool(row, key):
-    value = row.get(key)
-    if value is None:
-        return False
-    if isinstance(value, bool):
-        return value
-    return str(value).strip().lower() in {"1", "1.0", "true", "t", "yes"}
-
-
-def _num(row, key):
-    try:
-        import math
-
-        v = float(row.get(key))
-        return v if math.isfinite(v) else None
-    except Exception:
-        return None
+    # Upper-cased, unlike the other axes (Roma-BZCAT types, Gaia class names).
+    v = ROW.text(row, key)
+    return v and v.upper()
 
 
 def classify(row):
@@ -48,13 +31,11 @@ def classify(row):
     if "Roma-BZCAT" in str(catalogs):
         typ = _text(row, "roma_bzcat__blazar_type")
         assoc = _num(row, "association_confidence__roma_bzcat")
-        return {
-            "axis": AXIS,
-            "label": "BLAZAR",
-            "subtype": typ,
-            "confidence": assoc,
-            "status": "ROMA_BZCAT_MATCH",
-            "evidence": [
+        return _result(
+            "BLAZAR",
+            assoc,
+            "ROMA_BZCAT_MATCH",
+            [
                 {
                     "kind": "roma_bzcat_counterpart",
                     "name": row.get("roma_bzcat__catalog_object_id"),
@@ -64,44 +45,27 @@ def classify(row):
                     "score_semantics": "raw association score; not calibrated posterior",
                 }
             ],
-        }
+            subtype=typ,
+        )
     ot = row.get("otype") or row.get("simbad__otype")
     ot = str(ot).strip() if ot is not None else ""
     if OTYPES.is_a(ot, "Bla"):
-        return {
-            "axis": AXIS,
-            "label": "BLAZAR",
-            "subtype": SIMBAD_BLAZAR.get(ot),
-            "confidence": None,
-            "status": "SIMBAD_CURATED_BLAZAR",
-            "evidence": [{"kind": "simbad_physical_type", "otype": ot}],
-        }
+        return _result(
+            "BLAZAR",
+            None,
+            "SIMBAD_CURATED_BLAZAR",
+            [{"kind": "simbad_physical_type", "otype": ot}],
+            subtype=SIMBAD_BLAZAR.get(ot),
+        )
     raw = _text(row, "best_class_name")
     coarse = _text(row, "primary_class")
     if raw == "AGN" or _bool(row, "in_vari_agn"):
-        return {
-            "axis": AXIS,
-            "label": "AGN",
-            "confidence": None,
-            "status": "GAIA_DR3_AGN_CANDIDATE",
-            "evidence": [
-                {"kind": "gaia_dr3_variability", "best_class_name": raw, "in_vari_agn": _bool(row, "in_vari_agn")}
-            ],
-        }
-    if coarse == "QSO":
-        return {
-            "axis": AXIS,
-            "label": "QSO",
-            "confidence": None,
-            "status": "COARSE_QSO_ROUTE",
-            "evidence": [{"kind": "preprocess_route", "primary_class": "QSO"}],
-        }
-    if coarse == "GALAXY":
-        return {
-            "axis": AXIS,
-            "label": "GALAXY",
-            "confidence": None,
-            "status": "COARSE_GALAXY_ROUTE",
-            "evidence": [{"kind": "preprocess_route", "primary_class": "GALAXY"}],
-        }
-    return {"axis": AXIS, "label": "UNKNOWN", "confidence": None, "status": "NO_EXTRAGALACTIC_EVIDENCE", "evidence": []}
+        return _result(
+            "AGN",
+            None,
+            "GAIA_DR3_AGN_CANDIDATE",
+            [{"kind": "gaia_dr3_variability", "best_class_name": raw, "in_vari_agn": _bool(row, "in_vari_agn")}],
+        )
+    if coarse in ("QSO", "GALAXY"):  # COARSE_QSO_ROUTE / COARSE_GALAXY_ROUTE
+        return _result(coarse, None, f"COARSE_{coarse}_ROUTE", [{"kind": "preprocess_route", "primary_class": coarse}])
+    return _result("UNKNOWN", None, "NO_EXTRAGALACTIC_EVIDENCE", [])

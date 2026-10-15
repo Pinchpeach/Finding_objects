@@ -105,7 +105,6 @@ NED_LABEL = {
     "HII": "HII region",
     "WD*": "White dwarf",
     "PofG": "Part of a galaxy",
-    "GClstr": "Cluster of galaxies",
     "SNR": "Supernova remnant",
     "Nova": "Nova",
     "**": "Double star",

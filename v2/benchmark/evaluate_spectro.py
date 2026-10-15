@@ -113,13 +113,13 @@ def stars(sc) -> dict:
     cmd, spec, phot = [], [], []
     for r in d.to_dict("records"):
         r = _clean_row(r)
-        lum, rule, _ = sc.star_luminosity_class(r, None)
+        lum, rule, _ = sc.star_luminosity_class(r)
         cmd.append(lum if rule == "GAIA_CMD" else None)
         no_plx = {k: v for k, v in r.items() if "parallax" not in k}
-        lum2, rule2, _ = sc.star_luminosity_class(no_plx, None)
+        lum2, rule2, _ = sc.star_luminosity_class(no_plx)
         spec.append(lum2 if rule2 == "LAMOST_LOGG" else None)
         no_spec = {k: v for k, v in no_plx.items() if not k.startswith("lamost_")}
-        lum3, rule3, _ = sc.star_luminosity_class(no_spec, None)
+        lum3, rule3, _ = sc.star_luminosity_class(no_spec)
         phot.append(lum3 if rule3 == "GAIA_LOGG" else None)
     d["cmd"], d["spec"], d["phot"] = cmd, spec, phot
     both = d.cmd.notna() & d.spec.notna()
