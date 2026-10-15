@@ -315,3 +315,10 @@ epochs).
 | High-z quasar gri branch (PS1-QSO-HIZ-001) | Richards et al. 2002 (AJ 123, 2945), Section 3.4 | z ≈ 3.5–4.5 quasars are red in g−r from the Lyα forest and move off the stellar locus; benchmark purity 7/8, completeness ~11 % at z > 3. |
 | X-ray and radio keys kept out of the trees (linear only) | eRASS1 footprint: Merloni et al. 2024 (A&A 682, A34), Galactic l > 180°; LoTSS DR2: Shimwell et al. 2022 (A&A 659, A1), northern sky | A missing counterpart reflects the survey footprint, not the class: 33 % of SDSS-truth QSOs but 4 % of DESI-truth QSOs have an X-ray match. Tree missing-value branches learned that difference (DESI STAR recall 0.893 → 0.852); the linear model treats absence as logit 0. |
 | Gaia match at the truth epoch | Gaia DR3 epoch J2016.0 (Gaia Collaboration, Vallenari et al. 2023, A&A 674, A1) | Benchmark Gaia counterparts are searched within 15″ and moved by their proper motion to the spectroscopic epoch (SDSS MJD); 46 high-proper-motion SDSS stars gained their Gaia match. |
+
+## ZTF variability (2.27.0, measured, not adopted)
+
+| Element | Source | Outcome |
+|---|---|---|
+| Structure function SF(dt) = A (dt / 1 yr)^γ, χ²_red, from ZTF r/g light curves (ZTF-VAR-001, off unless its rule row is present) | Schmidt et al. 2010 (ApJ 714, 1194); Palanque-Delabrouille et al. 2011 (A&A 530, A122); Masci et al. 2019 (PASP 131, 018003) | Point sources only, since PSF photometry of resolved galaxies varies with seeing (benchmark galaxies: median χ²_red 10.6). The fitted weights point the right way (γ → QSO +1.28), but test accuracy changed by one object per set (SDSS +0.05 pp, DESI −0.11 pp) and the calibration log-loss rose (0.1433 → 0.1473). IRSA light-curve cones also take minutes per field. Not adopted. |
+| Gaia DSC all-zero stellar posterior | Delchambre et al. 2023 (A&A 674, A31) | A zero stellar probability is a confident extragalactic posterior; DSC-001 now emits it (2.27.0) instead of dropping the rule for 41 % of DSC rows. |
