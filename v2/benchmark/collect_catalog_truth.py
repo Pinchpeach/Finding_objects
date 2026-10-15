@@ -120,6 +120,23 @@ def query_one(mod, name, radius, t):
         return "error", None, repr(e)
 
 
+# Gaia DR3 positions are at epoch 2016.0 (Lindegren et al. 2021); SDSS truth
+# positions are 1998-2008 imaging.  A 0.3"/yr M dwarf moves ~5" in between,
+# so high-motion stars missed the 2" match and had no Gaia evidence at all
+# (8 of 9 SDSS test stars left UNKNOWN in 2.25.0).  Candidates are searched
+# within PM_SEARCH_ARCSEC and the Gaia position is moved to the truth epoch
+# (the spectrum MJD, ``mjd``, when the truth set has one) before the 2" test.
+PM_SEARCH_ARCSEC = 15.0
+GAIA_EPOCH = 2016.0
+
+
+def _truth_epoch(truth):
+    if "mjd" in truth.columns:
+        mjd = pd.to_numeric(truth["mjd"], errors="coerce")
+        return (2000.0 + (mjd - 51544.5) / 365.25).fillna(GAIA_EPOCH)
+    return pd.Series(GAIA_EPOCH, index=truth.index)
+
+
 def run_gaia(truth, out_dir):
     from astroquery.xmatch import XMatch
     from astropy.table import Table
@@ -130,11 +147,12 @@ def run_gaia(truth, out_dir):
     # crossmatching use the CDS/VizieR mirror of the Gaia DR3 main-source table,
     # which supports a single bulk XMatch for all truth coordinates.
     upload = truth[["benchmark_id", "ra", "dec"]].rename(columns={"ra": "truth_ra", "dec": "truth_dec"}).copy()
+    epoch = dict(zip(truth.benchmark_id, _truth_epoch(truth)))
     try:
         xm = XMatch.query(
             cat1=Table.from_pandas(upload),
             cat2="vizier:I/355/gaiadr3",
-            max_distance=MATCH_ARCSEC["gaia_dr3"] * u.arcsec,
+            max_distance=PM_SEARCH_ARCSEC * u.arcsec,
             colRA1="truth_ra",
             colDec1="truth_dec",
         ).to_pandas()
@@ -205,15 +223,20 @@ def run_gaia(truth, out_dir):
         raise KeyError(f"Gaia VizieR XMatch missing source identifier; columns={list(xm.columns)}")
     if "ra" not in xm.columns or "dec" not in xm.columns:
         raise KeyError(f"Gaia VizieR XMatch missing coordinates; columns={list(xm.columns)}")
-    if "angDist" in xm.columns:
-        xm["_sep_arcsec"] = pd.to_numeric(xm["angDist"], errors="coerce")
-    else:
-        xm["_sep_arcsec"] = sep_arcsec(
-            pd.to_numeric(xm["truth_ra"], errors="coerce").to_numpy(),
-            pd.to_numeric(xm["truth_dec"], errors="coerce").to_numpy(),
-            pd.to_numeric(xm["ra"], errors="coerce").to_numpy(),
-            pd.to_numeric(xm["dec"], errors="coerce").to_numpy(),
-        )
+    # Gaia position moved to the truth epoch (no motion: unchanged).
+    dt = xm["benchmark_id"].map(epoch).astype(float) - GAIA_EPOCH
+    pmra = pd.to_numeric(xm.get("pmra"), errors="coerce").fillna(0.0)
+    pmdec = pd.to_numeric(xm.get("pmdec"), errors="coerce").fillna(0.0)
+    g_dec = pd.to_numeric(xm["dec"], errors="coerce")
+    g_ra = pd.to_numeric(xm["ra"], errors="coerce")
+    dec_t = g_dec + pmdec * dt / 3.6e6
+    ra_t = g_ra + pmra * dt / 3.6e6 / np.cos(np.radians(g_dec))
+    xm["_sep_arcsec"] = sep_arcsec(
+        pd.to_numeric(xm["truth_ra"], errors="coerce").to_numpy(),
+        pd.to_numeric(xm["truth_dec"], errors="coerce").to_numpy(),
+        ra_t.to_numpy(),
+        dec_t.to_numpy(),
+    )
     xm = xm[np.isfinite(pd.to_numeric(xm["_sep_arcsec"], errors="coerce"))]
     xm = xm[pd.to_numeric(xm["_sep_arcsec"], errors="coerce") <= MATCH_ARCSEC["gaia_dr3"]]
     xm = xm.sort_values(["benchmark_id", "_sep_arcsec"]).drop_duplicates("benchmark_id", keep="first")
@@ -223,7 +246,7 @@ def run_gaia(truth, out_dir):
         ap = XMatch.query(
             cat1=Table.from_pandas(upload),
             cat2="vizier:I/355/paramp",
-            max_distance=MATCH_ARCSEC["gaia_dr3"] * u.arcsec,
+            max_distance=PM_SEARCH_ARCSEC * u.arcsec,
             colRA1="truth_ra",
             colDec1="truth_dec",
         ).to_pandas()
