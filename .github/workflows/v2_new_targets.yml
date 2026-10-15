@@ -3,14 +3,11 @@ name: v2 new targets (reference data and truth)
 # 2.22.0 target additions: fetches reference tables (SIMBAD otype hierarchy,
 # column lists of the truth catalogues) and builds the independent truth
 # sets, committing them to the branch it runs on.
+# Manual only (2.24.0): it rewrites preserved benchmark / truth data, which
+# must change only on purpose (an automatic run on a code push replaced the
+# DESI benchmark with a partial re-collection on 2026-10-14).
 on:
   workflow_dispatch:
-  push:
-    branches: [claude/code-review-7ox8zn]
-    paths:
-      - .github/workflows/v2_new_targets.yml
-      - v2/benchmark/new_targets/*.py
-
 permissions:
   contents: write
 

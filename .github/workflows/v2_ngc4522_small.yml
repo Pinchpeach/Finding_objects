@@ -1,14 +1,10 @@
 name: v2 NGC4522 small collection
 
+# Manual only (2.24.0): it rewrites preserved benchmark / truth data, which
+# must change only on purpose (an automatic run on a code push replaced the
+# DESI benchmark with a partial re-collection on 2026-10-14).
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - 'v2/Get_data/**'
-      - 'v2/scripts/collect_ngc4522_small.py'
-      - '.github/workflows/v2_ngc4522_small.yml'
-
 permissions:
   contents: write
 

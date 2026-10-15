@@ -2,17 +2,15 @@ name: DESI training set for the LS gradient-boosting classifier
 
 # Large DESI DR1 truth (Redrock SPECTYPE) with Legacy Surveys Tractor features
 # for the 2.11.0 coarse classifier; benchmark objects are removed.
+# Manual only (2.24.0): it rewrites preserved benchmark / truth data, which
+# must change only on purpose (an automatic run on a code push replaced the
+# DESI benchmark with a partial re-collection on 2026-10-14).
 on:
   workflow_dispatch:
     inputs:
       per_class:
         description: objects per class
         default: '50000'
-  push:
-    branches: [claude/code-review-7ox8zn]
-    paths:
-      - v2/benchmark/build_desi_gbm_truth.py
-
 concurrency:
   group: desi-gbm-truth-${{ github.ref }}
   cancel-in-progress: true

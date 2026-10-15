@@ -1,11 +1,10 @@
 name: Build LAMOST STAR External Truth
 
+# Manual only (2.24.0): it rewrites preserved benchmark / truth data, which
+# must change only on purpose (an automatic run on a code push replaced the
+# DESI benchmark with a partial re-collection on 2026-10-14).
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - v2/Classifier/build_lamost_star_external_truth.py
-
 jobs:
   build:
     runs-on: ubuntu-latest

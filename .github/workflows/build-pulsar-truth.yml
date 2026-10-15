@@ -3,13 +3,11 @@ name: Pulsar radio truth (ATNF vs NVSS control)
 # Radio properties (TGSS, LoTSS, NVSS polarisation, FIRST, VLASS) and Gaia
 # counterparts of ATNF pulsars and of random NVSS sources, measured around the
 # NVSS position, to calibrate an ATNF-independent pulsar rule (2.6.3).
+# Manual only (2.24.0): it rewrites preserved benchmark / truth data, which
+# must change only on purpose (an automatic run on a code push replaced the
+# DESI benchmark with a partial re-collection on 2026-10-14).
 on:
   workflow_dispatch:
-  push:
-    branches: [claude/code-review-7ox8zn]
-    paths:
-      - v2/benchmark/build_pulsar_truth.py
-
 concurrency:
   group: pulsar-truth-${{ github.ref }}
   cancel-in-progress: true

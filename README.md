@@ -35,8 +35,8 @@ The full description is in [`v2/ALGORITHM.md`](v2/ALGORITHM.md).
 
 | Test | Result |
 |---|---|
-| Primary class vs SDSS spectra | 97.59 % |
-| Primary class vs DESI spectra (faint objects) | 90.96 % |
+| Primary class vs SDSS spectra | 97.84 % |
+| Primary class vs DESI spectra (faint objects) | 91.89 % |
 | Mira / Cepheid / RR Lyrae | 94.8 / 93.2 / 82.4 % |
 | Planetary nebulae | 89.2 % |
 | Blind test on unseen objects | 9 / 9 |

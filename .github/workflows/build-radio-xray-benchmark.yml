@@ -1,9 +1,9 @@
 name: Build Radio X-ray Benchmark
+# Manual only (2.24.0): it rewrites preserved benchmark / truth data, which
+# must change only on purpose (an automatic run on a code push replaced the
+# DESI benchmark with a partial re-collection on 2026-10-14).
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - 'v2/benchmark/build_radio_xray_truth.py'
 jobs:
   truth:
     runs-on: ubuntu-latest
