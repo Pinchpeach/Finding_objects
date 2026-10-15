@@ -139,7 +139,9 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
         "FORMAT": "csv",
     }
     r = requests.get(URL, params=params, timeout=TIMEOUT_S)
-    r.raise_for_status()
+    if r.status_code >= 400:
+        # IRSA explains refusals (e.g. load limits) in the body; keep it in the error.
+        raise RuntimeError(f"IRSA ZTF HTTP {r.status_code}: {r.text[:300]!r}")
     text = r.text
     if not text.strip() or text.lstrip().startswith("<"):
         if "error" in text.lower() or "fault" in text.lower():

@@ -72,8 +72,9 @@ def query_one(mod, name, radius, t):
         except Exception as e:
             last = e
             # MAST/other public services can throttle bursts. Retry transient failures,
-            # with stronger backoff for explicit HTTP 429 responses.
-            delay = (2**attempt) * (1.0 if "429" in repr(e) else 0.5)
+            # with stronger backoff for explicit HTTP 429 responses (and IRSA
+            # ZTF refusals, which come back as HTTP 400 under load).
+            delay = (2**attempt) * (1.0 if "429" in repr(e) or "IRSA ZTF HTTP" in repr(e) else 0.5)
             if attempt < 4:
                 time.sleep(delay)
     else:  # all attempts failed
