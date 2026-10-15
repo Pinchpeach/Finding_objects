@@ -41,6 +41,7 @@ DISPLAY = {
     "chandra": "Chandra",
     "xmm": "XMM",
     "erosita": "eROSITA",
+    "ztf_lightcurve": "ZTF light curves",
 }
 # Full catalog names as emitted by the Get_data collectors; used for the same
 # ``<catalog>__<field>`` namespace that Stage 2 writes.
@@ -58,6 +59,7 @@ CATALOG_NAME = {
     "chandra": "Chandra CSC 2.0",
     "xmm": "XMM 4XMM-DR13",
     "erosita": "eROSITA eRASS1",
+    "ztf_lightcurve": "ZTF light curves",
 }
 DROP = {
     "truth_class",

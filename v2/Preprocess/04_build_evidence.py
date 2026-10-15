@@ -136,6 +136,8 @@ RAW_FIELDS = {
     "SpeakTot",
     "Total_flux",
     "Ftot",
+    # ZTF light-curve statistics (ZTF-VAR-001; Get_data/ztf_lightcurve.py)
+    *(f"ztf_{b}_{k}" for b in ("g", "r") for k in ("n", "mag", "rms", "chi2r", "exvar", "sf_a", "sf_gamma")),
 }
 DERIVED_PREFIXES = ("association_confidence__", "catalog_confidence_", "ps1_", "ls_", "catalogs")
 
@@ -587,6 +589,42 @@ def evaluate(rule, row, namespaced=frozenset()):
                         "origin": rule["threshold_origin"],
                         "feature_group": rule["feature_group"],
                         "note": "radio counterpart",
+                    }
+                )
+    elif rid == "ZTF-VAR-001":
+        # Aperiodic optical variability from ZTF light curves: quasars vary
+        # stochastically with a rising structure function (A ~ 0.1 mag at 1 yr,
+        # gamma ~ 0.3-0.5; Schmidt et al. 2010, Palanque-Delabrouille et al.
+        # 2011), most stars are constant at ZTF precision and galaxies show
+        # no nuclear variability.  The r band is used, else g.  Continuous
+        # features; weights come only from the fitted Stage-5 model.
+        z = "ztf_light_curves__"
+        band = next((b for b in ("r", "g") if (num(row, f"{z}ztf_{b}_n") or 0) >= 10), None)
+        if band is not None:
+            p = f"{z}ztf_{band}_"
+            feats = {"ztf_n_log": math.log10(num(row, p + "n"))}
+            chi2r = num(row, p + "chi2r")
+            if chi2r is not None and chi2r > 0:
+                feats["ztf_chi2r_log"] = max(-1.0, min(3.0, math.log10(chi2r)))
+            sf_a = num(row, p + "sf_a")
+            if sf_a is not None:
+                feats["ztf_sf_a_log"] = max(-3.0, min(0.5, math.log10(max(sf_a, 1e-3))))
+            gamma = num(row, p + "sf_gamma")
+            if gamma is not None:
+                feats["ztf_sf_gamma"] = max(-1.0, min(1.5, gamma))
+            mag = num(row, p + "mag")
+            if mag is not None:
+                feats["ztf_mag"] = max(12.0, min(22.0, mag))
+            for name, v in feats.items():
+                out.append(
+                    {
+                        "class": f"FEATURE:{name}",
+                        "rule_id": rid,
+                        "value": v,
+                        "kind": "linear_feature",
+                        "origin": rule["threshold_origin"],
+                        "feature_group": rule["feature_group"],
+                        "note": "ZTF light-curve variability",
                     }
                 )
     elif rid == "SGA-001":
