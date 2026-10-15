@@ -297,3 +297,11 @@ epochs).
 | Resolved-host AGN: "resolved × max(0, W1−W2 − R75)" feature | Assef et al. 2018 (ApJS 234, 23), R75: W1−W2 > 0.486 Vega (= −0.154 AB with the Jarrett et al. 2011 offsets) at W2 ≤ 13.07 | The QSOs still called GALAXY have a median excess of 0 (below R75), so mid-IR colour does not separate them from their hosts. Correctly classified resolved QSOs already carry the excess. In the fit the feature made the sign constraint drop DSC-001:QSO and LS-CKNN-001:QSO, and DESI STAR recall fell 0.899 → 0.855. A presence indicator ("resolved") was worse: it duplicated LS-MORPH-002 and dropped it. |
 | CatWISE2020 proper motions for faint STAR vs QSO | Marocco et al. 2021 (ApJS 253, 8): motions good to ~20 mas/yr at W1 ≈ 15 and ~100 mas/yr at W1 ≈ 17; formal errors ~2× too small near W1 ≈ 17.2 | The DESI stars misread as QSO have median W1 = 17.5 (Vega); halo-star motions of 5–20 mas/yr are far below that error. |
 | GALEX UV excess (FUV−NUV, NUV−r) | Bianchi et al. 2011; Trammell et al. 2007 (AJ 133, 1780) | 0 % of those stars, and 11 % of the QSOs misread as STAR, have a GALEX AIS detection. |
+
+## Hybrid Stage-5 fusion (2.25.0)
+
+| Element | Source | Use |
+|---|---|---|
+| Gradient-boosted trees over the evidence keys | Friedman 2001 (Ann. Stat. 29, 1189); Ke et al. 2017 (LightGBM, NeurIPS) | Lets evidence interact (e.g. a colour meaning something different for resolved and unresolved sources), which the linear log-odds sum cannot express. Absent evidence is a missing value, not logit 0. |
+| Temperature scaling | Guo et al. 2017 (ICML, "On Calibration of Modern Neural Networks") | One scalar (T = 1.3) fitted on the calibration split, so the abstention threshold works on calibrated probabilities. |
+| Geometric mean with the linear model (product of experts) | Hinton 2002 (Neural Computation 14, 1771) | The trees alone lowered Gaia-only faint-star recall (0.886 → 0.834, DESI test) for evidence combinations rare in training. The sign-constrained linear model keeps a predictable direction there, and the 0.5 blend was not below the linear model in any missing-evidence case on the calibration split. |

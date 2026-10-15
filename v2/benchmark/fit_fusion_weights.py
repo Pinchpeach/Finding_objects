@@ -19,6 +19,7 @@ import numpy as np, pandas as pd
 V2 = Path(__file__).resolve().parents[1]
 PRE = V2 / "Preprocess"
 CLASSES = ["STAR", "GALAXY", "QSO"]
+GBM_BLEND = 0.5
 
 
 def load(path, name):
@@ -42,7 +43,7 @@ def evidence_table(truth, catalog_root):
         return pd.read_csv(td / "e.csv", usecols=["benchmark_id", "evidence_json"])
 
 
-def design(evidence, s5):
+def design(evidence, s5, missing=0.0):
     rows = []
     kinds = {}
     for raw in evidence.evidence_json:
@@ -50,7 +51,7 @@ def design(evidence, s5):
         rows.append(x)
         kinds.update(k)
     keys = sorted({k for r in rows for k in r})
-    X = np.array([[r.get(k, 0.0) for k in keys] for r in rows])
+    X = np.array([[r.get(k, missing) for k in keys] for r in rows], dtype=float)
     used = np.array([len(r) > 0 for r in rows])
     return X, keys, kinds, used
 
@@ -84,6 +85,126 @@ def ece(p, y, bins=10):
     return float(total)
 
 
+def export_trees(clf, path, features):
+    """Flatten a fitted HistGradientBoostingClassifier into the arrays
+    ``Preprocess/ls_gbm.raw_scores`` evaluates (numpy-only inference)."""
+    feat, thr, mleft, left, right, leaf, value, start, tcls = [], [], [], [], [], [], [], [], []
+    offset = 0
+    for it in clf._predictors:
+        for k, pred in enumerate(it):
+            n = pred.nodes
+            if n["is_categorical"].any():
+                raise ValueError("categorical splits are not exported")
+            start.append(offset)
+            tcls.append(k)
+            feat.append(n["feature_idx"].astype(np.int64))
+            thr.append(n["num_threshold"].astype(float))
+            mleft.append(n["missing_go_to_left"].astype(bool))
+            left.append(n["left"].astype(np.int64))
+            right.append(n["right"].astype(np.int64))
+            leaf.append(n["is_leaf"].astype(bool))
+            value.append(n["value"].astype(float))
+            offset += len(n)
+    np.savez_compressed(
+        path,
+        feature=np.concatenate(feat),
+        threshold=np.concatenate(thr),
+        missing_left=np.concatenate(mleft),
+        left=np.concatenate(left),
+        right=np.concatenate(right),
+        is_leaf=np.concatenate(leaf),
+        value=np.concatenate(value),
+        tree_start=np.array(start, np.int64),
+        tree_class=np.array(tcls, np.int64),
+        baseline=np.asarray(clf._baseline_prediction, float).ravel(),
+        n_classes=np.int64(len(clf.classes_)),
+        classes=np.array(list(clf.classes_)),
+        features=np.array(features),
+    )
+
+
+def fit_gbm(a, ev, s5, keys, keep, y, tr, ca, used):
+    """Hybrid tree part: same supported keys, augmentation and splits as the
+    linear fit, but absent evidence is a missing value (not logit 0), so a
+    tree can tell "no morphology" from "neutral morphology"."""
+    from sklearn.ensemble import HistGradientBoostingClassifier
+
+    Xn, keys_n, _, _ = design(ev, s5, missing=np.nan)
+    assert keys_n == keys
+    if a.drop_keys:
+        Xn[:, [any(k.startswith(p) for p in a.drop_keys) for k in keys]] = np.nan
+    sup = [k for k, m in zip(keys, keep) if m]
+    Xs = Xn[:, keep]
+    groups = [[p for p in g.split(",") if p] for g in a.augment_drop]
+
+    def augment(Xr, yr):
+        Xo, yo, wo = [Xr], [yr], [np.ones(len(yr))]
+        for g in groups:
+            cols = np.array([any(k.startswith(p) for p in g) for k in sup])
+            has = np.isfinite(Xr[:, cols]).any(axis=1)
+            Xa = Xr[has].copy()
+            Xa[:, cols] = np.nan
+            ok = np.isfinite(Xa).any(axis=1)
+            Xo.append(Xa[ok])
+            yo.append(yr[has][ok])
+            wo.append(np.full(int(ok.sum()), a.augment_weight))
+        return np.vstack(Xo), np.concatenate(yo), np.concatenate(wo)
+
+    Xf, yf, wf = augment(Xs[tr & used], y[tr & used])
+    Xc, yc, wc = augment(Xs[ca & used], y[ca & used])
+    yi = None
+    best = None
+    # Small grid chosen by calibration log-loss (2.25.0 experiment: shallow
+    # trees, 7 leaves, lr 0.03 won; deeper trees overfit the 9k train rows).
+    for lr in (0.03, 0.05):
+        for leaves in (7, 15):
+            clf = HistGradientBoostingClassifier(
+                learning_rate=lr,
+                max_leaf_nodes=leaves,
+                max_iter=1500,
+                l2_regularization=1.0,
+                early_stopping=True,
+                validation_fraction=0.15,
+                random_state=0,
+            ).fit(Xf, yf, sample_weight=wf)
+            Z = clf._raw_predict(Xc)
+            yi = np.array([list(clf.classes_).index(v) for v in yc])
+            z = Z - Z.max(axis=1, keepdims=True)
+            lp = z - np.log(np.exp(z).sum(axis=1, keepdims=True))
+            ll = float(-np.average(lp[np.arange(len(yi)), yi], weights=wc))
+            print(f"gbm lr={lr} leaves={leaves} iters={clf.n_iter_} cal log-loss={ll:.4f}")
+            if best is None or ll < best[0]:
+                best = (ll, clf, Z, lr, leaves)
+    ll, clf, Z, lr, leaves = best
+
+    # Temperature scaling (Guo et al. 2017, ICML): one scalar on the
+    # calibration split, so the probabilities used for abstention are calibrated.
+    def nll(T):
+        z = Z / T
+        z = z - z.max(axis=1, keepdims=True)
+        lp = z - np.log(np.exp(z).sum(axis=1, keepdims=True))
+        return float(-np.average(lp[np.arange(len(yi)), yi], weights=wc))
+
+    T = float(min(np.round(np.arange(0.5, 3.001, 0.05), 2), key=nll))
+    path = a.out.with_name(a.out.stem + "_gbm.npz")
+    export_trees(clf, path, sup)
+    print(f"gbm: lr={lr} leaves={leaves} iters={clf.n_iter_} temperature={T} -> {path}")
+    return {
+        "file": path.name,
+        "keys": sup,
+        "temperature": T,
+        "learning_rate": lr,
+        "max_leaf_nodes": leaves,
+        "iterations": int(clf.n_iter_),
+        "calibration_log_loss": nll(T),
+        # Geometric-mean weight of the trees against the linear model.  0.5 on
+        # the 2.25.0 calibration split: never below the linear model in any
+        # missing-evidence case and keeps its Gaia-only faint-star recall,
+        # which trees alone lowered (0.92 -> 0.87).
+        "blend": GBM_BLEND,
+    }
+
+
 def main():
     ap = argparse.ArgumentParser()
     # Several truth sets may be combined (same order in each list); each keeps
@@ -115,6 +236,7 @@ def main():
         help="also report test accuracy with these evidence prefixes removed (default: --augment-drop)",
     )
     ap.add_argument("--min-support", type=int, default=30)
+    ap.add_argument("--gbm", action="store_true", help="fit the hybrid tree model (see module docstring)")
     ap.add_argument(
         "--target-accuracy",
         type=float,
@@ -247,16 +369,24 @@ def main():
         },
     }
 
+    if a.gbm:
+        model["gbm"] = fit_gbm(a, ev, s5, keys, keep, y, tr, ca, used)
+        model["semantics"] = (
+            "hybrid: gradient-boosted trees over benchmark-supported evidence keys (temperature-calibrated), "
+            "plus prior weights for keys without training support; fitted on class-balanced benchmarks"
+        )
+
     # Probabilities exactly as Stage 5 will compute them.
     def probs(mask, drop=()):
-        P = []
+        lists = []
         for raw in ev.evidence_json[mask]:
             items = json.loads(raw) if isinstance(raw, str) else []
             if drop:
                 items = [i for i in items if not str(i.get("rule_id", "")).startswith(tuple(drop))]
-            p, _ = s5.fuse(items, model)
-            P.append([p[c] for c in CLASSES])
-        return np.array(P)
+            lists.append(items)
+        return np.array([[p[c] for c in CLASSES] for p, _ in s5.fuse_many(lists, model, a.out.parent)]).reshape(
+            -1, len(CLASSES)
+        )
 
     grid = np.round(np.arange(0.34, 0.991, 0.01), 2)
     pca = probs(ca)

@@ -10,6 +10,15 @@ evidence keys with independent training support (benchmark train split) are
 replaced by fitted multinomial-logistic coefficients, and the abstention
 threshold is the one chosen on the calibration split; keys without support
 keep their prior weights.  See v2/benchmark/fit_fusion_weights.py.
+
+Hybrid fusion (2.25.0): when the model names a ``gbm`` tree file, the fitted
+part is a gradient-boosted tree model over the same supported keys (absent
+evidence = missing, not 0), so evidence can interact -- e.g. a colour can
+count differently for resolved and unresolved sources, which a linear sum
+cannot express.  Unsupported keys are still added with their prior weights
+on top of the trees' log-odds.  The result is blended (geometric mean,
+weight ``blend``) with the linear model of the same fit.  The trees are
+evaluated with numpy only (``ls_gbm.raw_scores``), as for LS-GBM-001.
 """
 
 from __future__ import annotations
@@ -24,6 +33,9 @@ _tio_s = _tio_u.spec_from_file_location(
 )
 TABLE_IO = _tio_u.module_from_spec(_tio_s)
 _tio_s.loader.exec_module(TABLE_IO)
+_gbm_s = _tio_u.spec_from_file_location("v2_ls_gbm_trees", Path(__file__).resolve().parent / "ls_gbm.py")
+TREES = _tio_u.module_from_spec(_gbm_s)
+_gbm_s.loader.exec_module(TREES)
 CLASSES = ("STAR", "GALAXY", "QSO")
 WEIGHT = {"direct_probability": 1.0, "catalog_label": 1.5, "continuous_score": 0.35, "binary_evidence": 0.35}
 MIN_CONFIDENCE = 0.50
@@ -133,10 +145,74 @@ def fuse(items, model=None):
             logit[t] += w.get(t, 0.0) * v
         # A continuous feature without a fitted weight carries no evidence.
         used += int(kinds[key] != "linear_feature" or key in coef)
+    return _softmax(logit), used
+
+
+def _softmax(logit):
     m = max(logit.values())
     p = {c: math.exp(v - m) for c, v in logit.items()}
     z = sum(p.values())
-    return {c: p[c] / z for c in CLASSES}, used
+    return {c: p[c] / z for c in CLASSES}
+
+
+def _gbm(model, base_dir=None):
+    """(spec, trees, class order) of the model's tree part, or None (no tree
+    file: the linear coefficients of the same fit are used instead)."""
+    g = (model or {}).get("gbm")
+    if not g:
+        return None
+    trees = TREES.load_model(str(Path(base_dir or MODEL_PATH.parent) / g["file"]))
+    if trees is None:
+        return None
+    names = [str(c) for c in trees["classes"]]
+    return g, trees, [names.index(c) for c in CLASSES]
+
+
+def fuse_many(item_lists, model=None, base_dir=None):
+    """``fuse`` for many objects; the tree part is evaluated in one batch."""
+    gb = _gbm(model, base_dir)
+    if gb is None:
+        return [fuse(items, model) for items in item_lists]
+    spec, trees, order = gb
+    keys = spec["keys"]
+    col = {k: j for j, k in enumerate(keys)}
+    feats_items = list(item_lists)
+    feats = [evidence_features(items) for items in feats_items]
+    X = np.full((len(feats), len(keys)), np.nan)
+    for r, (x, _) in enumerate(feats):
+        for k, v in x.items():
+            j = col.get(k)
+            if j is not None:
+                X[r, j] = v
+    fitted = np.isfinite(X).any(axis=1)
+    Z = np.zeros((len(feats), len(CLASSES)))
+    if fitted.any():
+        Z[fitted] = TREES.raw_scores(X[fitted], trees)[:, order] / float(spec.get("temperature", 1.0))
+    a = float(spec.get("blend", 1.0))
+    out = []
+    for r, (x, kinds) in enumerate(feats):
+        # Without any supported key the trees' baseline would be an
+        # extrapolation (as the linear intercept), so odds start equal.
+        logit = dict(zip(CLASSES, Z[r] if fitted[r] else np.zeros(len(CLASSES))))
+        used = 0
+        for key, v in x.items():
+            if key in col:
+                used += 1
+                continue
+            w = prior_coef(key, kinds[key])
+            for t in CLASSES:
+                logit[t] += w.get(t, 0.0) * max(v, 0.0)
+            used += int(kinds[key] != "linear_feature")
+        p = _softmax(logit)
+        if a < 1.0:
+            # Geometric mean with the sign-constrained linear model of the same
+            # fit (product of experts): the trees add interactions, the linear
+            # part keeps its predictable direction for evidence combinations
+            # rare in training (Gaia-only faint stars, 2.25.0 measurement).
+            q, _ = fuse(feats_items[r], model)
+            p = _softmax({c: (1 - a) * math.log(max(q[c], 1e-300)) + a * math.log(max(p[c], 1e-300)) for c in CLASSES})
+        out.append((p, used))
+    return out
 
 
 # Astrometry of a source whose Gaia BP/RP flux excess is > 5 sigma from that
@@ -222,13 +298,15 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
         if "host_elliptical_radius" in df
         else pd.Series(float("nan"), index=df.index)
     )
-    rows = []
-    for raw, hr in zip(raw_series, host_r):
+    item_lists = []
+    for raw in raw_series:
         try:
-            items = json.loads(raw) if isinstance(raw, str) else []
+            item_lists.append(json.loads(raw) if isinstance(raw, str) else [])
         except (json.JSONDecodeError, TypeError):
-            items = []
-        p, used = fuse(items, model)
+            item_lists.append([])
+    fused = fuse_many(item_lists, model, Path(model_path).parent)
+    rows = []
+    for items, hr, (p, used) in zip(item_lists, host_r, fused):
         strong = set()
         for e in items:
             c = e.get("class")

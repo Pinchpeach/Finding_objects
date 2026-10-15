@@ -7,6 +7,7 @@ import json
 import math
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -296,6 +297,57 @@ def test_unreliable_evidence_is_weak_not_contrary():
     assert abs(p["STAR"] - p["GALAXY"]) < 0.01  # ~no evidence, not "not a galaxy"
     p, _ = mod.fuse([dict(item, association_reliability=1.0, score=0.75)], model)
     assert p["GALAXY"] > 0.8
+
+
+def test_hybrid_fusion_trees_prior_keys_and_fallback(tmp_path):
+    """Hybrid Stage 5 (2.25.0): fitted keys go through the exported trees,
+    unsupported keys keep their prior weights, and without the tree file the
+    linear model of the same fit is used."""
+    mod = _load("05_likelihood_vectors")
+    # Hand-made stumps on one feature (the key's logit), one per class in the
+    # exported (alphabetical) class order: x > 0 -> GALAXY, x <= 0 -> STAR,
+    # missing -> QSO.  Nodes per tree: split, left leaf, right leaf.
+    stumps = [  # (threshold, missing_left, left value, right value)
+        (0.0, True, -1.0, 1.0),  # GALAXY
+        (np.inf, False, 0.0, 3.0),  # QSO
+        (0.0, False, 1.0, -1.0),  # STAR
+    ]
+    np.savez(
+        tmp_path / "m_gbm.npz",
+        feature=np.zeros(9, np.int64),
+        threshold=np.array([v for t, *_ in stumps for v in (t, 0.0, 0.0)]),
+        missing_left=np.array([v for _, m, *_ in stumps for v in (m, False, False)]),
+        left=np.array([1, 0, 0] * 3, np.int64),
+        right=np.array([2, 0, 0] * 3, np.int64),
+        is_leaf=np.array([False, True, True] * 3),
+        value=np.array([v for *_, l, r in stumps for v in (0.0, l, r)]),
+        tree_start=np.array([0, 3, 6], np.int64),
+        tree_class=np.array([0, 1, 2], np.int64),
+        baseline=np.zeros(3),
+        n_classes=np.int64(3),
+        classes=np.array(["GALAXY", "QSO", "STAR"]),
+        features=np.array(["LS-GBM-001:GALAXY", "LS-GBM-001:QSO"]),
+    )
+    zero = {"STAR": 0.0, "GALAXY": 0.0, "QSO": 0.0}
+    keys = ["LS-GBM-001:GALAXY", "LS-GBM-001:QSO"]
+    model = {
+        "intercept": dict(zero),
+        "coef": {k: dict(zero) for k in keys},
+        "gbm": {"file": "m_gbm.npz", "keys": keys, "temperature": 1.0, "blend": 1.0},
+    }
+    gal = {"rule_id": "LS-GBM-001", "class": "GALAXY", "kind": "direct_probability", "score": 0.9}
+    star = dict(gal, score=0.1)
+    no_feature0 = {"rule_id": "LS-GBM-001", "class": "QSO", "kind": "direct_probability", "score": 0.5}
+    simbad = {"rule_id": "SIMBAD-TYPE-001", "class": "QSO", "kind": "catalog_label", "score": 0.99}
+    out = mod.fuse_many([[gal], [star], [no_feature0], [simbad]], model, tmp_path)
+    assert [max(p, key=p.get) for p, _ in out] == ["GALAXY", "STAR", "QSO", "QSO"]
+    assert out[3][1] == 1 and out[3][0]["QSO"] > 0.9  # prior weight only, no tree baseline
+    # Blend 0.5 with an all-zero linear model halves the tree log-odds.
+    ((pb, _),) = mod.fuse_many([[gal]], dict(model, gbm=dict(model["gbm"], blend=0.5)), tmp_path)
+    assert out[0][0]["GALAXY"] > pb["GALAXY"] > 1 / 3
+    # Missing tree file: linear coefficients (all zero here) -> equal odds.
+    ((p0, _),) = mod.fuse_many([[gal]], dict(model, gbm=dict(model["gbm"], file="none.npz")), tmp_path)
+    assert abs(p0["GALAXY"] - 1 / 3) < 1e-9
 
 
 def test_association_posterior_sparse_vs_dense():

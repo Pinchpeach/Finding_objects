@@ -17,7 +17,7 @@ Finds every astronomical object in a patch of sky and classifies it, using catal
   ├─ Associate   group detections of the same object (position, epoch, errors, proper motion)
   ├─ Integrate   one row per object, harmonised units (AB mag, mJy, z)
   ├─ Evidence    25 rules each give evidence for STAR / GALAXY / QSO
-  ├─ Classify    fitted logistic fusion → STAR / GALAXY / QSO / UNKNOWN
+  ├─ Classify    fitted fusion (boosted trees + logistic) → STAR / GALAXY / QSO / UNKNOWN
   └─ Refine      sub-class + five independent axes
                  (physical state, variability, compact object, extragalactic, phenomenon)
   ↓
@@ -35,8 +35,8 @@ The full description is in [`v2/ALGORITHM.md`](v2/ALGORITHM.md).
 
 | Test | Result |
 |---|---|
-| Primary class vs SDSS spectra | 97.84 % |
-| Primary class vs DESI spectra (faint objects) | 91.89 % |
+| Primary class vs SDSS spectra | 98.09 % |
+| Primary class vs DESI spectra (faint objects) | 93.04 % |
 | Mira / Cepheid / RR Lyrae | 94.8 / 93.2 / 82.4 % |
 | Planetary nebulae | 89.2 % |
 | Blind test on unseen objects | 9 / 9 |
