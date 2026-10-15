@@ -23,6 +23,9 @@ on:
       fusion_per_cell:
         description: 'fusion truth objects per class per r bin'
         default: '700'
+      workers:
+        description: 'parallel queries per job (slow services such as IRSA ZTF need more)'
+        default: '8'
 concurrency:
   group: collect-truth-features-${{ github.ref }}
   cancel-in-progress: false
@@ -82,7 +85,7 @@ jobs:
             desi) T=v2/benchmark/desi_external/truth.csv ;;
             fusion) T=v2/benchmark/desi_fusion/truth.csv ;;
           esac
-          python v2/benchmark/collect_catalog_truth.py --truth "$T" --catalog "${{ matrix.catalog }}" --workers 8 --out-dir out 2>&1 | tee out.log | grep -v ERROR | tail -40
+          python v2/benchmark/collect_catalog_truth.py --truth "$T" --catalog "${{ matrix.catalog }}" --workers "${{ github.event.inputs.workers || 8 }}" --out-dir out 2>&1 | tee out.log | grep -v ERROR | tail -40
           mkdir -p out
           echo "errors: $(grep -c ' ERROR ' out.log || true)" | tee out/errors.txt
           wc -l < "$T" > out/targets.txt
