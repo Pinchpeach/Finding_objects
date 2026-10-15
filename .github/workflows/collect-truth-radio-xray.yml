@@ -1,0 +1,76 @@
+name: Collect Truth Radio X-ray Features
+# Manual only: adds the radio / X-ray counterparts of the SDSS and DESI
+# benchmark objects to the preserved catalog_features (2.25.0, accuracy item
+# #2: X-ray / radio evidence for host-dominated QSOs).  Existing files are
+# replaced only when under 1 % of the queries failed.
+on:
+  workflow_dispatch:
+concurrency:
+  group: collect-truth-radio-xray-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    strategy:
+      fail-fast: false
+      matrix:
+        catalog: [erosita, xmm, chandra, first, vlass, lotss, nvss]
+        truth: [sdss, desi]
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pandas numpy requests astropy astroquery
+      - name: Cross-query ${{ matrix.catalog }} (${{ matrix.truth }})
+        run: |
+          if [ "${{ matrix.truth }}" = sdss ]; then T=v2/benchmark/truth_data/ground_truth.csv; else T=v2/benchmark/desi_external/truth.csv; fi
+          python v2/benchmark/collect_catalog_truth.py --truth "$T" --catalog "${{ matrix.catalog }}" --workers 8 --out-dir out 2>&1 | tee out.log | grep -v ERROR | tail -40
+          mkdir -p out
+          echo "errors: $(grep -c ' ERROR ' out.log || true)" | tee out/errors.txt
+          grep ' ERROR ' out.log | head -5 || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rx-${{ matrix.truth }}-${{ matrix.catalog }}
+          path: out/
+          if-no-files-found: warn
+          retention-days: 14
+  commit:
+    needs: collect
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: rx-*
+          path: dl
+      - name: Copy complete collections
+        run: |
+          for d in dl/rx-*; do
+            n=${d#dl/rx-}; truth=${n%%-*}; cat=${n#*-}
+            f="$d/${cat}_trd.csv"; [ -f "$f" ] || { echo "$n: no output"; continue; }
+            e=$(sed -n 's/errors: //p' "$d/errors.txt")
+            rows=$(($(wc -l < "$f") - 1))
+            echo "$n: rows=$rows errors=$e"
+            # Radio / X-ray non-detections are not evidence, so a failed query
+            # only loses a possible match; above 1 % of targets it would bias
+            # the benchmark, so such a collection is not used.
+            n_t=$(($(wc -l < "$( [ "$truth" = sdss ] && echo v2/benchmark/truth_data/ground_truth.csv || echo v2/benchmark/desi_external/truth.csv )") - 1))
+            if [ "${e:-$n_t}" -gt $((n_t / 100)) ]; then echo "  skipped (query errors > 1 %)"; continue; fi
+            if [ "$truth" = sdss ]; then dst=v2/benchmark/catalog_features; else dst=v2/benchmark/desi_external/catalog_features; fi
+            gzip -9n -c "$f" > "$dst/${cat}_trd.csv.gz"
+          done
+      - name: Commit
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add v2/benchmark/catalog_features v2/benchmark/desi_external/catalog_features
+          git diff --cached --quiet && exit 0
+          git commit -m "Benchmark radio / X-ray counterparts (SDSS, DESI truth)"
+          bash .github/scripts/push_with_retry.sh "${GITHUB_REF_NAME}"
