@@ -6,23 +6,29 @@ its required feature columns are present and usable. Missing values are neutral.
 """
 
 from __future__ import annotations
-import argparse, json, math
+import argparse, importlib, importlib.util, json, math, sys
 from pathlib import Path
 import pandas as pd
-import importlib.util as _tio_u
 
-_tio_s = _tio_u.spec_from_file_location(
-    "v2_table_io", Path(__file__).resolve().parents[1] / "Preprocess" / "table_io.py"
-)
-TABLE_IO = _tio_u.module_from_spec(_tio_s)
-_tio_s.loader.exec_module(TABLE_IO)
-import importlib.util as _ilu
 
-_s = _ilu.spec_from_file_location(
-    "v2_simbad_otypes_s4", Path(__file__).resolve().parents[1] / "Classifier" / "simbad_otypes.py"
-)
-OTYPES = _ilu.module_from_spec(_s)
-_s.loader.exec_module(OTYPES)
+def _load(name, path):
+    spec = importlib.util.spec_from_file_location(name, path)
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    return m
+
+
+def _import_local(name):
+    """Import a sibling Preprocess module by name (shared module cache)."""
+    here = str(Path(__file__).resolve().parent)
+    if here not in sys.path:
+        sys.path.insert(0, here)
+    return importlib.import_module(name)
+
+
+_V2 = Path(__file__).resolve().parents[1]
+TABLE_IO = _load("v2_table_io", _V2 / "Preprocess" / "table_io.py")
+OTYPES = _load("v2_simbad_otypes_s4", _V2 / "Classifier" / "simbad_otypes.py")
 # SIMBAD-TYPE-001 through the otype hierarchy (2.22.0; the old exact-code map
 # missed every child type, e.g. BLL, Sy1, cC*, Mi*, and listed "Star", which
 # is not a code).  Most specific first: QSO (incl. blazars) before AGN before
@@ -155,8 +161,8 @@ def _rule_columns(columns):
 # formulae as Classifier/branches/star.py.  |C*| > 5 sigma means the BP/RP
 # flux comes from more than one point source: an extended source (galaxy
 # nucleus, HII region) or a blend, whose Gaia astrometry is not that of a
-# single star (2.22.0).
-CSTAR_MAX_SIGMA = 5.0
+# single star (2.22.0).  The 5-sigma cut itself is applied by Stage 5 and
+# host grouping (CSTAR_MAX_SIGMA there).
 
 
 def cstar_sigma(src):
@@ -310,6 +316,14 @@ def optical_r_mag(row):
     return r if r is not None and 5 < r < 30 else None
 
 
+def _pm_sigma(src):
+    """Total proper-motion significance (diagonal errors), or None."""
+    a, ae, d, de = (num(src, x) for x in ("pmra", "pmra_error", "pmdec", "pmdec_error"))
+    if None not in (a, ae, d, de) and ae > 0 and de > 0:
+        return math.sqrt((a / ae) ** 2 + (d / de) ** 2)
+    return None
+
+
 def evaluate(rule, row, namespaced=frozenset()):
     rid = rule["rule_id"]
     out = []
@@ -324,35 +338,39 @@ def evaluate(rule, row, namespaced=frozenset()):
     src = CatalogFields(row, ap, namespaced)
     if rcol and reliability is None:
         reliability = 0.0
+
+    def hit(cls, score, value=None, note=""):
+        emit(out, rule, cls, score, value, note, reliability, association_reliability)
+
+    def feature(name, value, note):
+        # Continuous feature for the fitted linear fusion (weights only from Stage 5).
+        out.append(
+            {
+                "class": f"FEATURE:{name}",
+                "rule_id": rid,
+                "value": value,
+                "kind": "linear_feature",
+                "origin": rule["threshold_origin"],
+                "feature_group": rule["feature_group"],
+                "note": note,
+            }
+        )
+
     if rid == "AST-EXT-001":
         p, e = num(src, "parallax"), num(src, "parallax_error")
         if p is not None and e and 0 < e <= AST_EXT_MAX_PLX_ERR:
             x = abs((p + 0.017) / e)
             if x < float(rule["threshold"]):
-                emit(
-                    out,
-                    rule,
-                    "EXTRAGALACTIC",
-                    1 - x / float(rule["threshold"]),
-                    x,
-                    reliability=reliability,
-                    association_reliability=association_reliability,
-                )
+                hit("EXTRAGALACTIC", 1 - x / float(rule["threshold"]), x)
     elif rid == "AST-EXT-002":
-        a, ae, d, de = (num(src, x) for x in ("pmra", "pmra_error", "pmdec", "pmdec_error"))
-        if None not in (a, ae, d, de) and ae > 0 and de > 0:
-            x = math.sqrt((a / ae) ** 2 + (d / de) ** 2)
-            if x < float(rule["threshold"]):
-                emit(
-                    out,
-                    rule,
-                    "EXTRAGALACTIC",
-                    1 - x / float(rule["threshold"]),
-                    x,
-                    "diagonal-error approximation; covariance unavailable",
-                    reliability,
-                    association_reliability,
-                )
+        x = _pm_sigma(src)
+        if x is not None and x < float(rule["threshold"]):
+            hit(
+                "EXTRAGALACTIC",
+                1 - x / float(rule["threshold"]),
+                x,
+                "diagonal-error approximation; covariance unavailable",
+            )
     elif rid == "AST-GAL-001":
         p, e = num(src, "parallax"), num(src, "parallax_error")
         if p is not None and e and e > 0:
@@ -361,35 +379,20 @@ def evaluate(rule, row, namespaced=frozenset()):
             # companion; El-Badry et al. 2021), and |plx|/sigma >= 10 used to
             # trigger the decisive-motion STAR rule (2.19.0).
             x = max(p, 0.0) / e
-            emit(
-                out, rule, "STAR", x / (x + 5), x, "uncalibrated physical support", reliability, association_reliability
-            )
+            hit("STAR", x / (x + 5), x, "uncalibrated physical support")
             _tag_cstar(out, rid, src)
     elif rid == "AST-GAL-002":
-        a, ae, d, de = (num(src, x) for x in ("pmra", "pmra_error", "pmdec", "pmdec_error"))
-        if None not in (a, ae, d, de) and ae > 0 and de > 0:
-            x = math.sqrt((a / ae) ** 2 + (d / de) ** 2)
-            emit(
-                out, rule, "STAR", x / (x + 5), x, "uncalibrated physical support", reliability, association_reliability
-            )
+        x = _pm_sigma(src)
+        if x is not None:
+            hit("STAR", x / (x + 5), x, "uncalibrated physical support")
             _tag_cstar(out, rid, src)
     elif rid.startswith("SPC-SDSS-"):
         c = str(src.get("class", "")).strip().upper()
         target = rule["target_class"]
-        hit = (target == "QSO" and c in {"QSO", "QUASAR"}) or c == target
-        if hit:
+        if (target == "QSO" and c in {"QSO", "QUASAR"}) or c == target:
             zw = num(src, "zwarning")
             score = 1.0 if zw in (None, 0) else 0.75
-            emit(
-                out,
-                rule,
-                target,
-                score,
-                c,
-                "nonzero zwarning downweights spectral label" if zw not in (None, 0) else "",
-                reliability,
-                association_reliability,
-            )
+            hit(target, score, c, "nonzero zwarning downweights spectral label" if zw not in (None, 0) else "")
     elif rid.startswith("PS1-MORPH-"):
         delta = num(row, "ps1_i_psf_minus_kron")
         imag = num(src, "iMeanPSFMag")
@@ -398,28 +401,15 @@ def evaluate(rule, row, namespaced=frozenset()):
             if rid == "PS1-MORPH-001" and delta > 0.05:
                 # Extended morphology is direct GALAXY support within the documented regime.
                 score = min(0.9, 0.55 + min(delta - 0.05, 0.35))
-                emit(
-                    out,
-                    rule,
-                    "GALAXY",
-                    score,
-                    delta,
-                    "PS1 i-band PSF-Kron extended-source evidence",
-                    reliability,
-                    association_reliability,
-                )
+                hit("GALAXY", score, delta, "PS1 i-band PSF-Kron extended-source evidence")
             elif rid == "PS1-MORPH-002" and delta <= 0.05:
                 # Point-like morphology is deliberately weak STAR evidence: QSOs are unresolved too.
                 score = min(0.65, 0.50 + min(max(0, 0.05 - delta), 0.15))
-                emit(
-                    out,
-                    rule,
+                hit(
                     "POINT_SOURCE",
                     score,
                     delta,
                     "weak point-source evidence; unresolved morphology is not STAR-specific",
-                    reliability,
-                    association_reliability,
                 )
     elif rid == "WISE-AGN-R90-001":
         # Assef+2018 (ApJS 234, 23) sec. 3 build R90 only where it is
@@ -433,20 +423,10 @@ def evaluate(rule, row, namespaced=frozenset()):
             cut = 0.650 if w2 <= 13.86 else 0.650 * math.exp(0.153 * (w2 - 13.86) ** 2)
             color = w1 - w2
             if color > cut:
-                emit(
-                    out,
-                    rule,
-                    "EXTRAGALACTIC",
-                    0.90,
-                    color,
-                    f"Assef+2018 AllWISE R90 AGN color selection; boundary={cut:.3f}",
-                    reliability,
-                    association_reliability,
-                )
+                hit("EXTRAGALACTIC", 0.90, color, f"Assef+2018 AllWISE R90 AGN color selection; boundary={cut:.3f}")
     elif rid == "PS1-QSO-Z6-001":
         iz = num(row, "ps1_i_z_color")
         zy = num(row, "ps1_z_y_color")
-        ei = num(row, "ps1_i_psf_mag_err")
         eg = num(row, "ps1_g_psf_mag_err")
         er = num(row, "ps1_r_psf_mag_err")
         ez = num(row, "ps1_z_psf_mag_err")
@@ -465,21 +445,17 @@ def evaluate(rule, row, namespaced=frozenset()):
             gdrop = sg is None or sg < 3
             if zy < 0.5:
                 rcond = sr is None or sr < 3 or (rz is not None and rz > 2.2)
-                hit = gdrop and sz > 10 and sy > 5 and rcond
+                selected = gdrop and sz > 10 and sy > 5 and rcond
             else:
-                hit = gdrop and sz > 7 and sy > 7 and (sr is None or sr < 3)
-            if hit:
+                selected = gdrop and sz > 7 and sy > 7 and (sr is None or sr < 3)
+            if selected:
                 # Candidate-selection evidence only. Keep moderate because the
                 # paper explicitly requires follow-up to reject cool dwarfs/artifacts.
-                emit(
-                    out,
-                    rule,
+                hit(
                     "QSO",
                     0.70,
                     {"i-z": iz, "z-y": zy},
                     "Bañados+2016 PS1 z~6 quasar color-selection candidate; follow-up required",
-                    reliability,
-                    association_reliability,
                 )
     elif rid == "PS1-QSO-HIZ-001":
         # z ~ 3.5-4.5 quasars: the Lyman-alpha forest leaves g faint (red
@@ -493,46 +469,29 @@ def evaluate(rule, row, namespaced=frozenset()):
         pk = num(row, "ps1_i_psf_minus_kron")
         if None not in (gr, ri, iz, er, ei, pk) and er < 0.2 and ei < 0.2 and pk < 0.05:
             if gr > 1.0 and (ri < 0.08 + 0.42 * (gr - 0.96) or gr > 2.26) and iz < 0.25:
-                emit(
-                    out,
-                    rule,
+                hit(
                     "QSO",
                     0.80,
                     {"g-r": gr, "r-i": ri, "i-z": iz},
                     "Richards+2002 high-z (gri) quasar colours, point source",
-                    reliability,
-                    association_reliability,
                 )
     elif rid == "WISE-AGN-001":
         w1, w2, s1, s2 = (num(src, x) for x in ("W1mag", "W2mag", "snr1", "snr2"))
         if None not in (w1, w2, s1, s2) and w1 - w2 >= 0.8 and w2 <= 15.05 and s1 >= 10 and s2 >= 10:
-            emit(
-                out,
-                rule,
+            hit(
                 "EXTRAGALACTIC",
                 0.95,
                 w1 - w2,
                 "Stern+2012 AGN selection; 0.95 is reported sample reliability, not per-source posterior",
-                reliability,
-                association_reliability,
             )
     elif rid.startswith("SDSS-PHOTO-"):
         typ = num(src, "type")
         clean = num(src, "clean")
         if clean == 1 and typ is not None:
             if rid == "SDSS-PHOTO-001" and int(typ) == 3:
-                emit(out, rule, "GALAXY", 0.8, typ, "SDSS extended morphology", reliability, association_reliability)
+                hit("GALAXY", 0.8, typ, "SDSS extended morphology")
             elif rid == "SDSS-PHOTO-002" and int(typ) == 6:
-                emit(
-                    out,
-                    rule,
-                    "POINT_SOURCE",
-                    0.55,
-                    typ,
-                    "weak point-source morphology; stars and quasars both unresolved",
-                    reliability,
-                    association_reliability,
-                )
+                hit("POINT_SOURCE", 0.55, typ, "weak point-source morphology; stars and quasars both unresolved")
     elif rid.startswith("LS-MORPH-"):
         # Legacy Surveys Tractor model choice (Dey+2019). Below S/N~10 a PSF
         # fit is preferred by default, so morphology is used only above it.
@@ -544,55 +503,17 @@ def evaluate(rule, row, namespaced=frozenset()):
         ]
         if snr and max(snr) >= float(rule["threshold"]):
             if rid == "LS-MORPH-001" and typ in {"REX", "EXP", "DEV", "SER"}:
-                emit(
-                    out,
-                    rule,
-                    "GALAXY",
-                    0.75,
-                    typ,
-                    "Legacy Surveys resolved Tractor model",
-                    reliability,
-                    association_reliability,
-                )
+                hit("GALAXY", 0.75, typ, "Legacy Surveys resolved Tractor model")
             elif rid == "LS-MORPH-002" and typ == "PSF":
-                emit(
-                    out,
-                    rule,
-                    "POINT_SOURCE",
-                    0.60,
-                    typ,
-                    "Legacy Surveys PSF model; stars and quasars both unresolved",
-                    reliability,
-                    association_reliability,
-                )
+                hit("POINT_SOURCE", 0.60, typ, "Legacy Surveys PSF model; stars and quasars both unresolved")
     elif rid == "LS-COLOR-001":
         # Continuous colour features for the fitted linear fusion; each colour
         # comes with a presence indicator so a missing colour is not read as 0.
         for name in ("g_r", "r_z", "z_w1", "w1_w2"):
             v = num(row, f"ls_{name}_color")
             if v is not None:
-                out.append(
-                    {
-                        "class": f"FEATURE:{name}",
-                        "rule_id": rid,
-                        "value": max(-3.0, min(6.0, v)),
-                        "kind": "linear_feature",
-                        "origin": rule["threshold_origin"],
-                        "feature_group": rule["feature_group"],
-                        "note": "dereddened AB colour",
-                    }
-                )
-                out.append(
-                    {
-                        "class": f"FEATURE:{name}_present",
-                        "rule_id": rid,
-                        "value": 1.0,
-                        "kind": "linear_feature",
-                        "origin": rule["threshold_origin"],
-                        "feature_group": rule["feature_group"],
-                        "note": "colour available",
-                    }
-                )
+                feature(name, max(-3.0, min(6.0, v)), "dereddened AB colour")
+                feature(f"{name}_present", 1.0, "colour available")
     elif rid == "RADIO-001":
         # Radio loudness R = 0.4 (r - t), t = -2.5 log10(S_1.4GHz / 3631 Jy)
         # (Ivezic et al. 2002, AJ 124, 2364; radio-loud R > 1).  Radio-loud
@@ -608,17 +529,7 @@ def evaluate(rule, row, namespaced=frozenset()):
                 t = -2.5 * math.log10(s * 1e-3 / 3631.0)
                 feats["radio_log_r"] = max(-2.0, min(6.0, 0.4 * (r - t)))
             for name, v in feats.items():
-                out.append(
-                    {
-                        "class": f"FEATURE:{name}",
-                        "rule_id": rid,
-                        "value": v,
-                        "kind": "linear_feature",
-                        "origin": rule["threshold_origin"],
-                        "feature_group": rule["feature_group"],
-                        "note": "radio counterpart",
-                    }
-                )
+                feature(name, v, "radio counterpart")
     elif rid == "XRAY-001":
         # X-ray-to-optical flux ratio log(fX/fopt) = log fX + r/2.5 + 5.37
         # (Maccacaro et al. 1988, Eq. 1; r used for V): AGN and quasars lie
@@ -632,17 +543,7 @@ def evaluate(rule, row, namespaced=frozenset()):
             if r is not None:
                 feats["xray_log_fx_fo"] = max(-4.0, min(3.0, math.log10(fx) + r / 2.5 + 5.37))
             for name, v in feats.items():
-                out.append(
-                    {
-                        "class": f"FEATURE:{name}",
-                        "rule_id": rid,
-                        "value": v,
-                        "kind": "linear_feature",
-                        "origin": rule["threshold_origin"],
-                        "feature_group": rule["feature_group"],
-                        "note": "X-ray counterpart",
-                    }
-                )
+                feature(name, v, "X-ray counterpart")
     elif rid == "ZTF-VAR-001":
         # Aperiodic optical variability from ZTF light curves: quasars vary
         # stochastically with a rising structure function (A ~ 0.1 mag at 1 yr,
@@ -668,29 +569,10 @@ def evaluate(rule, row, namespaced=frozenset()):
             if mag is not None:
                 feats["ztf_mag"] = max(12.0, min(22.0, mag))
             for name, v in feats.items():
-                out.append(
-                    {
-                        "class": f"FEATURE:{name}",
-                        "rule_id": rid,
-                        "value": v,
-                        "kind": "linear_feature",
-                        "origin": rule["threshold_origin"],
-                        "feature_group": rule["feature_group"],
-                        "note": "ZTF light-curve variability",
-                    }
-                )
+                feature(name, v, "ZTF light-curve variability")
     elif rid == "SGA-001":
         if "SGA-2020" in str(row.get("catalogs", "")).split("|"):
-            emit(
-                out,
-                rule,
-                "GALAXY",
-                0.95,
-                src.get("catalog_object_id"),
-                "Siena Galaxy Atlas 2020 large galaxy",
-                reliability,
-                association_reliability,
-            )
+            hit("GALAXY", 0.95, src.get("catalog_object_id"), "Siena Galaxy Atlas 2020 large galaxy")
     elif rid == "NED-TYPE-001":
         typ = str(src.get("Type", "")).strip()
         # NED "*" for faint sources is mostly inherited from photometric
@@ -698,30 +580,12 @@ def evaluate(rule, row, namespaced=frozenset()):
         # galaxies share; it is used as point-source evidence only.
         mp = {"G": "GALAXY", "QSO": "QSO", "*": "POINT_SOURCE", "WD*": "STAR"}
         if typ in mp:
-            emit(
-                out,
-                rule,
-                mp[typ],
-                0.85,
-                typ,
-                "curated NED preferred physical type",
-                reliability,
-                association_reliability,
-            )
+            hit(mp[typ], 0.85, typ, "curated NED preferred physical type")
     elif rid == "SIMBAD-TYPE-001":
         typ = str(src.get("otype", "")).strip()
         cls, _hit = OTYPES.resolve(typ, SIMBAD_COARSE)
         if cls:
-            emit(
-                out,
-                rule,
-                cls,
-                0.85,
-                typ,
-                "curated SIMBAD hierarchical physical type",
-                reliability,
-                association_reliability,
-            )
+            hit(cls, 0.85, typ, "curated SIMBAD hierarchical physical type")
     elif rid == "DSC-001":
         # Preprocess is intentionally coarse. Gaia DSC white-dwarf and
         # physical-binary posterior mass belongs to the stellar family here;
@@ -739,43 +603,25 @@ def evaluate(rule, row, namespaced=frozenset()):
         if all(v is not None for v in coarse.values()):
             lr = {c: max(v, DSC_FLOOR) / DSC_PRIOR[c] for c, v in coarse.items()}
             z = sum(lr.values())
-            for cls in ("STAR", "GALAXY", "QSO"):
-                q = lr[cls] / z
-                emit(
-                    out,
-                    rule,
+            for cls in PRIMARY:
+                hit(
                     cls,
-                    q,
+                    lr[cls] / z,
                     coarse[cls],
                     "Gaia DSC posterior with its class prior divided out (Delchambre+2023 App. C)",
-                    reliability=reliability,
-                    association_reliability=association_reliability,
                 )
     elif rid == "VAR-001":
         cls = str(src.get("best_class_name", "")).strip()
         score = num(src, "best_class_score")
         if cls and score is not None:
-            emit(
-                out,
-                rule,
-                f"VAR:{cls}",
-                score,
-                score,
-                reliability=reliability,
-                association_reliability=association_reliability,
-            )
+            hit(f"VAR:{cls}", score, score)
     return out
 
 
 def _color_knn_evidence(df, rule_list):
     """LS-CKNN-001 / PS1-CKNN-001: colour-space kNN class fractions, computed for all rows at once."""
     empty = [[] for _ in range(len(df))]
-    import sys
-
-    here = str(Path(__file__).resolve().parent)
-    if here not in sys.path:
-        sys.path.insert(0, here)
-    import color_knn
+    color_knn = _import_local("color_knn")
 
     rules = {r["rule_id"]: r for r in rule_list if r["rule_id"] in color_knn.COLOR_SETS}
     ref = color_knn.load_reference() if rules else None
@@ -800,12 +646,7 @@ def _ls_gbm_evidence(df, rule_list):
     rule = next((r for r in rule_list if r["rule_id"] == "LS-GBM-001"), None)
     if rule is None:
         return empty
-    import sys
-
-    here = str(Path(__file__).resolve().parent)
-    if here not in sys.path:
-        sys.path.insert(0, here)
-    import ls_gbm
+    ls_gbm = _import_local("ls_gbm")
 
     prob = ls_gbm.predict_proba(df)
     for i, f in enumerate(prob):

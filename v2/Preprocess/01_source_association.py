@@ -36,11 +36,11 @@ MAX_EPOCH_SPAN_YR = 45.0
 SMALL_CAP_ARCSEC = 8.0
 
 
-def _pm_shift_arcsec(det, span_yr=None):
+def _pm_shift_arcsec(det, span_yr):
     pmra, pmdec = det.get("pmra"), det.get("pmdec")
     if pmra is None or pmdec is None or det.get("ref_epoch") is None:
         return 0.0
-    return math.hypot(pmra, pmdec) * (MAX_EPOCH_SPAN_YR if span_yr is None else span_yr) / 1000.0
+    return math.hypot(pmra, pmdec) * span_yr / 1000.0
 
 
 class _SkyIndex:
@@ -76,7 +76,7 @@ class _SkyIndex:
 
 
 def _density(frame: pd.DataFrame) -> float | None:
-    if frame.empty or len(frame) < 5:
+    if len(frame) < 5:
         # A one/few-row targeted cone is not a reliable local-density estimator.
         return None
     radius = None
@@ -140,8 +140,7 @@ def load(raw: Path):
                 skipped += 1
                 continue
             seen.add(key)
-            payload = r
-            prof = profile_for(cat, payload)
+            prof = profile_for(cat, r)
             rows.append(
                 {
                     "detection_id": f"{path.stem}:{i}",
@@ -151,17 +150,17 @@ def load(raw: Path):
                     "object_name": str(r.get("object_name", "")),
                     "ra": ra,
                     "dec": dec,
-                    "poserr_arcsec": infer_poserr_arcsec(cat, payload),
-                    "psf_fwhm_arcsec": infer_psf_arcsec(cat, payload),
-                    "ref_epoch": infer_epoch(cat, payload),
-                    "entity_kind": infer_entity_kind(cat, payload),
+                    "poserr_arcsec": infer_poserr_arcsec(cat, r),
+                    "psf_fwhm_arcsec": infer_psf_arcsec(cat, r),
+                    "ref_epoch": infer_epoch(cat, r),
+                    "entity_kind": infer_entity_kind(cat, r),
                     "pmra": num(r.get("pmra")),
                     "pmra_error": num(r.get("pmra_error")),
                     "pmdec": num(r.get("pmdec")),
                     "pmdec_error": num(r.get("pmdec_error")),
                     "max_radius_arcsec": prof.max_radius_arcsec,
                     "source_density_arcsec2": density,
-                    "association_aliases": canonical_aliases(cat, payload, cid),
+                    "association_aliases": canonical_aliases(cat, r, cid),
                     "source_row": int(i),
                 }
             )
@@ -219,15 +218,11 @@ def run(raw_dir: Path, out: Path):
         else:
             wide.discard(gi)
 
-    dets_in_order = []
     for det in detections:
-        dets_in_order.append(det)
         # Time-domain events remain distinct from persistent host/catalog objects.
         # Event identity can later be linked to a host in a dedicated event layer.
-        if det["entity_kind"] == "transient_event":
-            candidates = []
-        else:
-            candidates = []
+        candidates = []
+        if det["entity_kind"] != "transient_event":
             # Accepted pairs lie within max(cap_anchor, cap_det) plus the PM
             # shifts: anchors with a cap above SMALL_CAP are in ``wide``.
             reach = max(cap(det), SMALL_CAP_ARCSEC) + PM_MARGIN_ARCSEC + _pm_shift_arcsec(det, span)
@@ -353,7 +348,7 @@ def run(raw_dir: Path, out: Path):
         )
 
     group_by_id = {g["id"]: g for g in groups}
-    for rec, det in zip(records, dets_in_order):
+    for rec, det in zip(records, detections):  # one record per detection, same order
         anchor = group_by_id[rec["object_id"]]["anchor"]
         # Membership confidence is judged against the object's final anchor
         # (its most precise position).  The score computed at match time used

@@ -64,6 +64,12 @@ CONFLICT_RESOLVED_P = 0.99
 DECISIVE_MOTION_SIGMA = 10.0
 DECISIVE_MIN_RELIABILITY = 0.8  # Gaia astrometry quality (RUWE <= ~1.75) and association
 MODEL_PATH = Path(__file__).resolve().parent / "fusion_weights.json"
+# Stage-4 rules measuring a significant Gaia parallax / proper motion.
+GAIA_MOTION_RULES = frozenset({"AST-GAL-001", "AST-GAL-002"})
+
+
+def _or1(v):
+    return 1.0 if v is None else v
 
 
 def evidence_features(items):
@@ -94,9 +100,7 @@ def evidence_features(items):
             raw = e.get("raw_score")
             if raw is not None:
                 r = min(max(float(raw), 0.01), 0.99)
-                rel = float(e.get("reliability", 1.0) if e.get("reliability") is not None else 1.0) * float(
-                    e.get("association_reliability", 1.0) if e.get("association_reliability") is not None else 1.0
-                )
+                rel = float(_or1(e.get("reliability"))) * float(_or1(e.get("association_reliability")))
                 v = max(0.0, min(1.0, rel)) * math.log(r / (1 - r))
             else:
                 s = min(max(float(e.get("score", 0)), 0.01), 0.99)
@@ -124,8 +128,22 @@ def load_model(path=MODEL_PATH):
         return None
 
 
+def _add_prior(logit, key, kind, v):
+    """Unfitted rules are one-sided support: a low-confidence claim (e.g. a
+    catalogue label with poor association reliability) is weak support, not
+    evidence against the class."""
+    w = prior_coef(key, kind)
+    v = max(v, 0.0)
+    for t in CLASSES:
+        logit[t] += w.get(t, 0.0) * v
+
+
 def fuse(items, model=None):
-    x, kinds = evidence_features(items)
+    return _fuse_linear(*evidence_features(items), model)
+
+
+def _fuse_linear(x, kinds, model):
+    """Linear log-odds fusion of ``evidence_features`` output."""
     coef = (model or {}).get("coef", {})
     # The fitted intercept is the baseline of the fitted feature set; with
     # none of those features present (e.g. only SIMBAD/NED labels, which use
@@ -136,13 +154,10 @@ def fuse(items, model=None):
     for key, v in x.items():
         w = coef.get(key)
         if w is None:
-            # Unfitted rules are one-sided support: a low-confidence claim
-            # (e.g. a catalogue label with poor association reliability) is
-            # weak support, not evidence against the class.
-            w = prior_coef(key, kinds[key])
-            v = max(v, 0.0)
-        for t in CLASSES:
-            logit[t] += w.get(t, 0.0) * v
+            _add_prior(logit, key, kinds[key], v)
+        else:
+            for t in CLASSES:
+                logit[t] += w.get(t, 0.0) * v
         # A continuous feature without a fitted weight carries no evidence.
         used += int(kinds[key] != "linear_feature" or key in coef)
     return _softmax(logit), used
@@ -176,8 +191,7 @@ def fuse_many(item_lists, model=None, base_dir=None):
     spec, trees, order = gb
     keys = spec["keys"]
     col = {k: j for j, k in enumerate(keys)}
-    feats_items = list(item_lists)
-    feats = [evidence_features(items) for items in feats_items]
+    feats = [evidence_features(items) for items in item_lists]
     X = np.full((len(feats), len(keys)), np.nan)
     for r, (x, _) in enumerate(feats):
         for k, v in x.items():
@@ -199,9 +213,7 @@ def fuse_many(item_lists, model=None, base_dir=None):
             if key in col:
                 used += 1
                 continue
-            w = prior_coef(key, kinds[key])
-            for t in CLASSES:
-                logit[t] += w.get(t, 0.0) * max(v, 0.0)
+            _add_prior(logit, key, kinds[key], v)
             used += int(kinds[key] != "linear_feature")
         p = _softmax(logit)
         if a < 1.0:
@@ -209,7 +221,7 @@ def fuse_many(item_lists, model=None, base_dir=None):
             # fit (product of experts): the trees add interactions, the linear
             # part keeps its predictable direction for evidence combinations
             # rare in training (Gaia-only faint stars, 2.25.0 measurement).
-            q, _ = fuse(feats_items[r], model)
+            q, _ = _fuse_linear(x, kinds, model)
             p = _softmax({c: (1 - a) * math.log(max(q[c], 1e-300)) + a * math.log(max(p[c], 1e-300)) for c in CLASSES})
         out.append((p, used))
     return out
@@ -234,8 +246,7 @@ def _gaia_foreground_star(items):
     """Significant Gaia parallax or proper motion (S/N >= 5; Stage-4 score >= 0.5)
     of a point-like source."""
     return any(
-        e.get("rule_id") in {"AST-GAL-001", "AST-GAL-002"} and float(e.get("raw_score", 0)) >= 0.5 and _point_like(e)
-        for e in items
+        e.get("rule_id") in GAIA_MOTION_RULES and float(e.get("raw_score", 0)) >= 0.5 and _point_like(e) for e in items
     )
 
 
@@ -243,7 +254,7 @@ def _decisive_motion(items):
     """Gaia parallax or proper motion at >= DECISIVE_MOTION_SIGMA with a good
     astrometric solution and a reliable association."""
     for e in items:
-        if e.get("rule_id") not in {"AST-GAL-001", "AST-GAL-002"} or not _point_like(e):
+        if e.get("rule_id") not in GAIA_MOTION_RULES or not _point_like(e):
             continue
         try:
             if (
