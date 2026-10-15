@@ -599,8 +599,11 @@ def evaluate(rule, row, namespaced=frozenset()):
         # divided out (their App. C) and the evidence is the prior-free
         # probability over STAR family / GALAXY / QSO (2.16.0).
         pv = {cls: num(src, col) for cls, col in DSC_MAP.items()}
-        stellar = sum(v for cls, v in pv.items() if cls in {"STAR", "WD", "BINARY"} and v is not None)
-        coarse = {"STAR": stellar if stellar > 0 else None, "GALAXY": pv.get("GALAXY"), "QSO": pv.get("QSO")}
+        # An all-zero stellar family is a valid (confidently extragalactic)
+        # posterior, not a missing one; DSC_FLOOR handles the zero.  Before
+        # 2.27.0 it suppressed the rule for 41 % of benchmark DSC rows.
+        stellar = [v for cls, v in pv.items() if cls in {"STAR", "WD", "BINARY"} and v is not None]
+        coarse = {"STAR": sum(stellar) if stellar else None, "GALAXY": pv.get("GALAXY"), "QSO": pv.get("QSO")}
         if all(v is not None for v in coarse.values()):
             lr = {c: max(v, DSC_FLOOR) / DSC_PRIOR[c] for c, v in coarse.items()}
             z = sum(lr.values())

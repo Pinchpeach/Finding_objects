@@ -977,17 +977,15 @@ def classify_star(row):
     lam = _text(row, "lamost_dr_catalog__SubClass") or ""
     for label, src in ((sdss, "SDSS"), (lam, "LAMOST")):
         u = label.upper()
-        if u.startswith("CARBON") and "WD" in u:  # SDSS CarbonWD: DQ white dwarf (C2 bands)
+        # SDSS WD templates: WD, WDhotter, WDcooler, WDmagnetic, CarbonWD (DQ)
+        # and CalciumWD (DZ, missed before 2.27.0); LAMOST DA/DB/... types.
+        if "WD" in u or u.startswith(("DA", "DB", "DC", "DQ", "DZ", "DO")):
             return _result(
                 f"White dwarf ({label})", "STAR:WD", None, f"{src}_SUBCLASS", f"{src} spectrum subclass {label}"
             )
         if u == "CV":
             return _result(
                 "Cataclysmic variable", "STAR:CV", None, f"{src}_SUBCLASS", f"{src} spectrum subclass {label}"
-            )
-        if u.startswith(("WD", "DA", "DB", "DC", "DQ", "DZ", "DO")):
-            return _result(
-                f"White dwarf ({label})", "STAR:WD", None, f"{src}_SUBCLASS", f"{src} spectrum subclass {label}"
             )
     sp_simbad = _text(row, "simbad__sp_type") or ""
     if re.match(r"^D[ABCOQZX]", sp_simbad):  # MK white-dwarf type (DA3, DB, DQ ...; 2.23.0)
