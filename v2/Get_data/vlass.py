@@ -1,10 +1,18 @@
 """Independent VLASS cone-search collector. No cross-match/classification."""
 
+import sys
 from pathlib import Path
 import pandas as pd
 
+if str(Path(__file__).resolve().parent) not in sys.path:  # loaded by file path elsewhere
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _catalog_utils import pick, coordinates
+
 CATALOG = "VLASS"
 VIZIER_CATALOG = "J/ApJS/255/30"
+ID_COLUMNS = ["CompName", "Component_name", "Name", "VLASS", "CompId", "Component_id"]
+RA_COLUMNS = ["RAJ2000", "RA_ICRS", "_RAJ2000", "RAdeg"]
+DEC_COLUMNS = ["DEJ2000", "DE_ICRS", "_DEJ2000", "DEdeg"]
 
 
 def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
@@ -17,12 +25,22 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     )
     if not tabs:
         return pd.DataFrame(columns=["catalog", "catalog_object_id", "object_name", "ra", "dec"])
-    df = tabs[0].to_pandas()
-    idc = "Name"
-    rac = "RAJ2000"
-    dcc = "DEJ2000"
-    if idc not in df.columns:
-        raise KeyError("identifier column missing: " + idc)
+    # J/ApJS/255/30 (Gordon et al. 2021) has several tables; use the one with
+    # positions.  Its component name column is not "Name" in every VizieR
+    # release (2.26.0: every VLASS match failed with "identifier column
+    # missing: Name"), so the identifier is picked from known names and
+    # otherwise built from the position.
+    df = next((t.to_pandas() for t in tabs if pick(t.to_pandas(), RA_COLUMNS) is not None), tabs[0].to_pandas())
+    rv, dv = coordinates(df, RA_COLUMNS, DEC_COLUMNS)
+    idc = pick(df, ID_COLUMNS)
+    if idc is not None:
+        ident = df[idc].astype("string").str.strip()
+    else:
+        ident = pd.Series([f"J{r:.5f}{d:+.5f}" for r, d in zip(rv, dv)], index=df.index, dtype="string")
+    df["_vlass_id"] = ident
+    idc = "_vlass_id"
+    df["_ra"], df["_dec"] = rv, dv
+    rac, dcc = "_ra", "_dec"
     df.insert(0, "catalog", CATALOG)
     df.insert(1, "catalog_object_id", df[idc].astype("string"))
     df.insert(2, "object_name", CATALOG + " " + df["catalog_object_id"].astype("string"))
