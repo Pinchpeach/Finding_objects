@@ -11,22 +11,6 @@ V2 = Path(__file__).resolve().parents[1]
 GET = V2 / "Get_data"
 DEFAULT_TRUTH = Path(__file__).resolve().parent / "truth_data" / "ground_truth.csv"
 DEFAULT_OUT = Path(__file__).resolve().parent / "catalog_data"
-COLLECTORS = [
-    "gaia_dr3",
-    "panstarrs1",
-    "allwise",
-    "twomass",
-    "galex",
-    "desi_legacy",
-    "nvss",
-    "first",
-    "lotss",
-    "vlass",
-    "chandra",
-    "xmm",
-    "erosita",
-    "ztf_lightcurve",
-]
 RADII = {
     "gaia_dr3": 0.10,
     "panstarrs1": 0.10,
@@ -43,6 +27,7 @@ RADII = {
     "erosita": 0.30,
     "ztf_lightcurve": 0.05,
 }
+COLLECTORS = list(RADII)  # query order
 MATCH_ARCSEC = {
     "gaia_dr3": 2.0,
     "panstarrs1": 2.0,
@@ -80,21 +65,18 @@ def sep_arcsec(ra1, dec1, ra2, dec2):
 
 
 def query_one(mod, name, radius, t):
-    last = None
     for attempt in range(5):
         try:
             d = mod.fetch(float(t.ra), float(t.dec), radius)
-            last = None
             break
         except Exception as e:
             last = e
             # MAST/other public services can throttle bursts. Retry transient failures,
             # with stronger backoff for explicit HTTP 429 responses.
-            msg = repr(e)
-            delay = (2**attempt) * (1.0 if "429" in msg else 0.5)
+            delay = (2**attempt) * (1.0 if "429" in repr(e) else 0.5)
             if attempt < 4:
                 time.sleep(delay)
-    if last is not None:
+    else:  # all attempts failed
         return "error", None, repr(last)
     try:
         if d is None or d.empty:
@@ -134,6 +116,23 @@ PM_SEARCH_ARCSEC = 15.0
 GAIA_EPOCH = 2016.0
 
 
+def _finish(name, out_dir, targets, out=None, matched=0, empty=None, errors=0):
+    """Write ``<name>_trd.csv`` (an empty table when ``out`` is None) and
+    return the catalog's coverage-summary row."""
+    if out is None:
+        out = pd.DataFrame(columns=["benchmark_id", "truth_class"])
+    out.to_csv(out_dir / f"{name}_trd.csv", index=False)
+    counts = out["truth_class"].value_counts().to_dict() if len(out) else {}
+    return {
+        "catalog": name,
+        "targets": targets,
+        "matched": matched,
+        "empty": targets - matched if empty is None else empty,
+        "errors": errors,
+        **{c: counts.get(c, 0) for c in ("STAR", "GALAXY", "QSO")},
+    }
+
+
 def _truth_epoch(truth):
     if "mjd" in truth.columns:
         mjd = pd.to_numeric(truth["mjd"], errors="coerce")
@@ -162,31 +161,9 @@ def run_gaia(truth, out_dir):
         ).to_pandas()
     except Exception as e:
         print(f"[gaia_dr3] CDS XMatch ERROR {e!r}", flush=True)
-        out = pd.DataFrame(columns=["benchmark_id", "truth_class"])
-        out.to_csv(out_dir / "gaia_dr3_trd.csv", index=False)
-        return {
-            "catalog": "gaia_dr3",
-            "targets": len(truth),
-            "matched": 0,
-            "empty": len(truth),
-            "errors": 1,
-            "STAR": 0,
-            "GALAXY": 0,
-            "QSO": 0,
-        }
+        return _finish("gaia_dr3", out_dir, len(truth), errors=1)
     if xm.empty:
-        out = pd.DataFrame(columns=["benchmark_id", "truth_class"])
-        out.to_csv(out_dir / "gaia_dr3_trd.csv", index=False)
-        return {
-            "catalog": "gaia_dr3",
-            "targets": len(truth),
-            "matched": 0,
-            "empty": len(truth),
-            "errors": 0,
-            "STAR": 0,
-            "GALAXY": 0,
-            "QSO": 0,
-        }
+        return _finish("gaia_dr3", out_dir, len(truth))
 
     # Normalize VizieR Gaia DR3 column names to the same schema used by the native
     # Gaia collector.  Missing optional fields remain NaN rather than being forged.
@@ -241,8 +218,8 @@ def run_gaia(truth, out_dir):
         ra_t.to_numpy(),
         dec_t.to_numpy(),
     )
-    xm = xm[np.isfinite(pd.to_numeric(xm["_sep_arcsec"], errors="coerce"))]
-    xm = xm[pd.to_numeric(xm["_sep_arcsec"], errors="coerce") <= MATCH_ARCSEC["gaia_dr3"]]
+    sep = pd.to_numeric(xm["_sep_arcsec"], errors="coerce")
+    xm = xm[np.isfinite(sep) & (sep <= MATCH_ARCSEC["gaia_dr3"])]
     xm = xm.sort_values(["benchmark_id", "_sep_arcsec"]).drop_duplicates("benchmark_id", keep="first")
     # Gaia DSC-Combmod class probabilities live in the astrophysical-parameter
     # table (I/355/paramp); join them by source_id when available.
@@ -281,20 +258,9 @@ def run_gaia(truth, out_dir):
     out["truth_dec"] = out.pop("truth_dec_meta")
     out["match_threshold_arcsec"] = MATCH_ARCSEC["gaia_dr3"]
     out = out.sort_values("benchmark_id")
-    out.to_csv(out_dir / "gaia_dr3_trd.csv", index=False)
-    counts = out.truth_class.value_counts().to_dict()
     ok = len(out)
     print(f"[gaia_dr3] CDS targets={len(truth)} matched={ok} empty={len(truth)-ok}", flush=True)
-    return {
-        "catalog": "gaia_dr3",
-        "targets": len(truth),
-        "matched": ok,
-        "empty": len(truth) - ok,
-        "errors": 0,
-        "STAR": counts.get("STAR", 0),
-        "GALAXY": counts.get("GALAXY", 0),
-        "QSO": counts.get("QSO", 0),
-    }
+    return _finish("gaia_dr3", out_dir, len(truth), out, matched=ok)
 
 
 def run_catalog(name, truth, out_dir, workers):
@@ -322,20 +288,8 @@ def run_catalog(name, truth, out_dir, workers):
                 print(f"[{name}] {t.benchmark_id} ERROR {err}", flush=True)
             if done % 25 == 0 or done == len(truth):
                 print(f"[{name}] {done}/{len(truth)} matched={ok} empty={empty} errors={errors}", flush=True)
-    out = pd.concat(rows, ignore_index=True) if rows else pd.DataFrame(columns=["benchmark_id", "truth_class"])
-    out = out.sort_values("benchmark_id") if len(out) else out
-    out.to_csv(out_dir / f"{name}_trd.csv", index=False)
-    counts = out["truth_class"].value_counts().to_dict() if len(out) else {}
-    return {
-        "catalog": name,
-        "targets": len(truth),
-        "matched": ok,
-        "empty": empty,
-        "errors": errors,
-        "STAR": counts.get("STAR", 0),
-        "GALAXY": counts.get("GALAXY", 0),
-        "QSO": counts.get("QSO", 0),
-    }
+    out = pd.concat(rows, ignore_index=True).sort_values("benchmark_id") if rows else None
+    return _finish(name, out_dir, len(truth), out, matched=ok, empty=empty, errors=errors)
 
 
 def run(truth_path, out_dir, limit=None, catalog=None, workers=8):

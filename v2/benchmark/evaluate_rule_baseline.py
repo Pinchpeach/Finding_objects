@@ -13,7 +13,8 @@ def accuracy_score(y, p):
     return float((y == p).mean()) if len(y) else float("nan")
 
 
-def f1_score(y, p, labels, average="macro", zero_division=0):
+def f1_score(y, p, labels):
+    """Macro F1 over ``labels`` (0 for a class absent from both y and p)."""
     y = np.asarray(y)
     p = np.asarray(p)
     out = []
@@ -21,7 +22,7 @@ def f1_score(y, p, labels, average="macro", zero_division=0):
         tp = int(((p == c) & (y == c)).sum())
         fp = int(((p == c) & (y != c)).sum())
         fn = int(((p != c) & (y == c)).sum())
-        out.append(2 * tp / (2 * tp + fp + fn) if (2 * tp + fp + fn) else zero_division)
+        out.append(2 * tp / (2 * tp + fp + fn) if (2 * tp + fp + fn) else 0)
     return float(np.mean(out))
 
 
@@ -115,15 +116,14 @@ pre = None
 
 def wide(truth, cats):
     x = truth[["benchmark_id"]].copy()
-    pres = {b: [] for b in x.benchmark_id}
+    # "|"-joined display names of the catalogs that matched each object; the
+    # left merges below keep x's row order, so positions line up.
+    ids = x.benchmark_id.astype(str).to_numpy()
+    tags = pd.Series("", index=range(len(x)), dtype=object)
     for cat, d in cats.items():
         if d is None or d.empty:
             continue
-        ids = set(d.benchmark_id.astype(str))
-        label = DISPLAY.get(cat, cat)
-        for b in pres:
-            if str(b) in ids:
-                pres[b].append(label)
+        tags[np.isin(ids, d.benchmark_id.astype(str).unique())] += "|" + DISPLAY.get(cat, cat)
         cols = [c for c in d.columns if c not in DROP]
         q = d[["benchmark_id"] + cols].drop_duplicates("benchmark_id").copy()
         # Keep first occurrence of a raw field name; the existing rule engine expects
@@ -132,7 +132,7 @@ def wide(truth, cats):
         ns = pre.prefix(CATALOG_NAME.get(cat, cat))
         spaced = q[["benchmark_id"] + cols].rename(columns={c: f"{ns}__{c}" for c in cols})
         x = x.merge(q[keep], on="benchmark_id", how="left").merge(spaced, on="benchmark_id", how="left")
-    x["catalogs"] = ["|".join(pres[b]) for b in x.benchmark_id]
+    x["catalogs"] = tags.str[1:].tolist()
     return x
 
 
@@ -182,18 +182,9 @@ def main():
     }
     metrics["accuracy_all_unknown_wrong"] = float((te.primary_class == te.truth_class).mean())
     if classified.any():
-        metrics["accuracy_when_classified"] = float(
-            accuracy_score(te.loc[classified, "truth_class"], te.loc[classified, "primary_class"])
-        )
-        metrics["macro_f1_when_classified"] = float(
-            f1_score(
-                te.loc[classified, "truth_class"],
-                te.loc[classified, "primary_class"],
-                labels=["STAR", "GALAXY", "QSO"],
-                average="macro",
-                zero_division=0,
-            )
-        )
+        y, pred = te.loc[classified, "truth_class"], te.loc[classified, "primary_class"]
+        metrics["accuracy_when_classified"] = accuracy_score(y, pred)
+        metrics["macro_f1_when_classified"] = f1_score(y, pred, labels=["STAR", "GALAXY", "QSO"])
     else:
         metrics["accuracy_when_classified"] = None
         metrics["macro_f1_when_classified"] = None

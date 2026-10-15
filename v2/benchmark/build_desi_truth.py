@@ -97,11 +97,18 @@ def main():
     rng = np.random.default_rng(a.seed)
     per_window = math.ceil(a.per_cell / len(RA_WINDOWS))
     parts = []
+    n_excluded = 0
     for cls in CLASSES:
         for rlo, rhi in R_BINS:
             got = []
             for ra_lo, ra_hi in RA_WINDOWS:
                 d = query(cls, rlo, rhi, ra_lo, ra_hi, per_window * 4)
+                # Excluded objects are dropped before sampling: dropped after
+                # head(per_cell) they left the cells short.
+                if excluded and len(d):
+                    keep = ~d.TargetID.astype(str).isin(excluded)
+                    n_excluded += int((~keep).sum())
+                    d = d[keep]
                 if len(d):
                     got.append(d.sample(min(len(d), per_window), random_state=int(rng.integers(1 << 31))))
             d = pd.concat(got, ignore_index=True) if got else pd.DataFrame()
@@ -111,9 +118,7 @@ def main():
                 parts.append(d.head(a.per_cell))
     t = pd.concat(parts, ignore_index=True).drop_duplicates("TargetID")
     if excluded:
-        n0 = len(t)
-        t = t[~t.TargetID.astype(str).isin(excluded)]
-        print(f"excluded {n0 - len(t)} objects listed in --exclude", flush=True)
+        print(f"excluded {n_excluded} queried objects listed in --exclude", flush=True)
     t["ra"] = pd.to_numeric(t.RAICRS, errors="coerce")
     t["dec"] = pd.to_numeric(t.DEICRS, errors="coerce")
     sd = pd.read_csv(a.sdss_truth)
