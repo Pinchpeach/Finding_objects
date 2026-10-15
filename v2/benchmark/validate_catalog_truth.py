@@ -18,6 +18,9 @@ def main():
     p.add_argument("--catalog-root", type=Path, required=True)
     p.add_argument("--out", type=Path, required=True)
     p.add_argument("--allow-unbalanced", action="store_true")
+    # 2.26.0: the DESI fusion-training set (benchmark/desi_fusion) is used for
+    # training only; the SDSS / DESI external test splits stay the reference.
+    p.add_argument("--split-all", choices=("train", "calibration", "test"), default=None)
     a = p.parse_args()
     truth = pd.read_csv(a.truth)
     a.out.mkdir(parents=True, exist_ok=True)
@@ -34,7 +37,7 @@ def main():
     elif any(counts.get(c, 0) < 20 for c in CLASSES):
         raise AssertionError(f"unbalanced benchmark still requires >=20 examples per class; got {counts}")
     manifest = truth[["benchmark_id", "truth_class", "ra", "dec"]].copy()
-    manifest["split"] = manifest.benchmark_id.map(split_for)
+    manifest["split"] = a.split_all or manifest.benchmark_id.map(split_for)
     reports = []
     problems = []
     active_catalogs = []
