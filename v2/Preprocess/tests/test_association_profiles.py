@@ -140,3 +140,25 @@ def test_duplicate_spectrum_does_not_move_to_a_neighbour(tmp_path):
     assert ls_obj in spec_objs  # one spectrum on its target
     for oid in spec_objs - {ls_obj}:  # the duplicate stands alone, it joins nothing else
         assert set(a.loc[a.object_id.eq(oid), "catalog"]) == {"DESI DR1 spectroscopy"}
+
+
+def test_spectrum_finds_its_target_when_another_survey_anchors_the_group(tmp_path):
+    # Field RA 20 (2.28.0): the LS target was 0.02" from the spectrum but its
+    # group was anchored by a PS1 detection 0.71" away, so FastSpecFit went by
+    # position to a lone GALEX detection and the spectrum followed by alias.
+    import pandas as pd
+
+    def one(cat, dx, cid, dy=0.0, **cols):
+        return {"catalog": cat, "catalog_object_id": cid, "ra": 20.0 + dx / 3600, "dec": dy / 3600, **cols}
+
+    pd.DataFrame([one("Pan-STARRS1 DR2 MeanObject", 0.0, "P1", dy=0.71)]).to_csv(tmp_path / "ps1.csv", index=False)
+    pd.DataFrame([one("DESI Legacy Surveys DR10", 0.0, "L1", type="EXP")]).to_csv(tmp_path / "ls.csv", index=False)
+    pd.DataFrame([one("Gaia DR3", 3.4, "S1")]).to_csv(tmp_path / "gaia.csv", index=False)
+    pd.DataFrame([one("GALEX AIS", 1.62, "G1")]).to_csv(tmp_path / "galex.csv", index=False)
+    tid = "39627785060228797"
+    pd.DataFrame([one("DESI DR1 spectroscopy", 0.02, tid)]).to_csv(tmp_path / "spec.csv", index=False)
+    pd.DataFrame([one("DESI DR1 FastSpecFit", 0.02, tid)]).to_csv(tmp_path / "fsf.csv", index=False)
+    out = tmp_path / "assoc.csv"
+    _stage1().run(tmp_path, out)
+    a = pd.read_csv(out).set_index("catalog").object_id
+    assert a["DESI DR1 spectroscopy"] == a["DESI DR1 FastSpecFit"] == a["DESI Legacy Surveys DR10"]

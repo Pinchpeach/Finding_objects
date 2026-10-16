@@ -179,6 +179,13 @@ def load(raw: Path):
     return rows, skipped
 
 
+def _target_sep(group, det):
+    """Distance to the group's Legacy Surveys member(s), the imaging target of
+    a DESI spectrum; the group anchor is often another survey's detection
+    (field RA 20: anchor 0.71" away, LS target 0.02")."""
+    return min((sep_arcsec(ra, dec, det["ra"], det["dec"]) for ra, dec in group["targets"]), default=math.inf)
+
+
 def _anchor_key(det):
     # Prefer a PM-aware astrometric anchor, then smaller astrometric uncertainty.
     has_motion = det.get("pmra") is not None and det.get("pmdec") is not None and det.get("ref_epoch") is not None
@@ -258,11 +265,7 @@ def run(raw_dir: Path, out: Path):
                 if det["catalog"] in group["catalogs"]:
                     # A second spectrum of a target already holding one is a
                     # duplicate, not evidence for a neighbour (field RA 20).
-                    target_taken |= (
-                        det["catalog"] in TARGET_SPECTRA
-                        and TARGET_IMAGING in group["catalogs"]
-                        and assess_pair(group["anchor"], det)["separation_arcsec"] <= TARGET_MATCH_ARCSEC
-                    )
+                    target_taken |= det["catalog"] in TARGET_SPECTRA and _target_sep(group, det) <= TARGET_MATCH_ARCSEC
                     continue
                 shared_aliases = set(det.get("association_aliases") or ()) & set(group.get("aliases") or ())
                 if shared_aliases:
@@ -282,11 +285,7 @@ def run(raw_dir: Path, out: Path):
                 result = assess_pair(group["anchor"], det, density)
                 result["association_method"] = "position_epoch_likelihood"
                 result["shared_aliases"] = ""
-                if (
-                    det["catalog"] in TARGET_SPECTRA
-                    and TARGET_IMAGING in group["catalogs"]
-                    and result["separation_arcsec"] <= TARGET_MATCH_ARCSEC
-                ):
+                if det["catalog"] in TARGET_SPECTRA and _target_sep(group, det) <= TARGET_MATCH_ARCSEC:
                     result.update({"accepted": True, "association_method": "spectroscopic_target"})
                 if result["accepted"]:
                     candidates.append((result["association_score"], result["normalized_separation"], gi, result))
@@ -299,7 +298,7 @@ def run(raw_dir: Path, out: Path):
         if len(alias_hits) == 1:
             candidates = alias_hits
         elif target_hits:
-            candidates = [min(target_hits, key=lambda c: c[3]["separation_arcsec"])]
+            candidates = [min(target_hits, key=lambda c: _target_sep(groups[c[2]], det))]
         elif det["catalog"] in TARGET_SPECTRA and target_taken:
             candidates = []
         ambiguous = len(candidates) > 1 and candidates[1][0] >= candidates[0][0] * AMBIG_SCORE_RATIO
@@ -310,6 +309,8 @@ def run(raw_dir: Path, out: Path):
             oid = group["id"]
             group["catalogs"].add(det["catalog"])
             group["members"] += 1
+            if det["catalog"] == TARGET_IMAGING:
+                group["targets"].append((det["ra"], det["dec"]))
             group["aliases"].update(det.get("association_aliases") or ())
             for alias in det.get("association_aliases") or ():
                 alias_groups.setdefault(alias, set()).add(gi)
@@ -327,6 +328,7 @@ def run(raw_dir: Path, out: Path):
                     "members": 1,
                     "entity_kind": det["entity_kind"],
                     "aliases": set(det.get("association_aliases") or ()),
+                    "targets": [(det["ra"], det["dec"])] if det["catalog"] == TARGET_IMAGING else [],
                 }
             )
             place(len(groups) - 1)
