@@ -440,3 +440,19 @@ All models together:
   search): Suh 2021 O-AGB (5,301) and C-AGB (3,576) stars with Gaia DR3,
   2MASS, AllWISE and Gaia DR3 LPV photometry. 98.4 % of the O-AGB stars have
   Ks − W3 > 1.0, which supports the silicate threshold.
+
+## New targets examined in 2.28.0
+
+Candidates came from the gaps of the sub-class benchmark (`evaluate_subclass.py`): faint white dwarfs (DESI WDs typed as WD: 18 %), galaxy activity of faint galaxies (photometric rules reached 3.6 % of DESI benchmark galaxies) and quasar redshift class without a spectrum. Each criterion was taken from the literature and measured before adoption.
+
+| Target | Criterion (source) | Measurement | Decision |
+|---|---|---|---|
+| QSO z < 2.1 without a spectrum (`PHOT_Z_KNN`) | kNN (k = 31) in dereddened LS g−r, r−z, z−W1, W1−W2 (errors ≤ 0.2) + r/4; reference = DESI DR1 quasars of the fusion training set (`benchmark/build_qso_photoz_reference.py`). Quasar colours vs z: Richards et al. 2001 (AJ 121, 2308); grzW photo-z 72 % within 0.1(1+z): Yang et al. 2017 (AJ 154, 269); kNN photo-z: Ball et al. 2008 (ApJ 683, 12). Claimed when P(z ≥ 2.1) ≤ 0.2 | purity 0.958 (DESI external, 834 QSOs, 70 % of its z < 2.1 QSOs) and 0.994 (SDSS test, 81 %); |Δz|/(1+z) < 0.1 for 70 % (cf. Yang+2017 72 %) | **adopted** (low-z only) |
+| QSO z ≥ 2.1 without a spectrum | same kNN, P ≥ 0.7–0.8; no published grzW cut with a z > 2.1 purity (Chaussidon et al. 2023, ApJ 944, 107: one random forest for all z; Yèche et al. 2020 colour cuts) | purity 0.88–0.91 on DESI but 0.40–0.65 on SDSS (prior dependent); z ~ 2.8 quasars sit on the stellar locus (Yang+2017) | not adopted |
+| Faint star-forming galaxies (`LS_ELG`) | DESI ELG box, dereddened LS: g > 20, r−z > 0.15, g−r < 0.5(r−z) + 0.1 (Raichoor et al. 2023, AJ 165, 126, Table 2; [O II] emitters at 0.6 < z < 1.6); g-fibre < 24.1 not applied (no fibre fluxes) | truth: FastSpecFit EW([O II] 3726+3729) of 4,361 DESI benchmark galaxies (`benchmark/desi_galaxy_activity`, passive below 5 Å: Balogh et al. 1999, ApJ 527, 54; Dressler et al. 1999, ApJS 122, 51). 601/637 decided cases are emitters (0.943; 0.932 / 0.950 on the two sets); 152 more have EW ≥ 5 Å below 3σ (median 10.4 Å). Activity coverage of the DESI benchmark galaxies 3.6 → 21.6 % | **adopted**, last in the activity chain, precision 0.943 |
+| Faint quiescent galaxies via the DESI LRG box | Zhou et al. 2023 (AJ 165, 58) Eqs. 1–2 | only 0.63 of LRG-box galaxies have EW([O II]) < 5 Å; the box is a stellar-mass selection (complete for log M* > 11.5), not a quiescence selection | not adopted |
+| WD without a usable parallax, reduced proper motion | H_G = G + 5 log μ + 5 > 10 + 7(BP−RP), pm/σ > 10 (Gentile Fusillo et al. 2021, MNRAS 508, 3877, Sect. 2.3 — a pre-cut before their P_WD map); inclusive H_g line of Kilic et al. 2006 (AJ 131, 582) | where the parallax gate abstains: DESI 4 WD / 4 non-WD, SDSS 5 WD / 30 non-WD (halo A/BHB stars just above the line); Kilic line with offsets ≤ 50 % purity | not adopted |
+| Hot WD from GALEX UV | FUV−NUV < −0.13 and NUV−r < 0.1, both errors ≤ 0.3 (Bianchi et al. 2011, MNRAS 411, 2770) | hot stars 96 % (as published) but WDs only ~50 % (B/A/BHB/sdB stars share the colours) | not adopted as WD |
+| Gaia DSC vs HR-locus conflict | the veto of a WD-locus star with DSC star ≥ 0.8 (2.17.0) | conflicting cases are 22 WD / 20 non-WD (SDSS), 9 / 10 (DESI) | kept |
+
+The faint DESI white dwarfs without a WD label (47 of 89) have no Gaia counterpart at all; no published grz white-dwarf cut with a measured purity exists (hot WDs overlap z ≈ 2–3 quasars and BHB / sdB stars in grz), so they stay unclassified.

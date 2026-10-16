@@ -66,6 +66,9 @@ def _load_precision() -> dict[str, float]:
 
 
 RULE_PRECISION: dict[str, float] = _load_precision()
+# Rules that never fire on the SDSS train split take their precision from the
+# benchmark that validated them (2.28.0).
+RULE_PRECISION.setdefault("LS_ELG", 0.943)  # DESI benchmark galaxies (see ELG_G_MIN)
 
 # Casagrande & VandenBerg (2018, MNRAS 479, L102): Gaia extinction
 # coefficients per E(B-V); E(BP-RP) = (3.374 - 2.035) E(B-V), A_G ~ 2.740 E(B-V).
@@ -147,6 +150,26 @@ def _wise_vega(row, band):
 
 def _ab_mag(flux_nmgy):
     return 22.5 - 2.5 * math.log10(flux_nmgy) if flux_nmgy and flux_nmgy > 0 else None
+
+
+def ls_dered_mags(row, bands, errors=False):
+    """Legacy Surveys DR10 AB magnitudes corrected for Galactic extinction
+    (flux / mw_transmission), {band: mag}, or None when a band is missing; with
+    ``errors``, ({band: mag}, {band: 1-sigma mag error}) and the flux_ivar
+    columns are required as well."""
+    m, e = {}, {}
+    for b in bands:
+        f = _num(row, f"desi_legacy_surveys_dr10__flux_{b}")
+        t = _num(row, f"desi_legacy_surveys_dr10__mw_transmission_{b}") or 1.0
+        if f is None or f <= 0:
+            return None
+        m[b] = 22.5 - 2.5 * math.log10(f / t)
+        if errors:
+            iv = _num(row, f"desi_legacy_surveys_dr10__flux_ivar_{b}")
+            if iv is None or iv <= 0:
+                return None
+            e[b] = 1.0857 / (f * math.sqrt(iv))
+    return (m, e) if errors else m
 
 
 @lru_cache(maxsize=1)
@@ -1175,6 +1198,21 @@ def _galaxy_lines(row, prefix, tag):
 # No K-correction: WISE colours change at z > ~0.1.
 W23_SF = 3.5
 W23_Q = 1.5
+# Faint galaxies (2.28.0): the DESI ELG colour box (Raichoor et al. 2023, AJ
+# 165, 126, Table 2; LS DR9 grz, dereddened AB): g > 20, r - z > 0.15,
+# g - r < 0.5 (r - z) + 0.1 selects [O II] emitters at 0.6 < z < 1.6 (the
+# g - r cut rejects stars and z < 0.6).  The g-fibre limit (24.1) is not
+# applied (fibre fluxes are not collected).  On the DESI benchmark galaxies
+# (desi_galaxy_activity: FastSpecFit EW([O II] 3726+3729); passive below 5 A,
+# Balogh et al. 1999, Dressler et al. 1999) 601 of 637 decided cases are
+# emitters (0.943; 0.932 / 0.950 on the two sets); a further 152 have
+# EW >= 5 A below 3 sigma.  [O II] can also come from an AGN or LINER, but
+# in these blue colours star formation dominates.  The LRG box (Zhou et al.
+# 2023) is not used for "quiescent": it selects by stellar mass, and only
+# 0.63 of its galaxies have EW([O II]) < 5 A.  Last in the chain, so any
+# spectrum, SIMBAD type, WISE or GALEX indicator decides first (those reach
+# only 3.6 % of the DESI benchmark galaxies; this adds 18 %).
+ELG_G_MIN = 20.0
 
 
 def galaxy_activity(row):
@@ -1242,7 +1280,17 @@ def galaxy_activity(row):
             # Green valley between the blue cloud and red sequence (Salim 2014,
             # SerAJ 189, 1: 4 < NUV-r < 5; Wyder et al. 2007).
             return "GREEN_VALLEY", "GALEX_NUVR_GV", f"4 < (NUV-r)0 = {nuvr:.2f} <= 5 (green valley)"
-    return None, None, "no spectrum, mid-IR or UV activity indicator"
+    m = ls_dered_mags(row, ("g", "r", "z"))
+    if m is not None:
+        gr, rz = m["g"] - m["r"], m["r"] - m["z"]
+        if m["g"] > ELG_G_MIN and rz > 0.15 and gr < 0.5 * rz + 0.1:
+            return (
+                "STAR_FORMING",
+                "LS_ELG",
+                f"DESI ELG colours (Raichoor+2023): g = {m['g']:.2f} > 20, r-z = {rz:.2f} > 0.15, "
+                f"g-r = {gr:.2f} < 0.5(r-z) + 0.1 ([O II] emitter at z > 0.6)",
+            )
+    return None, None, "no spectrum, mid-IR, UV or optical-colour activity indicator"
 
 
 # ------------------------------------------------- distances (flat LCDM)
@@ -1524,6 +1572,59 @@ def spectroscopic_z(row):
     return None
 
 
+# Photometric redshift class (2.28.0).  Quasar colours change with redshift as
+# emission lines and the Lyman-alpha forest move through the bands (Richards
+# et al. 2001, AJ 121, 2308); grz + W1/W2 photometric redshifts reach
+# |dz|/(1+z) < 0.1 for 72 % of quasars (Yang et al. 2017, AJ 154, 269), and
+# kNN in colour space is an established estimator (Ball et al. 2008, ApJ 683,
+# 12).  Coordinates: dereddened LS DR10 g-r, r-z, z-W1, W1-W2 (each error
+# <= 0.2) and r/4 (depth, as in Preprocess/color_knn.py); reference = DESI DR1
+# quasars of the fusion training set (benchmark/build_qso_photoz_reference.py).
+# Only z < 2.1 is claimed: at P(z >= 2.1) <= 0.2 among the 31 neighbours the
+# class is 95.8 % correct on the DESI external set (66 % of its quasars) and
+# 99.4 % on the SDSS test split.  z >= 2.1 is not: its purity was 0.88-0.91 on
+# DESI but 0.40-0.65 on SDSS, where high-z quasars are rarer, and no published
+# grzW cut gives a z > 2.1 purity (Chaussidon et al. 2023, ApJ 944, 107; z ~
+# 2.8 quasars sit on the stellar locus, Yang et al. 2017).  The Lyman-alpha
+# forest enters g at z ~ 2.1-2.2, DESI's Lyman-alpha quasar limit.
+QSO_PZ_REFERENCE = Path(__file__).with_name("qso_photoz_reference.csv.gz")
+QSO_PZ_COLUMNS = ("g_r", "r_z", "z_w1", "w1_w2", "r_4")
+QSO_PZ_K = 31
+QSO_PZ_LOW = 0.2
+QSO_PZ_MAX_ERR = 0.2
+
+
+def qso_photoz_features(row):
+    """Dereddened LS colours and r/4 for the quasar photo-z, or None."""
+    me = ls_dered_mags(row, ("g", "r", "z", "w1", "w2"), errors=True)
+    if me is None:
+        return None
+    m, e = me
+    pairs = (("g", "r"), ("r", "z"), ("z", "w1"), ("w1", "w2"))
+    if any(math.hypot(e[a], e[b]) > QSO_PZ_MAX_ERR for a, b in pairs):
+        return None
+    return [m[a] - m[b] for a, b in pairs] + [m["r"] / 4.0]
+
+
+@lru_cache(maxsize=1)
+def _qso_pz_reference():
+    if not QSO_PZ_REFERENCE.exists():
+        return None
+    ref = pd.read_csv(QSO_PZ_REFERENCE)
+    return ref[list(QSO_PZ_COLUMNS)].to_numpy(float), ref["z"].to_numpy(float)
+
+
+def qso_photoz(row):
+    """(P(z >= 2.1), median neighbour z) from the colour kNN, or None."""
+    x = qso_photoz_features(row)
+    ref = _qso_pz_reference()
+    if x is None or ref is None:
+        return None
+    R, z = ref
+    nn = np.argpartition(((R - np.asarray(x)) ** 2).sum(axis=1), QSO_PZ_K - 1)[:QSO_PZ_K]
+    return (float((z[nn] >= 2.1).sum()) + 1.0) / (QSO_PZ_K + 2.0), float(np.median(z[nn]))
+
+
 RADIO_WORD = {"RADIO_LOUD": "Radio-loud", "RADIO_QUIET": "Radio-quiet", "RADIO_DETECTED": "Radio-detected"}
 
 
@@ -1558,6 +1659,12 @@ def classify_qso(row):
         zc = "HIGH_Z" if z >= 2.1 else "LOW_Z"
         rules.append("SPEC_Z")
         basis.append(f"spectroscopic z = {z:.3f}")
+    else:
+        pz = qso_photoz(row)
+        if pz is not None and pz[0] <= QSO_PZ_LOW:
+            zc = "LOW_Z"
+            rules.append("PHOT_Z_KNN")
+            basis.append(f"photometric z < 2.1 (LS colour kNN: P(z >= 2.1) = {pz[0]:.2f}, median z = {pz[1]:.2f})")
     if not rules:
         return _result(
             None, None, None, None, "no radio, X-ray, redshift or SIMBAD type", status="NO_SUBCLASS_EVIDENCE"
@@ -1569,6 +1676,8 @@ def classify_qso(row):
     extra = []
     if z is not None and z > 0:
         extra.append(f"z = {z:.2f}")
+    elif zc == "LOW_Z":
+        extra.append("photometric z < 2.1")
     if xray:
         extra.append("X-ray")
     if extra:

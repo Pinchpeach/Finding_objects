@@ -58,6 +58,12 @@ FEATURES = {
                 "mw_transmission_g",
                 "mw_transmission_r",
                 "mw_transmission_z",
+                # Quasar photometric redshift (2.28.0): W1/W2 and flux errors.
+                "flux_w1",
+                "flux_w2",
+                "mw_transmission_w1",
+                "mw_transmission_w2",
+                *(f"flux_ivar_{b}" for b in ("g", "r", "z", "w1", "w2")),
             )
         },
     ),
@@ -247,6 +253,22 @@ def evaluate(rows: pd.DataFrame, sc, label: str) -> tuple[dict, pd.DataFrame]:
                 float(q.tags.str.contains("QUASAR_LUMINOSITY").sum() / max(q.tags.str.contains("LUMINOSITY").sum(), 1)),
                 4,
             ),
+        }
+        # Photometric redshift class (2.28.0), with the spectroscopic z hidden.
+        zkeys = ("std_z_spec", "sdss_dr18_spectroscopy__z", "desi_dr1_spectroscopy__z")
+        pz = pd.Series(
+            [
+                sc.classify_qso({k: v for k, v in r.items() if k not in zkeys}).get("redshift_class")
+                for r, c in zip(recs, out.primary_class)
+                if c == "QSO"
+            ],
+            index=q.index,
+        )
+        low = pz.eq("LOW_Z")
+        metrics["qso"]["photometric_low_z"] = {
+            "n": int(low.sum()),
+            "coverage_of_z_lt_2.1": round(float(low[q.z < 2.1].mean()), 4),
+            "purity": round(float((q.z[low] < 2.1).mean()), 4) if low.any() else None,
         }
     return metrics, out
 

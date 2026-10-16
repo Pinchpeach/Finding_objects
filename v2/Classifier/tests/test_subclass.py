@@ -563,3 +563,44 @@ def test_review_2_23_simbad_wd_mk_precedence_and_paper_vetoes():
     )
     # vetoed O-rich star: no "AGB" left in its name
     assert "AGB" not in sc.NON_AGB_NAME["O"]
+
+
+def _ls_row(mags, prefix="desi_legacy_surveys_dr10__"):
+    """LS DR10 fluxes (nanomaggies, S/N 50, no extinction) for AB magnitudes."""
+    row = {}
+    for b, m in mags.items():
+        f = 10 ** ((22.5 - m) / 2.5)
+        row.update({f"{prefix}flux_{b}": f, f"{prefix}flux_ivar_{b}": (50 / f) ** 2, f"{prefix}mw_transmission_{b}": 1.0})
+    return row
+
+
+def test_2_28_qso_photometric_low_z():
+    import pandas as pd
+
+    sc = _sc()
+    ref = pd.read_csv(sc.QSO_PZ_REFERENCE)
+    c = ref[ref.z < 1.0][list(sc.QSO_PZ_COLUMNS)].median()  # a typical z < 1 quasar
+    r = 4 * c.r_4
+    mags = {"r": r, "g": r + c.g_r, "z": r - c.r_z}
+    mags.update(w1=mags["z"] - c.z_w1)
+    mags.update(w2=mags["w1"] - c.w1_w2)
+    q = sc.classify(dict(_ls_row(mags), primary_class="QSO"))
+    assert q["redshift_class"] == "LOW_Z" and q["rule"] == "PHOT_Z_KNN" and "photometric z < 2.1" in q["subclass"]
+    # A spectroscopic redshift always decides.
+    q = sc.classify(dict(_ls_row(mags), primary_class="QSO", desi_dr1_spectroscopy__z=2.5))
+    assert q["redshift_class"] == "HIGH_Z" and q["rule"] == "SPEC_Z"
+    # Noisy colours (S/N 3) give no photometric class.
+    noisy = {k: (v / 278.0 if "ivar" in k else v) for k, v in _ls_row(mags).items()}
+    assert sc.qso_photoz_features(noisy) is None
+
+
+def test_2_28_elg_colours_star_forming():
+    sc = _sc()
+    elg = dict(_ls_row({"g": 23.0, "r": 22.7, "z": 22.1}), primary_class="GALAXY")  # r-z 0.6, g-r 0.3 < 0.4
+    act, rule, _ = sc.galaxy_activity(elg)
+    assert (act, rule) == ("STAR_FORMING", "LS_ELG")
+    assert sc.classify(elg)["confidence"] == sc.RULE_PRECISION["LS_ELG"]
+    red = dict(_ls_row({"g": 23.0, "r": 22.0, "z": 21.0}), primary_class="GALAXY")  # g-r 1.0: LRG-like
+    assert sc.galaxy_activity(red)[0] is None
+    bright = dict(_ls_row({"g": 19.0, "r": 18.7, "z": 18.1}), primary_class="GALAXY")  # g < 20: low z
+    assert sc.galaxy_activity(bright)[0] is None

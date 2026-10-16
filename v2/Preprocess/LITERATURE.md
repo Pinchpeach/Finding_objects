@@ -322,3 +322,11 @@ epochs).
 |---|---|---|
 | Structure function SF(dt) = A (dt / 1 yr)^γ, χ²_red, from ZTF r/g light curves (ZTF-VAR-001, off unless its rule row is present) | Schmidt et al. 2010 (ApJ 714, 1194); Palanque-Delabrouille et al. 2011 (A&A 530, A122); Masci et al. 2019 (PASP 131, 018003) | Point sources only, since PSF photometry of resolved galaxies varies with seeing (benchmark galaxies: median χ²_red 10.6). The fitted weights point the right way (γ → QSO +1.28), but test accuracy changed by one object per set (SDSS +0.05 pp, DESI −0.11 pp) and the calibration log-loss rose (0.1433 → 0.1473). IRSA light-curve cones also take minutes per field. Not adopted. |
 | Gaia DSC all-zero stellar posterior | Delchambre et al. 2023 (A&A 674, A31) | A zero stellar probability is a confident extragalactic posterior; DSC-001 now emits it (2.27.0) instead of dropping the rule for 41 % of DSC rows. |
+
+## DESI spectra in association (2.28.0)
+
+| Element | Source | Use |
+|---|---|---|
+| A DESI spectrum is a measurement at its Legacy Surveys target position (TARGET_RA/DEC), position error 0.1″ instead of the 0.6″ default | Myers et al. 2023 (AJ 165, 50), DESI target selection pipeline; Dey et al. 2019 (AJ 157, 168) LS astrometry | With 0.6″ a spectrum on a star 0.85″ from a galaxy scored 0.85 vs 1 and was left ambiguous (field RA 250). |
+| Spectra associate after the imaging, and a spectrum within 0.3″ of a group's LS member joins that group (decisive) | same (spectra have no independent position) | LS DR10 south release 10000 differs from the DR9 TARGETID, so the catalogue alias can fail; a shredded galaxy's PS1/SDSS fragments otherwise made its LS source ambiguous (RA 250), and a group anchored by a PS1 detection 0.71″ off sent the spectrum to a lone GALEX detection (RA 20). Distance is measured to the group's LS members, not its anchor. |
+| Duplicate spectra of one target: kept once (best ΔΧ², greedy 0.5″), a second spectrum never joins a neighbour | DESI DR1 has several spectra per target (zcat_primary) | A rounded 0.5″ grid key kept both copies when they straddled a cell edge. |
