@@ -157,6 +157,13 @@ jobs:
               nb=a[(sep<2.0)&(a.object_id!=r.object_id)].assign(sep=sep)
               print(round(float(r.get("match_separation_arcsec") or float("nan")),2), round(float(r.get("combined_sigma_arcsec") or float("nan")),2),
                     "|", sorted({(c,o,round(x,2)) for c,o,x in zip(nb.catalog,nb.object_id,nb.sep)}, key=lambda t:t[2])[:6])
+          print("\n== detections of DESI objects left UNKNOWN and their neighbours within 2 arcsec")
+          for oid in u.get("object_id", pd.Series(dtype=object)).head(8):
+              for _,r in a[a.object_id.eq(oid)].iterrows():
+                  sep=np.hypot((a.ra-r.ra)*cosd,a.dec-r.dec)*3600
+                  nb=a[(sep<2.0)&(a.object_id!=oid)].assign(sep=sep).sort_values("sep").head(6)
+                  print(oid, r.catalog, r.catalog_object_id, r.association_status, "|",
+                        [(c,o,st,round(x,2),str(i)[:20]) for c,o,st,x,i in zip(nb.catalog,nb.object_id,nb.association_status,nb.sep,nb.catalog_object_id)])
           import glob, numpy as np
           print(pd.read_csv(glob.glob("/tmp/field/raw/**/collection_summary_*.csv",recursive=True)[0])[["collector","status","rows","elapsed_seconds"]].to_string(index=False))
           if not glob.glob("/tmp/field/raw/**/desi_legacy_*.csv",recursive=True): raise SystemExit("Legacy Surveys collection failed in this run")

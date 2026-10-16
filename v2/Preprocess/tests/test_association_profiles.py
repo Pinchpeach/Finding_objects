@@ -43,3 +43,29 @@ def test_r90_sky_mask():
     assert not m._r90_sky(83.63, 22.01)  # Crab, b = -5.8
     assert m._r90_sky(150.1, 2.2)  # COSMOS
     assert m._r90_sky(None, None)
+
+
+def test_desi_target_position_is_not_ambiguous_next_to_a_star():
+    # Field RA 250 (2.27.0): a DESI spectrum 0.01" from its LS source and
+    # 0.34" from a Gaia-anchored star was "ambiguous_new" with the 0.6"
+    # default error; TARGET_RA/DEC are imaging positions (2.28.0).
+    dec = 30.0
+    cosd = math.cos(math.radians(dec))
+
+    def det(cat, dra_arcsec, **extra):
+        return {
+            "catalog": cat,
+            "ra": 250.0 + dra_arcsec / 3600.0 / cosd,
+            "dec": dec,
+            "poserr_arcsec": am.infer_poserr_arcsec(cat, extra),
+            "psf_fwhm_arcsec": am.infer_psf_arcsec(cat, extra),
+            "ref_epoch": None,
+            **extra,
+        }
+
+    desi = det("DESI DR1 spectroscopy", 0.0)
+    ls_target = det("DESI Legacy Surveys DR10", 0.01, type="REX")
+    star = det("Gaia DR3", 0.34)
+    s_target = am.assess_pair(ls_target, desi)["association_score"]
+    s_star = am.assess_pair(star, desi)["association_score"]
+    assert s_star < 0.67 * s_target  # AMBIG_SCORE_RATIO: no longer ambiguous
