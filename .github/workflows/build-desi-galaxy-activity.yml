@@ -2,11 +2,15 @@ name: DESI benchmark galaxy FastSpecFit lines
 
 # FastSpecFit lines and Dn4000 of the DESI benchmark galaxies (2.28.0):
 # truth for photometric galaxy-activity criteria on faint galaxies.
-# Manual only (2.24.0): it rewrites preserved benchmark / truth data, which
-# must change only on purpose (an automatic run on a code push replaced the
-# DESI benchmark with a partial re-collection on 2026-10-14).
+# Writes only its own directory (desi_galaxy_activity), never the DESI truth
+# sets.  Runs on a change to its own files (a new workflow cannot be
+# dispatched before it reaches the default branch) or by hand.
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/build-desi-galaxy-activity.yml
+      - v2/benchmark/build_desi_galaxy_activity_truth.py
 concurrency:
   group: desi-galaxy-activity-${{ github.ref }}
   cancel-in-progress: true
