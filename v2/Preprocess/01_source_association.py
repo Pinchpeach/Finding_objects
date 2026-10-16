@@ -21,6 +21,18 @@ from association_model import (
 )
 
 AMBIG_SCORE_RATIO = 0.67
+# DESI redshifts are measured at the imaging position of a Legacy Surveys
+# target (TARGET_RA/DEC; Myers et al. 2023, AJ 165, 50), so a spectrum is a
+# measurement of an LS source rather than an independent detection.  Spectra
+# are associated after all imaging detections (they never anchor a group
+# while their target is present), and a group holding an LS source within
+# TARGET_MATCH_ARCSEC is their target, decisively, as a shared identifier
+# would be (LS DR10 south re-numbers the DR9 objects DESI targeted).  Before
+# 2.28.0 a shredded galaxy's own fragments made the spectrum ambiguous and it
+# became an evidence-less object (fields RA 250 and RA 20).
+TARGET_SPECTRA = ("DESI DR1 spectroscopy", "DESI DR1 FastSpecFit")
+TARGET_IMAGING = "DESI Legacy Surveys DR10"
+TARGET_MATCH_ARCSEC = 0.3
 # Spatial pre-selection.  Any accepted pair is within the larger profile cap
 # (<= 45 arcsec) after proper-motion propagation; the index searches that cap
 # plus PM_MARGIN_ARCSEC, and anchors that can move further than the margin
@@ -194,7 +206,14 @@ def run(raw_dir: Path, out: Path):
     # Build groups from the best astrometric anchors first.  This prevents a
     # coarse IRAS/low-resolution row from becoming the coordinate anchor merely
     # because its filename sorts earlier.
-    detections.sort(key=lambda d: (*_anchor_key(d), str(d.get("catalog")), str(d.get("detection_id"))))
+    detections.sort(
+        key=lambda d: (
+            d.get("catalog") in TARGET_SPECTRA,
+            *_anchor_key(d),
+            str(d.get("catalog")),
+            str(d.get("detection_id")),
+        )
+    )
     groups, records = [], []
     epochs = [float(d["ref_epoch"]) for d in detections if d.get("ref_epoch") is not None]
     # Epoch span from the data (a 1950 catalogue vs Gaia is 66 yr), at least
@@ -253,6 +272,12 @@ def run(raw_dir: Path, out: Path):
                 result = assess_pair(group["anchor"], det, density)
                 result["association_method"] = "position_epoch_likelihood"
                 result["shared_aliases"] = ""
+                if (
+                    det["catalog"] in TARGET_SPECTRA
+                    and TARGET_IMAGING in group["catalogs"]
+                    and result["separation_arcsec"] <= TARGET_MATCH_ARCSEC
+                ):
+                    result.update({"accepted": True, "association_method": "spectroscopic_target"})
                 if result["accepted"]:
                     candidates.append((result["association_score"], result["normalized_separation"], gi, result))
             candidates.sort(key=lambda x: (-x[0], x[1]))
@@ -260,8 +285,11 @@ def run(raw_dir: Path, out: Path):
         # An exact shared identifier is decisive: positional neighbours (e.g.
         # catalogue duplicates in crowded fields) cannot make it ambiguous.
         alias_hits = [c for c in candidates if c[3].get("association_method") == "catalog_alias"]
+        target_hits = [c for c in candidates if c[3].get("association_method") == "spectroscopic_target"]
         if len(alias_hits) == 1:
             candidates = alias_hits
+        elif target_hits:
+            candidates = [min(target_hits, key=lambda c: c[3]["separation_arcsec"])]
         ambiguous = len(candidates) > 1 and candidates[1][0] >= candidates[0][0] * AMBIG_SCORE_RATIO
 
         if candidates and not ambiguous:

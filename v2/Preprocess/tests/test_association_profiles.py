@@ -69,3 +69,39 @@ def test_desi_target_position_is_not_ambiguous_next_to_a_star():
     s_target = am.assess_pair(ls_target, desi)["association_score"]
     s_star = am.assess_pair(star, desi)["association_score"]
     assert s_star < 0.67 * s_target  # AMBIG_SCORE_RATIO: no longer ambiguous
+
+
+def _stage1():
+    s = importlib.util.spec_from_file_location("s1", PRE / "01_source_association.py")
+    m = importlib.util.module_from_spec(s)
+    s.loader.exec_module(m)
+    return m
+
+
+def test_desi_spectrum_joins_its_shredded_ls_galaxy(tmp_path):
+    # Field RA 250 (2.28.0): a DESI galaxy spectrum on its LS source, with PS1
+    # and SDSS fragments of the same galaxy 0.3-0.4" away, became its own
+    # evidence-less object.  Spectra now attach to their LS target.
+    import pandas as pd
+
+    dec = 30.0
+    cosd = math.cos(math.radians(dec))
+
+    def rows(cat, offsets, **cols):
+        return pd.DataFrame(
+            [
+                {"catalog": cat, "catalog_object_id": f"{cat[:4]}{i}", "ra": 250.0 + dx / 3600 / cosd, "dec": dec, **cols}
+                for i, dx in enumerate(offsets)
+            ]
+        )
+
+    rows("DESI Legacy Surveys DR10", [0.0], type="REX").to_csv(tmp_path / "desi_legacy.csv", index=False)
+    rows("Pan-STARRS1 DR2 MeanObject", [0.31, -0.36]).to_csv(tmp_path / "panstarrs1.csv", index=False)
+    rows("SDSS DR18 PhotoObj", [0.37]).to_csv(tmp_path / "sdss.csv", index=False)
+    tid = "39628481746698530"  # DR9 south target: no LS DR10 identifier match
+    rows("DESI DR1 spectroscopy", [0.0]).assign(catalog_object_id=tid).to_csv(tmp_path / "desi_spec.csv", index=False)
+    rows("DESI DR1 FastSpecFit", [0.0]).assign(catalog_object_id=tid).to_csv(tmp_path / "desi_fsf.csv", index=False)
+    out = tmp_path / "assoc.csv"
+    _stage1().run(tmp_path, out)
+    a = pd.read_csv(out).set_index("catalog").object_id
+    assert a["DESI DR1 spectroscopy"] == a["DESI Legacy Surveys DR10"] == a["DESI DR1 FastSpecFit"]
