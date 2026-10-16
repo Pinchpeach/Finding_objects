@@ -25,7 +25,7 @@ if str(Path(__file__).resolve().parent) not in sys.path:  # loaded by file path 
 # Lab can stall).  Its HTTP session has a timeout, so an abandoned attempt
 # thread ends instead of piling up (pyvo's default session has none; 2.23.0).
 from desi_legacy import TAP_URL, _query_with_retries, _service  # noqa: F401 (TAP_URL: benchmark)
-from _catalog_utils import empty_frame, save_csv
+from _catalog_utils import empty_frame, save_csv, unique_positions
 
 save = save_csv  # collector API: save(df, path)
 
@@ -87,4 +87,6 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     df.insert(2, "object_name", "DESI " + df["catalog_object_id"])
     df.insert(3, "ra", pd.to_numeric(df["target_ra"], errors="coerce"))
     df.insert(4, "dec", pd.to_numeric(df["target_dec"], errors="coerce"))
-    return df.drop_duplicates("catalog_object_id", keep="last").reset_index(drop=True)
+    df = df.drop_duplicates("catalog_object_id", keep="last")
+    # One row per sky position, as in desi_spectroscopy (2.28.0).
+    return unique_positions(df, 0.5).reset_index(drop=True)

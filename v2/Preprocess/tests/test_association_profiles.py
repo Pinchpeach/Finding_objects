@@ -90,7 +90,13 @@ def test_desi_spectrum_joins_its_shredded_ls_galaxy(tmp_path):
     def rows(cat, offsets, **cols):
         return pd.DataFrame(
             [
-                {"catalog": cat, "catalog_object_id": f"{cat[:4]}{i}", "ra": 250.0 + dx / 3600 / cosd, "dec": dec, **cols}
+                {
+                    "catalog": cat,
+                    "catalog_object_id": f"{cat[:4]}{i}",
+                    "ra": 250.0 + dx / 3600 / cosd,
+                    "dec": dec,
+                    **cols,
+                }
                 for i, dx in enumerate(offsets)
             ]
         )
@@ -105,3 +111,32 @@ def test_desi_spectrum_joins_its_shredded_ls_galaxy(tmp_path):
     _stage1().run(tmp_path, out)
     a = pd.read_csv(out).set_index("catalog").object_id
     assert a["DESI DR1 spectroscopy"] == a["DESI Legacy Surveys DR10"] == a["DESI DR1 FastSpecFit"]
+
+
+def test_duplicate_spectrum_does_not_move_to_a_neighbour(tmp_path):
+    # Field RA 20 (2.28.0): two DESI spectra of one target; the second must
+    # not attach to a GALEX detection 1.6" away.
+    import pandas as pd
+
+    def one(cat, dx, cid, **cols):
+        return {"catalog": cat, "catalog_object_id": cid, "ra": 20.0 + dx / 3600, "dec": 0.0, **cols}
+
+    pd.DataFrame([one("DESI Legacy Surveys DR10", 0.0, "L1", type="EXP")]).to_csv(tmp_path / "ls.csv", index=False)
+    # A star 3.0" away makes the GALEX detection between them ambiguous, so it
+    # stands alone, as in the field.
+    pd.DataFrame([one("Gaia DR3", 3.0, "S1")]).to_csv(tmp_path / "gaia.csv", index=False)
+    pd.DataFrame([one("GALEX AIS", 1.62, "G1")]).to_csv(tmp_path / "galex.csv", index=False)
+    pd.DataFrame(
+        [
+            one("DESI DR1 spectroscopy", 0.02, "39627785060228797"),
+            one("DESI DR1 spectroscopy", 0.01, "39627785060228111"),
+        ]
+    ).to_csv(tmp_path / "spec.csv", index=False)
+    out = tmp_path / "assoc.csv"
+    _stage1().run(tmp_path, out)
+    a = pd.read_csv(out)
+    ls_obj = a.loc[a.catalog.eq("DESI Legacy Surveys DR10"), "object_id"].iloc[0]
+    spec_objs = set(a.loc[a.catalog.eq("DESI DR1 spectroscopy"), "object_id"])
+    assert ls_obj in spec_objs  # one spectrum on its target
+    for oid in spec_objs - {ls_obj}:  # the duplicate stands alone, it joins nothing else
+        assert set(a.loc[a.object_id.eq(oid), "catalog"]) == {"DESI DR1 spectroscopy"}

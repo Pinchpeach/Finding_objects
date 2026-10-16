@@ -241,6 +241,7 @@ def run(raw_dir: Path, out: Path):
         # Time-domain events remain distinct from persistent host/catalog objects.
         # Event identity can later be linked to a host in a dedicated event layer.
         candidates = []
+        target_taken = False
         if det["entity_kind"] != "transient_event":
             # Accepted pairs lie within max(cap_anchor, cap_det) plus the PM
             # shifts: anchors with a cap above SMALL_CAP are in ``wide``.
@@ -252,7 +253,16 @@ def run(raw_dir: Path, out: Path):
                 nearby |= alias_groups.get(alias, set())
             for gi in sorted(nearby):
                 group = groups[gi]
-                if group["entity_kind"] == "transient_event" or det["catalog"] in group["catalogs"]:
+                if group["entity_kind"] == "transient_event":
+                    continue
+                if det["catalog"] in group["catalogs"]:
+                    # A second spectrum of a target already holding one is a
+                    # duplicate, not evidence for a neighbour (field RA 20).
+                    target_taken |= (
+                        det["catalog"] in TARGET_SPECTRA
+                        and TARGET_IMAGING in group["catalogs"]
+                        and assess_pair(group["anchor"], det)["separation_arcsec"] <= TARGET_MATCH_ARCSEC
+                    )
                     continue
                 shared_aliases = set(det.get("association_aliases") or ()) & set(group.get("aliases") or ())
                 if shared_aliases:
@@ -290,6 +300,8 @@ def run(raw_dir: Path, out: Path):
             candidates = alias_hits
         elif target_hits:
             candidates = [min(target_hits, key=lambda c: c[3]["separation_arcsec"])]
+        elif det["catalog"] in TARGET_SPECTRA and target_taken:
+            candidates = []
         ambiguous = len(candidates) > 1 and candidates[1][0] >= candidates[0][0] * AMBIG_SCORE_RATIO
 
         if candidates and not ambiguous:

@@ -76,6 +76,26 @@ def pick(df: pd.DataFrame, names):
     return None
 
 
+def unique_positions(df: pd.DataFrame, radius_arcsec: float, quality=None) -> pd.DataFrame:
+    """Keep one row per position: rows are taken best ``quality`` first and a
+    row within ``radius_arcsec`` of a kept row is dropped.  (A rounded-grid
+    key splits pairs that straddle a cell edge.)"""
+    import numpy as np
+
+    if len(df) < 2:
+        return df
+    q = pd.Series(0.0, index=df.index) if quality is None else pd.to_numeric(quality, errors="coerce").fillna(-np.inf)
+    d = df.loc[q.sort_values(ascending=False, kind="stable").index]
+    ra, dec = np.radians(d["ra"].to_numpy(float)), np.radians(d["dec"].to_numpy(float))
+    xyz = np.stack([np.cos(dec) * np.cos(ra), np.cos(dec) * np.sin(ra), np.sin(dec)], axis=1)
+    lim = math.cos(math.radians(radius_arcsec / 3600.0))
+    kept = []
+    for i in range(len(d)):
+        if not np.isfinite(xyz[i]).all() or not kept or (xyz[kept] @ xyz[i]).max() < lim:
+            kept.append(i)
+    return d.iloc[sorted(kept)]
+
+
 def numeric(series):
     return pd.to_numeric(series, errors="coerce")
 
