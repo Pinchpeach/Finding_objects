@@ -604,6 +604,8 @@ def test_2_28_elg_colours_star_forming():
     assert sc.galaxy_activity(red)[0] is None
     bright = dict(_ls_row({"g": 19.0, "r": 18.7, "z": 18.1}), primary_class="GALAXY")  # g < 20: low z
     assert sc.galaxy_activity(bright)[0] is None
+    faint = dict(_ls_row({"g": 24.6, "r": 24.3, "z": 23.7}), primary_class="GALAXY")  # beyond the validated depth
+    assert sc.galaxy_activity(faint)[0] is None
 
 
 def test_2_28_blue_diagram_without_halpha():

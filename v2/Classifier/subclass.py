@@ -1239,8 +1239,11 @@ W23_Q = 1.5
 # Faint galaxies (2.28.0): the DESI ELG colour box (Raichoor et al. 2023, AJ
 # 165, 126, Table 2; LS DR9 grz, dereddened AB): g > 20, r - z > 0.15,
 # g - r < 0.5 (r - z) + 0.1 selects [O II] emitters at 0.6 < z < 1.6 (the
-# g - r cut rejects stars and z < 0.6).  The g-fibre limit (24.1) is not
-# applied (fibre fluxes are not collected).  On the DESI benchmark galaxies
+# g - r cut rejects stars and z < 0.6).  Fibre fluxes are not collected, so
+# the g-fibre limit (24.1) is applied to the total g (fibre g >= total g, so
+# this keeps the validated range and a little more): fainter galaxies have
+# noisy colours and were never validated (field RA 20: 795 galaxies
+# labelled before this limit).  On the DESI benchmark galaxies
 # (desi_galaxy_activity: FastSpecFit EW([O II] 3726+3729); passive below 5 A,
 # Balogh et al. 1999, Dressler et al. 1999) 601 of 637 decided cases are
 # emitters (0.943; 0.932 / 0.950 on the two sets); a further 152 have
@@ -1250,7 +1253,7 @@ W23_Q = 1.5
 # 0.63 of its galaxies have EW([O II]) < 5 A.  Last in the chain, so any
 # spectrum, SIMBAD type, WISE or GALEX indicator decides first (those reach
 # only 3.6 % of the DESI benchmark galaxies; this adds 18 %).
-ELG_G_MIN = 20.0
+ELG_G_MIN, ELG_G_MAX = 20.0, 24.1
 
 
 def galaxy_activity(row):
@@ -1321,11 +1324,11 @@ def galaxy_activity(row):
     m = ls_dered_mags(row, ("g", "r", "z"))
     if m is not None:
         gr, rz = m["g"] - m["r"], m["r"] - m["z"]
-        if m["g"] > ELG_G_MIN and rz > 0.15 and gr < 0.5 * rz + 0.1:
+        if ELG_G_MIN < m["g"] <= ELG_G_MAX and rz > 0.15 and gr < 0.5 * rz + 0.1:
             return (
                 "STAR_FORMING",
                 "LS_ELG",
-                f"DESI ELG colours (Raichoor+2023): g = {m['g']:.2f} > 20, r-z = {rz:.2f} > 0.15, "
+                f"DESI ELG colours (Raichoor+2023): 20 < g = {m['g']:.2f} <= 24.1, r-z = {rz:.2f} > 0.15, "
                 f"g-r = {gr:.2f} < 0.5(r-z) + 0.1 ([O II] emitter at z > 0.6)",
             )
     return None, None, "no spectrum, mid-IR, UV or optical-colour activity indicator"
