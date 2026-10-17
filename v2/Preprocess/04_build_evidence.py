@@ -514,6 +514,28 @@ def evaluate(rule, row, namespaced=frozenset()):
             if v is not None:
                 feature(name, max(-3.0, min(6.0, v)), "dereddened AB colour")
                 feature(f"{name}_present", 1.0, "colour available")
+    elif rid == "LS-2COL-001":
+        # Two-colour-diagram offsets (2.29.0): signed distance from a published
+        # line in a colour-colour plane, i.e. a fixed ratio of two colours.
+        #  * Zhou et al. 2023 (AJ 165, 58, Eq. 1b): z - W1 > 0.8 (r - z) - 0.6
+        #    rejects stars by the 1.6 um bump of galaxies (and the QSO IR excess).
+        #  * Wu et al. 2012 (AJ 144, 49, Sect. 4): z - W1 > 0.66 (g - z) + 2.01
+        #    (W1 Vega; -0.69 in AB) separates quasars from stars.
+        #  * DESI stellar locus in g-r vs r-z (desitarget isQSO_colors veto):
+        #    |(g - r) - 1.53 (r - z) - 0.2| is small for stars.
+        # LS-COLOR-001 already gives the colours, so a straight line is linear
+        # in them; the offsets matter for the trees and for the |locus|
+        # distance, which is not linear.  Weights only from the Stage-5 fit.
+        gr, rz, zw = (num(row, f"ls_{c}_color") for c in ("g_r", "r_z", "z_w1"))
+        clip = lambda v: max(-3.0, min(6.0, v))
+        if rz is not None and zw is not None:
+            feature("zhou_offset", clip(zw - 0.8 * rz + 0.6), "z-W1 - [0.8(r-z) - 0.6] (Zhou+2023)")
+            feature("zhou_present", 1.0, "colours available")
+            if gr is not None:
+                feature("wu_offset", clip(zw - 0.66 * (gr + rz) + 0.69), "z-W1 - [0.66(g-z) - 0.69] (Wu+2012, AB)")
+        if gr is not None and rz is not None:
+            feature("locus_abs", min(3.0, abs(gr - 1.53 * rz - 0.2)), "|g-r - 1.53(r-z) - 0.2| (stellar locus)")
+            feature("locus_present", 1.0, "colours available")
     elif rid == "RADIO-001":
         # Radio loudness R = 0.4 (r - t), t = -2.5 log10(S_1.4GHz / 3631 Jy)
         # (Ivezic et al. 2002, AJ 124, 2364; radio-loud R > 1).  Radio-loud
