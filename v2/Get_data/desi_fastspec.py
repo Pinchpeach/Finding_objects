@@ -33,7 +33,14 @@ CATALOG = "DESI DR1 FastSpecFit"
 TABLE = "desi_dr1.agngal"
 LINES = {"ha": "halpha", "hb": "hbeta", "oiii5007": "oiii_5007", "nii6584": "nii_6584"}
 EXTRA = ["halpha_broad_flux", "halpha_broad_flux_ivar", "halpha_broad_sigma", "opt_uv_type", "agn_maskbits"]
+# [O II] 3726+3729 (2.28.1): the doublet, summed, for galaxies whose H-alpha
+# is beyond the spectrum (z > 0.49); Classifier/subclass.py blue diagram.
+OII = ("oii_3726", "oii_3729")
 LINE_FIELDS = [f"line_{k}_{s}" for k in LINES for s in ("flux", "flux_err")] + [
+    "line_oii3727_flux",
+    "line_oii3727_flux_err",
+    "line_oii3727_ew",
+    "line_oii3727_ew_err",
     "line_ha_ew",
     "line_nii6584_ew",
     "line_source",
@@ -49,6 +56,15 @@ def standardise(df: pd.DataFrame) -> pd.DataFrame:
         ok = iv > 0
         out[f"line_{k}_flux"] = f.where(ok)
         out[f"line_{k}_flux_err"] = 1.0 / np.sqrt(iv.where(ok))
+    for kind in ("flux", "ew"):
+        if not all(f"{o}_{kind}_ivar" in out for o in OII):  # older queries without [O II]
+            out[f"line_oii3727_{kind}"] = out[f"line_oii3727_{kind}_err"] = np.nan
+            continue
+        v = [pd.to_numeric(out.get(f"{o}_{kind}"), errors="coerce") for o in OII]
+        iv = [pd.to_numeric(out.get(f"{o}_{kind}_ivar"), errors="coerce") for o in OII]
+        ok = (iv[0] > 0) & (iv[1] > 0)  # both lines fitted
+        out[f"line_oii3727_{kind}"] = (v[0] + v[1]).where(ok)
+        out[f"line_oii3727_{kind}_err"] = np.sqrt(1.0 / iv[0].where(ok) + 1.0 / iv[1].where(ok))
     ew = pd.to_numeric(out.get("halpha_ew"), errors="coerce")
     ewiv = pd.to_numeric(out.get("halpha_ew_ivar"), errors="coerce")
     out["line_ha_ew"] = ew.where(ewiv > 0)
@@ -69,6 +85,7 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
         *[f"{s}_{x}" for s in LINES.values() for x in ("flux", "flux_ivar")],
         "halpha_ew",
         "halpha_ew_ivar",
+        *[f"{o}_{k}" for o in OII for k in ("flux", "flux_ivar", "ew", "ew_ivar")],
         *EXTRA,
     ]
     query = (
