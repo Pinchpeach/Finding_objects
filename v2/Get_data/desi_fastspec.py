@@ -33,7 +33,7 @@ CATALOG = "DESI DR1 FastSpecFit"
 TABLE = "desi_dr1.agngal"
 LINES = {"ha": "halpha", "hb": "hbeta", "oiii5007": "oiii_5007", "nii6584": "nii_6584"}
 EXTRA = ["halpha_broad_flux", "halpha_broad_flux_ivar", "halpha_broad_sigma", "opt_uv_type", "agn_maskbits"]
-# [O II] 3726+3729 (2.28.1): the doublet, summed, for galaxies whose H-alpha
+# [O II] 3726+3729 (2.28.0): the doublet, summed, for galaxies whose H-alpha
 # is beyond the spectrum (z > 0.49); Classifier/subclass.py blue diagram.
 OII = ("oii_3726", "oii_3729")
 LINE_FIELDS = [f"line_{k}_{s}" for k in LINES for s in ("flux", "flux_err")] + [
@@ -41,6 +41,8 @@ LINE_FIELDS = [f"line_{k}_{s}" for k in LINES for s in ("flux", "flux_err")] + [
     "line_oii3727_flux_err",
     "line_oii3727_ew",
     "line_oii3727_ew_err",
+    "line_hb_ew",
+    "line_hb_ew_err",
     "line_ha_ew",
     "line_nii6584_ew",
     "line_source",
@@ -65,6 +67,11 @@ def standardise(df: pd.DataFrame) -> pd.DataFrame:
         ok = (iv[0] > 0) & (iv[1] > 0)  # both lines fitted
         out[f"line_oii3727_{kind}"] = (v[0] + v[1]).where(ok)
         out[f"line_oii3727_{kind}_err"] = np.sqrt(1.0 / iv[0].where(ok) + 1.0 / iv[1].where(ok))
+    if "hbeta_ew_ivar" in out:
+        ew, iv = (pd.to_numeric(out[c], errors="coerce") for c in ("hbeta_ew", "hbeta_ew_ivar"))
+        out["line_hb_ew"], out["line_hb_ew_err"] = ew.where(iv > 0), 1.0 / np.sqrt(iv.where(iv > 0))
+    else:
+        out["line_hb_ew"] = out["line_hb_ew_err"] = np.nan
     ew = pd.to_numeric(out.get("halpha_ew"), errors="coerce")
     ewiv = pd.to_numeric(out.get("halpha_ew_ivar"), errors="coerce")
     out["line_ha_ew"] = ew.where(ewiv > 0)
@@ -86,6 +93,8 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
         "halpha_ew",
         "halpha_ew_ivar",
         *[f"{o}_{k}" for o in OII for k in ("flux", "flux_ivar", "ew", "ew_ivar")],
+        "hbeta_ew",
+        "hbeta_ew_ivar",
         *EXTRA,
     ]
     query = (

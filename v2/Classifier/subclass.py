@@ -69,6 +69,7 @@ RULE_PRECISION: dict[str, float] = _load_precision()
 # Rules that never fire on the SDSS train split take their precision from the
 # benchmark that validated them (2.28.0).
 RULE_PRECISION.setdefault("LS_ELG", 0.943)  # DESI benchmark galaxies (see ELG_G_MIN)
+RULE_PRECISION.setdefault("DESI_BLUE", 0.857)  # DESI galaxies vs BPT (see _blue_diagram)
 
 # Casagrande & VandenBerg (2018, MNRAS 479, L102): Gaia extinction
 # coefficients per E(B-V); E(BP-RP) = (3.374 - 2.035) E(B-V), A_G ~ 2.740 E(B-V).
@@ -1183,10 +1184,47 @@ def _galaxy_lines(row, prefix, tag):
             return "COMPOSITE", f"{tag}_WHAN", f"{pos} in -0.4..-0.2 (composite; Stasinska+2006)"
         kind = "strong" if w > 6.0 else "weak"
         return "AGN", f"{tag}_WHAN", f"{pos} >= -0.2 ({kind} AGN; WHAN, Stasinska+2006)"
+    if ha is None:
+        blue = _blue_diagram(row, prefix, tag, hb, hb_sn, o3, o3_sn)
+        if blue is not None:
+            return blue
     d4 = _num(row, f"{prefix}d4000_n")
     if d4 is not None and d4 >= D4000_OLD and w is None:
         return "QUIESCENT", f"{tag}_D4000", f"Dn4000 = {d4:.2f} >= {D4000_OLD} (old stellar population)"
     return None
+
+
+# Blue diagram (2.28.0) for galaxies whose H-alpha is beyond the spectrum
+# (DESI at z > 0.49): x = log EW([O II] 3726+3729) / EW(H-beta), y = log
+# [O III] 5007 / H-beta (Lamareille 2010, A&A 509, A53; EW ratios remove the
+# direct reddening dependence).  FastSpecFit gives no [O III] EW, so y is the
+# flux ratio (5007 and 4861 A share the continuum).  Star-forming below
+# y = 0.11 / (x - 0.92) + 0.85 (Eq. 1) and at y <= 0.3 (Eq. 2, the SF/Sy2
+# mixed region above); the SF-LIN/composite region (Eq. 3) counts as
+# star-forming, as it is 79 % star-forming in Lamareille's SDSS test.
+# Measured on 620 DESI galaxies at z < 0.5 classified by the BPT from the same
+# spectra (benchmark/desi_galaxy_activity, S/N >= 3 as for the BPT): 318 of
+# 371 star-forming (0.857), 47 composite, 6 AGN; Lamareille reports 16 %
+# contamination, mostly composites.  209 of the 2,623 benchmark galaxies
+# without H-alpha are decided.  The AGN side is not used: 13 of 44 were
+# AGN by the BPT (0.30).  An [O II] EW < 5 A "passive" cut (Balogh et al.
+# 1999) was not adopted: only 0.58 of such galaxies are retired by WHAN;
+# [O II] also comes from LINER-like emission in red galaxies (Yan et al.
+# 2006) and dusty star formation weakens it.
+
+
+def _blue_diagram(row, prefix, tag, hb, hb_sn, o3, o3_sn):
+    o2w, o2e = _num(row, f"{prefix}line_oii3727_ew"), _num(row, f"{prefix}line_oii3727_ew_err")
+    hbw, hbe = _num(row, f"{prefix}line_hb_ew"), _num(row, f"{prefix}line_hb_ew_err")
+    if None in (o2w, o2e, hbw, hbe, hb, hb_sn, o3, o3_sn) or min(o2w, hbw, hb, o3, o2e, hbe) <= 0:
+        return None
+    if min(o2w / o2e, hbw / hbe, hb_sn, o3_sn) < LINE_SNR:
+        return None
+    x, y = math.log10(o2w / hbw), math.log10(o3 / hb)
+    if x >= 0.92 or y > 0.11 / (x - 0.92) + 0.85 or y > 0.3:
+        return None  # AGN or SF/Sy2 mixed: not decided (see above)
+    pos = f"log EW([O II])/EW(Hb) = {x:.2f}, log [O III]/Hb = {y:.2f}"
+    return "STAR_FORMING", f"{tag}_BLUE", f"{pos}: star-forming side of the blue diagram (Lamareille 2010)"
 
 
 # WISE W2-W3 sequence (Jarrett et al. 2017, ApJ 836, 182; 2019, ApJS 245,

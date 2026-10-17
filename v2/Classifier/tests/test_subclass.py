@@ -604,3 +604,24 @@ def test_2_28_elg_colours_star_forming():
     assert sc.galaxy_activity(red)[0] is None
     bright = dict(_ls_row({"g": 19.0, "r": 18.7, "z": 18.1}), primary_class="GALAXY")  # g < 20: low z
     assert sc.galaxy_activity(bright)[0] is None
+
+
+def test_2_28_blue_diagram_without_halpha():
+    sc = _sc()
+    p = "desi_dr1_fastspecfit__"
+    sf = {
+        f"{p}line_hb_flux": 10.0,
+        f"{p}line_hb_flux_err": 1.0,
+        f"{p}line_oiii5007_flux": 5.0,  # log [O III]/Hb = -0.30
+        f"{p}line_oiii5007_flux_err": 1.0,
+        f"{p}line_hb_ew": 10.0,
+        f"{p}line_hb_ew_err": 1.0,
+        f"{p}line_oii3727_ew": 20.0,  # log EW([O II])/EW(Hb) = 0.30
+        f"{p}line_oii3727_ew_err": 2.0,
+    }
+    act, rule, _ = sc.galaxy_lines(sf)
+    assert (act, rule) == ("STAR_FORMING", "DESI_BLUE")
+    agn = dict(sf, **{f"{p}line_oiii5007_flux": 60.0})  # log [O III]/Hb = 0.78: AGN side, not decided
+    assert sc.galaxy_lines(agn) is None
+    with_ha = dict(sf, **{f"{p}line_ha_flux": 30.0, f"{p}line_ha_flux_err": 1.0})
+    assert sc.galaxy_lines(with_ha) is None or sc.galaxy_lines(with_ha)[1] != "DESI_BLUE"  # H-alpha routes first
