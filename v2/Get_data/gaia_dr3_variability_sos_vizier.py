@@ -19,7 +19,7 @@ from __future__ import annotations
 from pathlib import Path
 import pandas as pd
 
-from _catalog_utils import add_standard_metadata, coordinates, pick
+from _catalog_utils import add_standard_metadata, coordinates, empty_frame, pick, vizier_cone
 
 CATALOG = "Gaia DR3 variability SOS"
 TABLES = {
@@ -102,11 +102,6 @@ def fetch(ra: float, dec: float, radius_arcmin: float, kinds: tuple[str, ...] | 
     collection omits it and gathers all three products; a class-specific
     validation query can request only its relevant SOS table.
     """
-    from astroquery.vizier import Vizier
-    from astropy.coordinates import SkyCoord
-    import astropy.units as u
-
-    centre = SkyCoord(float(ra) * u.deg, float(dec) * u.deg, frame="icrs")
     pieces: list[pd.DataFrame] = []
     requested = TABLES.keys() if kinds is None else tuple(kinds)
     unknown = set(requested) - set(TABLES)
@@ -114,15 +109,11 @@ def fetch(ra: float, dec: float, radius_arcmin: float, kinds: tuple[str, ...] | 
         raise ValueError(f"unknown Gaia SOS product(s): {sorted(unknown)}")
     for key in requested:
         table, columns = TABLES[key]
-        tabs = Vizier(columns=columns, row_limit=-1).query_region(
-            centre, radius=float(radius_arcmin) * u.arcmin, catalog=table
-        )
-        if tabs:
-            frame = tabs[0].to_pandas()
-            if not frame.empty:
-                pieces.append(PARSERS[key](frame, radius_arcmin))
+        frame = vizier_cone(table, ra, dec, radius_arcmin, columns)
+        if frame is not None and not frame.empty:
+            pieces.append(PARSERS[key](frame, radius_arcmin))
     if not pieces:
-        return pd.DataFrame(columns=["catalog", "catalog_object_id", "object_name", "ra", "dec"])
+        return empty_frame()
     out = pd.concat(pieces, ignore_index=True, sort=False)
     return (
         out.dropna(subset=["catalog_object_id", "ra", "dec"])

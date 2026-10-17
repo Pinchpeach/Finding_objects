@@ -10,13 +10,20 @@ import argparse
 from pathlib import Path
 import numpy as np
 import pandas as pd
-import importlib.util as _tio_u
+import importlib.util
 
-_tio_s = _tio_u.spec_from_file_location(
-    "v2_table_io", Path(__file__).resolve().parents[1] / "Preprocess" / "table_io.py"
-)
-TABLE_IO = _tio_u.module_from_spec(_tio_s)
-_tio_s.loader.exec_module(TABLE_IO)
+
+def _load(name, path):
+    spec = importlib.util.spec_from_file_location(name, path)
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    return m
+
+
+_V2 = Path(__file__).resolve().parents[1]
+TABLE_IO = _load("v2_table_io", _V2 / "Preprocess" / "table_io.py")
+# SIMBAD otype hierarchy (catalog_confidence_simbad_type); loaded once, not per run().
+OTYPES = _load("v2_simbad_otypes_s3", _V2 / "Classifier" / "simbad_otypes.py")
 
 
 def safe_div(a, b):
@@ -45,9 +52,9 @@ def run(objects: Path, rules_path: Path, out: Path) -> Path:
 
     gaia = lambda n: field("gaia_dr3", n)
     if gaia("parallax") and gaia("parallax_error"):
-        plx, eplx = df[gaia("parallax")], df[gaia("parallax_error")]
-        derived["parallax_snr"] = safe_div(pd.to_numeric(plx, errors="coerce").abs(), eplx)
-        derived["normalized_corrected_parallax"] = safe_div((pd.to_numeric(plx, errors="coerce") + 0.017).abs(), eplx)
+        plx, eplx = pd.to_numeric(df[gaia("parallax")], errors="coerce"), df[gaia("parallax_error")]
+        derived["parallax_snr"] = safe_div(plx.abs(), eplx)
+        derived["normalized_corrected_parallax"] = safe_div((plx + 0.017).abs(), eplx)
     pm = [gaia(c) for c in ("pmra", "pmra_error", "pmdec", "pmdec_error")]
     if all(pm):
         a = safe_div(df[pm[0]], df[pm[1]])
@@ -135,6 +142,9 @@ def run(objects: Path, rules_path: Path, out: Path) -> Path:
         return (22.5 - 2.5 * np.log10((flux / trans).where(ok))).where(ok)
 
     ls_mags = {b: ls_mag(b) for b in ("g", "r", "z", "w1", "w2")}
+    if ls_mags["r"] is not None:
+        # Dereddened r (AB) for flux ratios against radio / X-ray (2.26.0).
+        derived["ls_r_mag"] = ls_mags["r"]
     for b1, b2 in (("g", "r"), ("r", "z"), ("z", "w1"), ("w1", "w2")):
         if ls_mags[b1] is not None and ls_mags[b2] is not None:
             derived[f"ls_{b1}_{b2}_color"] = ls_mags[b1] - ls_mags[b2]
@@ -188,16 +198,15 @@ def run(objects: Path, rules_path: Path, out: Path) -> Path:
 
     # PS1 morphology: propagate PSF and Kron magnitude errors into the separator
     # and use distance from the documented 0.05-mag boundary in sigma units.
-    if derived:
-        delta = derived.get("ps1_i_psf_minus_kron")
-        pe = derived.get("ps1_i_psf_mag_err")
-        ke = derived.get("ps1_i_kron_mag_err")
-        imag = psf_mag.get("i")
-        if delta is not None and pe is not None and ke is not None and imag is not None:
-            sig = np.sqrt(pe * pe + ke * ke)
-            z = (delta - 0.05).abs() / sig.where(sig > 0)
-            q = (z / (z + 1)).where((imag >= 14) & (imag <= 21))
-            conf["catalog_confidence_ps1_morphology"] = q.where(hascat("Pan-STARRS1"))
+    delta = derived.get("ps1_i_psf_minus_kron")
+    pe = derived.get("ps1_i_psf_mag_err")
+    ke = derived.get("ps1_i_kron_mag_err")
+    imag = psf_mag.get("i")
+    if delta is not None and pe is not None and ke is not None and imag is not None:
+        sig = np.sqrt(pe * pe + ke * ke)
+        z = (delta - 0.05).abs() / sig.where(sig > 0)
+        q = (z / (z + 1)).where((imag >= 14) & (imag <= 21))
+        conf["catalog_confidence_ps1_morphology"] = q.where(hascat("Pan-STARRS1"))
 
     # AllWISE: Stern et al. AGN selection used W1/W2 SNR>=10, isolated sources
     # (nb<=2), and artifact-free W1/W2 photometry. The index measures how fully
@@ -268,15 +277,8 @@ def run(objects: Path, rules_path: Path, out: Path) -> Path:
         # Same hierarchy as Stage 4's SIMBAD-TYPE-001 (2.22.0): every child of
         # a mapped type is curated evidence; the old exact-code set gave the
         # children reliability 0, so Stage 4 emitted nothing for them (2.23.0).
-        import importlib.util as ilu
-
-        spec = ilu.spec_from_file_location(
-            "v2_simbad_otypes_s3", Path(__file__).resolve().parents[1] / "Classifier" / "simbad_otypes.py"
-        )
-        ot = ilu.module_from_spec(spec)
-        spec.loader.exec_module(ot)
         coarse = {"QSO": "QSO", "AGN": "EXTRAGALACTIC", "G": "GALAXY", "*": "STAR"}
-        typed = tcol("otype", "simbad").astype(str).map(lambda t: ot.resolve(str(t).strip(), coarse)[0] is not None)
+        typed = tcol("otype", "simbad").astype(str).map(lambda t: OTYPES.resolve(str(t).strip(), coarse)[0] is not None)
         conf["catalog_confidence_simbad_type"] = typed.astype(float).mul(0.8).where(hascat("SIMBAD"))
 
     if derived:

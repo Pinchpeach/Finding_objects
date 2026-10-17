@@ -18,6 +18,9 @@ def main():
     p.add_argument("--catalog-root", type=Path, required=True)
     p.add_argument("--out", type=Path, required=True)
     p.add_argument("--allow-unbalanced", action="store_true")
+    # 2.26.0: the DESI fusion-training set (benchmark/desi_fusion) is used for
+    # training only; the SDSS / DESI external test splits stay the reference.
+    p.add_argument("--split-all", choices=("train", "calibration", "test"), default=None)
     a = p.parse_args()
     truth = pd.read_csv(a.truth)
     a.out.mkdir(parents=True, exist_ok=True)
@@ -34,11 +37,8 @@ def main():
     elif any(counts.get(c, 0) < 20 for c in CLASSES):
         raise AssertionError(f"unbalanced benchmark still requires >=20 examples per class; got {counts}")
     manifest = truth[["benchmark_id", "truth_class", "ra", "dec"]].copy()
-    manifest["split"] = manifest.benchmark_id.map(split_for)
+    manifest["split"] = a.split_all or manifest.benchmark_id.map(split_for)
     reports = []
-    problems = []
-    active_catalogs = []
-    excluded_catalogs = []
     files = sorted([*a.catalog_root.rglob("*_trd.csv"), *a.catalog_root.rglob("*_trd.csv.gz")])
     for f in files:
         cat = f.name.split("_trd.csv")[0]
@@ -60,18 +60,17 @@ def main():
                 if "match_threshold_arcsec" in d:
                     sep_bad = int((s > pd.to_numeric(d.match_threshold_arcsec, errors="coerce")).sum())
         matched = len(d)
-        coverage_fraction = (matched / len(truth)) if len(truth) else 0.0
-        use_for_model_validation = matched > 0 and not (dup or bad_class or bad_coord or sep_bad)
-        exclusion_reason = (
-            "" if use_for_model_validation else ("zero_coverage" if matched == 0 else "validation_problem")
-        )
+        bad = bool(dup or bad_class or bad_coord or sep_bad)  # all zero when matched == 0
+        use_for_model_validation = matched > 0 and not bad
         reports.append(
             {
                 "catalog": cat,
                 "matched": matched,
-                "coverage_fraction": coverage_fraction,
+                "coverage_fraction": matched / len(truth),  # truth is non-empty (asserted above)
                 "use_for_model_validation": use_for_model_validation,
-                "exclusion_reason": exclusion_reason,
+                "exclusion_reason": (
+                    "" if use_for_model_validation else ("validation_problem" if bad else "zero_coverage")
+                ),
                 "duplicates": dup,
                 "bad_truth_class": bad_class,
                 "bad_coordinates": bad_coord,
@@ -80,14 +79,18 @@ def main():
                 **{c: int((d.truth_class == c).sum()) if len(d) and "truth_class" in d else 0 for c in CLASSES},
             }
         )
-        if use_for_model_validation:
-            active_catalogs.append(cat)
-        else:
-            excluded_catalogs.append(
-                {"catalog": cat, "reason": exclusion_reason, "matched": matched, "coverage_fraction": coverage_fraction}
-            )
-        if dup or bad_class or bad_coord or sep_bad:
-            problems.append(cat)
+    active_catalogs = [r["catalog"] for r in reports if r["use_for_model_validation"]]
+    excluded_catalogs = [
+        {
+            "catalog": r["catalog"],
+            "reason": r["exclusion_reason"],
+            "matched": r["matched"],
+            "coverage_fraction": r["coverage_fraction"],
+        }
+        for r in reports
+        if not r["use_for_model_validation"]
+    ]
+    problems = [r["catalog"] for r in reports if r["exclusion_reason"] == "validation_problem"]
     pd.DataFrame(reports).to_csv(a.out / "catalog_validation.csv", index=False)
     manifest.to_csv(a.out / "benchmark_manifest.csv", index=False)
     split_counts = manifest.groupby(["split", "truth_class"]).size().unstack(fill_value=0)

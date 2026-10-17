@@ -7,7 +7,7 @@ the exact same XP-available rows for a fair comparison.
 """
 
 from __future__ import annotations
-import argparse, hashlib, importlib.util, json
+import argparse, importlib.util, json
 from pathlib import Path
 import numpy as np
 import pandas as pd
@@ -32,17 +32,14 @@ ROOT = Path(__file__).resolve().parent
 CLASSES = ["DA", "DB"]
 
 
-def load_core():
-    p = ROOT / "train_validate_star_wd.py"
-    s = importlib.util.spec_from_file_location("starwd_core", p)
-    m = importlib.util.module_from_spec(s)
-    s.loader.exec_module(m)
-    return m
-
-
-def split_for(bid):
-    x = int(hashlib.sha256(("wd-subtype:" + str(bid)).encode()).hexdigest()[:8], 16) % 10
-    return "train" if x < 6 else ("calibration" if x < 8 else "test")
+# Same split and Gaia-broadband core as the broadband DA/DB validation (one
+# definition: the XP and broadband models must see the same train / test rows).
+# Also used as core.split_for by fit_wd_subtype_xp_model.py and
+# validate_wd_subtype_xp_external.py.
+_s = importlib.util.spec_from_file_location("wd_subtype_broadband", ROOT / "train_validate_wd_subtype.py")
+_BROADBAND = importlib.util.module_from_spec(_s)
+_s.loader.exec_module(_BROADBAND)
+load_core, split_for = _BROADBAND.load_core, _BROADBAND.split_for
 
 
 def metrics(y, pred, p=None, classes=None):

@@ -1,29 +1,17 @@
 """HASH planetary-nebula catalogue collector via CDS VizieR."""
 
 from __future__ import annotations
-from pathlib import Path
 import pandas as pd
-from _catalog_utils import pick, coordinates, add_standard_metadata
+from _catalog_utils import add_standard_metadata, coordinates, empty_frame, pick, save_csv, vizier_cone
 
 CATALOG = "HASH PN Catalog"
 VIZIER_CATALOG = "V/163/pnmain"
 
 
 def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
-    from astroquery.vizier import Vizier
-    from astropy.coordinates import SkyCoord
-    import astropy.units as u
-
-    result = Vizier(columns=["**"], row_limit=-1).query_region(
-        SkyCoord(float(ra) * u.deg, float(dec) * u.deg, frame="icrs"),
-        radius=float(radius_arcmin) * u.arcmin,
-        catalog=VIZIER_CATALOG,
-    )
-    if not result:
-        return pd.DataFrame(columns=["catalog", "catalog_object_id", "object_name", "ra", "dec"])
-    df = result[0].to_pandas()
-    if df.empty:
-        return pd.DataFrame(columns=["catalog", "catalog_object_id", "object_name", "ra", "dec"])
+    df = vizier_cone(VIZIER_CATALOG, ra, dec, radius_arcmin)
+    if df is None or df.empty:
+        return empty_frame()
     idc = pick(df, ["HASH", "PNG", "Name"])
     namec = pick(df, ["Name", "PNG", "HASH"])
     statusc = pick(df, ["Status", "stat", "PNstat"])
@@ -43,9 +31,5 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     return out.dropna(subset=["ra", "dec"]).drop_duplicates("catalog_object_id", keep="last").reset_index(drop=True)
 
 
-def save(df: pd.DataFrame, path: str | Path) -> None:
-    required = {"catalog", "catalog_object_id", "object_name", "ra", "dec"}
-    if not required.issubset(df.columns):
-        raise ValueError("invalid HASH PN output")
-    Path(path).parent.mkdir(parents=True, exist_ok=True)
-    df.drop_duplicates("catalog_object_id", keep="last").to_csv(path, index=False)
+def save(df: pd.DataFrame, path) -> None:
+    save_csv(df, path, "HASH PN")

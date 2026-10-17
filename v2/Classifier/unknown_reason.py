@@ -44,13 +44,12 @@ def _ls_snr(row):
 
 def _single(row, cat):
     if cat == "Pan-STARRS1 DR2 MeanObject":
-        valid = any(_num(row, f"std_mag__ps1_{b}") is not None for b in "grizy")
+        bands = [b for b in "grizy" if _num(row, f"std_mag__ps1_{b}") is not None]
         n = _num(row, "pan_starrs1_dr2_meanobject__nDetections")
-        if not valid:
+        if not bands:
             return "Pan-STARRS1 detection without valid mean photometry" + (
                 f" ({int(n)} detections)" if n is not None else ""
             )
-        bands = [b for b in "grizy" if _num(row, f"std_mag__ps1_{b}") is not None]
         i = _num(row, "std_mag__ps1_i")
         if len(bands) < 3:
             return (

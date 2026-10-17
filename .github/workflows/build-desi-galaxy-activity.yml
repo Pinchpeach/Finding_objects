@@ -1,0 +1,38 @@
+name: DESI benchmark galaxy FastSpecFit lines
+
+# FastSpecFit lines and Dn4000 of the DESI benchmark galaxies (2.28.0):
+# truth for photometric galaxy-activity criteria on faint galaxies.
+# Writes only its own directory (desi_galaxy_activity), never the DESI truth
+# sets.  Manual only, like every workflow that rewrites benchmark data (its
+# first run used a push trigger: a new workflow cannot be dispatched before it
+# reaches the default branch).
+on:
+  workflow_dispatch:
+concurrency:
+  group: desi-galaxy-activity-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pandas numpy astropy astroquery pyvo
+      - name: Build
+        run: python -u v2/benchmark/build_desi_galaxy_activity_truth.py
+      - name: Commit
+        if: ${{ !cancelled() }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add v2/benchmark/desi_galaxy_activity || true
+          if git diff --cached --quiet; then echo "nothing to commit"; exit 0; fi
+          git commit -m "DESI benchmark galaxy FastSpecFit lines"
+          bash .github/scripts/push_with_retry.sh "${{ github.ref_name }}"

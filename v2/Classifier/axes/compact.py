@@ -1,14 +1,17 @@
 """Compact-object axis with conservative catalog evidence."""
 
 from __future__ import annotations
-import math
+import functools, math
 import importlib.util as _ilu
 from pathlib import Path as _P
 
-_s = _ilu.spec_from_file_location("v2_simbad_otypes", _P(__file__).resolve().parents[1] / "simbad_otypes.py")
-OTYPES = _ilu.module_from_spec(_s)
-_s.loader.exec_module(OTYPES)
+_s = _ilu.spec_from_file_location("v2_classifier_rowutil", _P(__file__).resolve().parents[1] / "_rowutil.py")
+ROW = _ilu.module_from_spec(_s)
+_s.loader.exec_module(ROW)
+OTYPES = ROW.OTYPES
+_num, _text, _bool = ROW.num, ROW.text, ROW.flag
 AXIS = "compact"
+_result = functools.partial(ROW.axis_result, AXIS)
 CLASSES = ("NS", "PULSAR", "PULSAR_CANDIDATE", "XRB", "COMPACT_COMPANION_CANDIDATE", "OTHER_COMPACT", "UNKNOWN")
 # Radio pulsar candidate without the ATNF catalogue (2.6.3; revised 2.10.0).
 # Pulsars have steep spectra (alpha ~ -1.6; Jankowski et al. 2018, Bates et
@@ -87,95 +90,39 @@ def radio_pulsar_evidence(row):
     return ev
 
 
-def _bool(row, key):
-    v = row.get(key)
-    if v is None:
-        return False
-    if isinstance(v, bool):
-        return v
-    return str(v).strip().lower() in {"1", "1.0", "true", "t", "yes"}
-
-
-def _text(row, key):
-    v = row.get(key)
-    if v is None:
-        return None
-    v = str(v).strip()
-    return None if not v or v.lower() == "nan" else v
-
-
-def _num(row, key):
-    try:
-        v = float(row.get(key))
-        return v if math.isfinite(v) else None
-    except Exception:
-        return None
-
-
 def classify(row):
     catalogs = _text(row, "catalogs") or ""
     if "ATNF Pulsar Catalog" in catalogs:
         assoc = _num(row, "association_confidence__atnf_pulsar_catalog")
-        return {
-            "axis": AXIS,
-            "label": "PULSAR",
-            "confidence": assoc,
-            "status": "ATNF_CATALOG_MATCH",
-            "evidence": [
+        return _result(
+            "PULSAR",
+            assoc,
+            "ATNF_CATALOG_MATCH",
+            [
                 {
                     "kind": "atnf_pulsar_catalog_counterpart",
                     "association_confidence": assoc,
                     "score_semantics": "raw association score; not calibrated posterior",
                 }
             ],
-        }
+        )
     simbad = _text(row, "otype")
     hit, _c = OTYPES.resolve(simbad, {"Psr": "PULSAR", "N*": "NS", "XB*": "XRB"})  # hierarchy (2.22.0)
-    if hit == "NS":
-        return {
-            "axis": AXIS,
-            "label": "NS",
-            "confidence": None,
-            "status": "SIMBAD_CURATED_NS",
-            "evidence": [{"kind": "simbad_physical_type", "otype": simbad}],
-        }
-    if hit == "PULSAR":
-        return {
-            "axis": AXIS,
-            "label": "PULSAR",
-            "confidence": None,
-            "status": "SIMBAD_CURATED_PULSAR",
-            "evidence": [{"kind": "simbad_physical_type", "otype": simbad}],
-        }
-    if hit == "XRB":
-        return {
-            "axis": AXIS,
-            "label": "XRB",
-            "confidence": None,
-            "status": "SIMBAD_CURATED_XRB",
-            "evidence": [{"kind": "simbad_physical_type", "otype": simbad}],
-        }
+    if hit is not None:  # SIMBAD_CURATED_NS / _PULSAR / _XRB
+        return _result(hit, None, f"SIMBAD_CURATED_{hit}", [{"kind": "simbad_physical_type", "otype": simbad}])
     psr = radio_pulsar_evidence(row)
     if psr is not None:
-        return {
-            "axis": AXIS,
-            "label": "PULSAR_CANDIDATE",
-            "confidence": pulsar_posterior(row, psr),
-            "status": "RADIO_STEEP_COMPACT_POLARISED" if psr["significantly_polarised"] else "RADIO_STEEP_COMPACT",
-            "evidence": [psr],
-        }
+        return _result(
+            "PULSAR_CANDIDATE",
+            pulsar_posterior(row, psr),
+            "RADIO_STEEP_COMPACT_POLARISED" if psr["significantly_polarised"] else "RADIO_STEEP_COMPACT",
+            [psr],
+        )
     if _bool(row, "in_vari_compact_companion"):
-        return {
-            "axis": AXIS,
-            "label": "COMPACT_COMPANION_CANDIDATE",
-            "confidence": None,
-            "status": "GAIA_DR3_COMPACT_COMPANION_CANDIDATE",
-            "evidence": [{"kind": "gaia_dr3_vari_summary", "in_vari_compact_companion": True}],
-        }
-    return {
-        "axis": AXIS,
-        "label": "UNKNOWN",
-        "confidence": None,
-        "status": "NO_VALIDATED_COMPACT_EVIDENCE",
-        "evidence": [],
-    }
+        return _result(
+            "COMPACT_COMPANION_CANDIDATE",
+            None,
+            "GAIA_DR3_COMPACT_COMPANION_CANDIDATE",
+            [{"kind": "gaia_dr3_vari_summary", "in_vari_compact_companion": True}],
+        )
+    return _result("UNKNOWN", None, "NO_VALIDATED_COMPACT_EVIDENCE", [])

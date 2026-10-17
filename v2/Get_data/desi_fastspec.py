@@ -14,42 +14,39 @@ FastSpecFit reports 0 there, which must not read as "no emission".
 No classification is done here.
 """
 
+import sys
 from pathlib import Path
 import numpy as np
 import pandas as pd
 
+if str(Path(__file__).resolve().parent) not in sys.path:  # loaded by file path elsewhere
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+# Same Data Lab TAP service and bounded-attempt pattern as desi_legacy.py (Data
+# Lab can stall).  Its HTTP session has a timeout, so an abandoned attempt
+# thread ends instead of piling up (pyvo's default session has none; 2.23.0).
+from desi_legacy import TAP_URL, _query_with_retries, _service  # noqa: F401 (TAP_URL: benchmark)
+from _catalog_utils import empty_frame, save_csv, unique_positions
+
+save = save_csv  # collector API: save(df, path)
+
 CATALOG = "DESI DR1 FastSpecFit"
-TAP_URL = "https://datalab.noirlab.edu/tap"
 TABLE = "desi_dr1.agngal"
 LINES = {"ha": "halpha", "hb": "hbeta", "oiii5007": "oiii_5007", "nii6584": "nii_6584"}
 EXTRA = ["halpha_broad_flux", "halpha_broad_flux_ivar", "halpha_broad_sigma", "opt_uv_type", "agn_maskbits"]
+# [O II] 3726+3729 (2.28.0): the doublet, summed, for galaxies whose H-alpha
+# is beyond the spectrum (z > 0.49); Classifier/subclass.py blue diagram.
+OII = ("oii_3726", "oii_3729")
 LINE_FIELDS = [f"line_{k}_{s}" for k in LINES for s in ("flux", "flux_err")] + [
+    "line_oii3727_flux",
+    "line_oii3727_flux_err",
+    "line_oii3727_ew",
+    "line_oii3727_ew_err",
+    "line_hb_ew",
+    "line_hb_ew_err",
     "line_ha_ew",
     "line_nii6584_ew",
     "line_source",
 ]
-
-
-def _query_with_retries(run):
-    # Same bounded-attempt pattern as desi_legacy.py (Data Lab can stall).
-    import sys
-
-    here = str(Path(__file__).resolve().parent)
-    if here not in sys.path:  # loaded by file path elsewhere
-        sys.path.insert(0, here)
-    from desi_legacy import _query_with_retries as q
-
-    return q(run)
-
-
-def _service():
-    # The Legacy Surveys collector's TAP service: its HTTP session has a
-    # timeout, so an abandoned attempt thread ends instead of piling up
-    # (pyvo's default session has none; 2.23.0).
-    from desi_legacy import TAP_URL as LS_URL, _service as ls_service
-    import pyvo
-
-    return ls_service() if LS_URL == TAP_URL else pyvo.dal.TAPService(TAP_URL)
 
 
 def standardise(df: pd.DataFrame) -> pd.DataFrame:
@@ -61,6 +58,20 @@ def standardise(df: pd.DataFrame) -> pd.DataFrame:
         ok = iv > 0
         out[f"line_{k}_flux"] = f.where(ok)
         out[f"line_{k}_flux_err"] = 1.0 / np.sqrt(iv.where(ok))
+    for kind in ("flux", "ew"):
+        if not all(f"{o}_{kind}_ivar" in out for o in OII):  # older queries without [O II]
+            out[f"line_oii3727_{kind}"] = out[f"line_oii3727_{kind}_err"] = np.nan
+            continue
+        v = [pd.to_numeric(out.get(f"{o}_{kind}"), errors="coerce") for o in OII]
+        iv = [pd.to_numeric(out.get(f"{o}_{kind}_ivar"), errors="coerce") for o in OII]
+        ok = (iv[0] > 0) & (iv[1] > 0)  # both lines fitted
+        out[f"line_oii3727_{kind}"] = (v[0] + v[1]).where(ok)
+        out[f"line_oii3727_{kind}_err"] = np.sqrt(1.0 / iv[0].where(ok) + 1.0 / iv[1].where(ok))
+    if "hbeta_ew_ivar" in out:
+        ew, iv = (pd.to_numeric(out[c], errors="coerce") for c in ("hbeta_ew", "hbeta_ew_ivar"))
+        out["line_hb_ew"], out["line_hb_ew_err"] = ew.where(iv > 0), 1.0 / np.sqrt(iv.where(iv > 0))
+    else:
+        out["line_hb_ew"] = out["line_hb_ew_err"] = np.nan
     ew = pd.to_numeric(out.get("halpha_ew"), errors="coerce")
     ewiv = pd.to_numeric(out.get("halpha_ew_ivar"), errors="coerce")
     out["line_ha_ew"] = ew.where(ewiv > 0)
@@ -70,8 +81,6 @@ def standardise(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
-    import pyvo
-
     cols = [
         "targetid",
         "target_ra",
@@ -83,6 +92,9 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
         *[f"{s}_{x}" for s in LINES.values() for x in ("flux", "flux_ivar")],
         "halpha_ew",
         "halpha_ew_ivar",
+        *[f"{o}_{k}" for o in OII for k in ("flux", "flux_ivar", "ew", "ew_ivar")],
+        "hbeta_ew",
+        "hbeta_ew_ivar",
         *EXTRA,
     ]
     query = (
@@ -91,7 +103,7 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     )
     df = _query_with_retries(lambda: _service().search(query).to_table().to_pandas())
     if df.empty:
-        return pd.DataFrame(columns=["catalog", "catalog_object_id", "object_name", "ra", "dec", *LINE_FIELDS])
+        return empty_frame(*LINE_FIELDS)
     df.columns = [str(c).strip() for c in df.columns]
     prim = df["zcat_primary"].astype(str).str.strip().str.lower().isin(["true", "t", "1"])
     df = df[prim] if prim.any() else df  # one spectrum per object
@@ -101,9 +113,6 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     df.insert(2, "object_name", "DESI " + df["catalog_object_id"])
     df.insert(3, "ra", pd.to_numeric(df["target_ra"], errors="coerce"))
     df.insert(4, "dec", pd.to_numeric(df["target_dec"], errors="coerce"))
-    return df.drop_duplicates("catalog_object_id", keep="last").reset_index(drop=True)
-
-
-def save(df: pd.DataFrame, path: str | Path) -> None:
-    Path(path).parent.mkdir(parents=True, exist_ok=True)
-    df.drop_duplicates("catalog_object_id", keep="last").to_csv(path, index=False)
+    df = df.drop_duplicates("catalog_object_id", keep="last")
+    # One row per sky position, as in desi_spectroscopy (2.28.0).
+    return unique_positions(df, 0.5).reset_index(drop=True)

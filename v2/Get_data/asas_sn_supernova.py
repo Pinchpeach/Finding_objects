@@ -5,34 +5,24 @@ Rows are represented as transient events, not persistent host-galaxy sources.
 """
 
 from __future__ import annotations
-from pathlib import Path
 import pandas as pd
-from _catalog_utils import pick, coordinates, add_standard_metadata
+from _catalog_utils import add_standard_metadata, coordinates, empty_frame, pick, save_csv, vizier_query
 
 CATALOG = "ASAS-SN Supernova Catalog"
 TABLES = ("J/MNRAS/520/4356/table1", "J/MNRAS/520/4356/table2")
 
 
 def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
-    from astroquery.vizier import Vizier
-    from astropy.coordinates import SkyCoord
-    import astropy.units as u
-
-    coord = SkyCoord(float(ra) * u.deg, float(dec) * u.deg, frame="icrs")
     frames = []
     failed = []
     for table in TABLES:
         try:
-            result = Vizier(columns=["**"], row_limit=-1).query_region(
-                coord, radius=float(radius_arcmin) * u.arcmin, catalog=table
-            )
+            tabs = vizier_query(table, ra, dec, radius_arcmin)
         except Exception as exc:
             failed.append(f"{table}:{type(exc).__name__}")  # recorded, not silently dropped (2.23.0)
             continue
-        if not result:
-            continue
-        df = result[0].to_pandas()
-        if df.empty:
+        df = tabs[0].to_pandas() if tabs else None
+        if df is None or df.empty:
             continue
         idc = pick(df, ["IAUName", "SNName", "Name", "ASASSN"])
         typec = pick(df, ["SpType", "Type", "SNType"])
@@ -68,18 +58,7 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     if failed and not frames:
         raise RuntimeError("ASAS-SN tables failed: " + ", ".join(failed))
     if not frames:
-        return pd.DataFrame(
-            columns=[
-                "catalog",
-                "catalog_object_id",
-                "object_name",
-                "ra",
-                "dec",
-                "sn_subtype",
-                "event_mjd",
-                "entity_kind",
-            ]
-        )
+        return empty_frame("sn_subtype", "event_mjd", "entity_kind")
     out = (
         pd.concat(frames, ignore_index=True, sort=False)
         .dropna(subset=["ra", "dec"])
@@ -90,9 +69,5 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     return out
 
 
-def save(df: pd.DataFrame, path: str | Path) -> None:
-    required = {"catalog", "catalog_object_id", "object_name", "ra", "dec"}
-    if not required.issubset(df.columns):
-        raise ValueError("invalid ASAS-SN output")
-    Path(path).parent.mkdir(parents=True, exist_ok=True)
-    df.drop_duplicates("catalog_object_id", keep="last").to_csv(path, index=False)
+def save(df: pd.DataFrame, path) -> None:
+    save_csv(df, path, "ASAS-SN")

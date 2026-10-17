@@ -69,15 +69,46 @@ def main():
     ap.add_argument("--sdss-truth", type=Path, default=Path(__file__).with_name("truth_data") / "ground_truth.csv")
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--seed", type=int, default=20261008)
+    # 2.26.0: a second, larger DESI set for fusion training only.  It must
+    # not share objects with the DESI external benchmark or with the LS-GBM
+    # training set (LS-GBM-001 evidence would be in-sample there).
+    ap.add_argument(
+        "--ra-windows",
+        default=None,
+        help="RA windows 'lo-hi,lo-hi,...' (default: the external benchmark's eight windows)",
+    )
+    ap.add_argument(
+        "--exclude",
+        type=Path,
+        nargs="*",
+        default=[],
+        help="CSV files whose desi_targetid / targetid values are excluded",
+    )
+    ap.add_argument("--id-prefix", default="DESI")
     a = ap.parse_args()
+    global RA_WINDOWS
+    if a.ra_windows:
+        RA_WINDOWS = tuple(tuple(float(v) for v in w.split("-")) for w in a.ra_windows.split(","))
+    excluded = set()
+    for f in a.exclude:
+        x = pd.read_csv(f, low_memory=False)
+        col = next(c for c in ("desi_targetid", "targetid", "TargetID") if c in x.columns)
+        excluded |= set(x[col].astype(str))
     rng = np.random.default_rng(a.seed)
     per_window = math.ceil(a.per_cell / len(RA_WINDOWS))
     parts = []
+    n_excluded = 0
     for cls in CLASSES:
         for rlo, rhi in R_BINS:
             got = []
             for ra_lo, ra_hi in RA_WINDOWS:
                 d = query(cls, rlo, rhi, ra_lo, ra_hi, per_window * 4)
+                # Excluded objects are dropped before sampling: dropped after
+                # head(per_cell) they left the cells short.
+                if excluded and len(d):
+                    keep = ~d.TargetID.astype(str).isin(excluded)
+                    n_excluded += int((~keep).sum())
+                    d = d[keep]
                 if len(d):
                     got.append(d.sample(min(len(d), per_window), random_state=int(rng.integers(1 << 31))))
             d = pd.concat(got, ignore_index=True) if got else pd.DataFrame()
@@ -86,6 +117,8 @@ def main():
                 d["r_bin"] = f"{rlo:g}-{rhi:g}"
                 parts.append(d.head(a.per_cell))
     t = pd.concat(parts, ignore_index=True).drop_duplicates("TargetID")
+    if excluded:
+        print(f"excluded {n_excluded} queried objects listed in --exclude", flush=True)
     t["ra"] = pd.to_numeric(t.RAICRS, errors="coerce")
     t["dec"] = pd.to_numeric(t.DEICRS, errors="coerce")
     sd = pd.read_csv(a.sdss_truth)
@@ -98,7 +131,7 @@ def main():
     t["r_mag"] = 22.5 - 2.5 * np.log10(pd.to_numeric(t.Fr, errors="coerce").where(lambda x: x > 0))
     out = pd.DataFrame(
         {
-            "benchmark_id": [f"DESI{i:06d}" for i in range(1, len(t) + 1)],
+            "benchmark_id": [f"{a.id_prefix}{i:06d}" for i in range(1, len(t) + 1)],
             "ra": t.ra.to_numpy(),
             "dec": t.dec.to_numpy(),
             "truth_class": t.OType.astype(str).str.strip().to_numpy(),

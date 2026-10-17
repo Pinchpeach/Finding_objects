@@ -2,7 +2,68 @@
 
 from __future__ import annotations
 import math
+from pathlib import Path
 import pandas as pd
+
+# Leading columns of every collector's output, in this order.
+BASE = ["catalog", "catalog_object_id", "object_name", "ra", "dec"]
+
+
+def empty_frame(*extra) -> pd.DataFrame:
+    """No rows: the base columns plus a collector's own ``extra`` columns."""
+    return pd.DataFrame(columns=[*BASE, *extra])
+
+
+def vizier_query(catalog: str, ra: float, dec: float, radius_arcmin: float, columns=("**",)):
+    """VizieR cone search of ``catalog`` with every row (``row_limit=-1``); the TableList."""
+    from astroquery.vizier import Vizier
+    from astropy.coordinates import SkyCoord
+    import astropy.units as u
+
+    return Vizier(columns=list(columns), row_limit=-1).query_region(
+        SkyCoord(float(ra) * u.deg, float(dec) * u.deg, frame="icrs"),
+        radius=float(radius_arcmin) * u.arcmin,
+        catalog=catalog,
+    )
+
+
+def vizier_cone(catalog: str, ra: float, dec: float, radius_arcmin: float, columns=("**",)):
+    """First table of :func:`vizier_query` as a DataFrame, or None when VizieR returns nothing."""
+    tables = vizier_query(catalog, ra, dec, radius_arcmin, columns)
+    return tables[0].to_pandas() if tables else None
+
+
+def with_base(df: pd.DataFrame, catalog, ident, name, ra, dec) -> pd.DataFrame:
+    """Insert the BASE columns in front of ``df`` (in place) and keep the last
+    row of each ``catalog_object_id``."""
+    for i, (col, value) in enumerate(zip(BASE, (catalog, ident, name, ra, dec))):
+        df.insert(i, col, value)
+    return df.drop_duplicates("catalog_object_id", keep="last").reset_index(drop=True)
+
+
+def id_cone(
+    catalog: str, vizier_catalog: str, id_columns, ra_columns, dec_columns, ra: float, dec: float, radius_arcmin: float
+) -> pd.DataFrame:
+    """Cone search whose identifier and coordinates are picked from candidate
+    column lists; the identifier is also the object name."""
+    df = vizier_cone(vizier_catalog, ra, dec, radius_arcmin)
+    if df is None:
+        return empty_frame()
+    idc = pick(df, id_columns)
+    if idc is None:
+        raise KeyError(f"identifier column missing (tried {id_columns}); got {list(df.columns)[:20]}")
+    rv, dv = coordinates(df, ra_columns, dec_columns)
+    ident = df[idc].astype("string").str.strip()
+    return with_base(df, catalog, ident, ident, numeric(rv), numeric(dv))
+
+
+def save_csv(df: pd.DataFrame, path, label: str | None = None, required=BASE) -> None:
+    """Write one row per ``catalog_object_id``; with ``label``, first check
+    that the ``required`` columns are present."""
+    if label is not None and not set(required).issubset(df.columns):
+        raise ValueError(f"invalid {label} output")
+    Path(path).parent.mkdir(parents=True, exist_ok=True)
+    df.drop_duplicates("catalog_object_id", keep="last").to_csv(path, index=False)
 
 
 def pick(df: pd.DataFrame, names):
@@ -13,6 +74,26 @@ def pick(df: pd.DataFrame, names):
         if str(name).lower() in low:
             return low[str(name).lower()]
     return None
+
+
+def unique_positions(df: pd.DataFrame, radius_arcsec: float, quality=None) -> pd.DataFrame:
+    """Keep one row per position: rows are taken best ``quality`` first and a
+    row within ``radius_arcsec`` of a kept row is dropped.  (A rounded-grid
+    key splits pairs that straddle a cell edge.)"""
+    import numpy as np
+
+    if len(df) < 2:
+        return df
+    q = pd.Series(0.0, index=df.index) if quality is None else pd.to_numeric(quality, errors="coerce").fillna(-np.inf)
+    d = df.loc[q.sort_values(ascending=False, kind="stable").index]
+    ra, dec = np.radians(d["ra"].to_numpy(float)), np.radians(d["dec"].to_numpy(float))
+    xyz = np.stack([np.cos(dec) * np.cos(ra), np.cos(dec) * np.sin(ra), np.sin(dec)], axis=1)
+    lim = math.cos(math.radians(radius_arcsec / 3600.0))
+    kept = []
+    for i in range(len(d)):
+        if not np.isfinite(xyz[i]).all() or not kept or (xyz[kept] @ xyz[i]).max() < lim:
+            kept.append(i)
+    return d.iloc[sorted(kept)]
 
 
 def numeric(series):
@@ -70,14 +151,23 @@ def add_standard_metadata(
     return out
 
 
-def julian_year_from_mjd(value):
-    try:
-        x = float(value)
-        if not math.isfinite(x):
-            return None
-        return 2000.0 + (x - 51544.5) / 365.25
-    except Exception:
-        return None
+def j2000_degrees(df: pd.DataFrame):
+    """VizieR gives the NVSS / FIRST RAJ2000/DEJ2000 as sexagesimal strings
+    ("00 34 08.71"); pd.to_numeric made them NaN and every source was dropped
+    before association.  Use VizieR's computed decimal _RAJ2000/_DEJ2000, else
+    parse the sexagesimal columns."""
+    if "_RAJ2000" in df and "_DEJ2000" in df:
+        ra = pd.to_numeric(df["_RAJ2000"], errors="coerce")
+        dec = pd.to_numeric(df["_DEJ2000"], errors="coerce")
+        if ra.notna().all() and dec.notna().all():
+            return ra, dec
+    ra = pd.to_numeric(df["RAJ2000"], errors="coerce")
+    dec = pd.to_numeric(df["DEJ2000"], errors="coerce")
+    if len(df) and (ra.isna().any() or dec.isna().any()):
+        # Row by row (2.23.0): one empty or malformed value made the bulk
+        # SkyCoord parse raise and the whole collector fail.
+        ra, dec = coordinates(df, ["RAJ2000"], ["DEJ2000"])
+    return ra, dec
 
 
 SDSS_MAX_CONE_ARCMIN = 3.0
@@ -91,8 +181,6 @@ def sdss_region(ra: float, dec: float, radius_arcmin: float, **kwargs):
     rectangle covering the cone is queried (RA width widened by 1/cos(dec);
     astroquery's rectangle does not) and the rows are cut back to the cone.
     """
-    import math
-
     import astropy.units as u
     from astropy.coordinates import SkyCoord
     from astroquery.sdss import SDSS

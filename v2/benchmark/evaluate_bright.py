@@ -69,7 +69,7 @@ def apogee(sc) -> dict:
             x["gaia_dr3__flags_gspspec"] = x["gaia_dr3__flags_gspspec"].map(flags41)
         pred = []
         for r in x[list(cols)].to_dict("records"):
-            lum, rule, _ = sc.star_luminosity_class(_clean(r), None)
+            lum, rule, _ = sc.star_luminosity_class(_clean(r))
             pred.append(lum if rule in (f"{name}_LOGG", "GAIA_LOGG") else None)
         p = pd.Series(pred, index=d.index)
         m = p.notna()
@@ -149,7 +149,7 @@ def strict_giants(sc, d) -> dict:
             x["gaia_dr3__flags_gspspec"] = x["gaia_dr3__flags_gspspec"].map(flags41)
         pred = []
         for r in x.to_dict("records"):
-            lum, rule, _ = sc.star_luminosity_class(_clean(r), None)
+            lum, rule, _ = sc.star_luminosity_class(_clean(r))
             pred.append(lum if rule == name else None)
         p = pd.Series(pred, index=d.index)
         m = p.notna()

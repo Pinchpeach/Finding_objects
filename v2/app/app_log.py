@@ -19,9 +19,10 @@ copies), so it cannot grow without bound over months of use.
 
 from __future__ import annotations
 import os
-import sys
 import time
 from pathlib import Path
+
+from app_paths import user_file
 
 LOG_NAME = "finding_objects.log"
 MAX_BYTES = 5_000_000
@@ -30,17 +31,7 @@ RUN_MARK = "=" * 20
 
 
 def default_path() -> Path:
-    env = os.environ.get("FINDING_OBJECTS_LOG")
-    if env:
-        return Path(env).expanduser()
-    home = Path.home()
-    if sys.platform.startswith("win"):
-        base = Path(os.environ.get("LOCALAPPDATA") or home / "AppData" / "Local") / "FindingObjects"
-    elif sys.platform == "darwin":
-        base = home / "Library" / "Logs" / "FindingObjects"
-    else:
-        base = Path(os.environ.get("XDG_STATE_HOME") or home / ".local" / "state") / "finding_objects"
-    return base / LOG_NAME
+    return user_file(LOG_NAME, "FINDING_OBJECTS_LOG", "Logs", "XDG_STATE_HOME", ".local/state")
 
 
 def _stamp() -> str:
@@ -99,18 +90,26 @@ class AppLog:
 
     def read_tail(self, max_bytes: int = KEEP_BYTES) -> str:
         """Last ``max_bytes`` of the log (whole lines), creating the file if missing."""
+        return self.read_tail_and_size(max_bytes)[0]
+
+    def read_tail_and_size(self, max_bytes: int = KEEP_BYTES) -> tuple[str, int]:
+        """``read_tail`` plus the file offset the text ends at.  Size and text
+        come from one open handle and the read stops at that size, so bytes
+        appended meanwhile are neither shown nor skipped: a follower that
+        continues from the offset gets them (a separate stat() after the read
+        counted them as already shown)."""
         try:
             self.ensure()
-            size = self.path.stat().st_size
             with open(self.path, "rb") as fh:
-                if size > max_bytes:
-                    fh.seek(-max_bytes, os.SEEK_END)
-                data = fh.read()
-            if size > max_bytes:
+                size = os.fstat(fh.fileno()).st_size
+                start = max(size - max_bytes, 0)
+                fh.seek(start)
+                data = fh.read(size - start)
+            if start:
                 data = data[data.find(b"\n") + 1 :]
-            return data.decode("utf-8", "replace")
+            return data.decode("utf-8", "replace"), size
         except OSError as exc:
-            return f"(log file unavailable: {exc})"
+            return f"(log file unavailable: {exc})", 0
 
     def clear(self) -> None:
         try:

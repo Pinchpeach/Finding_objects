@@ -56,6 +56,45 @@ def design(evidence, s5, missing=0.0):
     return X, keys, kinds, used
 
 
+def _groups(specs):
+    """Comma-separated prefix groups (``--augment-drop`` / ``--report-drop``)."""
+    return [[p for p in g.split(",") if p] for g in specs]
+
+
+def augment(X, y, keys, groups, weight, missing):
+    """Missing-feature augmentation: per group, one extra copy (sample weight
+    ``weight``) of every row that has any of the group's keys, with those keys
+    set to ``missing`` (0 = logit-neutral for the linear fit, NaN for trees);
+    copies left without any evidence are skipped."""
+    present = np.isfinite if missing != missing else (lambda v: v != 0)
+    Xo, yo, wo = [X], [y], [np.ones(len(y))]
+    for g in groups:
+        cols = np.array([any(k.startswith(p) for p in g) for k in keys])
+        has = present(X[:, cols]).any(axis=1)
+        Xa = X[has].copy()
+        Xa[:, cols] = missing
+        ok = present(Xa).any(axis=1)
+        Xo.append(Xa[ok])
+        yo.append(y[has][ok])
+        wo.append(np.full(int(ok.sum()), weight))
+    return np.vstack(Xo), np.concatenate(yo), np.concatenate(wo)
+
+
+def _wll(Z, yi, w):
+    """Weighted multinomial log-loss of raw class scores ``Z``."""
+    z = Z - Z.max(axis=1, keepdims=True)
+    lp = z - np.log(np.exp(z).sum(axis=1, keepdims=True))
+    return float(-np.average(lp[np.arange(len(yi)), yi], weights=w))
+
+
+def _evidence_key(item):
+    """``RULE:CLASS`` key of a Stage-4 item, as ``evidence_features`` builds it."""
+    c = item.get("class")
+    if item.get("kind") != "linear_feature" and c in {"WD", "BINARY"}:
+        c = "STAR"
+    return f"{item.get('rule_id')}:{c}"
+
+
 def coverage_curve(p, y, used, grid):
     conf = p.max(axis=1)
     pred = np.array(CLASSES)[p.argmax(axis=1)]
@@ -133,25 +172,16 @@ def fit_gbm(a, ev, s5, keys, keep, y, tr, ca, used):
     assert keys_n == keys
     if a.drop_keys:
         Xn[:, [any(k.startswith(p) for p in a.drop_keys) for k in keys]] = np.nan
+    # Footprint-limited surveys: a missing X-ray / radio counterpart says
+    # where the object is, not what it is (eRASS1 covers half the sky; 33 % of
+    # SDSS-truth but 4 % of DESI-truth QSOs have one), so these keys stay out
+    # of the trees, whose missing-value branches would learn the footprint.
+    keep = keep & ~np.array([k.startswith(tuple(a.linear_only)) for k in keys])
     sup = [k for k, m in zip(keys, keep) if m]
     Xs = Xn[:, keep]
-    groups = [[p for p in g.split(",") if p] for g in a.augment_drop]
-
-    def augment(Xr, yr):
-        Xo, yo, wo = [Xr], [yr], [np.ones(len(yr))]
-        for g in groups:
-            cols = np.array([any(k.startswith(p) for p in g) for k in sup])
-            has = np.isfinite(Xr[:, cols]).any(axis=1)
-            Xa = Xr[has].copy()
-            Xa[:, cols] = np.nan
-            ok = np.isfinite(Xa).any(axis=1)
-            Xo.append(Xa[ok])
-            yo.append(yr[has][ok])
-            wo.append(np.full(int(ok.sum()), a.augment_weight))
-        return np.vstack(Xo), np.concatenate(yo), np.concatenate(wo)
-
-    Xf, yf, wf = augment(Xs[tr & used], y[tr & used])
-    Xc, yc, wc = augment(Xs[ca & used], y[ca & used])
+    groups = _groups(a.augment_drop)
+    Xf, yf, wf = augment(Xs[tr & used], y[tr & used], sup, groups, a.augment_weight, np.nan)
+    Xc, yc, wc = augment(Xs[ca & used], y[ca & used], sup, groups, a.augment_weight, np.nan)
     yi = None
     best = None
     # Small grid chosen by calibration log-loss (2.25.0 experiment: shallow
@@ -168,10 +198,9 @@ def fit_gbm(a, ev, s5, keys, keep, y, tr, ca, used):
                 random_state=0,
             ).fit(Xf, yf, sample_weight=wf)
             Z = clf._raw_predict(Xc)
-            yi = np.array([list(clf.classes_).index(v) for v in yc])
-            z = Z - Z.max(axis=1, keepdims=True)
-            lp = z - np.log(np.exp(z).sum(axis=1, keepdims=True))
-            ll = float(-np.average(lp[np.arange(len(yi)), yi], weights=wc))
+            if yi is None:  # classes_ = sorted labels of yf, the same for every fit
+                yi = np.array([list(clf.classes_).index(v) for v in yc])
+            ll = _wll(Z, yi, wc)
             print(f"gbm lr={lr} leaves={leaves} iters={clf.n_iter_} cal log-loss={ll:.4f}")
             if best is None or ll < best[0]:
                 best = (ll, clf, Z, lr, leaves)
@@ -180,10 +209,7 @@ def fit_gbm(a, ev, s5, keys, keep, y, tr, ca, used):
     # Temperature scaling (Guo et al. 2017, ICML): one scalar on the
     # calibration split, so the probabilities used for abstention are calibrated.
     def nll(T):
-        z = Z / T
-        z = z - z.max(axis=1, keepdims=True)
-        lp = z - np.log(np.exp(z).sum(axis=1, keepdims=True))
-        return float(-np.average(lp[np.arange(len(yi)), yi], weights=wc))
+        return _wll(Z / T, yi, wc)
 
     T = float(min(np.round(np.arange(0.5, 3.001, 0.05), 2), key=nll))
     path = a.out.with_name(a.out.stem + "_gbm.npz")
@@ -213,6 +239,7 @@ def main():
     ap.add_argument("--catalog-root", type=Path, nargs="+", required=True)
     ap.add_argument("--manifest", type=Path, nargs="+", required=True)
     ap.add_argument("--out", type=Path, default=PRE / "fusion_weights.json")
+    ap.add_argument("--linear-only", nargs="*", default=[], help="evidence-key prefixes kept out of the --gbm trees")
     ap.add_argument("--drop-keys", nargs="*", default=[], help="evidence-key prefixes to exclude (ablation)")
     ap.add_argument(
         "--augment-drop",
@@ -260,8 +287,8 @@ def main():
     ev = pd.concat(parts, ignore_index=True)
     X, keys, kinds, used = design(ev, s5)
     y = ev.truth_class.to_numpy()
+    dropped = np.array([any(k.startswith(p) for p in a.drop_keys) for k in keys], dtype=bool)
     if a.drop_keys:
-        dropped = np.array([any(k.startswith(p) for p in a.drop_keys) for k in keys])
         X[:, dropped] = 0.0
     tr = ev.split.eq("train").to_numpy()
     ca = ev.split.eq("calibration").to_numpy()
@@ -282,23 +309,9 @@ def main():
         # Each argument is one augmentation group: comma-separated prefixes
         # dropped together in one extra copy (e.g. all morphology; or every
         # Legacy Surveys rule, as when that archive is unavailable).
-        groups = [[p for p in g.split(",") if p] for g in a.augment_drop]
-
-        def augment(Xs, ys):
-            Xo, yo, wo = [Xs], [ys], [np.ones(len(ys))]
-            for g in groups:
-                aug = np.array([any(k.startswith(p) for p in g) for k in kept])
-                has = (Xs[:, aug] != 0).any(axis=1)
-                Xa = Xs[has].copy()
-                Xa[:, aug] = 0.0
-                keep_row = (Xa != 0).any(axis=1)
-                Xo.append(Xa[keep_row])
-                yo.append(ys[has][keep_row])
-                wo.append(np.full(int(keep_row.sum()), a.augment_weight))
-            return np.vstack(Xo), np.concatenate(yo), np.concatenate(wo)
-
-        Xfit, yfit, wfit = augment(Xfit, yfit)
-        Xcal, ycal, wcal = augment(Xcal, ycal)
+        groups = _groups(a.augment_drop)
+        Xfit, yfit, wfit = augment(Xfit, yfit, kept, groups, a.augment_weight, 0.0)
+        Xcal, ycal, wcal = augment(Xcal, ycal, kept, groups, a.augment_weight, 0.0)
     else:
         wfit = np.ones(len(yfit))
         wcal = np.ones(len(ycal))
@@ -341,7 +354,6 @@ def main():
         sign_dropped += [kept[j] for j in bad]
         cols = [j for j in cols if j not in bad]
     print("sign-constraint dropped:", sign_dropped)
-    Xk = Xk[:, cols]
     kept = [kept[j] for j in cols]
     coef = {k: {c: float(m.coef_[order[i], j]) for i, c in enumerate(CLASSES)} for j, k in enumerate(kept)}
     model = {
@@ -355,6 +367,7 @@ def main():
         "provenance": {
             "benchmarks": [str(t) for t in a.truth],
             "dropped_keys": a.drop_keys,
+            "linear_only_keys": a.linear_only,
             "train_rows": int(fit_rows.sum()),
             "augment_drop": a.augment_drop,
             "augment_weight": a.augment_weight,
@@ -364,10 +377,14 @@ def main():
             "calibration_log_loss": float(ll),
             "min_support": a.min_support,
             "support": {k: int(s) for k, s in zip(keys, support)},
-            "prior_weight_keys": [k for k, mk in zip(keys, keep) if not mk] + sign_dropped,
+            "prior_weight_keys": [k for k, mk, dk in zip(keys, keep, dropped) if not (mk or dk)] + sign_dropped,
             "sign_dropped_keys": sign_dropped,
         },
     }
+    if a.drop_keys:
+        # Ablation: these keys are removed from the evidence (fit and every
+        # evaluation below), not left to their Stage-5 prior weights.
+        model["provenance"]["excluded_keys"] = [k for k, dk in zip(keys, dropped) if dk]
 
     if a.gbm:
         model["gbm"] = fit_gbm(a, ev, s5, keys, keep, y, tr, ca, used)
@@ -376,13 +393,20 @@ def main():
             "plus prior weights for keys without training support; fitted on class-balanced benchmarks"
         )
 
-    # Probabilities exactly as Stage 5 will compute them.
+    # Probabilities exactly as Stage 5 will compute them, without the
+    # --drop-keys evidence (otherwise fuse_many would add it back with its
+    # prior weights) and without any ``drop`` (rule or key prefixes).
     def probs(mask, drop=()):
+        drop = tuple(a.drop_keys) + tuple(drop)
         lists = []
         for raw in ev.evidence_json[mask]:
             items = json.loads(raw) if isinstance(raw, str) else []
             if drop:
-                items = [i for i in items if not str(i.get("rule_id", "")).startswith(tuple(drop))]
+                items = [
+                    i
+                    for i in items
+                    if not str(i.get("rule_id", "")).startswith(drop) and not _evidence_key(i).startswith(drop)
+                ]
             lists.append(items)
         return np.array([[p[c] for c in CLASSES] for p, _ in s5.fuse_many(lists, model, a.out.parent)]).reshape(
             -1, len(CLASSES)
@@ -400,7 +424,7 @@ def main():
         # Faint objects (e.g. DESI) are harder than bright ones (SDSS); a pooled
         # target lets the larger bright set hide the faint set's errors.
         curves = []
-        for name in ev.dataset.unique():
+        for name in ev.dataset[ca].unique():  # train-only sets (desi_fusion) have no calibration rows
             mk = ca & ev.dataset.eq(name).to_numpy()
             curves.append(coverage_curve(probs(mk), y[mk], used[mk], grid))
         ok = [
@@ -415,7 +439,7 @@ def main():
     model["provenance"]["target_calibration_accuracy"] = a.target_accuracy
     model["provenance"]["target_scope"] = a.target_scope
     test = {}
-    for name in ev.dataset.unique():
+    for name in ev.dataset[te].unique():
         mask = te & ev.dataset.eq(name).to_numpy()
         pte = probs(mask)
         yte = y[mask]
@@ -427,7 +451,7 @@ def main():
             "rows": int(mask.sum()),
             "classified": int(cl.sum()),
             "coverage": float(cl.mean()),
-            "accuracy_when_classified": float((pred[cl] == yte[cl]).mean()),
+            "accuracy_when_classified": float((pred[cl] == yte[cl]).mean()) if cl.any() else None,
             "accuracy_all_unknown_wrong": float((np.where(cl, pred, "UNKNOWN") == yte).mean()),
             "recall": {c: float((pred[yte == c] == c).mean()) for c in CLASSES},
             "log_loss_used": float(log_loss(yte[ute], pte[ute][:, np.argsort(CLASSES)], labels=sorted(CLASSES))),
@@ -435,10 +459,9 @@ def main():
             "accuracy_by_threshold": coverage_curve(pte, yte, ute, (0.5, 0.6, 0.7, 0.8, 0.9, 0.95)),
         }
         rdrop = a.augment_drop if a.report_drop is None else a.report_drop
-        for g in rdrop:
+        for g in _groups(rdrop):
             # Same test rows with a group of evidence removed: how the model
             # behaves on objects that lack it (e.g. faint, unresolved fits).
-            g = [p for p in g.split(",") if p]
             pd_ = probs(mask, g)
             pr = np.array(CLASSES)[pd_.argmax(axis=1)]
             test[name]["without_" + "+".join(g)] = {

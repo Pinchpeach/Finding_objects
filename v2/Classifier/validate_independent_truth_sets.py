@@ -73,7 +73,9 @@ def collect(row, raw, radius):
 def select(frame, ra, dec, radius, entity=None):
     ras = pd.to_numeric(frame["ra"], errors="coerce")
     des = pd.to_numeric(frame["dec"], errors="coerce")
-    dra = (ras - ra) * math.cos(math.radians(dec))
+    # Wrap the RA difference into [-180, 180): a target near RA 0/360 deg
+    # otherwise sees its neighbours across the wrap ~360 deg away.
+    dra = ((ras - ra + 180) % 360 - 180) * math.cos(math.radians(dec))
     dde = des - dec
     sep = 3600 * (dra * dra + dde * dde) ** 0.5
     cand = frame.copy()

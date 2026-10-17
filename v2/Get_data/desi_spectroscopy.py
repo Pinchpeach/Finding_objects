@@ -3,62 +3,38 @@
 No cross-match/classification.  ``OType`` is Redrock's SPECTYPE.
 """
 
+import sys
 from pathlib import Path
 import pandas as pd
+
+if str(Path(__file__).resolve().parent) not in sys.path:  # loaded by file path elsewhere
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _catalog_utils import empty_frame, numeric, save_csv, unique_positions, vizier_cone, with_base
+
+save = save_csv  # collector API: save(df, path)
 
 CATALOG = "DESI DR1 spectroscopy"
 VIZIER_CATALOG = "V/161/zcatdr1"
 
 
 def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
-    from astroquery.vizier import Vizier
-    from astropy.coordinates import SkyCoord
-    import astropy.units as u
-
-    tabs = Vizier(columns=["**"], row_limit=-1).query_region(
-        SkyCoord(ra * u.deg, dec * u.deg), radius=radius_arcmin * u.arcmin, catalog=VIZIER_CATALOG
-    )
-    if not tabs:
-        return pd.DataFrame(columns=["catalog", "catalog_object_id", "object_name", "ra", "dec"])
-    df = tabs[0].to_pandas()
-    idc = "TargetID"
-    rac = "RAICRS"
-    dcc = "DEICRS"
-    if idc not in df.columns:
-        raise KeyError("identifier column missing: " + idc)
+    df = vizier_cone(VIZIER_CATALOG, ra, dec, radius_arcmin)
+    if df is None:
+        return empty_frame()
+    if "TargetID" not in df.columns:
+        raise KeyError("identifier column missing: " + "TargetID")
     if "ZCAT_PRIM" in df.columns:
         df = df[pd.to_numeric(df["ZCAT_PRIM"], errors="coerce").eq(1)]
     # OBJTYPE: keep science targets; SKY/BAD fibres sample blank sky, not objects.
     if "Type" in df.columns:
         df = df[df["Type"].astype(str).str.strip().eq("TGT")]
     df = df.copy()
-    df.insert(0, "catalog", CATALOG)
-    df.insert(1, "catalog_object_id", df[idc].astype("string"))
-    df.insert(2, "object_name", CATALOG + " " + df["catalog_object_id"].astype("string"))
-    df.insert(3, "ra", pd.to_numeric(df[rac], errors="coerce"))
-    df.insert(4, "dec", pd.to_numeric(df[dcc], errors="coerce"))
-    df = df.drop_duplicates("catalog_object_id", keep="last")
+    ident = df["TargetID"].astype("string")
+    df = with_base(df, CATALOG, ident, CATALOG + " " + ident, numeric(df["RAICRS"]), numeric(df["DEICRS"]))
     # One sky object can carry several TARGETIDs (different programs); keep the
-    # most confident spectrum per 0.5-arcsec position so one object stays one row.
-    import numpy as np
-
-    ref = float(df["ra"].dropna().iloc[0]) if df["ra"].notna().any() else 0.0
-    dra = ((df["ra"] - ref + 180.0) % 360.0) - 180.0  # RA wrap at 0/360 (2.23.0)
-    key = list(zip(np.round(dra * np.cos(np.radians(df["dec"])) * 7200), np.round(df["dec"] * 7200)))
-    order = (
-        pd.to_numeric(df["delChi2"], errors="coerce").fillna(-1)
-        if "delChi2" in df.columns
-        else pd.Series(0, index=df.index)
-    )
-    df = (
-        df.assign(_pos=key, _q=order)
-        .sort_values("_q", ascending=False)
-        .drop_duplicates("_pos")
-        .drop(columns=["_pos", "_q"])
-    )
+    # most confident spectrum within 0.5" so one object stays one row.  A
+    # rounded 0.5" grid key kept both of a pair straddling a cell edge, and
+    # the second spectrum then displaced the first from its LS target in
+    # association (field RA 20, 2.28.0).
+    df = unique_positions(df, 0.5, df["delChi2"] if "delChi2" in df.columns else None)
     return df.reset_index(drop=True)
-
-
-def save(df: pd.DataFrame, path: str | Path) -> None:
-    Path(path).parent.mkdir(parents=True, exist_ok=True)
-    df.drop_duplicates("catalog_object_id", keep="last").to_csv(path, index=False)

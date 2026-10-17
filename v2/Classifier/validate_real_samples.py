@@ -158,7 +158,9 @@ def collect(sample, raw, radius):
 def _separations(frame, ra, dec):
     ras = pd.to_numeric(frame["ra"], errors="coerce")
     decs = pd.to_numeric(frame["dec"], errors="coerce")
-    dra = (ras - ra) * math.cos(math.radians(dec))
+    # Wrap the RA difference into [-180, 180): a target near RA 0/360 deg
+    # otherwise sees its neighbours across the wrap ~360 deg away.
+    dra = ((ras - ra + 180) % 360 - 180) * math.cos(math.radians(dec))
     dde = decs - dec
     return 3600.0 * (dra * dra + dde * dde) ** 0.5
 

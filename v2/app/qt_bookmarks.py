@@ -142,6 +142,11 @@ class BookmarksPage(QWidget):
         """Rebuild the table from the store (keeps or sets the selection)."""
         self._save_note()
         select_id = select_id or self._current
+        # Rows are rewritten in place: a kept selection would now point at
+        # whatever bookmark landed in that row (after a removal elsewhere the
+        # table showed another bookmark while the panel still edited the old
+        # one).  Start unselected and select by id below.
+        self.table.clearSelection()
         self.table.setSortingEnabled(False)
         self.table.setRowCount(len(self.store.items))
         for r, b in enumerate(self.store.items):
@@ -165,8 +170,7 @@ class BookmarksPage(QWidget):
         self.table.resizeColumnsToContents()
         self._apply_filter()
         self._select_id(select_id)
-        if self.selected() is None:
-            self._show(None)
+        self._show(self.selected())  # also when the selection signal did not fire
 
     def _apply_filter(self) -> None:
         text = self.txt_search.text().strip().lower()
@@ -278,4 +282,7 @@ class BookmarksPage(QWidget):
             self, "Export bookmarks", str(Path.home() / "bookmarks.csv"), "CSV (*.csv)"
         )
         if path:
-            self.store.to_frame().to_csv(path, index=False)
+            try:
+                self.store.to_frame().to_csv(path, index=False)
+            except OSError as exc:  # e.g. the file is open in Excel
+                QMessageBox.warning(self, "Bookmarks", f"Could not write {path}:\n{exc}")

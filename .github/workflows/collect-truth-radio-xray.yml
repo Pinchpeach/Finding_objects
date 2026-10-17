@@ -1,76 +1,163 @@
-name: Collect Truth Radio X-ray Features
-# Manual only: adds the radio / X-ray counterparts of the SDSS and DESI
-# benchmark objects to the preserved catalog_features (2.25.0, accuracy item
-# #2: X-ray / radio evidence for host-dominated QSOs).  Existing files are
-# replaced only when under 1 % of the queries failed.
+name: Collect Truth Features
+# Manual only: adds catalogue counterparts of benchmark truth objects to the
+# preserved catalog_features.  (The file keeps its 2.25.0 name because a
+# workflow can be dispatched only once it exists on the default branch.)
+#   2.25.0: radio / X-ray counterparts of the SDSS and DESI truth sets
+#           (accuracy item A: X-ray / radio evidence for host-dominated QSOs).
+#   2.26.0: build_fusion=true builds the DESI fusion-training truth set
+#           (item D) before collecting; truths may include "fusion".
+#   2.27.0: catalog "ztf_lightcurve" (item E: ZTF variability).
+# A collection is used only when under 1 % of its queries failed.
 on:
   workflow_dispatch:
+    inputs:
+      catalogs:
+        description: 'JSON list of collectors'
+        default: '["erosita","xmm","chandra","first","vlass","lotss","nvss"]'
+      truths:
+        description: 'JSON list of truth sets: sdss, desi, fusion'
+        default: '["sdss","desi"]'
+      build_fusion:
+        description: 'build v2/benchmark/desi_fusion/truth.csv first (true/false)'
+        default: 'false'
+      fusion_per_cell:
+        description: 'fusion truth objects per class per r bin'
+        default: '700'
+      workers:
+        description: 'parallel queries per job (slow services such as IRSA ZTF need more)'
+        default: '8'
+      shards:
+        description: 'JSON list of shards "kofn" (every n-th truth object from k), e.g. ["0of4","1of4","2of4","3of4"]'
+        default: '["0of1"]'
 concurrency:
-  group: collect-truth-radio-xray-${{ github.ref }}
+  group: collect-truth-features-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  collect:
-    strategy:
-      fail-fast: false
-      matrix:
-        catalog: [erosita, xmm, chandra, first, vlass, lotss, nvss]
-        truth: [sdss, desi]
+  fusion_truth:
+    if: github.event.inputs.build_fusion == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 240
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install pandas numpy requests astropy astroquery
-      - name: Cross-query ${{ matrix.catalog }} (${{ matrix.truth }})
+      - run: pip install pandas numpy astropy astroquery
+      - name: Build DESI fusion-training truth
+        # RA windows disjoint from the DESI external benchmark windows and
+        # from the field-validation centres (RA 20, 245, 250); objects of the
+        # external benchmark and of the LS-GBM training set are excluded.
         run: |
-          if [ "${{ matrix.truth }}" = sdss ]; then T=v2/benchmark/truth_data/ground_truth.csv; else T=v2/benchmark/desi_external/truth.csv; fi
-          python v2/benchmark/collect_catalog_truth.py --truth "$T" --catalog "${{ matrix.catalog }}" --workers 8 --out-dir out 2>&1 | tee out.log | grep -v ERROR | tail -40
+          python v2/benchmark/build_desi_truth.py --per-cell "${{ github.event.inputs.fusion_per_cell }}" \
+            --ra-windows 22-32,50-60,140-150,165-175,190-200,215-225,255-265,345-355 \
+            --exclude v2/benchmark/desi_external/truth.csv v2/benchmark/desi_gbm_truth/train.csv.gz \
+            --id-prefix DFUS --seed 20261015 --out fusion/truth.csv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fusion-truth
+          path: fusion/truth.csv
+          retention-days: 14
+
+  collect:
+    needs: fusion_truth
+    if: always() && (needs.fusion_truth.result == 'success' || needs.fusion_truth.result == 'skipped')
+    strategy:
+      fail-fast: false
+      matrix:
+        catalog: ${{ fromJSON(github.event.inputs.catalogs) }}
+        truth: ${{ fromJSON(github.event.inputs.truths) }}
+        shard: ${{ fromJSON(github.event.inputs.shards || '["0of1"]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pandas numpy requests astropy astroquery pyvo
+      - uses: actions/download-artifact@v4
+        if: matrix.truth == 'fusion' && github.event.inputs.build_fusion == 'true'
+        with:
+          name: fusion-truth
+          path: v2/benchmark/desi_fusion
+      - name: Cross-query ${{ matrix.catalog }} (${{ matrix.truth }}, shard ${{ matrix.shard }})
+        shell: bash  # -eo pipefail: a crashed collector fails the job
+        run: |
+          case "${{ matrix.truth }}" in
+            sdss) T=v2/benchmark/truth_data/ground_truth.csv ;;
+            desi) T=v2/benchmark/desi_external/truth.csv ;;
+            fusion) T=v2/benchmark/desi_fusion/truth.csv ;;
+          esac
+          S="${{ matrix.shard }}"; k=${S%of*}; n=${S#*of}
+          python v2/benchmark/collect_catalog_truth.py --truth "$T" --catalog "${{ matrix.catalog }}" --workers "${{ github.event.inputs.workers || 8 }}" --shard "$k/$n" --out-dir out 2>&1 | tee out.log | grep -v ERROR | tail -40
           mkdir -p out
           echo "errors: $(grep -c ' ERROR ' out.log || true)" | tee out/errors.txt
+          python -c "import pandas as pd,sys; print(len(pd.read_csv(sys.argv[1]).iloc[$k::$n]) + 1)" "$T" > out/targets.txt
           grep ' ERROR ' out.log | head -5 || true
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: rx-${{ matrix.truth }}-${{ matrix.catalog }}
+          name: rx-${{ matrix.truth }}-${{ matrix.catalog }}-${{ matrix.shard }}
           path: out/
           if-no-files-found: warn
           retention-days: 14
+
   commit:
-    needs: collect
+    needs: [fusion_truth, collect]
     if: always()
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pandas
       - uses: actions/download-artifact@v4
         with:
           pattern: rx-*
           path: dl
+      - uses: actions/download-artifact@v4
+        if: github.event.inputs.build_fusion == 'true'
+        with:
+          name: fusion-truth
+          path: v2/benchmark/desi_fusion
       - name: Copy complete collections
+        # Shards of one truth set x catalogue are concatenated; the collection
+        # is used only when all its shards arrived and under 1 % of all its
+        # queries failed (non-detections are not evidence, so a failed query
+        # only loses a possible match; above 1 % it would bias the benchmark).
         run: |
-          for d in dl/rx-*; do
-            n=${d#dl/rx-}; truth=${n%%-*}; cat=${n#*-}
-            f="$d/${cat}_trd.csv"; [ -f "$f" ] || { echo "$n: no output"; continue; }
-            e=$(sed -n 's/errors: //p' "$d/errors.txt")
-            rows=$(($(wc -l < "$f") - 1))
-            echo "$n: rows=$rows errors=$e"
-            # Radio / X-ray non-detections are not evidence, so a failed query
-            # only loses a possible match; above 1 % of targets it would bias
-            # the benchmark, so such a collection is not used.
-            n_t=$(($(wc -l < "$( [ "$truth" = sdss ] && echo v2/benchmark/truth_data/ground_truth.csv || echo v2/benchmark/desi_external/truth.csv )") - 1))
-            if [ "${e:-$n_t}" -gt $((n_t / 100)) ]; then echo "  skipped (query errors > 1 %)"; continue; fi
-            if [ "$truth" = sdss ]; then dst=v2/benchmark/catalog_features; else dst=v2/benchmark/desi_external/catalog_features; fi
-            gzip -9n -c "$f" > "$dst/${cat}_trd.csv.gz"
+          shopt -s nullglob
+          for key in $(ls -d dl/rx-* | sed -E 's#dl/rx-(.*)-[0-9]+of[0-9]+$#\1#' | sort -u); do
+            truth=${key%%-*}; cat=${key#*-}
+            parts=(dl/rx-$key-*of*); n=${parts[0]##*of}
+            e=0; n_t=0; files=()
+            for d in "${parts[@]}"; do
+              e=$((e + $(sed -n 's/errors: //p' "$d/errors.txt" 2>/dev/null || echo 0)))
+              n_t=$((n_t + $(cat "$d/targets.txt" 2>/dev/null || echo 1) - 1))
+              [ -f "$d/${cat}_trd.csv" ] && files+=("$d/${cat}_trd.csv")
+            done
+            echo "$key: shards=${#files[@]}/$n errors=$e targets=$n_t"
+            if [ "${#files[@]}" -ne "$n" ]; then echo "  skipped (missing shards)"; continue; fi
+            if [ "$e" -gt $((n_t / 100)) ]; then echo "  skipped (query errors > 1 %)"; continue; fi
+            case "$truth" in
+              sdss) dst=v2/benchmark/catalog_features ;;
+              desi) dst=v2/benchmark/desi_external/catalog_features ;;
+              fusion) dst=v2/benchmark/desi_fusion/catalog_features ;;
+            esac
+            mkdir -p "$dst"
+            python -c "import pandas as pd,sys; d=pd.concat([pd.read_csv(f, low_memory=False) for f in sys.argv[2:]], ignore_index=True); d=d.sort_values('benchmark_id') if len(d) else d; d.to_csv(sys.argv[1], index=False)" merged.csv "${files[@]}"
+            gzip -9n -c merged.csv > "$dst/${cat}_trd.csv.gz"
           done
       - name: Commit
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add v2/benchmark/catalog_features v2/benchmark/desi_external/catalog_features
+          [ -d v2/benchmark/desi_fusion ] && git add v2/benchmark/desi_fusion
           git diff --cached --quiet && exit 0
-          git commit -m "Benchmark radio / X-ray counterparts (SDSS, DESI truth)"
+          git commit -m "Benchmark truth features: ${{ github.event.inputs.catalogs }} for ${{ github.event.inputs.truths }}"
           bash .github/scripts/push_with_retry.sh "${GITHUB_REF_NAME}"

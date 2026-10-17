@@ -173,32 +173,11 @@ def run(associations, raw_dir, out):
                 # is a legacy first-valid convenience shared by many catalogs
                 # (e.g. ``type`` exists in both SDSS PhotoObj and DESI Legacy).
                 rec[f"{pre}__{col}"] = val
+                # First valid value wins.  This also covers the astrometry,
+                # spectral-class and DSC fields, which a former second pass
+                # re-copied under the same condition (it never changed a value).
                 if col not in object_keys and (col not in rec or pd.isna(rec[col])):
                     rec[col] = val
-            for col in (
-                "parallax",
-                "parallax_error",
-                "pmra",
-                "pmra_error",
-                "pmdec",
-                "pmdec_error",
-                "class",
-                "zwarning",
-                "classprob_dsc_combmod_quasar",
-                "classprob_dsc_combmod_galaxy",
-                "classprob_dsc_combmod_star",
-                "classprob_dsc_combmod_whitedwarf",
-                "classprob_dsc_combmod_binarystar",
-                "best_class_name",
-                "best_class_score",
-                "event_mjd",
-                "event_discovery_date",
-                "sn_subtype",
-                "pn_spectroscopic_score",
-                "pn_spectroscopic_basis",
-            ):
-                if col in r and pd.notna(r[col]) and (col not in rec or pd.isna(rec[col])):
-                    rec[col] = r[col]
         rec["catalogs"] = "|".join(sorted(set(catalogs)))
         rows.append(rec)
     flag_large_galaxy_hosts(rows)

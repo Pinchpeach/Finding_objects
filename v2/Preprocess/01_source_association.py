@@ -21,6 +21,18 @@ from association_model import (
 )
 
 AMBIG_SCORE_RATIO = 0.67
+# DESI redshifts are measured at the imaging position of a Legacy Surveys
+# target (TARGET_RA/DEC; Myers et al. 2023, AJ 165, 50), so a spectrum is a
+# measurement of an LS source rather than an independent detection.  Spectra
+# are associated after all imaging detections (they never anchor a group
+# while their target is present), and a group holding an LS source within
+# TARGET_MATCH_ARCSEC is their target, decisively, as a shared identifier
+# would be (LS DR10 south re-numbers the DR9 objects DESI targeted).  Before
+# 2.28.0 a shredded galaxy's own fragments made the spectrum ambiguous and it
+# became an evidence-less object (fields RA 250 and RA 20).
+TARGET_SPECTRA = ("DESI DR1 spectroscopy", "DESI DR1 FastSpecFit")
+TARGET_IMAGING = "DESI Legacy Surveys DR10"
+TARGET_MATCH_ARCSEC = 0.3
 # Spatial pre-selection.  Any accepted pair is within the larger profile cap
 # (<= 45 arcsec) after proper-motion propagation; the index searches that cap
 # plus PM_MARGIN_ARCSEC, and anchors that can move further than the margin
@@ -36,11 +48,11 @@ MAX_EPOCH_SPAN_YR = 45.0
 SMALL_CAP_ARCSEC = 8.0
 
 
-def _pm_shift_arcsec(det, span_yr=None):
+def _pm_shift_arcsec(det, span_yr):
     pmra, pmdec = det.get("pmra"), det.get("pmdec")
     if pmra is None or pmdec is None or det.get("ref_epoch") is None:
         return 0.0
-    return math.hypot(pmra, pmdec) * (MAX_EPOCH_SPAN_YR if span_yr is None else span_yr) / 1000.0
+    return math.hypot(pmra, pmdec) * span_yr / 1000.0
 
 
 class _SkyIndex:
@@ -76,7 +88,7 @@ class _SkyIndex:
 
 
 def _density(frame: pd.DataFrame) -> float | None:
-    if frame.empty or len(frame) < 5:
+    if len(frame) < 5:
         # A one/few-row targeted cone is not a reliable local-density estimator.
         return None
     radius = None
@@ -140,8 +152,7 @@ def load(raw: Path):
                 skipped += 1
                 continue
             seen.add(key)
-            payload = r
-            prof = profile_for(cat, payload)
+            prof = profile_for(cat, r)
             rows.append(
                 {
                     "detection_id": f"{path.stem}:{i}",
@@ -151,21 +162,28 @@ def load(raw: Path):
                     "object_name": str(r.get("object_name", "")),
                     "ra": ra,
                     "dec": dec,
-                    "poserr_arcsec": infer_poserr_arcsec(cat, payload),
-                    "psf_fwhm_arcsec": infer_psf_arcsec(cat, payload),
-                    "ref_epoch": infer_epoch(cat, payload),
-                    "entity_kind": infer_entity_kind(cat, payload),
+                    "poserr_arcsec": infer_poserr_arcsec(cat, r),
+                    "psf_fwhm_arcsec": infer_psf_arcsec(cat, r),
+                    "ref_epoch": infer_epoch(cat, r),
+                    "entity_kind": infer_entity_kind(cat, r),
                     "pmra": num(r.get("pmra")),
                     "pmra_error": num(r.get("pmra_error")),
                     "pmdec": num(r.get("pmdec")),
                     "pmdec_error": num(r.get("pmdec_error")),
                     "max_radius_arcsec": prof.max_radius_arcsec,
                     "source_density_arcsec2": density,
-                    "association_aliases": canonical_aliases(cat, payload, cid),
+                    "association_aliases": canonical_aliases(cat, r, cid),
                     "source_row": int(i),
                 }
             )
     return rows, skipped
+
+
+def _target_sep(group, det):
+    """Distance to the group's Legacy Surveys member(s), the imaging target of
+    a DESI spectrum; the group anchor is often another survey's detection
+    (field RA 20: anchor 0.71" away, LS target 0.02")."""
+    return min((sep_arcsec(ra, dec, det["ra"], det["dec"]) for ra, dec in group["targets"]), default=math.inf)
 
 
 def _anchor_key(det):
@@ -195,7 +213,14 @@ def run(raw_dir: Path, out: Path):
     # Build groups from the best astrometric anchors first.  This prevents a
     # coarse IRAS/low-resolution row from becoming the coordinate anchor merely
     # because its filename sorts earlier.
-    detections.sort(key=lambda d: (*_anchor_key(d), str(d.get("catalog")), str(d.get("detection_id"))))
+    detections.sort(
+        key=lambda d: (
+            d.get("catalog") in TARGET_SPECTRA,
+            *_anchor_key(d),
+            str(d.get("catalog")),
+            str(d.get("detection_id")),
+        )
+    )
     groups, records = [], []
     epochs = [float(d["ref_epoch"]) for d in detections if d.get("ref_epoch") is not None]
     # Epoch span from the data (a 1950 catalogue vs Gaia is 66 yr), at least
@@ -219,15 +244,12 @@ def run(raw_dir: Path, out: Path):
         else:
             wide.discard(gi)
 
-    dets_in_order = []
     for det in detections:
-        dets_in_order.append(det)
         # Time-domain events remain distinct from persistent host/catalog objects.
         # Event identity can later be linked to a host in a dedicated event layer.
-        if det["entity_kind"] == "transient_event":
-            candidates = []
-        else:
-            candidates = []
+        candidates = []
+        target_taken = False
+        if det["entity_kind"] != "transient_event":
             # Accepted pairs lie within max(cap_anchor, cap_det) plus the PM
             # shifts: anchors with a cap above SMALL_CAP are in ``wide``.
             reach = max(cap(det), SMALL_CAP_ARCSEC) + PM_MARGIN_ARCSEC + _pm_shift_arcsec(det, span)
@@ -238,7 +260,12 @@ def run(raw_dir: Path, out: Path):
                 nearby |= alias_groups.get(alias, set())
             for gi in sorted(nearby):
                 group = groups[gi]
-                if group["entity_kind"] == "transient_event" or det["catalog"] in group["catalogs"]:
+                if group["entity_kind"] == "transient_event":
+                    continue
+                if det["catalog"] in group["catalogs"]:
+                    # A second spectrum of a target already holding one is a
+                    # duplicate, not evidence for a neighbour (field RA 20).
+                    target_taken |= det["catalog"] in TARGET_SPECTRA and _target_sep(group, det) <= TARGET_MATCH_ARCSEC
                     continue
                 shared_aliases = set(det.get("association_aliases") or ()) & set(group.get("aliases") or ())
                 if shared_aliases:
@@ -258,6 +285,8 @@ def run(raw_dir: Path, out: Path):
                 result = assess_pair(group["anchor"], det, density)
                 result["association_method"] = "position_epoch_likelihood"
                 result["shared_aliases"] = ""
+                if det["catalog"] in TARGET_SPECTRA and _target_sep(group, det) <= TARGET_MATCH_ARCSEC:
+                    result.update({"accepted": True, "association_method": "spectroscopic_target"})
                 if result["accepted"]:
                     candidates.append((result["association_score"], result["normalized_separation"], gi, result))
             candidates.sort(key=lambda x: (-x[0], x[1]))
@@ -265,8 +294,13 @@ def run(raw_dir: Path, out: Path):
         # An exact shared identifier is decisive: positional neighbours (e.g.
         # catalogue duplicates in crowded fields) cannot make it ambiguous.
         alias_hits = [c for c in candidates if c[3].get("association_method") == "catalog_alias"]
+        target_hits = [c for c in candidates if c[3].get("association_method") == "spectroscopic_target"]
         if len(alias_hits) == 1:
             candidates = alias_hits
+        elif target_hits:
+            candidates = [min(target_hits, key=lambda c: _target_sep(groups[c[2]], det))]
+        elif det["catalog"] in TARGET_SPECTRA and target_taken:
+            candidates = []
         ambiguous = len(candidates) > 1 and candidates[1][0] >= candidates[0][0] * AMBIG_SCORE_RATIO
 
         if candidates and not ambiguous:
@@ -275,6 +309,8 @@ def run(raw_dir: Path, out: Path):
             oid = group["id"]
             group["catalogs"].add(det["catalog"])
             group["members"] += 1
+            if det["catalog"] == TARGET_IMAGING:
+                group["targets"].append((det["ra"], det["dec"]))
             group["aliases"].update(det.get("association_aliases") or ())
             for alias in det.get("association_aliases") or ():
                 alias_groups.setdefault(alias, set()).add(gi)
@@ -292,6 +328,7 @@ def run(raw_dir: Path, out: Path):
                     "members": 1,
                     "entity_kind": det["entity_kind"],
                     "aliases": set(det.get("association_aliases") or ()),
+                    "targets": [(det["ra"], det["dec"])] if det["catalog"] == TARGET_IMAGING else [],
                 }
             )
             place(len(groups) - 1)
@@ -353,7 +390,7 @@ def run(raw_dir: Path, out: Path):
         )
 
     group_by_id = {g["id"]: g for g in groups}
-    for rec, det in zip(records, dets_in_order):
+    for rec, det in zip(records, detections):  # one record per detection, same order
         anchor = group_by_id[rec["object_id"]]["anchor"]
         # Membership confidence is judged against the object's final anchor
         # (its most precise position).  The score computed at match time used

@@ -305,3 +305,28 @@ epochs).
 | Gradient-boosted trees over the evidence keys | Friedman 2001 (Ann. Stat. 29, 1189); Ke et al. 2017 (LightGBM, NeurIPS) | Lets evidence interact (e.g. a colour meaning something different for resolved and unresolved sources), which the linear log-odds sum cannot express. Absent evidence is a missing value, not logit 0. |
 | Temperature scaling | Guo et al. 2017 (ICML, "On Calibration of Modern Neural Networks") | One scalar (T = 1.3) fitted on the calibration split, so the abstention threshold works on calibrated probabilities. |
 | Geometric mean with the linear model (product of experts) | Hinton 2002 (Neural Computation 14, 1771) | The trees alone lowered Gaia-only faint-star recall (0.886 → 0.834, DESI test) for evidence combinations rare in training. The sign-constrained linear model keeps a predictable direction there, and the 0.5 blend was not below the linear model in any missing-evidence case on the calibration split. |
+
+## X-ray, radio and high-redshift quasar evidence (2.26.0)
+
+| Element | Source | Use |
+|---|---|---|
+| X-ray-to-optical flux ratio, log(fX/fopt) = log fX + m/2.5 + 5.37 (XRAY-001) | Maccacaro et al. 1988 (ApJ 326, 680), Eq. 1; Stocke et al. 1991 (ApJS 76, 813) | AGN and quasars lie at −1 to +1.2, coronal stars below −1, normal galaxies below ~ −2. Survey bands (CSC 0.5–7, 4XMM 0.2–12, eRASS1 0.2–2.3 keV) are converted to 0.3–3.5 keV with a photon index Γ = 1.8 (mean AGN slope); r is used for V. |
+| Radio loudness R = 0.4 (r − t), t = −2.5 log10(S1.4 / 3631 Jy) (RADIO-001) | Ivezić et al. 2002 (AJ 124, 2364), Section 4 | Radio-loud quasars and AGN are detected at the survey limits while stars almost never are; LoTSS and VLASS are scaled to 1.4 GHz with S ∝ ν^−0.7. |
+| High-z quasar gri branch (PS1-QSO-HIZ-001) | Richards et al. 2002 (AJ 123, 2945), Section 3.4 | z ≈ 3.5–4.5 quasars are red in g−r from the Lyα forest and move off the stellar locus; benchmark purity 7/8, completeness ~11 % at z > 3. |
+| X-ray and radio keys kept out of the trees (linear only) | eRASS1 footprint: Merloni et al. 2024 (A&A 682, A34), Galactic l > 180°; LoTSS DR2: Shimwell et al. 2022 (A&A 659, A1), northern sky | A missing counterpart reflects the survey footprint, not the class: 33 % of SDSS-truth QSOs but 4 % of DESI-truth QSOs have an X-ray match. Tree missing-value branches learned that difference (DESI STAR recall 0.893 → 0.852); the linear model treats absence as logit 0. |
+| Gaia match at the truth epoch | Gaia DR3 epoch J2016.0 (Gaia Collaboration, Vallenari et al. 2023, A&A 674, A1) | Benchmark Gaia counterparts are searched within 15″ and moved by their proper motion to the spectroscopic epoch (SDSS MJD); 46 high-proper-motion SDSS stars gained their Gaia match. |
+
+## ZTF variability (2.27.0, measured, not adopted)
+
+| Element | Source | Outcome |
+|---|---|---|
+| Structure function SF(dt) = A (dt / 1 yr)^γ, χ²_red, from ZTF r/g light curves (ZTF-VAR-001, off unless its rule row is present) | Schmidt et al. 2010 (ApJ 714, 1194); Palanque-Delabrouille et al. 2011 (A&A 530, A122); Masci et al. 2019 (PASP 131, 018003) | Point sources only, since PSF photometry of resolved galaxies varies with seeing (benchmark galaxies: median χ²_red 10.6). The fitted weights point the right way (γ → QSO +1.28), but test accuracy changed by one object per set (SDSS +0.05 pp, DESI −0.11 pp) and the calibration log-loss rose (0.1433 → 0.1473). IRSA light-curve cones also take minutes per field. Not adopted. |
+| Gaia DSC all-zero stellar posterior | Delchambre et al. 2023 (A&A 674, A31) | A zero stellar probability is a confident extragalactic posterior; DSC-001 now emits it (2.27.0) instead of dropping the rule for 41 % of DSC rows. |
+
+## DESI spectra in association (2.28.0)
+
+| Element | Source | Use |
+|---|---|---|
+| A DESI spectrum is a measurement at its Legacy Surveys target position (TARGET_RA/DEC), position error 0.1″ instead of the 0.6″ default | Myers et al. 2023 (AJ 165, 50), DESI target selection pipeline; Dey et al. 2019 (AJ 157, 168) LS astrometry | With 0.6″ a spectrum on a star 0.85″ from a galaxy scored 0.85 vs 1 and was left ambiguous (field RA 250). |
+| Spectra associate after the imaging, and a spectrum within 0.3″ of a group's LS member joins that group (decisive) | same (spectra have no independent position) | LS DR10 south release 10000 differs from the DR9 TARGETID, so the catalogue alias can fail; a shredded galaxy's PS1/SDSS fragments otherwise made its LS source ambiguous (RA 250), and a group anchored by a PS1 detection 0.71″ off sent the spectrum to a lone GALEX detection (RA 20). Distance is measured to the group's LS members, not its anchor. |
+| Duplicate spectra of one target: kept once (best ΔΧ², greedy 0.5″), a second spectrum never joins a neighbour | DESI DR1 has several spectra per target (zcat_primary) | A rounded 0.5″ grid key kept both copies when they straddled a cell edge. |

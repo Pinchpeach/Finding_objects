@@ -29,6 +29,17 @@ RELATION_TEXT = {
     "transient": "Transient event inside a large galaxy (kept separate from the host)",
 }
 AXES = ("physical", "variability", "compact", "extragalactic", "phenomenon")
+# DetailPanel's info rows, in display order: (attribute, label).
+INFO_ROWS = (
+    ("lbl_sub", "Sub-class"),
+    ("lbl_tags", "Attributes"),
+    ("lbl_paper", "Literature"),
+    ("lbl_pos", "Position"),
+    ("lbl_status", "Status"),
+    ("lbl_parts", "Structure"),
+    ("lbl_names", "Catalog IDs"),
+    ("lbl_cats", "Catalogs"),
+)
 
 
 class SkyMap(QWidget):
@@ -86,7 +97,7 @@ class SkyMap(QWidget):
         tags = df["subclass_tags"].fillna("").astype(str) if "subclass_tags" in df else pd.Series([""] * len(df))
         self._subs = [a + (f"\n{b}" if b else "") for a, b in zip(subs.tolist(), tags.tolist())]
         self._hosts = []
-        sga = [c for c in df.columns if c.startswith(("sga_", "sga_2020__"))]
+        sga = [c for c in df.columns if c.startswith("sga_")]  # also the sga_2020__ namespace
         for i, r in enumerate(df[sga].to_dict("records") if sga else ()):
             d26 = _num(r.get("sga_d26_arcmin", r.get("sga_2020__sga_d26_arcmin")))
             if d26 and _num(r.get("sga_2020__catalog_object_id")) is not None:
@@ -184,9 +195,6 @@ class SkyMap(QWidget):
         ra = (self._c0[0] + x / 60.0 / max(math.cos(math.radians(self._c0[1])), 1e-6)) % 360.0
         return ra, dec
 
-    def _shown(self, i) -> bool:
-        return self._x is not None and self._x[i] == self._x[i] and (self._visible is None or i in self._visible)
-
     def _screen_all(self):
         """Screen x, y of every object and the shown mask, as numpy arrays
         (2.19.0: hover and paint looped over all objects in Python)."""
@@ -217,6 +225,7 @@ class SkyMap(QWidget):
             p.end()
 
     def _paint(self, p):
+        import numpy as np
         from qt_icons import draw
 
         p.setRenderHint(QPainter.Antialiasing)
@@ -237,11 +246,12 @@ class SkyMap(QWidget):
             p.setPen(QPen(QColor("#2f9e44"), 1.5))
             p.drawLine(QPointF(ox - 7, oy), QPointF(ox + 7, oy))
             p.drawLine(QPointF(ox, oy - 7), QPointF(ox, oy + 7))
+        ax, ay, shown = self._screen_all()
         # true extent of large galaxies (SGA D26 ellipse; PA from north through east)
         for i, d26, pa, ba in self._hosts:
-            if not self._shown(i):
+            if i >= len(shown) or not shown[i]:
                 continue
-            sx, sy = self._to_screen(self._x[i], self._y[i])
+            sx, sy = ax[i], ay[i]
             a = d26 / 2 * s
             if a < 4:
                 continue
@@ -252,9 +262,6 @@ class SkyMap(QWidget):
             p.setBrush(QColor(79, 143, 220, 25))
             p.drawEllipse(QPointF(0, 0), a * ba, a)
             p.restore()
-        import numpy as np
-
-        ax, ay, shown = self._screen_all()
         keep = shown & (ax >= -20) & (ax <= self.width() + 20) & (ay >= -20) & (ay <= self.height() + 20)
         in_view = [(int(i), float(ax[i]), float(ay[i])) for i in np.flatnonzero(keep)]
         # draw unclassified first so classified glyphs stay on top
@@ -433,35 +440,14 @@ class DetailPanel(QWidget):
         self.title.setStyleSheet("font-weight: 600; font-size: 14px;")
         lay.addWidget(self.title)
         info = QFormLayout()
-        self.lbl_pos, self.lbl_status, self.lbl_cats = QLabel("–"), QLabel("–"), QLabel("–")
-        self.lbl_names = QLabel("–")
-        self.lbl_sub = QLabel("–")
-        self.lbl_parts = QLabel("–")
-        self.lbl_tags = QLabel("–")
-        self.lbl_paper = QLabel("–")
-        self.lbl_paper.setOpenExternalLinks(True)
-        for w in (
-            self.lbl_cats,
-            self.lbl_names,
-            self.lbl_sub,
-            self.lbl_parts,
-            self.lbl_tags,
-            self.lbl_paper,
-            self.lbl_status,
-        ):
-            w.setWordWrap(True)
-        for k, w in (
-            ("Sub-class", self.lbl_sub),
-            ("Attributes", self.lbl_tags),
-            ("Literature", self.lbl_paper),
-            ("Position", self.lbl_pos),
-            ("Status", self.lbl_status),
-            ("Structure", self.lbl_parts),
-            ("Catalog IDs", self.lbl_names),
-            ("Catalogs", self.lbl_cats),
-        ):
-            w.setTextInteractionFlags(Qt.TextBrowserInteraction if w is self.lbl_paper else Qt.TextSelectableByMouse)
-            info.addRow(k, w)
+        for attr, label in INFO_ROWS:
+            w = QLabel("–")
+            setattr(self, attr, w)
+            w.setWordWrap(attr != "lbl_pos")  # the position stays on one line
+            if attr == "lbl_paper":  # ADS links open in the browser
+                w.setOpenExternalLinks(True)
+            w.setTextInteractionFlags(Qt.TextBrowserInteraction if attr == "lbl_paper" else Qt.TextSelectableByMouse)
+            info.addRow(label, w)
         lay.addLayout(info)
 
         probs = QGroupBox("Coarse class probability")
@@ -523,23 +509,14 @@ class DetailPanel(QWidget):
         if row is None:
             self.title.setText("Select an object")
             self.title.setStyleSheet("font-weight: 600; font-size: 14px;")
-            for w in (
-                self.lbl_pos,
-                self.lbl_status,
-                self.lbl_cats,
-                self.lbl_names,
-                self.lbl_sub,
-                self.lbl_parts,
-                self.lbl_tags,
-                self.lbl_paper,
-            ):
-                w.setText("–")
+            for attr, _ in INFO_ROWS:
+                getattr(self, attr).setText("–")
             for bar in self.bars.values():
                 bar.setValue(0)
             return
         cls = str(row.get("primary_class", "UNKNOWN"))
         name = row.get("designation")
-        name = row.get("object_id", "") if name is None or (isinstance(name, float) and name != name) else name
+        name = row.get("object_id", "") if _missing(name) else name
         self.title.setText(f"{name} — {cls}")
         self.title.setStyleSheet(f"font-weight: 600; font-size: 14px; color: {class_color(cls).name()};")
         sep = _num(row.get("separation_arcmin"))
@@ -606,7 +583,7 @@ class DetailPanel(QWidget):
             self.evidence.addTopLevelItem(item)
         for axis in AXES:
             label = row.get(f"{axis}_class")
-            if label is None or (isinstance(label, float) and label != label):
+            if _missing(label):
                 continue
             self.axes.addTopLevelItem(
                 QTreeWidgetItem(
@@ -692,8 +669,13 @@ def _f(v, nd):
     return "–" if x is None else f"{x:.{nd}f}"
 
 
+def _missing(v) -> bool:
+    """None or a float NaN (a missing cell of a results row)."""
+    return v is None or (isinstance(v, float) and v != v)
+
+
 def _short(v, n=40):
-    if v is None or (isinstance(v, float) and v != v):
+    if _missing(v):
         return ""
     s = f"{v:.3g}" if isinstance(v, float) else str(v)
     return s if len(s) <= n else s[: n - 1] + "…"
@@ -764,11 +746,10 @@ class LogWindow(QWidget):
         super().hideEvent(event)
 
     def reload(self):
-        self.text.setPlainText(self._log.read_tail())
-        try:
-            self._offset = self._log.path.stat().st_size
-        except OSError:
-            self._offset = 0
+        # Text and offset from one read: a stat() after read_tail() counted
+        # lines appended in between as shown, and poll() never added them.
+        text, self._offset = self._log.read_tail_and_size()
+        self.text.setPlainText(text)
         self._scroll_end()
 
     def poll(self):

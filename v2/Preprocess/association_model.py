@@ -51,6 +51,7 @@ PROFILES = {
     "TGSS ADR1": SurveyProfile(None, 2.0, 25.0, 25.0),
     # ZTF: ~0.1" astrometry, ~2" seeing (Bellm et al. 2019; Masci et al. 2019).
     "ZTF periodic variables": SurveyProfile(None, 0.15, 2.0, 3.0),
+    "ZTF light curves": SurveyProfile(None, 0.15, 2.0, 3.0),
     # Chandra CSC: on-axis PSF ~0.5"; per-source r0 is a 95 % error-ellipse
     # radius (Evans et al. 2010; CSC column documentation), see
     # infer_poserr_arcsec.
@@ -78,6 +79,16 @@ PROFILES = {
     # fallback error stays the conservative 0.6" (2.19.0; 0.10" split the
     # NGC 4522 nucleus from its galaxy), see also LS_RESOLVED_FLOOR_ARCSEC.
     "DESI Legacy Surveys DR10": SurveyProfile(None, 0.6, 1.2, 4.0),
+    # DESI DR1 redshift catalogues give TARGET_RA/TARGET_DEC, the imaging
+    # position the target was selected at (Legacy Surveys DR9 Tractor or
+    # Gaia; Myers et al. 2023, AJ 165, 50), not a fibre or spectral
+    # centroid, so the error is that of LS astrometry (~0.03" bright, 0.1"
+    # used).  With the 0.6" default, a target 0.01" from its LS source and
+    # 0.34" from a neighbouring star scored 0.85 vs 1 and became an
+    # evidence-less "ambiguous" object (field RA 250, 2.28.0).  Resolved LS
+    # sources keep their own 0.6" floor in the pair sigma.
+    "DESI DR1 spectroscopy": SurveyProfile(None, 0.1, None, 5.0),
+    "DESI DR1 FastSpecFit": SurveyProfile(None, 0.1, None, 5.0),
 }
 DEFAULT_PROFILE = SurveyProfile(None, 0.6, None, 5.0)
 LS_RESOLVED_FLOOR_ARCSEC = 0.6

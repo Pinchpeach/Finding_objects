@@ -35,15 +35,21 @@ def _worker_stdio() -> None:
                 setattr(sys, name, open(os.devnull, "w"))
 
 
+def _load_v2(module_name: str, file_name: str):
+    """Import a top-level v2 script (v2/<file_name>) as ``module_name``."""
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(module_name, V2 / file_name)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
 def _worker_main(argv: list[str]) -> int:
     """Run v2/pipeline.py's CLI in this process (``--pipeline`` mode)."""
     _worker_stdio()
-    import importlib.util
-
     sys.path.insert(0, str(V2))
-    spec = importlib.util.spec_from_file_location("v2_pipeline", V2 / "pipeline.py")
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
+    mod = _load_v2("v2_pipeline", "pipeline.py")
     sys.argv = ["pipeline.py", *argv]
     mod.main()
     mod.exit_now(0)  # results are written; skip interpreter teardown (see pipeline.exit_now)
@@ -106,6 +112,14 @@ RADIUS_UNITS = {"arcsec": 1 / 60.0, "arcmin": 1.0, "deg": 60.0}  # -> arcmin
 RADIUS_DECIMALS = {"arcsec": 1, "arcmin": 3, "deg": 5}
 RADIUS_RANGE_ARCMIN = (0.1 / 60.0, 180.0)  # 0.1 arcsec .. 3 deg
 MAX_QUERY_ARCMIN = 30.0  # largest cone the archive collectors were exercised with
+# Spin boxes kept between sessions: (settings key, MainWindow attribute, default).
+SPINS = (
+    ("ra", "sp_ra", 245.0),
+    ("dec", "sp_dec", 43.0),
+    ("radius", "sp_rad", 3.0),
+    ("minconf", "sp_minconf", 0.0),
+    ("workers", "sp_workers", 6),
+)
 
 
 def parse_coordinates(text: str) -> tuple[float, float] | None:
@@ -150,12 +164,7 @@ def parse_coordinates(text: str) -> tuple[float, float] | None:
 
 
 def _designations():
-    import importlib.util
-
-    spec = importlib.util.spec_from_file_location("v2_designations", V2 / "designations.py")
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    return mod
+    return _load_v2("v2_designations", "designations.py")
 
 
 class _NameResolver(QRunnable):
@@ -398,39 +407,27 @@ class MainWindow(QMainWindow):
         self._mode_changed()
         return box
 
+    def _action(self, menu, text, slot, shortcut=None) -> QAction:
+        a = QAction(text, self)
+        if shortcut is not None:
+            a.setShortcut(shortcut)
+        a.triggered.connect(slot)
+        menu.addAction(a)
+        return a
+
     def _build_menu(self):
         m = self.menuBar().addMenu("&File")
-        a_open = QAction("&Open results…", self)
-        a_open.setShortcut(QKeySequence.Open)
-        a_open.triggered.connect(self._open_results)
-        a_exp = QAction("&Export table as CSV…", self)
-        a_exp.setShortcut("Ctrl+E")
-        a_exp.triggered.connect(self._export)
-        a_quit = QAction("&Quit", self)
-        a_quit.setShortcut(QKeySequence.Quit)
-        a_quit.triggered.connect(self.close)
-        for a in (a_open, a_exp):
-            m.addAction(a)
+        self._action(m, "&Open results…", self._open_results, QKeySequence.Open)
+        self._action(m, "&Export table as CSV…", self._export, "Ctrl+E")
         m.addSeparator()
-        m.addAction(a_quit)
+        self._action(m, "&Quit", self.close, QKeySequence.Quit)
         v = self.menuBar().addMenu("&View")
-        a_log = QAction("&Log", self)
-        a_log.setShortcut("Ctrl+L")
-        a_log.triggered.connect(self.show_log)
-        v.addAction(a_log)
+        self._action(v, "&Log", self.show_log, "Ctrl+L")
         b = self.menuBar().addMenu("&Bookmarks")
-        self.a_bookmark = QAction("&Bookmark selected object", self)
-        self.a_bookmark.setShortcut("Ctrl+D")
-        self.a_bookmark.triggered.connect(self.toggle_bookmark)
-        a_pages = QAction("&Show bookmarks", self)
-        a_pages.setShortcut("Ctrl+B")
-        a_pages.triggered.connect(lambda: self.pages.setCurrentWidget(self.bookmark_page))
-        b.addAction(self.a_bookmark)
-        b.addAction(a_pages)
+        self.a_bookmark = self._action(b, "&Bookmark selected object", self.toggle_bookmark, "Ctrl+D")
+        self._action(b, "&Show bookmarks", lambda: self.pages.setCurrentWidget(self.bookmark_page), "Ctrl+B")
         h = self.menuBar().addMenu("&Help")
-        a_about = QAction("&About", self)
-        a_about.triggered.connect(self._about)
-        h.addAction(a_about)
+        self._action(h, "&About", self._about)
 
     # ----------------------------------------------------------- inputs
     def _mode_changed(self):
@@ -634,12 +631,13 @@ class MainWindow(QMainWindow):
             self._status("Run failed or was cancelled; see View > Log.")
 
     # ---------------------------------------------------------- results
-    def load_results(self, path: Path):
+    def load_results(self, path: Path) -> bool:
+        """Show a results file; False (and the previous results kept) if it cannot be read."""
         try:
             df = pd.read_csv(path, low_memory=False)
         except Exception as exc:  # unreadable / malformed file chosen by the user
             QMessageBox.warning(self, APP_NAME, f"Could not read {path}:\n{exc}")
-            return
+            return False
         assoc = path.parent / "source_association.csv"
         if "designation" not in df.columns and assoc.exists():  # results written before designations existed
             df = _designations().annotate(
@@ -655,14 +653,18 @@ class MainWindow(QMainWindow):
         self.detail.show_object(None)
         self._filters_changed()
         self.setWindowTitle(f"{APP_NAME} — {path.parent}")
+        return True
+
+    def _visible_source_rows(self) -> list[int]:
+        """Results-frame rows the filtered table shows, in table order."""
+        return [self.proxy.mapToSource(self.proxy.index(i, 0)).row() for i in range(self.proxy.rowCount())]
 
     def _filters_changed(self):
         self.proxy.set_class(self.cmb_class.currentText())
         self.proxy.set_status(self.cmb_status.currentText())
         self.proxy.set_text(self.txt_search.text())
         self.proxy.set_show_components(self.chk_parts.isChecked())
-        rows = [self.proxy.mapToSource(self.proxy.index(i, 0)).row() for i in range(self.proxy.rowCount())]
-        self.sky.set_visible_rows(rows)
+        self.sky.set_visible_rows(self._visible_source_rows())
         df = self.model.frame()
         if not df.empty and "primary_class" in df:
             top = df[df.parent_object_id.isna()] if "parent_object_id" in df else df
@@ -685,7 +687,7 @@ class MainWindow(QMainWindow):
         src = self.proxy.mapToSource(current).row()
         row = self.model.frame().iloc[src]
         self.detail.show_object(row)
-        self.detail.set_bookmarked(self.bookmarks.find(row) is not None)
+        self.detail.set_bookmarked(self._is_bookmarked(row))
         self.sky.set_selected(src)
 
     # -------------------------------------------------------- bookmarks
@@ -695,13 +697,25 @@ class MainWindow(QMainWindow):
             return None
         return self.model.frame().iloc[self.proxy.mapToSource(idx).row()]
 
+    def _is_bookmarked(self, row) -> bool:
+        return row is not None and self.bookmarks.find(row) is not None
+
     def toggle_bookmark(self):
         """Bookmark the selected object, or remove its bookmark."""
         row = self.selected_row()
         if row is None:
             self._status("Select an object to bookmark.")
             return
-        on = self.bookmarks.toggle(row, str(self.results_path) if self.results_path else None)
+        # toggle() only appends a new item or drops one (existing dicts are
+        # not changed), so the old list restores the in-memory state that
+        # matches the file when saving fails.
+        items = list(self.bookmarks.items)
+        try:
+            on = self.bookmarks.toggle(row, str(self.results_path) if self.results_path else None)
+        except OSError as exc:  # bookmark folder not writable, disk full, ...
+            self.bookmarks.items = items
+            QMessageBox.warning(self, APP_NAME, f"Could not save bookmarks to {self.bookmarks.path}:\n{exc}")
+            return
         self.detail.set_bookmarked(on)
         self.bookmark_page.refresh()
         name = self.bookmarks.snapshot(row)["name"] or "object"
@@ -714,7 +728,7 @@ class MainWindow(QMainWindow):
         self.table.selectRow(idx.row())
         row = self.selected_row()
         menu = QMenu(self)
-        on = row is not None and self.bookmarks.find(row) is not None
+        on = self._is_bookmarked(row)
         act = menu.addAction("Remove bookmark" if on else "Bookmark")
         act.triggered.connect(self.toggle_bookmark)
         menu.exec(self.table.viewport().mapToGlobal(pos))
@@ -723,14 +737,13 @@ class MainWindow(QMainWindow):
         if self.pages.widget(index) is self.bookmark_page:
             self.bookmark_page.refresh()
         else:
-            row = self.selected_row()
-            self.detail.set_bookmarked(row is not None and self.bookmarks.find(row) is not None)
+            self.detail.set_bookmarked(self._is_bookmarked(self.selected_row()))
 
     def open_bookmark(self, b: dict):
         """Load the results the bookmark came from and select the object."""
         path = Path(b["source"])
-        if self.results_path is None or Path(self.results_path) != path:
-            self.load_results(path)
+        if self.results_path != path and not self.load_results(path):
+            return  # unreadable: do not pick a row of the results still shown
         df = self.model.frame()
         hit = None
         for col, key in (("designation", "name"), ("object_name", "name"), ("object_id", "object_id")):
@@ -787,7 +800,7 @@ class MainWindow(QMainWindow):
             return
         path, _ = QFileDialog.getSaveFileName(self, "Export", str(Path.home() / "classified.csv"), "CSV (*.csv)")
         if path:
-            rows = [self.proxy.mapToSource(self.proxy.index(i, 0)).row() for i in range(self.proxy.rowCount())]
+            rows = self._visible_source_rows()
             try:
                 df.iloc[rows].to_csv(path, index=False)
             except OSError as exc:  # e.g. the file is open in Excel
@@ -823,14 +836,8 @@ class MainWindow(QMainWindow):
 
     def _save(self):
         s = self.settings
-        for k, w in (
-            ("ra", self.sp_ra),
-            ("dec", self.sp_dec),
-            ("radius", self.sp_rad),
-            ("minconf", self.sp_minconf),
-            ("workers", self.sp_workers),
-        ):
-            s.setValue(k, w.value())
+        for k, attr, _ in SPINS:
+            s.setValue(k, getattr(self, attr).value())
         s.setValue("radius_unit", self.cmb_rad_unit.currentText())
         s.setValue("area_cut", self.chk_area.isChecked())
         s.setValue("work", self.txt_work.text())
@@ -849,14 +856,8 @@ class MainWindow(QMainWindow):
             self._rad_unit = unit
         self._apply_unit_range(self._rad_unit)
         self.chk_area.setChecked(str(s.value("area_cut", "true")).lower() == "true")
-        for k, w, d in (
-            ("ra", self.sp_ra, 245.0),
-            ("dec", self.sp_dec, 43.0),
-            ("radius", self.sp_rad, 3.0),
-            ("minconf", self.sp_minconf, 0.0),
-            ("workers", self.sp_workers, 6),
-        ):
-            w.setValue(float(s.value(k, d)))
+        for k, attr, d in SPINS:
+            getattr(self, attr).setValue(float(s.value(k, d)))
         self.txt_work.setText(str(s.value("work", Path.home() / "finding_objects_runs" / "run")))
         self.txt_raw.setText(str(s.value("raw", "")))
         self.txt_name.setText(str(s.value("name", "")))
@@ -866,6 +867,11 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, event):
         self._save()
+        # A note typed just before closing is still waiting for its debounce timer.
+        try:
+            self.bookmark_page._save_note()
+        except OSError as exc:  # closing must not fail on an unwritable bookmark file
+            QMessageBox.warning(self, APP_NAME, f"Could not save the bookmark note:\n{exc}")
         if self.proc and self.proc.state() != QProcess.NotRunning:
             self.proc.kill()
             self.proc.waitForFinished(3000)

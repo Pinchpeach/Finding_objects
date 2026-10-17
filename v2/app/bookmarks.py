@@ -21,10 +21,11 @@ from __future__ import annotations
 import json
 import math
 import os
-import sys
 import time
 import uuid
 from pathlib import Path
+
+from app_paths import user_file
 
 FILE_NAME = "bookmarks.json"
 SCHEMA = 1
@@ -47,21 +48,10 @@ FIELDS = {
     "phenomenon": ("phenomenon_class",),
     "object_id": ("object_id",),
 }
-COLUMNS = ("name", "primary_class", "subclass", "ra", "dec", "confidence", "note", "added", "source")
 
 
 def default_path() -> Path:
-    env = os.environ.get("FINDING_OBJECTS_BOOKMARKS")
-    if env:
-        return Path(env).expanduser()
-    home = Path.home()
-    if sys.platform.startswith("win"):
-        base = Path(os.environ.get("LOCALAPPDATA") or home / "AppData" / "Local") / "FindingObjects"
-    elif sys.platform == "darwin":
-        base = home / "Library" / "Application Support" / "FindingObjects"
-    else:
-        base = Path(os.environ.get("XDG_DATA_HOME") or home / ".local" / "share") / "finding_objects"
-    return base / FILE_NAME
+    return user_file(FILE_NAME, "FINDING_OBJECTS_BOOKMARKS", "Application Support", "XDG_DATA_HOME", ".local/share")
 
 
 def _clean(value):

@@ -252,9 +252,12 @@ def prune(sources: dict[str, Path] | None = None, max_mb: float | None = None) -
                 folder = base / name
                 if not folder.is_dir():
                     continue
-                current = _code_hash(src)
+                # Compare the code hash only: the "-<Gaia release>" suffix
+                # keeps one folder per release, so switching V2_GAIA_RELEASE
+                # must not delete the other release's cache.
+                current = _code_hash(src).split("-")[0]
                 for sub in folder.iterdir():
-                    if sub.is_dir() and sub.name != current:
+                    if sub.is_dir() and sub.name.split("-")[0] != current:
                         _rmtree(sub)
                         out["folders"] += 1
         files = []

@@ -57,6 +57,7 @@ NUCLEUS_ARCSEC = 5.0
 FOREGROUND_RULES = {"AST-GAL-001", "AST-GAL-002"}
 NAME_CATALOGS = ("SIMBAD", "NED")
 EVENT_CATALOGS = ("ASAS-SN Supernova Catalog", "Asiago Supernova Catalog")
+# Spectroscopic surveys first, then the NED / SIMBAD compilations.
 Z_COLUMNS = (
     "sdss_dr18_spectroscopy__z",
     "desi_dr1_spectroscopy__z",
@@ -64,7 +65,6 @@ Z_COLUMNS = (
     "ned__Redshift",
     "simbad__rvz_redshift",
 )
-SPEC_Z_COLUMNS = Z_COLUMNS[:3]
 
 
 def _num(v):
@@ -181,7 +181,7 @@ def consolidate(df: pd.DataFrame, priority=()) -> pd.DataFrame:
             if any(c in cats for c in EVENT_CATALOGS):
                 role[i] = "transient"
                 continue
-            zi = _redshift(r, SPEC_Z_COLUMNS) or _redshift(r)
+            zi = _redshift(r)
             if zi is not None and host_z[h] is not None and abs(zi - host_z[h]) * C_KMS > DV_MAX_KMS:
                 role[i] = "background_source" if zi > host_z[h] else "foreground_source"
                 continue

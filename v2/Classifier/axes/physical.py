@@ -1,7 +1,7 @@
 """Physical/evolutionary-state axis with conservative independent evidence."""
 
 from __future__ import annotations
-import importlib.util, math
+import functools, importlib.util, math
 from pathlib import Path
 
 AXIS = "physical"
@@ -16,51 +16,20 @@ CLASSES = ("WD", "HOT_SUBDWARF", "ULTRACOOL_DWARF", "RGB", "AGB", "RED_GIANT", "
 # 0.3 Gyr; benchmark/flame_giants), so its RGB guardrails reject most.
 GIANT_TEFF_MAX = 5500.0
 ROOT = Path(__file__).resolve().parents[1]
+_s = importlib.util.spec_from_file_location("v2_classifier_rowutil", ROOT / "_rowutil.py")
+ROW = importlib.util.module_from_spec(_s)
+_s.loader.exec_module(ROW)
+OTYPES = ROW.OTYPES
+_num, _text = ROW.num, ROW.text
+_result = functools.partial(ROW.axis_result, AXIS)
+STAR = ROW.load("classifier_branch_star", ROOT / "branches" / "star.py")
+EVOLVED = ROW.load("classifier_branch_evolved_star", ROOT / "branches" / "evolved_star.py")
 
 
-def _load_branch(name):
-    p = ROOT / "branches" / f"{name}.py"
-    s = importlib.util.spec_from_file_location(f"classifier_branch_{name}", p)
-    if s is None or s.loader is None:
-        raise ImportError(p)
-    m = importlib.util.module_from_spec(s)
-    s.loader.exec_module(m)
-    return m
-
-
-def _text(row, key):
-    v = row.get(key)
-    if v is None:
-        return None
-    v = str(v).strip()
-    return None if not v or v.lower() == "nan" else v
-
-
-def _num(row, key):
-    try:
-        v = float(row.get(key))
-        return v if math.isfinite(v) else None
-    except Exception:
-        return None
-
-
-STAR = _load_branch("star")
-EVOLVED = _load_branch("evolved_star")
-_os = importlib.util.spec_from_file_location("v2_simbad_otypes_phys", ROOT / "simbad_otypes.py")
-OTYPES = importlib.util.module_from_spec(_os)
-_os.loader.exec_module(OTYPES)
-_SUB = None
-
-
+@functools.lru_cache(maxsize=1)
 def _subclass():
-    global _SUB
-    if _SUB is None:
-        p = ROOT / "subclass.py"
-        s = importlib.util.spec_from_file_location("classifier_subclass_for_physical", p)
-        m = importlib.util.module_from_spec(s)
-        s.loader.exec_module(m)
-        _SUB = m
-    return _SUB
+    # Loaded on first use (it is called per row, so cached here as well).
+    return ROW.load("classifier_subclass_for_physical", ROOT / "subclass.py")
 
 
 def _teff(row):
@@ -69,11 +38,7 @@ def _teff(row):
     sp = _subclass().spectro_params(row)
     if sp is not None:
         return sp["teff"]
-    for k in ("gaia_dr3__teff_gspphot", "teff_gspphot"):
-        v = _num(row, k)
-        if v is not None:
-            return v
-    return None
+    return _num(row, "gaia_dr3__teff_gspphot", "teff_gspphot")
 
 
 # HOT_SUBDWARF (2.22.0): hot subluminous star (sdO/sdB, plus some BHB stars,
@@ -98,8 +63,7 @@ HSD_MAX_ABS_CSTAR = 0.6
 
 
 def _gaia(row, key):
-    v = _num(row, "gaia_dr3__" + key)
-    return v if v is not None else _num(row, key)
+    return _num(row, "gaia_dr3__" + key, key)
 
 
 def hot_subdwarf_evidence(row):
@@ -113,11 +77,7 @@ def hot_subdwarf_evidence(row):
     gabs = g + 5 * math.log10(p) - 10  # parallax in mas
     if not HSD_GABS[0] <= gabs <= HSD_GABS[1]:
         return None
-    cstar = ex - (
-        1.154360 + 0.033772 * c + 0.032277 * c * c
-        if c < 0.5
-        else 1.162004 + 0.011464 * c + 0.049255 * c * c - 0.005879 * c**3
-    )
+    cstar = STAR.corrected_excess_factor(ex, c)  # Riello et al. 2021 C*
     if abs(cstar) >= HSD_MAX_ABS_CSTAR:
         return None
     ms_edge = 17.7 * c**3 - 6.9 * c**2 + 7.35 * c + 1.95
@@ -172,6 +132,20 @@ def ultracool_evidence(row):
     }
 
 
+# Curated SIMBAD types, in this order (codes through the hierarchy, 2.22.0):
+# (ancestor code, label, status, otype reported: None = the row's own code).
+# The AGB code is AB* ("AGB*" is its label, so the old test never fired);
+# Mira (Mi*) is an AB* child.  A curated white dwarf (2.23.0): without it, a
+# WD the Gaia HR gate abstained on was named a hot main-sequence star by its
+# colour.
+SIMBAD_CURATED = (
+    ("WD*", "WD", "SIMBAD_CURATED_WD", None),
+    ("HS*", "HOT_SUBDWARF", "SIMBAD_CURATED_HOT_SUBDWARF", "HS*"),
+    ("BD*", "ULTRACOOL_DWARF", "SIMBAD_CURATED_BROWN_DWARF", "BD*"),
+    ("AB*", "AGB", "SIMBAD_CURATED_AGB", None),
+)
+
+
 def classify(row):
     catalogs = _text(row, "catalogs") or ""
     if "Suh 2021 AGB Catalog" in catalogs:
@@ -182,30 +156,28 @@ def classify(row):
         mags = sub_mod.abs_mags(row)
         mk = mags[0] if mags else None
         if mk is not None and mk > sub_mod.AGB_MAX_MKS:
-            return {
-                "axis": AXIS,
-                "label": "UNKNOWN",
-                "confidence": None,
-                "status": "SUH2021_MATCH_BELOW_RED_CLUMP",
-                "evidence": [
+            return _result(
+                "UNKNOWN",
+                None,
+                "SUH2021_MATCH_BELOW_RED_CLUMP",
+                [
                     {
                         "kind": "suh2021_agb_catalog_counterpart",
                         "abs_ks": round(mk, 2),
                         "note": f"M_Ks = {mk:.2f} > {sub_mod.AGB_MAX_MKS}: fainter than the red clump, not on the AGB",
                     }
                 ],
-            }
+            )
         assoc = _num(row, "association_confidence__suh_2021_agb_catalog")
         sub = _text(row, "agb_subclass")
         if mk is not None and mk > sub_mod.RGB_TIP_MKS:
             # Below the RGB tip an evolved giant can be on either branch: the same
             # "RGB or AGB" call as the sub-class (2.23.0; was AGB here, RGB-or-AGB there).
-            return {
-                "axis": AXIS,
-                "label": "RED_GIANT",
-                "confidence": assoc,
-                "status": "SUH2021_BELOW_RGB_TIP",
-                "evidence": [
+            return _result(
+                "RED_GIANT",
+                assoc,
+                "SUH2021_BELOW_RGB_TIP",
+                [
                     {
                         "kind": "suh2021_agb_catalog_counterpart",
                         "agb_subclass": sub,
@@ -213,13 +185,12 @@ def classify(row):
                         "note": f"M_Ks = {mk:.2f} fainter than the RGB tip ({sub_mod.RGB_TIP_MKS}): RGB or AGB",
                     }
                 ],
-            }
-        return {
-            "axis": AXIS,
-            "label": "AGB",
-            "confidence": assoc,
-            "status": "SUH2021_AGB_CATALOG_MATCH",
-            "evidence": [
+            )
+        return _result(
+            "AGB",
+            assoc,
+            "SUH2021_AGB_CATALOG_MATCH",
+            [
                 {
                     "kind": "suh2021_agb_catalog_counterpart",
                     "agb_subclass": sub,
@@ -228,71 +199,20 @@ def classify(row):
                     "score_semantics": "raw association score; not calibrated posterior",
                 }
             ],
-        }
+        )
     simbad = _text(row, "otype")
-    # SIMBAD codes through the hierarchy (2.22.0): the AGB code is AB* ("AGB*"
-    # is its label, so the old test never fired); Mira (Mi*) is an AB* child.
-    # A curated white dwarf (2.23.0): without it, a WD the Gaia HR gate
-    # abstained on was named a hot main-sequence star by its colour.
-    if OTYPES.is_a(simbad, "WD*"):
-        return {
-            "axis": AXIS,
-            "label": "WD",
-            "confidence": None,
-            "status": "SIMBAD_CURATED_WD",
-            "evidence": [{"kind": "simbad_physical_type", "otype": simbad}],
-        }
-    if OTYPES.is_a(simbad, "HS*"):
-        return {
-            "axis": AXIS,
-            "label": "HOT_SUBDWARF",
-            "confidence": None,
-            "status": "SIMBAD_CURATED_HOT_SUBDWARF",
-            "evidence": [{"kind": "simbad_physical_type", "otype": "HS*"}],
-        }
-    if OTYPES.is_a(simbad, "BD*"):
-        return {
-            "axis": AXIS,
-            "label": "ULTRACOOL_DWARF",
-            "confidence": None,
-            "status": "SIMBAD_CURATED_BROWN_DWARF",
-            "evidence": [{"kind": "simbad_physical_type", "otype": "BD*"}],
-        }
-    if OTYPES.is_a(simbad, "AB*"):
-        return {
-            "axis": AXIS,
-            "label": "AGB",
-            "confidence": None,
-            "status": "SIMBAD_CURATED_AGB",
-            "evidence": [{"kind": "simbad_physical_type", "otype": simbad}],
-        }
+    for code, label, status, shown in SIMBAD_CURATED:
+        if OTYPES.is_a(simbad, code):
+            return _result(label, None, status, [{"kind": "simbad_physical_type", "otype": shown or simbad}])
     coarse = str(row.get("primary_class", "")).strip().upper()
     if coarse in {"GALAXY", "QSO"}:
-        return {
-            "axis": AXIS,
-            "label": "UNKNOWN",
-            "confidence": None,
-            "status": "NOT_STELLAR_ROUTE",
-            "evidence": [{"kind": "coarse_route", "primary_class": coarse}],
-        }
+        return _result("UNKNOWN", None, "NOT_STELLAR_ROUTE", [{"kind": "coarse_route", "primary_class": coarse}])
     ucd = ultracool_evidence(row)
     if ucd is not None:
-        return {
-            "axis": AXIS,
-            "label": "ULTRACOOL_DWARF",
-            "confidence": None,
-            "status": "GAIA_DR3_ESP_UCD",
-            "evidence": [ucd],
-        }
+        return _result("ULTRACOOL_DWARF", None, "GAIA_DR3_ESP_UCD", [ucd])
     hsd = hot_subdwarf_evidence(row)
     if hsd is not None:
-        return {
-            "axis": AXIS,
-            "label": "HOT_SUBDWARF",
-            "confidence": None,
-            "status": "GAIA_CMD_HOT_SUBLUMINOUS",
-            "evidence": [hsd],
-        }
+        return _result("HOT_SUBDWARF", None, "GAIA_CMD_HOT_SUBLUMINOUS", [hsd])
     star = STAR.classify(row)
     family = star.get("stellar_family")
     evidence = [
@@ -307,23 +227,11 @@ def classify(row):
         }
     ]
     if family == "WHITE_DWARF_CANDIDATE":
-        return {
-            "axis": AXIS,
-            "label": "WD",
-            "confidence": star.get("stellar_family_score"),
-            "status": "CLASSIFIED_WD",
-            "evidence": evidence,
-        }
+        return _result("WD", star.get("stellar_family_score"), "CLASSIFIED_WD", evidence)
     evolved = EVOLVED.classify(row)
     evidence.extend(evolved.get("evidence", []))
     if evolved.get("label") in {"RGB", "AGB", "RED_GIANT"}:
-        return {
-            "axis": AXIS,
-            "label": evolved["label"],
-            "confidence": evolved.get("confidence"),
-            "status": evolved.get("status", "CLASSIFIED"),
-            "evidence": evidence,
-        }
+        return _result(evolved["label"], evolved.get("confidence"), evolved.get("status", "CLASSIFIED"), evidence)
     # A stellar-family route establishes only that the object is stellar.  It is
     # not evidence for a physical/evolutionary state, and must not become a
     # catch-all physical class.  In particular, doing so turns missing RGB/AGB
@@ -339,31 +247,15 @@ def classify(row):
         lum = "III" if mk[1] in {"III", "II", "Ib", "Ia"} else mk[1]
         rule = "SIMBAD_SPTYPE"
         basis = f"SIMBAD MK type {sp}"
-        if teff is None and mk[0] is not None and mk[0] == mk[0] and mk[0] >= 48:
+        # mk[0] is the spectral number from _parse_mk (NaN when unparsed, and
+        # NaN >= 48 is False).
+        if teff is None and mk[0] >= 48:
             teff = GIANT_TEFF_MAX - 1  # G8 or later: cool
     else:
-        lum, rule, basis = sub.star_luminosity_class(row, sub._num)
+        lum, rule, basis = sub.star_luminosity_class(row)
     if lum == "III" and teff is not None and teff < GIANT_TEFF_MAX:
         evidence.append({"kind": "luminosity_class", "class": lum, "rule": rule, "basis": basis, "teff": teff})
-        return {
-            "axis": AXIS,
-            "label": "RED_GIANT",
-            "confidence": None,
-            "status": f"RED_GIANT_{rule}",
-            "evidence": evidence,
-        }
+        return _result("RED_GIANT", None, f"RED_GIANT_{rule}", evidence)
     if family == "STAR_LIKE":
-        return {
-            "axis": AXIS,
-            "label": "UNKNOWN",
-            "confidence": None,
-            "status": "STAR_LIKE_NO_VALIDATED_PHYSICAL_STATE",
-            "evidence": evidence,
-        }
-    return {
-        "axis": AXIS,
-        "label": "UNKNOWN",
-        "confidence": None,
-        "status": "INSUFFICIENT_PHYSICAL_EVIDENCE",
-        "evidence": evidence,
-    }
+        return _result("UNKNOWN", None, "STAR_LIKE_NO_VALIDATED_PHYSICAL_STATE", evidence)
+    return _result("UNKNOWN", None, "INSUFFICIENT_PHYSICAL_EVIDENCE", evidence)

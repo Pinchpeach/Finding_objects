@@ -42,7 +42,6 @@ HEADERS = {
     "dec": "Dec",
     "catalogs": "Catalogs",
 }
-SORT_ROLE = Qt.UserRole + 1
 
 
 def class_color(name: str) -> QColor:
@@ -57,6 +56,9 @@ class DataFrameModel(QAbstractTableModel):
         super().__init__(parent)
         self._df = pd.DataFrame()
         self._cols: list[str] = []
+        self._icons: list | None = None
+        self._kinds: list[dict] | None = None
+        self._sort_keys: dict[str, object] = {}
         if df is not None:
             self.set_frame(df)
 
@@ -65,7 +67,7 @@ class DataFrameModel(QAbstractTableModel):
         self._df = df.reset_index(drop=True)
         self._icons = None
         self._kinds = None
-        self._sort_keys: dict[str, object] = {}
+        self._sort_keys = {}
         cols = [c for c in TABLE_COLUMNS if c in self._df.columns]
         if "designation" not in cols and "object_id" in self._df.columns:  # very old results only
             cols.insert(0, "object_id")
@@ -111,7 +113,7 @@ class DataFrameModel(QAbstractTableModel):
         return keys
 
     def _icon(self, row: int):
-        if getattr(self, "_icons", None) is None:
+        if self._icons is None:
             from qt_icons import icon
 
             cache, icons = {}, []
@@ -152,10 +154,6 @@ class DataFrameModel(QAbstractTableModel):
                     return ""
                 return f"{value:.5f}" if col in ("ra", "dec") else f"{value:.3f}"
             return "" if value is None else str(value)
-        if role == SORT_ROLE:
-            if isinstance(value, float) and math.isnan(value):
-                return float("-inf")
-            return value
         if role == Qt.ForegroundRole and col == "primary_class":
             return class_color(value)
         if role == Qt.DecorationRole and index.column() == 0:
@@ -178,7 +176,6 @@ class ResultsFilter(QSortFilterProxyModel):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setSortRole(SORT_ROLE)
         self._cls = "ALL"
         self._status = "ALL"
         self._text = ""
@@ -259,12 +256,7 @@ class ResultsFilter(QSortFilterProxyModel):
         return True
 
     def lessThan(self, left, right):
-        src = self.sourceModel()
-        if hasattr(src, "sort_keys") and left.column() == right.column():
-            keys = src.sort_keys(left.column())
-            return bool(keys[left.row()] < keys[right.row()])
-        a, b = left.data(SORT_ROLE), right.data(SORT_ROLE)
-        try:
-            return bool(a < b)
-        except TypeError:
-            return str(a) < str(b)
+        # The source is always a DataFrameModel and Qt sorts one column at a
+        # time: compare its precomputed per-column keys.
+        keys = self.sourceModel().sort_keys(left.column())
+        return bool(keys[left.row()] < keys[right.row()])
