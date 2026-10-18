@@ -50,7 +50,10 @@ def test_radio_only_cases():
         _row("bright", 104.0, 10.0, "VLASS", vlass__Ftot=500.0, vlass__QualFlag=0, vlass__DupFlag=0),
         _row("faintB", 104.0 + 20 * d, 10.0, "VLASS", vlass__Ftot=2.0, vlass__QualFlag=0, vlass__DupFlag=0),
     ]
+    faint = dict(vlass__QualFlag=0, vlass__DupFlag=0, vlass__SCode="S", vlass__Ftot=0.5)
+    rows += [_row("fA", 105.0, 10.0, "VLASS", **faint), _row("fB", 105.0 + 50 * d, 10.0, "VLASS", **faint)]
     out = rs.apply(pd.DataFrame(rows)).set_index("object_id")
+    assert out.loc["fA", "classification_status"] == "NO_EVIDENCE"  # 1 mJy < 5.9 mJy (50/100)^2: chance pair
     assert out.loc["lobeA", "classification_status"] == "RADIO_COMPONENT"
     assert "host candidate host" in out.loc["lobeA", "unknown_reason"]
     assert out.loc["dup", "classification_status"] == "UNCONFIRMED"

@@ -17,9 +17,14 @@ literature-based cases, in this order:
    entry of the same arcsecond-resolution survey (VLASS, FIRST, LoTSS) within
    GROUP_RADIUS_ARCSEC with a flux ratio < MAX_FLUX_RATIO -- the grouping and
    lobe-ratio limits of van Velzen et al. 2015 (MNRAS 446, 2985, Sect. 2.1,
-   Table 1; random pairs ~20 % of their groups).  A lobe has no optical
-   counterpart because the host is elsewhere; the object nearest the pair
-   midpoint (within HOST_RADIUS_ARCSEC) is reported as the host candidate.
+   Table 1) -- and bright enough for its separation, S1 + S2 >= K (d/100")^2
+   with K = 10 mJy at 1.4 GHz (Huynh et al. 2005) and 50 mJy at 150 MHz
+   (Williams et al. 2019, Sect. 6.5), 5.9 mJy at 3 GHz (alpha = -0.7):
+   without it, chance pairs dominate in deep surveys (LoTSS ~780 sources
+   per deg^2, i.e. 0.7 unrelated neighbours within 60").  A lobe has no
+   optical counterpart because the host is elsewhere; the optical/IR object
+   nearest the pair midpoint (within HOST_RADIUS_ARCSEC) is reported as the
+   host candidate.
 3. Otherwise the reason says what such sources usually are: AGN whose host
    lies below the optical/IR limits, typically at high redshift (13-27 % of
    LoTSS sources unidentified; Williams et al. 2019, A&A 622, A2; Shimwell et
@@ -38,6 +43,8 @@ GROUP_SURVEYS = {
     "FIRST": ("first__Fint",),
     "LoTSS DR2": ("lotss_dr2__SpeakTot", "lotss_dr2__Stotal", "lotss_dr2__Total_flux"),
 }
+# Flux-separation constant K (mJy) of S1 + S2 >= K (d / 100")^2 per survey.
+PAIR_K_MJY = {"VLASS": 10.0 * (3.0 / 1.4) ** -0.7, "FIRST": 10.0, "LoTSS DR2": 50.0}
 GROUP_RADIUS_ARCSEC = 60.0
 MAX_FLUX_RATIO = 10.0
 HOST_RADIUS_ARCSEC = 10.0
@@ -94,6 +101,7 @@ def classify(out: pd.DataFrame) -> pd.DataFrame:
     if not radio_only.any():
         return res
     xyz = _unit(out.ra, out.dec)
+    optical_none = cats.map(lambda c: not (c - RADIO)).to_numpy()
     pos = {i: k for k, i in enumerate(out.index)}
     for i in out.index[radio_only]:
         row, c = out.loc[i], set(cats[i])
@@ -113,7 +121,13 @@ def classify(out: pd.DataFrame) -> pd.DataFrame:
             sep = _sep_arcsec(xyz[[pos[i]]], xyz[[pos[j] for j in idx]])[0]
             for j, d in zip(idx, sep):
                 g = _num(out.loc[j], *keys)
-                if d <= GROUP_RADIUS_ARCSEC and g and g > 0 and max(f, g) / min(f, g) < MAX_FLUX_RATIO:
+                if (
+                    d <= GROUP_RADIUS_ARCSEC
+                    and g
+                    and g > 0
+                    and max(f, g) / min(f, g) < MAX_FLUX_RATIO
+                    and f + g >= PAIR_K_MJY[survey] * (d / 100.0) ** 2
+                ):
                     if best is None or d < best[1]:
                         best = (j, d, f / g, survey)
         if best:
@@ -122,6 +136,7 @@ def classify(out: pd.DataFrame) -> pd.DataFrame:
             mid /= np.linalg.norm(mid)
             hsep = _sep_arcsec(mid[None, :], xyz)[0]
             hsep[[pos[i], pos[j]]] = np.inf
+            hsep[optical_none] = np.inf  # a host has optical/IR measurements
             hosts = np.flatnonzero(hsep <= HOST_RADIUS_ARCSEC)
             host = ""
             if len(hosts):
