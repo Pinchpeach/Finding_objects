@@ -48,10 +48,20 @@ COLUMNS = [
 ]
 
 
+# Apparent motion fitted by the SDSS photometric pipeline between the five
+# filters (~5 min; deg/day) and the imaging epoch (2.29.0): moving objects
+# (Ivezic et al. 2001, AJ 122, 2749).  Optional: the query is repeated without
+# them if the service rejects the columns.
+MOTION_COLUMNS = ["rowv", "colv", "rowvErr", "colvErr", "mjd"]
+
+
 def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     from _catalog_utils import sdss_region
 
-    t = sdss_region(ra, dec, radius_arcmin, photoobj_fields=COLUMNS, data_release=18)
+    try:
+        t = sdss_region(ra, dec, radius_arcmin, photoobj_fields=COLUMNS + MOTION_COLUMNS, data_release=18)
+    except Exception:  # noqa: BLE001 - fall back to the established columns
+        t = sdss_region(ra, dec, radius_arcmin, photoobj_fields=COLUMNS, data_release=18)
     if t is None:
         return pd.DataFrame(columns=["catalog", "catalog_object_id", "object_name", *COLUMNS])
     df = t.to_pandas()

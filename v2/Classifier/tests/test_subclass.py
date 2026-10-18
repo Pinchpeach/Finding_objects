@@ -570,7 +570,9 @@ def _ls_row(mags, prefix="desi_legacy_surveys_dr10__"):
     row = {}
     for b, m in mags.items():
         f = 10 ** ((22.5 - m) / 2.5)
-        row.update({f"{prefix}flux_{b}": f, f"{prefix}flux_ivar_{b}": (50 / f) ** 2, f"{prefix}mw_transmission_{b}": 1.0})
+        row.update(
+            {f"{prefix}flux_{b}": f, f"{prefix}flux_ivar_{b}": (50 / f) ** 2, f"{prefix}mw_transmission_{b}": 1.0}
+        )
     return row
 
 
@@ -627,3 +629,38 @@ def test_2_28_blue_diagram_without_halpha():
     assert sc.galaxy_lines(agn) is None
     with_ha = dict(sf, **{f"{p}line_ha_flux": 30.0, f"{p}line_ha_flux_err": 1.0})
     assert sc.galaxy_lines(with_ha) is None or sc.galaxy_lines(with_ha)[1] != "DESI_BLUE"  # H-alpha routes first
+
+
+def test_2_29_solar_system_objects():
+    import pandas as pd
+
+    sc = _sc()
+    ps1 = {
+        "primary_class": "UNKNOWN",
+        "classification_status": "NO_EVIDENCE",
+        "catalogs": "Pan-STARRS1 DR2 MeanObject",
+        "pan_starrs1_dr2_meanobject__nDetections": 2,
+        "pan_starrs1_dr2_meanobject__objInfoFlag": 0x200 | 0x4,
+    }
+    sdss = {
+        "primary_class": "UNKNOWN",
+        "classification_status": "NO_EVIDENCE",
+        "catalogs": "SDSS DR18 PhotoObj",
+        "sdss_dr18_photoobj__rowv": 0.15,
+        "sdss_dr18_photoobj__colv": -0.10,
+        "sdss_dr18_photoobj__rowvErr": 0.01,
+        "sdss_dr18_photoobj__colvErr": 0.01,
+    }
+    star = dict(ps1, primary_class="STAR", classification_status="CLASSIFIED")
+    slow = dict(sdss, **{"sdss_dr18_photoobj__rowv": 0.01, "sdss_dr18_photoobj__colv": 0.0})  # below 0.05 deg/day
+    shared = dict(ps1, catalogs="Pan-STARRS1 DR2 MeanObject|DESI Legacy Surveys DR10")  # seen at another epoch
+    out = sc.annotate(pd.DataFrame([ps1, sdss, star, slow, shared]))
+    assert out.classification_status.tolist() == [
+        "SOLAR_SYSTEM",
+        "SOLAR_SYSTEM",
+        "CLASSIFIED",
+        "NO_EVIDENCE",
+        "NO_EVIDENCE",
+    ]
+    assert out.subclass_rule.tolist()[:2] == ["PS1_SOLSYS", "SDSS_MOVING"]
+    assert "Ivezic" in out.unknown_reason[1]

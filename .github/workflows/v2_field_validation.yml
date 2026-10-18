@@ -92,6 +92,23 @@ jobs:
           if len(ls_):
               print("  LS-only type:", ls_.get("desi_legacy_surveys_dr10__type",pd.Series(dtype=object)).value_counts().to_dict(),
                     "| g/r/z S/N>5:", [int((1/pd.to_numeric(ls_[f"std_magerr__ls_{b}"],errors="coerce")*1.0857>5).sum()) for b in "grz"])
+          print("\n== Solar System objects (2.29.0)")
+          print("status SOLAR_SYSTEM:", int(d.classification_status.eq("SOLAR_SYSTEM").sum()),
+                "| by rule:", d.loc[d.classification_status.eq("SOLAR_SYSTEM"), "subclass_rule"].value_counts().to_dict())
+          one = d[d.catalogs.astype(str).eq("Pan-STARRS1 DR2 MeanObject")]
+          fl = pd.to_numeric(one.get("pan_starrs1_dr2_meanobject__objInfoFlag", pd.Series(dtype=float)), errors="coerce")
+          print("PS1-only objects", len(one), "| objInfoFlag present", int(fl.notna().sum()),
+                "| HAS_SOLSYS_DET", int((fl.fillna(0).astype("int64") & 0x200 > 0).sum()),
+                "| MOST_SOLSYS_DET", int((fl.fillna(0).astype("int64") & 0x400 > 0).sum()),
+                "| TRANSIENT", int((fl.fillna(0).astype("int64") & 0x100 > 0).sum()))
+          allps = pd.to_numeric(d.get("pan_starrs1_dr2_meanobject__objInfoFlag", pd.Series(dtype=float)), errors="coerce").fillna(0).astype("int64")
+          print("all objects with PS1 SOLSYS bits:", int((allps & 0x600 > 0).sum()), "by class", d.loc[allps & 0x600 > 0, "primary_class"].value_counts().to_dict())
+          sd = d[d.catalogs.astype(str).eq("SDSS DR18 PhotoObj")]
+          if "sdss_dr18_photoobj__rowv" in d:
+              v = (pd.to_numeric(sd["sdss_dr18_photoobj__rowv"], errors="coerce")**2 + pd.to_numeric(sd["sdss_dr18_photoobj__colv"], errors="coerce")**2)**0.5
+              print("SDSS-only objects", len(sd), "| velocity quartiles (deg/day)", v.quantile([.25,.5,.75]).round(3).tolist(), "| 0.05<v<0.5:", int(v.between(0.05, 0.5).sum()))
+          else:
+              print("SDSS velocity columns absent")
           print("\n== unit harmonisation: same band from two catalogues (point sources; AB after conversion)")
           print(units.consistency(pts))
           print("\n== second-stage sub-class")

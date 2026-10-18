@@ -1849,6 +1849,16 @@ def annotate(df: pd.DataFrame, rows=None) -> pd.DataFrame:
         if p and str(row.get("primary_class") or "UNKNOWN").upper() == "UNKNOWN":
             r["subclass"] = f"from paper: {p['paper_class']}" + (" (detection only)" if p["detection_only"] else "")
             r["status"], r["rule"], r["basis"] = "FROM_PAPER", "LITERATURE", p["paper_source"]
+    # Solar System objects (2.29.0): single-survey moving detections; the
+    # coarse class stays UNKNOWN (not a star, galaxy or quasar).
+    sso = _load("solar_system")
+    moving = [
+        sso.match(row) if str(row.get("primary_class") or "UNKNOWN").upper() == "UNKNOWN" else None for row in rows
+    ]
+    for r, m in zip(res, moving):
+        if m:
+            r["subclass"], r["code"], r["status"] = "Solar System object (moving)", "SSO", "SOLAR_SYSTEM"
+            r["rule"], r["basis"] = m["route"], m["basis"]
     out = df.copy()
     out["subclass"] = [r.get("subclass") for r in res]
     out["subclass_code"] = [r.get("code") for r in res]
@@ -1859,7 +1869,11 @@ def annotate(df: pd.DataFrame, rows=None) -> pd.DataFrame:
     for col in ("paper_class", "paper_source", "paper_refs", "paper_ads"):
         out[col] = [p.get(col) if p else None for p in papers]
     why = _load("unknown_reason")
-    out["unknown_reason"] = [why.reason(r) for r in rows]
+    out["unknown_reason"] = [m["basis"] if m else why.reason(r) for r, m in zip(rows, moving)]
+    if "classification_status" in out:
+        out["classification_status"] = [
+            "SOLAR_SYSTEM" if m else s for s, m in zip(out["classification_status"], moving)
+        ]
     out["subclass_tags"] = ["; ".join(t["label"] for t in r.get("tags", [])) or None for r in res]
     out["subclass_json"] = [json.dumps(r, separators=(",", ":"), default=str) for r in res]
     return out
