@@ -42,6 +42,16 @@ jobs:
           d=pd.read_csv("/tmp/field/classified_objects.csv",low_memory=False)
           print(pd.read_csv("/tmp/field/pipeline_summary.csv").to_string(index=False))
           print("objects",len(d)); print(d.classification_status.value_counts().to_string())
+          import glob as _g
+          _f = _g.glob("/tmp/field/raw/*/galaxy_clusters_*.csv")
+          _cl = pd.concat([pd.read_csv(f) for f in _f], ignore_index=True) if _f else pd.DataFrame()
+          print("cluster catalogue rows by source:", _cl.get("cluster_source", pd.Series(dtype=object)).value_counts().to_dict())
+          if len(_cl) and "pcont" in _cl:
+              print(_cl[_cl.cluster_source.eq("eRASS1")][[c for c in ("catalog_object_id","ra","dec","cluster_z","cluster_r500_mpc","pcont","lext","m500") if c in _cl]].to_string(index=False))
+          if "cluster_membership" in d:
+              print("cluster membership:", d.cluster_membership.value_counts().to_dict())
+              for _, r in d[d.cluster_membership.isin(["BCG"])].iterrows():
+                  print("  ", r.get("designation"), "|", r.cluster_basis)
           col="desi_dr1_spectroscopy__OType"
           if col not in d.columns: raise SystemExit("no DESI spectra in this field")
           s=d[d[col].notna()].copy(); s["truth"]=s[col].astype(str).str.strip()
@@ -196,15 +206,6 @@ jobs:
           except Exception as exc:
               print("radio diagnostics failed:", exc)
           print("\n== galaxy clusters (2.32.0)")
-          try:
-              from astroquery.vizier import Vizier
-              for kw in ("eRASS1 galaxy clusters", "Bulbul eROSITA clusters", "J/A+A/685/A106"):
-                  found = Vizier.find_catalogs(kw)
-                  print("VizieR find", repr(kw), "->", {k: str(v.description)[:70] for k, v in list(found.items())[:6]})
-              cats = Vizier.get_catalogs("J/A+A/685/A106")
-              print("J/A+A/685/A106 tables:", [(t.meta.get("name"), len(t)) for t in cats][:6])
-          except Exception as exc:
-              print("VizieR probe failed:", str(exc)[:200])
           try:
               import glob
               files = glob.glob("/tmp/field/raw/*/galaxy_clusters_*.csv")
