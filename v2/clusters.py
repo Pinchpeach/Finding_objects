@@ -10,11 +10,14 @@ H0 = 70, Om = 0.3):
   |dv| = c |z - z_cl| / (1 + z_cl) <= 2500 km/s (Wen & Han 2024, Sect. 3,
   the membership window around a spectroscopic cluster redshift), otherwise
   NON_MEMBER (a fore- or background galaxy seen through the cluster);
-* without one: IN_CLUSTER_AREA -- membership needs a redshift (photometric
-  membership windows are 0.04 (1+z) wide, Wen & Han 2024).
+* without one, nothing is claimed: membership needs a redshift (photometric
+  windows are 0.04 (1+z) wide, Wen & Han 2024), and a few-arcmin field lies
+  inside r500 of dozens of z ~ 0.5-1 clusters (Abell 2142 field: 36
+  clusters; labelling every galaxy there "in a cluster area" said nothing).
 The galaxy within BCG_RADIUS_ARCSEC of a Wen & Han cluster position (their
 position is the BCG) is the brightest cluster galaxy.  Where several clusters
-overlap, the one with the smallest distance in units of r500 is used.
+overlap, a galaxy is tested against all of them (member of the one whose
+redshift it matches).
 """
 
 from __future__ import annotations
@@ -82,40 +85,16 @@ def apply(out: pd.DataFrame, raw_dir) -> pd.DataFrame:
         * 3600
     )
     scaled = sep / cl.theta500_arcsec.to_numpy()[None, :]
-    best = scaled.argmin(axis=1)
-    inside = scaled[np.arange(len(gal)), best] <= 1.0
     out = out.copy()
     for col in ("cluster_name", "cluster_z", "cluster_membership", "cluster_basis"):
         out[col] = out[col].astype(object) if col in out else pd.Series(None, index=out.index, dtype=object)
     if "subclass_tags" in out:
         out["subclass_tags"] = out["subclass_tags"].astype(object)
-    for k, i in enumerate(gal):
-        if not inside[k]:
-            continue
-        c = cl.iloc[best[k]]
-        d = sep[k, best[k]]
-        ztxt = f"z = {c.cluster_z:.3f}{' (spec)' if str(c.get('cluster_z_spec')) == 'True' else ''}"
-        where = f"{d / 60:.1f}' from the centre ({d / c.theta500_arcsec:.2f} r500)"
-        z = _zspec(out.loc[i])
-        if c.cluster_source == "WH24" and d <= BCG_RADIUS_ARCSEC:
-            mem, basis = "BCG", f"brightest cluster galaxy of {c.catalog_object_id} ({ztxt}; Wen & Han 2024)"
-        elif z is not None:
-            dv = C_KMS * abs(z - c.cluster_z) / (1 + c.cluster_z)
-            if dv <= MAX_DV_KMS:
-                mem, basis = (
-                    "MEMBER",
-                    f"member of {c.catalog_object_id} ({ztxt}): |dv| = {dv:.0f} km/s <= 2500, {where}",
-                )
-            else:
-                mem, basis = (
-                    "NON_MEMBER",
-                    f"seen through {c.catalog_object_id} ({ztxt}) but |dv| = {dv:.0f} km/s, {where}",
-                )
-        else:
-            mem, basis = (
-                "IN_CLUSTER_AREA",
-                f"inside {c.catalog_object_id} ({ztxt}), {where}; no redshift to test membership",
-            )
+
+    def ztxt(c):
+        return f"z = {c.cluster_z:.3f}{' (spec)' if str(c.get('cluster_z_spec')) == 'True' else ''}"
+
+    def put(i, c, mem, basis):
         out.loc[i, ["cluster_name", "cluster_z", "cluster_membership", "cluster_basis"]] = [
             c.catalog_object_id,
             round(float(c.cluster_z), 4),
@@ -128,4 +107,36 @@ def apply(out: pd.DataFrame, raw_dir) -> pd.DataFrame:
             ) + f" ({c.catalog_object_id})"
             prev = out.loc[i, "subclass_tags"]
             out.loc[i, "subclass_tags"] = f"{prev}; {tag}" if isinstance(prev, str) and prev else tag
+
+    # Brightest cluster galaxies: per Wen & Han cluster, only the nearest
+    # galaxy within BCG_RADIUS_ARCSEC (pieces of one galaxy from several
+    # surveys can lie within a few arcsec of each other).
+    bcg = set()
+    for j, c in cl.iterrows():
+        if c.cluster_source != "WH24":
+            continue
+        k = int(sep[:, j].argmin())
+        if sep[k, j] <= BCG_RADIUS_ARCSEC and gal[k] not in bcg:
+            bcg.add(gal[k])
+            put(gal[k], c, "BCG", f"brightest cluster galaxy of {c.catalog_object_id} ({ztxt(c)}; Wen & Han 2024)")
+    # Members: a galaxy with a spectroscopic redshift inside r500 of any
+    # cluster is a member of the one whose redshift it matches (|dv| <= 2500
+    # km/s; nearest in r500 units if several), else a non-member of the nearest.
+    for k, i in enumerate(gal):
+        if i in bcg:
+            continue
+        inside = np.flatnonzero(scaled[k] <= 1.0)
+        z = _zspec(out.loc[i])
+        if not len(inside) or z is None:
+            continue  # no redshift: membership cannot be tested
+        dv = C_KMS * np.abs(z - cl.cluster_z.to_numpy()[inside]) / (1 + cl.cluster_z.to_numpy()[inside])
+        ok = inside[dv <= MAX_DV_KMS]
+        j = ok[np.argmin(scaled[k, ok])] if len(ok) else inside[np.argmin(scaled[k, inside])]
+        c = cl.iloc[j]
+        v = C_KMS * abs(z - c.cluster_z) / (1 + c.cluster_z)
+        where = f"{sep[k, j] / 60:.1f}' from the centre ({scaled[k, j]:.2f} r500)"
+        if len(ok):
+            put(i, c, "MEMBER", f"member of {c.catalog_object_id} ({ztxt(c)}): |dv| = {v:.0f} km/s <= 2500, {where}")
+        else:
+            put(i, c, "NON_MEMBER", f"seen through {c.catalog_object_id} ({ztxt(c)}) but |dv| = {v:.0f} km/s, {where}")
     return out

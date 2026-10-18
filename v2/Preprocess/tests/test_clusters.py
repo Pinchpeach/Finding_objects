@@ -47,6 +47,7 @@ def test_membership(tmp_path):
     out = pd.DataFrame(
         [
             {"object_id": "bcg", "ra": 200.0, "dec": 10.0 + 1 * d, "primary_class": "GALAXY", "subclass_tags": None},
+            {"object_id": "bcg2", "ra": 200.0, "dec": 10.0 + 2 * d, "primary_class": "GALAXY"},  # fragment, farther
             {
                 "object_id": "mem",
                 "ra": 200.0,
@@ -69,8 +70,8 @@ def test_membership(tmp_path):
     )
     r = cl.apply(out, tmp_path).set_index("object_id")
     assert r.loc["bcg", "cluster_membership"] == "BCG" and "brightest cluster galaxy" in r.loc["bcg", "subclass_tags"]
+    assert pd.isna(r.loc["bcg2", "cluster_membership"])
     assert r.loc["mem", "cluster_membership"] == "MEMBER"
     assert r.loc["bg", "cluster_membership"] == "NON_MEMBER"
-    assert r.loc["nz", "cluster_membership"] == "IN_CLUSTER_AREA"
-    for o in ("far", "star", "ctm"):
+    for o in ("nz", "far", "star", "ctm"):
         assert pd.isna(r.loc[o, "cluster_membership"])

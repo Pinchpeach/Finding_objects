@@ -93,6 +93,7 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
             p = _one(*s, ra, dec, float(radius_arcmin) + MAX_EXTRA_ARCMIN)
         except Exception as exc:  # noqa: BLE001 - one catalogue failing keeps the other
             errors.append(f"{s[0]}: {exc}"[:300])
+            print(f"[galaxy_clusters] {errors[-1]}", flush=True)
             continue
         if p is not None and len(p):
             parts.append(p)
