@@ -472,6 +472,18 @@ Outcome: the label exists (classification_status SOLAR_SYSTEM, primary class UNK
 
 Four fields (RA 20, 150, 245, 250): 236 / 104 / 63 / 108 rows labelled; no object with a DESI spectrum labelled; DESI scoring unchanged. PS1-only rows with an LS object within 2″ (17–49 per field) are not labelled: they are association misses, not missing sources.
 
+## 10. Radio-only objects (2.31.0)
+
+| Element | Source | Use / measurement |
+|---|---|---|
+| VLASS QL primary sample: Duplicate_flag < 2, Quality_flag ∈ {0, 4}, S_Code ≠ 'E' (< 1 % spurious) | Gordon et al. 2021 (ApJS 255, 30) §2.2–2.3, §3.4 | a radio-only VLASS entry outside it → UNCONFIRMED (catalogue artefact) |
+| FIRST sidelobe probability P(S) ≥ 0.1 | Helfand et al. 2015 (ApJ 801, 26) §4 | a radio-only FIRST entry above it → UNCONFIRMED |
+| Multi-component radio sources: companions within 1′, lobe flux ratio < 10 | van Velzen et al. 2015 (MNRAS 446, 2985) §2.1, Table 1 | same-survey companion (VLASS, FIRST, LoTSS) → RADIO_COMPONENT; host candidate = optical/IR object nearest the pair centre (≤ 10″) |
+| Flux–separation criterion S1 + S2 ≥ K (d/100″)²; K = 10 mJy at 1.4 GHz, 50 mJy at 150 MHz (5.9 mJy at 3 GHz, α = −0.7) | Huynh et al. 2005; Williams et al. 2019 (A&A 622, A2) §6.5 | without it LoTSS chance pairs dominated (~0.7 unrelated neighbours within 60″): RA 250 radio components 6 → 3 |
+| Radio sources without optical ID are mostly AGN with hosts below the optical limits (high z / obscured) | Williams et al. 2019 (27 % unidentified in LoTSS DR1); Shimwell et al. 2022 (13 % in DR2 with LS); Kondapally et al. 2021 (A&A 648, A3; "AGN at z ~ 3–4") | reason text for the remaining radio-only objects (status unchanged) |
+
+NVSS and TGSS (45″, 25″ beams) are not used for grouping.
+
 ## Confidence of axis labels (2.15.0)
 
 Most axis labels come from rules without a score.  Their calibrated

@@ -152,6 +152,9 @@ def run(
     # Pan-STARRS1-only rows that the deeper Legacy Surveys imaging does not
     # confirm: likely artefacts or transients (2.30.0, detection_quality.py).
     out = _load(V2 / "detection_quality.py", "v2_detection_quality").apply(out)
+    # Radio-only objects: catalogue artefacts, lobes of radio galaxies or
+    # optically faint radio AGN (2.31.0, radio_sources.py).
+    out = _load(V2 / "radio_sources.py", "v2_radio_sources").apply(out)
     out.to_csv(work / "classified_objects.csv", index=False)
 
     summary = pd.DataFrame(timings)
