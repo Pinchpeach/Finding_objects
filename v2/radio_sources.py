@@ -148,6 +148,8 @@ def classify(out: pd.DataFrame) -> pd.DataFrame:
                     f"; host candidate {name} ({out.iloc[h].get('primary_class')}) {hsep[h]:.1f}\" from the pair centre"
                 )
             other = out.loc[j].get("designation") or out.loc[j].get("object_id")
+            if not optical_none[pos[j]]:
+                other += " (optical/IR object with radio emission: probable core or host)"
             res.loc[i] = (
                 "RADIO_COMPONENT",
                 f'part of a multi-component radio source: {survey} companion {other} {d:.0f}" away, flux ratio '
