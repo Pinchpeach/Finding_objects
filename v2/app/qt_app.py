@@ -237,7 +237,16 @@ class MainWindow(QMainWindow):
         self.cmb_class.addItems(["ALL", "STAR", "GALAXY", "QSO", "UNKNOWN"])
         self.cmb_status = QComboBox()
         self.cmb_status.addItems(
-            ["ALL", "CLASSIFIED", "LOW_CONFIDENCE", "NO_EVIDENCE", "CONFLICT", "WITHIN_LARGE_GALAXY", "SOLAR_SYSTEM"]
+            [
+                "ALL",
+                "CLASSIFIED",
+                "LOW_CONFIDENCE",
+                "NO_EVIDENCE",
+                "CONFLICT",
+                "WITHIN_LARGE_GALAXY",
+                "SOLAR_SYSTEM",
+                "UNCONFIRMED",
+            ]
         )
         self.txt_search = QLineEdit()
         self.txt_search.setPlaceholderText("Search name / catalog…")

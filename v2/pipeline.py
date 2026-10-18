@@ -149,6 +149,9 @@ def run(
     if out.n_components.gt(0).any():  # hosts may have inherited a nucleus spectrum
         out = _load(CLS / "subclass.py", "v2_subclass").annotate(out)
     out = names.annotate(out, assoc, None if None in (ra, dec) else (ra, dec), None if collect else radius)
+    # Pan-STARRS1-only rows that the deeper Legacy Surveys imaging does not
+    # confirm: likely artefacts or transients (2.30.0, detection_quality.py).
+    out = _load(V2 / "detection_quality.py", "v2_detection_quality").apply(out)
     out.to_csv(work / "classified_objects.csv", index=False)
 
     summary = pd.DataFrame(timings)

@@ -165,17 +165,18 @@ jobs:
               nd = pd.to_numeric(pso.get("pan_starrs1_dr2_meanobject__nDetections"), errors="coerce")
               print("nDetections counts:", nd.value_counts().sort_index().head(8).to_dict())
               ls = d[d.catalogs.astype(str).str.contains("DESI Legacy Surveys DR10")]
-              if len(pso) and len(ls):
-                  c1, c2 = SkyCoord(pso.ra.values*u.deg, pso.dec.values*u.deg), SkyCoord(ls.ra.values*u.deg, ls.dec.values*u.deg)
-                  _, sep, _ = c1.match_to_catalog_sky(c2)
-                  sep = sep.arcsec
-                  print("nearest LS object (arcsec) quartiles:", np.round(np.quantile(sep, [.1,.25,.5,.75,.9]), 2).tolist(),
-                        "| within 1\":", int((sep<1).sum()), "within 2\":", int((sep<2).sum()), "within 5\":", int((sep<5).sum()))
-                  mags = pso[[f"std_mag__ps1_{b}" for b in "grizy"]].min(axis=1)
-                  print("brightest PS1 mag quartiles:", mags.quantile([.1,.25,.5,.75,.9]).round(2).tolist())
-                  lsr = pd.to_numeric(ls.get("std_mag__ls_r"), errors="coerce")
-                  print("LS r 95th/99th percentile in field (depth proxy):", lsr.quantile([.95,.99]).round(2).tolist())
-                  print("PS1-only with LS within 2\": nDet", nd[sep<2].value_counts().to_dict(), "| beyond 2\": nDet", nd[sep>=2].value_counts().head(5).to_dict())
+              import importlib.util
+              sp = importlib.util.spec_from_file_location("dq", "v2/detection_quality.py"); dq = importlib.util.module_from_spec(sp); sp.loader.exec_module(dq)
+              near, cnt = dq._neighbours(pso, ls, dq.COVERAGE_RADIUS_ARCSEC)
+              print("nearest LS object (arcsec) quantiles 10/25/50/75/90:", np.round(np.quantile(near, [.1,.25,.5,.75,.9]), 2).tolist() if len(near) else None,
+                    "| within 1\":", int((near<1).sum()), "within 2\":", int((near<2).sum()), "within 5\":", int((near<5).sum()),
+                    "| LS neighbours within 60\" median:", float(np.median(cnt)) if len(cnt) else None)
+              mags = pso[[f"std_mag__ps1_{b}" for b in "grizy"]].min(axis=1)
+              print("brightest PS1 mag quantiles:", mags.quantile([.1,.25,.5,.75,.9]).round(2).tolist())
+              print("status UNCONFIRMED:", int(d.classification_status.eq("UNCONFIRMED").sum()), "of", len(d),
+                    "| PS1-only not flagged: nDet", nd[~d.loc[pso.index, "classification_status"].eq("UNCONFIRMED")].value_counts().head(6).to_dict())
+              print("DESI-spectrum objects flagged UNCONFIRMED (should be 0):",
+                    int(d[d.catalogs.astype(str).str.contains("DESI DR1 spectroscopy")].classification_status.eq("UNCONFIRMED").sum()))
           except Exception as exc:
               print("PS1-only diagnostics failed:", exc)
           print("\n== unit harmonisation: same band from two catalogues (point sources; AB after conversion)")
