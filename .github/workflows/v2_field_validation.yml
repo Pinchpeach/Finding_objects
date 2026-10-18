@@ -154,6 +154,31 @@ jobs:
                   print("SkyBoT field check:", str(exc)[:120])
           else:
               print("SDSS velocity columns absent")
+          print("\n== Pan-STARRS1-only objects (2.30.0)")
+          try:
+              import numpy as np
+              from astropy.coordinates import SkyCoord
+              import astropy.units as u
+              pso = d[d.catalogs.astype(str).eq("Pan-STARRS1 DR2 MeanObject")]
+              qf = pd.to_numeric(pso.get("pan_starrs1_dr2_meanobject__qualityFlag"), errors="coerce").fillna(0).astype("int64")
+              print("n", len(pso), "| qualityFlag bits:", {b: int((qf & b > 0).sum()) for b in (1,2,4,8,16,32,64,128)})
+              nd = pd.to_numeric(pso.get("pan_starrs1_dr2_meanobject__nDetections"), errors="coerce")
+              print("nDetections counts:", nd.value_counts().sort_index().head(8).to_dict())
+              ls = d[d.catalogs.astype(str).str.contains("DESI Legacy Surveys DR10")]
+              import importlib.util
+              sp = importlib.util.spec_from_file_location("dq", "v2/detection_quality.py"); dq = importlib.util.module_from_spec(sp); sp.loader.exec_module(dq)
+              near, cnt = dq._neighbours(pso, ls, dq.COVERAGE_RADIUS_ARCSEC)
+              print("nearest LS object (arcsec) quantiles 10/25/50/75/90:", np.round(np.quantile(near, [.1,.25,.5,.75,.9]), 2).tolist() if len(near) else None,
+                    "| within 1\":", int((near<1).sum()), "within 2\":", int((near<2).sum()), "within 5\":", int((near<5).sum()),
+                    "| LS neighbours within 60\" median:", float(np.median(cnt)) if len(cnt) else None)
+              mags = pso[[f"std_mag__ps1_{b}" for b in "grizy"]].min(axis=1)
+              print("brightest PS1 mag quantiles:", mags.quantile([.1,.25,.5,.75,.9]).round(2).tolist())
+              print("status UNCONFIRMED:", int(d.classification_status.eq("UNCONFIRMED").sum()), "of", len(d),
+                    "| PS1-only not flagged: nDet", nd[~d.loc[pso.index, "classification_status"].eq("UNCONFIRMED")].value_counts().head(6).to_dict())
+              print("DESI-spectrum objects flagged UNCONFIRMED (should be 0):",
+                    int(d[d.catalogs.astype(str).str.contains("DESI DR1 spectroscopy")].classification_status.eq("UNCONFIRMED").sum()))
+          except Exception as exc:
+              print("PS1-only diagnostics failed:", exc)
           print("\n== unit harmonisation: same band from two catalogues (point sources; AB after conversion)")
           print(units.consistency(pts))
           print("\n== second-stage sub-class")
