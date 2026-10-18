@@ -16,9 +16,12 @@ Two routes, both from the survey's own measurements (no extra queries):
   most of the object.
 * SDSS PhotoObj velocity (rowv, colv; deg/day), measured from the ~5 min
   between the r, i, u, z, g exposures: the SDSS Moving Object Catalog
-  selection 0.05 < v < 0.5 deg/day (Ivezic et al. 2001, AJ 122, 2749; ~95 %
-  complete, ~6 % contamination in later releases), here with v >= 3 sigma_v
-  instead of their photometric flags.
+  selection 0.05 < v < 0.5 deg/day for point sources (type 6) at
+  14.5 < r < 21.5 (Ivezic et al. 2001, AJ 122, 2749; ~95 % complete, ~6 %
+  contamination in later releases), here with v >= 3 sigma_v instead of
+  their photometric flags.  Without the type and magnitude limits the first
+  field test labelled a faint galaxy (type 3, r = 22.3, v = 0.12 +- 0.03)
+  that SkyBoT shows no known object near.
 
 Only objects that no other survey catalogue shares are considered: a moving
 detection cannot be associated with detections from other epochs.
@@ -33,6 +36,7 @@ HAS_SOLSYS_DET, MOST_SOLSYS_DET = 0x200, 0x400
 MAX_PS1_DETECTIONS = 3
 SDSS_V_RANGE = (0.05, 0.5)  # deg/day
 SDSS_V_SIGMA = 3.0
+SDSS_R_RANGE = (14.5, 21.5)  # PSF r
 LITERATURE = {"SIMBAD", "NED"}
 
 
@@ -65,7 +69,16 @@ def match(row) -> dict | None:
     if cats == {SDSS}:
         p = "sdss_dr18_photoobj__"
         rv, cv, re, ce = (_num(row, p + k) for k in ("rowv", "colv", "rowvErr", "colvErr"))
-        if None not in (rv, cv, re, ce) and re > 0 and ce > 0:
+        r = _num(row, p + "psfMag_r")
+        point = _num(row, p + "type") == 6
+        if (
+            point
+            and r is not None
+            and SDSS_R_RANGE[0] < r < SDSS_R_RANGE[1]
+            and None not in (rv, cv, re, ce)
+            and re > 0
+            and ce > 0
+        ):
             v, sv = math.hypot(rv, cv), math.hypot(re, ce)
             if SDSS_V_RANGE[0] < v < SDSS_V_RANGE[1] and v >= SDSS_V_SIGMA * sv:
                 return {

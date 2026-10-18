@@ -650,6 +650,8 @@ def test_2_29_solar_system_objects():
         "sdss_dr18_photoobj__colv": -0.10,
         "sdss_dr18_photoobj__rowvErr": 0.01,
         "sdss_dr18_photoobj__colvErr": 0.01,
+        "sdss_dr18_photoobj__type": 6,
+        "sdss_dr18_photoobj__psfMag_r": 20.5,
     }
     star = dict(ps1, primary_class="STAR", classification_status="CLASSIFIED")
     slow = dict(sdss, **{"sdss_dr18_photoobj__rowv": 0.01, "sdss_dr18_photoobj__colv": 0.0})  # below 0.05 deg/day
