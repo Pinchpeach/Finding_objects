@@ -103,9 +103,11 @@ def classify(out: pd.DataFrame) -> pd.DataFrame:
     xyz = _unit(out.ra, out.dec)
     optical_none = cats.map(lambda c: not (c - RADIO)).to_numpy()
     pos = {i: k for k, i in enumerate(out.index)}
+    artefacts = {i: _artefact(out.loc[i], set(cats[i])) for i in out.index[radio_only]}
+    bad = out.index.isin([i for i, w in artefacts.items() if w])  # never a companion
     for i in out.index[radio_only]:
         row, c = out.loc[i], set(cats[i])
-        why = _artefact(row, c)
+        why = artefacts[i]
         if why:
             res.loc[i] = ("UNCONFIRMED", "radio-only " + why)
             continue
@@ -114,7 +116,7 @@ def classify(out: pd.DataFrame) -> pd.DataFrame:
             f = _num(row, *keys)
             if survey not in c or f is None or f <= 0:
                 continue
-            same = cats.map(lambda s: survey in s) & (out.index != i)
+            same = cats.map(lambda s: survey in s) & (out.index != i) & ~bad
             if not same.any():
                 continue
             idx = out.index[same]
