@@ -195,6 +195,22 @@ jobs:
                   print(f"  {sv}: {n} entries in the field; chance companions within 60\" per object: {n / area * math.pi * 3600:.2f}")
           except Exception as exc:
               print("radio diagnostics failed:", exc)
+          print("\n== galaxy clusters (2.32.0)")
+          try:
+              import glob
+              files = glob.glob("/tmp/field/raw/*/galaxy_clusters_*.csv")
+              cl = pd.concat([pd.read_csv(f) for f in files], ignore_index=True) if files else pd.DataFrame()
+              print("cluster rows:", len(cl), "| by source:", cl.get("cluster_source", pd.Series(dtype=object)).value_counts().to_dict())
+              if len(cl):
+                  print(cl[[c for c in ("catalog_object_id","ra","dec","cluster_z","cluster_z_spec","cluster_r500_mpc","pcont","m500") if c in cl]].head(12).to_string(index=False))
+              if "cluster_membership" in d:
+                  print("membership:", d.cluster_membership.value_counts().to_dict())
+                  ds = d[d.catalogs.astype(str).str.contains("DESI DR1 spectroscopy") & d.cluster_membership.notna()]
+                  print("DESI-spectrum galaxies inside r500:", len(ds), ds.cluster_membership.value_counts().to_dict())
+                  for _, r in d[d.cluster_membership.isin(["BCG","MEMBER"])].head(8).iterrows():
+                      print("  ", r.get("designation"), "|", r.cluster_basis)
+          except Exception as exc:
+              print("cluster diagnostics failed:", exc)
           print("\n== unit harmonisation: same band from two catalogues (point sources; AB after conversion)")
           print(units.consistency(pts))
           print("\n== second-stage sub-class")

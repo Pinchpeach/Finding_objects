@@ -125,7 +125,8 @@ def _density(frame: pd.DataFrame) -> float | None:
 def load(raw: Path):
     rows, seen, skipped = [], set(), 0
     for path in sorted(raw.glob("*.csv")):
-        if path.name.startswith(("collection_summary_", "ngc4522_")):
+        # galaxy_clusters_*: cluster catalogue context for v2/clusters.py, not detections (2.32.0).
+        if path.name.startswith(("collection_summary_", "ngc4522_", "galaxy_clusters_")):
             continue
         try:
             # Identifiers are text: 64-bit Gaia/PS1/SDSS IDs lose precision as float64.

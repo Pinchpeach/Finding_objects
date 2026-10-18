@@ -146,6 +146,7 @@ RAW_FIELDS = {
     "Fluxb",
     "Flux8",
     "MLFlux1",
+    "EXTLike",  # eRASS1 extent likelihood (2.32.0: extended = cluster gas, not a point counterpart)
     # ZTF light-curve statistics (ZTF-VAR-001; Get_data/ztf_lightcurve.py)
     *(f"ztf_{b}_{k}" for b in ("g", "r") for k in ("n", "mag", "rms", "chi2r", "exvar", "sf_a", "sf_gamma")),
 }
@@ -301,7 +302,13 @@ XRAY_FLUX = (
 
 
 def xray_flux(row):
+    # An extended eRASS1 source (EXT_LIKE > 0; point sources have EXT_LIKE = 0,
+    # Merloni et al. 2024, Table 4) is hot gas of a galaxy cluster or group
+    # (Bulbul et al. 2024), not X-ray emission of the matched object (2.32.0).
+    extended = (num(row, "erosita_erass1__EXTLike") or 0.0) > 0
     for name, scale in XRAY_FLUX:
+        if extended and name.startswith("erosita_"):
+            continue
         v = num(row, name)
         if v is not None and v > 0:
             return v * scale
