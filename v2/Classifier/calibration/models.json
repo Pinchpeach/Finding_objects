@@ -103,7 +103,7 @@
         "truth_independent": true
       },
       "RR_LYRAE": {
-        "coef": 1.7205885697282608,
+        "coef": 1.7205885697282606,
         "intercept": -2.0264311851771293,
         "method": "platt",
         "n": 197,
