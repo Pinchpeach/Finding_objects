@@ -123,8 +123,11 @@ jobs:
                       if pd.notna(mjd):
                           try:
                               t = Skybot.cone_search(SkyCoord(r.ra*u.deg, r.dec*u.deg), 60*u.arcsec, Time(mjd, format="mjd"), location="645")
-                              sep = SkyCoord(t["RA"], t["DEC"]).separation(SkyCoord(r.ra*u.deg, r.dec*u.deg)).arcsec
-                              hit = f"SkyBoT {t['Name'][sep.argmin()]} at {sep.min():.1f}\" V={t['V'][sep.argmin()]}"
+                              ca = next(c for c in t.colnames if c.upper().startswith("RA"))
+                              cd = next(c for c in t.colnames if c.upper().startswith("DE"))
+                              sep = SkyCoord(t[ca], t[cd], unit="deg").separation(SkyCoord(r.ra*u.deg, r.dec*u.deg)).arcsec
+                              i = sep.argmin()
+                              hit = f"SkyBoT {t['Name'][i]} at {sep[i]:.1f}\" V={t['V'][i] if 'V' in t.colnames else '?'} (cols {t.colnames[:6]})"
                           except Exception as exc:
                               hit = "SkyBoT none (" + str(exc)[:60] + ")"
                       print(f"  SDSS-only v={vv:.3f}+-{sv:.3f} deg/d r={r.get('std_mag__sdss_r')} type={r.get('sdss_dr18_photoobj__type')} status={r.classification_status} -> {hit}")
