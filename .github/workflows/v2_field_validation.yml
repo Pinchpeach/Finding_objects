@@ -154,6 +154,30 @@ jobs:
                   print("SkyBoT field check:", str(exc)[:120])
           else:
               print("SDSS velocity columns absent")
+          print("\n== Pan-STARRS1-only objects (2.30.0)")
+          try:
+              import numpy as np
+              from astropy.coordinates import SkyCoord
+              import astropy.units as u
+              pso = d[d.catalogs.astype(str).eq("Pan-STARRS1 DR2 MeanObject")]
+              qf = pd.to_numeric(pso.get("pan_starrs1_dr2_meanobject__qualityFlag"), errors="coerce").fillna(0).astype("int64")
+              print("n", len(pso), "| qualityFlag bits:", {b: int((qf & b > 0).sum()) for b in (1,2,4,8,16,32,64,128)})
+              nd = pd.to_numeric(pso.get("pan_starrs1_dr2_meanobject__nDetections"), errors="coerce")
+              print("nDetections counts:", nd.value_counts().sort_index().head(8).to_dict())
+              ls = d[d.catalogs.astype(str).str.contains("DESI Legacy Surveys DR10")]
+              if len(pso) and len(ls):
+                  c1, c2 = SkyCoord(pso.ra.values*u.deg, pso.dec.values*u.deg), SkyCoord(ls.ra.values*u.deg, ls.dec.values*u.deg)
+                  _, sep, _ = c1.match_to_catalog_sky(c2)
+                  sep = sep.arcsec
+                  print("nearest LS object (arcsec) quartiles:", np.round(np.quantile(sep, [.1,.25,.5,.75,.9]), 2).tolist(),
+                        "| within 1\":", int((sep<1).sum()), "within 2\":", int((sep<2).sum()), "within 5\":", int((sep<5).sum()))
+                  mags = pso[[f"std_mag__ps1_{b}" for b in "grizy"]].min(axis=1)
+                  print("brightest PS1 mag quartiles:", mags.quantile([.1,.25,.5,.75,.9]).round(2).tolist())
+                  lsr = pd.to_numeric(ls.get("std_mag__ls_r"), errors="coerce")
+                  print("LS r 95th/99th percentile in field (depth proxy):", lsr.quantile([.95,.99]).round(2).tolist())
+                  print("PS1-only with LS within 2\": nDet", nd[sep<2].value_counts().to_dict(), "| beyond 2\": nDet", nd[sep>=2].value_counts().head(5).to_dict())
+          except Exception as exc:
+              print("PS1-only diagnostics failed:", exc)
           print("\n== unit harmonisation: same band from two catalogues (point sources; AB after conversion)")
           print(units.consistency(pts))
           print("\n== second-stage sub-class")
