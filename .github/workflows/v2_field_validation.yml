@@ -179,6 +179,22 @@ jobs:
                     int(d[d.catalogs.astype(str).str.contains("DESI DR1 spectroscopy")].classification_status.eq("UNCONFIRMED").sum()))
           except Exception as exc:
               print("PS1-only diagnostics failed:", exc)
+          print("\n== radio-only objects (2.31.0)")
+          try:
+              import os, math
+              lit = {"SIMBAD", "NED"}
+              radio = {"VLASS", "FIRST", "NVSS", "LoTSS DR2", "TGSS ADR1"}
+              cs = d.catalogs.astype(str).map(lambda x: frozenset(c for c in x.split("|") if c) - lit)
+              ro = d[cs.map(lambda c: bool(c) and c <= radio)]
+              print("radio-only objects:", len(ro), "| status:", ro.classification_status.value_counts().to_dict())
+              for _, r in ro.iterrows():
+                  print("  ", r.get("designation"), "|", r.get("catalogs"), "|", r.classification_status, "|", str(r.get("unknown_reason"))[:170])
+              area = math.pi * float(os.environ["RADIUS"]) ** 2 * 3600.0  # arcsec^2
+              for sv in ("VLASS", "FIRST", "LoTSS DR2"):
+                  n = int(cs.map(lambda c: sv in c).sum())
+                  print(f"  {sv}: {n} entries in the field; chance companions within 60\" per object: {n / area * math.pi * 3600:.2f}")
+          except Exception as exc:
+              print("radio diagnostics failed:", exc)
           print("\n== unit harmonisation: same band from two catalogues (point sources; AB after conversion)")
           print(units.consistency(pts))
           print("\n== second-stage sub-class")

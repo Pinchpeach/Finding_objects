@@ -246,6 +246,7 @@ class MainWindow(QMainWindow):
                 "WITHIN_LARGE_GALAXY",
                 "SOLAR_SYSTEM",
                 "UNCONFIRMED",
+                "RADIO_COMPONENT",
             ]
         )
         self.txt_search = QLineEdit()
