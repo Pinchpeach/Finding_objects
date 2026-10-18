@@ -197,6 +197,15 @@ jobs:
               print("radio diagnostics failed:", exc)
           print("\n== galaxy clusters (2.32.0)")
           try:
+              from astroquery.vizier import Vizier
+              for kw in ("eRASS1 galaxy clusters", "Bulbul eROSITA clusters", "J/A+A/685/A106"):
+                  found = Vizier.find_catalogs(kw)
+                  print("VizieR find", repr(kw), "->", {k: str(v.description)[:70] for k, v in list(found.items())[:6]})
+              cats = Vizier.get_catalogs("J/A+A/685/A106")
+              print("J/A+A/685/A106 tables:", [(t.meta.get("name"), len(t)) for t in cats][:6])
+          except Exception as exc:
+              print("VizieR probe failed:", str(exc)[:200])
+          try:
               import glob
               files = glob.glob("/tmp/field/raw/*/galaxy_clusters_*.csv")
               cl = pd.concat([pd.read_csv(f) for f in files], ignore_index=True) if files else pd.DataFrame()

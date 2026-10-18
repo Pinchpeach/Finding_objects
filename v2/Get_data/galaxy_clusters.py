@@ -97,6 +97,8 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
             continue
         if p is not None and len(p):
             parts.append(p)
+        else:
+            print(f"[galaxy_clusters] {s[0]}: no rows from {s[1]}", flush=True)
     if errors and not parts:
         raise RuntimeError("; ".join(errors))
     if not parts:

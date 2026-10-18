@@ -48,3 +48,10 @@ def test_ps1_pair_without_legacy_counterpart_is_unconfirmed():
         "UNCONFIRMED",
     ]
     assert "Legacy Surveys" in out.unknown_reason.iloc[5]
+
+
+def test_field_without_pan_starrs1():
+    # A3667 field (Dec -57): no Pan-STARRS1 rows, so its columns are absent (2.32.0 crash).
+    dq = _dq()
+    out = pd.DataFrame([_row(303.1, -56.8, "DESI Legacy Surveys DR10", primary_class="GALAXY")])
+    assert dq.apply(out).classification_status.tolist() == ["NO_EVIDENCE"]
