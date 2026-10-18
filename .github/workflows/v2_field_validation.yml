@@ -92,6 +92,68 @@ jobs:
           if len(ls_):
               print("  LS-only type:", ls_.get("desi_legacy_surveys_dr10__type",pd.Series(dtype=object)).value_counts().to_dict(),
                     "| g/r/z S/N>5:", [int((1/pd.to_numeric(ls_[f"std_magerr__ls_{b}"],errors="coerce")*1.0857>5).sum()) for b in "grz"])
+          print("\n== Solar System objects (2.29.0)")
+          print("status SOLAR_SYSTEM:", int(d.classification_status.eq("SOLAR_SYSTEM").sum()),
+                "| by rule:", d.loc[d.classification_status.eq("SOLAR_SYSTEM"), "subclass_rule"].value_counts().to_dict())
+          one = d[d.catalogs.astype(str).eq("Pan-STARRS1 DR2 MeanObject")]
+          fl = pd.to_numeric(one.get("pan_starrs1_dr2_meanobject__objInfoFlag", pd.Series(dtype=float)), errors="coerce")
+          print("PS1-only objects", len(one), "| objInfoFlag present", int(fl.notna().sum()),
+                "| HAS_SOLSYS_DET", int((fl.fillna(0).astype("int64") & 0x200 > 0).sum()),
+                "| MOST_SOLSYS_DET", int((fl.fillna(0).astype("int64") & 0x400 > 0).sum()),
+                "| TRANSIENT", int((fl.fillna(0).astype("int64") & 0x100 > 0).sum()))
+          allps = pd.to_numeric(d.get("pan_starrs1_dr2_meanobject__objInfoFlag", pd.Series(dtype=float)), errors="coerce").fillna(0).astype("int64")
+          print("all objects with PS1 SOLSYS bits:", int((allps & 0x600 > 0).sum()), "by class", d.loc[allps & 0x600 > 0, "primary_class"].value_counts().to_dict())
+          sd = d[d.catalogs.astype(str).eq("SDSS DR18 PhotoObj")]
+          if "sdss_dr18_photoobj__rowv" in d:
+              v = (pd.to_numeric(sd["sdss_dr18_photoobj__rowv"], errors="coerce")**2 + pd.to_numeric(sd["sdss_dr18_photoobj__colv"], errors="coerce")**2)**0.5
+              print("SDSS-only objects", len(sd), "| velocity quartiles (deg/day)", v.quantile([.25,.5,.75]).round(3).tolist(), "| 0.05<v<0.5:", int(v.between(0.05, 0.5).sum()))
+              # Truth check (2.29.0): known Solar System objects at each SDSS-only
+              # candidate's imaging epoch, from IMCCE SkyBoT (Berthier et al. 2006).
+              cand = sd[v.between(0.05, 0.5)]
+              try:
+                  from astroquery.imcce import Skybot
+                  from astropy.coordinates import SkyCoord
+                  from astropy.time import Time
+                  import astropy.units as u
+                  for _, r in cand.iterrows():
+                      mjd = pd.to_numeric(r.get("sdss_dr18_photoobj__mjd"), errors="coerce")
+                      rv, cv, re_, ce = (pd.to_numeric(r.get(f"sdss_dr18_photoobj__{k}"), errors="coerce") for k in ("rowv","colv","rowvErr","colvErr"))
+                      vv, sv = (rv**2+cv**2)**0.5, (re_**2+ce**2)**0.5
+                      hit = "no epoch"
+                      if pd.notna(mjd):
+                          try:
+                              t = Skybot.cone_search(SkyCoord(r.ra*u.deg, r.dec*u.deg), 60*u.arcsec, Time(mjd, format="mjd"), location="645")
+                              ca = next(c for c in t.colnames if c.upper().startswith("RA"))
+                              cd = next(c for c in t.colnames if c.upper().startswith("DE"))
+                              sep = SkyCoord(t[ca], t[cd], unit="deg").separation(SkyCoord(r.ra*u.deg, r.dec*u.deg)).arcsec
+                              i = sep.argmin()
+                              hit = f"SkyBoT {t['Name'][i]} at {sep[i]:.1f}\" V={t['V'][i] if 'V' in t.colnames else '?'} (cols {t.colnames[:6]})"
+                          except Exception as exc:
+                              hit = "SkyBoT none (" + str(exc)[:60] + ")"
+                      print(f"  SDSS-only v={vv:.3f}+-{sv:.3f} deg/d r={r.get('std_mag__sdss_r')} type={r.get('sdss_dr18_photoobj__type')} status={r.classification_status} -> {hit}")
+              except Exception as exc:
+                  print("SkyBoT check failed:", exc)
+              # Completeness check: every known Solar System object in the cone at
+              # the SDSS imaging epoch, and the pipeline object nearest to it.
+              try:
+                  import numpy as np
+                  ep = pd.to_numeric(d.get("sdss_dr18_photoobj__mjd"), errors="coerce").dropna()
+                  if len(ep):
+                      import os
+                      ra0, dec0, rad = float(os.environ["RA"]), float(os.environ["DEC"]), float(os.environ["RADIUS"])
+                      mjd0 = float(ep.mode().iloc[0])
+                      t = Skybot.cone_search(SkyCoord(ra0*u.deg, dec0*u.deg), rad*u.arcmin, Time(mjd0, format="mjd"), location="645")
+                      ca = next(c for c in t.colnames if c.upper().startswith("RA")); cd = next(c for c in t.colnames if c.upper().startswith("DE"))
+                      print(f"known SSOs in the cone at SDSS epoch MJD {mjd0:.4f}: {len(t)}")
+                      pos = SkyCoord(d.ra.values*u.deg, d.dec.values*u.deg)
+                      for row in t:
+                          c = SkyCoord(float(row[ca])*u.deg if not hasattr(row[ca], "unit") else row[ca], float(row[cd])*u.deg if not hasattr(row[cd], "unit") else row[cd])
+                          sep = c.separation(pos).arcsec; i = int(np.argmin(sep))
+                          print(f"  {row['Name']} V={row['V'] if 'V' in t.colnames else '?'} -> nearest object {sep[i]:.1f}\" catalogs={d.catalogs.iloc[i]} status={d.classification_status.iloc[i]} type={d.get('sdss_dr18_photoobj__type', pd.Series([None]*len(d))).iloc[i]}")
+              except Exception as exc:
+                  print("SkyBoT field check:", str(exc)[:120])
+          else:
+              print("SDSS velocity columns absent")
           print("\n== unit harmonisation: same band from two catalogues (point sources; AB after conversion)")
           print(units.consistency(pts))
           print("\n== second-stage sub-class")

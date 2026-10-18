@@ -52,8 +52,11 @@ COLUMNS = [
     "yMeanApMagErr",
 ]
 # epochMean (MJD of the mean position) lets Gaia proper motions be propagated
-# to the PS1 epoch (2.16.0); optional, dropped if the service rejects it.
-OPTIONAL_COLUMNS = ["epochMean"]
+# to the PS1 epoch (2.16.0); objInfoFlag carries the PS1 known-Solar-System
+# matches (HAS_SOLSYS_DET 512, MOST_SOLSYS_DET 1024; Flewelling et al. 2020)
+# and qualityFlag the measurement quality (2.29.0).  Optional, dropped if the
+# service rejects them.
+OPTIONAL_COLUMNS = ["epochMean", "objInfoFlag", "qualityFlag"]
 
 
 def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
