@@ -484,6 +484,17 @@ Four fields (RA 20, 150, 245, 250): 236 / 104 / 63 / 108 rows labelled; no objec
 
 NVSS and TGSS (45″, 25″ beams) are not used for grouping.
 
+## 11. Galaxy clusters (2.32.0)
+
+| Element | Source | Use / measurement |
+|---|---|---|
+| Cluster catalogue from DESI Legacy Surveys: 1.58 million clusters, z < 1.5, BCG position, z (photometric ~0.010 or spectroscopic), r500, M500 | Wen & Han 2024 (ApJS 272, 39), VizieR J/ApJS/272/39 | cluster positions and sizes; the galaxy within 3″ of a cluster position (the BCG) → brightest cluster galaxy (one per cluster) |
+| eRASS1 X-ray clusters, R500, P_cont < 0.5 (95 % pure) | Bulbul et al. 2024 (A&A 685, A106), Kluge et al. 2024; VizieR J/A+A/685/A106 (emain) | X-ray-selected clusters in the western Galactic hemisphere |
+| Spectroscopic membership: rest-frame |Δv| = c|z − z_cl|/(1 + z_cl) ≤ 2500 km/s inside r500 | Wen & Han 2024 §3 | MEMBER / NON_MEMBER; without a redshift nothing is claimed (dozens of z ~ 0.5–1 clusters overlap a few-arcmin field) |
+| Extended eRASS1 sources (EXT_LIKE > 0) are cluster gas, not point counterparts | Merloni et al. 2024 (A&A 682, A34) Table 4; Bulbul et al. 2024 | excluded from XRAY-001 (7 SDSS benchmark rows, none in the test split) |
+
+Abell 2142 field: BCG 2MASX J15582002+2714000, 23 members; Abell 3667 field: eRASS1 finds the cluster (z = 0.0555, M500 = 7.6 × 10¹⁴ M☉), BCG IC 4965, 28 members.
+
 ## Confidence of axis labels (2.15.0)
 
 Most axis labels come from rules without a score.  Their calibrated

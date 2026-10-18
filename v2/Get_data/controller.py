@@ -48,6 +48,7 @@ COLLECTORS = [
     "bzcat",
     "agb_suh2021",
     "sga2020",
+    "galaxy_clusters",
     "simbad",
     "ned",
 ]

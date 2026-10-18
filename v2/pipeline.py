@@ -155,6 +155,8 @@ def run(
     # Radio-only objects: catalogue artefacts, lobes of radio galaxies or
     # optically faint radio AGN (2.31.0, radio_sources.py).
     out = _load(V2 / "radio_sources.py", "v2_radio_sources").apply(out)
+    # Galaxy cluster membership from cluster catalogues (2.32.0, clusters.py).
+    out = _load(V2 / "clusters.py", "v2_clusters").apply(out, raw_dir)
     out.to_csv(work / "classified_objects.csv", index=False)
 
     summary = pd.DataFrame(timings)
