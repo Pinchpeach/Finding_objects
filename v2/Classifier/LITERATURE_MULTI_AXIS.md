@@ -461,6 +461,17 @@ unreliable), galaxy clusters (needs a multi-object entity), E+A galaxies (Hδ /
 
 Outcome: the label exists (classification_status SOLAR_SYSTEM, primary class UNKNOWN) and costs no extra query (survey columns only), but the measured yield in these fields is zero. The excess of PS1-only UNKNOWN objects at RA 20 (6.3 vs ~3 per arcmin²) is therefore **not** asteroids; see 2.30.0.
 
+## 9. Unconfirmed single-survey detections (2.30.0)
+
+| Element | Source | Use / measurement |
+|---|---|---|
+| PS1 objects with 1–2 detections are dominated by artefacts (GPC1 correlated read noise etc.), moving objects and transients | Chambers et al. 2016 (arXiv:1612.05560) §4.2.2; Flewelling et al. 2020 (ApJS 251, 7) query examples | most UNKNOWN objects in real fields are PS1-only rows with nDetections = 2 at 20.8–22 mag |
+| ≥ 3 detections required "to reject artifacts detected in a pair of exposures from the same night" | Magnier et al. 2020c (ApJS 251, 6) §6.4 | rule: nDetections ≤ 2, mean magnitude in ≤ 2 bands |
+| PS1 single-epoch 5σ depths g 22.0, r 21.8, i 21.5, z 20.9, y 19.7 | Chambers et al. 2016, Table 11 | the rows sit at the single-epoch limit |
+| Legacy Surveys single-frame 5σ PSF depths r 23.5 (DECaLS) / 23.1 (BASS), g 23.7–24.0 | Dey et al. 2019 (AJ 157, 168), Table 4 | a real source brighter than 22.5 mag where the Legacy Surveys observed would be detected: no LS object within 2″ while ≥ 3 LS objects lie within 60″ (coverage) → classification_status UNCONFIRMED (likely artefact or transient) |
+
+Four fields (RA 20, 150, 245, 250): 236 / 104 / 63 / 108 rows labelled; no object with a DESI spectrum labelled; DESI scoring unchanged. PS1-only rows with an LS object within 2″ (17–49 per field) are not labelled: they are association misses, not missing sources.
+
 ## Confidence of axis labels (2.15.0)
 
 Most axis labels come from rules without a score.  Their calibrated
