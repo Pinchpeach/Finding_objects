@@ -450,6 +450,17 @@ unreliable), galaxy clusters (needs a multi-object entity), E+A galaxies (Hδ /
   / type II Cepheids) were not mapped; BLL, Sy1, Sy2 and all variable-star
   codes gave no coarse SIMBAD evidence.  Candidate codes (`?`) are not used.
 
+## 8. Solar System objects (2.29.0)
+
+| Element | Source | Use / measurement |
+|---|---|---|
+| PS1 `objInfoFlag` MOST_SOLSYS_DET (0x400), or HAS_SOLSYS_DET (0x200) with ≤ 3 detections | Flewelling et al. 2020 (ApJS 251, 7); MAST PS1 object flags; Chambers et al. 2016 (arXiv:1612.05560) | PS1's own match of its detections to known Solar System objects. In four fields (RA 20, 150, 245, 250; two within 8° of the ecliptic) none of 787 PS1-only objects carries a SOLSYS bit: a main-belt asteroid moves ~9″ between the two exposures of a PS1 pair, so it is split into single-detection rows, which the collector drops (nDetections ≥ 2) |
+| SDSS moving object: point source (type 6), 14.5 < r < 21.5, 0.05 < v < 0.5 deg/day from rowv/colv, v ≥ 3σ | Ivezić et al. 2001 (AJ 122, 2749), SDSS Moving Object Catalog (~95 % complete, ~6 % contamination in later releases) | without the type and magnitude limits the first test labelled a faint galaxy (type 3, r = 22.3) that SkyBoT shows no known object near |
+| Truth check: IMCCE SkyBoT cone search at the SDSS imaging epoch (observatory 645) | Berthier et al. 2006 (ASPC 351, 367); 2016 (MNRAS 458, 3394) | none of 10 velocity candidates in four fields is a known object; the only known object inside any cone at the SDSS epoch (2010 CA98, V = 22.2, RA 150) is fainter than the SDSS limit |
+| Only objects that no other survey catalogue shares | — | a moving detection cannot match detections from other epochs |
+
+Outcome: the label exists (classification_status SOLAR_SYSTEM, primary class UNKNOWN) and costs no extra query (survey columns only), but the measured yield in these fields is zero. The excess of PS1-only UNKNOWN objects at RA 20 (6.3 vs ~3 per arcmin²) is therefore **not** asteroids; see 2.30.0.
+
 ## Confidence of axis labels (2.15.0)
 
 Most axis labels come from rules without a score.  Their calibrated
