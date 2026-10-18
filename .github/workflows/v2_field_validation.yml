@@ -107,6 +107,29 @@ jobs:
           if "sdss_dr18_photoobj__rowv" in d:
               v = (pd.to_numeric(sd["sdss_dr18_photoobj__rowv"], errors="coerce")**2 + pd.to_numeric(sd["sdss_dr18_photoobj__colv"], errors="coerce")**2)**0.5
               print("SDSS-only objects", len(sd), "| velocity quartiles (deg/day)", v.quantile([.25,.5,.75]).round(3).tolist(), "| 0.05<v<0.5:", int(v.between(0.05, 0.5).sum()))
+              # Truth check (2.29.0): known Solar System objects at each SDSS-only
+              # candidate's imaging epoch, from IMCCE SkyBoT (Berthier et al. 2006).
+              cand = sd[v.between(0.05, 0.5)]
+              try:
+                  from astroquery.imcce import Skybot
+                  from astropy.coordinates import SkyCoord
+                  from astropy.time import Time
+                  import astropy.units as u
+                  for _, r in cand.iterrows():
+                      mjd = pd.to_numeric(r.get("sdss_dr18_photoobj__mjd"), errors="coerce")
+                      rv, cv, re_, ce = (pd.to_numeric(r.get(f"sdss_dr18_photoobj__{k}"), errors="coerce") for k in ("rowv","colv","rowvErr","colvErr"))
+                      vv, sv = (rv**2+cv**2)**0.5, (re_**2+ce**2)**0.5
+                      hit = "no epoch"
+                      if pd.notna(mjd):
+                          try:
+                              t = Skybot.cone_search(SkyCoord(r.ra*u.deg, r.dec*u.deg), 60*u.arcsec, Time(mjd, format="mjd"), location="645")
+                              sep = SkyCoord(t["RA"], t["DEC"]).separation(SkyCoord(r.ra*u.deg, r.dec*u.deg)).arcsec
+                              hit = f"SkyBoT {t['Name'][sep.argmin()]} at {sep.min():.1f}\" V={t['V'][sep.argmin()]}"
+                          except Exception as exc:
+                              hit = "SkyBoT none (" + str(exc)[:60] + ")"
+                      print(f"  SDSS-only v={vv:.3f}+-{sv:.3f} deg/d r={r.get('std_mag__sdss_r')} type={r.get('sdss_dr18_photoobj__type')} status={r.classification_status} -> {hit}")
+              except Exception as exc:
+                  print("SkyBoT check failed:", exc)
           else:
               print("SDSS velocity columns absent")
           print("\n== unit harmonisation: same band from two catalogues (point sources; AB after conversion)")
