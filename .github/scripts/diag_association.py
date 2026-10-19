@@ -60,7 +60,7 @@ for _, r in pa.iterrows():
     if held_ps1:
         other = a[a.object_id.eq(l.object_id) & a.catalog.eq(PS1)].iloc[0]
         why = "LS object already holds another PS1 row"
-        extra = f"other PS1 {sep(r, other.to_frame().T)[0]:.2f}\" from this one"
+        extra = f"other PS1 {float(np.hypot((float(other.ra) - r.ra) * cosd, float(other.dec) - r.dec) * 3600):.2f}\" from this one"
     elif "ambiguous_new" in (r.association_status, l.association_status):
         # Detections are placed in anchor order (smaller poserr first), so the
         # later of the two made the decision; record which one was ambiguous.
@@ -109,7 +109,7 @@ if len(t):
     print(t.sort_values("sep").head(25).to_string(index=False))
     held = t[t.why.str.startswith("LS object already")]
     if len(held):
-        print("\nother-PS1 separations:", held.extra.str.extract(r"([0-9.]+)")[0].astype(float).describe().round(2).to_dict())
+        print("\nother-PS1 separations:", held.extra.str.extract(r"PS1 ([0-9.]+)\"")[0].astype(float).describe().round(2).to_dict())
 
 print("\n=== B. SIMBAD/NED-only objects ===")
 lit_only = set(cats_of[cats_of.map(lambda c: bool(c) and c <= LIT)].index)
