@@ -12,12 +12,14 @@ on:
       ra: {description: "RA (deg)", default: "245.0"}
       dec: {description: "Dec (deg)", default: "43.0"}
       radius: {description: "radius (arcmin)", default: "3"}
+      from_run: {description: "diagnose the field-validation artifact of this earlier run id instead of collecting (archives down)", default: ""}
   push:
     paths:
       - .github/workflows/v2_field_validation.yml
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   field:
@@ -34,11 +36,21 @@ jobs:
           python-version: "3.11"
       - run: pip install pandas numpy requests astropy astroquery pyvo
       - name: Pipeline
+        if: ${{ !github.event.inputs.from_run }}
         run: python -u v2/pipeline.py --ra $RA --dec $DEC --radius $RADIUS --work /tmp/field
+      - name: Earlier run's products
+        if: ${{ github.event.inputs.from_run }}
+        uses: actions/download-artifact@v4
+        with:
+          name: field-validation
+          path: /tmp/field
+          run-id: ${{ github.event.inputs.from_run }}
+          github-token: ${{ github.token }}
       - name: Association diagnostics (PS1-only near LS, SIMBAD/NED-only)
         continue-on-error: true
         run: python -u .github/scripts/diag_association.py /tmp/field $RA $DEC $RADIUS
       - name: Compare with DESI DR1 spectroscopy in the field
+        if: ${{ !github.event.inputs.from_run }}
         run: |
           python - <<'PY'
           import pandas as pd
@@ -173,9 +185,9 @@ jobs:
               from astropy.coordinates import SkyCoord
               import astropy.units as u
               pso = d[d.catalogs.astype(str).eq("Pan-STARRS1 DR2 MeanObject")]
-              qf = pd.to_numeric(pso.get("pan_starrs1_dr2_meanobject__qualityFlag"), errors="coerce").fillna(0).astype("int64")
+              qf = pd.to_numeric(pso.get("pan_starrs1_dr2_meanobject__qualityFlag", pd.Series(0.0, index=pso.index)), errors="coerce").fillna(0).astype("int64")
               print("n", len(pso), "| qualityFlag bits:", {b: int((qf & b > 0).sum()) for b in (1,2,4,8,16,32,64,128)})
-              nd = pd.to_numeric(pso.get("pan_starrs1_dr2_meanobject__nDetections"), errors="coerce")
+              nd = pd.to_numeric(pso.get("pan_starrs1_dr2_meanobject__nDetections", pd.Series(np.nan, index=pso.index)), errors="coerce")
               print("nDetections counts:", nd.value_counts().sort_index().head(8).to_dict())
               ls = d[d.catalogs.astype(str).str.contains("DESI Legacy Surveys DR10")]
               import importlib.util
@@ -308,7 +320,7 @@ jobs:
           print("LS ra/dec span", ls.ra.min(), ls.ra.max(), ls.dec.min(), ls.dec.max())
           PY
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: ${{ always() && !github.event.inputs.from_run }}
         with:
           name: field-validation
           path: /tmp/field/*.csv
