@@ -114,7 +114,7 @@ jobs:
                 "| HAS_SOLSYS_DET", int((fl.fillna(0).astype("int64") & 0x200 > 0).sum()),
                 "| MOST_SOLSYS_DET", int((fl.fillna(0).astype("int64") & 0x400 > 0).sum()),
                 "| TRANSIENT", int((fl.fillna(0).astype("int64") & 0x100 > 0).sum()))
-          allps = pd.to_numeric(d.get("pan_starrs1_dr2_meanobject__objInfoFlag", pd.Series(dtype=float)), errors="coerce").fillna(0).astype("int64")
+          allps = pd.to_numeric(d.get("pan_starrs1_dr2_meanobject__objInfoFlag", pd.Series(0.0, index=d.index)), errors="coerce").fillna(0).astype("int64")
           print("all objects with PS1 SOLSYS bits:", int((allps & 0x600 > 0).sum()), "by class", d.loc[allps & 0x600 > 0, "primary_class"].value_counts().to_dict())
           sd = d[d.catalogs.astype(str).eq("SDSS DR18 PhotoObj")]
           if "sdss_dr18_photoobj__rowv" in d:
