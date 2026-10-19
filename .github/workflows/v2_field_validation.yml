@@ -12,6 +12,7 @@ on:
       ra: {description: "RA (deg)", default: "245.0"}
       dec: {description: "Dec (deg)", default: "43.0"}
       radius: {description: "radius (arcmin)", default: "3"}
+      probe: {description: "set to 'coords' to run only the coordinate-format probe (2.33.0)", default: ""}
       from_run: {description: "diagnose the field-validation artifact of this earlier run id instead of collecting (archives down)", default: ""}
   push:
     paths:
@@ -35,8 +36,11 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install pandas numpy requests astropy astroquery pyvo
+      - name: Coordinate-format probe
+        if: ${{ github.event.inputs.probe == 'coords' }}
+        run: python -u .github/scripts/probe_coord_format.py
       - name: Pipeline
-        if: ${{ !github.event.inputs.from_run }}
+        if: ${{ !github.event.inputs.from_run && github.event.inputs.probe != 'coords' }}
         run: python -u v2/pipeline.py --ra $RA --dec $DEC --radius $RADIUS --work /tmp/field
       - name: Earlier run's products
         if: ${{ github.event.inputs.from_run }}
@@ -47,10 +51,11 @@ jobs:
           run-id: ${{ github.event.inputs.from_run }}
           github-token: ${{ github.token }}
       - name: Association diagnostics (PS1-only near LS, SIMBAD/NED-only)
+        if: ${{ github.event.inputs.probe != 'coords' }}
         continue-on-error: true
         run: python -u .github/scripts/diag_association.py /tmp/field $RA $DEC $RADIUS
       - name: Compare with DESI DR1 spectroscopy in the field
-        if: ${{ !github.event.inputs.from_run }}
+        if: ${{ !github.event.inputs.from_run && github.event.inputs.probe != 'coords' }}
         run: |
           python - <<'PY'
           import pandas as pd
@@ -320,7 +325,7 @@ jobs:
           print("LS ra/dec span", ls.ra.min(), ls.ra.max(), ls.dec.min(), ls.dec.max())
           PY
       - uses: actions/upload-artifact@v4
-        if: ${{ always() && !github.event.inputs.from_run }}
+        if: ${{ always() && !github.event.inputs.from_run && github.event.inputs.probe != 'coords' }}
         with:
           name: field-validation
           path: /tmp/field/*.csv

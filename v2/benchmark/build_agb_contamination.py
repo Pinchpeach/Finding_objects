@@ -115,6 +115,12 @@ def simbad(df: pd.DataFrame, chunk: int = 2000) -> pd.DataFrame:
 
 
 def main() -> None:
+    import sys
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "Get_data"))
+    import throttle
+
+    throttle.install()  # 3-5 s before every archive request (2.33.0)
     p = argparse.ArgumentParser()
     p.add_argument("--cones", type=int, default=80)
     p.add_argument("--radius", type=float, default=1.0, help="cone radius, degrees")

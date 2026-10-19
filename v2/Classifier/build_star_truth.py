@@ -75,6 +75,12 @@ def run(out: Path, total=1000):
 
 
 def main():
+    import sys
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "Get_data"))
+    import throttle
+
+    throttle.install()  # 3-5 s before every archive request (2.33.0)
     p = argparse.ArgumentParser()
     p.add_argument("--out", type=Path, default=Path(__file__).resolve().parent / "star_truth.csv")
     p.add_argument("--total", type=int, default=1000)

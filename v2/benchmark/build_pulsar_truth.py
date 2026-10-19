@@ -87,6 +87,12 @@ def control(n_cones: int, seed: int) -> pd.DataFrame:
 
 
 def main() -> None:
+    import sys
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "Get_data"))
+    import throttle
+
+    throttle.install()  # 3-5 s before every archive request (2.33.0)
     p = argparse.ArgumentParser()
     p.add_argument("--cones", type=int, default=60)
     p.add_argument("--seed", type=int, default=11)

@@ -214,6 +214,12 @@ def ultracool(out, say):
 
 
 def main():
+    import sys
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "Get_data"))
+    import throttle
+
+    throttle.install()  # 3-5 s before every archive request (2.33.0)
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
     a = ap.parse_args()
