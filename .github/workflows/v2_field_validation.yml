@@ -35,6 +35,9 @@ jobs:
       - run: pip install pandas numpy requests astropy astroquery pyvo
       - name: Pipeline
         run: python -u v2/pipeline.py --ra $RA --dec $DEC --radius $RADIUS --work /tmp/field
+      - name: Association diagnostics (PS1-only near LS, SIMBAD/NED-only)
+        continue-on-error: true
+        run: python -u .github/scripts/diag_association.py /tmp/field $RA $DEC $RADIUS
       - name: Compare with DESI DR1 spectroscopy in the field
         run: |
           python - <<'PY'
