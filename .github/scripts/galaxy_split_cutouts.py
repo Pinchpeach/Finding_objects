@@ -32,8 +32,10 @@ throttle.install()
 work, out, tag = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3]
 cases = pd.read_csv(work / "galaxy_split_cases.csv")
 a = pd.read_csv(work / "source_association.csv", low_memory=False)
+objs = pd.read_csv(work / "classified_objects.csv", usecols=["object_id", "pan_starrs1_dr2_meanobject__nDetections"], low_memory=False)
+NDET = objs.set_index("object_id")["pan_starrs1_dr2_meanobject__nDetections"]
 URL = "https://www.legacysurvey.org/viewer/cutout.jpg"
-SIZE, PIX = 96, 0.262  # pixels, arcsec/pixel (DECam native) -> 25"
+SIZE, PIX = 120, 0.131  # pixels, arcsec/pixel (half the DECam pixel) -> 15.7"
 HALF = SIZE * PIX / 2
 STYLE = {
     "DESI Legacy Surveys DR10": dict(marker="+", color="lime", s=90, lw=1.5),
@@ -46,7 +48,7 @@ cases = cases.sort_values(["verdict", "case", "sep"]).reset_index(drop=True)
 n = len(cases)
 cols = 5
 rows = max(1, int(np.ceil(n / cols)))
-fig, axes = plt.subplots(rows, cols, figsize=(3.2 * cols, 3.5 * rows), squeeze=False)
+fig, axes = plt.subplots(rows, cols, figsize=(4.2 * cols, 4.6 * rows), squeeze=False)
 for ax in axes.flat:
     ax.axis("off")
 for i, c in cases.iterrows():
@@ -68,6 +70,10 @@ for i, c in cases.iterrows():
         dy = (g.dec.to_numpy() - de0) * 3600
         k = (np.abs(dx) < HALF) & (np.abs(dy) < HALF)
         ax.scatter(dx[k], dy[k], **st)
+        if cat == "Pan-STARRS1 DR2 MeanObject":  # label each PS1 row with its detection count
+            for x, y, oid in zip(dx[k], dy[k], g.object_id.to_numpy()[k]):
+                nd = NDET.get(oid)
+                ax.text(x - 0.35, y + 0.35, f"{nd:g}" if pd.notna(nd) else "?", color="red", fontsize=7, weight="bold")
     ax.scatter([(c.ps1_ra - ra0) * cosd * 3600], [(c.ps1_dec - de0) * 3600], marker="o", facecolors="none", edgecolors="red", s=220, lw=2.2)
     ax.set_xlim(HALF, -HALF)
     ax.set_ylim(-HALF, HALF)
@@ -77,12 +83,12 @@ for i, c in cases.iterrows():
     ax.set_title(
         f"#{i} {c.case[:9]} | {str(c.verdict)[:14]}\n"
         f"sep {c.sep:.2f}\" r/re {c.r_over_shape_r} nDet {c.nDet:g}\n"
-        f"extra->{c.ps1_obj_class} gaia {c.gaia_sep}",
+        f"extra->{c.ps1_obj_class}  PS1 nDet:Kron-LS {c.ps1_rows_ndet_kron_minus_ls}",
         fontsize=7,
     )
-fig.suptitle(f"{tag}: LS galaxy centre; + LS, o PS1 (thick: PS1-only row), x Gaia, square SDSS; 25\" N up E left", fontsize=9)
+fig.suptitle(f"{tag}: LS galaxy centre; + LS, o PS1 (thick: PS1-only row), x Gaia, square SDSS; 15.7\" N up E left; red numbers = PS1 nDetections", fontsize=9)
 fig.tight_layout()
 out.mkdir(parents=True, exist_ok=True)
-fig.savefig(out / f"{tag}.png", dpi=80)
+fig.savefig(out / f"{tag}.png", dpi=100)
 cases.to_csv(out / f"{tag}.csv", index=False)
 print(f"wrote {out / f'{tag}.png'} ({n} cases) in {time.process_time():.1f} s cpu")

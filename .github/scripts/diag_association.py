@@ -177,6 +177,14 @@ if len(t):
         kr = kr[(kr > 10) & (kr < 30)]
         ls_r = pd.to_numeric(col("std_mag__ls_r").get(x.ls_oid), errors="coerce")
         sum_r = -2.5 * np.log10(np.sum(10 ** (-0.4 * kr.to_numpy()))) if len(kr) else np.nan
+        # every PS1 row on the galaxy: its detections and Kron r minus the LS total r
+        # (one whole-galaxy measurement ~ 0 to +0.2; a fragment much fainter)
+        nd_on = pd.to_numeric(D.reindex(on.object_id).get("pan_starrs1_dr2_meanobject__nDetections", pd.Series(dtype=float)), errors="coerce")
+        kr_all = pd.to_numeric(D.reindex(on.object_id).get("pan_starrs1_dr2_meanobject__rMeanKronMag", pd.Series(dtype=float)), errors="coerce")
+        rows_on = ";".join(
+            f"{n:g}:{(k - ls_r):+.2f}" if np.isfinite(k) and 10 < k < 30 and np.isfinite(ls_r) else f"{n:g}:nan"
+            for n, k in zip(nd_on.fillna(-1).to_numpy(), kr_all.to_numpy())
+        )
         kg = pd.to_numeric(col("pan_starrs1_dr2_meanobject__gMeanKronMag").get(x.ps1_oid), errors="coerce")
         ls_gr = pd.to_numeric(col("std_mag__ls_g").get(x.ls_oid), errors="coerce") - ls_r
         ps1_gr = kg - kron if np.isfinite(kg) and np.isfinite(kron) and 10 < kg < 30 and 10 < kron < 30 else np.nan
@@ -184,7 +192,7 @@ if len(t):
             "field": f"{RA0:g},{DEC0:g}", "ls_ra": lra, "ls_dec": lde, "ps1_ra": pra, "ps1_dec": pde,
             "ls_oid": x.ls_oid, "ps1_oid": x.ps1_oid,
             "gaia_sep": round(gaia_sep, 2) if np.isfinite(gaia_sep) else np.nan, "gaia_star": gaia_star,
-            "n_ps1_on_galaxy": len(on), "ps1_sum_minus_ls_r": round(float(sum_r - ls_r), 2) if np.isfinite(sum_r) and np.isfinite(ls_r) else np.nan,
+            "n_ps1_on_galaxy": len(on), "ps1_rows_ndet_kron_minus_ls": rows_on, "ps1_sum_minus_ls_r": round(float(sum_r - ls_r), 2) if np.isfinite(sum_r) and np.isfinite(ls_r) else np.nan,
             "ps1_gr_minus_ls_gr": round(float(ps1_gr - ls_gr), 2) if np.isfinite(ps1_gr) and np.isfinite(ls_gr) else np.nan,
             "case": x.why.split(" (")[0], "verdict": verdict, "sep": x.sep, "shape_r": round(float(shape_r), 2) if np.isfinite(shape_r) else np.nan,
             "r_over_shape_r": round(float(r_off), 2) if np.isfinite(r_off) else np.nan, "other_LS_arcsec": round(other1, 2),
