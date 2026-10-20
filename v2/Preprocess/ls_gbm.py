@@ -32,6 +32,11 @@ TYPES = ("PSF", "REX", "EXP", "DEV", "SER")
 # benchmark score is its production score (adding W1 S/N, half-light radius
 # and Sersic index raised held-out accuracy by only 0.2 points, 95.6 -> 95.8 %).
 FEATURES = ("r_mag", "g_r", "r_z", "z_w1", "w1_w2", "r_w1", "log_snr_r", *[f"type_{t}" for t in TYPES])
+# 2.35.0: per-band S/N, so the trees can tell a noisy colour from a real one
+# at the faint end (photometric errors as classifier inputs; Bovy et al. 2011
+# deconvolve them, KiDS/Nakoneczny et al. 2021 raise thresholds with depth).
+SNR_FEATURES = ("log_snr_g", "log_snr_z", "log_snr_w1", "log_snr_w2")
+ALL_FEATURES = FEATURES + SNR_FEATURES
 
 
 def _col(df, name):
@@ -53,7 +58,7 @@ def features(df: pd.DataFrame, prefix: str = P) -> np.ndarray:
         with np.errstate(divide="ignore", invalid="ignore"):
             mag[b] = np.where(f > 0, 22.5 - 2.5 * np.log10(f / t), np.nan)
     snr = {}
-    for b in ("r",):
+    for b in BANDS:
         f, iv = _col(df, f"{prefix}flux_{b}"), _col(df, f"{prefix}flux_ivar_{b}")
         with np.errstate(divide="ignore", invalid="ignore"):
             s = f * np.sqrt(np.where(iv > 0, iv, np.nan))
@@ -76,6 +81,10 @@ def features(df: pd.DataFrame, prefix: str = P) -> np.ndarray:
             mag["r"] - mag["w1"],
             snr["r"],
             *onehot,
+            snr["g"],
+            snr["z"],
+            snr["w1"],
+            snr["w2"],
         ]
     )
     return X
@@ -115,6 +124,8 @@ def predict_proba(df: pd.DataFrame, prefix: str = P) -> np.ndarray:
     """(n, 3) STAR/GALAXY/QSO probabilities; NaN rows where there is no LS photometry or no model."""
     model = load_model()
     X = features(df, prefix)
+    if model is not None:  # the columns the model was trained on (older models: FEATURES only)
+        X = X[:, : len(model["features"])]
     probs = np.full((len(df), len(CLASSES)), np.nan)
     has = np.isfinite(X[:, [0, 6]]).any(axis=1) | np.isfinite(X[:, 3])  # r mag, r S/N or z-W1
     if model is None or not has.any():

@@ -52,7 +52,7 @@ def production_frame(d: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
-def export(clf, path: Path) -> None:
+def export(clf, path: Path, names=ls_gbm.FEATURES) -> None:
     """Flatten the fitted HistGradientBoostingClassifier trees into arrays."""
     feat, thr, mleft, left, right, leaf, value, start, tcls = [], [], [], [], [], [], [], [], []
     offset = 0
@@ -86,8 +86,28 @@ def export(clf, path: Path) -> None:
         baseline=base,
         n_classes=np.int64(len(clf.classes_)),
         classes=np.array(list(clf.classes_)),
-        features=np.array(ls_gbm.FEATURES),
+        features=np.array(names),
     )
+
+
+def balance_weights(r: np.ndarray, y: np.ndarray, width: float = 0.5, cap: float = 30.0) -> np.ndarray:
+    """Sample weights giving STAR, GALAXY and QSO equal total weight in every
+    ``width``-mag bin of r (2.35.0).
+
+    DESI targets few faint stars, so trained on the DESI class mix the trees
+    learn "faint point source = QSO" (holdout star recall 0.44 at r = 21-22).
+    The classifier should give class likelihoods; the class mix of the sky
+    belongs in a separate prior (Bovy et al. 2011 keep the number-count prior
+    out of the density model; Chaussidon et al. 2023 reweight their star
+    training set to the QSO magnitude distribution).  Fusion weights are
+    fitted on class-balanced benchmarks, so a balanced GBM matches them.
+    """
+    b = np.floor(np.nan_to_num(r, nan=99.0) / width)
+    key = b * 10 + y
+    _, inv, cnt = np.unique(key, return_inverse=True, return_counts=True)
+    _, binv, bcnt = np.unique(b, return_inverse=True, return_counts=True)
+    w = bcnt[binv] / (3.0 * cnt[inv])
+    return np.clip(w, 0.0, cap)
 
 
 def main() -> None:
@@ -96,10 +116,14 @@ def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--out", type=Path, default=ls_gbm.MODEL_PATH)
     p.add_argument("--seed", type=int, default=7)
+    p.add_argument("--no-balance", action="store_true", help="train on the DESI class mix (pre-2.35.0)")
+    p.add_argument("--snr", action="store_true", help="add the per-band S/N features (ls_gbm.SNR_FEATURES)")
     a = p.parse_args()
     d = pd.read_csv(BENCH / "desi_gbm_truth" / "train.csv.gz", low_memory=False)
     d = d[d.spectype.isin(ls_gbm.CLASSES)].reset_index(drop=True)
     X = ls_gbm.features(production_frame(d))
+    names = ls_gbm.ALL_FEATURES if a.snr else ls_gbm.FEATURES
+    X = X[:, : len(names)]
     y = d.spectype.map({c: i for i, c in enumerate(ls_gbm.CLASSES)}).to_numpy()
     keep = np.isfinite(X[:, 0]) | np.isfinite(X[:, 3])
     X, y = X[keep], y[keep]
@@ -116,9 +140,9 @@ def main() -> None:
         n_iter_no_change=20,
         random_state=a.seed,
     )
-    clf.fit(X[~hold], y[~hold])
+    clf.fit(X[~hold], y[~hold], sample_weight=None if a.no_balance else balance_weights(X[~hold, 0], y[~hold]))
     assert list(clf.classes_) == [0, 1, 2]
-    export(clf, a.out)
+    export(clf, a.out, names)
     ls_gbm.load_model.cache_clear()
     model = ls_gbm.load_model(str(a.out))
     z = ls_gbm.raw_scores(X[hold], model)
