@@ -92,15 +92,17 @@ def export(clf, path: Path, names=ls_gbm.FEATURES) -> None:
 
 def balance_weights(r: np.ndarray, y: np.ndarray, width: float = 0.5, cap: float = 30.0) -> np.ndarray:
     """Sample weights giving STAR, GALAXY and QSO equal total weight in every
-    ``width``-mag bin of r (2.35.0).
+    ``width``-mag bin of r (option ``--balance``; measured, not adopted).
 
     DESI targets few faint stars, so trained on the DESI class mix the trees
     learn "faint point source = QSO" (holdout star recall 0.44 at r = 21-22).
     The classifier should give class likelihoods; the class mix of the sky
     belongs in a separate prior (Bovy et al. 2011 keep the number-count prior
     out of the density model; Chaussidon et al. 2023 reweight their star
-    training set to the QSO magnitude distribution).  Fusion weights are
-    fitted on class-balanced benchmarks, so a balanced GBM matches them.
+    training set to the QSO magnitude distribution).  Alone it raises the
+    holdout faint-star recall (r 21-22: 0.44 -> 0.86), but after the fusion
+    refit the benchmark gain in stars is paid in quasars (DESI test 92.41 ->
+    92.31 %; McNemar p = 1.0).
     """
     b = np.floor(np.nan_to_num(r, nan=99.0) / width)
     key = b * 10 + y
@@ -116,7 +118,9 @@ def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--out", type=Path, default=ls_gbm.MODEL_PATH)
     p.add_argument("--seed", type=int, default=7)
-    p.add_argument("--no-balance", action="store_true", help="train on the DESI class mix (pre-2.35.0)")
+    # Measured 2026-10-20 and not adopted (WORK_REPORT_2026-10-20b.md): they
+    # move faint stars from QSO to STAR but cost as many quasars.
+    p.add_argument("--balance", action="store_true", help="class-balance each 0.5-mag r bin (see balance_weights)")
     p.add_argument("--snr", action="store_true", help="add the per-band S/N features (ls_gbm.SNR_FEATURES)")
     a = p.parse_args()
     d = pd.read_csv(BENCH / "desi_gbm_truth" / "train.csv.gz", low_memory=False)
@@ -140,7 +144,7 @@ def main() -> None:
         n_iter_no_change=20,
         random_state=a.seed,
     )
-    clf.fit(X[~hold], y[~hold], sample_weight=None if a.no_balance else balance_weights(X[~hold, 0], y[~hold]))
+    clf.fit(X[~hold], y[~hold], sample_weight=balance_weights(X[~hold, 0], y[~hold]) if a.balance else None)
     assert list(clf.classes_) == [0, 1, 2]
     export(clf, a.out, names)
     ls_gbm.load_model.cache_clear()

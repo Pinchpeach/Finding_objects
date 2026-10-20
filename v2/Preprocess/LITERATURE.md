@@ -350,3 +350,18 @@ epochs).
 - **Not used.**
   - LS `shape_e1/e2`: we could not confirm their position-angle convention, so the circular major-axis r_e is used instead. That is generous along the minor axis.
   - Galaxy sizes beyond r_e (the halo of bright galaxies) are left for later.
+
+## Faint stars vs quasars: methods measured 2026-10-20 (2.34.1, none adopted)
+Failure analysed: on the DESI test split, faint stars go to QSO (19), to GALAXY (10) or to UNKNOWN (7). The STAR->QSO cases are blue point sources (g-r ~ 0.3), the colour region where stars and low-z quasars overlap without a u band (Richards et al. 2002; Yèche et al. 2020).
+
+| Method (literature) | How it was tested | DESI test (962) | SDSS test (1991) | Verdict |
+|---|---|---|---|---|
+| Class-balanced LS-GBM per 0.5-mag r bin (Chaussidon et al. 2023 reweight stars to the QSO magnitude distribution; Bovy et al. 2011 keep the prior out of the likelihood) | `train_ls_gbm.py --balance` + fusion refit | 92.41 -> 92.31 %; faint (r>21) stars 127 -> 132 of 149, QSO recall 93.6 -> 89.8 %; McNemar p = 1.0 | 98.69 -> 98.74 % | not adopted: stars gained = quasars lost |
+| + per-band S/N features (photometric errors as inputs; Bovy et al. 2011) | `--balance --snr` | 91.79 %; faint stars 134/149, QSO 88.5 %; p = 0.39 | 98.54 % | not adopted |
+| IR-excess feature grz-W vs g-z (Yèche et al. 2020) | GBM holdout | no change in macro recall (0.888 vs 0.885 at r 21-22) | – | not adopted |
+| Galactic latitude as a feature (number-count prior; Bovy et al. 2011) | GBM holdout | no gain (DESI targets are selected, so the latitude dependence of the sky mix is not in the training set) | – | not adopted; a real-sky prior cannot be validated on the class-balanced benchmarks |
+| r magnitude as a fusion feature (magnitude-dependent classification; Nakoneczny et al. 2021) | LS-COLOR-001 `r_mag` + fusion refit | 92.31 %, p = 1.0 | 98.54 % | not adopted |
+| Balanced GBM + r-magnitude fusion feature | both | 92.10 %, faint stars 133/149, p = 0.71 | 98.69 % | not adopted |
+| Gaia proper-motion significance | error analysis | only 4 of 140 misclassified DESI stars (all splits) have mu/sigma > 3, and the motion rules (AST-GAL-001/002) already use it | – | no headroom |
+
+The holdout of the LS-GBM training set alone showed a large faint-star gain from class balancing (r 21-22 recall 0.44 -> 0.86). In the full pipeline the fusion already corrects most of the GBM's DESI-target prior, so what remains is the genuine star/QSO colour overlap. Separating those needs a u band or variability, which are not available at r > 21 in our sources.

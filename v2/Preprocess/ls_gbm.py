@@ -32,9 +32,11 @@ TYPES = ("PSF", "REX", "EXP", "DEV", "SER")
 # benchmark score is its production score (adding W1 S/N, half-light radius
 # and Sersic index raised held-out accuracy by only 0.2 points, 95.6 -> 95.8 %).
 FEATURES = ("r_mag", "g_r", "r_z", "z_w1", "w1_w2", "r_w1", "log_snr_r", *[f"type_{t}" for t in TYPES])
-# 2.35.0: per-band S/N, so the trees can tell a noisy colour from a real one
-# at the faint end (photometric errors as classifier inputs; Bovy et al. 2011
-# deconvolve them, KiDS/Nakoneczny et al. 2021 raise thresholds with depth).
+# Per-band S/N (train_ls_gbm.py --snr), so the trees can tell a noisy colour
+# from a real one at the faint end (photometric errors as classifier inputs;
+# Bovy et al. 2011 deconvolve them).  Measured 2026-10-20, not adopted: the
+# shipped model uses FEATURES only; inference takes as many columns as the
+# model was trained on.
 SNR_FEATURES = ("log_snr_g", "log_snr_z", "log_snr_w1", "log_snr_w2")
 ALL_FEATURES = FEATURES + SNR_FEATURES
 
