@@ -104,11 +104,13 @@ VAR_SUMMARY = [
 # Wall-clock budgets: a slow Gaia archive previously held a field for ~26 min
 # in retries; past the budget the VizieR mirror fallback is used instead.
 # From CI runners the ESA TAP rarely answers a cone search within 2 min while
-# VizieR answers in seconds, so the base budget is short.
-BASE_TAP_BUDGET_S = 30.0
-OPTIONAL_TAP_BUDGET_S = 60.0
+# VizieR answers in seconds, so the base budget is short.  2.33.0: +20 s each,
+# for the 3-5 s pause (throttle.py) before each of an async job's ~4-5
+# requests (submit, status polls, results).
+BASE_TAP_BUDGET_S = 50.0
+OPTIONAL_TAP_BUDGET_S = 80.0
 # All optional tables together stay well inside the 300 s controller budget
-# (worst case was 30 + 3 tables x ceil(N/500) x 60 s).
+# (worst case was 50 + 3 tables x ceil(N/500) x 80 s, capped here).
 OPTIONAL_TOTAL_BUDGET_S = 180.0
 SYNC_MAX_ROWS = 2000
 
@@ -326,7 +328,7 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     rel = _release()
     used = rel
     select = ",".join(SOURCE)
-    q = f"""SELECT {select} FROM {_table(rel,'gaia_source')} WHERE 1=CONTAINS(POINT('ICRS',ra,dec),CIRCLE('ICRS',{float(ra)},{float(dec)},{float(radius_arcmin)/60.0}))"""
+    q = f"""SELECT {select} FROM {_table(rel,'gaia_source')} WHERE 1=CONTAINS(POINT('ICRS',ra,dec),CIRCLE('ICRS',{float(ra):.10f},{float(dec):.10f},{float(radius_arcmin)/60.0:.10f}))"""
     try:
         df = _bounded(_tap, BASE_TAP_BUDGET_S, q)
         df["gaia_base_query_status"] = "tap"

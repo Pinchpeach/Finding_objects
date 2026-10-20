@@ -64,6 +64,12 @@ def sep_arcsec(ra1, dec1, ra2, dec2):
 
 
 def main():
+    import sys
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "Get_data"))
+    import throttle
+
+    throttle.install()  # 3-5 s before every archive request (2.33.0)
     ap = argparse.ArgumentParser()
     ap.add_argument("--per-cell", type=int, default=150, help="objects per class per r bin")
     ap.add_argument("--sdss-truth", type=Path, default=Path(__file__).with_name("truth_data") / "ground_truth.csv")

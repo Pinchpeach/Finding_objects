@@ -277,6 +277,12 @@ def vizier_asu(df: pd.DataFrame, chunk: int = 500, catalogs: dict | None = None)
 
 
 def main():
+    import sys
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "Get_data"))
+    import throttle
+
+    throttle.install()  # 3-5 s before every archive request (2.33.0)
     p = argparse.ArgumentParser()
     p.add_argument(
         "--out", type=Path, default=Path(__file__).resolve().parent / "agb_truth" / "agb_chemistry_truth.csv.gz"

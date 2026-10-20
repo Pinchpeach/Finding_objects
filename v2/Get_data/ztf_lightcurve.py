@@ -32,6 +32,14 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+import sys
+
+if str(Path(__file__).resolve().parent) not in sys.path:  # loaded by file path elsewhere
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+import throttle  # noqa: E402
+
+throttle.install()  # 3-5 s before every archive request (2.33.0)
+
 CATALOG = "ZTF light curves"
 URL = "https://irsa.ipac.caltech.edu/cgi-bin/ZTF/nph_light_curves"
 MERGE_ARCSEC = 1.5

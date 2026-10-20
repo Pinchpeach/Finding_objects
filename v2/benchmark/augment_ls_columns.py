@@ -51,6 +51,12 @@ def fetch(ids: list[str]) -> pd.DataFrame:
 
 
 def main() -> None:
+    import sys
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "Get_data"))
+    import throttle
+
+    throttle.install()  # 3-5 s before every archive request (2.33.0)
     for f in FILES:
         d = pd.read_csv(f, low_memory=False, dtype={"ls_id": str})
         ids = sorted({x for x in d.ls_id.dropna().astype(str) if x.isdigit()})

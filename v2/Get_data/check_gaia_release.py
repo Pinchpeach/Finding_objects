@@ -16,7 +16,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import gaia_dr3 as g  # noqa: E402
+import throttle  # noqa: E402
 from gaia_release import RELEASES, table  # noqa: E402
+
+throttle.install()  # 3-5 s before every archive request (2.33.0)
 
 NEEDED = {
     "gaia_source": g.SOURCE,

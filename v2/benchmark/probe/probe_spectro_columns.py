@@ -2,7 +2,14 @@
 could use (run in GitHub Actions; the archives are not reachable from every
 environment).  Output goes to the job log only."""
 
-from astroquery.vizier import Vizier
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "Get_data"))
+import throttle  # noqa: E402
+from astroquery.vizier import Vizier  # noqa: E402
+
+throttle.install()  # 3-5 s before every archive request (2.33.0)
 
 for cat in (
     "V/164/dr5",

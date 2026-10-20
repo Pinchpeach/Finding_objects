@@ -133,6 +133,12 @@ def run(features: Path, out: Path, batch_size: int = 40):
 
 
 def main():
+    import sys
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "Get_data"))
+    import throttle
+
+    throttle.install()  # 3-5 s before every archive request (2.33.0)
     p = argparse.ArgumentParser()
     p.add_argument("--features", type=Path, required=True)
     p.add_argument("--out", type=Path, required=True)

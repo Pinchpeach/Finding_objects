@@ -5,6 +5,10 @@ import math
 from pathlib import Path
 import pandas as pd
 
+import throttle
+
+throttle.install()  # 3-5 s before every archive request (2.33.0), also for scripts that import the collectors directly
+
 # Leading columns of every collector's output, in this order.
 BASE = ["catalog", "catalog_object_id", "object_name", "ra", "dec"]
 
@@ -173,6 +177,29 @@ def j2000_degrees(df: pd.DataFrame):
 SDSS_MAX_CONE_ARCMIN = 3.0
 
 
+def _sdss():
+    """astroquery's SDSS client with full-precision rectangle bounds (2.33.0).
+
+    astroquery writes the rectangle's RA/Dec limits with ``{:g}`` (six
+    significant digits): at RA 245 a limit moves by up to 0.0005 deg (1.8"),
+    and a limit near 0 is written in exponent notation.  Same SQL, written to
+    1e-8 deg.
+    """
+    from astroquery.sdss.core import SDSSClass
+
+    class FullPrecisionSDSS(SDSSClass):
+        def _rectangle_sql(self, ra, dec, width, height=None):
+            height = width if height is None else height
+            d0, d1 = max(dec - height / 2.0, -90.0), min(dec + height / 2.0, 90.0)
+            r0, r1 = ra - width / 2.0, ra + width / 2.0
+            wrap = r0 < 0 or r1 > 360.0
+            r0, r1 = (r0 + 360.0 if r0 < 0 else r0), (r1 - 360.0 if r1 > 360.0 else r1)
+            ra_sql = f"((p.ra >= {r0:.8f}) OR (p.ra <= {r1:.8f}))" if wrap else f"(p.ra BETWEEN {r0:.8f} AND {r1:.8f})"
+            return f"({ra_sql} AND (p.dec BETWEEN {d0:.8f} AND {d1:.8f}))"
+
+    return FullPrecisionSDSS()
+
+
 def sdss_region(ra: float, dec: float, radius_arcmin: float, **kwargs):
     """``SDSS.query_region`` for any radius (2.23.0).
 
@@ -183,8 +210,8 @@ def sdss_region(ra: float, dec: float, radius_arcmin: float, **kwargs):
     """
     import astropy.units as u
     from astropy.coordinates import SkyCoord
-    from astroquery.sdss import SDSS
 
+    SDSS = _sdss()
     pos = SkyCoord(ra=float(ra) * u.deg, dec=float(dec) * u.deg, frame="icrs")
     if radius_arcmin <= SDSS_MAX_CONE_ARCMIN:
         return SDSS.query_region(pos, radius=radius_arcmin * u.arcmin, **kwargs)

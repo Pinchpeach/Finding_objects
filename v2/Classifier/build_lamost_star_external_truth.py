@@ -134,6 +134,12 @@ def run(sdss_truth: Path, out: Path, total=1000):
 
 
 def main():
+    import sys
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "Get_data"))
+    import throttle
+
+    throttle.install()  # 3-5 s before every archive request (2.33.0)
     root = Path(__file__).resolve().parent
     p = argparse.ArgumentParser()
     p.add_argument("--sdss-truth", type=Path, default=root / "star_truth.csv")

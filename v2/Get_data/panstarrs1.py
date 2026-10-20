@@ -4,6 +4,14 @@ from io import StringIO
 from pathlib import Path
 import pandas as pd, requests
 
+import sys
+
+if str(Path(__file__).resolve().parent) not in sys.path:  # loaded by file path elsewhere
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+import throttle  # noqa: E402
+
+throttle.install()  # 3-5 s before every archive request (2.33.0)
+
 MIN_DETECTIONS = 2
 CATALOG = "Pan-STARRS1 DR2 MeanObject"
 API = "https://catalogs.mast.stsci.edu/api/v0.1/panstarrs/dr2/mean.csv"
@@ -64,9 +72,11 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     # mostly spurious/moving; they duplicated real sources and made Stage-1
     # association ambiguous in real fields.
     p = {
-        "ra": ra,
-        "dec": dec,
-        "radius": radius_arcmin / 60.0,
+        # Fixed-point text: str() of a coordinate within 1e-4 deg of 0 is in
+        # exponent notation, which NED misread (2.33.0); not left to chance here.
+        "ra": f"{float(ra):.10f}",
+        "dec": f"{float(dec):.10f}",
+        "radius": f"{float(radius_arcmin) / 60.0:.10f}",
         "nDetections.gte": MIN_DETECTIONS,
         "columns": "[" + ",".join(COLUMNS + OPTIONAL_COLUMNS) + "]",
     }

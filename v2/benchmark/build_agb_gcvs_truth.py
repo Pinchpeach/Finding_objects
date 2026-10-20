@@ -74,6 +74,12 @@ def labels() -> pd.DataFrame:
 
 
 def main() -> None:
+    import sys
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "Get_data"))
+    import throttle
+
+    throttle.install()  # 3-5 s before every archive request (2.33.0)
     p = argparse.ArgumentParser()
     p.add_argument("--out", type=Path, default=BENCH / "agb_truth" / "agb_gcvs_truth.csv.gz")
     a = p.parse_args()

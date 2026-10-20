@@ -7,6 +7,14 @@ catalog (DR10 South + DR9 North).  No classification/truth labels are queried.
 from pathlib import Path
 import pandas as pd
 
+import sys
+
+if str(Path(__file__).resolve().parent) not in sys.path:  # loaded by file path elsewhere
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+import throttle  # noqa: E402
+
+throttle.install()  # 3-5 s before every archive request (2.33.0)
+
 CATALOG = "DESI Legacy Surveys DR10"
 TAP_URL = "https://datalab.noirlab.edu/tap"
 TABLE = "ls_dr10.tractor"

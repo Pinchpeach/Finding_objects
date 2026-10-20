@@ -21,6 +21,9 @@ DEFAULT_OUT = ROOT / "rawdata"
 if str(GET_DATA) not in sys.path:
     sys.path.insert(0, str(GET_DATA))
 import archive_cache  # noqa: E402  (local cache / mirror of collector results, 2.9.1)
+import throttle  # noqa: E402
+
+throttle.install()  # 3-5 s before every archive request (2.33.0)
 
 COLLECTORS = [
     "gaia_dr3",
