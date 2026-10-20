@@ -270,7 +270,9 @@ _spec = _iu.spec_from_file_location("v2_host_groups", "v2/host_groups.py")
 hg = _iu.module_from_spec(_spec)
 _spec.loader.exec_module(hg)
 before = d.copy()
-after = hg.attach_ps1_fragments(before, a)
+reasons_d = {}
+after = hg.attach_ps1_fragments(before, a, reasons_d)
+print("left independent, by reason:", pd.Series(reasons_d).value_counts().to_dict() if reasons_d else {})
 new = after.parent_object_id.notna() & (before.parent_object_id.isna() if "parent_object_id" in before else True)
 print("attached:", int(new.sum()), "| roles:", after.loc[new, "component_role"].value_counts().to_dict(),
       "| their class/status:", (after.loc[new, "primary_class"].astype(str) + "/" + after.loc[new, "classification_status"].astype(str)).value_counts().to_dict())
@@ -285,3 +287,5 @@ if Path(f"{work}/galaxy_split_cases.csv").exists():
     cc = pd.read_csv(f"{work}/galaxy_split_cases.csv")
     cc["attached"] = cc.ps1_oid.isin(set(after.loc[new, "object_id"]))
     print("section-C cases attached by verdict:\n" + pd.crosstab(cc.verdict, cc.attached).to_string())
+    left = cc[~cc.attached]
+    print("section-C cases left, by reason:\n" + pd.crosstab(left.verdict, left.ps1_oid.map(reasons_d).fillna("not a candidate (other surveys / already a part)")).to_string())

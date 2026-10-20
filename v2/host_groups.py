@@ -299,7 +299,11 @@ def _attach_identity(out: pd.DataFrame, priority) -> None:
 #     (LS would have resolved a separate source there);
 #   * no Gaia or SDSS source of another object lies within SEPARATE_ARCSEC
 #     (an independent detection: a star on the galaxy, or a neighbour that
-#     SDSS deblends and LS merged, field RA 245);
+#     SDSS deblends and LS merged, field RA 245).  The one exception is an
+#     SDSS source that is the only SDSS source on the galaxy: that is SDSS's
+#     measurement of the galaxy itself, which the association often joined to
+#     one of the PS1 rows rather than to the LS galaxy (an object measured by
+#     PS1 and SDSS only is then also a candidate);
 #   * it is not brighter than the galaxy by more than BRIGHTER_MAG (a brighter
 #     PS1 source is another object).
 # The PS1 measurement is kept as a component (role ``ps1_duplicate`` when its
@@ -318,7 +322,14 @@ BRIGHTER_MAG = 0.75
 WHOLE_GALAXY_MAG = 0.5
 
 
-def attach_ps1_fragments(out: pd.DataFrame, assoc: pd.DataFrame) -> pd.DataFrame:
+SDSS = "SDSS DR18 PhotoObj"
+SDSS_ON_GALAXY_MIN_ARCSEC = 1.5
+
+
+def attach_ps1_fragments(out: pd.DataFrame, assoc: pd.DataFrame, explain: dict | None = None) -> pd.DataFrame:
+    """Group PS1 duplicates/fragments under their galaxy; ``explain`` (optional
+    dict) receives object_id -> reason for every candidate left independent."""
+    why = explain if explain is not None else {}
     if out.empty or assoc is None or assoc.empty or "catalogs" not in out:
         return out
     out = out.copy()
@@ -330,7 +341,7 @@ def attach_ps1_fragments(out: pd.DataFrame, assoc: pd.DataFrame) -> pd.DataFrame
             out[c] = out[c].astype(object)
     top = out.parent_object_id.isna()
     cats = out.catalogs.astype(str).map(lambda s: frozenset(c for c in s.split("|") if c) - LITERATURE)
-    cand = out.index[top & cats.map(lambda c: c == frozenset({PS1}))]
+    cand = out.index[top & cats.map(lambda c: PS1 in c and c <= {PS1, SDSS})]
     typ = out.get("desi_legacy_surveys_dr10__type", pd.Series("", index=out.index)).astype(str).str.strip().str.upper()
     shape = pd.to_numeric(out.get("desi_legacy_surveys_dr10__shape_r", pd.Series(np.nan, index=out.index)), errors="coerce")
     hosts = out.index[top & typ.isin(EXTENDED_TYPES) & shape.gt(0)]
@@ -343,7 +354,8 @@ def attach_ps1_fragments(out: pd.DataFrame, assoc: pd.DataFrame) -> pd.DataFrame
 
     ls_oid, ls_ra, ls_dec = positions(LS)
     ps_oid, ps_ra, ps_dec = positions(PS1)
-    others = assoc[assoc.catalog.isin(["Gaia DR3", "SDSS DR18 PhotoObj"])]
+    others = assoc[assoc.catalog.isin(["Gaia DR3", SDSS])]
+    sd = assoc[assoc.catalog.eq(SDSS)]
     oid_index = dict(zip(out.object_id, out.index))
     ls_pos = {o: (r, d) for o, r, d in zip(ls_oid, ls_ra, ls_dec)}
     ps_pos = {o: (r, d) for o, r, d in zip(ps_oid, ps_ra, ps_dec)}
@@ -367,19 +379,34 @@ def attach_ps1_fragments(out: pd.DataFrame, assoc: pd.DataFrame) -> pd.DataFrame
         d = sep(ra, dec, h_ra, h_dec)
         ok = d <= np.maximum(PS1_HOST_RADII * h_re, PS1_HOST_MIN_ARCSEC)
         if not ok.any():
+            why[oid] = "not inside an extended LS galaxy"
             continue
         k = int(np.argmin(np.where(ok, d / h_re, np.inf)))
         host = host_oids[k]
         ls_d = sep(ra, dec, ls_ra, ls_dec)
         if ((ls_d <= LS_RESOLVED_ARCSEC) & (ls_oid != host)).any():
+            why[oid] = "another LS source within 1 arcsec"
+            continue
+        # SDSS sources on the galaxy: exactly one = SDSS's measurement of the galaxy.
+        on = sep(h_ra[k], h_dec[k], sd.ra.to_numpy(float), sd.dec.to_numpy(float)) <= max(
+            PS1_HOST_RADII * h_re[k], SDSS_ON_GALAXY_MIN_ARCSEC
+        )
+        galaxy_sdss = set(sd.object_id.to_numpy()[on]) if on.sum() == 1 else set()
+        if SDSS in cats[i] and oid not in galaxy_sdss:
+            why[oid] = "its SDSS source is one of several SDSS sources on the galaxy"
             continue
         if len(others):
             od = sep(ra, dec, others.ra.to_numpy(float), others.dec.to_numpy(float))
-            if ((od <= SEPARATE_ARCSEC) & (others.object_id.to_numpy() != host)).any():
+            oo = others.object_id.to_numpy()
+            near = (od <= SEPARATE_ARCSEC) & (oo != host) & (oo != oid)
+            near &= ~(others.catalog.eq(SDSS).to_numpy() & np.isin(oo, list(galaxy_sdss)))
+            if near.any():
+                why[oid] = "Gaia or SDSS source of another object within 0.7 arcsec"
                 continue
         h = oid_index[host]
         dm = kron[i] - ls_r[h] if 10 < kron[i] < 30 and np.isfinite(ls_r[h]) else np.nan
         if np.isfinite(dm) and dm < -BRIGHTER_MAG:
+            why[oid] = "brighter than the galaxy"
             continue
         out.at[i, "parent_object_id"] = host
         out.at[i, "component_role"] = "ps1_duplicate" if np.isfinite(dm) and abs(dm) <= WHOLE_GALAXY_MAG else "component"

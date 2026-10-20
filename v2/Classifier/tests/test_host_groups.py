@@ -153,6 +153,8 @@ def test_ps1_rows_on_a_small_galaxy_are_grouped_under_it():
         dict(object_id="E", catalogs=PS1, pan_starrs1_dr2_meanobject__rMeanKronMag=18.0),  # 2 mag brighter
         dict(object_id="F", catalogs=PS1, pan_starrs1_dr2_meanobject__rMeanKronMag=21.0),  # 3" away
         dict(object_id="S", catalogs="Gaia DR3"),
+        # PS1+SDSS object at the centre; its SDSS source is the only one on the galaxy
+        dict(object_id="H", catalogs=f"{PS1}|SDSS DR18 PhotoObj", pan_starrs1_dr2_meanobject__rMeanKronMag=20.1),
     ]
     out = pd.DataFrame(objs)
     out["unknown_reason"] = ""
@@ -161,6 +163,7 @@ def test_ps1_rows_on_a_small_galaxy_are_grouped_under_it():
         (PS1, "A", 10.0 + 0.6 * arc, 0.0), (PS1, "B", 10.0, -1.2 * arc), (PS1, "C", 10.0, 1.4 * arc),
         (PS1, "D", 10.0 - 0.8 * arc, 0.0), ("Gaia DR3", "S", 10.0 - 0.9 * arc, 0.0),
         (PS1, "E", 10.0, 0.5 * arc), (PS1, "F", 10.0 + 3.0 * arc, 0.0),
+        (PS1, "H", 10.0, -0.3 * arc), ("SDSS DR18 PhotoObj", "H", 10.0, -0.3 * arc),
     ]
     assoc = pd.DataFrame(rows, columns=["catalog", "object_id", "ra", "dec"])
     res = hg.attach_ps1_fragments(out, assoc).set_index("object_id")
@@ -169,4 +172,5 @@ def test_ps1_rows_on_a_small_galaxy_are_grouped_under_it():
     assert "G1" in res.at["B", "unknown_reason"]
     for k in "CDEF":
         assert pd.isna(res.at[k, "parent_object_id"]), k
-    assert res.at["G", "n_components"] == 2
+    assert res.at["H", "parent_object_id"] == "G"  # SDSS's own measurement of the galaxy
+    assert res.at["G", "n_components"] == 3
