@@ -131,3 +131,46 @@ def test_cone_cut_keeps_the_host_of_a_kept_component():
     # 2 arcsec around the disc knot: the host centre is ~10 arcsec away
     cut = names.annotate(out, pd.DataFrame(), center=(188.4170, 9.1770), radius_arcmin=2 / 60)
     assert set(cut.object_id) == {"K", "H"}
+
+
+def test_ps1_rows_on_a_small_galaxy_are_grouped_under_it():
+    """2.34.0: PS1 duplicates/fragments of an extended LS galaxy become its
+    components; separate sources (other LS/Gaia/SDSS detection, much brighter,
+    outside 2 half-light radii, point-source host) stay independent."""
+    hg = _load("host_groups")
+    LS, PS1 = hg.LS, hg.PS1
+    arc = 1 / 3600.0
+    objs = [
+        # host galaxy (LS EXP, r_e = 1.0") and a point-source LS object
+        dict(object_id="G", catalogs=f"{LS}|{PS1}", desi_legacy_surveys_dr10__type="EXP",
+             desi_legacy_surveys_dr10__shape_r=1.0, std_mag__ls_r=20.0, designation="G1"),
+        dict(object_id="P", catalogs=LS, desi_legacy_surveys_dr10__type="PSF", desi_legacy_surveys_dr10__shape_r=0.0,
+             std_mag__ls_r=21.0, designation="P1"),
+        dict(object_id="A", catalogs=PS1, pan_starrs1_dr2_meanobject__rMeanKronMag=20.2),  # whole-galaxy duplicate
+        dict(object_id="B", catalogs=PS1, pan_starrs1_dr2_meanobject__rMeanKronMag=22.0),  # faint knot
+        dict(object_id="C", catalogs=PS1, pan_starrs1_dr2_meanobject__rMeanKronMag=21.0),  # on the other LS source
+        dict(object_id="D", catalogs=PS1, pan_starrs1_dr2_meanobject__rMeanKronMag=21.0),  # Gaia star there
+        dict(object_id="E", catalogs=PS1, pan_starrs1_dr2_meanobject__rMeanKronMag=18.0),  # 2 mag brighter
+        dict(object_id="F", catalogs=PS1, pan_starrs1_dr2_meanobject__rMeanKronMag=21.0),  # 3" away
+        dict(object_id="S", catalogs="Gaia DR3"),
+        # PS1+SDSS object at the centre; its SDSS source is the only one on the galaxy
+        dict(object_id="H", catalogs=f"{PS1}|SDSS DR18 PhotoObj", pan_starrs1_dr2_meanobject__rMeanKronMag=20.1),
+    ]
+    out = pd.DataFrame(objs)
+    out["unknown_reason"] = ""
+    rows = [
+        (LS, "G", 10.0, 0.0), (PS1, "G", 10.0, 0.0), (LS, "P", 10.0, 1.5 * arc),
+        (PS1, "A", 10.0 + 0.6 * arc, 0.0), (PS1, "B", 10.0, -1.2 * arc), (PS1, "C", 10.0, 1.4 * arc),
+        (PS1, "D", 10.0 - 0.8 * arc, 0.0), ("Gaia DR3", "S", 10.0 - 0.9 * arc, 0.0),
+        (PS1, "E", 10.0, 0.5 * arc), (PS1, "F", 10.0 + 3.0 * arc, 0.0),
+        (PS1, "H", 10.0, -0.3 * arc), ("SDSS DR18 PhotoObj", "H", 10.0, -0.3 * arc),
+    ]
+    assoc = pd.DataFrame(rows, columns=["catalog", "object_id", "ra", "dec"])
+    res = hg.attach_ps1_fragments(out, assoc).set_index("object_id")
+    assert res.at["A", "parent_object_id"] == "G" and res.at["A", "component_role"] == "ps1_duplicate"
+    assert res.at["B", "parent_object_id"] == "G" and res.at["B", "component_role"] == "component"
+    assert "G1" in res.at["B", "unknown_reason"]
+    for k in "CDEF":
+        assert pd.isna(res.at[k, "parent_object_id"]), k
+    assert res.at["H", "parent_object_id"] == "G"  # SDSS's own measurement of the galaxy
+    assert res.at["G", "n_components"] == 3

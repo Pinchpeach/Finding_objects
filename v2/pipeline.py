@@ -146,6 +146,8 @@ def run(
     table_io = _load(PRE / "table_io.py", "v2_table_io")
     out = names.annotate(table_io.read_table(work / "classified_objects.csv"), assoc)
     out = hosts.consolidate(out, names.PRIORITY)
+    # Pan-STARRS1 duplicates / fragments of small galaxies (2.34.0).
+    out = hosts.attach_ps1_fragments(out, assoc)
     if out.n_components.gt(0).any():  # hosts may have inherited a nucleus spectrum
         out = _load(CLS / "subclass.py", "v2_subclass").annotate(out)
     out = names.annotate(out, assoc, None if None in (ra, dec) else (ra, dec), None if collect else radius)

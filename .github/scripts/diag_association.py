@@ -153,7 +153,47 @@ if len(t):
             else "outside 2 shape_r" if np.isfinite(r_off)
             else "no shape_r"
         )
+        # 2.33.1 review: independent evidence for "same galaxy" vs "separate object".
+        #  * Gaia DR3 at the PS1 position: Gaia resolves 0.2" pairs, and a
+        #    source with significant parallax/proper motion there is a
+        #    foreground star on the galaxy, not a fragment of it;
+        #  * PS1 flux budget: all PS1 rows on the galaxy (within rr) summed
+        #    against the LS total r flux.  Pieces of one galaxy add up to
+        #    about the galaxy; two whole-galaxy measurements give ~2x;
+        #  * colour: the PS1 row's Kron g-r against the LS galaxy's g-r.
+        gaia = a[a.catalog.eq("Gaia DR3")]
+        gsep = np.hypot((gaia.ra.to_numpy() - pra) * cosd, gaia.dec.to_numpy() - pde) * 3600 if len(gaia) else np.array([])
+        gaia_sep = float(gsep.min()) if len(gsep) else np.inf
+        gaia_star = False
+        if gaia_sep <= 0.5:
+            g = gaia.iloc[int(np.argmin(gsep))]
+            go = D.loc[g.object_id] if g.object_id in D.index else {}
+            plx, eplx = pd.to_numeric(go.get("gaia_dr3__parallax"), errors="coerce"), pd.to_numeric(go.get("gaia_dr3__parallax_error"), errors="coerce")
+            pm = np.hypot(pd.to_numeric(go.get("gaia_dr3__pmra"), errors="coerce"), pd.to_numeric(go.get("gaia_dr3__pmdec"), errors="coerce"))
+            gaia_star = bool((np.isfinite(plx) and np.isfinite(eplx) and eplx > 0 and plx / eplx > 5) or (np.isfinite(pm) and pm > 10))
+        ps = a[a.catalog.eq(PS1)]
+        on = ps[np.hypot((ps.ra.to_numpy() - lra) * cosd, ps.dec.to_numpy() - lde) * 3600 <= rr]
+        kr = pd.to_numeric(D.reindex(on.object_id).get("pan_starrs1_dr2_meanobject__rMeanKronMag", pd.Series(dtype=float)), errors="coerce")
+        kr = kr[(kr > 10) & (kr < 30)]
+        ls_r = pd.to_numeric(col("std_mag__ls_r").get(x.ls_oid), errors="coerce")
+        sum_r = -2.5 * np.log10(np.sum(10 ** (-0.4 * kr.to_numpy()))) if len(kr) else np.nan
+        # every PS1 row on the galaxy: its detections and Kron r minus the LS total r
+        # (one whole-galaxy measurement ~ 0 to +0.2; a fragment much fainter)
+        nd_on = pd.to_numeric(D.reindex(on.object_id).get("pan_starrs1_dr2_meanobject__nDetections", pd.Series(dtype=float)), errors="coerce")
+        kr_all = pd.to_numeric(D.reindex(on.object_id).get("pan_starrs1_dr2_meanobject__rMeanKronMag", pd.Series(dtype=float)), errors="coerce")
+        rows_on = ";".join(
+            f"{n:g}:{(k - ls_r):+.2f}" if np.isfinite(k) and 10 < k < 30 and np.isfinite(ls_r) else f"{n:g}:nan"
+            for n, k in zip(nd_on.fillna(-1).to_numpy(), kr_all.to_numpy())
+        )
+        kg = pd.to_numeric(col("pan_starrs1_dr2_meanobject__gMeanKronMag").get(x.ps1_oid), errors="coerce")
+        ls_gr = pd.to_numeric(col("std_mag__ls_g").get(x.ls_oid), errors="coerce") - ls_r
+        ps1_gr = kg - kron if np.isfinite(kg) and np.isfinite(kron) and 10 < kg < 30 and 10 < kron < 30 else np.nan
         recs.append({
+            "field": f"{RA0:g},{DEC0:g}", "ls_ra": lra, "ls_dec": lde, "ps1_ra": pra, "ps1_dec": pde,
+            "ls_oid": x.ls_oid, "ps1_oid": x.ps1_oid,
+            "gaia_sep": round(gaia_sep, 2) if np.isfinite(gaia_sep) else np.nan, "gaia_star": gaia_star,
+            "n_ps1_on_galaxy": len(on), "ps1_rows_ndet_kron_minus_ls": rows_on, "ps1_sum_minus_ls_r": round(float(sum_r - ls_r), 2) if np.isfinite(sum_r) and np.isfinite(ls_r) else np.nan,
+            "ps1_gr_minus_ls_gr": round(float(ps1_gr - ls_gr), 2) if np.isfinite(ps1_gr) and np.isfinite(ls_gr) else np.nan,
             "case": x.why.split(" (")[0], "verdict": verdict, "sep": x.sep, "shape_r": round(float(shape_r), 2) if np.isfinite(shape_r) else np.nan,
             "r_over_shape_r": round(float(r_off), 2) if np.isfinite(r_off) else np.nan, "other_LS_arcsec": round(other1, 2),
             "sdss_n": n_sdss, "ps1_ext": (int(qf) & 1) if np.isfinite(qf) else -1, "nDet": x.nDet,
@@ -172,10 +212,14 @@ if len(t):
             print("  SDSS sources on the galaxy:", g.sdss_n.value_counts().sort_index().to_dict(), "| PS1 EXT bit:", g.ps1_ext.value_counts().to_dict(),
                   "| nDet:", g.nDet.value_counts().sort_index().to_dict())
             print("  PS1 psf-kron r", q(g.ps1_psf_minus_kron), "| PS1 r - LS r (galaxy)", q(g.dmag_r))
+            print("  Gaia within 0.5\" of the PS1 row:", int((g.gaia_sep <= 0.5).sum()), "| of which stars (plx/err>5 or pm>10):", int(g.gaia_star.sum()),
+                  "| PS1 rows on the galaxy:", g.n_ps1_on_galaxy.value_counts().sort_index().to_dict())
+            print("  sum(PS1 Kron r on galaxy) - LS r", q(g.ps1_sum_minus_ls_r), "| PS1 g-r minus LS g-r", q(g.ps1_gr_minus_ls_gr))
             print("  extra object ->", g.ps1_obj_class.astype(str).str.cat(g.ps1_obj_status.astype(str), sep="/").value_counts().to_dict(),
                   "| galaxy object ->", g.ls_obj_class.value_counts().to_dict())
         print("\nsample:")
-        print(c.sort_values(["verdict", "sep"]).head(30).to_string(index=False))
+        print(c.drop(columns=["ls_ra", "ls_dec", "ps1_ra", "ps1_dec", "ls_oid", "ps1_oid", "field"]).sort_values(["verdict", "sep"]).head(30).to_string(index=False))
+        c.to_csv(f"{work}/galaxy_split_cases.csv", index=False)
 
 print("\n=== B. SIMBAD/NED-only objects ===")
 lit_only = set(cats_of[cats_of.map(lambda c: bool(c) and c <= LIT)].index)
@@ -218,3 +262,30 @@ for c in ("ned__Redshift", "ned__Photometry Points", "ned__References", "ned__Se
 print("\nsample:")
 cols = [c for c in ("designation", "catalogs", "ned__Type", "simbad__otype", "ned__Redshift", "ned__Photometry Points") if c in lo]
 print(lo[cols].head(30).to_string(index=False))
+
+print("\n=== D. 2.34.0 rule: PS1 rows grouped under their galaxy (host_groups.attach_ps1_fragments) ===")
+import importlib.util as _iu  # noqa: E402
+
+_spec = _iu.spec_from_file_location("v2_host_groups", "v2/host_groups.py")
+hg = _iu.module_from_spec(_spec)
+_spec.loader.exec_module(hg)
+before = d.copy()
+reasons_d = {}
+after = hg.attach_ps1_fragments(before, a, reasons_d)
+print("left independent, by reason:", pd.Series(reasons_d).value_counts().to_dict() if reasons_d else {})
+new = after.parent_object_id.notna() & (before.parent_object_id.isna() if "parent_object_id" in before else True)
+print("attached:", int(new.sum()), "| roles:", after.loc[new, "component_role"].value_counts().to_dict(),
+      "| their class/status:", (after.loc[new, "primary_class"].astype(str) + "/" + after.loc[new, "classification_status"].astype(str)).value_counts().to_dict())
+hosts_cls = after.set_index("object_id").reindex(after.loc[new, "parent_object_id"]).primary_class
+print("host classes:", hosts_cls.value_counts().to_dict())
+for lab, df in (("before", before), ("after", after)):
+    tl = df[df.parent_object_id.isna()] if "parent_object_id" in df else df
+    print(f"top-level {lab}: {len(tl)} objects {tl.primary_class.value_counts().to_dict()}")
+from pathlib import Path  # noqa: E402
+
+if Path(f"{work}/galaxy_split_cases.csv").exists():
+    cc = pd.read_csv(f"{work}/galaxy_split_cases.csv")
+    cc["attached"] = cc.ps1_oid.isin(set(after.loc[new, "object_id"]))
+    print("section-C cases attached by verdict:\n" + pd.crosstab(cc.verdict, cc.attached).to_string())
+    left = cc[~cc.attached]
+    print("section-C cases left, by reason:\n" + pd.crosstab(left.verdict, left.ps1_oid.map(reasons_d).fillna("not a candidate (other surveys / already a part)")).to_string())

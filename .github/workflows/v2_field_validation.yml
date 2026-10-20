@@ -13,13 +13,14 @@ on:
       dec: {description: "Dec (deg)", default: "43.0"}
       radius: {description: "radius (arcmin)", default: "3"}
       probe: {description: "set to 'coords' to run only the coordinate-format probe (2.33.0)", default: ""}
+      cutouts: {description: "with from_run: '1' commits Legacy Surveys cutouts of the galaxy-split cases (2.33.1)", default: ""}
       from_run: {description: "diagnose the field-validation artifact of this earlier run id instead of collecting (archives down)", default: ""}
   push:
     paths:
       - .github/workflows/v2_field_validation.yml
 
 permissions:
-  contents: read
+  contents: write  # only the cutouts step commits (from_run + cutouts=1)
   actions: read
 
 jobs:
@@ -54,6 +55,18 @@ jobs:
         if: ${{ github.event.inputs.probe != 'coords' }}
         continue-on-error: true
         run: python -u .github/scripts/diag_association.py /tmp/field $RA $DEC $RADIUS
+      - name: Galaxy-split cutouts (Legacy Surveys images)
+        if: ${{ github.event.inputs.from_run && github.event.inputs.cutouts == '1' }}
+        run: |
+          pip install matplotlib pillow
+          tag="ra${RA}_dec${DEC}"
+          python -u .github/scripts/galaxy_split_cutouts.py /tmp/field v2/benchmark/diagnostics/galaxy_split "$tag"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add v2/benchmark/diagnostics/galaxy_split
+          if git diff --cached --quiet; then echo "nothing to commit"; exit 0; fi
+          git commit -m "Galaxy-split cutouts ${tag} (from run ${{ github.event.inputs.from_run }})"
+          bash .github/scripts/push_with_retry.sh "${{ github.ref_name }}"
       - name: Compare with DESI DR1 spectroscopy in the field
         if: ${{ !github.event.inputs.from_run && github.event.inputs.probe != 'coords' }}
         run: |
