@@ -521,6 +521,14 @@ def evaluate(rule, row, namespaced=frozenset()):
             if v is not None:
                 feature(name, max(-3.0, min(6.0, v)), "dereddened AB colour")
                 feature(f"{name}_present", 1.0, "colour available")
+        # Depth: the same colour means less at r = 23 than at r = 19, so the
+        # fitted fusion trees see the magnitude the colours were measured at
+        # (magnitude-dependent classification; Bovy et al. 2011 fit their
+        # densities in magnitude bins, Nakoneczny et al. 2021 raise the
+        # threshold at the faint end) (2.35.0).
+        rm = num(row, "ls_r_mag")
+        if rm is not None:
+            feature("r_mag", max(12.0, min(26.0, rm)), "dereddened Legacy Surveys r")
     elif rid == "RADIO-001":
         # Radio loudness R = 0.4 (r - t), t = -2.5 log10(S_1.4GHz / 3631 Jy)
         # (Ivezic et al. 2002, AJ 124, 2364; radio-loud R > 1).  Radio-loud
