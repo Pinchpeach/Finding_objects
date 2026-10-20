@@ -330,3 +330,23 @@ epochs).
 | A DESI spectrum is a measurement at its Legacy Surveys target position (TARGET_RA/DEC), position error 0.1″ instead of the 0.6″ default | Myers et al. 2023 (AJ 165, 50), DESI target selection pipeline; Dey et al. 2019 (AJ 157, 168) LS astrometry | With 0.6″ a spectrum on a star 0.85″ from a galaxy scored 0.85 vs 1 and was left ambiguous (field RA 250). |
 | Spectra associate after the imaging, and a spectrum within 0.3″ of a group's LS member joins that group (decisive) | same (spectra have no independent position) | LS DR10 south release 10000 differs from the DR9 TARGETID, so the catalogue alias can fail; a shredded galaxy's PS1/SDSS fragments otherwise made its LS source ambiguous (RA 250), and a group anchored by a PS1 detection 0.71″ off sent the spectrum to a lone GALEX detection (RA 20). Distance is measured to the group's LS members, not its anchor. |
 | Duplicate spectra of one target: kept once (best ΔΧ², greedy 0.5″), a second spectrum never joins a neighbour | DESI DR1 has several spectra per target (zcat_primary) | A rounded 0.5″ grid key kept both copies when they straddled a cell edge. |
+
+## Pan-STARRS1 duplicates and fragments of small galaxies (2.34.0)
+- **Problem.** PS1 sometimes makes two or three MeanObjects from one resolved galaxy, and the pipeline then counted that galaxy two or three times.
+- **Literature.**
+  - PS1 MeanObjects link single-epoch detections that lie within 1″ of each other, and one-time false detections also become objects (Chambers et al. 2016, arXiv:1612.05560, §4.2).
+  - Generic object finders in PS1 DR2 break flat galaxies into pieces (Makarov et al. 2022, MNRAS 511, 3063).
+  - Bright galaxies are also shredded in SDSS (Blanton et al. 2005, AJ 129, 2562) and in the Legacy Surveys (Dey et al. 2019 §8; Moustakas et al. 2023).
+  - Gaia's external cross-match keeps the extra catalogue entries of one source as "mates" instead of dropping them (Marrese et al. 2019, A&A 621, A144).
+  - Host galaxies are assigned with a light-radius-normalised separation, d_DLR < 4 (Sullivan et al. 2006, ApJ 648, 868; Gupta et al. 2016, AJ 152, 154).
+- **Review of 2026-10-20** (`WORK_REPORT_2026-10-20.md`), PS1-only rows lying inside an extended LS galaxy:
+  - The Legacy Surveys image shows a single galaxy every time.
+  - No Gaia source lies within 0.5″.
+  - Where both rows have a Kron magnitude, each holds the whole galaxy's flux, so they are repeated measurements of the galaxy.
+- **Rule** (`host_groups.attach_ps1_fragments`, applied after classification):
+  - A PS1 (or PS1+SDSS) object becomes a component of the galaxy when it lies within 2 r_e of the galaxy centre (minimum 1″).
+  - It is kept independent if another LS source lies within 1″, or a Gaia or SDSS source of another object lies within 0.7″. The exception is an SDSS source that is the only SDSS source on the galaxy: that is SDSS's own measurement of the galaxy.
+  - It is also kept independent if it is more than 0.75 mag brighter than the galaxy.
+- **Not used.**
+  - LS `shape_e1/e2`: we could not confirm their position-angle convention, so the circular major-axis r_e is used instead. That is generous along the minor axis.
+  - Galaxy sizes beyond r_e (the halo of bright galaxies) are left for later.
