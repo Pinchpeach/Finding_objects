@@ -63,6 +63,8 @@ def flag(out: pd.DataFrame) -> pd.Series:
     unknown = out.get("primary_class", pd.Series("UNKNOWN", index=out.index)).astype(str).str.upper().eq("UNKNOWN")
     status = out.get("classification_status", pd.Series("", index=out.index)).astype(str)
     cand = unknown & cats.map(lambda c: c == frozenset({PS1})) & ~status.isin({"SOLAR_SYSTEM", "WITHIN_LARGE_GALAXY"})
+    if "parent_object_id" in out:  # a measurement of a galaxy already grouped under it (2.34.0)
+        cand &= out.parent_object_id.isna()
     n = pd.to_numeric(
         out.get("pan_starrs1_dr2_meanobject__nDetections", pd.Series(np.nan, index=out.index)), errors="coerce"
     )

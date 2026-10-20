@@ -274,3 +274,118 @@ def _attach_identity(out: pd.DataFrame, priority) -> None:
         if not others.any():
             out.at[h, "designation"] = b
         out.at[i, "designation"] = f"{b} ({out.at[i, 'designation_catalog']} entry)"
+
+
+# --- Pan-STARRS1 duplicates and fragments of small galaxies (2.34.0) ---------
+# PS1 builds MeanObjects by linking single-epoch detections within 1"
+# (Chambers et al. 2016, sec. 4.2).  On a resolved galaxy the per-epoch
+# centroid wanders, and one galaxy becomes two or three MeanObjects: in the
+# 2026-10-20 review (WORK_REPORT_2026-10-20.md; 4 fields, 76 cases) every one
+# lay on a single galaxy in the Legacy Surveys image, none had a Gaia source
+# within 0.5", and where both rows had a Kron magnitude each held the whole
+# galaxy's flux (Kron r - LS r ~ 0 to +0.4), i.e. repeated measurements of
+# one galaxy, not separate objects.  Others are knots along large discs.  The
+# association left them as separate objects (only one PS1 row per object, or
+# an ambiguous match), so a galaxy was counted two or three times.
+#
+# Rule: a top-level object measured only by PS1 becomes a component of an
+# extended Legacy Surveys galaxy when
+#   * it lies within PS1_HOST_RADII half-light radii of the galaxy centre
+#     (Tractor shape_r along the major axis, so the bound is generous on the
+#     minor axis; host-galaxy association uses directional light radius
+#     d_DLR < 4, Sullivan et al. 2006; Gupta et al. 2016), at least
+#     PS1_HOST_MIN_ARCSEC (PS1 centroid scatter at ~1.2" seeing);
+#   * no other Legacy Surveys source lies within LS_RESOLVED_ARCSEC of it
+#     (LS would have resolved a separate source there);
+#   * no Gaia or SDSS source of another object lies within SEPARATE_ARCSEC
+#     (an independent detection: a star on the galaxy, or a neighbour that
+#     SDSS deblends and LS merged, field RA 245);
+#   * it is not brighter than the galaxy by more than BRIGHTER_MAG (a brighter
+#     PS1 source is another object).
+# The PS1 measurement is kept as a component (role ``ps1_duplicate`` when its
+# Kron flux is the whole galaxy's, else ``component``), as Gaia's external
+# cross-match keeps the extra entries of one source (number_of_mates,
+# Marrese et al. 2019).
+PS1 = "Pan-STARRS1 DR2 MeanObject"
+LS = "DESI Legacy Surveys DR10"
+LITERATURE = {"SIMBAD", "NED"}
+EXTENDED_TYPES = {"REX", "EXP", "DEV", "SER", "COMP"}
+PS1_HOST_RADII = 2.0
+PS1_HOST_MIN_ARCSEC = 1.0
+LS_RESOLVED_ARCSEC = 1.0
+SEPARATE_ARCSEC = 0.7
+BRIGHTER_MAG = 0.75
+WHOLE_GALAXY_MAG = 0.5
+
+
+def attach_ps1_fragments(out: pd.DataFrame, assoc: pd.DataFrame) -> pd.DataFrame:
+    if out.empty or assoc is None or assoc.empty or "catalogs" not in out:
+        return out
+    out = out.copy()
+    for c, default in (("parent_object_id", None), ("component_role", ""), ("n_components", 0)):
+        if c not in out:
+            out[c] = default
+    for c in ("parent_object_id", "component_role", "unknown_reason"):  # read back from CSV as all-NaN floats
+        if c in out:
+            out[c] = out[c].astype(object)
+    top = out.parent_object_id.isna()
+    cats = out.catalogs.astype(str).map(lambda s: frozenset(c for c in s.split("|") if c) - LITERATURE)
+    cand = out.index[top & cats.map(lambda c: c == frozenset({PS1}))]
+    typ = out.get("desi_legacy_surveys_dr10__type", pd.Series("", index=out.index)).astype(str).str.strip().str.upper()
+    shape = pd.to_numeric(out.get("desi_legacy_surveys_dr10__shape_r", pd.Series(np.nan, index=out.index)), errors="coerce")
+    hosts = out.index[top & typ.isin(EXTENDED_TYPES) & shape.gt(0)]
+    if not len(cand) or not len(hosts):
+        return out
+
+    def positions(catalog):
+        a = assoc[assoc.catalog.eq(catalog)]
+        return a.object_id.to_numpy(), a.ra.to_numpy(float), a.dec.to_numpy(float)
+
+    ls_oid, ls_ra, ls_dec = positions(LS)
+    ps_oid, ps_ra, ps_dec = positions(PS1)
+    others = assoc[assoc.catalog.isin(["Gaia DR3", "SDSS DR18 PhotoObj"])]
+    oid_index = dict(zip(out.object_id, out.index))
+    ls_pos = {o: (r, d) for o, r, d in zip(ls_oid, ls_ra, ls_dec)}
+    ps_pos = {o: (r, d) for o, r, d in zip(ps_oid, ps_ra, ps_dec)}
+    host_oids = [out.at[h, "object_id"] for h in hosts if out.at[h, "object_id"] in ls_pos]
+    if not host_oids:
+        return out
+    h_ra = np.array([ls_pos[o][0] for o in host_oids])
+    h_dec = np.array([ls_pos[o][1] for o in host_oids])
+    h_re = np.array([shape[oid_index[o]] for o in host_oids])
+    kron = pd.to_numeric(out.get("pan_starrs1_dr2_meanobject__rMeanKronMag", pd.Series(np.nan, index=out.index)), errors="coerce")
+    ls_r = pd.to_numeric(out.get("std_mag__ls_r", pd.Series(np.nan, index=out.index)), errors="coerce")
+
+    def sep(ra, dec, ras, decs):
+        return np.hypot(((ras - ra + 180.0) % 360.0 - 180.0) * math.cos(math.radians(dec)), decs - dec) * 3600.0
+
+    for i in cand:
+        oid = out.at[i, "object_id"]
+        if oid not in ps_pos:
+            continue
+        ra, dec = ps_pos[oid]
+        d = sep(ra, dec, h_ra, h_dec)
+        ok = d <= np.maximum(PS1_HOST_RADII * h_re, PS1_HOST_MIN_ARCSEC)
+        if not ok.any():
+            continue
+        k = int(np.argmin(np.where(ok, d / h_re, np.inf)))
+        host = host_oids[k]
+        ls_d = sep(ra, dec, ls_ra, ls_dec)
+        if ((ls_d <= LS_RESOLVED_ARCSEC) & (ls_oid != host)).any():
+            continue
+        if len(others):
+            od = sep(ra, dec, others.ra.to_numpy(float), others.dec.to_numpy(float))
+            if ((od <= SEPARATE_ARCSEC) & (others.object_id.to_numpy() != host)).any():
+                continue
+        h = oid_index[host]
+        dm = kron[i] - ls_r[h] if 10 < kron[i] < 30 and np.isfinite(ls_r[h]) else np.nan
+        if np.isfinite(dm) and dm < -BRIGHTER_MAG:
+            continue
+        out.at[i, "parent_object_id"] = host
+        out.at[i, "component_role"] = "ps1_duplicate" if np.isfinite(dm) and abs(dm) <= WHOLE_GALAXY_MAG else "component"
+        if "unknown_reason" in out:
+            name = out.at[h, "designation"] if "designation" in out else host
+            out.at[i, "unknown_reason"] = f"Pan-STARRS1 measurement of the galaxy {name} (grouped under it)"
+    counts = out.parent_object_id.dropna().value_counts()
+    out["n_components"] = out.object_id.map(counts).fillna(0).astype(int)
+    return out
