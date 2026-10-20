@@ -1,0 +1,3 @@
+# Preserve published snapshot hashes across Windows/Linux checkouts.
+*.csv text eol=lf
+*.json text eol=lf

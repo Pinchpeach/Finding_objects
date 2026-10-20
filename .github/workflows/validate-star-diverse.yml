@@ -1,0 +1,62 @@
+name: Validate frozen STAR model on diverse LAMOST truth
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - v2/Classifier/build_star_diverse_truth.py
+      - v2/Classifier/evaluate_star_diverse.py
+      - v2/Classifier/test_star_diverse.py
+      - .github/workflows/validate-star-diverse.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      OMP_NUM_THREADS: '2'
+      OPENBLAS_NUM_THREADS: '2'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install original model runtime
+        run: pip install numpy==2.4.6 scipy==1.17.1 pandas==3.0.6 scikit-learn==1.9.1 joblib==1.6.0 astropy==8.0.1 astroquery==0.4.11 pytest
+      - uses: actions/download-artifact@v4
+        with:
+          name: star-wd-classifier-eval
+          run-id: 36295747956
+          github-token: ${{ github.token }}
+          path: results/star-diverse/frozen
+      - name: Test independence and feature isolation
+        run: python -m pytest v2/Classifier/test_star_diverse.py -q
+      - name: Build larger diverse truth without model access
+        run: python v2/Classifier/build_star_diverse_truth.py --out results/star-diverse/data --cache results/star-diverse/raw
+      - name: Match external and previous truth to Gaia
+        run: |
+          python v2/Classifier/collect_star_gaia.py --truth results/star-diverse/data/truth.csv --out results/star-diverse/external_gaia.csv
+          python - <<'PY'
+          import pandas as pd
+          from pathlib import Path
+          root = Path('v2/Classifier')
+          d = pd.concat([pd.read_csv(root/'lamost_star_external_truth.csv'), pd.read_csv(root/'wd_subtype_truth.csv')], ignore_index=True)
+          d.to_csv('results/star-diverse/previous_truth.csv', index=False)
+          PY
+          python v2/Classifier/collect_star_gaia.py --truth results/star-diverse/previous_truth.csv --out results/star-diverse/previous_gaia.csv
+      - name: Evaluate original frozen classifier
+        run: |
+          python v2/Classifier/evaluate_star_diverse.py \
+            --frozen results/star-diverse/frozen/star_wd_eval/star_wd_classifier.joblib \
+            --sdss results/star-diverse/frozen/star_gaia_features.csv \
+            --truth results/star-diverse/data/truth.csv \
+            --external results/star-diverse/external_gaia.csv \
+            --previous results/star-diverse/previous_gaia.csv \
+            --out results/star-diverse/eval
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: star-diverse-frozen-validation
+          path: results/star-diverse/
+          retention-days: 90
