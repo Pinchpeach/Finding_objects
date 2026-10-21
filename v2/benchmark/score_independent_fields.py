@@ -14,8 +14,8 @@ Truth surveys and the reliability cuts their papers recommend:
   -> GALAXY (rare higher-z QSO interlopers are dropped).
 * 6dFGS (Jones et al. 2004, 2009): q_cz = 3-4 -> GALAXY (cz >= 600 km/s,
   else STAR), q_cz = 6 -> STAR (confirmed Galactic).
-* WiggleZ (Drinkwater et al. 2010, 2018): q_z >= 3; z < 0.002 -> STAR, else
-  GALAXY (emission-line galaxies; QSOs are not flagged and are rare).
+* WiggleZ (Drinkwater et al. 2010, 2018): q_z >= 3; comment AGN/QSO -> QSO,
+  z < 0.002 -> STAR, else GALAXY (emission-line galaxy targets).
 * RAVE DR6 (Steinmetz et al. 2020): S/N >= 10 -> STAR.
 
 An object counts once (1" groups); surveys that disagree drop it.  Truth is
@@ -80,7 +80,8 @@ def truth_table(truth_dir):
     d = _read(truth_dir, "J_MNRAS_474_4151_wigglez")
     if d is not None:
         d = d[_num(d, "q_z").ge(3)]
-        t.append(_rows(d, np.where(_num(d, "z").abs() < 0.002, "STAR", "GALAXY"), "WiggleZ"))
+        agn = d.get("Com", pd.Series("", index=d.index)).astype(str).str.contains("AGN|QSO", case=False)
+        t.append(_rows(d, np.where(agn, "QSO", np.where(_num(d, "z").abs() < 0.002, "STAR", "GALAXY")), "WiggleZ"))
     d = _read(truth_dir, "III_283_ravedr6")
     if d is not None:
         t.append(_rows(d[_num(d, "S/N").ge(10)], "STAR", "RAVE DR6"))
@@ -167,6 +168,27 @@ def field_matches(fdir, which, bench):
     lim = np.where(t.survey.str.contains("LAMOST|RAVE"), 2.0, 1.5)
     t["matched"] = s <= lim
     t["sep"] = s
+    # The counterpart is the object with the most catalogues inside the match
+    # radius, not simply the nearest: a J2000 truth position of a bright star
+    # sits closer to a stray single-catalogue fragment (AllWISE or PS1 row the
+    # association left apart) than to the Gaia-anchored 2016 position.  The
+    # fragments are counted separately (n_fragments) as an association problem.
+    from astropy.coordinates import SkyCoord
+    import astropy.units as u
+
+    nc = o.catalogs.fillna("").str.count(r"\|").add(1).to_numpy()
+    tc = SkyCoord(t.ra.to_numpy() * u.deg, t.dec.to_numpy() * u.deg)
+    oc = SkyCoord(o.ra.to_numpy() * u.deg, o.dec.to_numpy() * u.deg)
+    ti, oi, d2, _ = oc.search_around_sky(tc, 2.0 * u.arcsec) if len(t) and len(o) else ([], [], [], [])
+    t["n_fragments"] = 0
+    for k in range(len(t)):
+        sel = (np.asarray(ti) == k) & (np.asarray(d2.arcsec if len(ti) else []) <= lim[k])
+        if sel.sum() > 1:
+            cand = np.asarray(oi)[sel]
+            best = cand[np.lexsort((np.asarray(d2.arcsec)[sel], -nc[cand]))[0]]
+            i[k], s[k] = best, float(np.asarray(d2.arcsec)[sel][list(cand).index(best)])
+            t.loc[k, "n_fragments"] = int((nc[cand] == 1).sum() - (nc[best] == 1))
+    t["sep"] = s
     m = o.iloc[np.where(t.matched, i, 0)].reset_index(drop=True)
     m.index = t.index
     cls = m.primary_class.copy()
@@ -197,6 +219,7 @@ def main():
         allm.append(m)
         info = st["info"]
         print(f"\n=== {fdir.name}: centre ({info['ra']:.4f}, {info['dec']:+.4f}) r={info['radius_arcmin']}' seeing {info.get('seeing')}")
+        print(f"single-catalogue fragments next to a truth object: {int(m.t_n_fragments.gt(0).sum())}")
         print(f"truth in field {st['n_truth']} (unmatched {st['unmatched']}, in SDSS/DESI benchmark {st['in_bench']}, survey conflicts {st['conflicts']}); scored {len(m)}")
         print("   by survey:", m.t_survey.value_counts().to_dict(), "| truth mix:", m.t_truth.value_counts().to_dict())
         r = dict(field=fdir.name, ra=info["ra"], dec=info["dec"], n=len(m), ours=score(m.ours, m.t_truth))

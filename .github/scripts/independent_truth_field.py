@@ -190,9 +190,41 @@ def seeing(ra, dec, radius):
         q = f"""SELECT psfsize_g, psfsize_r, psfsize_z FROM {ls.TABLE}
                 WHERE type = 'PSF' AND 't' = Q3C_RADIAL_QUERY(ra, dec, {ra:.10f}, {dec:.10f}, {radius / 60:.10f})"""
         t = ls._query_with_retries(lambda: ls._service().search(q).to_table().to_pandas())
-        return {b: round(float(t[f"psfsize_{b}"].replace(0, np.nan).median()), 2) for b in "grz"} | {"n_psf": int(len(t))}
+        out = {b: round(float(t[f"psfsize_{b}"].replace(0, np.nan).median()), 2) for b in "grz"} | {"n_psf": int(len(t)), "source": "LS DR10 psfsize"}
     except Exception as exc:
-        return {"error": f"{type(exc).__name__}: {str(exc)[:120]}"}
+        out = {"error": f"{type(exc).__name__}: {str(exc)[:120]}"}
+    if out.get("n_psf"):
+        return out
+    return out | {"ps1": ps1_seeing(ra, dec, radius)}  # outside the Legacy Surveys footprint
+
+
+def ps1_seeing(ra, dec, radius):
+    """Median PS1 stack PSF FWHM (major/minor axis, arcsec) of primary
+    detections (StackObjectAttributes psfMajorFWHM/psfMinorFWHM; Flewelling
+    et al. 2020) where Legacy Surveys has no imaging."""
+    import io
+    import requests
+
+    url = "https://catalogs.mast.stsci.edu/api/v0.1/panstarrs/dr2/stack.csv"
+    cols = [f"{b}psf{a}FWHM" for b in "gri" for a in ("Major", "Minor")] + ["primaryDetection"]
+    try:
+        r = requests.get(url, params={"ra": f"{ra:.10f}", "dec": f"{dec:.10f}", "radius": f"{radius / 60:.10f}",
+                                       "columns": "[" + ",".join(cols) + "]", "primaryDetection": 1}, timeout=120)
+        r.raise_for_status()
+        t = pd.read_csv(io.StringIO(r.text))
+        res = {"source": "PS1 stack psfMajor/MinorFWHM", "n": int(len(t))}
+        for b in "gri":
+            mj, mn = (pd.to_numeric(t.get(f"{b}psf{a}FWHM"), errors="coerce") for a in ("Major", "Minor"))
+            fw = np.sqrt(mj.where(mj > 0) * mn.where(mn > 0))
+            res[b] = round(float(fw.median()), 2) if fw.notna().any() else None
+        return res
+    except Exception as exc:
+        try:
+            meta = requests.get(url.replace("stack.csv", "stack/metadata"), timeout=60).json()
+            names = [m.get("name") for m in meta if "fwhm" in str(m.get("name", "")).lower()]
+        except Exception:
+            names = []
+        return {"error": f"{type(exc).__name__}: {str(exc)[:120]}", "fwhm_columns": names}
 
 
 if __name__ == "__main__":

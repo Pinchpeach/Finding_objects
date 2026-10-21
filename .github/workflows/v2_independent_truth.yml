@@ -1,9 +1,9 @@
 name: v2 independent-truth field validation
 
-# 2026-10-21 (push 2): validate v2 on many sky regions against spectroscopic classes
+# 2026-10-21 (push 3): validate v2 on many sky regions against spectroscopic classes
 # from surveys never used to train or tune it (LAMOST, 2QZ/6QZ, 2dFGRS,
 # 6dFGS, 2SLAQ, WiggleZ, RAVE; SDSS and DESI excluded).  Per region: fetch
-# every candidate truth catalogue within 30', put the 8' field on the truth
+# every candidate truth catalogue within 40', put the 12' field on the truth
 # object with the most truth neighbours, run v2/pipeline.py there and commit
 # compact products to v2/benchmark/independent_fields/<region>/ for scoring
 # A second, "blind" run re-classifies the same collected data without the
@@ -17,7 +17,7 @@ on:
     inputs:
       mode: {description: "'probe' lists VizieR catalogues only; 'fields' runs the regions", default: "fields"}
       only: {description: "comma-separated region names to run (empty = all)", default: ""}
-      radius: {description: "field radius (arcmin)", default: "8"}
+      radius: {description: "field radius (arcmin)", default: "12"}
   push:  # dispatch needs the file on main; a push of this file runs all regions
     paths:
       - .github/workflows/v2_independent_truth.yml
@@ -48,14 +48,20 @@ jobs:
         region:
           # name, nominal centre (deg), why this region
           - {name: ngp_165m01, ra: 165.0, dec: -1.0}    # 2QZ/2dFGRS NGP strip, b~+51
+          - {name: ngp_185m01, ra: 185.0, dec: -1.0}    # 2QZ/2dFGRS NGP strip (Virgo direction), b~+61
           - {name: ngp_205m02, ra: 205.0, dec: -2.0}    # 2QZ/2dFGRS NGP strip, b~+59
+          - {name: ngp_220m01, ra: 220.0, dec: -1.0}    # 2QZ/2dFGRS NGP strip east end, WiggleZ 15h, b~+50
           - {name: sgp_005m29, ra: 5.0, dec: -29.0}     # 2QZ/2dFGRS SGP strip, b~-83
-          - {name: sgp_340m30, ra: 340.0, dec: -30.0}   # 2QZ/2dFGRS SGP strip, b~-60
+          - {name: sgp_020m30, ra: 20.0, dec: -30.0}    # 2QZ/2dFGRS SGP strip, b~-84
+          - {name: sgp_340m30, ra: 340.0, dec: -30.0}   # 2QZ/2dFGRS SGP strip, b~-60 (DR10 without r)
           - {name: sgp_040m28, ra: 40.0, dec: -28.5}    # 2dFGRS SGP strip east end, b~-65
           - {name: s82_030p00, ra: 30.0, dec: -0.3}     # Stripe 82: 2SLAQ, WiggleZ 1h, LAMOST
+          - {name: s82_010p00, ra: 10.0, dec: -0.5}     # Stripe 82 / 2SLAQ, WiggleZ 0h, b~-63
           - {name: wigz_330p00, ra: 330.0, dec: 0.5}    # WiggleZ 22h, b~-42
-          - {name: des_060m45, ra: 60.0, dec: -45.0}    # 6dFGS deep south (DES footprint), b~-48
+          - {name: wigz_140p05, ra: 140.0, dec: 5.0}    # WiggleZ 9h, b~+35
+          - {name: des_060m45, ra: 60.0, dec: -45.0}    # 6dFGS/RAVE deep south (DES footprint), b~-48
           - {name: lam_115p25, ra: 115.0, dec: 25.0}    # LAMOST Galactic anticentre, b~+20 (dense stars)
+          - {name: lam_090p28, ra: 90.0, dec: 28.0}     # LAMOST anticentre in the plane, b~+3 (crowded, extincted)
           - {name: lam_015p38, ra: 15.0, dec: 38.0}     # LAMOST M31-M33 survey area, b~-25
           - {name: lam_180p50, ra: 180.0, dec: 50.0}    # LAMOST north, b~+66
           - {name: kep_291p44, ra: 291.0, dec: 44.5}    # LAMOST-Kepler field, b~+13 (crowded)
@@ -63,7 +69,7 @@ jobs:
       NAME: ${{ matrix.region.name }}
       RA0: ${{ matrix.region.ra }}
       DEC0: ${{ matrix.region.dec }}
-      R: ${{ github.event.inputs.radius || '8' }}
+      R: ${{ github.event.inputs.radius || '12' }}
     steps:
       - id: pick
         run: |
@@ -76,13 +82,13 @@ jobs:
         with: {python-version: "3.11"}
       - if: steps.pick.outputs.run
         run: pip install pandas numpy requests astropy astroquery pyvo
-      - name: Independent truth within 30'
+      - name: Independent truth within 40'
         if: steps.pick.outputs.run
-        run: python -u .github/scripts/independent_truth_field.py truth $RA0 $DEC0 30 /tmp/truth
+        run: python -u .github/scripts/independent_truth_field.py truth $RA0 $DEC0 40 /tmp/truth
       - name: Field centre with the most truth objects
         if: steps.pick.outputs.run
         run: |
-          read RA DEC N < <(python -u .github/scripts/independent_truth_field.py centre /tmp/truth $RA0 $DEC0 30 $R | tail -1)
+          read RA DEC N < <(python -u .github/scripts/independent_truth_field.py centre /tmp/truth $RA0 $DEC0 40 $R | tail -1)
           echo "centre $RA $DEC holds $N truth positions"
           echo "RA=$RA" >> "$GITHUB_ENV"; echo "DEC=$DEC" >> "$GITHUB_ENV"
       - name: Pipeline

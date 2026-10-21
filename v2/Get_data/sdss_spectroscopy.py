@@ -111,7 +111,7 @@ def _lines(ids: list[str]) -> pd.DataFrame:
 
 
 def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
-    from _catalog_utils import sdss_region
+    from _catalog_utils import sdss_region, unique_positions
 
     t = sdss_region(ra, dec, radius_arcmin, spectro=True, specobj_fields=FIELDS, data_release=18)
     if t is None:
@@ -122,6 +122,12 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     df.insert(1, "catalog_object_id", df["specobjid"])
     df.insert(2, "object_name", "SDSS spectrum " + df["specobjid"])
     df = df.drop_duplicates("catalog_object_id", keep="last").reset_index(drop=True)
+    # Repeat spectra of one target (SDSS-I/II + BOSS re-observations) are one
+    # object: keep a zwarning == 0 spectrum, the smallest-zerr one first, as
+    # for LAMOST (2026-10-21).  1" is inside the 2-3" fibres.
+    zw = pd.to_numeric(df["zwarning"], errors="coerce").fillna(1).eq(0) if "zwarning" in df else pd.Series(True, index=df.index)
+    ze = pd.to_numeric(df["zerr"], errors="coerce").abs() if "zerr" in df else pd.Series(0.0, index=df.index)
+    df = unique_positions(df, 1.0, zw.astype(float) - ze.fillna(1.0).clip(0, 0.99)).reset_index(drop=True)
     gal = df.loc[df["class"].astype(str).str.strip().str.upper().eq("GALAXY"), "specobjid"].tolist()
     lines = _lines(gal) if gal else pd.DataFrame(columns=["specobjid", *LINE_FIELDS])
     return df.merge(lines, on="specobjid", how="left")

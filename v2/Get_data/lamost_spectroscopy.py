@@ -6,7 +6,7 @@ import pandas as pd
 
 if str(Path(__file__).resolve().parent) not in sys.path:  # loaded by file path elsewhere
     sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _catalog_utils import empty_frame, numeric, save_csv, vizier_cone, with_base
+from _catalog_utils import empty_frame, numeric, save_csv, unique_positions, vizier_cone, with_base
 
 save = save_csv  # collector API: save(df, path)
 
@@ -50,4 +50,13 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     for c in LASP.values():
         if c not in df:
             df[c] = pd.NA
-    return df
+    # LAMOST re-observes many targets (repeat plates; 40-50 % of the stars in
+    # the 2026-10-21 Kepler/anticentre/M31 fields), each spectrum a separate
+    # ObsID at input-catalogue positions that differ by up to ~1".  A second
+    # spectrum cannot join the star that already holds one (one row per
+    # catalogue per object), so each repeat became an evidence-less
+    # "only in LAMOST" object.  Keep the best-S/N spectrum per target: 1" is
+    # well inside the 3.3" fibre and the ~3.5" minimum fibre spacing (Cui et
+    # al. 2012, RAA 12, 1197), so distinct targets are never closer.
+    snr = df[[c for c in ("snrg", "snrr", "snri") if c in df]].apply(pd.to_numeric, errors="coerce").max(axis=1)
+    return unique_positions(df, 1.0, snr).reset_index(drop=True)
