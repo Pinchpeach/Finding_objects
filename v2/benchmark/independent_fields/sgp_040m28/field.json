@@ -1,38 +1,38 @@
 {
- "ra": 40.33917,
- "dec": -28.62028,
- "radius_arcmin": 8.0,
- "n_objects": 11255,
+ "ra": 40.47306,
+ "dec": -28.52944,
+ "radius_arcmin": 12.0,
+ "n_objects": 26032,
  "seconds": {
-  "collect": 66.7,
-  "1_associate": 3.9,
-  "2_integrate": 6.6,
-  "3_features": 9.6,
-  "4_evidence": 9.1,
-  "5_coarse": 13.1,
-  "6_prepare": 10.7,
-  "7_classify": 11.8
+  "collect": 98.1,
+  "1_associate": 9.2,
+  "2_integrate": 14.8,
+  "3_features": 20.3,
+  "4_evidence": 20.0,
+  "5_coarse": 29.1,
+  "6_prepare": 23.1,
+  "7_classify": 26.4
  },
  "catalog_rows": {
-  "DESI Legacy Surveys DR10": 10121,
-  "Pan-STARRS1 DR2 MeanObject": 2328,
-  "NED": 1085,
-  "AllWISE": 1017,
-  "GALEX AIS": 283,
-  "Gaia DR3": 244,
-  "2MASS PSC": 107,
-  "SIMBAD": 35,
-  "XMM 4XMM-DR13": 31,
-  "eROSITA eRASS1": 13,
-  "SGA-2020": 12,
-  "VLASS": 6,
-  "NVSS": 6,
-  "TGSS ADR1": 5
+  "DESI Legacy Surveys DR10": 22945,
+  "Pan-STARRS1 DR2 MeanObject": 5660,
+  "NED": 2459,
+  "AllWISE": 2333,
+  "GALEX AIS": 588,
+  "Gaia DR3": 458,
+  "2MASS PSC": 199,
+  "XMM 4XMM-DR13": 38,
+  "eROSITA eRASS1": 25,
+  "SGA-2020": 18,
+  "VLASS": 15,
+  "NVSS": 13,
+  "TGSS ADR1": 7
  },
  "seeing": {
-  "g": 1.47,
-  "r": 1.32,
-  "z": 1.19,
-  "n_psf": 3115
+  "g": 1.49,
+  "r": 1.27,
+  "z": 1.18,
+  "n_psf": 7229,
+  "source": "LS DR10 psfsize"
  }
 }
