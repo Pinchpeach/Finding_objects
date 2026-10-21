@@ -420,8 +420,8 @@ def attach_ps1_fragments(out: pd.DataFrame, assoc: pd.DataFrame, explain: dict |
 
 # Bright-star halo artefacts (2.35.0).  Saturated stars break into extra
 # catalogue rows: PSPHOT splits bright stars and their diffraction spikes into
-# several detections, so PS1 masks around them (Chambers et al. 2016, Magnier
-# et al. 2020; PS1 saturates near r ~ 13-15), and a WISE/GALEX row that the
+# several detections, so PS1 analyses mask around them (Metcalfe et al. 2013,
+# arXiv:1310.6368; PS1 saturates near r ~ 13-15, Chambers et al. 2016), and a WISE/GALEX row that the
 # association could not tie to the saturated star stays alone.  In the
 # 2026-10-21 independent fields single-catalogue PS1 rows were 40-100 times
 # more frequent than the background within 2" of G < 13 stars, 5-10 times
