@@ -165,8 +165,22 @@ def compact(work, ra, dec, radius, out, name="objects"):
                     r[f"lsgbm_{e['class']}"] = e.get("raw_score", e.get("score"))
             rows.append(r)
         o = o.merge(pd.DataFrame(rows).drop_duplicates("object_id"), on="object_id", how="left")
-    o.to_csv(out / f"{name}.csv.gz", index=False)
+    n_all = len(o)
     truth_dir = out / "truth"
+    if name == "objects" and truth_dir.exists():
+        # The full run is only scored against truth: keep objects within 5"
+        # of a truth position (the blind table keeps every object for the
+        # field-level statistics), ~4 MB less per field.
+        p = _positions(truth_dir)
+        if len(p):
+            from astropy.coordinates import SkyCoord
+            import astropy.units as u
+
+            _, sep, _ = SkyCoord(o.ra.to_numpy(float) * u.deg, o.dec.to_numpy(float) * u.deg).match_to_catalog_sky(
+                SkyCoord(p[:, 0] * u.deg, p[:, 1] * u.deg)
+            )
+            o = o[sep.arcsec <= 5.0]
+    o.to_csv(out / f"{name}.csv.gz", index=False)
     if lv.exists() and truth_dir.exists():
         # Evidence of the objects within 3" of a truth position, for error analysis.
         p = _positions(truth_dir)
@@ -182,7 +196,7 @@ def compact(work, ra, dec, radius, out, name="objects"):
             ev[ev.object_id.isin(near)][keep].to_csv(out / f"{name}_evidence.csv.gz", index=False)
     if name != "objects":
         return
-    info = {"ra": ra, "dec": dec, "radius_arcmin": radius, "n_objects": int(len(o))}
+    info = {"ra": ra, "dec": dec, "radius_arcmin": radius, "n_objects": int(n_all)}
     summ = work / "pipeline_summary.csv"
     if summ.exists():
         info["seconds"] = pd.read_csv(summ).set_index("stage").seconds.round(1).to_dict()
