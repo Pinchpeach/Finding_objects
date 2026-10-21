@@ -142,6 +142,14 @@ RAW_FIELDS = {
     "SpeakTot",
     "Total_flux",
     "Ftot",
+    # GALEX AIS ultraviolet (UV-COLOR-001)
+    "NUVmag",
+    "e_NUVmag",
+    "FUVmag",
+    "e_FUVmag",
+    "Nafl",
+    "Fafl",
+    "E(B-V)",
     # X-ray fluxes (XRAY-001)
     "Fluxb",
     "Flux8",
@@ -239,6 +247,7 @@ RELMAP = {
     "NED-TYPE-001": "catalog_confidence_ned_type",
     "SIMBAD-TYPE-001": "catalog_confidence_simbad_type",
     "WISE-AGN-R90-001": "catalog_confidence_allwise",
+    "UV-COLOR-001": "catalog_confidence_galex",
 }
 ASSOC_PREFIX = {
     "AST-EXT-001": "gaia_dr3",
@@ -256,6 +265,7 @@ ASSOC_PREFIX = {
     "PS1-QSO-HIZ-001": "pan_starrs1_dr2_meanobject",
     "WISE-AGN-001": "allwise",
     "WISE-AGN-R90-001": "allwise",
+    "UV-COLOR-001": "galex_ais",
     "SDSS-PHOTO-001": "sdss_dr18_photoobj",
     "SDSS-PHOTO-002": "sdss_dr18_photoobj",
     "NED-TYPE-001": "ned",
@@ -521,6 +531,31 @@ def evaluate(rule, row, namespaced=frozenset()):
             if v is not None:
                 feature(name, max(-3.0, min(6.0, v)), "dereddened AB colour")
                 feature(f"{name}_present", 1.0, "colour available")
+    elif rid == "UV-COLOR-001":
+        # GALEX ultraviolet colours (2.36.0).  UV-detected quasars separate
+        # from stars in NUV-r vs FUV-NUV (Trammell et al. 2007, AJ 133, 1780;
+        # Bianchi et al. 2007; Atlee & Gould 2007): the quasar power law keeps
+        # NUV-r small while all but the hottest stars are UV-faint; FUV-NUV
+        # reddens above z ~ 0.8 (Lyman-limit systems).  Dereddened with the
+        # catalogue's SFD E(B-V): A_FUV = 8.24, A_NUV = 8.20 E(B-V) (Wyder et
+        # al. 2007, ApJS 173, 293); a non-dereddened PS1 r gets A_r = 2.27
+        # E(B-V) (Schlafly & Finkbeiner 2011).  Only detections at S/N >= 3
+        # without artefact flags: AIS non-detections carry no depth here.
+        ebv = num(src, "E(B-V)") or 0.0
+        mags = {}
+        for band, err, af, a in (("nuv", "e_NUVmag", "Nafl", 8.20), ("fuv", "e_FUVmag", "Fafl", 8.24)):
+            m, e = num(src, band.upper() + "mag"), num(src, err)
+            if m is not None and e is not None and 0 < e <= 1.0857 / 3 and not (num(src, af) or 0):
+                mags[band] = m - a * ebv
+        r = num(row, "ls_r_mag")
+        if r is None and num(row, "pan_starrs1_dr2_meanobject__rMeanPSFMag") is not None:
+            r = num(row, "pan_starrs1_dr2_meanobject__rMeanPSFMag") - 2.27 * ebv
+        if "nuv" in mags:
+            feature("uv_nuv_detected", 1.0, "GALEX NUV S/N >= 3")
+            if r is not None and 5 < r < 30:
+                feature("uv_nuv_r", max(-3.0, min(10.0, mags["nuv"] - r)), "dereddened NUV - r")
+            if "fuv" in mags:
+                feature("uv_fuv_nuv", max(-3.0, min(6.0, mags["fuv"] - mags["nuv"])), "dereddened FUV - NUV")
     elif rid == "RADIO-001":
         # Radio loudness R = 0.4 (r - t), t = -2.5 log10(S_1.4GHz / 3631 Jy)
         # (Ivezic et al. 2002, AJ 124, 2364; radio-loud R > 1).  Radio-loud
