@@ -1,6 +1,6 @@
 name: v2 independent-truth field validation
 
-# 2026-10-21: validate v2 on many sky regions against spectroscopic classes
+# 2026-10-21 (push 1): validate v2 on many sky regions against spectroscopic classes
 # from surveys never used to train or tune it (LAMOST, 2QZ/6QZ, 2dFGRS,
 # 6dFGS, 2SLAQ, WiggleZ, RAVE; SDSS and DESI excluded).  Per region: fetch
 # every candidate truth catalogue within 30', put the 8' field on the truth
@@ -13,6 +13,9 @@ on:
       mode: {description: "'probe' lists VizieR catalogues only; 'fields' runs the regions", default: "fields"}
       only: {description: "comma-separated region names to run (empty = all)", default: ""}
       radius: {description: "field radius (arcmin)", default: "8"}
+  push:  # dispatch needs the file on main; a push of this file runs all regions
+    paths:
+      - .github/workflows/v2_independent_truth.yml
 
 permissions:
   contents: write
@@ -30,7 +33,7 @@ jobs:
       - run: python -u .github/scripts/independent_truth_field.py probe
 
   field:
-    if: ${{ github.event.inputs.mode == 'fields' }}
+    if: ${{ github.event_name == 'push' || github.event.inputs.mode == 'fields' }}
     runs-on: ubuntu-latest
     timeout-minutes: 240
     strategy:
