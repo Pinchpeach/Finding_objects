@@ -1,6 +1,6 @@
 name: v2 independent-truth field validation
 
-# 2026-10-21 (push 9): validate v2 on many sky regions against spectroscopic classes
+# 2026-10-21: validate v2 on many sky regions against spectroscopic classes
 # from surveys never used to train or tune it (LAMOST, 2QZ/6QZ, 2dFGRS,
 # 6dFGS, 2SLAQ, WiggleZ, RAVE; SDSS and DESI excluded).  Per region: fetch
 # every candidate truth catalogue within 40', put the 12' field on the truth
@@ -18,16 +18,10 @@ on:
       mode: {description: "'probe' lists VizieR catalogues only; 'fields' runs the regions", default: "fields"}
       only: {description: "comma-separated region names to run (empty = all)", default: ""}
       radius: {description: "field radius (arcmin)", default: "12"}
-  push:  # dispatch needs the file on main; a push of this file runs all regions
-    paths:
-      - .github/workflows/v2_independent_truth.yml
 
 permissions:
   contents: write
 
-env:
-  # Regions a push re-runs (empty = all): those whose last run lost an archive.
-  PUSH_ONLY: ""
 
 jobs:
   probe:
@@ -42,7 +36,7 @@ jobs:
       - run: python -u .github/scripts/independent_truth_field.py probe
 
   field:
-    if: ${{ github.event_name == 'push' || github.event.inputs.mode == 'fields' }}
+    if: ${{ github.event.inputs.mode == 'fields' }}
     runs-on: ubuntu-latest
     timeout-minutes: 240
     strategy:
@@ -77,7 +71,7 @@ jobs:
     steps:
       - id: pick
         run: |
-          only="${{ github.event.inputs.only || env.PUSH_ONLY }}"
+          only="${{ github.event.inputs.only }}"
           if [ -z "$only" ] || echo ",$only," | grep -q ",$NAME,"; then echo "run=1" >> "$GITHUB_OUTPUT"; fi
       - uses: actions/checkout@v4
         if: steps.pick.outputs.run
