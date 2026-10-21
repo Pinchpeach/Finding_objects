@@ -2,16 +2,16 @@
  "ra": 165.13833,
  "dec": -0.78111,
  "radius_arcmin": 8.0,
- "n_objects": 8478,
+ "n_objects": 8508,
  "seconds": {
-  "collect": 89.3,
-  "1_associate": 5.9,
-  "2_integrate": 9.9,
-  "3_features": 14.8,
-  "4_evidence": 11.6,
-  "5_coarse": 18.7,
-  "6_prepare": 15.9,
-  "7_classify": 15.3
+  "collect": 69.4,
+  "1_associate": 4.2,
+  "2_integrate": 6.4,
+  "3_features": 9.7,
+  "4_evidence": 7.9,
+  "5_coarse": 12.2,
+  "6_prepare": 10.2,
+  "7_classify": 10.9
  },
  "catalog_rows": {
   "DESI Legacy Surveys DR10": 7030,
@@ -23,6 +23,7 @@
   "DESI DR1 FastSpecFit": 260,
   "GALEX AIS": 207,
   "Gaia DR3": 204,
+  "SIMBAD": 123,
   "2MASS PSC": 99,
   "SDSS DR18 spectroscopy": 28,
   "VLASS": 18,
