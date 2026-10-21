@@ -2,16 +2,16 @@
  "ra": 291.23,
  "dec": 44.89806,
  "radius_arcmin": 12.0,
- "n_objects": 14613,
+ "n_objects": 14644,
  "seconds": {
-  "collect": 203.9,
-  "1_associate": 5.1,
-  "2_integrate": 5.1,
-  "3_features": 5.2,
-  "4_evidence": 6.1,
-  "5_coarse": 8.2,
-  "6_prepare": 6.2,
-  "7_classify": 8.7
+  "collect": 201.9,
+  "1_associate": 8.7,
+  "2_integrate": 9.0,
+  "3_features": 9.6,
+  "4_evidence": 10.7,
+  "5_coarse": 12.9,
+  "6_prepare": 10.4,
+  "7_classify": 15.0
  },
  "catalog_rows": {
   "Pan-STARRS1 DR2 MeanObject": 13934,
@@ -19,6 +19,7 @@
   "NED": 3307,
   "AllWISE": 2708,
   "2MASS PSC": 1982,
+  "SIMBAD": 200,
   "LAMOST DR catalog": 157,
   "ZTF periodic variables": 7,
   "VLASS": 5,
