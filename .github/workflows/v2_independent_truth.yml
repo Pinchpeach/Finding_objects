@@ -1,0 +1,101 @@
+name: v2 independent-truth field validation
+
+# 2026-10-21: validate v2 on many sky regions against spectroscopic classes
+# from surveys never used to train or tune it (LAMOST, 2QZ/6QZ, 2dFGRS,
+# 6dFGS, 2SLAQ, WiggleZ, RAVE; SDSS and DESI excluded).  Per region: fetch
+# every candidate truth catalogue within 30', put the 8' field on the truth
+# object with the most truth neighbours, run v2/pipeline.py there and commit
+# compact products to v2/benchmark/independent_fields/<region>/ for scoring
+# by v2/benchmark/score_independent_fields.py.
+on:
+  workflow_dispatch:
+    inputs:
+      mode: {description: "'probe' lists VizieR catalogues only; 'fields' runs the regions", default: "fields"}
+      only: {description: "comma-separated region names to run (empty = all)", default: ""}
+      radius: {description: "field radius (arcmin)", default: "8"}
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    if: ${{ github.event.inputs.mode == 'probe' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas numpy requests astropy astroquery pyvo
+      - run: python -u .github/scripts/independent_truth_field.py probe
+
+  field:
+    if: ${{ github.event.inputs.mode == 'fields' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    strategy:
+      fail-fast: false
+      max-parallel: 4  # spread the archive load (each job also waits 3-5 s per request)
+      matrix:
+        region:
+          # name, nominal centre (deg), why this region
+          - {name: ngp_165m01, ra: 165.0, dec: -1.0}    # 2QZ/2dFGRS NGP strip, b~+51
+          - {name: ngp_205m02, ra: 205.0, dec: -2.0}    # 2QZ/2dFGRS NGP strip, b~+59
+          - {name: sgp_005m29, ra: 5.0, dec: -29.0}     # 2QZ/2dFGRS SGP strip, b~-83
+          - {name: sgp_340m30, ra: 340.0, dec: -30.0}   # 2QZ/2dFGRS SGP strip, b~-60
+          - {name: sgp_040m28, ra: 40.0, dec: -28.5}    # 2dFGRS SGP strip east end, b~-65
+          - {name: s82_030p00, ra: 30.0, dec: -0.3}     # Stripe 82: 2SLAQ, WiggleZ 1h, LAMOST
+          - {name: wigz_330p00, ra: 330.0, dec: 0.5}    # WiggleZ 22h, b~-42
+          - {name: des_060m45, ra: 60.0, dec: -45.0}    # 6dFGS deep south (DES footprint), b~-48
+          - {name: lam_115p25, ra: 115.0, dec: 25.0}    # LAMOST Galactic anticentre, b~+20 (dense stars)
+          - {name: lam_015p38, ra: 15.0, dec: 38.0}     # LAMOST M31-M33 survey area, b~-25
+          - {name: lam_180p50, ra: 180.0, dec: 50.0}    # LAMOST north, b~+66
+          - {name: kep_291p44, ra: 291.0, dec: 44.5}    # LAMOST-Kepler field, b~+13 (crowded)
+    env:
+      NAME: ${{ matrix.region.name }}
+      RA0: ${{ matrix.region.ra }}
+      DEC0: ${{ matrix.region.dec }}
+      R: ${{ github.event.inputs.radius || '8' }}
+    steps:
+      - id: pick
+        run: |
+          only="${{ github.event.inputs.only }}"
+          if [ -z "$only" ] || echo ",$only," | grep -q ",$NAME,"; then echo "run=1" >> "$GITHUB_OUTPUT"; fi
+      - uses: actions/checkout@v4
+        if: steps.pick.outputs.run
+      - uses: actions/setup-python@v5
+        if: steps.pick.outputs.run
+        with: {python-version: "3.11"}
+      - if: steps.pick.outputs.run
+        run: pip install pandas numpy requests astropy astroquery pyvo
+      - name: Independent truth within 30'
+        if: steps.pick.outputs.run
+        run: python -u .github/scripts/independent_truth_field.py truth $RA0 $DEC0 30 /tmp/truth
+      - name: Field centre with the most truth objects
+        if: steps.pick.outputs.run
+        run: |
+          read RA DEC N < <(python -u .github/scripts/independent_truth_field.py centre /tmp/truth $RA0 $DEC0 30 $R | tail -1)
+          echo "centre $RA $DEC holds $N truth positions"
+          echo "RA=$RA" >> "$GITHUB_ENV"; echo "DEC=$DEC" >> "$GITHUB_ENV"
+      - name: Pipeline
+        if: steps.pick.outputs.run
+        run: python -u v2/pipeline.py --ra $RA --dec $DEC --radius $R --work /tmp/field
+      - name: Commit compact products
+        if: steps.pick.outputs.run
+        run: |
+          out=v2/benchmark/independent_fields/$NAME
+          rm -rf "$out"; mkdir -p "$out/truth"
+          python -u .github/scripts/independent_truth_field.py compact /tmp/field $RA $DEC $R "$out"
+          cp /tmp/truth/* "$out/truth/"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$out"
+          git commit -m "Independent-truth field $NAME ($RA, $DEC, r=$R')" || exit 0
+          bash .github/scripts/push_with_retry.sh "${{ github.ref_name }}"
+      - uses: actions/upload-artifact@v4
+        if: ${{ always() && steps.pick.outputs.run }}
+        with:
+          name: field-${{ matrix.region.name }}
+          path: /tmp/field/*.csv
+          retention-days: 7
+          if-no-files-found: ignore
