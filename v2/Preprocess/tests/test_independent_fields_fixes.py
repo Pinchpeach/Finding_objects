@@ -48,3 +48,16 @@ def test_ls_gbm_gives_no_evidence_without_r_band_imaging():
     p = ls_gbm.predict_proba(pd.DataFrame([with_r, no_r]))
     assert np.isfinite(p[0]).all()
     assert np.isnan(p[1]).all()
+
+
+def test_latitude_prior_scales_extragalactic_odds_only_near_the_plane():
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("s5", V2 / "Preprocess" / "05_likelihood_vectors.py")
+    s5 = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(s5)
+    # Galactic anticentre at b ~ +2.3, the Kepler field (b ~ +13), the NGP, no position
+    f = s5.latitude_factor(pd.DataFrame({"ra": [89.92, 291.23, 192.86, np.nan], "dec": [28.30, 44.90, 27.13, np.nan]}))
+    assert abs(f[0] - np.sin(np.radians(2.3)) / np.sin(np.radians(20))) < 0.01
+    assert 0.6 < f[1] < 0.75
+    assert f[2] == 1.0 and f[3] == 1.0

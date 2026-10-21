@@ -108,7 +108,8 @@ VAR_SUMMARY = [
 # for the 3-5 s pause (throttle.py) before each of an async job's ~4-5
 # requests (submit, status polls, results).
 BASE_TAP_BUDGET_S = 50.0
-OPTIONAL_TAP_BUDGET_S = 80.0
+OPTIONAL_TAP_BUDGET_S = 80
+OPTIONAL_CHUNK = 2000.0
 # All optional tables together stay well inside the 300 s controller budget
 # (worst case was 50 + 3 tables x ceil(N/500) x 80 s, capped here).
 OPTIONAL_TOTAL_BUDGET_S = 180.0
@@ -180,8 +181,12 @@ def _merge_optional(
         return base
     pieces = []
     try:
-        for start in range(0, len(ids), 500):
-            chunk = ids[start : start + 500]
+        # 2000 ids per query (sent by POST): with 500 a crowded field (6,966
+        # sources at l = 182, b = +2, 2026-10-21) needed 14 queries, each also
+        # paced 3-5 s, and lost every optional table (DSC included) to the
+        # shared deadline.
+        for start in range(0, len(ids), OPTIONAL_CHUNK):
+            chunk = ids[start : start + OPTIONAL_CHUNK]
             select = "source_id," + ",".join(columns)
             # One shared deadline for all optional tables, so a slow archive
             # cannot push the base astrometry past the controller budget.

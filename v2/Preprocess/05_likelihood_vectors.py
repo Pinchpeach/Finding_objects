@@ -296,6 +296,34 @@ def estimate_field_prior(P, train_prior, iters=200, tol=1e-7):
     return pi
 
 
+# Galactic-latitude class prior (2.35.0).  The fusion was trained and tested
+# on SDSS/DESI objects, none of them at |b| < 10 deg and 21 of 23,000 at
+# |b| < 20 deg, so it assumes high-latitude class odds.  Toward the plane the
+# star counts rise roughly as csc|b| (plane-parallel disc; Bahcall & Soneira
+# 1980) while extragalactic counts fall (extinction), and Gaia's
+# zero-motion/zero-parallax test passes distant disc stars, most of all toward
+# the anticentre: a field at l = 182, b = +2 had 616 "QSO" among G ~ 20 stars
+# (2026-10-21).  Gaia DR3 source classification uses a class prior that varies
+# with latitude for this reason (Hughes, Bailer-Jones & Jamal 2022, A&A 668,
+# A99; Bailer-Jones et al. 2024), and quasar catalogues cut |sin b| <= 0.1.
+# Here the GALAXY and QSO odds are scaled by the star-count ratio
+# sin|b| / sin(20 deg) below 20 deg (extinction ignored, i.e. conservative);
+# at |b| >= 20 deg, where all benchmarks lie, nothing changes.
+LATITUDE_PRIOR_DEG = 20.0
+
+
+def latitude_factor(df: pd.DataFrame) -> np.ndarray:
+    """Per-row factor (0, 1] on the GALAXY and QSO odds from Galactic latitude; 1 without a position."""
+    ra = pd.to_numeric(df.get("ra", pd.Series(np.nan, index=df.index)), errors="coerce").to_numpy(float)
+    dec = pd.to_numeric(df.get("dec", pd.Series(np.nan, index=df.index)), errors="coerce").to_numpy(float)
+    a, d = np.radians(ra), np.radians(dec)
+    # sin b = n_gp . r, north Galactic pole at ICRS (192.85948, +27.12825) deg
+    # (Hipparcos catalogue, ESA 1997, vol. 1 sec. 1.5.3)
+    sinb = np.abs(-0.867666135683 * np.cos(d) * np.cos(a) - 0.198076389613 * np.cos(d) * np.sin(a) + 0.455983794521 * np.sin(d))
+    f = np.minimum(1.0, sinb / np.sin(np.radians(LATITUDE_PRIOR_DEG)))
+    return np.where(np.isfinite(f), np.maximum(f, 1e-3), 1.0)
+
+
 def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=False):
     model = load_model(model_path)
     min_conf = float(model.get("min_confidence", MIN_CONFIDENCE)) if model else MIN_CONFIDENCE
@@ -350,6 +378,8 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     prior = estimate_field_prior(P[eligible], train_prior) if estimable else np.array(train_prior)
     adjust = estimable and bool(field_prior)
     Q = P * (prior if adjust else np.array(train_prior)) / np.array(train_prior)
+    lat = latitude_factor(df)
+    Q[:, [CLASSES.index("GALAXY"), CLASSES.index("QSO")]] *= lat[:, None]
     Q = Q / Q.sum(axis=1, keepdims=True) if len(Q) else Q
     labels = []
     confidence = []
