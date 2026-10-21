@@ -61,3 +61,21 @@ def test_latitude_prior_scales_extragalactic_odds_only_near_the_plane():
     assert abs(f[0] - np.sin(np.radians(2.3)) / np.sin(np.radians(20))) < 0.01
     assert 0.6 < f[1] < 0.75
     assert f[2] == 1.0 and f[3] == 1.0
+
+
+def test_gaia_optional_tables_merge_in_chunks(monkeypatch):
+    import gaia_dr3
+
+    calls = []
+
+    def fake_tap(query):
+        ids = query.split("IN (")[1].rstrip(")").split(",")
+        calls.append(len(ids))
+        return pd.DataFrame({"source_id": [int(i) for i in ids], "classprob_dsc_combmod_quasar": 0.1})
+
+    monkeypatch.setattr(gaia_dr3, "_tap", fake_tap)
+    monkeypatch.setattr(gaia_dr3, "_bounded", lambda fn, left, *a: fn(*a))
+    base = pd.DataFrame({"source_id": np.arange(1, 4501)})
+    out = gaia_dr3._merge_optional(base, "gaiadr3.astrophysical_parameters", ["classprob_dsc_combmod_quasar"], "dsc_status")
+    assert calls == [2000, 2000, 500]
+    assert out["classprob_dsc_combmod_quasar"].notna().all() and set(out["dsc_status"]) == {"ok"}
