@@ -174,3 +174,27 @@ def test_ps1_rows_on_a_small_galaxy_are_grouped_under_it():
         assert pd.isna(res.at[k, "parent_object_id"]), k
     assert res.at["H", "parent_object_id"] == "G"  # SDSS's own measurement of the galaxy
     assert res.at["G", "n_components"] == 3
+
+
+def test_single_survey_rows_in_a_bright_star_halo_are_grouped_under_the_star():
+    import pandas as pd
+
+    import host_groups
+
+    star = dict(object_id="S", designation="Gaia DR3 1", ra=150.0, dec=2.0, primary_class="STAR",
+                gaia_dr3__phot_g_mean_mag=11.0, catalogs="DESI Legacy Surveys DR10|Gaia DR3|Pan-STARRS1 DR2 MeanObject")
+    rows = [
+        star,
+        # PS1-only row 5" away (R/2 = 20" at G = 11): halo artefact
+        dict(object_id="P", ra=150.0 + 5 / 3600, dec=2.0, primary_class="GALAXY", catalogs="Pan-STARRS1 DR2 MeanObject"),
+        # a real neighbour measured by LS too: stays independent
+        dict(object_id="L", ra=150.0, dec=2.0 + 6 / 3600, primary_class="GALAXY",
+             catalogs="DESI Legacy Surveys DR10|Pan-STARRS1 DR2 MeanObject"),
+        # PS1-only row beyond the halo radius: stays
+        dict(object_id="F", ra=150.0, dec=2.0 + 40 / 3600, primary_class="UNKNOWN", catalogs="Pan-STARRS1 DR2 MeanObject"),
+    ]
+    out = host_groups.attach_bright_star_artifacts(pd.DataFrame(rows).assign(unknown_reason=None, parent_object_id=None))
+    got = out.set_index("object_id")
+    assert got.at["P", "parent_object_id"] == "S" and got.at["P", "component_role"] == "bright_star_halo"
+    assert got.parent_object_id.isna()[["S", "L", "F"]].all()
+    assert got.at["S", "n_components"] == 1

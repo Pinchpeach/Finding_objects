@@ -130,6 +130,15 @@ def predict_proba(df: pd.DataFrame, prefix: str = P) -> np.ndarray:
         X = X[:, : len(model["features"])]
     probs = np.full((len(df), len(CLASSES)), np.nan)
     has = np.isfinite(X[:, [0, 6]]).any(axis=1) | np.isfinite(X[:, 3])  # r mag, r S/N or z-W1
+    # The model only saw DESI targets, which all have g, r and z imaging
+    # (NOBS >= 1 per band; Myers et al. 2023, AJ 165, 50).  A source outside
+    # that footprint, e.g. DR10 DECam areas without r (field 340/-30,
+    # 2026-10-21), sends every r feature down an untrained missing branch:
+    # extended Sersic galaxies scored STAR 1.00.  No evidence there.
+    for b in ("g", "r", "z"):
+        iv = _col(df, f"{prefix}flux_ivar_{b}")
+        if f"{prefix}flux_ivar_{b}" in df:
+            has &= np.isfinite(iv) & (iv > 0)
     if model is None or not has.any():
         return probs
     z = raw_scores(X[has], model)

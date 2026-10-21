@@ -416,3 +416,83 @@ def attach_ps1_fragments(out: pd.DataFrame, assoc: pd.DataFrame, explain: dict |
     counts = out.parent_object_id.dropna().value_counts()
     out["n_components"] = out.object_id.map(counts).fillna(0).astype(int)
     return out
+
+
+# Bright-star halo artefacts (2.35.0).  Saturated stars break into extra
+# catalogue rows: PSPHOT splits bright stars and their diffraction spikes into
+# several detections, so PS1 analyses mask around them (Metcalfe et al. 2013,
+# arXiv:1310.6368; PS1 saturates near r ~ 13-15, Chambers et al. 2016), and a WISE/GALEX row that the
+# association could not tie to the saturated star stays alone.  In the
+# 2026-10-21 independent fields single-catalogue PS1 rows were 40-100 times
+# more frequent than the background within 2" of G < 13 stars, 5-10 times
+# within 1-5" of G = 13-15 stars, and still 4 times at 20-30" of G < 11 stars;
+# 214 such objects around 96 stars, 51 of them classified (mostly GALAXY).
+# Radius: the Legacy Surveys BRIGHT-star mask, half the radius-magnitude locus
+# R(G) = 1630" x 1.396^-G of legacypipe (mask_radius_for_mag; LS DR9/DR10
+# bitmask documentation: MEDIUM = R, BRIGHT = R/2), applied to Gaia stars
+# brighter than the MEDIUM-mask limit G = 16.  Only rows seen by a single
+# survey qualify: a real neighbour in the halo is also measured by the deeper
+# Legacy Surveys or by Gaia.  That premise needs Legacy Surveys imaging: where
+# a star has no LS source within LS_COVER_ARCSEC (Kepler field, M31 area,
+# Galactic plane), a PS1-only row is often a real faint star, so only the
+# inner quarter of the locus, where the measured excess was >= 4-9 times the
+# background (>= 75-90 % artefacts), is used.
+HALO_G_MAX = 16.0
+HALO_MIN_ARCSEC = 2.0
+HALO_CATALOGS = {PS1, "AllWISE", "GALEX AIS", SDSS, "2MASS PSC"}
+LS_COVER_ARCSEC = 60.0
+
+
+def halo_radius_arcsec(g, ls_imaging=True):
+    """Legacy Surveys BRIGHT-mask radius (arcsec) of a star of Gaia magnitude
+    ``g``; half of it outside the Legacy Surveys footprint."""
+    return max((0.5 if ls_imaging else 0.25) * 1630.0 * 1.396 ** (-float(g)), HALO_MIN_ARCSEC)
+
+
+def attach_bright_star_artifacts(out: pd.DataFrame) -> pd.DataFrame:
+    """Group single-survey rows in the halo of a bright Gaia star under the star."""
+    need = {"catalogs", "ra", "dec", "primary_class", "gaia_dr3__phot_g_mean_mag"}
+    if out.empty or not need <= set(out.columns):
+        return out
+    out = out.copy()
+    for c, default in (("parent_object_id", None), ("component_role", ""), ("n_components", 0)):
+        if c not in out:
+            out[c] = default
+    for c in ("parent_object_id", "component_role", "unknown_reason"):
+        if c in out:
+            out[c] = out[c].astype(object)
+    top = out.parent_object_id.isna()
+    g = pd.to_numeric(out.gaia_dr3__phot_g_mean_mag, errors="coerce")
+    stars = out.index[top & out.primary_class.eq("STAR") & g.lt(HALO_G_MAX)]
+    cats = out.catalogs.astype(str).map(lambda s: frozenset(c for c in s.split("|") if c) - LITERATURE)
+    cand = out.index[top & cats.map(lambda c: len(c) == 1 and c <= HALO_CATALOGS)]
+    if not len(stars) or not len(cand):
+        return out
+    s_ra, s_dec = out.loc[stars, "ra"].to_numpy(float), out.loc[stars, "dec"].to_numpy(float)
+    has_ls = out.catalogs.astype(str).str.contains(LS, regex=False)
+    l_ra, l_dec = out.loc[has_ls, "ra"].to_numpy(float), out.loc[has_ls, "dec"].to_numpy(float)
+
+    def covered(ra, dec):
+        d = np.hypot(((l_ra - ra + 180.0) % 360.0 - 180.0) * math.cos(math.radians(dec)), l_dec - dec) * 3600.0
+        return bool((d <= LS_COVER_ARCSEC).any())
+
+    s_r = np.array([halo_radius_arcsec(x, covered(a, b)) for x, a, b in zip(g[stars], s_ra, s_dec)])
+    for i in cand:
+        ra, dec = float(out.at[i, "ra"]), float(out.at[i, "dec"])
+        d = np.hypot(((s_ra - ra + 180.0) % 360.0 - 180.0) * math.cos(math.radians(dec)), s_dec - dec) * 3600.0
+        ok = d <= s_r
+        if not ok.any():
+            continue
+        k = int(np.argmin(np.where(ok, d / s_r, np.inf)))
+        h = stars[k]
+        out.at[i, "parent_object_id"] = out.at[h, "object_id"]
+        out.at[i, "component_role"] = "bright_star_halo"
+        if "unknown_reason" in out:
+            name = out.at[h, "designation"] if "designation" in out else out.at[h, "object_id"]
+            out.at[i, "unknown_reason"] = (
+                f"{next(iter(cats[i]))} row {d[k]:.1f}\" from the bright star {name} (G {g[h]:.1f}): "
+                "a saturation/halo artefact or the star's own unmatched measurement (grouped under it)"
+            )
+    counts = out.parent_object_id.dropna().value_counts()
+    out["n_components"] = out.object_id.map(counts).fillna(0).astype(int)
+    return out
