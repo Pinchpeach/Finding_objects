@@ -7,9 +7,11 @@ surveys that were never used to train or tune v2 (LAMOST, 2QZ/6QZ, 2dFGRS,
   centre TRUTH RA DEC R_SEARCH R_FIELD   print "ra dec n" of the R_FIELD cone,
                               centred on a truth object within R_SEARCH, that
                               holds the most truth objects
-  compact WORK RA DEC R OUT   field products for local scoring: objects.csv.gz
-                              (classes + the columns other classifiers need),
-                              field.json (LS PSF size = seeing, counts)
+  compact WORK RA DEC R OUT [NAME]  field products for local scoring:
+                              NAME.csv.gz (classes + the columns other
+                              classifiers need; default "objects"); with the
+                              default name also field.json (LS PSF size =
+                              seeing, counts)
 
 Every archive request waits 3-5 s first (v2/Get_data/throttle.py).
 """
@@ -136,7 +138,7 @@ KEEP = re.compile(
 )
 
 
-def compact(work, ra, dec, radius, out):
+def compact(work, ra, dec, radius, out, name="objects"):
     work, out = Path(work), Path(out)
     out.mkdir(parents=True, exist_ok=True)
     d = pd.read_csv(work / "classified_objects.csv", low_memory=False)
@@ -163,7 +165,9 @@ def compact(work, ra, dec, radius, out):
                     r[f"lsgbm_{e['class']}"] = e.get("raw_score", e.get("score"))
             rows.append(r)
         o = o.merge(pd.DataFrame(rows).drop_duplicates("object_id"), on="object_id", how="left")
-    o.to_csv(out / "objects.csv.gz", index=False)
+    o.to_csv(out / f"{name}.csv.gz", index=False)
+    if name != "objects":
+        return
     info = {"ra": ra, "dec": dec, "radius_arcmin": radius, "n_objects": int(len(o))}
     summ = work / "pipeline_summary.csv"
     if summ.exists():
@@ -200,5 +204,5 @@ if __name__ == "__main__":
     elif mode == "centre":
         centre(args[0], float(args[1]), float(args[2]), float(args[3]), float(args[4]))
     elif mode == "compact":
-        compact(args[0], float(args[1]), float(args[2]), float(args[3]), args[4])
+        compact(args[0], float(args[1]), float(args[2]), float(args[3]), args[4], *args[5:6])
     sys.stdout.flush()

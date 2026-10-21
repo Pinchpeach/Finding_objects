@@ -1,11 +1,16 @@
 name: v2 independent-truth field validation
 
-# 2026-10-21 (push 1): validate v2 on many sky regions against spectroscopic classes
+# 2026-10-21 (push 2): validate v2 on many sky regions against spectroscopic classes
 # from surveys never used to train or tune it (LAMOST, 2QZ/6QZ, 2dFGRS,
 # 6dFGS, 2SLAQ, WiggleZ, RAVE; SDSS and DESI excluded).  Per region: fetch
 # every candidate truth catalogue within 30', put the 8' field on the truth
 # object with the most truth neighbours, run v2/pipeline.py there and commit
 # compact products to v2/benchmark/independent_fields/<region>/ for scoring
+# A second, "blind" run re-classifies the same collected data without the
+# spectroscopic and literature catalogues (LAMOST, SDSS/DESI spectra, SIMBAD,
+# NED, ...): these can carry the truth surveys' own labels (SIMBAD and NED
+# ingest 2QZ, 2dFGRS, 6dFGS; v2 collects LAMOST DR5 itself), so only the
+# blind run is an independent test.
 # by v2/benchmark/score_independent_fields.py.
 on:
   workflow_dispatch:
@@ -83,12 +88,25 @@ jobs:
       - name: Pipeline
         if: steps.pick.outputs.run
         run: python -u v2/pipeline.py --ra $RA --dec $DEC --radius $R --work /tmp/field
+      - name: Blind run (no spectroscopic or literature catalogues)
+        if: steps.pick.outputs.run
+        run: |
+          raw=$(ls -d /tmp/field/raw/*/ | head -1)
+          mkdir -p /tmp/blindraw
+          for f in "$raw"*.csv; do
+            case "$(basename "$f")" in
+              lamost_spectroscopy_*|sdss_spectroscopy_*|desi_spectroscopy_*|desi_fastspec_*|simbad_*|ned_*|bzcat_*|pn_spectroscopy_*|hash_pn_*|asas_sn_supernova_*|asiago_supernova_*|agb_suh2021_*|atnf_pulsar_*|galaxy_clusters_*) echo "blind: drop $(basename "$f")";;
+              *) cp "$f" /tmp/blindraw/;;
+            esac
+          done
+          python -u v2/pipeline.py --raw-dir /tmp/blindraw --ra $RA --dec $DEC --radius $R --work /tmp/blind
       - name: Commit compact products
         if: steps.pick.outputs.run
         run: |
           out=v2/benchmark/independent_fields/$NAME
           rm -rf "$out"; mkdir -p "$out/truth"
           python -u .github/scripts/independent_truth_field.py compact /tmp/field $RA $DEC $R "$out"
+          python -u .github/scripts/independent_truth_field.py compact /tmp/blind $RA $DEC $R "$out" objects_blind
           cp /tmp/truth/* "$out/truth/"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
