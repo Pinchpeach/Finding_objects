@@ -202,6 +202,57 @@ def field_matches(fdir, which, bench):
     return m, dict(info=info, n_truth=len(t), conflicts=conflicts, unmatched=int((~t.matched).sum()), in_bench=int(t.in_benchmark.sum()))
 
 
+def _galactic(ra, dec):
+    from astropy.coordinates import SkyCoord
+    import astropy.units as u
+
+    g = SkyCoord(ra * u.deg, dec * u.deg).galactic
+    return g.l.deg, g.b.deg
+
+
+def markdown_table(rows, M):
+    """One line per field: centre, radius/FOV, seeing, truth, our accuracy and the others' on the same objects."""
+    head = (
+        "| 영역 | 중심 RA, Dec (°) | l, b (°) | 반경 / FOV | seeing (″) | 정답 출처 | 채점 수 (별/은하/QSO) "
+        "| 우리 정확도 (미분류) | Gaia DSC: 그쪽 / 우리 | LS-GBM: 그쪽 / 우리 | LS형태+WISE: 그쪽 / 우리 | PS1 점/퍼짐: 그쪽 / 우리 |\n"
+        "|---|---|---|---|---|---|---|---|---|---|---|---|\n"
+    )
+    lines = []
+    for r in rows:
+        g = M[M.field.eq(r["field"])]
+        info = json.loads((Path(r["root"]) / r["field"] / "field.json").read_text())
+        se = info.get("seeing") or {}
+        if se.get("n_psf"):
+            see = f"LS g/r/z {se.get('g')}/{se.get('r')}/{se.get('z')}"
+        elif isinstance(se.get("ps1"), dict) and se["ps1"].get("r"):
+            see = f"PS1 g/r/i {se['ps1'].get('g')}/{se['ps1'].get('r')}/{se['ps1'].get('i')}"
+        else:
+            see = "–"
+        l, b = _galactic(info["ra"], info["dec"])
+        mix = g.t_truth.value_counts()
+        src = ", ".join(sorted({x for s_ in g.t_survey for x in s_.split("+")}))
+        o = score(g.ours, g.t_truth)
+        lab, pe = other_labels(g)
+
+        def pair(k):
+            v = lab[k]
+            t_, u_ = score(v, g.t_truth), score(g.ours.where(v.notna()), g.t_truth)
+            return f"{t_['acc']} / {u_['acc']} (n={t_['n']})" if t_ else "–"
+
+        pt = np.where(g.t_truth.isin(["STAR", "QSO"]), "POINT", "EXT")
+        o2 = g.ours.map({"STAR": "POINT", "QSO": "POINT", "GALAXY": "EXT"}).to_numpy()
+        v = pe["PS1 iPSF-iKron>0.05"].to_numpy()
+        mm = pd.notna(v)
+        ps1 = f"{100 * np.mean(v[mm] == pt[mm]):.1f} / {100 * np.mean(o2[mm] == pt[mm]):.1f} (n={mm.sum()})" if mm.any() else "–"
+        lines.append(
+            f"| {r['field']} | {info['ra']:.3f}, {info['dec']:+.3f} | {l:.1f}, {b:+.1f} | {info['radius_arcmin']:.0f}′ / {2 * info['radius_arcmin']:.0f}′ "
+            f"| {see} | {src} | {len(g)} ({mix.get('STAR', 0)}/{mix.get('GALAXY', 0)}/{mix.get('QSO', 0)}) "
+            f"| {o['acc']} % ({o['unknown']} %) | {pair('Gaia DR3 DSC-Combmod')} | {pair('LS-GBM (LS photometry only)')} "
+            f"| {pair('LS morphology + WISE W1-W2>=0.8')} | {ps1} |"
+        )
+    return head + "\n".join(lines) + "\n"
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", type=Path, default=B / "independent_fields")
@@ -222,7 +273,7 @@ def main():
         print(f"single-catalogue fragments next to a truth object: {int(m.t_n_fragments.gt(0).sum())}")
         print(f"truth in field {st['n_truth']} (unmatched {st['unmatched']}, in SDSS/DESI benchmark {st['in_bench']}, survey conflicts {st['conflicts']}); scored {len(m)}")
         print("   by survey:", m.t_survey.value_counts().to_dict(), "| truth mix:", m.t_truth.value_counts().to_dict())
-        r = dict(field=fdir.name, ra=info["ra"], dec=info["dec"], n=len(m), ours=score(m.ours, m.t_truth))
+        r = dict(field=fdir.name, root=str(a.root), ra=info["ra"], dec=info["dec"], n=len(m), ours=score(m.ours, m.t_truth))
         lab, pe = other_labels(m)
         for k, v in lab.items():
             r[k] = score(v, m.t_truth)
@@ -248,6 +299,7 @@ def main():
         print(f"   {s_}: {score(g.ours, g.t_truth)}")
     if a.out:
         a.out.mkdir(parents=True, exist_ok=True)
+        (a.out / f"fields_{a.which}.md").write_text(markdown_table(rows, M))
         M.to_csv(a.out / f"matches_{a.which}.csv", index=False)
         (a.out / f"fields_{a.which}.json").write_text(json.dumps(rows, indent=1))
 
