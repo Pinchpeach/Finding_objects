@@ -1,6 +1,6 @@
 name: v2 independent-truth field validation
 
-# 2026-10-21 (push 4): validate v2 on many sky regions against spectroscopic classes
+# 2026-10-21 (push 5): validate v2 on many sky regions against spectroscopic classes
 # from surveys never used to train or tune it (LAMOST, 2QZ/6QZ, 2dFGRS,
 # 6dFGS, 2SLAQ, WiggleZ, RAVE; SDSS and DESI excluded).  Per region: fetch
 # every candidate truth catalogue within 40', put the 12' field on the truth
@@ -24,6 +24,10 @@ on:
 
 permissions:
   contents: write
+
+env:
+  # Regions a push re-runs (empty = all): those whose last run lost an archive.
+  PUSH_ONLY: "ngp_165m01,ngp_185m01,ngp_205m02,ngp_220m01,s82_010p00"
 
 jobs:
   probe:
@@ -73,7 +77,7 @@ jobs:
     steps:
       - id: pick
         run: |
-          only="${{ github.event.inputs.only }}"
+          only="${{ github.event.inputs.only || env.PUSH_ONLY }}"
           if [ -z "$only" ] || echo ",$only," | grep -q ",$NAME,"; then echo "run=1" >> "$GITHUB_OUTPUT"; fi
       - uses: actions/checkout@v4
         if: steps.pick.outputs.run
