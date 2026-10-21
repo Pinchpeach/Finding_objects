@@ -2,16 +2,16 @@
  "ra": 204.72639,
  "dec": -1.77806,
  "radius_arcmin": 8.0,
- "n_objects": 9115,
+ "n_objects": 9117,
  "seconds": {
-  "collect": 90.8,
-  "1_associate": 5.3,
-  "2_integrate": 8.6,
+  "collect": 71.6,
+  "1_associate": 5.1,
+  "2_integrate": 8.5,
   "3_features": 11.9,
-  "4_evidence": 10.1,
-  "5_coarse": 15.3,
-  "6_prepare": 12.6,
-  "7_classify": 13.7
+  "4_evidence": 10.2,
+  "5_coarse": 15.2,
+  "6_prepare": 12.7,
+  "7_classify": 14.8
  },
  "catalog_rows": {
   "DESI Legacy Surveys DR10": 8139,
