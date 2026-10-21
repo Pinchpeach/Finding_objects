@@ -543,12 +543,16 @@ class DetailPanel(QWidget):
         self.lbl_paper.setText(_paper_html(row))
         ncomp = int(_num(row.get("n_components")) or 0)
         parent = row.get("parent_object_id")
-        if ncomp:
+        if ncomp and row.get("primary_class") == "STAR":
+            self.lbl_parts.setText(f"Bright star: {ncomp} single-survey entries in its halo grouped under it")
+        elif ncomp:
             z = _num(row.get("host_redshift"))
             self.lbl_parts.setText(
                 f"Large galaxy: {ncomp} catalogue entries grouped as its parts"
                 + (f", z = {z:.4f}" if z is not None else "")
             )
+        elif isinstance(parent, str) and parent and row.get("component_role") == "bright_star_halo":
+            self.lbl_parts.setText("Artefact or unmatched measurement in the halo of a bright star")
         elif isinstance(parent, str) and parent:
             self.lbl_parts.setText(f"Part of a large galaxy ({row.get('component_role', 'component')})")
         elif row.get("component_role") in RELATION_TEXT:

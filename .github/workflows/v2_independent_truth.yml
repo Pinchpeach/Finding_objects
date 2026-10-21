@@ -1,6 +1,6 @@
 name: v2 independent-truth field validation
 
-# 2026-10-21 (push 3): validate v2 on many sky regions against spectroscopic classes
+# 2026-10-21 (push 4): validate v2 on many sky regions against spectroscopic classes
 # from surveys never used to train or tune it (LAMOST, 2QZ/6QZ, 2dFGRS,
 # 6dFGS, 2SLAQ, WiggleZ, RAVE; SDSS and DESI excluded).  Per region: fetch
 # every candidate truth catalogue within 40', put the 12' field on the truth
