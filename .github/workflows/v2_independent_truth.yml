@@ -1,6 +1,6 @@
 name: v2 independent-truth field validation
 
-# 2026-10-21 (push 6): validate v2 on many sky regions against spectroscopic classes
+# 2026-10-21 (push 7): validate v2 on many sky regions against spectroscopic classes
 # from surveys never used to train or tune it (LAMOST, 2QZ/6QZ, 2dFGRS,
 # 6dFGS, 2SLAQ, WiggleZ, RAVE; SDSS and DESI excluded).  Per region: fetch
 # every candidate truth catalogue within 40', put the 12' field on the truth
@@ -85,7 +85,7 @@ jobs:
         if: steps.pick.outputs.run
         with: {python-version: "3.11"}
       - if: steps.pick.outputs.run
-        run: pip install pandas numpy requests astropy astroquery pyvo
+        run: pip install pandas numpy scipy requests astropy astroquery pyvo
       - name: Independent truth within 40'
         if: steps.pick.outputs.run
         run: python -u .github/scripts/independent_truth_field.py truth $RA0 $DEC0 40 /tmp/truth
