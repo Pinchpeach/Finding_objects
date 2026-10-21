@@ -2,24 +2,26 @@
  "ra": 184.69083,
  "dec": -1.13028,
  "radius_arcmin": 12.0,
- "n_objects": 6151,
+ "n_objects": 16743,
  "seconds": {
-  "collect": 283.0,
-  "1_associate": 2.5,
-  "2_integrate": 6.2,
-  "3_features": 9.2,
-  "4_evidence": 6.2,
-  "5_coarse": 10.0,
-  "6_prepare": 9.5,
-  "7_classify": 10.1
+  "collect": 107.9,
+  "1_associate": 9.7,
+  "2_integrate": 21.9,
+  "3_features": 38.5,
+  "4_evidence": 25.2,
+  "5_coarse": 44.6,
+  "6_prepare": 39.9,
+  "7_classify": 35.2
  },
  "catalog_rows": {
+  "DESI Legacy Surveys DR10": 14297,
   "Pan-STARRS1 DR2 MeanObject": 4410,
   "SDSS DR18 PhotoObj": 3062,
   "NED": 3000,
   "AllWISE": 1570,
   "DESI DR1 spectroscopy": 631,
   "Gaia DR3": 569,
+  "DESI DR1 FastSpecFit": 521,
   "SIMBAD": 254,
   "2MASS PSC": 235,
   "Chandra CSC 2.0": 26,
@@ -32,13 +34,10 @@
   "TGSS ADR1": 3
  },
  "seeing": {
-  "error": "RuntimeError: Legacy Surveys TAP failed after 3 attempts: DALServiceError: 502 Server Error: Bad Gateway for url: https://datalab.noir",
-  "ps1": {
-   "source": "PS1 stack psfMajor/MinorFWHM",
-   "n": 6553,
-   "g": 1.15,
-   "r": 1.06,
-   "i": 1.08
-  }
+  "g": 1.24,
+  "r": 1.32,
+  "z": 1.46,
+  "n_psf": 5613,
+  "source": "LS DR10 psfsize"
  }
 }
