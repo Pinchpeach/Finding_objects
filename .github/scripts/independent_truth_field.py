@@ -166,6 +166,20 @@ def compact(work, ra, dec, radius, out, name="objects"):
             rows.append(r)
         o = o.merge(pd.DataFrame(rows).drop_duplicates("object_id"), on="object_id", how="left")
     o.to_csv(out / f"{name}.csv.gz", index=False)
+    truth_dir = out / "truth"
+    if lv.exists() and truth_dir.exists():
+        # Evidence of the objects within 3" of a truth position, for error analysis.
+        p = _positions(truth_dir)
+        if len(p):
+            from astropy.coordinates import SkyCoord
+            import astropy.units as u
+
+            oc = SkyCoord(o.ra.to_numpy(float) * u.deg, o.dec.to_numpy(float) * u.deg)
+            _, sep, _ = oc.match_to_catalog_sky(SkyCoord(p[:, 0] * u.deg, p[:, 1] * u.deg))
+            near = set(o.object_id[sep.arcsec <= 3.0])
+            ev = pd.read_csv(lv, low_memory=False)
+            keep = [c for c in ev.columns if c in ("object_id", "evidence_json", "coarse_probabilities_json") or c.startswith(("p_", "prob", "fused"))]
+            ev[ev.object_id.isin(near)][keep].to_csv(out / f"{name}_evidence.csv.gz", index=False)
     if name != "objects":
         return
     info = {"ra": ra, "dec": dec, "radius_arcmin": radius, "n_objects": int(len(o))}
