@@ -72,6 +72,8 @@ class SkyMap(QWidget):
         self._hosts: list[tuple[int, float, float, float]] = []  # (row, d26 arcmin, pa, b/a)
         self._visible = None
         self._selected: int | None = None
+        self._high = None  # high-confidence mask (2.36.0)
+        self.highlight = True
         self._extent = 1.0
         self._area: tuple[float, float, float] | None = None
         self._c0: tuple[float, float] | None = None
@@ -96,6 +98,11 @@ class SkyMap(QWidget):
         subs = df["subclass"].fillna("").astype(str) if "subclass" in df else pd.Series([""] * len(df))
         tags = df["subclass_tags"].fillna("").astype(str) if "subclass_tags" in df else pd.Series([""] * len(df))
         self._subs = [a + (f"\n{b}" if b else "") for a, b in zip(subs.tolist(), tags.tolist())]
+        self._high = (
+            df["high_confidence"].fillna(False).astype(bool).to_numpy()
+            if "high_confidence" in df
+            else None
+        )
         self._hosts = []
         sga = [c for c in df.columns if c.startswith("sga_")]  # also the sga_2020__ namespace
         for i, r in enumerate(df[sga].to_dict("records") if sga else ()):
@@ -226,7 +233,7 @@ class SkyMap(QWidget):
 
     def _paint(self, p):
         import numpy as np
-        from qt_icons import draw
+        from qt_icons import draw, draw_highlight
 
         p.setRenderHint(QPainter.Antialiasing)
         p.fillRect(self.rect(), self.palette().base())
@@ -265,7 +272,10 @@ class SkyMap(QWidget):
         keep = shown & (ax >= -20) & (ax <= self.width() + 20) & (ay >= -20) & (ay <= self.height() + 20)
         in_view = [(int(i), float(ax[i]), float(ay[i])) for i in np.flatnonzero(keep)]
         # draw unclassified first so classified glyphs stay on top
+        high = self._high if self.highlight and self._high is not None and len(self._high) == len(shown) else None
         for i, sx, sy in sorted(in_view, key=lambda t: self._kinds[t[0]].get("cls") != "UNKNOWN"):
+            if high is not None and high[i]:
+                draw_highlight(p, QPointF(sx, sy), self.ICON)
             draw(p, self._kinds[i], QPointF(sx, sy), self.ICON, selected=(i == self._selected))
         if len(in_view) <= self.LABEL_LIMIT:
             p.setPen(text)
@@ -383,7 +393,7 @@ class SkyLegend(QWidget):
         grid.setContentsMargins(6, 2, 6, 2)
         grid.setHorizontalSpacing(10)
         grid.setVerticalSpacing(1)
-        for n, (label, kind) in enumerate(LEGEND):
+        for n, (label, kind) in enumerate(LEGEND + [("High confidence", {"cls": "GALAXY", "high": True})]):
             w = QLabel()
             w.setPixmap(icon(kind, 18).pixmap(18, 18))
             t = QLabel(label)
@@ -419,6 +429,14 @@ class SkyView(QWidget):
             lambda on: (setattr(self.map, "LABEL_LIMIT", 40 if on else -1), self.map.update())
         )
         bar.addWidget(self.chk_labels)
+        self.chk_high = QCheckBox("Highlight")
+        self.chk_high.setChecked(True)
+        self.chk_high.setToolTip(
+            "Gold ring: high-confidence objects (class confirmed by a spectrum, or a confidence\n"
+            "above the threshold where the estimated real-sky purity is >= 98 %)."
+        )
+        self.chk_high.toggled.connect(lambda on: (setattr(self.map, "highlight", on), self.map.update()))
+        bar.addWidget(self.chk_high)
         bar.addStretch(1)
         hint = QLabel("wheel: zoom · drag: pan · right-click: reset · double-click: set centre")
         hint.setStyleSheet("color: gray; font-size: 10px;")
@@ -562,8 +580,14 @@ class DetailPanel(QWidget):
         names = row.get("catalog_designations")
         self.lbl_names.setText(str(names).replace("; ", "\n") if isinstance(names, str) and names else "–")
         why = row.get("unknown_reason")
+        hc = row.get("high_confidence_basis")
         self.lbl_status.setText(
             f"{row.get('classification_status', '')}  (confidence {_f(row.get('primary_confidence'), 3)})"
+            + (
+                f"<br><span style='color:#b8860b'>★ high confidence: {html.escape(hc)}</span>"
+                if bool(row.get("high_confidence")) is True and isinstance(hc, str) and hc
+                else ""
+            )
             + (
                 f"<br><span style='color:gray'>why UNKNOWN: {html.escape(why)}</span>"
                 if isinstance(why, str) and why

@@ -111,6 +111,14 @@ RAW_FIELDS = {
     "pmdec_error",
     "class",
     "zwarning",
+    # DESI DR1 Redrock / LAMOST DR5 spectral class (SPC-DESI-*, SPC-LAMOST-*)
+    "OType",
+    "ZWARN",
+    "delChi2",
+    "Prog",
+    "Class",
+    "snrg",
+    "snri",
     "iMeanPSFMag",
     "rMeanPSFMag",
     "zMeanPSFMag",
@@ -234,6 +242,8 @@ RELMAP = {
     "SPC-SDSS-001": "catalog_confidence_sdss_spectroscopy",
     "SPC-SDSS-002": "catalog_confidence_sdss_spectroscopy",
     "SPC-SDSS-003": "catalog_confidence_sdss_spectroscopy",
+    **{f"SPC-DESI-00{i}": "catalog_confidence_desi_spectroscopy" for i in (1, 2, 3)},
+    **{f"SPC-LAMOST-00{i}": "catalog_confidence_lamost_spectroscopy" for i in (1, 2, 3)},
     "DSC-001": "catalog_confidence_gaia_dsc",
     "PS1-MORPH-001": "catalog_confidence_ps1_morphology",
     "PS1-MORPH-002": "catalog_confidence_ps1_morphology",
@@ -254,6 +264,8 @@ ASSOC_PREFIX = {
     "SPC-SDSS-001": "sdss_dr18_spectroscopy",
     "SPC-SDSS-002": "sdss_dr18_spectroscopy",
     "SPC-SDSS-003": "sdss_dr18_spectroscopy",
+    **{f"SPC-DESI-00{i}": "desi_dr1_spectroscopy" for i in (1, 2, 3)},
+    **{f"SPC-LAMOST-00{i}": "lamost_dr_catalog" for i in (1, 2, 3)},
     "PS1-MORPH-001": "pan_starrs1_dr2_meanobject",
     "PS1-MORPH-002": "pan_starrs1_dr2_meanobject",
     "PS1-QSO-Z6-001": "pan_starrs1_dr2_meanobject",
@@ -405,6 +417,12 @@ def evaluate(rule, row, namespaced=frozenset()):
             zw = num(src, "zwarning")
             score = 1.0 if zw in (None, 0) else 0.75
             hit(target, score, c, "nonzero zwarning downweights spectral label" if zw not in (None, 0) else "")
+    elif rid.startswith(("SPC-DESI-", "SPC-LAMOST-")):
+        # Pipeline spectral class (DESI Redrock SPECTYPE, LAMOST 1D class);
+        # spectrum quality is the catalogue reliability (Stage 3).
+        c = str(src.get("OType" if rid.startswith("SPC-DESI-") else "Class", "")).strip().upper()
+        if c == rule["target_class"]:
+            hit(c, 1.0, c)
     elif rid.startswith("PS1-MORPH-"):
         delta = num(row, "ps1_i_psf_minus_kron")
         imag = num(src, "iMeanPSFMag")

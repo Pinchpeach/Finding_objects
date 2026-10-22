@@ -6,9 +6,6 @@ name: Re-collect Pan-STARRS1 benchmark features
 # features next to the other preserved catalog features.
 on:
   workflow_dispatch:
-  push:  # experiment branch only; removed before merging (dispatch needs the file on main)
-    paths:
-      - .github/workflows/recollect-ps1-features.yml
 
 concurrency:
   group: recollect-ps1-features-${{ github.ref }}

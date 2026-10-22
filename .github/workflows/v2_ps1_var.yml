@@ -6,9 +6,6 @@ name: v2 PS1 variability at benchmark error targets
 # of correct objects), committed to v2/benchmark/ps1_var/.
 on:
   workflow_dispatch:
-  push:  # experiment branch only; removed before merging
-    paths:
-      - .github/workflows/v2_ps1_var.yml
 
 permissions:
   contents: write
