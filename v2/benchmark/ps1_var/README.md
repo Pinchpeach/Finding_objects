@@ -32,3 +32,23 @@ Question: do quasars' stochastic variations (MacLeod et al. 2010) in the Pan-STA
 ## Conclusion
 - The upper bound is about +1 point on the DESI test (10 of 962).
 - A proper measurement needs `vx` for the whole benchmark (re-collecting PS1 with `MeanPSFMagStd`/`Npt`, ~23,000 objects) and a fusion refit. The naive update above overstates the breakage risk as much as it may understate it.
+
+## Full measurement (2026-10-22, after re-collecting PS1 for the whole benchmark)
+- **Data:**
+  - Benchmark PS1 features re-collected with `MeanPSFMagStd`/`Npt` (`recollect-ps1-features.yml`).
+  - The preserved rows were kept unchanged. Variability columns were added only where the same PS1 object was re-found (SDSS 9,878/9,963, DESI 4,408/4,408, fusion 7,558/7,562).
+  - With the 2.35.0 models the benchmarks are unchanged: SDSS 98.69 %, DESI 92.41 %.
+- **Feature:** `PS1-VAR-001`, point sources only: log R, where R = Std/(Err·√N), the median of g, r and i (≥ 5 epochs), plus a presence flag.
+- **Refit:** fusion refitted on the train splits; the GBM was not refitted. The feature was present for 9,365 training objects.
+- **Learned weights:** small for log R (STAR −0.17, QSO +0.04, GALAXY +0.13).
+
+| Test split | Accuracy | Fixed / broken | McNemar p | Recall STAR | Recall GALAXY | Recall QSO |
+|---|---|---|---|---|---|---|
+| SDSS | 98.69 → 98.74 % | 3 / 2 | 1.0 | 99.7 → 99.7 % | 98.7 → 98.9 % | 97.7 → 97.7 % |
+| DESI | 92.41 → 92.52 % | 5 / 4 | 1.0 | 88.7 → 89.6 % | 94.8 → 94.6 % | 93.6 → 93.2 % |
+
+- **Decision: not adopted.**
+  - The gain is within noise.
+  - At the faint end, the per-epoch PS1 errors (r ~ 21-22, single-epoch depth ~22) leave the quasar scatter only slightly above the error-predicted scatter.
+  - The existing colours and astrometry already carry most of the star/QSO information that variability adds at r < 20.
+- **What is kept:** the collector columns, the benchmark variability columns and the rule code (no fitted weight, so no effect), as for ZTF in 2.27.0.
