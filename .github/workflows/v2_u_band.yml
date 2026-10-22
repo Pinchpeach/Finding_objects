@@ -1,6 +1,6 @@
 name: v2 u-band photometry at benchmark positions
 
-# 2.36.0 experiment (run 2): SDSS DR16, Stripe 82 co-add, KiDS DR4 and SkyMapper DR4
+# 2.36.0 experiment (run 3): SDSS DR16, Stripe 82 co-add, KiDS DR4 and SkyMapper DR4
 # u-band photometry for the benchmark truth sets (CDS XMatch, one request per
 # set and survey), committed to v2/benchmark/u_band/ for local measurement.
 on:
