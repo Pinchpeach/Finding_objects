@@ -1,0 +1,84 @@
+name: Re-collect Pan-STARRS1 benchmark features
+
+# 2.36.0: re-queries Pan-STARRS1 DR2 MeanObject (now with the per-band
+# MeanPSFMagStd / MeanPSFMagNpt multi-epoch statistics) for the SDSS, DESI
+# external and DESI fusion truth sets, 4 shards each, and commits the gzip
+# features next to the other preserved catalog features.
+on:
+  workflow_dispatch:
+  push:  # experiment branch only; removed before merging (dispatch needs the file on main)
+    paths:
+      - .github/workflows/recollect-ps1-features.yml
+
+concurrency:
+  group: recollect-ps1-features-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  collect:
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        set: [sdss, desi, fusion]
+        shard: [0, 1, 2, 3]
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pandas numpy requests astropy astroquery pyvo
+      - run: |
+          case "${{ matrix.set }}" in
+            sdss) T=v2/benchmark/truth_data/ground_truth.csv ;;
+            desi) T=v2/benchmark/desi_external/truth.csv ;;
+            fusion) T=v2/benchmark/desi_fusion/truth.csv ;;
+          esac
+          python -u v2/benchmark/collect_catalog_truth.py --truth $T --out-dir /tmp/out --catalog panstarrs1 --workers 8 --shard ${{ matrix.shard }}/4
+      - run: |
+          python - <<'PY'
+          import glob, pandas as pd
+          f = glob.glob("/tmp/out/panstarrs1_trd*.csv"); print(f)
+          d = pd.read_csv(f[0]); print(len(d), "rows; rMeanPSFMagStd present:", "rMeanPSFMagStd" in d.columns, d.get("rMeanPSFMagStd", pd.Series()).notna().sum())
+          assert "rMeanPSFMagStd" in d.columns and len(d) > 0
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ps1-${{ matrix.set }}-${{ matrix.shard }}
+          path: /tmp/out/panstarrs1_trd*.csv
+          retention-days: 7
+  commit:
+    needs: collect
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: /tmp/art
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pandas
+      - run: |
+          set -euo pipefail
+          python - <<'PY'
+          import glob, pandas as pd
+          dest = {"sdss": "v2/benchmark/catalog_features", "desi": "v2/benchmark/desi_external/catalog_features", "fusion": "v2/benchmark/desi_fusion/catalog_features"}
+          for s, d in dest.items():
+              parts = [pd.read_csv(f, low_memory=False) for k in range(4) for f in glob.glob(f"/tmp/art/ps1-{s}-{k}/*.csv")]
+              if len(parts) != 4:
+                  raise SystemExit(f"{s}: {len(parts)} of 4 shards")
+              out = pd.concat(parts, ignore_index=True).sort_values("benchmark_id", kind="stable")
+              out.to_csv(f"{d}/panstarrs1_trd.csv.gz", index=False, compression={"method": "gzip", "mtime": 0})
+              print(s, len(out))
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add v2/benchmark/catalog_features v2/benchmark/desi_external/catalog_features v2/benchmark/desi_fusion/catalog_features
+          git diff --cached --quiet && exit 0
+          git commit -m "Re-collect Pan-STARRS1 benchmark features with multi-epoch Std/Npt"
+          bash .github/scripts/push_with_retry.sh "${{ github.ref_name }}"
