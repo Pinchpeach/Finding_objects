@@ -142,6 +142,10 @@ RAW_FIELDS = {
     "SpeakTot",
     "Total_flux",
     "Ftot",
+    # Pan-STARRS1 multi-epoch statistics (PS1-VAR-001)
+    *(f"{b}MeanPSFMag{k}" for b in "gri" for k in ("Std", "Npt", "Err")),
+    "iMeanPSFMag",
+    "iMeanKronMag",
     # X-ray fluxes (XRAY-001)
     "Fluxb",
     "Flux8",
@@ -256,6 +260,7 @@ ASSOC_PREFIX = {
     "PS1-QSO-HIZ-001": "pan_starrs1_dr2_meanobject",
     "WISE-AGN-001": "allwise",
     "WISE-AGN-R90-001": "allwise",
+    "PS1-VAR-001": "pan_starrs1_dr2_meanobject",
     "SDSS-PHOTO-001": "sdss_dr18_photoobj",
     "SDSS-PHOTO-002": "sdss_dr18_photoobj",
     "NED-TYPE-001": "ned",
@@ -521,6 +526,33 @@ def evaluate(rule, row, namespaced=frozenset()):
             if v is not None:
                 feature(name, max(-3.0, min(6.0, v)), "dereddened AB colour")
                 feature(f"{name}_present", 1.0, "colour available")
+    elif rid == "PS1-VAR-001":
+        # Multi-epoch variability of point sources (2.36.0).  Quasars vary
+        # stochastically by ~0.1-0.3 mag over years (MacLeod et al. 2010,
+        # ApJ 721, 1014); PS1 3pi has ~12 epochs per band over ~4 yr and
+        # separates quasars by variability (Hernitschek et al. 2016, ApJ 817,
+        # 73).  Index per band: R = Std / (MeanErr * sqrt(Npt)), the epoch
+        # scatter over the scatter the photometric errors predict (MeanErr is
+        # the error of the mean, so R ~ 1 without variability; median 1.08-1.14
+        # measured on 373 benchmark objects).  Median of g, r, i over bands
+        # with >= 5 epochs.  Point sources only: resolved galaxies scatter in
+        # PSF magnitude with the seeing (benchmark galaxies reached R ~ 2-6).
+        typ = str(row.get("desi_legacy_surveys_dr10__type", "")).strip().upper()
+        psf_kron = None
+        if num(src, "iMeanPSFMag") is not None and num(src, "iMeanKronMag") is not None:
+            psf_kron = num(src, "iMeanPSFMag") - num(src, "iMeanKronMag")
+        point = typ == "PSF" if typ in {"PSF", "REX", "EXP", "DEV", "SER", "COMP"} else (psf_kron is not None and psf_kron <= 0.05)
+        if point:
+            ratios = []
+            for b in "gri":
+                sd, n, e = num(src, f"{b}MeanPSFMagStd"), num(src, f"{b}MeanPSFMagNpt"), num(src, f"{b}MeanPSFMagErr")
+                if sd is not None and n is not None and e is not None and n >= 5 and e > 0 and sd >= 0:
+                    ratios.append(sd / (e * math.sqrt(n)))
+            if ratios:
+                ratios.sort()
+                rmed = ratios[len(ratios) // 2] if len(ratios) % 2 else 0.5 * (ratios[len(ratios) // 2 - 1] + ratios[len(ratios) // 2])
+                feature("ps1_var_log_r", max(-2.0, min(3.0, math.log(max(rmed, 1e-3)))), "log epoch scatter / predicted")
+                feature("ps1_var_present", 1.0, "PS1 multi-epoch statistics (point source)")
     elif rid == "RADIO-001":
         # Radio loudness R = 0.4 (r - t), t = -2.5 log10(S_1.4GHz / 3631 Jy)
         # (Ivezic et al. 2002, AJ 124, 2364; radio-loud R > 1).  Radio-loud
