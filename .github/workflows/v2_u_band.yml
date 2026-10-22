@@ -1,6 +1,6 @@
 name: v2 u-band photometry at benchmark positions
 
-# 2.36.0 experiment: SDSS DR16, Stripe 82 co-add, KiDS DR4 and SkyMapper DR4
+# 2.36.0 experiment (run 2): SDSS DR16, Stripe 82 co-add, KiDS DR4 and SkyMapper DR4
 # u-band photometry for the benchmark truth sets (CDS XMatch, one request per
 # set and survey), committed to v2/benchmark/u_band/ for local measurement.
 on:
@@ -15,13 +15,15 @@ permissions:
 jobs:
   collect:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 100
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.11"}
       - run: pip install pandas numpy scipy requests astropy astroquery
       - run: python -u .github/scripts/collect_u_band.py v2/benchmark/u_band
+        timeout-minutes: 80
+        continue-on-error: true  # commit whatever arrived
       - name: Commit
         run: |
           git config user.name "github-actions[bot]"

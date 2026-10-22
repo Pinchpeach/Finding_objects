@@ -37,49 +37,77 @@ SURVEYS = {
     "kids_dr4": ["II/347/kids_dr4", "II/347"],
     "skymapper_dr4": ["II/379/smssdr4", "II/379", "II/358/smss"],
 }
-SEARCH = ["Stripe 82 coadd", "Stripe 82 co-add", "KiDS DR4", "SkyMapper DR4", "CFIS u-band", "UNIONS"]
+
+
+PROBE_S, FULL_S = 90, 600  # hard limits per XMatch request (a dead identifier must not stall the run)
+
+
+def _bounded(fn, seconds):
+    import threading
+
+    box = {}
+
+    def run():
+        try:
+            box["v"] = fn()
+        except BaseException as exc:  # reported by the caller
+            box["e"] = exc
+
+    th = threading.Thread(target=run, daemon=True)
+    th.start()
+    th.join(seconds)
+    if "v" in box:
+        return box["v"]
+    raise box.get("e") or TimeoutError(f"no answer in {seconds} s")
 
 
 def main(out):
     import astropy.units as u
     from astropy.table import Table
-    from astroquery.vizier import Vizier
     from astroquery.xmatch import XMatch
 
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
-    log = {"search": {}, "xmatch": {}}
-    for w in SEARCH:
-        try:
-            log["search"][w] = {k: v.description for k, v in list(Vizier.find_catalogs(w).items())[:12]}
-        except Exception as exc:
-            log["search"][w] = f"failed: {exc!r}"[:200]
-    print(json.dumps(log["search"], indent=1))
-    XMatch.TIMEOUT = 600
-    for tname, tpath in TRUTH.items():
-        t = pd.read_csv(tpath, usecols=["benchmark_id", "ra", "dec"]).dropna()
-        up = Table.from_pandas(t)
-        for sname, ids in SURVEYS.items():
-            done = False
-            for cid in ids:
-                try:
-                    res = XMatch.query(
-                        cat1=up, cat2=f"vizier:{cid}", max_distance=1.5 * u.arcsec, colRA1="ra", colDec1="dec"
-                    )
-                except Exception as exc:
-                    log["xmatch"][f"{tname}/{sname}/{cid}"] = f"failed: {type(exc).__name__}: {str(exc)[:160]}"
-                    print(f"[u] {tname} {sname} {cid}: {log['xmatch'][f'{tname}/{sname}/{cid}']}", flush=True)
-                    continue
-                df = res.to_pandas()
-                df.insert(0, "u_catalog", cid)
-                df.to_csv(out / f"{tname}__{sname}.csv.gz", index=False)
-                log["xmatch"][f"{tname}/{sname}/{cid}"] = {"rows": len(df), "unique_ids": int(df.benchmark_id.nunique()), "columns": list(df.columns)}
-                print(f"[u] {tname} {sname} {cid}: {len(df)} rows, {df.benchmark_id.nunique()} objects", flush=True)
-                done = True
+    log = {"probe": {}, "xmatch": {}}
+    truth = {k: pd.read_csv(v, usecols=["benchmark_id", "ra", "dec"]).dropna() for k, v in TRUTH.items()}
+    sample = Table.from_pandas(truth["desi_external"].head(5))
+
+    def xm(table, cid, seconds):
+        return _bounded(
+            lambda: XMatch.query(cat1=table, cat2=f"vizier:{cid}", max_distance=1.5 * u.arcsec, colRA1="ra", colDec1="dec"),
+            seconds,
+        )
+
+    # 1. Which identifier answers (5 positions, 90 s each).
+    chosen = {}
+    for sname, ids in SURVEYS.items():
+        for cid in ids:
+            try:
+                r = xm(sample, cid, PROBE_S)
+                log["probe"][cid] = {"ok": True, "rows": len(r), "columns": list(r.colnames)}
+                chosen[sname] = cid
+                print(f"[u] probe {sname} {cid}: ok, {len(r)} rows, columns {list(r.colnames)[:25]}", flush=True)
                 break
-            if not done:
-                print(f"[u] {tname} {sname}: no identifier answered", flush=True)
+            except Exception as exc:
+                log["probe"][cid] = f"{type(exc).__name__}: {str(exc)[:160]}"
+                print(f"[u] probe {sname} {cid}: {log['probe'][cid]}", flush=True)
     (out / "collect_log.json").write_text(json.dumps(log, indent=1, default=str))
+    # 2. Full uploads with the identifiers that answered; each file is written as soon as it arrives.
+    for tname, t in truth.items():
+        up = Table.from_pandas(t)
+        for sname, cid in chosen.items():
+            key = f"{tname}/{sname}/{cid}"
+            try:
+                df = xm(up, cid, FULL_S).to_pandas()
+            except Exception as exc:
+                log["xmatch"][key] = f"failed: {type(exc).__name__}: {str(exc)[:160]}"
+                print(f"[u] {key}: {log['xmatch'][key]}", flush=True)
+                continue
+            df.insert(0, "u_catalog", cid)
+            df.to_csv(out / f"{tname}__{sname}.csv.gz", index=False)
+            log["xmatch"][key] = {"rows": len(df), "unique_ids": int(df.benchmark_id.nunique())}
+            print(f"[u] {key}: {len(df)} rows, {df.benchmark_id.nunique()} objects", flush=True)
+            (out / "collect_log.json").write_text(json.dumps(log, indent=1, default=str))
 
 
 if __name__ == "__main__":
