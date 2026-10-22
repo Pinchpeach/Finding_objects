@@ -5,9 +5,9 @@ name: v2 u-band photometry at benchmark positions
 # set and survey), committed to v2/benchmark/u_band/ for local measurement.
 on:
   workflow_dispatch:
-  push:  # experiment branch only; removed before merging (dispatch needs the file on main)
-    paths:
-      - .github/workflows/v2_u_band.yml
+
+
+
 
 permissions:
   contents: write
