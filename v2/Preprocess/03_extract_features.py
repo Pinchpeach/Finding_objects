@@ -261,6 +261,29 @@ def run(objects: Path, rules_path: Path, out: Path) -> Path:
         conf["catalog_confidence_sdss_spectroscopy"] = pd.Series(
             np.where(zw.eq(0), 1.0, np.where(zw.notna(), 0.5, np.nan)), index=df.index
         ).where(hascat("SDSS DR18 spectroscopy"))
+    # DESI DR1 Redrock (V/161; DESI Collaboration 2025, arXiv:2503.14745):
+    # ZWARN = 0 and DELTACHI2 >= 25 (the best template ~5 sigma better than
+    # the next; the DR1 reliable-redshift cut) -> 1.0, any other spectrum 0.5.
+    # Backup-programme GALAXY fits are mostly misfit faint stars (~65 %,
+    # DESI MWS backup paper, arXiv:2505.17230), so they keep 0.5 only.
+    if field("desi_dr1_spectroscopy", "OType"):
+        zw, dc = ncol("ZWARN", "desi_dr1_spectroscopy"), ncol("delChi2", "desi_dr1_spectroscopy")
+        good = zw.eq(0) & dc.ge(25)
+        backup_gal = tcol("Prog", "desi_dr1_spectroscopy").astype(str).str.strip().str.lower().eq("backup") & tcol(
+            "OType", "desi_dr1_spectroscopy"
+        ).astype(str).str.strip().str.upper().eq("GALAXY")
+        conf["catalog_confidence_desi_spectroscopy"] = pd.Series(
+            np.where(good & ~backup_gal, 1.0, 0.5), index=df.index
+        ).where(hascat("DESI DR1 spectroscopy"))
+    # LAMOST DR5 1D pipeline class (Luo et al. 2015, RAA 15, 1095): spectra
+    # with S/N > 10 in g or i are the survey's good-quality set.  Against the
+    # other spectroscopic surveys of the 18 independent fields (2.36.0) the
+    # class agreed for 44/45 at S/N >= 10 and 16/18 below; "Unknown" is no class.
+    if field("lamost_dr_catalog", "Class"):
+        snr = pd.concat([ncol("snrg", "lamost_dr_catalog"), ncol("snri", "lamost_dr_catalog")], axis=1).max(axis=1)
+        conf["catalog_confidence_lamost_spectroscopy"] = pd.Series(
+            np.where(snr.ge(10), 1.0, 0.5), index=df.index
+        ).where(hascat("LAMOST DR catalog"))
     # SDSS imaging: official guidance recommends clean=1 for clean star/galaxy samples.
     if field("sdss_dr18_photoobj", "clean"):
         cl = ncol("clean", "sdss_dr18_photoobj")

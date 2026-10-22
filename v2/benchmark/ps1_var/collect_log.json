@@ -1,0 +1,16 @@
+{
+ "ps1_fail": 1,
+ "hern_probe": {
+  "J/ApJ/817/73/table3": {
+   "tables": [],
+   "columns": []
+  },
+  "J/ApJ/817/73": {
+   "tables": [],
+   "columns": []
+  }
+ },
+ "hern_fail": 0,
+ "ps1_rows": 498,
+ "hern_rows": 0
+}

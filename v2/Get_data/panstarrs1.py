@@ -62,9 +62,15 @@ COLUMNS = [
 # epochMean (MJD of the mean position) lets Gaia proper motions be propagated
 # to the PS1 epoch (2.16.0); objInfoFlag carries the PS1 known-Solar-System
 # matches (HAS_SOLSYS_DET 512, MOST_SOLSYS_DET 1024; Flewelling et al. 2020)
-# and qualityFlag the measurement quality (2.29.0).  Optional, dropped if the
-# service rejects them.
-OPTIONAL_COLUMNS = ["epochMean", "objInfoFlag", "qualityFlag"]
+# and qualityFlag the measurement quality (2.29.0).  The per-band standard
+# deviation and number of the single-epoch PSF magnitudes measure multi-epoch
+# variability (~12 epochs per band over ~4 yr in 3pi; Chambers et al. 2016;
+# quasar variability: MacLeod et al. 2010; PS1 3pi quasar selection:
+# Hernitschek et al. 2016) (2.36.0).  Optional, dropped if the service
+# rejects them.
+OPTIONAL_COLUMNS = ["epochMean", "objInfoFlag", "qualityFlag"] + [
+    f"{b}MeanPSFMag{k}" for b in "grizy" for k in ("Std", "Npt")
+]
 
 
 def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:

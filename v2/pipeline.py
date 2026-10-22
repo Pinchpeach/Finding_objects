@@ -43,6 +43,16 @@ def _load(path: Path, name: str):
 KEEP_RAW_FOLDERS = 10
 
 
+def _coverage(work: Path, raw_dir: Path) -> dict:
+    """Write catalog_coverage.json and print the missing-archive warning."""
+    mod = _load(V2 / "catalog_coverage.py", "v2_catalog_coverage")
+    cov = mod.write(work, raw_dir)
+    msg = mod.message(cov)
+    if msg:
+        print(f"[pipeline] WARNING {msg}", flush=True)
+    return cov
+
+
 def _prune_raw(base: Path, keep: Path, n: int = KEEP_RAW_FOLDERS) -> None:
     import shutil
 
@@ -120,6 +130,7 @@ def run(
         out = pd.DataFrame(columns=EMPTY_RESULT_COLUMNS)
         out.to_csv(work / "classified_objects.csv", index=False)
         pd.DataFrame(timings).to_csv(work / "pipeline_summary.csv", index=False)
+        _coverage(work, raw_dir)
         print("[pipeline] 0 objects: no detections in the search area", flush=True)
         return out
     step("2_integrate", s2.run, work / "source_association.csv", Path(raw_dir), work / "integrated_objects.csv")
@@ -161,12 +172,18 @@ def run(
     out = _load(V2 / "radio_sources.py", "v2_radio_sources").apply(out)
     # Galaxy cluster membership from cluster catalogues (2.32.0, clusters.py).
     out = _load(V2 / "clusters.py", "v2_clusters").apply(out, raw_dir)
+    # Archives this search could not reach, and the high-confidence objects
+    # (spectroscopically confirmed or above the real-sky purity threshold)
+    # (2.36.0, catalog_coverage.py / high_confidence.py).
+    coverage = _coverage(work, raw_dir)
+    out = _load(V2 / "high_confidence.py", "v2_high_confidence").apply(out, coverage)
     out.to_csv(work / "classified_objects.csv", index=False)
 
     summary = pd.DataFrame(timings)
     summary.to_csv(work / "pipeline_summary.csv", index=False)
     print(
         f"[pipeline] {len(out)} objects; primary classes {out.primary_class.value_counts().to_dict()}; "
+        f"high confidence {int(out.high_confidence.sum())}; "
         f"total {summary.seconds.sum():.1f} s -> {work / 'classified_objects.csv'}",
         flush=True,
     )

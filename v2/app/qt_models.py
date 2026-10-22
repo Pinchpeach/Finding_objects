@@ -180,6 +180,8 @@ class ResultsFilter(QSortFilterProxyModel):
         self._status = "ALL"
         self._text = ""
         self._components = False
+        self._high_only = False
+        self._a_high = None
         self._a_cls = self._a_status = self._a_text = self._a_part = None
         self._n_cached = -1
 
@@ -212,6 +214,10 @@ class ResultsFilter(QSortFilterProxyModel):
         """Show the parts of large galaxies (hidden by default: they are listed under their host)."""
         self._set("_components", bool(on))
 
+    def set_high_only(self, on: bool):
+        """Only high-confidence objects (2.36.0)."""
+        self._set("_high_only", bool(on))
+
     def setSourceModel(self, model):
         # Connected before the proxy's own reset handler, so the column arrays
         # match the new frame when the proxy refilters it.
@@ -228,6 +234,7 @@ class ResultsFilter(QSortFilterProxyModel):
         col = lambda c: df[c].fillna("").astype(str).to_numpy(dtype=object) if c in df else None
         self._a_cls, self._a_status = col("primary_class"), col("classification_status")
         self._a_part = df["parent_object_id"].notna().to_numpy() if "parent_object_id" in df else None
+        self._a_high = df["high_confidence"].fillna(False).astype(bool).to_numpy() if "high_confidence" in df else None
         parts = [
             a
             for a in (
@@ -246,6 +253,8 @@ class ResultsFilter(QSortFilterProxyModel):
         if self._n_cached != self.sourceModel().rowCount():  # never index arrays of an older frame
             self._cache()
         if not self._components and self._a_part is not None and self._a_part[row]:
+            return False
+        if self._high_only and (self._a_high is None or not self._a_high[row]):
             return False
         if self._cls != "ALL" and self._a_cls is not None and self._a_cls[row] != self._cls:
             return False

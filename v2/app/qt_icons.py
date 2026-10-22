@@ -205,11 +205,29 @@ def draw(p: QPainter, k: dict, c: QPointF, size: float = 9.0, selected: bool = F
     p.restore()
 
 
+HIGHLIGHT = QColor("#e0a800")  # gold: high-confidence objects (2.36.0)
+
+
+def draw_highlight(p: QPainter, c: QPointF, size: float = 9.0) -> None:
+    """Gold ring around a high-confidence object's glyph (drawn first, under it)."""
+    p.save()
+    p.setRenderHint(QPainter.Antialiasing)
+    p.setPen(QPen(HIGHLIGHT, max(1.6, size * 0.25)))
+    p.setBrush(Qt.NoBrush)
+    p.drawEllipse(c, size * 1.55, size * 1.55)
+    p.restore()
+
+
 def icon(k: dict, px: int = 18) -> QIcon:
     pm = QPixmap(px, px)
     pm.fill(Qt.transparent)
     p = QPainter(pm)
-    draw(p, k, QPointF(px / 2, px / 2), px * 0.36)
+    c = QPointF(px / 2, px / 2)
+    if k.get("high"):
+        draw_highlight(p, c, px * 0.28)
+        draw(p, k, c, px * 0.22)
+    else:
+        draw(p, k, c, px * 0.36)
     p.end()
     return QIcon(pm)
 

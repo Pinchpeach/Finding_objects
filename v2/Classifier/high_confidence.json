@@ -1,0 +1,71 @@
+{
+ "description": "Confidence threshold per magnitude bin and class above which the estimated real-sky purity is >= 0.98 (bootstrap 84 % one-sided); null = no photometric high-confidence objects. Built by v2/benchmark/natural_purity.py (2.36.0).",
+ "target_purity": 0.98,
+ "magnitude_columns": [
+  "std_mag__ls_r",
+  "std_mag__ps1_r",
+  "std_mag__sdss_r",
+  "gaia_dr3__phot_g_mean_mag"
+ ],
+ "edges": [
+  null,
+  18.0,
+  20.0,
+  21.0,
+  22.0,
+  null
+ ],
+ "labels": [
+  "r<=18",
+  "18-20",
+  "20-21",
+  "21-22",
+  "r>22"
+ ],
+ "thresholds": {
+  "r<=18": {
+   "STAR": 0.5,
+   "GALAXY": 0.5,
+   "QSO": null
+  },
+  "18-20": {
+   "STAR": 0.5,
+   "GALAXY": 0.5,
+   "QSO": null
+  },
+  "20-21": {
+   "STAR": 0.7,
+   "GALAXY": null,
+   "QSO": null
+  },
+  "21-22": {
+   "STAR": null,
+   "GALAXY": 0.5,
+   "QSO": null
+  },
+  "r>22": {
+   "STAR": null,
+   "GALAXY": 0.5,
+   "QSO": null
+  }
+ },
+ "purity_lower_bound": {
+  "r<=18": {
+   "STAR": 0.9997,
+   "GALAXY": 0.9921
+  },
+  "18-20": {
+   "STAR": 0.9988,
+   "GALAXY": 0.9849
+  },
+  "20-21": {
+   "STAR": 0.9805
+  },
+  "21-22": {
+   "GALAXY": 0.996
+  },
+  "r>22": {
+   "GALAXY": 0.9831
+  }
+ }
+}

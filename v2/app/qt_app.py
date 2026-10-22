@@ -167,6 +167,15 @@ def _designations():
     return _load_v2("v2_designations", "designations.py")
 
 
+def coverage_text(results_dir: Path) -> str:
+    """Missing-archive warning of a results folder ("" if none or unknown)."""
+    try:
+        cov = _load_v2("v2_catalog_coverage", "catalog_coverage.py")
+        return cov.message(cov.read(results_dir))
+    except Exception:  # a broken/old results folder must still open
+        return ""
+
+
 class _NameResolver(QRunnable):
     """Resolve an object name to ICRS coordinates (CDS Sesame) off the GUI thread."""
 
@@ -232,6 +241,15 @@ class MainWindow(QMainWindow):
         table_box = QWidget()
         tl = QVBoxLayout(table_box)
         tl.setContentsMargins(0, 0, 0, 0)
+        # Archives the search could not reach (2.36.0): stays visible with
+        # the results, not only as a transient status-bar note.
+        self.lbl_coverage = QLabel("")
+        self.lbl_coverage.setWordWrap(True)
+        self.lbl_coverage.setStyleSheet(
+            "QLabel { background: #fff3cd; color: #664d03; border: 1px solid #e0c36c; padding: 4px; }"
+        )
+        self.lbl_coverage.setVisible(False)
+        tl.addWidget(self.lbl_coverage)
         bar = QHBoxLayout()
         self.cmb_class = QComboBox()
         self.cmb_class.addItems(["ALL", "STAR", "GALAXY", "QSO", "UNKNOWN"])
@@ -257,7 +275,21 @@ class MainWindow(QMainWindow):
             "Catalogue entries that are pieces of a large galaxy (HII regions, nucleus, shreds)\n"
             "are grouped under the galaxy and hidden unless this is on."
         )
-        for w in (QLabel("Class"), self.cmb_class, QLabel("Status"), self.cmb_status, self.txt_search, self.chk_parts):
+        self.chk_high = QCheckBox("High confidence only")
+        self.chk_high.setToolTip(
+            "Objects whose class is confirmed by a spectrum (SDSS / DESI / LAMOST), or whose confidence\n"
+            "is above the threshold where the estimated real-sky purity is >= 98 %\n"
+            "(per class and magnitude; v2/Classifier/high_confidence.json).  Ringed in gold on the sky map."
+        )
+        for w in (
+            QLabel("Class"),
+            self.cmb_class,
+            QLabel("Status"),
+            self.cmb_status,
+            self.txt_search,
+            self.chk_parts,
+            self.chk_high,
+        ):
             bar.addWidget(w)
         bar.addStretch(1)
         bar.addWidget(self.lbl_counts)
@@ -301,6 +333,7 @@ class MainWindow(QMainWindow):
         self._filter_timer.timeout.connect(self._filters_changed)
         self.txt_search.textChanged.connect(self._filter_timer.start)
         self.chk_parts.toggled.connect(self._filters_changed)
+        self.chk_high.toggled.connect(self._filters_changed)
         self.table.selectionModel().currentRowChanged.connect(self._row_changed)
         self.sky.objectClicked.connect(self._select_source_row)
         self.sky.centerPicked.connect(self._center_from_map)
@@ -655,6 +688,9 @@ class MainWindow(QMainWindow):
             )
         self.model.set_frame(df)
         self.results_path = path
+        warn = coverage_text(path.parent)
+        self.lbl_coverage.setText("⚠ " + warn if warn else "")
+        self.lbl_coverage.setVisible(bool(warn))
         self.sky.set_frame(self.model.frame(), self.model.kinds())
         cols = [self.model.column_name(i) for i in range(self.model.columnCount())]
         if "separation_arcmin" in cols:  # nearest to the search centre first
@@ -674,15 +710,18 @@ class MainWindow(QMainWindow):
         self.proxy.set_status(self.cmb_status.currentText())
         self.proxy.set_text(self.txt_search.text())
         self.proxy.set_show_components(self.chk_parts.isChecked())
+        self.proxy.set_high_only(self.chk_high.isChecked())
         self.sky.set_visible_rows(self._visible_source_rows())
         df = self.model.frame()
         if not df.empty and "primary_class" in df:
             top = df[df.parent_object_id.isna()] if "parent_object_id" in df else df
             counts = top.primary_class.value_counts()
             parts = len(df) - len(top)
+            n_high = int(top.high_confidence.fillna(False).astype(bool).sum()) if "high_confidence" in top else 0
             self.lbl_counts.setText(
                 f"{self.proxy.rowCount()} shown / {len(top)} objects"
                 + (f" (+{parts} galaxy parts)" if parts else "")
+                + (f" · {n_high} high confidence" if n_high else "")
                 + " · "
                 + " · ".join(f"{k} {v}" for k, v in counts.items())
             )
