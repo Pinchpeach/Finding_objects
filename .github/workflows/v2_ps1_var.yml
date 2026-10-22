@@ -1,0 +1,34 @@
+name: v2 PS1 variability at benchmark error targets
+
+# 2026-10-22 experiment: Pan-STARRS1 DR2 multi-epoch statistics and the
+# Hernitschek et al. (2016) PS1 3pi variability classification at the target
+# list of v2/benchmark/u_band/targets.csv (QSO-related test errors + a sample
+# of correct objects), committed to v2/benchmark/ps1_var/.
+on:
+  workflow_dispatch:
+  push:  # experiment branch only; removed before merging
+    paths:
+      - .github/workflows/v2_ps1_var.yml
+
+permissions:
+  contents: write
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas numpy scipy requests astropy astroquery
+      - run: python -u .github/scripts/collect_ps1_var.py v2/benchmark/u_band/targets.csv v2/benchmark/ps1_var
+        timeout-minutes: 100
+        continue-on-error: true
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add v2/benchmark/ps1_var
+          git commit -m "PS1 variability at benchmark error targets" || exit 0
+          bash .github/scripts/push_with_retry.sh "${{ github.ref_name }}"
