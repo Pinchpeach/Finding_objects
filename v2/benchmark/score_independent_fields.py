@@ -170,6 +170,8 @@ def field_matches(fdir, which, bench):
     # Truth inside the field only.
     sep0 = np.hypot((t.ra - info["ra"]) * np.cos(np.radians(info["dec"])), t.dec - info["dec"]) * 60
     t = t[sep0 <= info["radius_arcmin"]].reset_index(drop=True)
+    if t.empty:  # no truth object inside the field (e.g. a LAMOST plate gap)
+        return pd.DataFrame(), dict(info=info, n_truth=0, conflicts=conflicts, unmatched=0, in_bench=0)
     bi, bs = _nearest(t.ra.to_numpy(), t.dec.to_numpy(), bench.ra.to_numpy(), bench.dec.to_numpy())
     t["in_benchmark"] = bs < 1.5
     has_parent = "parent_object_id" in o.columns
@@ -285,6 +287,9 @@ def main():
             print(f"{fdir.name}: no blind run yet")
             continue
         m, st = field_matches(fdir, a.which, bench)
+        if m.empty:
+            print(f"\n=== {fdir.name}: no truth object inside the field; not scored")
+            continue
         m.insert(0, "field", fdir.name)
         allm.append(m)
         info = st["info"]
