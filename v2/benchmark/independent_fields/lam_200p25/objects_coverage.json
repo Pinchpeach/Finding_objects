@@ -3,12 +3,12 @@
  "attempted": 28,
  "failed": [
   {
-   "collector": "simbad",
-   "catalog": "SIMBAD",
+   "collector": "ned",
+   "catalog": "NED",
    "status": "error",
    "impact": "literature labels",
    "key": false,
-   "error": "DALServiceError: Unable to access the capabilities endpoint at:\n- https://simbad.cds.unistra.fr/simbad/sim-tap/capabilities: Connection failed (Possible causes: incorrect URL, DNS issue, or service is"
+   "error": "RemoteServiceError(\"The remote service returned the following error message.\\nERROR: We can't start the database search program /ned/ops/util/bin/nedexec. start_exec() returned status=-4\")"
   }
  ],
  "key_failed": false

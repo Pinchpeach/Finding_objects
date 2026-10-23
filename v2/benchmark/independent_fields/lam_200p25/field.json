@@ -1,43 +1,43 @@
 {
- "ra": 200.0,
- "dec": 25.0,
+ "ra": 200.35056,
+ "dec": 25.32167,
  "radius_arcmin": 12.0,
- "n_objects": 14866,
+ "n_objects": 14526,
  "seconds": {
-  "collect": 183.8,
-  "1_associate": 6.7,
-  "2_integrate": 8.5,
-  "3_features": 11.2,
-  "4_evidence": 11.8,
-  "5_coarse": 15.5,
-  "6_prepare": 12.4,
-  "7_classify": 14.9
+  "collect": 78.9,
+  "1_associate": 3.8,
+  "2_integrate": 5.9,
+  "3_features": 8.4,
+  "4_evidence": 7.7,
+  "5_coarse": 12.0,
+  "6_prepare": 9.7,
+  "7_classify": 10.9
  },
  "catalog_rows": {
-  "DESI Legacy Surveys DR10": 12200,
-  "Pan-STARRS1 DR2 MeanObject": 4184,
-  "SDSS DR18 PhotoObj": 3617,
-  "NED": 3515,
-  "AllWISE": 1903,
-  "Gaia DR3": 377,
-  "GALEX AIS": 317,
-  "2MASS PSC": 139,
-  "LoTSS DR2": 56,
-  "SDSS DR18 spectroscopy": 40,
-  "DESI DR1 spectroscopy": 21,
-  "VLASS": 8,
-  "FIRST": 8,
-  "SGA-2020": 4,
-  "NVSS": 4
+  "DESI Legacy Surveys DR10": 11586,
+  "Pan-STARRS1 DR2 MeanObject": 4856,
+  "SDSS DR18 PhotoObj": 3495,
+  "AllWISE": 1938,
+  "GALEX AIS": 502,
+  "Gaia DR3": 384,
+  "2MASS PSC": 144,
+  "LoTSS DR2": 70,
+  "SIMBAD": 61,
+  "SDSS DR18 spectroscopy": 54,
+  "DESI DR1 spectroscopy": 38,
+  "LAMOST DR catalog": 35,
+  "VLASS": 28,
+  "FIRST": 13,
+  "SGA-2020": 7,
+  "NVSS": 4,
+  "TGSS ADR1": 2,
+  "DESI DR1 FastSpecFit": 1
  },
  "seeing": {
-  "error": "RuntimeError: Legacy Surveys TAP failed after 3 attempts: DALFormatError: ReadTimeout: HTTPSConnectionPool(host='datalab.noirlab.edu',",
-  "ps1": {
-   "source": "PS1 stack psfMajor/MinorFWHM",
-   "n": 5379,
-   "g": 1.32,
-   "r": 1.28,
-   "i": 0.9
-  }
+  "g": 1.5,
+  "r": 1.3,
+  "z": 1.31,
+  "n_psf": 4088,
+  "source": "LS DR10 psfsize"
  }
 }
