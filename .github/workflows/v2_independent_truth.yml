@@ -63,6 +63,21 @@ jobs:
           - {name: lam_015p38, ra: 15.0, dec: 38.0}     # LAMOST M31-M33 survey area, b~-25
           - {name: lam_180p50, ra: 180.0, dec: 50.0}    # LAMOST north, b~+66
           - {name: kep_291p44, ra: 291.0, dec: 44.5}    # LAMOST-Kepler field, b~+13 (crowded)
+          # 2.36.2 extension to 32 regions (all > 5 deg from each other)
+          - {name: ngp_150m01, ra: 150.0, dec: -1.0}    # 2dFGRS NGP strip west end / COSMOS side, b~+42
+          - {name: ngp_175m03, ra: 175.0, dec: -3.0}    # 2QZ/2dFGRS NGP strip, b~+55
+          - {name: ngp_195p01, ra: 195.0, dec: 1.0}     # 2QZ/2dFGRS NGP strip, b~+64
+          - {name: sgp_350m30, ra: 350.0, dec: -30.0}   # 2QZ/2dFGRS SGP strip, b~-73
+          - {name: sgp_030m33, ra: 30.0, dec: -33.0}    # 2dFGRS SGP strip, b~-77
+          - {name: sgp_050m27, ra: 50.0, dec: -27.0}    # 2dFGRS SGP strip east end, b~-56
+          - {name: lam_060p20, ra: 60.0, dec: 20.0}     # LAMOST, Taurus side of the anticentre, b~-24
+          - {name: lam_130p30, ra: 130.0, dec: 30.0}    # LAMOST, b~+36
+          - {name: lam_160p40, ra: 160.0, dec: 40.0}    # LAMOST north, b~+60
+          - {name: lam_200p25, ra: 200.0, dec: 25.0}    # LAMOST near the NGP, b~+83
+          - {name: lam_240p30, ra: 240.0, dec: 30.0}    # LAMOST, b~+49
+          - {name: lam_330p25, ra: 330.0, dec: 25.0}    # LAMOST south-galactic side, b~-24
+          - {name: lam_100p45, ra: 100.0, dec: 45.0}    # LAMOST outer disc, b~+17
+          - {name: lam_250p10, ra: 250.0, dec: 10.0}    # LAMOST towards the inner Galaxy, b~+34
     env:
       NAME: ${{ matrix.region.name }}
       RA0: ${{ matrix.region.ra }}
