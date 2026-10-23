@@ -1,97 +1,216 @@
-# Finding Objects
+# Finding Objects — 프로그램 개요
 
-Finds every astronomical object in a patch of sky and classifies it, using catalogues from radio to X-rays.
+버전 2.36.2 · 전 파장대 관측 자료로 하늘 영역의 천체를 찾고 분류하는 프로그램
 
-- **Primary class:** `STAR`, `GALAXY`, `QSO`, or `UNKNOWN`
-- **Detailed class:** spectral type, white dwarf, hot subdwarf, ultracool dwarf, red giant / AGB, variable stars (Mira, Cepheid, RR Lyrae, young stellar object, …), pulsar, AGN, blazar, planetary nebula, and more
-- **Abstains when unsure:** an object without enough evidence stays `UNKNOWN`, with the reason recorded
-- **Literature-based:** every threshold and rule cites its source (`v2/**/LITERATURE*.md`)
+같은 내용의 PDF: [`v2/document/OVERVIEW_v2.36.1.pdf`](v2/document/OVERVIEW_v2.36.1.pdf) · 알고리즘 상세: [`v2/ALGORITHM.md`](v2/ALGORITHM.md) · 버전별 변경: [`v2/CHANGELOG.md`](v2/CHANGELOG.md)
 
-## How it works
+## 1. 한눈에 보기
+
+| 항목 | 내용 |
+|---|---|
+| 목적 | 하늘의 한 영역(중심 좌표 + 반경)에 있는 모든 천체를 찾고, 전파부터 X선까지의 공개 목록을 종합해 종류를 판정한다. |
+| 입력 | 천체 이름 또는 좌표(RA, Dec)와 반경. 또는 이미 모아 둔 목록 파일 폴더. |
+| 1차 분류 | `STAR` · `GALAXY` · `QSO` · `UNKNOWN`. 증거가 부족하면 이유와 함께 `UNKNOWN`으로 기권한다. |
+| 세부 분류 | 분광형, 백색왜성, 뜨거운 준왜성, 초저온 왜성, 적색거성·AGB(탄소/산소), 변광성(미라·세페이드·RR Lyrae·YSO), 펄서, AGN, 블레이자, 행성상성운, 은하 활동성 등. 여기에 5개 독립 축이 더해진다. |
+| 출력 | `classified_objects.csv`: 천체당 한 행에 종류, 확신도, 세부 분류, 고신뢰 여부·근거, 근거 증거를 담는다. 단계별 CSV와 아카이브 상태 파일(`catalog_coverage.json`)도 함께 나온다. |
+| 사용 방법 | 데스크톱 앱(Windows·macOS·Linux, 파이썬 설치 불필요) 또는 명령줄 `v2/pipeline.py` |
+| 원칙 | 모든 임계값·규칙은 문헌 근거를 코드 주석과 `LITERATURE*.md`에 남긴다. 정확도와 속도를 함께 측정한다. |
+
+## 2. 처리 흐름
 
 ```
-(RA, Dec, radius)
+(RA, Dec, 반경)
   │
-  ├─ Collect     query 27 archives in parallel (Gaia, SDSS, Pan-STARRS, Legacy Surveys, WISE,
-  │              2MASS, GALEX, 5 radio, 3 X-ray, 4 spectroscopic, ZTF, ATNF, BZCAT, SIMBAD, NED)
-  ├─ Associate   group detections of the same object (position, epoch, errors, proper motion)
-  ├─ Integrate   one row per object, harmonised units (AB mag, mJy, z)
-  ├─ Evidence    25 rules each give evidence for STAR / GALAXY / QSO
-  ├─ Classify    fitted fusion (boosted trees + logistic) → STAR / GALAXY / QSO / UNKNOWN
-  └─ Refine      sub-class + five independent axes
-                 (physical state, variability, compact object, extragalactic, phenomenon)
+  ├─ 수집         28개 아카이브 병렬 조회 (요청마다 3–5초 간격, 수집기별 시간 제한, 로컬 캐시)
+  │               실패한 수집기는 기록된다
+  ├─ 1 연관       같은 천체의 검출을 묶음 — 위치·관측 시기·오차·고유운동을 고려한 우도비
+  ├─ 2 통합       천체당 한 행, 단위 통일 (AB 등급, mJy, 적색이동)
+  ├─ 3 특징       색·형태·품질 지표, 목록별 품질 신뢰도
+  ├─ 4 증거       37개 문헌 규칙이 STAR / GALAXY / QSO 증거를 냄
+  ├─ 5 1차 분류   학습된 융합 (경사 부스팅 나무 + 선형 모델), 결정적 운동 규칙, 은하 위도 사전확률, 기권
+  ├─ 6–7 세부 분류 세부 분류기 + 5개 독립 축 (물리 상태·변광·밀집천체·외부은하·현상)
+  └─ 후처리       큰 은하 조각, PS1 중복, 밝은 별 헤일로, 미확인 검출, 전파 성분, 은하단,
+                  아카이브 경고, 고신뢰 판정
   ↓
 classified_objects.csv
 ```
 
-- **Collect:** results are cached locally, so re-running the same or a smaller area needs no network.
-- **Associate:** counterparts are chosen by likelihood ratio, not just the nearest neighbour.
-- **Evidence:** a catalogue's own label is never taken as final; each measurement becomes weighted evidence that is combined with the rest.
-- **Refine:** runs only after the primary class is known (e.g. `STAR` → K5 dwarf, Mira, carbon-rich AGB; `GALAXY` → star-forming, AGN).
+## 3. 사용하는 관측 자료 (28개 수집기)
 
-The full description is in [`v2/ALGORITHM.md`](v2/ALGORITHM.md).
+| 파장·종류 | 목록 | 주로 주는 정보 |
+|---|---|---|
+| 위치측정 | Gaia DR3 (+ 변광 SOS, DSC·천체물리 변수) | 시차·고유운동(별의 결정적 증거), 분류 확률, 변광 |
+| 광학 영상 | Pan-STARRS1 DR2, DESI Legacy Surveys DR10, SDSS DR18 영상 | 색, 형태(점광원/퍼진 광원), 어두운 천체 분류(LS-GBM) |
+| 자외선·적외선 | GALEX, 2MASS, AllWISE | UV 색, 근적외 색, 중적외 AGN 색 |
+| 전파 | LoTSS, FIRST, NVSS, TGSS, VLASS | 전파 세기, 전파 성분 |
+| X선 | 4XMM, Chandra CSC, eROSITA eRASS1 | X선/광학 비(AGN), 은하단 가스 |
+| 분광 | SDSS, DESI DR1 (+FastSpecFit), LAMOST DR5 | 분광 종류(1차 분류 증거), 적색이동, 방출선, 항성 변수 |
+| 시간 영역 | ZTF 주기 변광성 | 변광성 세부형 |
+| 특수 목록 | ATNF 펄서, Roma-BZCAT, AGB(Suh 2021), Siena Galaxy Atlas, 은하단 목록 | 펄서·블레이자·AGB 표지, 큰 은하 크기, 은하단 |
+| 문헌 데이터베이스 | SIMBAD, NED | 문헌 표지(낮은 가중치의 증거) |
 
-## Accuracy
+핵심 아카이브(Gaia, PS1, Legacy Surveys, AllWISE)가 조회에 실패하면 결과 표 위에 경고가 뜬다. 이때 측광만으로 판정하는 고신뢰 경로는 쓰지 않는다.
 
-| Test | Result |
+## 4. 1차 분류 (STAR / GALAXY / QSO)
+
+### 증거 규칙 37개 ([`v2/Preprocess/classification_rules.csv`](v2/Preprocess/classification_rules.csv))
+
+| 규칙 묶음 | 개수 | 내용 |
+|---|---|---|
+| SPC (분광) | 9 | SDSS·DESI·LAMOST 분광 종류. 품질(경고 없음, Δχ², S/N)에 따라 신뢰도 1.0 또는 0.5 |
+| PS1 / LS / SDSS | 13 | 형태(PSF−Kron, Tractor 모형), 색 kNN, LS-GBM(어두운 천체 기계학습), 고적색이동 QSO 색 선택, PS1 변광(비활성) |
+| AST (Gaia) | 4 | 시차·고유운동이 유의하면 별, 0과 같으면 외부은하 |
+| DSC / VAR | 2 | Gaia 분류 확률, Gaia 변광 |
+| WISE | 2 | 중적외 AGN 색(Assef+2018 R90 등) |
+| RADIO / XRAY | 2 | 전파 세기, X선/광학 비 (선형 특징) |
+| SGA / NED / SIMBAD | 3 | 큰 은하 목록, 문헌 표지 |
+
+### 증거 결합
+
+- **혼합 융합:** 경사 부스팅 나무와 부호 제약 선형 모델을 학습해 기하평균한다. 학습 근거가 없는 증거(분광·문헌 표지)는 문헌 사전 가중치로 더한다.
+- **학습:** SDSS·DESI 정답 세트의 train 분할만 쓴다. test 분할은 보고용이다.
+- **결정적 운동:** Gaia 시차·고유운동이 10σ 이상이면 다른 증거와 충돌해도 STAR로 판정한다.
+- **은하 위도 사전확률:** |b| < 20°에서는 GALAXY·QSO 확률을 sin|b|/sin20°만큼 낮춘다. 학습 자료가 고위도뿐이기 때문이다.
+- **기권:** 확신도가 0.50 미만이거나 1·2위 차이가 작으면 `UNKNOWN`으로 두고 이유를 기록한다.
+
+## 5. 후처리와 결과 정리
+
+| 단계 | 하는 일 | 도입 |
+|---|---|---|
+| 큰 은하 묶기 | SGA D26 타원 안의 조각(HII 영역·핵·팔)을 모은하 아래로 묶음 | 2.2.0 |
+| PS1 중복·조각 | 한 은하를 PS1이 여러 번 잰 측정을 그 은하의 부속으로 묶음 | 2.34.0 |
+| 밝은 별 헤일로 | G < 16 별 주변의 단일 목록 가짜 천체를 별 아래로 묶음 | 2.35.0 |
+| 검출 품질 | PS1에만 2회 잡히고 더 깊은 LS에 없는 천체를 `UNCONFIRMED`로 표시 | 2.30.0 |
+| 전파 천체 | 목록 가짜 항목, 전파은하 lobe 같은 다중 성분을 `RADIO_COMPONENT`로 표시 | 2.31.0 |
+| 은하단 | BCG와 분광 적색이동으로 소속 판정 | 2.32.0 |
+| 태양계 천체 | PS1 표지와 SDSS 이동 속도로 소행성 판정 | 2.29.0 |
+| 아카이브 경고 | 실패한 수집기와 잃는 정보를 `catalog_coverage.json`과 앱 경고 띠로 알림 | 2.36.0 |
+| 고신뢰 판정 | 분광으로 확인됐거나 실제 하늘 순도 ≥ 98 %이면 `high_confidence`와 근거를 기록 | 2.36.0 |
+
+## 6. 세부 분류
+
+- **STAR:** 분광형·광도 계급(MK), 백색왜성(세부형 DA/DB 등), 뜨거운 준왜성, 초저온 왜성, 적색거성(RGB/AGB), AGB 화학형(탄소/산소), 미라·세페이드·RR Lyrae·YSO 변광, 쌍성 후보, 헤일로 별, 대변광성(CV) 등
+- **GALAXY:** 별 생성/정지/녹색 계곡, AGN 숙주(BPT·WISE·X선), 형태(원반·조기형), 은하단 소속
+- **QSO:** 측광 적색이동(z < 2.1 여부), 전파 강한 QSO, 블레이자
+- **5개 독립 축:** 물리 상태, 변광, 밀집천체(펄서·WD), 외부은하, 현상(행성상성운·초신성 잔해 등). 각 판정의 확신도는 독립 정답에서 잰 규칙 정밀도다.
+- **문헌 표지:** 분류되지 않은 천체도 SIMBAD/NED의 문헌 종류를 'from paper'로 보여 준다.
+
+## 7. 성능
+
+### 벤치마크 (시험 분할, 학습에 쓰지 않음)
+
+| 시험 | 결과 | 비고 |
+|---|---|---|
+| SDSS 분광 정답 (1,991개) | 98.69 % | 밝은 천체 위주 |
+| DESI DR1 분광 정답 (962개) | 92.41 % | r 18–23의 어두운 천체, 종류별 같은 수 |
+| 같은 천체에서 다른 분류기와 비교 | Gaia DSC·LS 단독 ML·형태·WISE 색 기준보다 모두 높음 | [`v2/benchmark/COMPARISON_2026-10-21.md`](v2/benchmark/COMPARISON_2026-10-21.md) |
+
+### 독립 검증: 18개 하늘 영역
+
+학습에 쓰지 않은 분광 탐사 7종을 정답으로 썼다. 영역 반경은 12′이다.
+
+| 항목 | blind (분광·문헌 목록 제외) |
 |---|---|
-| Primary class vs SDSS spectra | 97.99 % |
-| Primary class vs DESI spectra (faint objects) | 92.62 % |
-| Mira / Cepheid / RR Lyrae | 94.8 / 93.2 / 82.4 % |
-| Planetary nebulae | 89.2 % |
-| Blind test on unseen objects | 9 / 9 |
+| 정확도 (1,728개) | 97.2 % (분류된 것만 98.1 %, 미분류 0.9 %) |
+| 재현율 별 / 은하 / QSO | 99.7 / 91.7 / 98.3 % |
+| 고신뢰로 표시된 천체 | 1,482개, 그중 99.73 % 정확 (표시 안 된 나머지 82.1 %) |
+| 영역 | 남·북 은하극, 적도대, Stripe 82, 반은하중심, 은하면(b = +2°), Kepler 영역, M31 방향 |
 
-Spectroscopic classes are used only as ground truth, never as evidence in these tests. Per-version results are in [`v2/CHANGELOG.md`](v2/CHANGELOG.md).
+### 실제 하늘 비율 기준 순도 (blind, 18개 영역)
 
-## Usage
+| 종류 | 확신도 ≥ 0.5 | ≥ 0.8 | ≥ 0.9 |
+|---|---|---|---|
+| 별 | 75.5 % | 97.6 % | 97.6 % |
+| 은하 | 98.8 % | 99.2 % | 99.5 % |
+| QSO (측광만) | 4.1 % | 5.7 % | 6.4 % |
 
-### Desktop app
+- **QSO:** 어두운 하늘은 은하가 퀘이사보다 약 100배 많다. 그래서 측광만으로 낸 QSO 판정은 대부분 실제로는 은하나 별이고, QSO는 분광이 있을 때만 고신뢰가 된다.
+- **별:** 확신도 0.5 기준 순도가 낮은 것은 r > 22의 어두운 '별' 판정 때문이다.
+- 계산 방법: [`v2/benchmark/natural_purity.py`](v2/benchmark/natural_purity.py)
 
-Download the zip for your OS from [Releases](https://github.com/Pinchpeach/Finding_objects/releases), unzip it, and run `FindingObjects` (`FindingObjects.exe` on Windows). No Python installation is needed.
+### 세부 분류 정확도 (독립 정답)
 
-To run from source:
+| 대상 | 결과 |
+|---|---|
+| 미라 / 세페이드 / RR Lyrae | 94.8 / 93.2 / 82.4 % |
+| 행성상성운 | 89.2 % |
+| AGB 화학형(탄소/산소) | 95.8 % |
+| 은하 활동성 | 87.9 % |
+| 초저온 왜성(M7 이후) / 뜨거운 준왜성 | 92.7 % / 완전도 84.8 %·순도 81 % |
+
+### 속도
+
+- 천체 15,231개 영역(반경 12′) 실측: 아카이브 조회 199 s, 분류 1–7단계 합계 약 113 s. 천체 84개 영역은 전체 2 s다.
+- 같은 영역을 다시 조회하면 로컬 캐시를 쓰므로 네트워크 없이 바로 처리된다.
+
+## 8. 데스크톱 앱
+
+[Releases](https://github.com/Pinchpeach/Finding_objects/releases)에서 OS에 맞는 zip을 받아 압축을 풀고 `FindingObjects`(Windows는 `FindingObjects.exe`)를 실행한다. 파이썬 설치는 필요 없다.
+
+| 기능 | 설명 |
+|---|---|
+| 검색 영역 | 천체 이름(Sesame) 또는 좌표 + 반경. 지도에서 더블클릭하면 그 위치를 중심으로 지정한다. |
+| 결과 표 | 정렬·필터(종류, 상태, 텍스트), 은하 부속 보기, **High confidence only** 필터 |
+| 천체 상세 | 1차 확률 막대, 근거 증거, 세부 분류와 근거, 문헌 링크(ADS), Legacy Viewer·SIMBAD 열기, 고신뢰 근거(★) |
+| 하늘 지도 | 종류·세부 종류별 아이콘, 큰 은하 실제 타원, 확대·이동, 이름 표시, 고신뢰 천체 **금색 테두리** |
+| 경고 | 조회에 실패한 아카이브와 그 영향을 결과 표 위 노란 띠로 계속 표시 |
+| 북마크 | `Ctrl+D`로 저장. **Bookmarks** 탭(`Ctrl+B`)에서 메모·검색, 다시 열기, 그 위치에서 새 검색 |
+| 로그 | 사용자당 로그 파일 하나, View > Log (`Ctrl+L`) |
+| 배포 | GitHub Releases에 Windows·macOS·Linux zip을 올린다. 빌드마다 세 OS에서 오프라인 스모크 시험을 한다. |
+
+소스에서 실행:
 
 ```bash
 pip install -r v2/app/requirements.txt
 python v2/app/qt_app.py
 ```
 
-| Feature | How |
-|---|---|
-| Search area | object name or coordinates, plus a radius |
-| Results | sortable, filterable table; object details; sky map |
-| Bookmarks | `Ctrl+D` to bookmark the selected object; **Bookmarks** tab (`Ctrl+B`) to add notes, search, reopen an object or start a new search there |
-| Log | one log file per user, shown with View > Log (`Ctrl+L`) |
-
-### Command line
+명령줄:
 
 ```bash
-# Collect every survey around a position and classify (needs archive access)
+# 좌표 주변의 모든 탐사를 모아서 분류 (아카이브 접속 필요)
 python v2/pipeline.py --ra 188.4155 --dec 9.1751 --radius 0.5 --work runs/ngc4522
 
-# Classify catalogues collected earlier
+# 이미 모아 둔 목록을 분류
 python v2/pipeline.py --raw-dir v2/rawdata --work runs/ngc4522
 ```
 
-Each stage writes a CSV to `--work`; `pipeline_summary.csv` records the time each stage took.
+단계마다 `--work`에 CSV를 쓰고, `pipeline_summary.csv`에 단계별 시간을 기록한다.
 
-## Development
+## 9. 코드 구성
+
+| 위치 | 역할 |
+|---|---|
+| `v2/Get_data/` | 28개 수집기, 병렬 실행·시간 제한(`controller.py`), 캐시, 요청 간격 |
+| `v2/Preprocess/` | 1–5단계(연관·통합·특징·증거·1차 분류), 규칙 표, 융합 가중치, `LITERATURE.md` |
+| `v2/Classifier/` | 세부 분류(`subclass.py`), 5개 축, 축별 보정, 고신뢰 기준표 |
+| `v2/*.py` | `pipeline.py`와 후처리 모듈(`host_groups`, `detection_quality`, `radio_sources`, `clusters`, `catalog_coverage`, `high_confidence`, `designations`) |
+| `v2/app/` | PySide6 앱, PyInstaller 패키징 |
+| `v2/benchmark/` | 정답 세트, 보존된 목록 특징, 평가·학습·독립 검증·실제 하늘 순도 스크립트 |
+| `.github/workflows/` | 자료 수집·검증(수동 실행), 앱 빌드·배포 |
+
+## 10. 개발·검증 체계
+
+- **문헌 우선:** 규칙·임계값을 바꾸기 전에 근거를 조사하고 기록한다. 분류된 논문 목록은 [`v2/document/PAPERS.md`](v2/document/PAPERS.md)에 있다.
+- **시험:** pytest 112개(전처리·분류기·앱 통합). 벤치마크는 보존된 특징으로 네트워크 없이 재현한다.
+- **자료가 필요한 검증:** GitHub Actions 워크플로로 실행하고 결과를 커밋으로 받는다.
+- **버전:** main에 병합할 때마다 `v2/VERSION`과 `v2/CHANGELOG.md`(변경·이유·측정치)를 올린다. 작업 보고서(`v2/WORK_REPORT_*.md`)에는 설계 이유와 버린 대안을 적는다.
+- **채택 기준:** 벤치마크·독립 정답에서 유의한 개선이 없으면 채택하지 않는다. 예: GALEX UV, u 대역, PS1 변광은 측정 후 기각했다.
 
 ```bash
-cd v2 && python -m pytest -q Preprocess/tests Classifier/tests app/tests   # tests
-black v2                                                                     # formatting (pyproject.toml)
+cd v2 && python -m pytest -q Preprocess/tests Classifier/tests app/tests   # 시험
+black v2                                                                     # 코드 모양 (pyproject.toml)
 ```
 
-| Folder | Contents |
-|---|---|
-| `v2/Get_data/` | archive collectors |
-| `v2/Preprocess/` | association, integration, features, evidence, primary class |
-| `v2/Classifier/` | sub-classes and the independent axes |
-| `v2/app/` | desktop app (Qt) |
-| `v2/benchmark/` | truth sets and benchmarks |
+## 11. 한계와 다음 과제
 
-## License
+- 측광 QSO의 실제 하늘 순도가 낮다. 다음 과제는 밝기별 실제 하늘 사전확률을 선택적으로 적용하는 방안이다(순도는 오르고 완전도는 내려간다).
+- 어두운(r > 21) 별과 퀘이사를 구분하기 어렵다. 이 깊이에서는 u 대역·변광 자료가 부족하다.
+- Legacy Surveys 밖에서는 미분류가 많고(39–68 %), 아카이브 접속 상태에 따라 결과가 달라진다(경고로 표시).
+- 어두운 별 정답 표본이 작아, 일부 밝기 구간은 고신뢰를 증명하지 못한다.
 
-- Code: MIT License — see [`LICENSE`](LICENSE).
-- Third-party components bundled with the app (Qt / PySide6 under LGPLv3, among others) and data-use terms: see [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
-- When publishing results, follow the citation and acknowledgement requirements of each survey used.
+## 라이선스
+
+- 코드: MIT License — [`LICENSE`](LICENSE)
+- 앱에 포함된 제3자 구성요소(Qt / PySide6, LGPLv3 등)와 자료 이용 조건: [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)
+- 결과를 발표할 때는 사용한 각 탐사의 인용·감사 문구 요구를 따른다.
