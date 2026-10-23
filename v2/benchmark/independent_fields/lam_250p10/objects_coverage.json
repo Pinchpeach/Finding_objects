@@ -3,21 +3,13 @@
  "attempted": 28,
  "failed": [
   {
-   "collector": "desi_legacy",
-   "catalog": "DESI Legacy Surveys DR10",
-   "status": "timeout",
-   "impact": "deep morphology and the faint-object (LS-GBM) classifier",
-   "key": true,
-   "error": "exceeded 300 s collector budget"
-  },
-  {
-   "collector": "desi_fastspec",
-   "catalog": "DESI FastSpecFit",
-   "status": "timeout",
-   "impact": "emission-line sub-classes",
+   "collector": "simbad",
+   "catalog": "SIMBAD",
+   "status": "error",
+   "impact": "literature labels",
    "key": false,
-   "error": "TapTimeout(\"Legacy Surveys TAP failed after 3 attempts: TimeoutError('Data Lab TAP exceeded 80 s')\")"
+   "error": "DALFormatError: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
   }
  ],
- "key_failed": true
+ "key_failed": false
 }
