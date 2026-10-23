@@ -1,0 +1,35 @@
+{
+ "ra": 50.30111,
+ "dec": -27.33028,
+ "radius_arcmin": 12.0,
+ "n_objects": 4935,
+ "seconds": {
+  "collect": 305.6,
+  "1_associate": 1.7,
+  "2_integrate": 3.9,
+  "3_features": 4.9,
+  "4_evidence": 4.3,
+  "5_coarse": 5.8,
+  "6_prepare": 5.1,
+  "7_classify": 7.4
+ },
+ "catalog_rows": {
+  "Pan-STARRS1 DR2 MeanObject": 3696,
+  "AllWISE": 2184,
+  "GALEX AIS": 481,
+  "Gaia DR3": 468,
+  "2MASS PSC": 232,
+  "SGA-2020": 15,
+  "eROSITA eRASS1": 9,
+  "VLASS": 6,
+  "NVSS": 3,
+  "TGSS ADR1": 1
+ },
+ "seeing": {
+  "g": 1.39,
+  "r": 1.15,
+  "z": 1.18,
+  "n_psf": 6855,
+  "source": "LS DR10 psfsize"
+ }
+}
