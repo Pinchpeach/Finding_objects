@@ -19,7 +19,10 @@ ENTRY = str(V2 / "app" / "qt_app.py")
 
 # v2 tree as data: only what the app and pipeline read at run time.
 INCLUDE_DIRS = ("app", "Get_data", "Preprocess", "Classifier")
-INCLUDE_FILES = ("pipeline.py", "designations.py", "host_groups.py", "VERSION", "CHANGELOG.md")
+# Every top-level module: pipeline.py loads its post-processing steps by file
+# path, and a hand-kept list missed detection_quality.py and the modules added
+# after it (2.30.0-2.36.0), so the frozen pipeline stopped at that step.
+INCLUDE_FILES = tuple(sorted(p.name for p in V2.glob("*.py"))) + ("VERSION", "CHANGELOG.md")
 SKIP_PARTS = {"__pycache__", "tests", "packaging"}
 datas = []
 for d in INCLUDE_DIRS:
