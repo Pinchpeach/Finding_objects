@@ -3,21 +3,13 @@
  "attempted": 28,
  "failed": [
   {
-   "collector": "desi_legacy",
-   "catalog": "DESI Legacy Surveys DR10",
+   "collector": "sdss_spectroscopy",
+   "catalog": "SDSS spectroscopy",
    "status": "timeout",
-   "impact": "deep morphology and the faint-object (LS-GBM) classifier",
-   "key": true,
-   "error": "exceeded 300 s collector budget"
-  },
-  {
-   "collector": "desi_fastspec",
-   "catalog": "DESI FastSpecFit",
-   "status": "timeout",
-   "impact": "emission-line sub-classes",
+   "impact": "spectroscopic classes and redshifts",
    "key": false,
-   "error": "TapTimeout(\"Legacy Surveys TAP failed after 3 attempts: TimeoutError('Data Lab TAP exceeded 80 s')\")"
+   "error": "ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='skyserver.sdss.org', port=443): Max retries exceeded with url: /dr18/en/tools/search/x_results.aspx?cmd=+SELECT%0D+s.specobjid%2C+s.bestobjid%2C"
   }
  ],
- "key_failed": true
+ "key_failed": false
 }
