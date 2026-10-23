@@ -1,0 +1,55 @@
+{
+ "known": true,
+ "attempted": 28,
+ "failed": [
+  {
+   "collector": "gaia_dr3_variability_sos_vizier",
+   "catalog": "Gaia DR3 variability",
+   "status": "timeout",
+   "impact": "variable-star sub-classes",
+   "key": false,
+   "error": "ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='vizier.cds.unistra.fr', port=443): Max retries exceeded with url: /viz-bin/votable (Caused by ConnectTimeoutError(<HTTPSConnection(host='vizier."
+  },
+  {
+   "collector": "galex",
+   "catalog": "GALEX",
+   "status": "timeout",
+   "impact": "UV colours",
+   "key": false,
+   "error": "ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='vizier.cds.unistra.fr', port=443): Read timed out. (read timeout=60)\"))"
+  },
+  {
+   "collector": "allwise",
+   "catalog": "AllWISE",
+   "status": "timeout",
+   "impact": "mid-IR AGN colours (QSO evidence)",
+   "key": true,
+   "error": "ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='vizier.cds.unistra.fr', port=443): Read timed out. (read timeout=60)\"))"
+  },
+  {
+   "collector": "lotss",
+   "catalog": "LoTSS DR2",
+   "status": "timeout",
+   "impact": "radio detections",
+   "key": false,
+   "error": "ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='vizier.cds.unistra.fr', port=443): Max retries exceeded with url: /viz-bin/votable (Caused by ConnectTimeoutError(<HTTPSConnection(host='vizier."
+  },
+  {
+   "collector": "vlass",
+   "catalog": "VLASS",
+   "status": "timeout",
+   "impact": "radio detections",
+   "key": false,
+   "error": "ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='vizier.cds.unistra.fr', port=443): Max retries exceeded with url: /viz-bin/votable (Caused by ConnectTimeoutError(<HTTPSConnection(host='vizier."
+  },
+  {
+   "collector": "chandra",
+   "catalog": "Chandra CSC",
+   "status": "timeout",
+   "impact": "X-ray detections (AGN evidence)",
+   "key": false,
+   "error": "ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='vizier.cds.unistra.fr', port=443): Max retries exceeded with url: /viz-bin/votable (Caused by ConnectTimeoutError(<HTTPSConnection(host='vizier."
+  }
+ ],
+ "key_failed": true
+}
