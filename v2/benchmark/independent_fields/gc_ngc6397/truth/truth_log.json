@@ -8,7 +8,11 @@
  },
  "2SLAQ QSO (Croom+2009)": {},
  "WiggleZ final (Drinkwater+2018)": {},
- "RAVE DR6 (Steinmetz+2020)": {},
+ "RAVE DR6 (Steinmetz+2020)": {
+  "III/283/ravedr6": 47,
+  "III/283/xgaia2": 47,
+  "III/283/xgaiae3": 47
+ },
  "APOGEE DR17 (Abdurro'uf+2022)": {
   "III/286/catalog": 365,
   "III/286/allvis": 2300
