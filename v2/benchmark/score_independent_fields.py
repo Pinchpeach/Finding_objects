@@ -17,11 +17,20 @@ Truth surveys and the reliability cuts their papers recommend:
 * WiggleZ (Drinkwater et al. 2010, 2018): q_z >= 3; comment AGN/QSO -> QSO,
   z < 0.002 -> STAR, else GALAXY (emission-line galaxy targets).
 * RAVE DR6 (Steinmetz et al. 2020): S/N >= 10 -> STAR.
+* APOGEE DR17 allStar (Abdurro'uf et al. 2022): S/N >= 50 with an ASPCAP
+  fit (Teff present) -> STAR (stars in clusters, star-forming regions and the
+  Magellanic Clouds; S/N > 70 is the survey's science cut, 50 still gives a
+  secure stellar spectrum).
+* Gaia-ESO DR5 (Randich et al. 2022, cluster targets): S/N >= 10 -> STAR.
+* 2dF SMC OBA stars (Evans et al. 2004): spectral type given -> STAR.
+* Magellanic Quasars Survey (Kozlowski et al. 2013): quality Q1 (secure) and
+  z >= 0.5 -> QSO (luminous quasars behind the Clouds; low-z narrow-line AGN
+  in galaxies are left out because a host galaxy can dominate).
 
 An object counts once (1" groups); surveys that disagree drop it.  Truth is
 matched to our top-level objects within 1.5" (2" for the bright-star surveys
-LAMOST and RAVE, whose J2000 positions differ by proper motion from the
-2016 epoch); a matched part of a galaxy is scored with its host's class.
+LAMOST, RAVE, APOGEE, Gaia-ESO and 2dF SMC, whose J2000 positions differ by
+proper motion from the 2016 epoch); a matched part of a galaxy is scored with its host's class.
 Objects in the SDSS/DESI benchmark truth sets (training data) are excluded.
 
     python v2/benchmark/score_independent_fields.py [--which blind|full] [--out DIR]
@@ -88,6 +97,19 @@ def truth_table(truth_dir):
     d = _read(truth_dir, "III_283_ravedr6")
     if d is not None:
         t.append(_rows(d[_num(d, "S/N").ge(10)], "STAR", "RAVE DR6"))
+    d = _read(truth_dir, "III_286_catalog")
+    if d is not None:
+        t.append(_rows(d[_num(d, "SNR").ge(50) & _num(d, "Teff").notna()], "STAR", "APOGEE DR17"))
+    d = _read(truth_dir, "J_A_A_666_A121_tableb5")
+    if d is not None:
+        t.append(_rows(d[_num(d, "SNR").ge(10)], "STAR", "Gaia-ESO DR5"))
+    d = _read(truth_dir, "J_MNRAS_353_601_smc2df")
+    if d is not None:
+        t.append(_rows(d[d.get("SpType", pd.Series("", index=d.index)).astype(str).str.strip().ne("")], "STAR", "2dF SMC"))
+    d = _read(truth_dir, "J_ApJ_775_92_agn_mc")
+    if d is not None:
+        q = d.get("Qs", pd.Series("", index=d.index)).astype(str).str.strip()
+        t.append(_rows(d[q.eq("Q1") & _num(d, "z").ge(0.5)], "QSO", "MQS"))
     t = pd.concat(t, ignore_index=True) if t else pd.DataFrame(columns=["ra", "dec", "truth", "survey"])
     # One object per 1" group; disagreeing surveys drop it.
     key = list(zip((t.ra * 3600).round().astype("int64"), (t.dec * 3600).round().astype("int64")))
@@ -180,7 +202,7 @@ def field_matches(fdir, which, bench):
     has_parent = "parent_object_id" in o.columns
     top = o[o.parent_object_id.isna()] if has_parent else o
     i, s = _nearest(t.ra.to_numpy(), t.dec.to_numpy(), o.ra.to_numpy(), o.dec.to_numpy())
-    lim = np.where(t.survey.str.contains("LAMOST|RAVE"), 2.0, 1.5)
+    lim = np.where(t.survey.str.contains("LAMOST|RAVE|APOGEE|Gaia-ESO|2dF SMC"), 2.0, 1.5)
     t["matched"] = s <= lim
     t["sep"] = s
     # The counterpart is the object with the most catalogues inside the match
