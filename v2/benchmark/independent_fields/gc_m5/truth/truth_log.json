@@ -7,7 +7,9 @@
  "2dFGRS (Colless+2003)": {},
  "6dFGS DR3 (Jones+2009)": {},
  "2SLAQ QSO (Croom+2009)": {},
- "WiggleZ final (Drinkwater+2018)": {},
+ "WiggleZ final (Drinkwater+2018)": {
+  "J/MNRAS/474/4151/wigglez": 11
+ },
  "RAVE DR6 (Steinmetz+2020)": {},
  "APOGEE DR17 (Abdurro'uf+2022)": {
   "III/286/catalog": 435,
