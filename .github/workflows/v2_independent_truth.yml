@@ -147,11 +147,115 @@ jobs:
           - {name: lam_000p50, ra: 0.0, dec: 50.0}    # lam pool, b~-12
           - {name: lam_054p30, ra: 54.0, dec: 30.0}    # lam pool, b~-21
           - {name: lam_090p40, ra: 90.0, dec: 40.0}    # lam pool, b~+8
+          # 2026-10-24 extension to 200 regions: clusters, star-forming regions, starburst galaxies,
+          # the Magellanic Clouds (fixed centre, r = 6' where crowded) and 47 more survey-footprint regions
+          - {name: lmc_bar, ra: 80.89, dec: -69.76, r: 6, fixed: true}    # LMC bar, b~-33
+          - {name: lmc_30dor, ra: 84.67, dec: -69.1, r: 6, fixed: true}    # LMC 30 Doradus (starburst HII region), b~-32
+          - {name: lmc_north, ra: 81.0, dec: -66.5, r: 6, fixed: true}    # LMC northern disc, b~-33
+          - {name: lmc_south, ra: 82.0, dec: -72.0, r: 6, fixed: true}    # LMC southern disc, b~-32
+          - {name: lmc_east, ra: 89.0, dec: -68.5, r: 6, fixed: true}    # LMC eastern disc, b~-30
+          - {name: lmc_west, ra: 74.0, dec: -68.5, r: 6, fixed: true}    # LMC western disc, b~-36
+          - {name: smc_bar, ra: 13.19, dec: -72.83, r: 6, fixed: true}    # SMC bar, b~-44
+          - {name: smc_wing, ra: 19.5, dec: -73.4, r: 6, fixed: true}    # SMC wing, b~-44
+          - {name: smc_north, ra: 12.5, dec: -71.2, r: 6, fixed: true}    # SMC northern body, b~-46
+          - {name: smc_ne, ra: 16.0, dec: -71.8, r: 6, fixed: true}    # SMC north-east, b~-45
+          - {name: mag_bridge, ra: 33.0, dec: -74.0, r: 6, fixed: true}    # Magellanic Bridge, b~-42
+          - {name: gc_47tuc, ra: 6.024, dec: -72.081, r: 6, fixed: true}    # globular 47 Tuc, b~-45
+          - {name: gc_omegacen, ra: 201.697, dec: -47.48, r: 6, fixed: true}    # globular omega Cen, b~+15
+          - {name: gc_m4, ra: 245.897, dec: -26.526, r: 6, fixed: true}    # globular M4, b~+16
+          - {name: gc_ngc6397, ra: 265.175, dec: -53.674, r: 6, fixed: true}    # globular NGC 6397, b~-12
+          - {name: gc_ngc6752, ra: 287.717, dec: -59.985, r: 6, fixed: true}    # globular NGC 6752, b~-26
+          - {name: gc_m13, ra: 250.422, dec: 36.46, r: 6, fixed: true}    # globular M13, b~+41
+          - {name: gc_m3, ra: 205.548, dec: 28.377, r: 6, fixed: true}    # globular M3, b~+79
+          - {name: gc_m5, ra: 229.638, dec: 2.081, r: 6, fixed: true}    # globular M5, b~+47
+          - {name: gc_m15, ra: 322.493, dec: 12.167, r: 6, fixed: true}    # globular M15, b~-27
+          - {name: gc_m92, ra: 259.281, dec: 43.136, r: 6, fixed: true}    # globular M92, b~+35
+          - {name: gc_m2, ra: 323.363, dec: -0.823, r: 6, fixed: true}    # globular M2, b~-36
+          - {name: gc_ngc288, ra: 13.188, dec: -26.583, r: 6, fixed: true}    # globular NGC 288, b~-89
+          - {name: oc_pleiades, ra: 56.75, dec: 24.12, r: 12, fixed: true}    # open cluster Pleiades, b~-24
+          - {name: oc_hyades, ra: 66.73, dec: 15.87, r: 12, fixed: true}    # open cluster Hyades, b~-22
+          - {name: oc_praesepe, ra: 130.1, dec: 19.67, r: 12, fixed: true}    # open cluster Praesepe, b~+32
+          - {name: oc_m67, ra: 132.85, dec: 11.81, r: 12, fixed: true}    # open cluster M67, b~+32
+          - {name: oc_ngc188, ra: 12.11, dec: 85.24, r: 12, fixed: true}    # open cluster NGC 188, b~+22
+          - {name: oc_ngc752, ra: 29.42, dec: 37.78, r: 12, fixed: true}    # open cluster NGC 752, b~-23
+          - {name: oc_m35, ra: 92.25, dec: 24.33, r: 12, fixed: true}    # open cluster M35, b~+2
+          - {name: oc_ngc2516, ra: 119.52, dec: -60.75, r: 12, fixed: true}    # open cluster NGC 2516, b~-16
+          - {name: oc_ngc6791, ra: 290.22, dec: 37.77, r: 12, fixed: true}    # open cluster NGC 6791, b~+11
+          - {name: oc_m11, ra: 282.77, dec: -6.27, r: 6, fixed: true}    # open cluster M11 (rich, b~-3), b~-3
+          - {name: oc_ngc2420, ra: 114.6, dec: 21.57, r: 12, fixed: true}    # open cluster NGC 2420, b~+20
+          - {name: oc_ic2391, ra: 130.1, dec: -53.0, r: 12, fixed: true}    # open cluster IC 2391, b~-7
+          - {name: sfr_onc, ra: 83.82, dec: -5.39, r: 12, fixed: true}    # Orion Nebula Cluster, b~-19
+          - {name: sfr_l1495, ra: 64.5, dec: 28.3, r: 12, fixed: true}    # Taurus L1495, b~-16
+          - {name: sfr_rhooph, ra: 246.8, dec: -24.5, r: 12, fixed: true}    # rho Ophiuchi, b~+17
+          - {name: sfr_lupus3, ra: 242.5, dec: -39.1, r: 12, fixed: true}    # Lupus 3, b~+9
+          - {name: sfr_chai, ra: 167.0, dec: -77.6, r: 12, fixed: true}    # Chamaeleon I, b~-16
+          - {name: sfr_ngc1333, ra: 52.3, dec: 31.3, r: 12, fixed: true}    # Perseus NGC 1333, b~-21
+          - {name: sfr_ic348, ra: 56.13, dec: 32.16, r: 12, fixed: true}    # Perseus IC 348, b~-18
+          - {name: sfr_ngc2264, ra: 100.24, dec: 9.89, r: 12, fixed: true}    # NGC 2264, b~+2
+          - {name: sfr_lambdaori, ra: 83.78, dec: 9.93, r: 12, fixed: true}    # lambda Orionis, b~-12
+          - {name: sfr_cygob2, ra: 308.3, dec: 41.3, r: 6, fixed: true}    # Cygnus OB2 (b~+1), b~+1
+          - {name: sfr_m8, ra: 270.92, dec: -24.38, r: 6, fixed: true}    # Lagoon Nebula M8 (b~-1), b~-1
+          - {name: sfr_m16, ra: 274.7, dec: -13.81, r: 6, fixed: true}    # Eagle Nebula M16 (b~+1), b~+1
+          - {name: sfr_carina, ra: 161.1, dec: -59.8, r: 6, fixed: true}    # Carina Nebula (b~-1), b~-1
+          - {name: sb_m82, ra: 148.97, dec: 69.68, r: 12, fixed: true}    # starburst galaxy M82, b~+41
+          - {name: sb_ngc253, ra: 11.89, dec: -25.29, r: 12, fixed: true}    # starburst galaxy NGC 253, b~-88
+          - {name: sb_m83, ra: 204.25, dec: -29.87, r: 12, fixed: true}    # starburst galaxy M83, b~+32
+          - {name: sb_arp220, ra: 233.74, dec: 23.5, r: 12, fixed: true}    # starburst merger Arp 220, b~+53
+          - {name: sb_antennae, ra: 180.47, dec: -18.87, r: 12, fixed: true}    # starburst merger Antennae, b~+42
+          - {name: ngp_182p02, ra: 182.0, dec: 2.0}    # ngp pool, b~+63
+          - {name: ngp_221m04, ra: 221.0, dec: -4.5}    # ngp pool, b~+48
+          - {name: ngp_212p02, ra: 212.0, dec: 2.0}    # ngp pool, b~+59
+          - {name: ngp_173p02, ra: 173.0, dec: 2.0}    # ngp pool, b~+58
+          - {name: ngp_188m04, ra: 188.0, dec: -4.5}    # ngp pool, b~+58
+          - {name: ngp_158p02, ra: 158.0, dec: 2.0}    # ngp pool, b~+48
+          - {name: ngp_167m04, ra: 167.0, dec: -4.5}    # ngp pool, b~+50
+          - {name: ngp_152m04, ra: 152.0, dec: -4.5}    # ngp pool, b~+39
+          - {name: sgp_021m24, ra: 21.0, dec: -24.0}    # sgp pool, b~-82
+          - {name: sgp_356m28, ra: 356.5, dec: -28.0}    # sgp pool, b~-75
+          - {name: sgp_052m24, ra: 52.5, dec: -24.0}    # sgp pool, b~-54
+          - {name: sgp_049m32, ra: 49.0, dec: -32.0}    # sgp pool, b~-58
+          - {name: sgp_346m36, ra: 346.0, dec: -36.0}    # sgp pool, b~-66
+          - {name: sgp_028m28, ra: 28.0, dec: -28.0}    # sgp pool, b~-77
+          - {name: sgp_032m24, ra: 31.5, dec: -24.0}    # sgp pool, b~-73
+          - {name: sgp_000m36, ra: 0.0, dec: -36.0}    # sgp pool, b~-76
+          - {name: s82_336p01, ra: 336.5, dec: 1.0}    # s82 pool, b~-45
+          - {name: s82_308p01, ra: 308.5, dec: 1.0}    # s82 pool, b~-22
+          - {name: s82_018m01, ra: 18.5, dec: -1.0}    # s82 pool, b~-63
+          - {name: s82_054m01, ra: 53.5, dec: -1.0}    # s82 pool, b~-43
+          - {name: s82_050p01, ra: 50.0, dec: 1.0}    # s82 pool, b~-45
+          - {name: s82_312m01, ra: 312.0, dec: -1.0}    # s82 pool, b~-26
+          - {name: sth_312m45, ra: 312.0, dec: -45.0}    # sth pool, b~-39
+          - {name: sth_080m50, ra: 80.0, dec: -50.0}    # sth pool, b~-35
+          - {name: sth_040m65, ra: 40.0, dec: -65.0}    # sth pool, b~-48
+          - {name: sth_296m60, ra: 296.0, dec: -60.0}    # sth pool, b~-30
+          - {name: sth_008m60, ra: 8.0, dec: -60.0}    # sth pool, b~-57
+          - {name: sth_016m45, ra: 16.0, dec: -45.0}    # sth pool, b~-72
+          - {name: sth_008m50, ra: 8.0, dec: -50.0}    # sth pool, b~-67
+          - {name: sth_320m40, ra: 320.0, dec: -40.0}    # sth pool, b~-45
+          - {name: sth_312m50, ra: 312.0, dec: -50.0}    # sth pool, b~-39
+          - {name: sth_296m65, ra: 296.0, dec: -65.0}    # sth pool, b~-30
+          - {name: lam_343p15, ra: 343.0, dec: 15.0}    # lam pool, b~-39
+          - {name: lam_210p25, ra: 210.0, dec: 25.0}    # lam pool, b~+74
+          - {name: lam_112p15, ra: 112.0, dec: 15.0}    # lam pool, b~+15
+          - {name: lam_161p15, ra: 161.0, dec: 15.0}    # lam pool, b~+58
+          - {name: lam_126p05, ra: 126.0, dec: 5.0}    # lam pool, b~+23
+          - {name: lam_112p35, ra: 112.0, dec: 35.0}    # lam pool, b~+22
+          - {name: lam_203p05, ra: 203.0, dec: 5.0}    # lam pool, b~+66
+          - {name: lam_014m05, ra: 14.0, dec: -5.0}    # lam pool, b~-68
+          - {name: lam_020p45, ra: 20.0, dec: 45.0}    # lam pool, b~-18
+          - {name: lam_140p55, ra: 140.0, dec: 55.0}    # lam pool, b~+43
+          - {name: lam_035p25, ra: 35.0, dec: 25.0}    # lam pool, b~-34
+          - {name: lam_070p55, ra: 70.0, dec: 55.0}    # lam pool, b~+6
+          - {name: lam_273p25, ra: 273.0, dec: 25.0}    # lam pool, b~+19
+          - {name: lam_322m05, ra: 322.0, dec: -5.0}    # lam pool, b~-37
+          - {name: lam_100p55, ra: 100.0, dec: 55.0}    # lam pool, b~+20
     env:
       NAME: ${{ matrix.region.name }}
       RA0: ${{ matrix.region.ra }}
       DEC0: ${{ matrix.region.dec }}
-      R: ${{ github.event.inputs.radius || '12' }}
+      # per-region radius (6' in crowded clusters / Magellanic Clouds) and fixed centre (2026-10-24)
+      R: ${{ matrix.region.r || github.event.inputs.radius || '12' }}
+      FIXED: ${{ matrix.region.fixed || false }}
     steps:
       - id: pick
         run: |
@@ -171,7 +275,8 @@ jobs:
         if: steps.pick.outputs.run
         run: |
           read RA DEC N < <(python -u .github/scripts/independent_truth_field.py centre /tmp/truth $RA0 $DEC0 40 $R | tail -1)
-          echo "centre $RA $DEC holds $N truth positions"
+          if [ "$FIXED" = "true" ]; then RA=$RA0; DEC=$DEC0; echo "fixed centre (cluster / star-forming region / galaxy)"; fi
+          echo "centre $RA $DEC (densest truth cone holds $N truth positions)"
           echo "RA=$RA" >> "$GITHUB_ENV"; echo "DEC=$DEC" >> "$GITHUB_ENV"
       - name: Pipeline
         if: steps.pick.outputs.run
