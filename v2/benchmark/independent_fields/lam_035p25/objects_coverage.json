@@ -1,0 +1,31 @@
+{
+ "known": true,
+ "attempted": 28,
+ "failed": [
+  {
+   "collector": "sdss_dr18",
+   "catalog": "SDSS DR18 imaging",
+   "status": "error",
+   "impact": "SDSS morphology and u-band colours",
+   "key": false,
+   "error": "UFuncTypeError(<ufunc 'add'>, (dtype('<U6'), dtype('float64'), None))"
+  },
+  {
+   "collector": "desi_legacy",
+   "catalog": "DESI Legacy Surveys DR10",
+   "status": "timeout",
+   "impact": "deep morphology and the faint-object (LS-GBM) classifier",
+   "key": true,
+   "error": "TapTimeout(\"Legacy Surveys TAP failed after 3 attempts: TimeoutError('Data Lab TAP exceeded 80 s')\")"
+  },
+  {
+   "collector": "desi_fastspec",
+   "catalog": "DESI FastSpecFit",
+   "status": "timeout",
+   "impact": "emission-line sub-classes",
+   "key": false,
+   "error": "RuntimeError(\"Legacy Surveys TAP failed after 3 attempts: DALFormatError: ReadTimeout: HTTPSConnectionPool(host='datalab.noirlab.edu', port=443): Read timed out. (read timeout=80.0)\")"
+  }
+ ],
+ "key_failed": true
+}
