@@ -1,0 +1,45 @@
+{
+ "ra": 66.73,
+ "dec": 15.87,
+ "radius_arcmin": 12.0,
+ "n_objects": 5504,
+ "seconds": {
+  "collect": 277.5,
+  "1_associate": 2.4,
+  "2_integrate": 4.7,
+  "3_features": 5.9,
+  "4_evidence": 5.2,
+  "5_coarse": 7.1,
+  "6_prepare": 6.5,
+  "7_classify": 7.5
+ },
+ "catalog_rows": {
+  "Pan-STARRS1 DR2 MeanObject": 4800,
+  "NED": 1877,
+  "AllWISE": 1818,
+  "Gaia DR3": 1070,
+  "2MASS PSC": 507,
+  "LAMOST DR catalog": 77,
+  "SIMBAD": 20,
+  "XMM 4XMM-DR13": 14,
+  "VLASS": 12,
+  "NVSS": 5,
+  "ZTF periodic variables": 2,
+  "TGSS ADR1": 2,
+  "eROSITA eRASS1": 1
+ },
+ "seeing": {
+  "g": NaN,
+  "r": NaN,
+  "z": NaN,
+  "n_psf": 0,
+  "source": "LS DR10 psfsize",
+  "ps1": {
+   "source": "PS1 stack psfMajor/MinorFWHM",
+   "n": 5243,
+   "g": 1.22,
+   "r": 1.06,
+   "i": 1.04
+  }
+ }
+}
