@@ -1,0 +1,34 @@
+{
+ "ra": 323.363,
+ "dec": -0.823,
+ "radius_arcmin": 6.0,
+ "n_objects": 28005,
+ "seconds": {
+  "collect": 455.3,
+  "1_associate": 65.2,
+  "2_integrate": 13.5,
+  "3_features": 12.6,
+  "4_evidence": 20.8,
+  "5_coarse": 22.5,
+  "6_prepare": 15.0,
+  "7_classify": 21.4
+ },
+ "catalog_rows": {
+  "Gaia DR3": 21480,
+  "DESI Legacy Surveys DR10": 21480,
+  "Pan-STARRS1 DR2 MeanObject": 21302,
+  "NED": 2655,
+  "SDSS DR18 PhotoObj": 438,
+  "SDSS DR18 spectroscopy": 12,
+  "ATNF Pulsar Catalog": 7,
+  "LAMOST DR catalog": 5,
+  "ZTF periodic variables": 2
+ },
+ "seeing": {
+  "g": 1.32,
+  "r": 1.19,
+  "z": 1.0,
+  "n_psf": 21480,
+  "source": "LS DR10 psfsize"
+ }
+}
