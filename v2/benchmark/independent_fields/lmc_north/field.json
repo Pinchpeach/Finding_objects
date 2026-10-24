@@ -1,0 +1,34 @@
+{
+ "ra": 81.0,
+ "dec": -66.5,
+ "radius_arcmin": 6.0,
+ "n_objects": 8383,
+ "seconds": {
+  "collect": 204.1,
+  "1_associate": 5.1,
+  "2_integrate": 3.3,
+  "3_features": 4.2,
+  "4_evidence": 3.9,
+  "5_coarse": 5.9,
+  "6_prepare": 4.8,
+  "7_classify": 6.0
+ },
+ "catalog_rows": {
+  "Gaia DR3": 7997,
+  "DESI Legacy Surveys DR10": 5866,
+  "NED": 1996,
+  "AllWISE": 759,
+  "2MASS PSC": 484,
+  "SIMBAD": 106,
+  "Gaia DR3 variability SOS": 23,
+  "XMM 4XMM-DR13": 13,
+  "eROSITA eRASS1": 2
+ },
+ "seeing": {
+  "g": NaN,
+  "r": 1.05,
+  "z": 1.14,
+  "n_psf": 5866,
+  "source": "LS DR10 psfsize"
+ }
+}
