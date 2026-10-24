@@ -11,7 +11,9 @@
   "VII/259/6dfgs": 5,
   "VII/259/spectra": 6
  },
- "2SLAQ QSO (Croom+2009)": {},
+ "2SLAQ QSO (Croom+2009)": {
+  "J/MNRAS/392/19/2slaqqso": 179
+ },
  "WiggleZ final (Drinkwater+2018)": {
   "J/MNRAS/474/4151/wigglez": 936
  },
