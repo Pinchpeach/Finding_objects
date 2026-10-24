@@ -1,0 +1,15 @@
+{
+ "known": true,
+ "attempted": 28,
+ "failed": [
+  {
+   "collector": "desi_fastspec",
+   "catalog": "DESI FastSpecFit",
+   "status": "timeout",
+   "impact": "emission-line sub-classes",
+   "key": false,
+   "error": "RuntimeError(\"Legacy Surveys TAP failed after 3 attempts: DALFormatError: ReadTimeout: HTTPSConnectionPool(host='datalab.noirlab.edu', port=443): Read timed out. (read timeout=80.0)\")"
+  }
+ ],
+ "key_failed": false
+}
