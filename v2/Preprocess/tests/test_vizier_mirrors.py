@@ -29,6 +29,8 @@ def _send(behaviour, seen):
             if host in url:
                 if result == "refuse":
                     raise requests.exceptions.ConnectionError("refused")
+                if result == "slow":
+                    raise requests.exceptions.ReadTimeout("read timed out")
                 return Resp(result)
         return Resp(200)
 
@@ -62,3 +64,10 @@ def test_all_mirrors_refuse_raises():
     with pytest.raises(requests.exceptions.ConnectionError):
         req(None, "GET", "https://vizier.cds.unistra.fr/x")
     assert len(seen) == len(throttle.VIZIER_HOSTS)
+
+
+def test_read_timeout_falls_over():
+    seen = []
+    req = throttle._with_mirrors(_send({"vizier.cds.unistra.fr": "slow"}, seen))
+    assert req(None, "GET", "https://vizier.cds.unistra.fr/x").status_code == 200
+    assert "vizier.cfa.harvard.edu" in seen[-1]

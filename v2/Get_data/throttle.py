@@ -9,11 +9,13 @@ status polls, a column-list probe) are spaced as well.  Public archives limit
 scripted clients (CDS blocks a host that sends SIMBAD more than a few queries
 per second); the random jitter keeps parallel collectors out of lock-step.
 
-VizieR mirrors (2.36.4): a VizieR request whose connection is refused or
-times out, or that answers 502/503/504, is sent again to the next official
+VizieR mirrors (2.36.4): a VizieR request whose connection is refused,
+that times out (connecting or reading), or that answers 502/503/504, is sent
+again to the next official
 mirror (CDS list of VizieR sites: Strasbourg, CfA, NAOJ, IUCAA, China-VO,
 IDIA; same catalogues).  On 2026-10-24 the Strasbourg server refused every
-connection from the validation runners for hours, which stopped every
+connection from the validation runners for hours, and later answered so
+slowly that every query ran into the 60 s read timeout; either stopped every
 VizieR-backed collector.  A mirror that answered is preferred for
 MIRROR_STICKY_S, then Strasbourg is tried first again.
 """
@@ -93,7 +95,7 @@ def _with_mirrors(send):
             target = urlunsplit(parts._replace(netloc=parts.netloc.replace(parts.hostname, host)))
             try:
                 resp = send(self, method, target, *args, **kwargs)
-            except requests.exceptions.ConnectionError as exc:  # refused, DNS, connect timeout
+            except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as exc:  # refused, DNS, connect/read timeout
                 last = exc
                 continue
             if resp.status_code in RETRY_STATUS and i < len(hosts) - 1:

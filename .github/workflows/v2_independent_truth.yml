@@ -41,7 +41,7 @@ jobs:
     timeout-minutes: 240
     strategy:
       fail-fast: false
-      max-parallel: 4  # spread the archive load (each job also waits 3-5 s per request)
+      max-parallel: 6  # spread the archive load (VizieR mirrors share it since 2.36.4) (each job also waits 3-5 s per request)
       matrix:
         region:
           # name, nominal centre (deg), why this region
