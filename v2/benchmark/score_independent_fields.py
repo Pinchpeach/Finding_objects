@@ -29,8 +29,8 @@ Truth surveys and the reliability cuts their papers recommend:
 
 An object counts once (1" groups); surveys that disagree drop it.  Truth is
 matched to our top-level objects within 1.5" (2" for the bright-star surveys
-the bright-star surveys (LAMOST, RAVE, APOGEE, Gaia-ESO, 2dF SMC), whose J2000 positions differ by proper motion from the
-2016 epoch); a matched part of a galaxy is scored with its host's class.
+LAMOST, RAVE, APOGEE, Gaia-ESO and 2dF SMC, whose J2000 positions differ by
+proper motion from the 2016 epoch); a matched part of a galaxy is scored with its host's class.
 Objects in the SDSS/DESI benchmark truth sets (training data) are excluded.
 
     python v2/benchmark/score_independent_fields.py [--which blind|full] [--out DIR]
