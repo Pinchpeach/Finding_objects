@@ -25,6 +25,9 @@ LAMOST and RAVE, whose J2000 positions differ by proper motion from the
 Objects in the SDSS/DESI benchmark truth sets (training data) are excluded.
 
     python v2/benchmark/score_independent_fields.py [--which blind|full] [--out DIR]
+
+The per-region products live on the validation-data branch (233 MB);
+fetch them first: v2/benchmark/independent_fields/README.md.
 """
 
 import argparse
@@ -152,6 +155,16 @@ def score(pred, truth):
     )
 
 
+def high_confidence_score(m):
+    """Objects flagged high_confidence (2.36.0) and how many of them are right."""
+    if "high_confidence" not in m:
+        return None
+    h = m.high_confidence.astype(str).str.lower().isin(["true", "1"])
+    if not h.any():
+        return dict(n=0, acc=None)
+    return dict(n=int(h.sum()), acc=round(100 * float((m.ours[h] == m.t_truth[h]).mean()), 2))
+
+
 def field_matches(fdir, which, bench):
     t, conflicts = truth_table(fdir / "truth")
     info = json.loads((fdir / "field.json").read_text())
@@ -160,6 +173,8 @@ def field_matches(fdir, which, bench):
     # Truth inside the field only.
     sep0 = np.hypot((t.ra - info["ra"]) * np.cos(np.radians(info["dec"])), t.dec - info["dec"]) * 60
     t = t[sep0 <= info["radius_arcmin"]].reset_index(drop=True)
+    if t.empty:  # no truth object inside the field (e.g. a LAMOST plate gap)
+        return pd.DataFrame(), dict(info=info, n_truth=0, conflicts=conflicts, unmatched=0, in_bench=0)
     bi, bs = _nearest(t.ra.to_numpy(), t.dec.to_numpy(), bench.ra.to_numpy(), bench.dec.to_numpy())
     t["in_benchmark"] = bs < 1.5
     has_parent = "parent_object_id" in o.columns
@@ -214,8 +229,9 @@ def markdown_table(rows, M):
     """One line per field: centre, radius/FOV, seeing, truth, our accuracy and the others' on the same objects."""
     head = (
         "| 영역 | 중심 RA, Dec (°) | l, b (°) | 반경 / FOV | seeing (″) | 정답 출처 | 채점 수 (별/은하/QSO) "
-        "| 우리 정확도 (미분류) | Gaia DSC: 그쪽 / 우리 | LS-GBM: 그쪽 / 우리 | LS형태+WISE: 그쪽 / 우리 | PS1 점/퍼짐: 그쪽 / 우리 |\n"
-        "|---|---|---|---|---|---|---|---|---|---|---|---|\n"
+        "| 우리 정확도 (미분류) | 고신뢰: 수 / 정확도 | Gaia DSC: 그쪽 / 우리 | LS-GBM: 그쪽 / 우리 | LS형태+WISE: 그쪽 / 우리 "
+        "| PS1 점/퍼짐: 그쪽 / 우리 | 실패한 아카이브 |\n"
+        "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|\n"
     )
     lines = []
     for r in rows:
@@ -244,11 +260,19 @@ def markdown_table(rows, M):
         v = pe["PS1 iPSF-iKron>0.05"].to_numpy()
         mm = pd.notna(v)
         ps1 = f"{100 * np.mean(v[mm] == pt[mm]):.1f} / {100 * np.mean(o2[mm] == pt[mm]):.1f} (n={mm.sum()})" if mm.any() else "–"
+        hc = high_confidence_score(g)
+        hct = f"{hc['n']} / {hc['acc']} %" if hc else "–"
+        covf = Path(r["root"]) / r["field"] / ("objects_blind_coverage.json" if r.get("which") == "blind" else "objects_coverage.json")
+        try:
+            cov = json.loads(covf.read_text())
+            failed = ", ".join(f["collector"] for f in cov.get("failed", [])) or "없음"
+        except (OSError, ValueError):
+            failed = "–"
         lines.append(
             f"| {r['field']} | {info['ra']:.3f}, {info['dec']:+.3f} | {l:.1f}, {b:+.1f} | {info['radius_arcmin']:.0f}′ / {2 * info['radius_arcmin']:.0f}′ "
             f"| {see} | {src} | {len(g)} ({mix.get('STAR', 0)}/{mix.get('GALAXY', 0)}/{mix.get('QSO', 0)}) "
-            f"| {o['acc']} % ({o['unknown']} %) | {pair('Gaia DR3 DSC-Combmod')} | {pair('LS-GBM (LS photometry only)')} "
-            f"| {pair('LS morphology + WISE W1-W2>=0.8')} | {ps1} |"
+            f"| {o['acc']} % ({o['unknown']} %) | {hct} | {pair('Gaia DR3 DSC-Combmod')} | {pair('LS-GBM (LS photometry only)')} "
+            f"| {pair('LS morphology + WISE W1-W2>=0.8')} | {ps1} | {failed} |"
         )
     return head + "\n".join(lines) + "\n"
 
@@ -266,6 +290,9 @@ def main():
             print(f"{fdir.name}: no blind run yet")
             continue
         m, st = field_matches(fdir, a.which, bench)
+        if m.empty:
+            print(f"\n=== {fdir.name}: no truth object inside the field; not scored")
+            continue
         m.insert(0, "field", fdir.name)
         allm.append(m)
         info = st["info"]
@@ -273,7 +300,7 @@ def main():
         print(f"single-catalogue fragments next to a truth object: {int(m.t_n_fragments.gt(0).sum())}")
         print(f"truth in field {st['n_truth']} (unmatched {st['unmatched']}, in SDSS/DESI benchmark {st['in_bench']}, survey conflicts {st['conflicts']}); scored {len(m)}")
         print("   by survey:", m.t_survey.value_counts().to_dict(), "| truth mix:", m.t_truth.value_counts().to_dict())
-        r = dict(field=fdir.name, root=str(a.root), ra=info["ra"], dec=info["dec"], n=len(m), ours=score(m.ours, m.t_truth))
+        r = dict(field=fdir.name, root=str(a.root), which=a.which, ra=info["ra"], dec=info["dec"], n=len(m), ours=score(m.ours, m.t_truth), high=high_confidence_score(m))
         lab, pe = other_labels(m)
         for k, v in lab.items():
             r[k] = score(v, m.t_truth)
@@ -285,6 +312,7 @@ def main():
     M = pd.concat(allm, ignore_index=True)
     print(f"\n=== ALL FIELDS ({a.which}): {len(M)} objects; truth mix {M.t_truth.value_counts().to_dict()}")
     print("ours:", score(M.ours, M.t_truth))
+    print("high confidence:", high_confidence_score(M))
     print(pd.crosstab(M.t_truth, M.ours, margins=True).to_string())
     lab, pe = other_labels(M)
     for k, v in lab.items():

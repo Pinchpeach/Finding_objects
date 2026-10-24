@@ -134,7 +134,8 @@ KEEP = re.compile(
     r"parent_object_id|component_role|unknown_reason|subclass|gaia_dr3__classprob_dsc_combmod_\w+|"
     r"desi_legacy_surveys_dr10__(type|shape_r|sersic|maskbits)|allwise__W[12]mag|"
     r"pan_starrs1_dr2_meanobject__(iMeanPSFMag|iMeanKronMag|nDetections)|std_mag__\w+|gaia_dr3__phot_g_mean_mag|"
-    r"gaia_dr3__(pmra|pmdec|parallax|parallax_over_error|ruwe))$"
+    r"gaia_dr3__(pmra|pmdec|parallax|parallax_over_error|ruwe)|high_confidence|high_confidence_basis|"
+    r"sdss_dr18_spectroscopy__class|desi_dr1_spectroscopy__OType|lamost_dr_catalog__Class)$"
 )
 
 
@@ -181,6 +182,9 @@ def compact(work, ra, dec, radius, out, name="objects"):
             )
             o = o[sep.arcsec <= 5.0]
     o.to_csv(out / f"{name}.csv.gz", index=False)
+    cov = work / "catalog_coverage.json"  # archives this run could not reach (2.36.0)
+    if cov.exists():
+        (out / f"{name}_coverage.json").write_text(cov.read_text())
     if lv.exists() and truth_dir.exists():
         # Evidence of the objects within 3" of a truth position, for error analysis.
         p = _positions(truth_dir)

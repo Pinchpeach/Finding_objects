@@ -63,6 +63,90 @@ jobs:
           - {name: lam_015p38, ra: 15.0, dec: 38.0}     # LAMOST M31-M33 survey area, b~-25
           - {name: lam_180p50, ra: 180.0, dec: 50.0}    # LAMOST north, b~+66
           - {name: kep_291p44, ra: 291.0, dec: 44.5}    # LAMOST-Kepler field, b~+13 (crowded)
+          # 2.36.2 extension to 32 regions (all > 5 deg from each other)
+          - {name: ngp_150m01, ra: 150.0, dec: -1.0}    # 2dFGRS NGP strip west end / COSMOS side, b~+42
+          - {name: ngp_175m03, ra: 175.0, dec: -3.0}    # 2QZ/2dFGRS NGP strip, b~+55
+          - {name: ngp_195p01, ra: 195.0, dec: 1.0}     # 2QZ/2dFGRS NGP strip, b~+64
+          - {name: sgp_350m30, ra: 350.0, dec: -30.0}   # 2QZ/2dFGRS SGP strip, b~-73
+          - {name: sgp_030m33, ra: 30.0, dec: -33.0}    # 2dFGRS SGP strip, b~-77
+          - {name: sgp_050m27, ra: 50.0, dec: -27.0}    # 2dFGRS SGP strip east end, b~-56
+          - {name: lam_060p20, ra: 60.0, dec: 20.0}     # LAMOST, Taurus side of the anticentre, b~-24
+          - {name: lam_130p30, ra: 130.0, dec: 30.0}    # LAMOST, b~+36
+          - {name: lam_160p40, ra: 160.0, dec: 40.0}    # LAMOST north, b~+60
+          - {name: lam_200p25, ra: 200.0, dec: 25.0}    # LAMOST near the NGP, b~+83
+          - {name: lam_240p30, ra: 240.0, dec: 30.0}    # LAMOST, b~+49
+          - {name: lam_330p25, ra: 330.0, dec: 25.0}    # LAMOST south-galactic side, b~-24
+          - {name: lam_100p45, ra: 100.0, dec: 45.0}    # LAMOST outer disc, b~+17
+          - {name: lam_250p10, ra: 250.0, dec: 10.0}    # LAMOST towards the inner Galaxy, b~+34
+          # 2026-10-24 extension to 100 regions (>= 3.5 deg from every other region; v2/benchmark pick from survey footprints)
+          - {name: ngp_180m04, ra: 180.5, dec: -4.0}    # ngp pool, b~+57
+          - {name: ngp_212m04, ra: 212.0, dec: -4.0}    # ngp pool, b~+54
+          - {name: ngp_160m02, ra: 159.5, dec: -1.5}    # ngp pool, b~+47
+          - {name: ngp_188p02, ra: 187.5, dec: 1.5}    # ngp pool, b~+64
+          - {name: ngp_208p02, ra: 208.5, dec: 1.5}    # ngp pool, b~+60
+          - {name: ngp_163m04, ra: 163.0, dec: -4.0}    # ngp pool, b~+48
+          - {name: ngp_156m04, ra: 156.0, dec: -4.0}    # ngp pool, b~+43
+          - {name: ngp_202m04, ra: 201.5, dec: -4.0}    # ngp pool, b~+58
+          - {name: ngp_170m02, ra: 170.0, dec: -1.5}    # ngp pool, b~+54
+          - {name: ngp_194m04, ra: 194.5, dec: -4.0}    # ngp pool, b~+59
+          - {name: ngp_177p02, ra: 177.0, dec: 1.5}    # ngp pool, b~+60
+          - {name: ngp_191m02, ra: 191.0, dec: -1.5}    # ngp pool, b~+61
+          - {name: ngp_202p02, ra: 201.5, dec: 1.5}    # ngp pool, b~+63
+          - {name: ngp_216m02, ra: 215.5, dec: -1.5}    # ngp pool, b~+54
+          - {name: sgp_017m25, ra: 17.0, dec: -25.0}    # sgp pool, b~-86
+          - {name: sgp_053m35, ra: 53.0, dec: -35.0}    # sgp pool, b~-55
+          - {name: sgp_017m35, ra: 17.0, dec: -35.0}    # sgp pool, b~-81
+          - {name: sgp_337m25, ra: 337.0, dec: -25.0}    # sgp pool, b~-58
+          - {name: sgp_001m25, ra: 1.0, dec: -25.0}    # sgp pool, b~-79
+          - {name: sgp_053m30, ra: 53.0, dec: -30.0}    # sgp pool, b~-55
+          - {name: sgp_329m25, ra: 329.0, dec: -25.0}    # sgp pool, b~-51
+          - {name: sgp_001m30, ra: 1.0, dec: -30.0}    # sgp pool, b~-79
+          - {name: sgp_013m30, ra: 13.0, dec: -30.0}    # sgp pool, b~-87
+          - {name: sgp_325m35, ra: 325.0, dec: -35.0}    # sgp pool, b~-49
+          - {name: sgp_009m25, ra: 9.0, dec: -25.0}    # sgp pool, b~-86
+          - {name: sgp_325m25, ra: 325.0, dec: -25.0}    # sgp pool, b~-47
+          - {name: sgp_349m25, ra: 349.0, dec: -25.0}    # sgp pool, b~-68
+          - {name: sgp_025m35, ra: 25.0, dec: -35.0}    # sgp pool, b~-77
+          - {name: sgp_005m25, ra: 5.0, dec: -25.0}    # sgp pool, b~-83
+          - {name: sgp_045m25, ra: 45.0, dec: -25.0}    # sgp pool, b~-61
+          - {name: s82_354p00, ra: 354.0, dec: 0.0}    # s82 pool, b~-57
+          - {name: s82_326p00, ra: 326.0, dec: 0.0}    # s82 pool, b~-37
+          - {name: s82_046p00, ra: 46.0, dec: 0.0}    # s82 pool, b~-48
+          - {name: s82_318p00, ra: 318.0, dec: 0.0}    # s82 pool, b~-31
+          - {name: s82_038p00, ra: 38.0, dec: 0.0}    # s82 pool, b~-54
+          - {name: s82_350p00, ra: 350.0, dec: 0.0}    # s82 pool, b~-55
+          - {name: s82_022p00, ra: 22.0, dec: 0.0}    # s82 pool, b~-61
+          - {name: s82_026p00, ra: 26.0, dec: 0.0}    # s82 pool, b~-60
+          - {name: lam_000p40, ra: 0.0, dec: 40.0}    # lam pool, b~-22
+          - {name: lam_342p20, ra: 342.0, dec: 20.0}    # lam pool, b~-34
+          - {name: lam_135p10, ra: 135.0, dec: 10.0}    # lam pool, b~+33
+          - {name: lam_084p58, ra: 84.0, dec: 58.0}    # lam pool, b~+14
+          - {name: lam_261p30, ra: 261.0, dec: 30.0}    # lam pool, b~+31
+          - {name: lam_153p10, ra: 153.0, dec: 10.0}    # lam pool, b~+49
+          - {name: lam_108p58, ra: 108.0, dec: 58.0}    # lam pool, b~+25
+          - {name: lam_156p50, ra: 156.0, dec: 50.0}    # lam pool, b~+54
+          - {name: lam_171p20, ra: 171.0, dec: 20.0}    # lam pool, b~+69
+          - {name: lam_162p10, ra: 162.0, dec: 10.0}    # lam pool, b~+56
+          - {name: lam_216p10, ra: 216.0, dec: 10.0}    # lam pool, b~+62
+          - {name: lam_189p10, ra: 189.0, dec: 10.0}    # lam pool, b~+72
+          - {name: lam_000p00, ra: 0.0, dec: 0.0}    # lam pool, b~-60
+          - {name: lam_045p30, ra: 45.0, dec: 30.0}    # lam pool, b~-25
+          - {name: lam_063p40, ra: 63.0, dec: 40.0}    # lam pool, b~-8
+          - {name: lam_252p40, ra: 252.0, dec: 40.0}    # lam pool, b~+40
+          - {name: lam_126p00, ra: 126.0, dec: 0.0}    # lam pool, b~+20
+          - {name: lam_264p50, ra: 264.0, dec: 50.0}    # lam pool, b~+32
+          - {name: lam_048p50, ra: 48.0, dec: 50.0}    # lam pool, b~-7
+          - {name: lam_180p20, ra: 180.0, dec: 20.0}    # lam pool, b~+76
+          - {name: lam_261p20, ra: 261.0, dec: 20.0}    # lam pool, b~+28
+          - {name: lam_009p10, ra: 9.0, dec: 10.0}    # lam pool, b~-53
+          - {name: lam_279p30, ra: 279.0, dec: 30.0}    # lam pool, b~+16
+          - {name: lam_351p30, ra: 351.0, dec: 30.0}    # lam pool, b~-29
+          - {name: lam_072p20, ra: 72.0, dec: 20.0}    # lam pool, b~-16
+          - {name: lam_018p30, ra: 18.0, dec: 30.0}    # lam pool, b~-33
+          - {name: lam_198p30, ra: 198.0, dec: 30.0}    # lam pool, b~+85
+          - {name: lam_000p50, ra: 0.0, dec: 50.0}    # lam pool, b~-12
+          - {name: lam_054p30, ra: 54.0, dec: 30.0}    # lam pool, b~-21
+          - {name: lam_090p40, ra: 90.0, dec: 40.0}    # lam pool, b~+8
     env:
       NAME: ${{ matrix.region.name }}
       RA0: ${{ matrix.region.ra }}
@@ -105,7 +189,8 @@ jobs:
           done
           python -u v2/pipeline.py --raw-dir /tmp/blindraw --ra $RA --dec $DEC --radius $R --work /tmp/blind
       - name: Commit compact products
-        if: steps.pick.outputs.run
+        # raw products live on the validation-data branch (233 MB for 100 regions), never on main
+        if: steps.pick.outputs.run && github.ref_name != 'main'
         run: |
           out=v2/benchmark/independent_fields/$NAME
           rm -rf "$out"; mkdir -p "$out/truth"
