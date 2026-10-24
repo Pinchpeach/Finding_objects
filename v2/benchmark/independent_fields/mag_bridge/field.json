@@ -1,0 +1,28 @@
+{
+ "ra": 33.0,
+ "dec": -74.0,
+ "radius_arcmin": 6.0,
+ "n_objects": 5273,
+ "seconds": {
+  "collect": 449.2,
+  "1_associate": 1.5,
+  "2_integrate": 1.2,
+  "3_features": 0.9,
+  "4_evidence": 2.8,
+  "5_coarse": 2.9,
+  "6_prepare": 1.2,
+  "7_classify": 2.5
+ },
+ "catalog_rows": {
+  "DESI Legacy Surveys DR10": 5127,
+  "NED": 1154,
+  "Gaia DR3": 364
+ },
+ "seeing": {
+  "g": 1.76,
+  "r": 1.56,
+  "z": 1.45,
+  "n_psf": 2988,
+  "source": "LS DR10 psfsize"
+ }
+}
