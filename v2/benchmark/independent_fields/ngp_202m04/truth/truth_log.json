@@ -1,0 +1,25 @@
+{
+ "LAMOST DR5 (Luo+2019)": {
+  "V/164/dr5": 175,
+  "V/164/stellar5": 104,
+  "V/164/astars5": 3,
+  "V/164/mstars5": 13
+ },
+ "2QZ/6QZ (Croom+2004)": {},
+ "2dFGRS (Colless+2003)": {
+  "VII/250/2dfgrs": 276,
+  "VII/250/parent": 353,
+  "VII/250/photo": 350
+ },
+ "6dFGS DR3 (Jones+2009)": {
+  "VII/259/6dfgs": 20,
+  "VII/259/spectra": 6
+ },
+ "2SLAQ QSO (Croom+2009)": {},
+ "WiggleZ final (Drinkwater+2018)": {},
+ "RAVE DR6 (Steinmetz+2020)": {
+  "III/283/ravedr6": 30,
+  "III/283/xgaia2": 30,
+  "III/283/xgaiae3": 30
+ }
+}
