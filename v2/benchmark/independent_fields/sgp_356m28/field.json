@@ -1,0 +1,37 @@
+{
+ "ra": 356.76417,
+ "dec": -28.11111,
+ "radius_arcmin": 12.0,
+ "n_objects": 30552,
+ "seconds": {
+  "collect": 89.7,
+  "1_associate": 8.9,
+  "2_integrate": 18.0,
+  "3_features": 28.5,
+  "4_evidence": 23.5,
+  "5_coarse": 38.0,
+  "6_prepare": 30.8,
+  "7_classify": 33.0
+ },
+ "catalog_rows": {
+  "DESI Legacy Surveys DR10": 28512,
+  "Pan-STARRS1 DR2 MeanObject": 4092,
+  "NED": 2249,
+  "AllWISE": 2021,
+  "Gaia DR3": 477,
+  "2MASS PSC": 250,
+  "SIMBAD": 163,
+  "XMM 4XMM-DR13": 55,
+  "Chandra CSC 2.0": 38,
+  "NVSS": 13,
+  "VLASS": 12,
+  "TGSS ADR1": 4
+ },
+ "seeing": {
+  "g": 1.52,
+  "r": 1.52,
+  "z": 1.32,
+  "n_psf": 11720,
+  "source": "LS DR10 psfsize"
+ }
+}
