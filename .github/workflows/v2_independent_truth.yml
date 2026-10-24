@@ -189,7 +189,8 @@ jobs:
           done
           python -u v2/pipeline.py --raw-dir /tmp/blindraw --ra $RA --dec $DEC --radius $R --work /tmp/blind
       - name: Commit compact products
-        if: steps.pick.outputs.run
+        # raw products live on the validation-data branch (233 MB for 100 regions), never on main
+        if: steps.pick.outputs.run && github.ref_name != 'main'
         run: |
           out=v2/benchmark/independent_fields/$NAME
           rm -rf "$out"; mkdir -p "$out/truth"

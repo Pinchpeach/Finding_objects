@@ -25,6 +25,9 @@ LAMOST and RAVE, whose J2000 positions differ by proper motion from the
 Objects in the SDSS/DESI benchmark truth sets (training data) are excluded.
 
     python v2/benchmark/score_independent_fields.py [--which blind|full] [--out DIR]
+
+The per-region products live on the validation-data branch (233 MB);
+fetch them first: v2/benchmark/independent_fields/README.md.
 """
 
 import argparse

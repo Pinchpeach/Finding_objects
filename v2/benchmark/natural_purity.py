@@ -35,6 +35,9 @@ no such t -> no photometric high-confidence objects of c in that bin.
 (PRED_CSV: rule_baseline_test_predictions.csv of evaluate_rule_baseline.py
 on the DESI external test set.)  --write stores the thresholds in
 v2/Classifier/high_confidence.json.
+
+The per-region products live on the validation-data branch (233 MB);
+fetch them first: v2/benchmark/independent_fields/README.md.
 """
 
 import argparse
