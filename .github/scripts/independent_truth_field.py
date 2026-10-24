@@ -40,8 +40,14 @@ CATALOGUES = {
     "2SLAQ QSO (Croom+2009)": "J/MNRAS/392/19",
     "WiggleZ final (Drinkwater+2018)": "J/MNRAS/474/4151",
     "RAVE DR6 (Steinmetz+2020)": "III/283",
+    # 2026-10-24: clusters, star-forming regions and the Magellanic Clouds
+    "APOGEE DR17 (Abdurro'uf+2022)": "III/286",
+    "Magellanic Quasars Survey (Kozlowski+2013)": "J/ApJ/775/92",
+    "Gaia-ESO DR5 (Randich+2022)": "J/A+A/666/A121",
+    "2dF SMC OBA stars (Evans+2004)": "J/MNRAS/353/601",
 }
-SEARCH_WORDS = ["LAMOST", "2SLAQ", "WiggleZ", "GAMA redshift", "6dF", "2QZ", "VIPERS", "zCOSMOS", "DEEP2", "VVDS"]
+SEARCH_WORDS = ["APOGEE DR17", "Magellanic Quasars", "quasars behind Magellanic", "Gaia-ESO survey DR5",
+                "SMC 2dF spectroscopy", "LMC spectroscopic survey", "open clusters spectroscopic members"]
 
 
 def _vizier(row_limit=-1):
