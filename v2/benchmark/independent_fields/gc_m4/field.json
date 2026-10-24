@@ -1,0 +1,40 @@
+{
+ "ra": 245.897,
+ "dec": -26.526,
+ "radius_arcmin": 6.0,
+ "n_objects": 23629,
+ "seconds": {
+  "collect": 518.5,
+  "1_associate": 76.2,
+  "2_integrate": 14.7,
+  "3_features": 13.9,
+  "4_evidence": 17.5,
+  "5_coarse": 22.0,
+  "6_prepare": 17.0,
+  "7_classify": 24.7
+ },
+ "catalog_rows": {
+  "Gaia DR3": 20067,
+  "Pan-STARRS1 DR2 MeanObject": 17146,
+  "NED": 5260,
+  "2MASS PSC": 4791,
+  "SIMBAD": 2390,
+  "AllWISE": 898,
+  "Gaia DR3 variability SOS": 35,
+  "ATNF Pulsar Catalog": 1
+ },
+ "seeing": {
+  "g": NaN,
+  "r": NaN,
+  "z": NaN,
+  "n_psf": 0,
+  "source": "LS DR10 psfsize",
+  "ps1": {
+   "source": "PS1 stack psfMajor/MinorFWHM",
+   "n": 15358,
+   "g": 1.38,
+   "r": 1.28,
+   "i": 1.11
+  }
+ }
+}
