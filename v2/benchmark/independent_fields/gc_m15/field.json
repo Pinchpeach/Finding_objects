@@ -1,0 +1,40 @@
+{
+ "ra": 322.493,
+ "dec": 12.167,
+ "radius_arcmin": 6.0,
+ "n_objects": 30869,
+ "seconds": {
+  "collect": 467.9,
+  "1_associate": 101.0,
+  "2_integrate": 34.3,
+  "3_features": 51.1,
+  "4_evidence": 40.0,
+  "5_coarse": 66.6,
+  "6_prepare": 57.9,
+  "7_classify": 55.8
+ },
+ "catalog_rows": {
+  "DESI Legacy Surveys DR10": 23986,
+  "Gaia DR3": 23980,
+  "Pan-STARRS1 DR2 MeanObject": 22582,
+  "NED": 2866,
+  "AllWISE": 953,
+  "ZTF periodic variables": 83,
+  "Chandra CSC 2.0": 54,
+  "SDSS DR18 PhotoObj": 20,
+  "DESI DR1 spectroscopy": 18,
+  "ATNF Pulsar Catalog": 13,
+  "SGA-2020": 8,
+  "FIRST": 6,
+  "VLASS": 4,
+  "NVSS": 4,
+  "SDSS DR18 spectroscopy": 1
+ },
+ "seeing": {
+  "g": 1.64,
+  "r": 1.33,
+  "z": 1.33,
+  "n_psf": 23976,
+  "source": "LS DR10 psfsize"
+ }
+}
