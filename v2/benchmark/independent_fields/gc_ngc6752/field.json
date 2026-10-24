@@ -2,24 +2,28 @@
  "ra": 287.717,
  "dec": -59.985,
  "radius_arcmin": 6.0,
- "n_objects": 35578,
+ "n_objects": 36022,
  "seconds": {
-  "collect": 475.8,
-  "1_associate": 45.1,
-  "2_integrate": 23.2,
-  "3_features": 30.8,
-  "4_evidence": 25.9,
-  "5_coarse": 38.3,
-  "6_prepare": 32.3,
-  "7_classify": 38.9
+  "collect": 208.4,
+  "1_associate": 53.8,
+  "2_integrate": 26.8,
+  "3_features": 46.3,
+  "4_evidence": 30.0,
+  "5_coarse": 52.8,
+  "6_prepare": 46.3,
+  "7_classify": 43.6
  },
  "catalog_rows": {
   "Gaia DR3": 35071,
   "DESI Legacy Surveys DR10": 6020,
   "NED": 4115,
+  "2MASS PSC": 3464,
   "SIMBAD": 1307,
+  "AllWISE": 1020,
   "Chandra CSC 2.0": 63,
-  "ATNF Pulsar Catalog": 5
+  "Gaia DR3 variability SOS": 5,
+  "ATNF Pulsar Catalog": 5,
+  "eROSITA eRASS1": 5
  },
  "seeing": {
   "g": 1.3,
