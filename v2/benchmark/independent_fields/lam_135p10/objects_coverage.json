@@ -1,0 +1,23 @@
+{
+ "known": true,
+ "attempted": 28,
+ "failed": [
+  {
+   "collector": "simbad",
+   "catalog": "SIMBAD",
+   "status": "error",
+   "impact": "literature labels",
+   "key": false,
+   "error": "DALFormatError: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+  },
+  {
+   "collector": "ned",
+   "catalog": "NED",
+   "status": "error",
+   "impact": "literature labels",
+   "key": false,
+   "error": "RemoteServiceError(\"The remote service returned the following error message.\\nERROR: We can't start the database search program /ned/ops/util/bin/nedexec. start_exec() returned status=-4\")"
+  }
+ ],
+ "key_failed": false
+}
