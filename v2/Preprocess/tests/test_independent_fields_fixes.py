@@ -79,3 +79,45 @@ def test_gaia_optional_tables_merge_in_chunks(monkeypatch):
     out = gaia_dr3._merge_optional(base, "gaiadr3.astrophysical_parameters", ["classprob_dsc_combmod_quasar"], "dsc_status")
     assert calls == [2000, 2000, 500]
     assert out["classprob_dsc_combmod_quasar"].notna().all() and set(out["dsc_status"]) == {"ok"}
+
+
+def _stage5():
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("s5", V2 / "Preprocess" / "05_likelihood_vectors.py")
+    s5 = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(s5)
+    return s5
+
+
+def test_strong_parallax_is_decisive_even_when_cstar_fails():
+    s5 = _stage5()
+    item = {"rule_id": "AST-GAL-001", "value": 18.0, "reliability": 1.0, "association_reliability": 1.0, "cstar_sigma": 40.0}
+    assert s5._decisive_motion([item])
+    assert not s5._decisive_motion([{**item, "value": 12.0}])  # point-like threshold 10, non-point 15
+    assert s5._decisive_motion([{**item, "value": 12.0, "cstar_sigma": 1.0}])
+    # proper motion of an extended source stays gated (NGC 4522 nucleus)
+    assert not s5._decisive_motion([{**item, "rule_id": "AST-GAL-002", "value": 30.0}])
+
+
+def test_magellanic_prior_suppresses_qso_odds_of_cloud_members_only():
+    s5 = _stage5()
+    base = {"catalog_confidence_gaia_astrometry": 1.0, "association_confidence__gaia_dr3": 1.0}
+    rows = [
+        # LMC bar, no proper motion: the star-count prior alone
+        {"ra": 80.89, "dec": -69.76},
+        # LMC bar, faint member at the systemic motion
+        {"ra": 80.89, "dec": -69.76, "gaia_dr3__pmra": 1.9, "gaia_dr3__pmdec": 0.3, "gaia_dr3__pmra_error": 0.5, "gaia_dr3__pmdec_error": 0.5, **base},
+        # LMC bar, bright source at zero motion (background quasar)
+        {"ra": 80.89, "dec": -69.76, "gaia_dr3__pmra": 0.0, "gaia_dr3__pmdec": 0.0, "gaia_dr3__pmra_error": 0.05, "gaia_dr3__pmdec_error": 0.05, **base},
+        # SMC bar, no proper motion; far outside both Clouds; no position
+        {"ra": 13.19, "dec": -72.83},
+        {"ra": 150.0, "dec": 2.0},
+        {"ra": np.nan, "dec": np.nan},
+    ]
+    f = s5.magellanic_factor(pd.DataFrame(rows))
+    assert abs(f[0] - 1.2e4 / 1.2e6) < 1e-6
+    assert f[1] < f[0] / 10
+    assert f[2] == 1.0  # the motion rules the Cloud out: the fusion's odds stand
+    assert abs(f[3] - 6.6e3 / 1.09e6) < 1e-6
+    assert f[4] == 1.0 and f[5] == 1.0

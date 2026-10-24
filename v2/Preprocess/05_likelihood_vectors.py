@@ -250,15 +250,37 @@ def _gaia_foreground_star(items):
     )
 
 
+# The C* gate guards against spurious *proper motions* of blended or
+# extended sources (the NGC 4522 nucleus, 2.22.0).  Inside bright nebulae
+# (ONC, M8) the BP/RP excess of genuine young stars is raised by the nebular
+# background, so C* > 5 there too, and the gate hid their parallaxes
+# (200-region validation, 2026-10-24: ONC 64 % correct, 27 % UNKNOWN).  A
+# parallax at >= 15 sigma is kept decisive whatever C*: of the 152 C*-failing
+# truth objects with such a parallax (reliability and association >= 0.8),
+# 151 are spectroscopic stars (the other, a galaxy, was UNKNOWN before), and
+# the Gaia quasar parallaxes scatter with a width of ~1.1 (Lindegren et al.
+# 2021), so 15 sigma also covers an error underestimate of ~1.5 for blended
+# faint sources (El-Badry, Rix & Heintz 2021; Fabricius et al. 2021, A&A
+# 649, A5).  Proper motion keeps the C* gate.
+DECISIVE_PARALLAX_NONPOINT_SIGMA = 15.0
+
+
 def _decisive_motion(items):
     """Gaia parallax or proper motion at >= DECISIVE_MOTION_SIGMA with a good
-    astrometric solution and a reliable association."""
+    astrometric solution and a reliable association (a parallax of a
+    non-point-like source only at >= DECISIVE_PARALLAX_NONPOINT_SIGMA)."""
     for e in items:
-        if e.get("rule_id") not in GAIA_MOTION_RULES or not _point_like(e):
+        if e.get("rule_id") not in GAIA_MOTION_RULES:
+            continue
+        if _point_like(e):
+            need = DECISIVE_MOTION_SIGMA
+        elif e.get("rule_id") == "AST-GAL-001":
+            need = DECISIVE_PARALLAX_NONPOINT_SIGMA
+        else:
             continue
         try:
             if (
-                float(e.get("value")) >= DECISIVE_MOTION_SIGMA
+                float(e.get("value")) >= need
                 and float(e.get("reliability", 0)) >= DECISIVE_MIN_RELIABILITY
                 and float(e.get("association_reliability", 0)) >= DECISIVE_MIN_RELIABILITY
             ):
@@ -324,6 +346,81 @@ def latitude_factor(df: pd.DataFrame) -> np.ndarray:
     return np.where(np.isfinite(f), np.maximum(f, 1e-3), 1.0)
 
 
+# Magellanic Cloud prior (2.37.0).  Inside the LMC and SMC the star counts
+# reach 10^6 deg^-2 (Gaia DR3 sources in the 200-region validation: lmc_bar
+# 1.3e6, smc_bar 1.1e6) against ~10^4 at the same latitudes elsewhere, while
+# background quasars stay at ~10^2 deg^-2, so a photometric QSO there is
+# almost always a faint Cloud star: the blind run predicted 2,900-5,900 QSO
+# per 6' field (~10^5 deg^-2).  Gaia DR3 drops the Clouds from its purer
+# quasar sample for the same reason (Gaia Collaboration, Bailer-Jones et al.
+# 2023, A&A 674, A41), as do Gaia-CRF3 and Quaia (Storey-Fisher et al. 2024).
+# Two factors on the GALAXY and QSO odds, never above 1:
+#   * prior: the local star-count excess rho_ref / rho(R), rho(R) =
+#     rho0 exp(-R / h), fitted to the Gaia counts of the 11 Cloud fields
+#     (LMC rho0 = 1.2e6, h = 1.97 deg; SMC 1.09e6, 0.66 deg; scatter 0.2 dex)
+#     with rho_ref the median count of the |b| = 25-35 (LMC, b = -33) and
+#     35-45 deg (SMC, b = -44) fields away from the Clouds (1.2e4, 6.6e3).
+#     It reaches 1 at R = 9.1 deg (LMC) and 3.4 deg (SMC), the usual extent
+#     of their discs;
+#   * proper motion: the likelihood ratio of the Gaia proper motion under
+#     "Cloud member" (systemic motion with an internal spread) and
+#     "background source" (zero; errors scaled by 1.1 as for Gaia-CRF3
+#     quasars, Lindegren et al. 2021).  Systemic motions (mas/yr): LMC
+#     (1.88, 0.31) with spread 0.4, covering Gaia DR1-EDR3 and HST values
+#     (1.85-1.91, 0.23-0.39; van der Marel & Sahlmann 2016, Gaia
+#     Collaboration, Helmi et al. 2018, Luri et al. 2021, Kallivayalil et al.
+#     2013) and the disc rotation (~0.3 mas/yr at 50 kpc); SMC (0.82, -1.21)
+#     with spread 0.3 (Zivick et al. 2018; Helmi et al. 2018; 0.69-0.87).
+#     A motion consistent with zero but not with the Cloud (bright
+#     quasars) raises the odds again, at most back to the fusion's.
+MAGELLANIC = (
+    # name, centre (deg), rho0, scale length (deg), rho_ref (deg^-2), systemic PM, internal spread (mas/yr)
+    ("LMC", 80.89, -69.76, 1.2e6, 1.97, 1.2e4, (1.88, 0.31), 0.4),
+    ("SMC", 13.19, -72.83, 1.09e6, 0.66, 6.6e3, (0.82, -1.21), 0.3),
+)
+MAGELLANIC_PM_ERROR_SCALE = 1.1
+MAGELLANIC_MIN_RELIABILITY = 0.8
+
+
+def _col(df, name):
+    return pd.to_numeric(df[name], errors="coerce").to_numpy(float) if name in df else np.full(len(df), np.nan)
+
+
+def magellanic_factor(df: pd.DataFrame) -> np.ndarray:
+    """Per-row factor (0, 1] on the GALAXY and QSO odds inside the Magellanic Clouds; 1 elsewhere."""
+    ra, dec = _col(df, "ra"), _col(df, "dec")
+    f = np.ones(len(df))
+    pa, pd_ = _col(df, "gaia_dr3__pmra"), _col(df, "gaia_dr3__pmdec")
+    ea, ed = (MAGELLANIC_PM_ERROR_SCALE * _col(df, c) for c in ("gaia_dr3__pmra_error", "gaia_dr3__pmdec_error"))
+    rel = np.fmin(
+        np.nan_to_num(_col(df, "catalog_confidence_gaia_astrometry"), nan=0.0),
+        np.nan_to_num(_col(df, "association_confidence__gaia_dr3"), nan=1.0),
+    )
+    ok = np.isfinite(pa + pd_ + ea + ed) & (ea > 0) & (ed > 0) & (rel >= MAGELLANIC_MIN_RELIABILITY)
+    for _, ra0, dec0, rho0, h, rho_ref, (ma, md), s in MAGELLANIC:
+        c = np.sin(np.radians(dec)) * np.sin(np.radians(dec0)) + np.cos(np.radians(dec)) * np.cos(
+            np.radians(dec0)
+        ) * np.cos(np.radians(ra - ra0))
+        r = np.degrees(np.arccos(np.clip(c, -1, 1)))
+        prior = np.minimum(1.0, rho_ref / (rho0 * np.exp(-r / h)))
+        inside = np.isfinite(r) & (prior < 1.0)
+        if not inside.any():
+            continue
+        # ln L(member) - ln L(zero motion), independent Gaussian components
+        va, vd = ea**2 + s**2, ed**2 + s**2
+        with np.errstate(invalid="ignore", divide="ignore"):
+            lnlr = (
+                -0.5 * ((pa - ma) ** 2 / va + (pd_ - md) ** 2 / vd)
+                - 0.5 * np.log(va * vd)
+                + 0.5 * ((pa / ea) ** 2 + (pd_ / ed) ** 2)
+                + 0.5 * np.log(ea**2 * ed**2)
+            )
+        lnlr = np.where(ok, np.clip(lnlr, -700, 700), 0.0)
+        g = np.minimum(1.0, prior * np.exp(-lnlr))
+        f = np.where(inside, np.minimum(f, g), f)
+    return np.maximum(f, 1e-6)
+
+
 def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=False):
     model = load_model(model_path)
     min_conf = float(model.get("min_confidence", MIN_CONFIDENCE)) if model else MIN_CONFIDENCE
@@ -378,7 +475,7 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     prior = estimate_field_prior(P[eligible], train_prior) if estimable else np.array(train_prior)
     adjust = estimable and bool(field_prior)
     Q = P * (prior if adjust else np.array(train_prior)) / np.array(train_prior)
-    lat = latitude_factor(df)
+    lat = latitude_factor(df) * magellanic_factor(df)
     Q[:, [CLASSES.index("GALAXY"), CLASSES.index("QSO")]] *= lat[:, None]
     Q = Q / Q.sum(axis=1, keepdims=True) if len(Q) else Q
     labels = []
