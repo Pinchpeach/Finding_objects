@@ -1,0 +1,15 @@
+{
+ "LAMOST DR5 (Luo+2019)": {
+  "V/164/dr5": 598,
+  "V/164/stellar5": 441,
+  "V/164/astars5": 8,
+  "V/164/mstars5": 38,
+  "V/164/dr5_plan": 5
+ },
+ "2QZ/6QZ (Croom+2004)": {},
+ "2dFGRS (Colless+2003)": {},
+ "6dFGS DR3 (Jones+2009)": {},
+ "2SLAQ QSO (Croom+2009)": {},
+ "WiggleZ final (Drinkwater+2018)": {},
+ "RAVE DR6 (Steinmetz+2020)": {}
+}
