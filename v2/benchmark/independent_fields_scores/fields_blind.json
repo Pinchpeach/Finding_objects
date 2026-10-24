@@ -103,6 +103,954 @@
   }
  },
  {
+  "field": "gc_47tuc",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 6.024,
+  "dec": -72.081,
+  "n": 182,
+  "ours": {
+   "n": 182,
+   "acc": 97.8,
+   "acc_cls": 100.0,
+   "unknown": 2.2,
+   "bal": 97.8,
+   "recall": {
+    "STAR": [
+     97.8,
+     182
+    ]
+   }
+  },
+  "high": {
+   "n": 178,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": null,
+  "Gaia DR3 DSC-Combmod | ours same": null,
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 6,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     6
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 6,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     6
+    ]
+   }
+  }
+ },
+ {
+  "field": "gc_m13",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 250.422,
+  "dec": 36.46,
+  "n": 95,
+  "ours": {
+   "n": 95,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     95
+    ]
+   }
+  },
+  "high": {
+   "n": 95,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": null,
+  "Gaia DR3 DSC-Combmod | ours same": null,
+  "LS-GBM (LS photometry only)": {
+   "n": 7,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     7
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 7,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     7
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 42,
+   "acc": 97.6,
+   "acc_cls": 97.6,
+   "unknown": 0.0,
+   "bal": 97.6,
+   "recall": {
+    "STAR": [
+     97.6,
+     42
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 42,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     42
+    ]
+   }
+  }
+ },
+ {
+  "field": "gc_m15",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 322.493,
+  "dec": 12.167,
+  "n": 94,
+  "ours": {
+   "n": 94,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     94
+    ]
+   }
+  },
+  "high": {
+   "n": 94,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": null,
+  "Gaia DR3 DSC-Combmod | ours same": null,
+  "LS-GBM (LS photometry only)": {
+   "n": 92,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     92
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 92,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     92
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 72,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     72
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 72,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     72
+    ]
+   }
+  }
+ },
+ {
+  "field": "gc_m2",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 323.363,
+  "dec": -0.823,
+  "n": 41,
+  "ours": {
+   "n": 41,
+   "acc": 87.8,
+   "acc_cls": 87.8,
+   "unknown": 0.0,
+   "bal": 50.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     36
+    ],
+    "GALAXY": [
+     0.0,
+     5
+    ]
+   }
+  },
+  "high": {
+   "n": 41,
+   "acc": 87.8
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 40,
+   "acc": 92.5,
+   "acc_cls": 92.5,
+   "unknown": 0.0,
+   "bal": 62.5,
+   "recall": {
+    "STAR": [
+     100.0,
+     36
+    ],
+    "GALAXY": [
+     25.0,
+     4
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 40,
+   "acc": 90.0,
+   "acc_cls": 90.0,
+   "unknown": 0.0,
+   "bal": 50.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     36
+    ],
+    "GALAXY": [
+     0.0,
+     4
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 40,
+   "acc": 87.5,
+   "acc_cls": 87.5,
+   "unknown": 0.0,
+   "bal": 50.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     35
+    ],
+    "GALAXY": [
+     0.0,
+     5
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 40,
+   "acc": 87.5,
+   "acc_cls": 87.5,
+   "unknown": 0.0,
+   "bal": 50.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     35
+    ],
+    "GALAXY": [
+     0.0,
+     5
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 25,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     25
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 25,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     25
+    ]
+   }
+  }
+ },
+ {
+  "field": "gc_m3",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 205.548,
+  "dec": 28.377,
+  "n": 101,
+  "ours": {
+   "n": 101,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     101
+    ]
+   }
+  },
+  "high": {
+   "n": 101,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": null,
+  "Gaia DR3 DSC-Combmod | ours same": null,
+  "LS-GBM (LS photometry only)": {
+   "n": 98,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     98
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 98,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     98
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 72,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     72
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 72,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     72
+    ]
+   }
+  }
+ },
+ {
+  "field": "gc_m4",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 245.897,
+  "dec": -26.526,
+  "n": 105,
+  "ours": {
+   "n": 105,
+   "acc": 99.0,
+   "acc_cls": 100.0,
+   "unknown": 1.0,
+   "bal": 99.0,
+   "recall": {
+    "STAR": [
+     99.0,
+     105
+    ]
+   }
+  },
+  "high": {
+   "n": 104,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 104,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     104
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 104,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     104
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": null,
+  "LS morphology + WISE W1-W2>=0.8 | ours same": null
+ },
+ {
+  "field": "gc_m5",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 229.638,
+  "dec": 2.081,
+  "n": 123,
+  "ours": {
+   "n": 123,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     123
+    ]
+   }
+  },
+  "high": {
+   "n": 123,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": null,
+  "Gaia DR3 DSC-Combmod | ours same": null,
+  "LS-GBM (LS photometry only)": {
+   "n": 80,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     80
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 80,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     80
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 83,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     83
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 83,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     83
+    ]
+   }
+  }
+ },
+ {
+  "field": "gc_m92",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 259.281,
+  "dec": 43.136,
+  "n": 65,
+  "ours": {
+   "n": 65,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     65
+    ]
+   }
+  },
+  "high": {
+   "n": 65,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 65,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     65
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 65,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     65
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 38,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     38
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 38,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     38
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 48,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     48
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 48,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     48
+    ]
+   }
+  }
+ },
+ {
+  "field": "gc_ngc288",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 13.188,
+  "dec": -26.583,
+  "n": 42,
+  "ours": {
+   "n": 42,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     41
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "high": {
+   "n": 41,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 42,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     41
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 42,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     41
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 36,
+   "acc": 97.2,
+   "acc_cls": 97.2,
+   "unknown": 0.0,
+   "bal": 50.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     35
+    ],
+    "GALAXY": [
+     0.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 36,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     35
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 35,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     34
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 35,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     34
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  }
+ },
+ {
+  "field": "gc_ngc6397",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 265.175,
+  "dec": -53.674,
+  "n": 99,
+  "ours": {
+   "n": 99,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     99
+    ]
+   }
+  },
+  "high": {
+   "n": 99,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": null,
+  "Gaia DR3 DSC-Combmod | ours same": null,
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": null,
+  "LS morphology + WISE W1-W2>=0.8 | ours same": null
+ },
+ {
+  "field": "gc_ngc6752",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 287.717,
+  "dec": -59.985,
+  "n": 207,
+  "ours": {
+   "n": 207,
+   "acc": 99.5,
+   "acc_cls": 100.0,
+   "unknown": 0.5,
+   "bal": 99.5,
+   "recall": {
+    "STAR": [
+     99.5,
+     207
+    ]
+   }
+  },
+  "high": {
+   "n": 206,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": null,
+  "Gaia DR3 DSC-Combmod | ours same": null,
+  "LS-GBM (LS photometry only)": {
+   "n": 43,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     43
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 43,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     43
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 27,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     27
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 27,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     27
+    ]
+   }
+  }
+ },
+ {
+  "field": "gc_omegacen",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 201.697,
+  "dec": -47.48,
+  "n": 336,
+  "ours": {
+   "n": 336,
+   "acc": 96.4,
+   "acc_cls": 100.0,
+   "unknown": 3.6,
+   "bal": 96.4,
+   "recall": {
+    "STAR": [
+     96.4,
+     336
+    ]
+   }
+  },
+  "high": {
+   "n": 324,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": null,
+  "Gaia DR3 DSC-Combmod | ours same": null,
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 154,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     154
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 154,
+   "acc": 99.4,
+   "acc_cls": 100.0,
+   "unknown": 0.6,
+   "bal": 99.4,
+   "recall": {
+    "STAR": [
+     99.4,
+     154
+    ]
+   }
+  }
+ },
+ {
   "field": "kep_291p44",
   "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
   "which": "blind",
@@ -514,6 +1462,121 @@
   }
  },
  {
+  "field": "lam_014m05",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 14.32472,
+  "dec": -4.99111,
+  "n": 8,
+  "ours": {
+   "n": 8,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     4
+    ],
+    "GALAXY": [
+     100.0,
+     4
+    ]
+   }
+  },
+  "high": {
+   "n": 5,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 8,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     4
+    ],
+    "GALAXY": [
+     100.0,
+     4
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 8,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     4
+    ],
+    "GALAXY": [
+     100.0,
+     4
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 4,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     4
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 4,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     4
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 1,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 1,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     1
+    ]
+   }
+  }
+ },
+ {
   "field": "lam_015p38",
   "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
   "which": "blind",
@@ -667,6 +1730,192 @@
     "STAR": [
      100.0,
      83
+    ]
+   }
+  }
+ },
+ {
+  "field": "lam_020p45",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 19.45972,
+  "dec": 44.76417,
+  "n": 120,
+  "ours": {
+   "n": 120,
+   "acc": 98.3,
+   "acc_cls": 100.0,
+   "unknown": 1.7,
+   "bal": 98.3,
+   "recall": {
+    "STAR": [
+     98.3,
+     120
+    ]
+   }
+  },
+  "high": {
+   "n": 117,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 116,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     116
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 116,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     116
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": null,
+  "LS morphology + WISE W1-W2>=0.8 | ours same": null
+ },
+ {
+  "field": "lam_035p25",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 35.42778,
+  "dec": 24.9525,
+  "n": 79,
+  "ours": {
+   "n": 79,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     78
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "high": {
+   "n": 78,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 79,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     78
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 79,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     78
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 79,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     78
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 79,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     78
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 69,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     68
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 69,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     68
+    ],
+    "QSO": [
+     100.0,
+     1
     ]
    }
   }
@@ -950,6 +2199,61 @@
     "STAR": [
      100.0,
      115
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": null,
+  "LS morphology + WISE W1-W2>=0.8 | ours same": null
+ },
+ {
+  "field": "lam_070p55",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 70.4025,
+  "dec": 54.61222,
+  "n": 86,
+  "ours": {
+   "n": 86,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     86
+    ]
+   }
+  },
+  "high": {
+   "n": 85,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 85,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     85
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 85,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     85
     ]
    }
   },
@@ -1282,6 +2586,137 @@
   }
  },
  {
+  "field": "lam_100p55",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 99.87694,
+  "dec": 55.1225,
+  "n": 116,
+  "ours": {
+   "n": 116,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     115
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "high": {
+   "n": 114,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 114,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     113
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 114,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     113
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 109,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     108
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 109,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     108
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 101,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     100
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 101,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     100
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  }
+ },
+ {
   "field": "lam_108p58",
   "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
   "which": "blind",
@@ -1380,6 +2815,176 @@
     "STAR": [
      100.0,
      39
+    ]
+   }
+  }
+ },
+ {
+  "field": "lam_112p15",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 112.32056,
+  "dec": 14.70667,
+  "n": 88,
+  "ours": {
+   "n": 88,
+   "acc": 98.9,
+   "acc_cls": 98.9,
+   "unknown": 0.0,
+   "bal": 50.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     87
+    ],
+    "GALAXY": [
+     0.0,
+     1
+    ]
+   }
+  },
+  "high": {
+   "n": 86,
+   "acc": 98.84
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 86,
+   "acc": 98.8,
+   "acc_cls": 98.8,
+   "unknown": 0.0,
+   "bal": 50.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     85
+    ],
+    "GALAXY": [
+     0.0,
+     1
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 86,
+   "acc": 98.8,
+   "acc_cls": 98.8,
+   "unknown": 0.0,
+   "bal": 50.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     85
+    ],
+    "GALAXY": [
+     0.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": null,
+  "LS morphology + WISE W1-W2>=0.8 | ours same": null
+ },
+ {
+  "field": "lam_112p35",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 112.51917,
+  "dec": 34.93167,
+  "n": 134,
+  "ours": {
+   "n": 134,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     134
+    ]
+   }
+  },
+  "high": {
+   "n": 133,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 133,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     133
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 133,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     133
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 133,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     133
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 133,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     133
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 125,
+   "acc": 98.4,
+   "acc_cls": 98.4,
+   "unknown": 0.0,
+   "bal": 98.4,
+   "recall": {
+    "STAR": [
+     98.4,
+     125
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 125,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     125
     ]
    }
   }
@@ -1619,6 +3224,137 @@
   }
  },
  {
+  "field": "lam_126p05",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 125.68861,
+  "dec": 5.32722,
+  "n": 61,
+  "ours": {
+   "n": 61,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     60
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "high": {
+   "n": 60,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 60,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     59
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 60,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     59
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 60,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     59
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 60,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     59
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 55,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     54
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 55,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     54
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  }
+ },
+ {
   "field": "lam_130p30",
   "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
   "which": "blind",
@@ -1848,6 +3584,137 @@
     "STAR": [
      100.0,
      59
+    ]
+   }
+  }
+ },
+ {
+  "field": "lam_140p55",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 140.13667,
+  "dec": 54.59111,
+  "n": 56,
+  "ours": {
+   "n": 56,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     52
+    ],
+    "GALAXY": [
+     100.0,
+     4
+    ]
+   }
+  },
+  "high": {
+   "n": 56,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 55,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     52
+    ],
+    "GALAXY": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 55,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     52
+    ],
+    "GALAXY": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 56,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     52
+    ],
+    "GALAXY": [
+     100.0,
+     4
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 56,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     52
+    ],
+    "GALAXY": [
+     100.0,
+     4
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 49,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     45
+    ],
+    "GALAXY": [
+     100.0,
+     4
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 49,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     45
+    ],
+    "GALAXY": [
+     100.0,
+     4
     ]
    }
   }
@@ -2213,6 +4080,109 @@
     "GALAXY": [
      100.0,
      3
+    ]
+   }
+  }
+ },
+ {
+  "field": "lam_161p15",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 160.68417,
+  "dec": 15.32222,
+  "n": 43,
+  "ours": {
+   "n": 43,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     43
+    ]
+   }
+  },
+  "high": {
+   "n": 41,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 41,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     41
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 41,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     41
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 41,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     41
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 41,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     41
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 40,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     40
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 40,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     40
     ]
    }
   }
@@ -3107,6 +5077,240 @@
   }
  },
  {
+  "field": "lam_203p05",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 203.24361,
+  "dec": 5.36278,
+  "n": 22,
+  "ours": {
+   "n": 22,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     21
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "high": {
+   "n": 20,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 21,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     20
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 21,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     20
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 21,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     20
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 21,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     20
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 20,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     19
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 20,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     19
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  }
+ },
+ {
+  "field": "lam_210p25",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 210.49833,
+  "dec": 24.90389,
+  "n": 35,
+  "ours": {
+   "n": 35,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     35
+    ]
+   }
+  },
+  "high": {
+   "n": 35,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 35,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     35
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 35,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     35
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 35,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     35
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 35,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     35
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 33,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     33
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 33,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     33
+    ]
+   }
+  }
+ },
+ {
   "field": "lam_216p10",
   "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
   "which": "blind",
@@ -3856,6 +6060,85 @@
   }
  },
  {
+  "field": "lam_273p25",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 273.33889,
+  "dec": 24.86333,
+  "n": 38,
+  "ours": {
+   "n": 38,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     38
+    ]
+   }
+  },
+  "high": {
+   "n": 38,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 38,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     38
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 38,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     38
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 26,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     26
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 26,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     26
+    ]
+   }
+  }
+ },
+ {
   "field": "lam_279p30",
   "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
   "which": "blind",
@@ -3909,6 +6192,157 @@
   "LS-GBM (LS photometry only) | ours same": null,
   "LS morphology + WISE W1-W2>=0.8": null,
   "LS morphology + WISE W1-W2>=0.8 | ours same": null
+ },
+ {
+  "field": "lam_322m05",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 321.72556,
+  "dec": -4.63139,
+  "n": 73,
+  "ours": {
+   "n": 73,
+   "acc": 97.3,
+   "acc_cls": 97.3,
+   "unknown": 0.0,
+   "bal": 98.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     37
+    ],
+    "GALAXY": [
+     94.1,
+     34
+    ],
+    "QSO": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "high": {
+   "n": 56,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 39,
+   "acc": 97.4,
+   "acc_cls": 97.4,
+   "unknown": 0.0,
+   "bal": 75.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     37
+    ],
+    "QSO": [
+     50.0,
+     2
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 39,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     37
+    ],
+    "QSO": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 72,
+   "acc": 98.6,
+   "acc_cls": 98.6,
+   "unknown": 0.0,
+   "bal": 99.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     37
+    ],
+    "GALAXY": [
+     97.0,
+     33
+    ],
+    "QSO": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 72,
+   "acc": 97.2,
+   "acc_cls": 97.2,
+   "unknown": 0.0,
+   "bal": 98.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     37
+    ],
+    "GALAXY": [
+     93.9,
+     33
+    ],
+    "QSO": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 69,
+   "acc": 98.6,
+   "acc_cls": 98.6,
+   "unknown": 0.0,
+   "bal": 83.3,
+   "recall": {
+    "STAR": [
+     100.0,
+     34
+    ],
+    "GALAXY": [
+     100.0,
+     33
+    ],
+    "QSO": [
+     50.0,
+     2
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 69,
+   "acc": 97.1,
+   "acc_cls": 97.1,
+   "unknown": 0.0,
+   "bal": 98.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     34
+    ],
+    "GALAXY": [
+     93.9,
+     33
+    ],
+    "QSO": [
+     100.0,
+     2
+    ]
+   }
+  }
  },
  {
   "field": "lam_330p25",
@@ -4117,6 +6551,137 @@
   }
  },
  {
+  "field": "lam_343p15",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 342.94778,
+  "dec": 15.24139,
+  "n": 97,
+  "ours": {
+   "n": 97,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     94
+    ],
+    "GALAXY": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "high": {
+   "n": 96,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 95,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     93
+    ],
+    "GALAXY": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 95,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     93
+    ],
+    "GALAXY": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 96,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     93
+    ],
+    "GALAXY": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 96,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     93
+    ],
+    "GALAXY": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 86,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     83
+    ],
+    "GALAXY": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 86,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     83
+    ],
+    "GALAXY": [
+     100.0,
+     3
+    ]
+   }
+  }
+ },
+ {
   "field": "lam_351p30",
   "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
   "which": "blind",
@@ -4215,6 +6780,456 @@
     "STAR": [
      100.0,
      38
+    ]
+   }
+  }
+ },
+ {
+  "field": "lmc_30dor",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 84.67,
+  "dec": -69.1,
+  "n": 12,
+  "ours": {
+   "n": 12,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     12
+    ]
+   }
+  },
+  "high": {
+   "n": 12,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 12,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     12
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 12,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     12
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 3,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 3,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     3
+    ]
+   }
+  }
+ },
+ {
+  "field": "lmc_bar",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 80.89,
+  "dec": -69.76,
+  "n": 9,
+  "ours": {
+   "n": 9,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     9
+    ]
+   }
+  },
+  "high": {
+   "n": 9,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": null,
+  "Gaia DR3 DSC-Combmod | ours same": null,
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": null,
+  "LS morphology + WISE W1-W2>=0.8 | ours same": null
+ },
+ {
+  "field": "lmc_north",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 81.0,
+  "dec": -66.5,
+  "n": 4,
+  "ours": {
+   "n": 4,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     4
+    ]
+   }
+  },
+  "high": {
+   "n": 4,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 4,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     4
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 4,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     4
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 3,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 3,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     3
+    ]
+   }
+  }
+ },
+ {
+  "field": "lmc_south",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 82.0,
+  "dec": -72.0,
+  "n": 2,
+  "ours": {
+   "n": 2,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "high": {
+   "n": 2,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 2,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 2,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 2,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 2,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ]
+   }
+  }
+ },
+ {
+  "field": "lmc_west",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 74.0,
+  "dec": -68.5,
+  "n": 7,
+  "ours": {
+   "n": 7,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     7
+    ]
+   }
+  },
+  "high": {
+   "n": 7,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 7,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     7
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 7,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     7
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 4,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     4
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 4,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     4
+    ]
+   }
+  }
+ },
+ {
+  "field": "mag_bridge",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 33.0,
+  "dec": -74.0,
+  "n": 3,
+  "ours": {
+   "n": 3,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "high": {
+   "n": 3,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 3,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 3,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 3,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 3,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 3,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 3,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     3
     ]
    }
   }
@@ -4371,6 +7386,137 @@
   }
  },
  {
+  "field": "ngp_152m04",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 152.1975,
+  "dec": -4.3725,
+  "n": 68,
+  "ours": {
+   "n": 68,
+   "acc": 98.5,
+   "acc_cls": 100.0,
+   "unknown": 1.5,
+   "bal": 98.4,
+   "recall": {
+    "STAR": [
+     100.0,
+     37
+    ],
+    "GALAXY": [
+     96.8,
+     31
+    ]
+   }
+  },
+  "high": {
+   "n": 62,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 48,
+   "acc": 91.7,
+   "acc_cls": 91.7,
+   "unknown": 0.0,
+   "bal": 81.8,
+   "recall": {
+    "STAR": [
+     100.0,
+     37
+    ],
+    "GALAXY": [
+     63.6,
+     11
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 48,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     37
+    ],
+    "GALAXY": [
+     100.0,
+     11
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 60,
+   "acc": 98.3,
+   "acc_cls": 98.3,
+   "unknown": 0.0,
+   "bal": 97.8,
+   "recall": {
+    "STAR": [
+     100.0,
+     37
+    ],
+    "GALAXY": [
+     95.7,
+     23
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 60,
+   "acc": 98.3,
+   "acc_cls": 100.0,
+   "unknown": 1.7,
+   "bal": 97.8,
+   "recall": {
+    "STAR": [
+     100.0,
+     37
+    ],
+    "GALAXY": [
+     95.7,
+     23
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 55,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     31
+    ],
+    "GALAXY": [
+     100.0,
+     24
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 55,
+   "acc": 98.2,
+   "acc_cls": 100.0,
+   "unknown": 1.8,
+   "bal": 97.9,
+   "recall": {
+    "STAR": [
+     100.0,
+     31
+    ],
+    "GALAXY": [
+     95.8,
+     24
+    ]
+   }
+  }
+ },
+ {
   "field": "ngp_156m04",
   "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
   "which": "blind",
@@ -4497,6 +7643,165 @@
     "GALAXY": [
      100.0,
      14
+    ]
+   }
+  }
+ },
+ {
+  "field": "ngp_158p02",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 158.13056,
+  "dec": 1.63861,
+  "n": 115,
+  "ours": {
+   "n": 115,
+   "acc": 94.8,
+   "acc_cls": 95.6,
+   "unknown": 0.9,
+   "bal": 96.5,
+   "recall": {
+    "STAR": [
+     95.2,
+     21
+    ],
+    "GALAXY": [
+     94.3,
+     87
+    ],
+    "QSO": [
+     100.0,
+     7
+    ]
+   }
+  },
+  "high": {
+   "n": 90,
+   "acc": 98.89
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 52,
+   "acc": 86.5,
+   "acc_cls": 86.5,
+   "unknown": 0.0,
+   "bal": 90.3,
+   "recall": {
+    "STAR": [
+     95.0,
+     20
+    ],
+    "GALAXY": [
+     76.0,
+     25
+    ],
+    "QSO": [
+     100.0,
+     7
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 52,
+   "acc": 98.1,
+   "acc_cls": 98.1,
+   "unknown": 0.0,
+   "bal": 98.3,
+   "recall": {
+    "STAR": [
+     95.0,
+     20
+    ],
+    "GALAXY": [
+     100.0,
+     25
+    ],
+    "QSO": [
+     100.0,
+     7
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 106,
+   "acc": 96.2,
+   "acc_cls": 96.2,
+   "unknown": 0.0,
+   "bal": 97.1,
+   "recall": {
+    "STAR": [
+     95.0,
+     20
+    ],
+    "GALAXY": [
+     96.2,
+     79
+    ],
+    "QSO": [
+     100.0,
+     7
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 106,
+   "acc": 95.3,
+   "acc_cls": 95.3,
+   "unknown": 0.0,
+   "bal": 96.6,
+   "recall": {
+    "STAR": [
+     95.0,
+     20
+    ],
+    "GALAXY": [
+     94.9,
+     79
+    ],
+    "QSO": [
+     100.0,
+     7
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 100,
+   "acc": 97.0,
+   "acc_cls": 97.0,
+   "unknown": 0.0,
+   "bal": 87.1,
+   "recall": {
+    "STAR": [
+     94.7,
+     19
+    ],
+    "GALAXY": [
+     100.0,
+     75
+    ],
+    "QSO": [
+     66.7,
+     6
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 100,
+   "acc": 97.0,
+   "acc_cls": 97.0,
+   "unknown": 0.0,
+   "bal": 97.3,
+   "recall": {
+    "STAR": [
+     94.7,
+     19
+    ],
+    "GALAXY": [
+     97.3,
+     75
+    ],
+    "QSO": [
+     100.0,
+     6
     ]
    }
   }
@@ -4951,6 +8256,137 @@
   }
  },
  {
+  "field": "ngp_167m04",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 167.18972,
+  "dec": -4.73972,
+  "n": 107,
+  "ours": {
+   "n": 107,
+   "acc": 99.1,
+   "acc_cls": 100.0,
+   "unknown": 0.9,
+   "bal": 98.5,
+   "recall": {
+    "STAR": [
+     100.0,
+     72
+    ],
+    "GALAXY": [
+     97.1,
+     35
+    ]
+   }
+  },
+  "high": {
+   "n": 96,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 89,
+   "acc": 95.5,
+   "acc_cls": 95.5,
+   "unknown": 0.0,
+   "bal": 88.9,
+   "recall": {
+    "STAR": [
+     100.0,
+     71
+    ],
+    "GALAXY": [
+     77.8,
+     18
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 89,
+   "acc": 98.9,
+   "acc_cls": 100.0,
+   "unknown": 1.1,
+   "bal": 97.2,
+   "recall": {
+    "STAR": [
+     100.0,
+     71
+    ],
+    "GALAXY": [
+     94.4,
+     18
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 102,
+   "acc": 98.0,
+   "acc_cls": 98.0,
+   "unknown": 0.0,
+   "bal": 96.8,
+   "recall": {
+    "STAR": [
+     100.0,
+     71
+    ],
+    "GALAXY": [
+     93.5,
+     31
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 102,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     71
+    ],
+    "GALAXY": [
+     100.0,
+     31
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 97,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     66
+    ],
+    "GALAXY": [
+     100.0,
+     31
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 97,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     66
+    ],
+    "GALAXY": [
+     100.0,
+     31
+    ]
+   }
+  }
+ },
+ {
   "field": "ngp_170m02",
   "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
   "which": "blind",
@@ -5105,6 +8541,165 @@
     "QSO": [
      100.0,
      7
+    ]
+   }
+  }
+ },
+ {
+  "field": "ngp_173p02",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 172.55417,
+  "dec": 1.86611,
+  "n": 91,
+  "ours": {
+   "n": 91,
+   "acc": 97.8,
+   "acc_cls": 98.9,
+   "unknown": 1.1,
+   "bal": 98.6,
+   "recall": {
+    "STAR": [
+     100.0,
+     44
+    ],
+    "GALAXY": [
+     95.7,
+     46
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "high": {
+   "n": 82,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 72,
+   "acc": 88.9,
+   "acc_cls": 88.9,
+   "unknown": 0.0,
+   "bal": 90.1,
+   "recall": {
+    "STAR": [
+     100.0,
+     44
+    ],
+    "GALAXY": [
+     70.4,
+     27
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 72,
+   "acc": 98.6,
+   "acc_cls": 98.6,
+   "unknown": 0.0,
+   "bal": 98.8,
+   "recall": {
+    "STAR": [
+     100.0,
+     44
+    ],
+    "GALAXY": [
+     96.3,
+     27
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 86,
+   "acc": 98.8,
+   "acc_cls": 98.8,
+   "unknown": 0.0,
+   "bal": 99.2,
+   "recall": {
+    "STAR": [
+     100.0,
+     44
+    ],
+    "GALAXY": [
+     97.6,
+     41
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 86,
+   "acc": 98.8,
+   "acc_cls": 98.8,
+   "unknown": 0.0,
+   "bal": 99.2,
+   "recall": {
+    "STAR": [
+     100.0,
+     44
+    ],
+    "GALAXY": [
+     97.6,
+     41
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 82,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     40
+    ],
+    "GALAXY": [
+     100.0,
+     41
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 82,
+   "acc": 98.8,
+   "acc_cls": 98.8,
+   "unknown": 0.0,
+   "bal": 99.2,
+   "recall": {
+    "STAR": [
+     100.0,
+     40
+    ],
+    "GALAXY": [
+     97.6,
+     41
+    ],
+    "QSO": [
+     100.0,
+     1
     ]
    }
   }
@@ -5559,6 +9154,137 @@
   }
  },
  {
+  "field": "ngp_182p02",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 182.30667,
+  "dec": 1.84806,
+  "n": 80,
+  "ours": {
+   "n": 80,
+   "acc": 97.5,
+   "acc_cls": 98.7,
+   "unknown": 1.2,
+   "bal": 97.5,
+   "recall": {
+    "STAR": [
+     97.7,
+     44
+    ],
+    "GALAXY": [
+     97.2,
+     36
+    ]
+   }
+  },
+  "high": {
+   "n": 72,
+   "acc": 98.61
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 60,
+   "acc": 93.3,
+   "acc_cls": 93.3,
+   "unknown": 0.0,
+   "bal": 88.2,
+   "recall": {
+    "STAR": [
+     100.0,
+     43
+    ],
+    "GALAXY": [
+     76.5,
+     17
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 60,
+   "acc": 98.3,
+   "acc_cls": 98.3,
+   "unknown": 0.0,
+   "bal": 98.8,
+   "recall": {
+    "STAR": [
+     97.7,
+     43
+    ],
+    "GALAXY": [
+     100.0,
+     17
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 77,
+   "acc": 98.7,
+   "acc_cls": 98.7,
+   "unknown": 0.0,
+   "bal": 98.8,
+   "recall": {
+    "STAR": [
+     97.7,
+     43
+    ],
+    "GALAXY": [
+     100.0,
+     34
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 77,
+   "acc": 98.7,
+   "acc_cls": 98.7,
+   "unknown": 0.0,
+   "bal": 98.8,
+   "recall": {
+    "STAR": [
+     97.7,
+     43
+    ],
+    "GALAXY": [
+     100.0,
+     34
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 73,
+   "acc": 98.6,
+   "acc_cls": 98.6,
+   "unknown": 0.0,
+   "bal": 98.7,
+   "recall": {
+    "STAR": [
+     97.4,
+     39
+    ],
+    "GALAXY": [
+     100.0,
+     34
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 73,
+   "acc": 98.6,
+   "acc_cls": 98.6,
+   "unknown": 0.0,
+   "bal": 98.7,
+   "recall": {
+    "STAR": [
+     97.4,
+     39
+    ],
+    "GALAXY": [
+     100.0,
+     34
+    ]
+   }
+  }
+ },
+ {
   "field": "ngp_185m01",
   "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
   "which": "blind",
@@ -5713,6 +9439,137 @@
     "QSO": [
      100.0,
      1
+    ]
+   }
+  }
+ },
+ {
+  "field": "ngp_188m04",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 187.54083,
+  "dec": -4.43444,
+  "n": 55,
+  "ours": {
+   "n": 55,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     28
+    ],
+    "GALAXY": [
+     100.0,
+     27
+    ]
+   }
+  },
+  "high": {
+   "n": 51,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 44,
+   "acc": 93.2,
+   "acc_cls": 93.2,
+   "unknown": 0.0,
+   "bal": 91.2,
+   "recall": {
+    "STAR": [
+     100.0,
+     27
+    ],
+    "GALAXY": [
+     82.4,
+     17
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 44,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     27
+    ],
+    "GALAXY": [
+     100.0,
+     17
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 52,
+   "acc": 98.1,
+   "acc_cls": 98.1,
+   "unknown": 0.0,
+   "bal": 98.2,
+   "recall": {
+    "STAR": [
+     96.4,
+     28
+    ],
+    "GALAXY": [
+     100.0,
+     24
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 52,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     28
+    ],
+    "GALAXY": [
+     100.0,
+     24
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 51,
+   "acc": 98.0,
+   "acc_cls": 98.0,
+   "unknown": 0.0,
+   "bal": 98.2,
+   "recall": {
+    "STAR": [
+     96.3,
+     27
+    ],
+    "GALAXY": [
+     100.0,
+     24
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 51,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     27
+    ],
+    "GALAXY": [
+     100.0,
+     24
     ]
    }
   }
@@ -7065,6 +10922,157 @@
   }
  },
  {
+  "field": "ngp_212p02",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 212.43778,
+  "dec": 2.05111,
+  "n": 53,
+  "ours": {
+   "n": 53,
+   "acc": 92.5,
+   "acc_cls": 94.2,
+   "unknown": 1.9,
+   "bal": 95.2,
+   "recall": {
+    "STAR": [
+     100.0,
+     23
+    ],
+    "GALAXY": [
+     85.7,
+     28
+    ],
+    "QSO": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "high": {
+   "n": 46,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 25,
+   "acc": 96.0,
+   "acc_cls": 96.0,
+   "unknown": 0.0,
+   "bal": 75.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     23
+    ],
+    "QSO": [
+     50.0,
+     2
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 25,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     23
+    ],
+    "QSO": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 52,
+   "acc": 98.1,
+   "acc_cls": 98.1,
+   "unknown": 0.0,
+   "bal": 98.8,
+   "recall": {
+    "STAR": [
+     100.0,
+     23
+    ],
+    "GALAXY": [
+     96.3,
+     27
+    ],
+    "QSO": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 52,
+   "acc": 92.3,
+   "acc_cls": 94.1,
+   "unknown": 1.9,
+   "bal": 95.1,
+   "recall": {
+    "STAR": [
+     100.0,
+     23
+    ],
+    "GALAXY": [
+     85.2,
+     27
+    ],
+    "QSO": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 48,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     21
+    ],
+    "GALAXY": [
+     100.0,
+     26
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 48,
+   "acc": 93.8,
+   "acc_cls": 93.8,
+   "unknown": 0.0,
+   "bal": 96.2,
+   "recall": {
+    "STAR": [
+     100.0,
+     21
+    ],
+    "GALAXY": [
+     88.5,
+     26
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  }
+ },
+ {
   "field": "ngp_216m02",
   "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
   "which": "blind",
@@ -7383,6 +11391,969 @@
   }
  },
  {
+  "field": "ngp_221m04",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 220.98583,
+  "dec": -4.91306,
+  "n": 64,
+  "ours": {
+   "n": 64,
+   "acc": 96.9,
+   "acc_cls": 96.9,
+   "unknown": 0.0,
+   "bal": 96.7,
+   "recall": {
+    "STAR": [
+     97.6,
+     41
+    ],
+    "GALAXY": [
+     95.7,
+     23
+    ]
+   }
+  },
+  "high": {
+   "n": 60,
+   "acc": 98.33
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 52,
+   "acc": 86.5,
+   "acc_cls": 86.5,
+   "unknown": 0.0,
+   "bal": 70.8,
+   "recall": {
+    "STAR": [
+     100.0,
+     40
+    ],
+    "GALAXY": [
+     41.7,
+     12
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 52,
+   "acc": 98.1,
+   "acc_cls": 98.1,
+   "unknown": 0.0,
+   "bal": 95.8,
+   "recall": {
+    "STAR": [
+     100.0,
+     40
+    ],
+    "GALAXY": [
+     91.7,
+     12
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 62,
+   "acc": 95.2,
+   "acc_cls": 95.2,
+   "unknown": 0.0,
+   "bal": 94.0,
+   "recall": {
+    "STAR": [
+     97.6,
+     41
+    ],
+    "GALAXY": [
+     90.5,
+     21
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 62,
+   "acc": 96.8,
+   "acc_cls": 96.8,
+   "unknown": 0.0,
+   "bal": 96.4,
+   "recall": {
+    "STAR": [
+     97.6,
+     41
+    ],
+    "GALAXY": [
+     95.2,
+     21
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 60,
+   "acc": 98.3,
+   "acc_cls": 98.3,
+   "unknown": 0.0,
+   "bal": 98.7,
+   "recall": {
+    "STAR": [
+     97.4,
+     39
+    ],
+    "GALAXY": [
+     100.0,
+     21
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 60,
+   "acc": 96.7,
+   "acc_cls": 96.7,
+   "unknown": 0.0,
+   "bal": 96.3,
+   "recall": {
+    "STAR": [
+     97.4,
+     39
+    ],
+    "GALAXY": [
+     95.2,
+     21
+    ]
+   }
+  }
+ },
+ {
+  "field": "oc_hyades",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 66.73,
+  "dec": 15.87,
+  "n": 71,
+  "ours": {
+   "n": 71,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     71
+    ]
+   }
+  },
+  "high": {
+   "n": 71,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 70,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     70
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 70,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     70
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": null,
+  "LS morphology + WISE W1-W2>=0.8 | ours same": null
+ },
+ {
+  "field": "oc_ic2391",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 130.1,
+  "dec": -53.0,
+  "n": 55,
+  "ours": {
+   "n": 55,
+   "acc": 98.2,
+   "acc_cls": 100.0,
+   "unknown": 1.8,
+   "bal": 98.2,
+   "recall": {
+    "STAR": [
+     98.2,
+     55
+    ]
+   }
+  },
+  "high": {
+   "n": 54,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 54,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     54
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 54,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     54
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": null,
+  "LS morphology + WISE W1-W2>=0.8 | ours same": null
+ },
+ {
+  "field": "oc_m11",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 282.77,
+  "dec": -6.27,
+  "n": 620,
+  "ours": {
+   "n": 620,
+   "acc": 98.9,
+   "acc_cls": 99.8,
+   "unknown": 1.0,
+   "bal": 98.9,
+   "recall": {
+    "STAR": [
+     98.9,
+     620
+    ]
+   }
+  },
+  "high": {
+   "n": 614,
+   "acc": 99.84
+  },
+  "Gaia DR3 DSC-Combmod": null,
+  "Gaia DR3 DSC-Combmod | ours same": null,
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": null,
+  "LS morphology + WISE W1-W2>=0.8 | ours same": null
+ },
+ {
+  "field": "oc_m35",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 92.25,
+  "dec": 24.33,
+  "n": 298,
+  "ours": {
+   "n": 298,
+   "acc": 99.7,
+   "acc_cls": 99.7,
+   "unknown": 0.0,
+   "bal": 99.7,
+   "recall": {
+    "STAR": [
+     99.7,
+     298
+    ]
+   }
+  },
+  "high": {
+   "n": 296,
+   "acc": 99.66
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 295,
+   "acc": 99.7,
+   "acc_cls": 99.7,
+   "unknown": 0.0,
+   "bal": 99.7,
+   "recall": {
+    "STAR": [
+     99.7,
+     295
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 295,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     295
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": null,
+  "LS morphology + WISE W1-W2>=0.8 | ours same": null
+ },
+ {
+  "field": "oc_m67",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 132.85,
+  "dec": 11.81,
+  "n": 349,
+  "ours": {
+   "n": 349,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     348
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "high": {
+   "n": 347,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 347,
+   "acc": 99.7,
+   "acc_cls": 99.7,
+   "unknown": 0.0,
+   "bal": 99.8,
+   "recall": {
+    "STAR": [
+     99.7,
+     346
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 347,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     346
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 345,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     345
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 345,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     345
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 317,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     317
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 317,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     317
+    ]
+   }
+  }
+ },
+ {
+  "field": "oc_ngc188",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 12.11,
+  "dec": 85.24,
+  "n": 57,
+  "ours": {
+   "n": 57,
+   "acc": 98.2,
+   "acc_cls": 100.0,
+   "unknown": 1.8,
+   "bal": 98.2,
+   "recall": {
+    "STAR": [
+     98.2,
+     57
+    ]
+   }
+  },
+  "high": {
+   "n": 56,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 56,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     56
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 56,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     56
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": null,
+  "LS morphology + WISE W1-W2>=0.8 | ours same": null
+ },
+ {
+  "field": "oc_ngc2420",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 114.6,
+  "dec": 21.57,
+  "n": 634,
+  "ours": {
+   "n": 634,
+   "acc": 99.7,
+   "acc_cls": 99.8,
+   "unknown": 0.2,
+   "bal": 99.8,
+   "recall": {
+    "STAR": [
+     99.7,
+     633
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "high": {
+   "n": 633,
+   "acc": 99.84
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 633,
+   "acc": 99.8,
+   "acc_cls": 99.8,
+   "unknown": 0.0,
+   "bal": 99.9,
+   "recall": {
+    "STAR": [
+     99.8,
+     632
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 633,
+   "acc": 99.7,
+   "acc_cls": 99.8,
+   "unknown": 0.2,
+   "bal": 99.8,
+   "recall": {
+    "STAR": [
+     99.7,
+     632
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 633,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     632
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 633,
+   "acc": 99.8,
+   "acc_cls": 100.0,
+   "unknown": 0.2,
+   "bal": 99.9,
+   "recall": {
+    "STAR": [
+     99.8,
+     632
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 521,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     520
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 521,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     520
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  }
+ },
+ {
+  "field": "oc_ngc2516",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 119.52,
+  "dec": -60.75,
+  "n": 147,
+  "ours": {
+   "n": 147,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     147
+    ]
+   }
+  },
+  "high": {
+   "n": 145,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 145,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     145
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 145,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     145
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": null,
+  "LS morphology + WISE W1-W2>=0.8 | ours same": null
+ },
+ {
+  "field": "oc_ngc6791",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 290.22,
+  "dec": 37.77,
+  "n": 188,
+  "ours": {
+   "n": 188,
+   "acc": 99.5,
+   "acc_cls": 100.0,
+   "unknown": 0.5,
+   "bal": 99.8,
+   "recall": {
+    "STAR": [
+     99.5,
+     186
+    ],
+    "GALAXY": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "high": {
+   "n": 186,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 186,
+   "acc": 99.5,
+   "acc_cls": 99.5,
+   "unknown": 0.0,
+   "bal": 50.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     185
+    ],
+    "GALAXY": [
+     0.0,
+     1
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 186,
+   "acc": 99.5,
+   "acc_cls": 100.0,
+   "unknown": 0.5,
+   "bal": 99.8,
+   "recall": {
+    "STAR": [
+     99.5,
+     185
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": null,
+  "LS morphology + WISE W1-W2>=0.8 | ours same": null
+ },
+ {
+  "field": "oc_ngc752",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 29.42,
+  "dec": 37.78,
+  "n": 99,
+  "ours": {
+   "n": 99,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     99
+    ]
+   }
+  },
+  "high": {
+   "n": 93,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 93,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     93
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 93,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     93
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": null,
+  "LS morphology + WISE W1-W2>=0.8 | ours same": null
+ },
+ {
+  "field": "oc_pleiades",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 56.75,
+  "dec": 24.12,
+  "n": 105,
+  "ours": {
+   "n": 105,
+   "acc": 99.0,
+   "acc_cls": 100.0,
+   "unknown": 1.0,
+   "bal": 99.0,
+   "recall": {
+    "STAR": [
+     99.0,
+     105
+    ]
+   }
+  },
+  "high": {
+   "n": 101,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 101,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     101
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 101,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     101
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": null,
+  "LS morphology + WISE W1-W2>=0.8 | ours same": null
+ },
+ {
+  "field": "oc_praesepe",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 130.1,
+  "dec": 19.67,
+  "n": 96,
+  "ours": {
+   "n": 96,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     96
+    ]
+   }
+  },
+  "high": {
+   "n": 88,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 87,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     87
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 87,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     87
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 87,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     87
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 87,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     87
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 79,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     79
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 79,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     79
+    ]
+   }
+  }
+ },
+ {
   "field": "s82_010p00",
   "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
   "which": "blind",
@@ -7509,6 +12480,109 @@
     "QSO": [
      100.0,
      4
+    ]
+   }
+  }
+ },
+ {
+  "field": "s82_018m01",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 18.45056,
+  "dec": -0.91028,
+  "n": 22,
+  "ours": {
+   "n": 22,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     22
+    ]
+   }
+  },
+  "high": {
+   "n": 22,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 22,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     22
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 22,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     22
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 22,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     22
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 22,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     22
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 20,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     20
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 20,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     20
     ]
    }
   }
@@ -8161,6 +13235,534 @@
   }
  },
  {
+  "field": "s82_050p01",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 49.9925,
+  "dec": 0.81278,
+  "n": 57,
+  "ours": {
+   "n": 57,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     55
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "high": {
+   "n": 56,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 56,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     55
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 56,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     55
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 57,
+   "acc": 98.2,
+   "acc_cls": 98.2,
+   "unknown": 0.0,
+   "bal": 66.7,
+   "recall": {
+    "STAR": [
+     100.0,
+     55
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ],
+    "QSO": [
+     0.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 57,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     55
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 55,
+   "acc": 98.2,
+   "acc_cls": 98.2,
+   "unknown": 0.0,
+   "bal": 66.7,
+   "recall": {
+    "STAR": [
+     100.0,
+     53
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ],
+    "QSO": [
+     0.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 55,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     53
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  }
+ },
+ {
+  "field": "s82_054m01",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 53.33389,
+  "dec": -0.61472,
+  "n": 49,
+  "ours": {
+   "n": 49,
+   "acc": 98.0,
+   "acc_cls": 100.0,
+   "unknown": 2.0,
+   "bal": 99.3,
+   "recall": {
+    "STAR": [
+     97.8,
+     46
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ],
+    "QSO": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "high": {
+   "n": 46,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 47,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     44
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ],
+    "QSO": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 47,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     44
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ],
+    "QSO": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 47,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     44
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ],
+    "QSO": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 47,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     44
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ],
+    "QSO": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 41,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     38
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ],
+    "QSO": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 41,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     38
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ],
+    "QSO": [
+     100.0,
+     2
+    ]
+   }
+  }
+ },
+ {
+  "field": "s82_308p01",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 308.6225,
+  "dec": 1.13167,
+  "n": 5,
+  "ours": {
+   "n": 5,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     5
+    ]
+   }
+  },
+  "high": {
+   "n": 5,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 5,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     5
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 5,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     5
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 5,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     5
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 5,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     5
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 4,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     4
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 4,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     4
+    ]
+   }
+  }
+ },
+ {
+  "field": "s82_312m01",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 312.33056,
+  "dec": -0.8825,
+  "n": 10,
+  "ours": {
+   "n": 10,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     9
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "high": {
+   "n": 9,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 10,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     9
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 10,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     9
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 9,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     9
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 9,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     9
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 7,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     7
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 7,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     7
+    ]
+   }
+  }
+ },
+ {
   "field": "s82_318p00",
   "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
   "which": "blind",
@@ -8418,6 +14020,157 @@
     "QSO": [
      100.0,
      7
+    ]
+   }
+  }
+ },
+ {
+  "field": "s82_336p01",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 336.68778,
+  "dec": 0.75583,
+  "n": 64,
+  "ours": {
+   "n": 64,
+   "acc": 98.4,
+   "acc_cls": 98.4,
+   "unknown": 0.0,
+   "bal": 99.4,
+   "recall": {
+    "STAR": [
+     98.3,
+     59
+    ],
+    "GALAXY": [
+     100.0,
+     4
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "high": {
+   "n": 60,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 63,
+   "acc": 98.4,
+   "acc_cls": 98.4,
+   "unknown": 0.0,
+   "bal": 99.4,
+   "recall": {
+    "STAR": [
+     98.3,
+     59
+    ],
+    "GALAXY": [
+     100.0,
+     3
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 63,
+   "acc": 98.4,
+   "acc_cls": 98.4,
+   "unknown": 0.0,
+   "bal": 99.4,
+   "recall": {
+    "STAR": [
+     98.3,
+     59
+    ],
+    "GALAXY": [
+     100.0,
+     3
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 63,
+   "acc": 98.4,
+   "acc_cls": 98.4,
+   "unknown": 0.0,
+   "bal": 99.4,
+   "recall": {
+    "STAR": [
+     98.3,
+     59
+    ],
+    "GALAXY": [
+     100.0,
+     3
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 63,
+   "acc": 98.4,
+   "acc_cls": 98.4,
+   "unknown": 0.0,
+   "bal": 99.4,
+   "recall": {
+    "STAR": [
+     98.3,
+     59
+    ],
+    "GALAXY": [
+     100.0,
+     3
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 58,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     55
+    ],
+    "GALAXY": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 58,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     55
+    ],
+    "GALAXY": [
+     100.0,
+     3
     ]
    }
   }
@@ -8712,6 +14465,1197 @@
     "GALAXY": [
      97.7,
      43
+    ]
+   }
+  }
+ },
+ {
+  "field": "sb_antennae",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 180.47,
+  "dec": -18.87,
+  "n": 3,
+  "ours": {
+   "n": 3,
+   "acc": 66.7,
+   "acc_cls": 66.7,
+   "unknown": 0.0,
+   "bal": 50.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ],
+    "GALAXY": [
+     0.0,
+     1
+    ]
+   }
+  },
+  "high": {
+   "n": 3,
+   "acc": 66.67
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 2,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 2,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 3,
+   "acc": 66.7,
+   "acc_cls": 66.7,
+   "unknown": 0.0,
+   "bal": 50.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ],
+    "GALAXY": [
+     0.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 3,
+   "acc": 66.7,
+   "acc_cls": 66.7,
+   "unknown": 0.0,
+   "bal": 50.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ],
+    "GALAXY": [
+     0.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 2,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 2,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ]
+   }
+  }
+ },
+ {
+  "field": "sb_arp220",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 233.74,
+  "dec": 23.5,
+  "n": 41,
+  "ours": {
+   "n": 41,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     41
+    ]
+   }
+  },
+  "high": {
+   "n": 40,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 40,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     40
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 40,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     40
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 40,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     40
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 40,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     40
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 40,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     40
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 40,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     40
+    ]
+   }
+  }
+ },
+ {
+  "field": "sb_m83",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 204.25,
+  "dec": -29.87,
+  "n": 9,
+  "ours": {
+   "n": 9,
+   "acc": 77.8,
+   "acc_cls": 77.8,
+   "unknown": 0.0,
+   "bal": 75.0,
+   "recall": {
+    "STAR": [
+     50.0,
+     4
+    ],
+    "GALAXY": [
+     100.0,
+     5
+    ]
+   }
+  },
+  "high": {
+   "n": 8,
+   "acc": 75.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 9,
+   "acc": 77.8,
+   "acc_cls": 77.8,
+   "unknown": 0.0,
+   "bal": 75.0,
+   "recall": {
+    "STAR": [
+     50.0,
+     4
+    ],
+    "GALAXY": [
+     100.0,
+     5
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 9,
+   "acc": 77.8,
+   "acc_cls": 77.8,
+   "unknown": 0.0,
+   "bal": 75.0,
+   "recall": {
+    "STAR": [
+     50.0,
+     4
+    ],
+    "GALAXY": [
+     100.0,
+     5
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": null,
+  "LS morphology + WISE W1-W2>=0.8 | ours same": null
+ },
+ {
+  "field": "sb_ngc253",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 11.89,
+  "dec": -25.29,
+  "n": 6,
+  "ours": {
+   "n": 6,
+   "acc": 83.3,
+   "acc_cls": 83.3,
+   "unknown": 0.0,
+   "bal": 83.3,
+   "recall": {
+    "STAR": [
+     83.3,
+     6
+    ]
+   }
+  },
+  "high": {
+   "n": 5,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 6,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     6
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 6,
+   "acc": 83.3,
+   "acc_cls": 83.3,
+   "unknown": 0.0,
+   "bal": 83.3,
+   "recall": {
+    "STAR": [
+     83.3,
+     6
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 6,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     6
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 6,
+   "acc": 83.3,
+   "acc_cls": 83.3,
+   "unknown": 0.0,
+   "bal": 83.3,
+   "recall": {
+    "STAR": [
+     83.3,
+     6
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 4,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     4
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 4,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     4
+    ]
+   }
+  }
+ },
+ {
+  "field": "sfr_carina",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 161.1,
+  "dec": -59.8,
+  "n": 246,
+  "ours": {
+   "n": 246,
+   "acc": 99.6,
+   "acc_cls": 100.0,
+   "unknown": 0.4,
+   "bal": 99.6,
+   "recall": {
+    "STAR": [
+     99.6,
+     246
+    ]
+   }
+  },
+  "high": {
+   "n": 245,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 245,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     245
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 245,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     245
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": null,
+  "LS morphology + WISE W1-W2>=0.8 | ours same": null
+ },
+ {
+  "field": "sfr_chai",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 167.0,
+  "dec": -77.6,
+  "n": 43,
+  "ours": {
+   "n": 43,
+   "acc": 97.7,
+   "acc_cls": 100.0,
+   "unknown": 2.3,
+   "bal": 97.7,
+   "recall": {
+    "STAR": [
+     97.7,
+     43
+    ]
+   }
+  },
+  "high": {
+   "n": 41,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 41,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     41
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 41,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     41
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": null,
+  "LS morphology + WISE W1-W2>=0.8 | ours same": null
+ },
+ {
+  "field": "sfr_cygob2",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 308.3,
+  "dec": 41.3,
+  "n": 58,
+  "ours": {
+   "n": 58,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     58
+    ]
+   }
+  },
+  "high": {
+   "n": 57,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 57,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     57
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 57,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     57
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": null,
+  "LS morphology + WISE W1-W2>=0.8 | ours same": null
+ },
+ {
+  "field": "sfr_ic348",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 56.13,
+  "dec": 32.16,
+  "n": 134,
+  "ours": {
+   "n": 134,
+   "acc": 99.3,
+   "acc_cls": 100.0,
+   "unknown": 0.7,
+   "bal": 99.3,
+   "recall": {
+    "STAR": [
+     99.3,
+     134
+    ]
+   }
+  },
+  "high": {
+   "n": 132,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 133,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     133
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 133,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     133
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": null,
+  "LS morphology + WISE W1-W2>=0.8 | ours same": null
+ },
+ {
+  "field": "sfr_l1495",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 64.5,
+  "dec": 28.3,
+  "n": 40,
+  "ours": {
+   "n": 40,
+   "acc": 95.0,
+   "acc_cls": 97.4,
+   "unknown": 2.5,
+   "bal": 95.0,
+   "recall": {
+    "STAR": [
+     95.0,
+     40
+    ]
+   }
+  },
+  "high": {
+   "n": 38,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 38,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     38
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 38,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     38
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": null,
+  "LS morphology + WISE W1-W2>=0.8 | ours same": null
+ },
+ {
+  "field": "sfr_lambdaori",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 83.78,
+  "dec": 9.93,
+  "n": 150,
+  "ours": {
+   "n": 150,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     150
+    ]
+   }
+  },
+  "high": {
+   "n": 148,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 148,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     148
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 148,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     148
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": null,
+  "LS morphology + WISE W1-W2>=0.8 | ours same": null
+ },
+ {
+  "field": "sfr_lupus3",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 242.5,
+  "dec": -39.1,
+  "n": 8,
+  "ours": {
+   "n": 8,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     8
+    ]
+   }
+  },
+  "high": {
+   "n": 8,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 8,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     8
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 8,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     8
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": null,
+  "LS morphology + WISE W1-W2>=0.8 | ours same": null
+ },
+ {
+  "field": "sfr_m8",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 270.92,
+  "dec": -24.38,
+  "n": 122,
+  "ours": {
+   "n": 122,
+   "acc": 97.5,
+   "acc_cls": 100.0,
+   "unknown": 2.5,
+   "bal": 97.5,
+   "recall": {
+    "STAR": [
+     97.5,
+     122
+    ]
+   }
+  },
+  "high": {
+   "n": 119,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 122,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     122
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 122,
+   "acc": 97.5,
+   "acc_cls": 100.0,
+   "unknown": 2.5,
+   "bal": 97.5,
+   "recall": {
+    "STAR": [
+     97.5,
+     122
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": null,
+  "LS morphology + WISE W1-W2>=0.8 | ours same": null
+ },
+ {
+  "field": "sfr_ngc1333",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 52.3,
+  "dec": 31.3,
+  "n": 69,
+  "ours": {
+   "n": 69,
+   "acc": 97.1,
+   "acc_cls": 98.5,
+   "unknown": 1.4,
+   "bal": 97.1,
+   "recall": {
+    "STAR": [
+     97.1,
+     69
+    ]
+   }
+  },
+  "high": {
+   "n": 63,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 64,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     64
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 64,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     64
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": null,
+  "LS morphology + WISE W1-W2>=0.8 | ours same": null
+ },
+ {
+  "field": "sfr_ngc2264",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 100.24,
+  "dec": 9.89,
+  "n": 434,
+  "ours": {
+   "n": 434,
+   "acc": 99.1,
+   "acc_cls": 100.0,
+   "unknown": 0.9,
+   "bal": 99.1,
+   "recall": {
+    "STAR": [
+     99.1,
+     434
+    ]
+   }
+  },
+  "high": {
+   "n": 428,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 429,
+   "acc": 99.8,
+   "acc_cls": 99.8,
+   "unknown": 0.0,
+   "bal": 99.8,
+   "recall": {
+    "STAR": [
+     99.8,
+     429
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 429,
+   "acc": 99.3,
+   "acc_cls": 100.0,
+   "unknown": 0.7,
+   "bal": 99.3,
+   "recall": {
+    "STAR": [
+     99.3,
+     429
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": null,
+  "LS morphology + WISE W1-W2>=0.8 | ours same": null
+ },
+ {
+  "field": "sfr_onc",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 83.82,
+  "dec": -5.39,
+  "n": 45,
+  "ours": {
+   "n": 45,
+   "acc": 64.4,
+   "acc_cls": 87.9,
+   "unknown": 26.7,
+   "bal": 33.0,
+   "recall": {
+    "STAR": [
+     65.9,
+     44
+    ],
+    "GALAXY": [
+     0.0,
+     1
+    ]
+   }
+  },
+  "high": {
+   "n": 30,
+   "acc": 93.33
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 38,
+   "acc": 97.4,
+   "acc_cls": 97.4,
+   "unknown": 0.0,
+   "bal": 50.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     37
+    ],
+    "GALAXY": [
+     0.0,
+     1
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 38,
+   "acc": 73.7,
+   "acc_cls": 90.3,
+   "unknown": 18.4,
+   "bal": 37.9,
+   "recall": {
+    "STAR": [
+     75.7,
+     37
+    ],
+    "GALAXY": [
+     0.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": null,
+  "LS morphology + WISE W1-W2>=0.8 | ours same": null
+ },
+ {
+  "field": "sfr_rhooph",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 246.8,
+  "dec": -24.5,
+  "n": 19,
+  "ours": {
+   "n": 19,
+   "acc": 89.5,
+   "acc_cls": 100.0,
+   "unknown": 10.5,
+   "bal": 89.5,
+   "recall": {
+    "STAR": [
+     89.5,
+     19
+    ]
+   }
+  },
+  "high": {
+   "n": 13,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 17,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     17
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 17,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     17
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": null,
+  "LS morphology + WISE W1-W2>=0.8 | ours same": null
+ },
+ {
+  "field": "sgp_000m36",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 0.28806,
+  "dec": -36.36472,
+  "n": 5,
+  "ours": {
+   "n": 5,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     1
+    ],
+    "GALAXY": [
+     100.0,
+     4
+    ]
+   }
+  },
+  "high": {
+   "n": 1,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 4,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     1
+    ],
+    "GALAXY": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 4,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     1
+    ],
+    "GALAXY": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 3,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     1
+    ],
+    "GALAXY": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 3,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     1
+    ],
+    "GALAXY": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 3,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     1
+    ],
+    "GALAXY": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 3,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     1
+    ],
+    "GALAXY": [
+     100.0,
+     2
     ]
    }
   }
@@ -10008,6 +16952,109 @@
   }
  },
  {
+  "field": "sgp_021m24",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 20.56472,
+  "dec": -23.83556,
+  "n": 3,
+  "ours": {
+   "n": 3,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "high": {
+   "n": 3,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 3,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 3,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 3,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 3,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 2,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 2,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ]
+   }
+  }
+ },
+ {
   "field": "sgp_025m35",
   "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
   "which": "blind",
@@ -10104,6 +17151,165 @@
    "bal": 100.0,
    "recall": {
     "STAR": [
+     100.0,
+     3
+    ]
+   }
+  }
+ },
+ {
+  "field": "sgp_028m28",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 27.67361,
+  "dec": -27.76917,
+  "n": 39,
+  "ours": {
+   "n": 39,
+   "acc": 92.3,
+   "acc_cls": 94.7,
+   "unknown": 2.6,
+   "bal": 97.1,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ],
+    "GALAXY": [
+     91.2,
+     34
+    ],
+    "QSO": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "high": {
+   "n": 26,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 15,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ],
+    "GALAXY": [
+     100.0,
+     10
+    ],
+    "QSO": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 15,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ],
+    "GALAXY": [
+     100.0,
+     10
+    ],
+    "QSO": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 31,
+   "acc": 96.8,
+   "acc_cls": 96.8,
+   "unknown": 0.0,
+   "bal": 98.7,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ],
+    "GALAXY": [
+     96.2,
+     26
+    ],
+    "QSO": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 31,
+   "acc": 93.5,
+   "acc_cls": 93.5,
+   "unknown": 0.0,
+   "bal": 97.4,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ],
+    "GALAXY": [
+     92.3,
+     26
+    ],
+    "QSO": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 30,
+   "acc": 96.7,
+   "acc_cls": 96.7,
+   "unknown": 0.0,
+   "bal": 88.9,
+   "recall": {
+    "STAR": [
+     100.0,
+     1
+    ],
+    "GALAXY": [
+     100.0,
+     26
+    ],
+    "QSO": [
+     66.7,
+     3
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 30,
+   "acc": 93.3,
+   "acc_cls": 93.3,
+   "unknown": 0.0,
+   "bal": 97.4,
+   "recall": {
+    "STAR": [
+     100.0,
+     1
+    ],
+    "GALAXY": [
+     92.3,
+     26
+    ],
+    "QSO": [
      100.0,
      3
     ]
@@ -10237,6 +17443,109 @@
     "GALAXY": [
      95.9,
      49
+    ]
+   }
+  }
+ },
+ {
+  "field": "sgp_032m24",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 31.36194,
+  "dec": -24.43944,
+  "n": 4,
+  "ours": {
+   "n": 4,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     4
+    ]
+   }
+  },
+  "high": {
+   "n": 4,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 4,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     4
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 4,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     4
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 4,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     4
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 4,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     4
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 4,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     4
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 4,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     4
     ]
    }
   }
@@ -10504,6 +17813,165 @@
   }
  },
  {
+  "field": "sgp_049m32",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 48.57944,
+  "dec": -32.24778,
+  "n": 44,
+  "ours": {
+   "n": 44,
+   "acc": 93.2,
+   "acc_cls": 95.3,
+   "unknown": 2.3,
+   "bal": 97.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     4
+    ],
+    "GALAXY": [
+     90.9,
+     33
+    ],
+    "QSO": [
+     100.0,
+     7
+    ]
+   }
+  },
+  "high": {
+   "n": 31,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 32,
+   "acc": 93.8,
+   "acc_cls": 93.8,
+   "unknown": 0.0,
+   "bal": 96.8,
+   "recall": {
+    "STAR": [
+     100.0,
+     4
+    ],
+    "GALAXY": [
+     90.5,
+     21
+    ],
+    "QSO": [
+     100.0,
+     7
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 32,
+   "acc": 96.9,
+   "acc_cls": 96.9,
+   "unknown": 0.0,
+   "bal": 98.4,
+   "recall": {
+    "STAR": [
+     100.0,
+     4
+    ],
+    "GALAXY": [
+     95.2,
+     21
+    ],
+    "QSO": [
+     100.0,
+     7
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 40,
+   "acc": 95.0,
+   "acc_cls": 95.0,
+   "unknown": 0.0,
+   "bal": 97.7,
+   "recall": {
+    "STAR": [
+     100.0,
+     4
+    ],
+    "GALAXY": [
+     93.1,
+     29
+    ],
+    "QSO": [
+     100.0,
+     7
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 40,
+   "acc": 95.0,
+   "acc_cls": 95.0,
+   "unknown": 0.0,
+   "bal": 97.7,
+   "recall": {
+    "STAR": [
+     100.0,
+     4
+    ],
+    "GALAXY": [
+     93.1,
+     29
+    ],
+    "QSO": [
+     100.0,
+     7
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 38,
+   "acc": 97.4,
+   "acc_cls": 97.4,
+   "unknown": 0.0,
+   "bal": 94.4,
+   "recall": {
+    "STAR": [
+     100.0,
+     3
+    ],
+    "GALAXY": [
+     100.0,
+     29
+    ],
+    "QSO": [
+     83.3,
+     6
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 38,
+   "acc": 94.7,
+   "acc_cls": 94.7,
+   "unknown": 0.0,
+   "bal": 97.7,
+   "recall": {
+    "STAR": [
+     100.0,
+     3
+    ],
+    "GALAXY": [
+     93.1,
+     29
+    ],
+    "QSO": [
+     100.0,
+     6
+    ]
+   }
+  }
+ },
+ {
   "field": "sgp_050m27",
   "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
   "which": "blind",
@@ -10630,6 +18098,85 @@
     "GALAXY": [
      94.1,
      17
+    ]
+   }
+  }
+ },
+ {
+  "field": "sgp_052m24",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 52.59917,
+  "dec": -24.40306,
+  "n": 3,
+  "ours": {
+   "n": 3,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "GALAXY": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "high": {
+   "n": 2,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": null,
+  "Gaia DR3 DSC-Combmod | ours same": null,
+  "LS-GBM (LS photometry only)": {
+   "n": 3,
+   "acc": 66.7,
+   "acc_cls": 66.7,
+   "unknown": 0.0,
+   "bal": 66.7,
+   "recall": {
+    "GALAXY": [
+     66.7,
+     3
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 3,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "GALAXY": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 2,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "GALAXY": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 2,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "GALAXY": [
+     100.0,
+     2
     ]
    }
   }
@@ -11384,6 +18931,137 @@
   }
  },
  {
+  "field": "sgp_346m36",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 346.2425,
+  "dec": -35.80889,
+  "n": 22,
+  "ours": {
+   "n": 22,
+   "acc": 90.9,
+   "acc_cls": 90.9,
+   "unknown": 0.0,
+   "bal": 94.5,
+   "recall": {
+    "STAR": [
+     100.0,
+     4
+    ],
+    "GALAXY": [
+     88.9,
+     18
+    ]
+   }
+  },
+  "high": {
+   "n": 18,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 13,
+   "acc": 84.6,
+   "acc_cls": 84.6,
+   "unknown": 0.0,
+   "bal": 88.9,
+   "recall": {
+    "STAR": [
+     100.0,
+     4
+    ],
+    "GALAXY": [
+     77.8,
+     9
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 13,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     4
+    ],
+    "GALAXY": [
+     100.0,
+     9
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 17,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ],
+    "GALAXY": [
+     100.0,
+     15
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 17,
+   "acc": 94.1,
+   "acc_cls": 94.1,
+   "unknown": 0.0,
+   "bal": 96.7,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ],
+    "GALAXY": [
+     93.3,
+     15
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 20,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     3
+    ],
+    "GALAXY": [
+     100.0,
+     17
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 20,
+   "acc": 90.0,
+   "acc_cls": 90.0,
+   "unknown": 0.0,
+   "bal": 94.1,
+   "recall": {
+    "STAR": [
+     100.0,
+     3
+    ],
+    "GALAXY": [
+     88.2,
+     17
+    ]
+   }
+  }
+ },
+ {
   "field": "sgp_349m25",
   "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
   "which": "blind",
@@ -11637,6 +19315,1755 @@
     "QSO": [
      100.0,
      3
+    ]
+   }
+  }
+ },
+ {
+  "field": "sgp_356m28",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 356.76417,
+  "dec": -28.11111,
+  "n": 109,
+  "ours": {
+   "n": 109,
+   "acc": 95.4,
+   "acc_cls": 96.3,
+   "unknown": 0.9,
+   "bal": 98.4,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ],
+    "GALAXY": [
+     95.2,
+     104
+    ],
+    "QSO": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "high": {
+   "n": 98,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 74,
+   "acc": 82.4,
+   "acc_cls": 82.4,
+   "unknown": 0.0,
+   "bal": 93.7,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ],
+    "GALAXY": [
+     81.2,
+     69
+    ],
+    "QSO": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 74,
+   "acc": 97.3,
+   "acc_cls": 97.3,
+   "unknown": 0.0,
+   "bal": 99.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ],
+    "GALAXY": [
+     97.1,
+     69
+    ],
+    "QSO": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 90,
+   "acc": 86.7,
+   "acc_cls": 86.7,
+   "unknown": 0.0,
+   "bal": 95.3,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ],
+    "GALAXY": [
+     85.9,
+     85
+    ],
+    "QSO": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 90,
+   "acc": 96.7,
+   "acc_cls": 97.8,
+   "unknown": 1.1,
+   "bal": 98.8,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ],
+    "GALAXY": [
+     96.5,
+     85
+    ],
+    "QSO": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 89,
+   "acc": 88.8,
+   "acc_cls": 88.8,
+   "unknown": 0.0,
+   "bal": 96.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ],
+    "GALAXY": [
+     88.1,
+     84
+    ],
+    "QSO": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 89,
+   "acc": 97.8,
+   "acc_cls": 98.9,
+   "unknown": 1.1,
+   "bal": 99.2,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ],
+    "GALAXY": [
+     97.6,
+     84
+    ],
+    "QSO": [
+     100.0,
+     3
+    ]
+   }
+  }
+ },
+ {
+  "field": "smc_bar",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 13.19,
+  "dec": -72.83,
+  "n": 42,
+  "ours": {
+   "n": 42,
+   "acc": 90.5,
+   "acc_cls": 95.0,
+   "unknown": 4.8,
+   "bal": 90.5,
+   "recall": {
+    "STAR": [
+     90.5,
+     42
+    ]
+   }
+  },
+  "high": {
+   "n": 38,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": null,
+  "Gaia DR3 DSC-Combmod | ours same": null,
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": null,
+  "LS morphology + WISE W1-W2>=0.8 | ours same": null
+ },
+ {
+  "field": "smc_ne",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 16.0,
+  "dec": -71.8,
+  "n": 3,
+  "ours": {
+   "n": 3,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "high": {
+   "n": 3,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 3,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 3,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 2,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 2,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 3,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 3,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     3
+    ]
+   }
+  }
+ },
+ {
+  "field": "smc_north",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 12.5,
+  "dec": -71.2,
+  "n": 2,
+  "ours": {
+   "n": 2,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "high": {
+   "n": 2,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 2,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 2,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 2,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 2,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 2,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 2,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     2
+    ]
+   }
+  }
+ },
+ {
+  "field": "smc_wing",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 19.5,
+  "dec": -73.4,
+  "n": 24,
+  "ours": {
+   "n": 24,
+   "acc": 95.8,
+   "acc_cls": 95.8,
+   "unknown": 0.0,
+   "bal": 95.8,
+   "recall": {
+    "STAR": [
+     95.8,
+     24
+    ]
+   }
+  },
+  "high": {
+   "n": 23,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 23,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     23
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 23,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     23
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": null,
+  "LS-GBM (LS photometry only) | ours same": null,
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 18,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     18
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 18,
+   "acc": 94.4,
+   "acc_cls": 94.4,
+   "unknown": 0.0,
+   "bal": 94.4,
+   "recall": {
+    "STAR": [
+     94.4,
+     18
+    ]
+   }
+  }
+ },
+ {
+  "field": "sth_008m50",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 7.43139,
+  "dec": -50.07472,
+  "n": 6,
+  "ours": {
+   "n": 6,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     5
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "high": {
+   "n": 5,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 6,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     5
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 6,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     5
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 6,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     5
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 6,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     5
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 6,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     5
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 6,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     5
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  }
+ },
+ {
+  "field": "sth_008m60",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 8.60278,
+  "dec": -59.72972,
+  "n": 10,
+  "ours": {
+   "n": 10,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     9
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "high": {
+   "n": 9,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 10,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     9
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 10,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     9
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 10,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     9
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 10,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     9
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 10,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     9
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 10,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     9
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  }
+ },
+ {
+  "field": "sth_016m45",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 15.58889,
+  "dec": -44.77028,
+  "n": 10,
+  "ours": {
+   "n": 10,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     9
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "high": {
+   "n": 10,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 9,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     9
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 9,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     9
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 10,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     9
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 10,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     9
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 10,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     9
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 10,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     9
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  }
+ },
+ {
+  "field": "sth_040m65",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 40.74722,
+  "dec": -65.33028,
+  "n": 11,
+  "ours": {
+   "n": 11,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     11
+    ]
+   }
+  },
+  "high": {
+   "n": 11,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 11,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     11
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 11,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     11
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 11,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     11
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 11,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     11
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 11,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     11
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 11,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     11
+    ]
+   }
+  }
+ },
+ {
+  "field": "sth_080m50",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 79.64444,
+  "dec": -50.21556,
+  "n": 7,
+  "ours": {
+   "n": 7,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     6
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "high": {
+   "n": 7,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 7,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     6
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 7,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     6
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 7,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     6
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 7,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     6
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 7,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     6
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 7,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     6
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  }
+ },
+ {
+  "field": "sth_296m60",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 295.90833,
+  "dec": -59.665,
+  "n": 18,
+  "ours": {
+   "n": 18,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     17
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "high": {
+   "n": 18,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 18,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     17
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 18,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     17
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 18,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     17
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 18,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     17
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 18,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     17
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 18,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     17
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  }
+ },
+ {
+  "field": "sth_296m65",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 296.41417,
+  "dec": -65.16694,
+  "n": 13,
+  "ours": {
+   "n": 13,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     12
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "high": {
+   "n": 13,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 13,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     12
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 13,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     12
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 13,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     12
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 13,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     12
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 13,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     12
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 13,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     12
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  }
+ },
+ {
+  "field": "sth_312m45",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 312.38917,
+  "dec": -44.99333,
+  "n": 9,
+  "ours": {
+   "n": 9,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     6
+    ],
+    "GALAXY": [
+     100.0,
+     3
+    ]
+   }
+  },
+  "high": {
+   "n": 7,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 8,
+   "acc": 87.5,
+   "acc_cls": 87.5,
+   "unknown": 0.0,
+   "bal": 75.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     6
+    ],
+    "GALAXY": [
+     50.0,
+     2
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 8,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     6
+    ],
+    "GALAXY": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 7,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     6
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 7,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     6
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 6,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     5
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 6,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     5
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  }
+ },
+ {
+  "field": "sth_312m50",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 312.24028,
+  "dec": -49.65806,
+  "n": 12,
+  "ours": {
+   "n": 12,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     10
+    ],
+    "GALAXY": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "high": {
+   "n": 11,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 12,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     10
+    ],
+    "GALAXY": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 12,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     10
+    ],
+    "GALAXY": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 11,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     10
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 11,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     10
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 11,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     10
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 11,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     10
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  }
+ },
+ {
+  "field": "sth_320m40",
+  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "which": "blind",
+  "ra": 319.86111,
+  "dec": -40.3525,
+  "n": 7,
+  "ours": {
+   "n": 7,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     5
+    ],
+    "GALAXY": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "high": {
+   "n": 7,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 7,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     5
+    ],
+    "GALAXY": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 7,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     5
+    ],
+    "GALAXY": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 7,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     5
+    ],
+    "GALAXY": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 7,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     5
+    ],
+    "GALAXY": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 7,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     5
+    ],
+    "GALAXY": [
+     100.0,
+     2
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8 | ours same": {
+   "n": 7,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     5
+    ],
+    "GALAXY": [
+     100.0,
+     2
     ]
    }
   }
