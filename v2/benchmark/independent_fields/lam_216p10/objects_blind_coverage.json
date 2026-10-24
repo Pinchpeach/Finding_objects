@@ -1,0 +1,15 @@
+{
+ "known": true,
+ "attempted": 28,
+ "failed": [
+  {
+   "collector": "ned",
+   "catalog": "NED",
+   "status": "timeout",
+   "impact": "literature labels",
+   "key": false,
+   "error": "ConnectionError(ReadTimeoutError(\"HTTPSConnectionPool(host='ned.ipac.caltech.edu', port=443): Read timed out.\"))"
+  }
+ ],
+ "key_failed": false
+}
