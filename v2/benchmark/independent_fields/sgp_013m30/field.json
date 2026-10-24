@@ -1,0 +1,37 @@
+{
+ "ra": 13.07167,
+ "dec": -30.41389,
+ "radius_arcmin": 12.0,
+ "n_objects": 19427,
+ "seconds": {
+  "collect": 80.9,
+  "1_associate": 5.1,
+  "2_integrate": 13.3,
+  "3_features": 16.6,
+  "4_evidence": 17.4,
+  "5_coarse": 24.1,
+  "6_prepare": 18.8,
+  "7_classify": 22.7
+ },
+ "catalog_rows": {
+  "DESI Legacy Surveys DR10": 19177,
+  "NED": 1820,
+  "AllWISE": 1729,
+  "Gaia DR3": 354,
+  "2MASS PSC": 157,
+  "GALEX AIS": 86,
+  "eROSITA eRASS1": 11,
+  "SGA-2020": 10,
+  "NVSS": 5,
+  "VLASS": 3,
+  "TGSS ADR1": 2,
+  "Gaia DR3 variability SOS": 1
+ },
+ "seeing": {
+  "g": 1.4,
+  "r": 1.21,
+  "z": 1.15,
+  "n_psf": 6395,
+  "source": "LS DR10 psfsize"
+ }
+}

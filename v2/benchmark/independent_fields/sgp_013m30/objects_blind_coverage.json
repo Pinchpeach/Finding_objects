@@ -1,0 +1,15 @@
+{
+ "known": true,
+ "attempted": 28,
+ "failed": [
+  {
+   "collector": "simbad",
+   "catalog": "SIMBAD",
+   "status": "error",
+   "impact": "literature labels",
+   "key": false,
+   "error": "DALFormatError: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+  }
+ ],
+ "key_failed": false
+}
