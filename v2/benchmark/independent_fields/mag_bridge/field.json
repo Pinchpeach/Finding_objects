@@ -2,21 +2,27 @@
  "ra": 33.0,
  "dec": -74.0,
  "radius_arcmin": 6.0,
- "n_objects": 5273,
+ "n_objects": 5305,
  "seconds": {
-  "collect": 449.2,
-  "1_associate": 1.5,
-  "2_integrate": 1.2,
-  "3_features": 0.9,
-  "4_evidence": 2.8,
-  "5_coarse": 2.9,
-  "6_prepare": 1.2,
-  "7_classify": 2.5
+  "collect": 139.1,
+  "1_associate": 1.1,
+  "2_integrate": 1.6,
+  "3_features": 2.3,
+  "4_evidence": 2.5,
+  "5_coarse": 3.6,
+  "6_prepare": 2.5,
+  "7_classify": 3.3
  },
  "catalog_rows": {
   "DESI Legacy Surveys DR10": 5127,
   "NED": 1154,
-  "Gaia DR3": 364
+  "AllWISE": 515,
+  "Gaia DR3": 364,
+  "GALEX AIS": 188,
+  "2MASS PSC": 99,
+  "SIMBAD": 67,
+  "XMM 4XMM-DR13": 19,
+  "eROSITA eRASS1": 3
  },
  "seeing": {
   "g": 1.76,
