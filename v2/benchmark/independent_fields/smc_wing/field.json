@@ -2,16 +2,16 @@
  "ra": 19.5,
  "dec": -73.4,
  "radius_arcmin": 6.0,
- "n_objects": 6950,
+ "n_objects": 6951,
  "seconds": {
-  "collect": 433.7,
-  "1_associate": 4.2,
-  "2_integrate": 4.4,
-  "3_features": 5.1,
-  "4_evidence": 5.1,
-  "5_coarse": 6.5,
-  "6_prepare": 5.6,
-  "7_classify": 7.5
+  "collect": 191.2,
+  "1_associate": 4.3,
+  "2_integrate": 7.1,
+  "3_features": 11.4,
+  "4_evidence": 7.5,
+  "5_coarse": 12.4,
+  "6_prepare": 11.8,
+  "7_classify": 11.2
  },
  "catalog_rows": {
   "NED": 6727,
@@ -22,6 +22,7 @@
   "SIMBAD": 180,
   "XMM 4XMM-DR13": 60,
   "eROSITA eRASS1": 12,
+  "Chandra CSC 2.0": 10,
   "Gaia DR3 variability SOS": 9
  },
  "seeing": {
