@@ -1,0 +1,127 @@
+{
+ "known": true,
+ "attempted": 28,
+ "failed": [
+  {
+   "collector": "gaia_dr3_variability_sos_vizier",
+   "catalog": "Gaia DR3 variability",
+   "status": "timeout",
+   "impact": "variable-star sub-classes",
+   "key": false,
+   "error": "ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='vizier.cds.unistra.fr', port=443): Read timed out. (read timeout=60)\"))"
+  },
+  {
+   "collector": "galex",
+   "catalog": "GALEX",
+   "status": "timeout",
+   "impact": "UV colours",
+   "key": false,
+   "error": "ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='vizier.cds.unistra.fr', port=443): Read timed out. (read timeout=60)\"))"
+  },
+  {
+   "collector": "lotss",
+   "catalog": "LoTSS DR2",
+   "status": "timeout",
+   "impact": "radio detections",
+   "key": false,
+   "error": "ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='vizier.cds.unistra.fr', port=443): Read timed out. (read timeout=60)\"))"
+  },
+  {
+   "collector": "xmm",
+   "catalog": "4XMM",
+   "status": "timeout",
+   "impact": "X-ray detections (AGN evidence)",
+   "key": false,
+   "error": "ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='vizier.cds.unistra.fr', port=443): Read timed out. (read timeout=60)\"))"
+  },
+  {
+   "collector": "chandra",
+   "catalog": "Chandra CSC",
+   "status": "timeout",
+   "impact": "X-ray detections (AGN evidence)",
+   "key": false,
+   "error": "ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='vizier.cds.unistra.fr', port=443): Read timed out. (read timeout=60)\"))"
+  },
+  {
+   "collector": "erosita",
+   "catalog": "eROSITA eRASS1",
+   "status": "timeout",
+   "impact": "X-ray detections (AGN, clusters)",
+   "key": false,
+   "error": "ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='vizier.cds.unistra.fr', port=443): Read timed out. (read timeout=60)\"))"
+  },
+  {
+   "collector": "desi_spectroscopy",
+   "catalog": "DESI DR1 spectroscopy",
+   "status": "timeout",
+   "impact": "spectroscopic classes and redshifts",
+   "key": false,
+   "error": "ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='vizier.cds.unistra.fr', port=443): Read timed out. (read timeout=60)\"))"
+  },
+  {
+   "collector": "lamost_spectroscopy",
+   "catalog": "LAMOST DR5",
+   "status": "timeout",
+   "impact": "spectroscopic classes and stellar parameters",
+   "key": false,
+   "error": "ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='vizier.cds.unistra.fr', port=443): Read timed out. (read timeout=60)\"))"
+  },
+  {
+   "collector": "ztf_periodic",
+   "catalog": "ZTF periodic variables",
+   "status": "timeout",
+   "impact": "variable-star sub-classes",
+   "key": false,
+   "error": "ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='vizier.cds.unistra.fr', port=443): Read timed out. (read timeout=60)\"))"
+  },
+  {
+   "collector": "bzcat",
+   "catalog": "Roma-BZCAT",
+   "status": "timeout",
+   "impact": "blazar labels",
+   "key": false,
+   "error": "ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='vizier.cds.unistra.fr', port=443): Read timed out. (read timeout=60)\"))"
+  },
+  {
+   "collector": "agb_suh2021",
+   "catalog": "AGB catalogue (Suh 2021)",
+   "status": "timeout",
+   "impact": "AGB labels",
+   "key": false,
+   "error": "RuntimeError('Suh 2021 AGB tables failed: table9:ReadTimeout, table10:ReadTimeout, table11:ReadTimeout, table12:ReadTimeout')"
+  },
+  {
+   "collector": "sga2020",
+   "catalog": "Siena Galaxy Atlas",
+   "status": "timeout",
+   "impact": "large-galaxy grouping",
+   "key": false,
+   "error": "ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='vizier.cds.unistra.fr', port=443): Read timed out. (read timeout=60)\"))"
+  },
+  {
+   "collector": "galaxy_clusters",
+   "catalog": "galaxy cluster catalogues",
+   "status": "timeout",
+   "impact": "cluster membership",
+   "key": false,
+   "error": "RuntimeError(\"WH24: HTTPSConnectionPool(host='vizier.cds.unistra.fr', port=443): Read timed out. (read timeout=60); eRASS1: HTTPSConnectionPool(host='vizier.cds.unistra.fr', port=443): Read timed out."
+  },
+  {
+   "collector": "simbad",
+   "catalog": "SIMBAD",
+   "status": "error",
+   "impact": "literature labels",
+   "key": false,
+   "error": "DALFormatError: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+  },
+  {
+   "collector": "ned",
+   "catalog": "NED",
+   "status": "error",
+   "impact": "literature labels",
+   "key": false,
+   "error": "ExpatError('syntax error: line 1, column 49')"
+  }
+ ],
+ "key_failed": false
+}
