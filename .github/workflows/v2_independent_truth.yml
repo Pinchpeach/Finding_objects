@@ -184,7 +184,7 @@ jobs:
           - {name: oc_m11, ra: 282.77, dec: -6.27, r: 6, fixed: true}    # open cluster M11 (rich, b~-3), b~-3
           - {name: oc_ngc2420, ra: 114.6, dec: 21.57, r: 12, fixed: true}    # open cluster NGC 2420, b~+20
           - {name: oc_ic2391, ra: 130.1, dec: -53.0, r: 12, fixed: true}    # open cluster IC 2391, b~-7
-          - {name: sfr_onc, ra: 83.82, dec: -5.39, r: 12, fixed: true}    # Orion Nebula Cluster, b~-19
+          - {name: sfr_onc, ra: 83.82, dec: -5.39, r: 6, fixed: true}    # Orion Nebula Cluster, b~-19
           - {name: sfr_l1495, ra: 64.5, dec: 28.3, r: 12, fixed: true}    # Taurus L1495, b~-16
           - {name: sfr_rhooph, ra: 246.8, dec: -24.5, r: 12, fixed: true}    # rho Ophiuchi, b~+17
           - {name: sfr_lupus3, ra: 242.5, dec: -39.1, r: 12, fixed: true}    # Lupus 3, b~+9
