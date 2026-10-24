@@ -1,0 +1,31 @@
+{
+ "ra": 13.188,
+ "dec": -26.583,
+ "radius_arcmin": 6.0,
+ "n_objects": 15824,
+ "seconds": {
+  "collect": 453.0,
+  "1_associate": 51.8,
+  "2_integrate": 12.9,
+  "3_features": 14.6,
+  "4_evidence": 17.2,
+  "5_coarse": 21.4,
+  "6_prepare": 16.8,
+  "7_classify": 20.6
+ },
+ "catalog_rows": {
+  "DESI Legacy Surveys DR10": 13215,
+  "Gaia DR3": 13214,
+  "Pan-STARRS1 DR2 MeanObject": 11873,
+  "NED": 2308,
+  "Chandra CSC 2.0": 42,
+  "SGA-2020": 4
+ },
+ "seeing": {
+  "g": 1.33,
+  "r": 1.09,
+  "z": 1.0,
+  "n_psf": 13213,
+  "source": "LS DR10 psfsize"
+ }
+}

@@ -1,0 +1,79 @@
+{
+ "known": true,
+ "attempted": 28,
+ "failed": [
+  {
+   "collector": "gaia_dr3_variability_sos_vizier",
+   "catalog": "Gaia DR3 variability",
+   "status": "timeout",
+   "impact": "variable-star sub-classes",
+   "key": false,
+   "error": "ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='vizier.cds.unistra.fr', port=443): Read timed out. (read timeout=60)\"))"
+  },
+  {
+   "collector": "galex",
+   "catalog": "GALEX",
+   "status": "timeout",
+   "impact": "UV colours",
+   "key": false,
+   "error": "ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='vizier.cds.unistra.fr', port=443): Read timed out. (read timeout=60)\"))"
+  },
+  {
+   "collector": "twomass",
+   "catalog": "2MASS",
+   "status": "timeout",
+   "impact": "near-IR colours of bright stars",
+   "key": false,
+   "error": "ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='vizier.cds.unistra.fr', port=443): Read timed out. (read timeout=60)\"))"
+  },
+  {
+   "collector": "allwise",
+   "catalog": "AllWISE",
+   "status": "timeout",
+   "impact": "mid-IR AGN colours (QSO evidence)",
+   "key": true,
+   "error": "ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='vizier.cds.unistra.fr', port=443): Read timed out. (read timeout=60)\"))"
+  },
+  {
+   "collector": "lotss",
+   "catalog": "LoTSS DR2",
+   "status": "timeout",
+   "impact": "radio detections",
+   "key": false,
+   "error": "ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='vizier.cds.unistra.fr', port=443): Read timed out. (read timeout=60)\"))"
+  },
+  {
+   "collector": "first",
+   "catalog": "FIRST",
+   "status": "timeout",
+   "impact": "radio detections",
+   "key": false,
+   "error": "ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='vizier.cds.unistra.fr', port=443): Read timed out. (read timeout=60)\"))"
+  },
+  {
+   "collector": "desi_spectroscopy",
+   "catalog": "DESI DR1 spectroscopy",
+   "status": "timeout",
+   "impact": "spectroscopic classes and redshifts",
+   "key": false,
+   "error": "ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='vizier.cds.unistra.fr', port=443): Read timed out. (read timeout=60)\"))"
+  },
+  {
+   "collector": "agb_suh2021",
+   "catalog": "AGB catalogue (Suh 2021)",
+   "status": "timeout",
+   "impact": "AGB labels",
+   "key": false,
+   "error": "RuntimeError('Suh 2021 AGB tables failed: table11:ReadTimeout, table12:ReadTimeout')"
+  },
+  {
+   "collector": "simbad",
+   "catalog": "SIMBAD",
+   "status": "error",
+   "impact": "literature labels",
+   "key": false,
+   "error": "DALFormatError: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+  }
+ ],
+ "key_failed": true
+}
