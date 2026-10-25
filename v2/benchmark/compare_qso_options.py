@@ -35,9 +35,9 @@ B = Path(__file__).resolve().parent
 V2 = B.parent
 PRE = V2 / "Preprocess"
 C = ["STAR", "GALAXY", "QSO"]
-# c2, c5 and c6 are the default since 2.38.0 (Preprocess/qso_options.ADOPTED)
-SINGLES = ["c1a", "c1a_half", "c1b", "c3a", "c3b", "c4", "c7", "c8"]
-COMBOS = ["c3a+c7", "c1b+c3a+c7"]
+# c1b, c3a, c5, c6, c7 are the default since 2.39.0 (Preprocess/qso_options.ADOPTED)
+SINGLES = ["c1a", "c1a_half", "c2", "c3b", "c4", "c8"]
+COMBOS = ["c1a_half+c3b"]
 SETS = ["base", *SINGLES, *COMBOS]
 
 
@@ -176,13 +176,13 @@ def score(a):
     for fdir in sorted(p for p in (B / "independent_fields").iterdir() if (p / "qso_options_blind.csv.gz").exists()):
         q = pd.read_csv(fdir / "qso_options_blind.csv.gz")
         m, _ = sf.field_matches(fdir, "blind", bench_pos)
-        mm = m.merge(q, on="object_id", how="inner")
+        m = m if "object_id" in m else pd.DataFrame(columns=["object_id", "t_truth"])  # field without truth
+        mm = m[["object_id", "t_truth"]].merge(q, on="object_id", how="inner")
         js = json.loads((fdir / "field.json").read_text())
         area = np.pi * (js["radius_arcmin"] / 60) ** 2
-        for opt in SETS:
+        # options as replayed in that run (the set changed in 2.38.0)
+        for opt in [c[: -len("_class")] for c in q.columns if c.endswith("_class")]:
             col = f"{opt}_class"
-            if col not in q:
-                continue
             rows.append(
                 pd.DataFrame(
                     {"field": fdir.name, "option": opt, "truth": mm.t_truth, "pred": mm[col].fillna("UNKNOWN"), "r": mm.r}

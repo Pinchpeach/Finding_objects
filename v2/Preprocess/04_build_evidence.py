@@ -342,25 +342,27 @@ def optical_r_mag(row):
     return r if r is not None and 5 < r < 30 else None
 
 
-# Proper-motion significance (2.38.0): Mahalanobis distance of the motion
-# from zero with the pmra-pmdec correlation (ignoring it biases the test),
-# divided by the scale s = 1.1485 of the scaled chi^2 (k = 2) that fits the
-# Gaia-CRF3 quasars (Li & Fynbo 2026, arXiv:2610.13742, Sect. 3.1; their
-# 2-sigma threshold D^2 < 7.097 = 1.1485 x 6.18).  Benchmarks with refitted
-# fusion: SDSS 98.69 -> 98.69 %, DESI 92.41 -> 92.62 %
-# (benchmark/compare_qso_options.py, option c2).
+# Option c2 (qso_options.py): Mahalanobis distance of the motion from zero
+# with the pmra-pmdec correlation, divided by the scale s = 1.1485 of the
+# scaled chi^2 fitted to Gaia-CRF3 quasars (Li & Fynbo 2026).  Default in
+# 2.38.0 with refitted fusion weights; reverted in 2.39.0: on the 200
+# independent fields it lowered the Stage-5 accuracy 96.12 -> 96.01 % and
+# added QSO predictions (benchmarks had gained 0.2 %p).
+PM_MAHALANOBIS = False
 PM_MAHALANOBIS_SCALE = 1.1485
 
 
 def _pm_sigma(src):
-    """Proper-motion significance sqrt(D^2 / s) (full covariance), or None."""
+    """Total proper-motion significance (diagonal errors; option c2: full covariance), or None."""
     a, ae, d, de = (num(src, x) for x in ("pmra", "pmra_error", "pmdec", "pmdec_error"))
     if None not in (a, ae, d, de) and ae > 0 and de > 0:
-        rho = num(src, "pmra_pmdec_corr")
-        rho = num(src, "pmRApmDEcor") if rho is None else rho  # VizieR name
-        rho = 0.0 if rho is None or not -0.999 < rho < 0.999 else rho
-        x, y = a / ae, d / de
-        return math.sqrt((x * x - 2 * rho * x * y + y * y) / (1 - rho * rho) / PM_MAHALANOBIS_SCALE)
+        if PM_MAHALANOBIS:
+            rho = num(src, "pmra_pmdec_corr")
+            rho = num(src, "pmRApmDEcor") if rho is None else rho  # VizieR name
+            rho = 0.0 if rho is None or not -0.999 < rho < 0.999 else rho
+            x, y = a / ae, d / de
+            return math.sqrt((x * x - 2 * rho * x * y + y * y) / (1 - rho * rho) / PM_MAHALANOBIS_SCALE)
+        return math.sqrt((a / ae) ** 2 + (d / de) ** 2)
     return None
 
 
@@ -409,7 +411,7 @@ def evaluate(rule, row, namespaced=frozenset()):
                 "EXTRAGALACTIC",
                 1 - x / float(rule["threshold"]),
                 x,
-                "Mahalanobis distance with the pmra-pmdec correlation (2.38.0)",
+                "diagonal-error approximation; covariance unavailable",
             )
     elif rid == "AST-GAL-001":
         p, e = num(src, "parallax"), num(src, "parallax_error")
@@ -739,6 +741,8 @@ SOFT_SUFFIXES = ("-CKNN-001", "-GBM-001")
 
 
 def run(features: Path, rules_path: Path, out: Path) -> Path:
+    global PM_MAHALANOBIS
+    PM_MAHALANOBIS = "c2" in _import_local("qso_options").parse()
     df = TABLE_IO.read_table(features)
     rules = pd.read_csv(rules_path, keep_default_na=False)
     result = df.copy()

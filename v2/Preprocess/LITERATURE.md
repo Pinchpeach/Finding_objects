@@ -404,8 +404,19 @@ Candidates of `v2/LITERATURE_QSO.md` replayed on the same Stage-4 evidence (`ben
 
 | Item | Literature | Rule | Measurement |
 |---|---|---|---|
-| Proper-motion significance with full covariance (adopted) | Li & Fynbo 2026 (arXiv:2610.13742): Mahalanobis distance from zero motion, scaled chi^2 (k = 2) with s = 1.1485 fitted to Gaia-CRF3; ignoring the pmra-pmdec correlation biases the test | AST-EXT-002 / AST-GAL-002 value sqrt(D^2/1.1485); `pmra_pmdec_corr` collected; fusion refitted | SDSS 98.69 -> 98.69 %, DESI 92.41 -> 92.62 % |
+| Proper-motion significance with full covariance (adopted in 2.38.0, reverted in 2.39.0: 200-field Stage-5 accuracy 96.12 -> 96.01 %; option c2) | Li & Fynbo 2026 (arXiv:2610.13742): Mahalanobis distance from zero motion, scaled chi^2 (k = 2) with s = 1.1485 fitted to Gaia-CRF3; ignoring the pmra-pmdec correlation biases the test | AST-EXT-002 / AST-GAL-002 value sqrt(D^2/1.1485); `pmra_pmdec_corr` collected; fusion refitted | SDSS 98.69 -> 98.69 %, DESI 92.41 -> 92.62 % |
 | X-ray star line (adopted) | Salvato et al. 2018 (MNRAS 473, 4937) Eq. 2: [W1] = -1.625 log F(0.5-2 keV) - 8.8 separates stars (brighter W1) from AGN | X-ray counterpart on the stellar side: QSO odds x 0.1 | with the above: SDSS 98.74 %, DESI 92.62 %; real-sky QSO purity r 20-21 8.4 -> 10.6 % |
 | Magellanic systemic motions (adopted) | Gaia Collaboration, Luri et al. 2021 Table 4: LMC (1.871, 0.391), SMC (0.686, -1.237) mas/yr | MAGELLANIC in Stage 5 | no benchmark object; field check pending |
 | Magnitude prior, DESI tanh threshold (kept as options c1a, c3b) | Bovy et al. 2011; Jamal & Bailer-Jones 2024; Chaussidon et al. 2023 | V2_QSO_OPTIONS | real-sky QSO purity x2-3, QSO recall -16 to -49 %p |
 | Quaia colours, faint abstention (not adopted) | Storey-Fisher et al. 2024; Nakoneczny et al. 2019 | - | SDSS -0.6 %p; DESI -5.7 %p |
+
+### 200 independent fields (2.39.0)
+
+Stage-5 replay of every option on the blind evidence of the 200 fields (14,498 truth objects; `benchmark/qso_options/qso_options_fields.csv`).
+
+| Item | Literature | Rule | Measurement |
+|---|---|---|---|
+| Local stellar-density prior (adopted) | continuous position prior: Jamal & Bailer-Jones 2024 (A&A 687, A258); Hughes et al. 2022 (A&A 668, A99) | GALAXY/QSO odds x min(1, 5000 deg^-2 / Gaia density from the 10th neighbour); latitude + Magellanic priors where < 11 Gaia sources | 96.12 -> 96.16 %, QSO predictions -16 % (Clouds -59 %) |
+| DESI WISE cut (adopted) | Chaussidon et al. 2023 (ApJ 944, 107) Sect. 3: W1 < 22.3 and W2 < 22.3 | QSO odds x 0.1 otherwise | 96.21 %, QSO precision 77.1 -> 79.2 % |
+| Gaia DSC ignored in the Clouds (adopted) | Delchambre et al. 2023: 38 % of DSC quasars lie in the LMC, 6.4 % in the SMC | DSC-001 dropped where the Magellanic prior < 1 | Magellanic QSO 5,657 -> 3,162 |
+| Magnitude prior, half strength (option c1a_half) | Bovy et al. 2011; Jamal & Bailer-Jones 2024 | QSO odds x sqrt(real-sky / training odds) per r bin | 96.30 %, QSO precision 87 %, recall 96 -> 91 %; benchmarks SDSS -0.75, DESI -3.4 %p |
