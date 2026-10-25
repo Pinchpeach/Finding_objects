@@ -109,6 +109,8 @@ RAW_FIELDS = {
     "pmra_error",
     "pmdec",
     "pmdec_error",
+    "pmra_pmdec_corr",
+    "pmRApmDEcor",
     "class",
     "zwarning",
     # DESI DR1 Redrock / LAMOST DR5 spectral class (SPC-DESI-*, SPC-LAMOST-*)
@@ -340,10 +342,23 @@ def optical_r_mag(row):
     return r if r is not None and 5 < r < 30 else None
 
 
+# Option c2 of the 2.38.0 QSO comparison (qso_options.py): Mahalanobis
+# distance of the proper motion from zero with the pmra-pmdec correlation,
+# scaled by s = 1.1485 fitted to Gaia-CRF3 quasars (Li & Fynbo 2026).
+PM_MAHALANOBIS = False
+PM_MAHALANOBIS_SCALE = 1.1485
+
+
 def _pm_sigma(src):
     """Total proper-motion significance (diagonal errors), or None."""
     a, ae, d, de = (num(src, x) for x in ("pmra", "pmra_error", "pmdec", "pmdec_error"))
     if None not in (a, ae, d, de) and ae > 0 and de > 0:
+        if PM_MAHALANOBIS:
+            rho = num(src, "pmra_pmdec_corr")
+            rho = num(src, "pmRApmDEcor") if rho is None else rho
+            rho = 0.0 if rho is None or not -0.999 < rho < 0.999 else rho
+            x, y = a / ae, d / de
+            return math.sqrt((x * x - 2 * rho * x * y + y * y) / (1 - rho * rho) / PM_MAHALANOBIS_SCALE)
         return math.sqrt((a / ae) ** 2 + (d / de) ** 2)
     return None
 
@@ -723,6 +738,8 @@ SOFT_SUFFIXES = ("-CKNN-001", "-GBM-001")
 
 
 def run(features: Path, rules_path: Path, out: Path) -> Path:
+    global PM_MAHALANOBIS
+    PM_MAHALANOBIS = "c2" in _import_local("qso_options").parse()
     df = TABLE_IO.read_table(features)
     rules = pd.read_csv(rules_path, keep_default_na=False)
     result = df.copy()

@@ -36,6 +36,9 @@ _tio_s.loader.exec_module(TABLE_IO)
 _gbm_s = _tio_u.spec_from_file_location("v2_ls_gbm_trees", Path(__file__).resolve().parent / "ls_gbm.py")
 TREES = _tio_u.module_from_spec(_gbm_s)
 _gbm_s.loader.exec_module(TREES)
+_qo_s = _tio_u.spec_from_file_location("v2_qso_options", Path(__file__).resolve().parent / "qso_options.py")
+QSO_OPT = _tio_u.module_from_spec(_qo_s)
+_qo_s.loader.exec_module(QSO_OPT)
 CLASSES = ("STAR", "GALAXY", "QSO")
 WEIGHT = {"direct_probability": 1.0, "catalog_label": 1.5, "continuous_score": 0.35, "binary_evidence": 0.35}
 MIN_CONFIDENCE = 0.50
@@ -392,8 +395,23 @@ def _col(df, name):
     return pd.to_numeric(df[name], errors="coerce").to_numpy(float) if name in df else np.full(len(df), np.nan)
 
 
-def magellanic_factor(df: pd.DataFrame) -> np.ndarray:
-    """Per-row factor (0, 1] on the GALAXY and QSO odds inside the Magellanic Clouds; 1 elsewhere."""
+def magellanic_region(df: pd.DataFrame) -> np.ndarray:
+    """True where the Magellanic star-count prior is below 1 (inside the Clouds' discs)."""
+    ra, dec = _col(df, "ra"), _col(df, "dec")
+    inside = np.zeros(len(df), bool)
+    for _, ra0, dec0, rho0, h, rho_ref, _, _ in MAGELLANIC:
+        c = np.sin(np.radians(dec)) * np.sin(np.radians(dec0)) + np.cos(np.radians(dec)) * np.cos(
+            np.radians(dec0)
+        ) * np.cos(np.radians(ra - ra0))
+        r = np.degrees(np.arccos(np.clip(c, -1, 1)))
+        inside |= np.isfinite(r) & (rho_ref / (rho0 * np.exp(-r / h)) < 1.0)
+    return inside
+
+
+def magellanic_factor(df: pd.DataFrame, systemic=None) -> np.ndarray:
+    """Per-row factor (0, 1] on the GALAXY and QSO odds inside the Magellanic Clouds; 1 elsewhere.
+
+    ``systemic`` = {"LMC": (pmra, pmdec), "SMC": ...} overrides the adopted motions."""
     ra, dec = _col(df, "ra"), _col(df, "dec")
     f = np.ones(len(df))
     pa, pd_ = _col(df, "gaia_dr3__pmra"), _col(df, "gaia_dr3__pmdec")
@@ -403,7 +421,8 @@ def magellanic_factor(df: pd.DataFrame) -> np.ndarray:
         np.nan_to_num(_col(df, "association_confidence__gaia_dr3"), nan=1.0),
     )
     ok = np.isfinite(pa + pd_ + ea + ed) & (ea > 0) & (ed > 0) & (rel >= MAGELLANIC_MIN_RELIABILITY)
-    for _, ra0, dec0, rho0, h, rho_ref, (ma, md), s in MAGELLANIC:
+    for name, ra0, dec0, rho0, h, rho_ref, (ma, md), s in MAGELLANIC:
+        ma, md = (systemic or {}).get(name, (ma, md))
         c = np.sin(np.radians(dec)) * np.sin(np.radians(dec0)) + np.cos(np.radians(dec)) * np.cos(
             np.radians(dec0)
         ) * np.cos(np.radians(ra - ra0))
@@ -427,7 +446,8 @@ def magellanic_factor(df: pd.DataFrame) -> np.ndarray:
     return np.maximum(f, 1e-6)
 
 
-def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=False):
+def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=False, options=None):
+    opts = QSO_OPT.parse(options)
     model = load_model(model_path)
     min_conf = float(model.get("min_confidence", MIN_CONFIDENCE)) if model else MIN_CONFIDENCE
     if min_confidence is not None:
@@ -446,6 +466,9 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
             item_lists.append(json.loads(raw) if isinstance(raw, str) else [])
         except (json.JSONDecodeError, TypeError):
             item_lists.append([])
+    if "c7" in opts:  # Gaia DSC ignored inside the Magellanic Clouds
+        for i in np.flatnonzero(magellanic_region(df)):
+            item_lists[i] = [e for e in item_lists[i] if e.get("rule_id") != "DSC-001"]
     fused = fuse_many(item_lists, model, Path(model_path).parent)
     rows = []
     for items, hr, (p, used) in zip(item_lists, host_r, fused):
@@ -481,8 +504,23 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     prior = estimate_field_prior(P[eligible], train_prior) if estimable else np.array(train_prior)
     adjust = estimable and bool(field_prior)
     Q = P * (prior if adjust else np.array(train_prior)) / np.array(train_prior)
-    lat = latitude_factor(df) * magellanic_factor(df)
+    if "c1b" in opts:  # local stellar density replaces the latitude and Magellanic priors
+        lat = QSO_OPT.density_prior(df)
+    else:
+        lat = latitude_factor(df) * magellanic_factor(df, QSO_OPT.LURI_2021 if "c5" in opts else None)
     Q[:, [CLASSES.index("GALAXY"), CLASSES.index("QSO")]] *= lat[:, None]
+    qf = np.ones(len(df))
+    if "c1a" in opts or "c1a_half" in opts:
+        qf *= QSO_OPT.magnitude_prior(df, half="c1a" not in opts)
+    if "c3a" in opts or "c3b" in opts:
+        qf *= np.where(QSO_OPT.desi_wise_cut(df), QSO_OPT.VETO, 1.0)
+    if "c4" in opts:
+        qf *= np.where(QSO_OPT.quaia_fail(df), QSO_OPT.VETO, 1.0)
+    if "c6" in opts:
+        qf *= np.where(QSO_OPT.xray_star_side(df), QSO_OPT.VETO, 1.0)
+    Q[:, CLASSES.index("QSO")] *= qf
+    qso_min = QSO_OPT.desi_threshold(df) if "c3b" in opts else np.zeros(len(df))
+    faint = QSO_OPT.r_mag(df) > 22 if "c8" in opts else np.zeros(len(df), bool)
     Q = Q / Q.sum(axis=1, keepdims=True) if len(Q) else Q
     labels = []
     confidence = []
@@ -490,7 +528,7 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     statuses = []
     best_candidates = []
     best_candidate_scores = []
-    for q, (_, used, conflict, in_host, moving) in zip(Q, rows):
+    for q, (_, used, conflict, in_host, moving), qmin, qfaint in zip(Q, rows, qso_min, faint):
         order = np.argsort(-q)
         conf = float(q[order[0]])
         margin = conf - float(q[order[1]])
@@ -517,7 +555,7 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
         elif conflict and (not model or conf < CONFLICT_RESOLVED_P):
             label = "UNKNOWN"
             status = "CONFLICT"
-        elif conf < min_conf or margin < min_margin:
+        elif conf < min_conf or margin < min_margin or (top == "QSO" and (conf < qmin or qfaint)):
             label = "UNKNOWN"
             status = "LOW_CONFIDENCE"
         else:
