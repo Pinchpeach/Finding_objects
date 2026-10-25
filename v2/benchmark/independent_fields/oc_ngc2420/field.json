@@ -2,29 +2,28 @@
  "ra": 114.6,
  "dec": 21.57,
  "radius_arcmin": 12.0,
- "n_objects": 19513,
+ "n_objects": 11142,
  "seconds": {
-  "collect": 115.4,
-  "1_associate": 16.0,
-  "2_integrate": 21.1,
-  "3_features": 31.4,
-  "4_evidence": 24.1,
-  "5_coarse": 37.4,
-  "6_prepare": 33.3,
-  "7_classify": 33.3
+  "collect": 306.4,
+  "1_associate": 6.6,
+  "2_integrate": 9.8,
+  "3_features": 12.3,
+  "4_evidence": 9.9,
+  "5_coarse": 14.6,
+  "6_prepare": 13.5,
+  "7_classify": 15.1
  },
  "catalog_rows": {
-  "DESI Legacy Surveys DR10": 14704,
   "Pan-STARRS1 DR2 MeanObject": 9400,
   "NED": 4818,
   "SDSS DR18 PhotoObj": 4726,
   "Gaia DR3": 2649,
   "AllWISE": 2279,
   "2MASS PSC": 1321,
+  "SIMBAD": 1232,
   "GALEX AIS": 646,
   "DESI DR1 spectroscopy": 224,
   "SDSS DR18 spectroscopy": 190,
-  "DESI DR1 FastSpecFit": 143,
   "LAMOST DR catalog": 134,
   "XMM 4XMM-DR13": 41,
   "SGA-2020": 9,
@@ -36,10 +35,13 @@
   "eROSITA eRASS1": 1
  },
  "seeing": {
-  "g": 1.68,
-  "r": 1.64,
-  "z": 1.62,
-  "n_psf": 9316,
-  "source": "LS DR10 psfsize"
+  "error": "RuntimeError: Legacy Surveys TAP failed after 3 attempts: DALFormatError: ReadTimeout: HTTPSConnectionPool(host='datalab.noirlab.edu',",
+  "ps1": {
+   "source": "PS1 stack psfMajor/MinorFWHM",
+   "n": 9678,
+   "g": 1.27,
+   "r": 1.14,
+   "i": 1.03
+  }
  }
 }
