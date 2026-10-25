@@ -1,7 +1,7 @@
 [
  {
   "field": "des_060m45",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 60.13028,
   "dec": -45.10944,
@@ -104,13 +104,13 @@
  },
  {
   "field": "gc_47tuc",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 6.024,
   "dec": -72.081,
-  "n": 182,
+  "n": 189,
   "ours": {
-   "n": 182,
+   "n": 189,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -118,12 +118,12 @@
    "recall": {
     "STAR": [
      100.0,
-     182
+     189
     ]
    }
   },
   "high": {
-   "n": 181,
+   "n": 188,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": null,
@@ -159,7 +159,7 @@
  },
  {
   "field": "gc_m13",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 250.422,
   "dec": 36.46,
@@ -238,7 +238,7 @@
  },
  {
   "field": "gc_m15",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 322.493,
   "dec": 12.167,
@@ -317,7 +317,7 @@
  },
  {
   "field": "gc_m2",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 323.363,
   "dec": -0.823,
@@ -440,7 +440,7 @@
  },
  {
   "field": "gc_m3",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 205.548,
   "dec": 28.377,
@@ -519,7 +519,7 @@
  },
  {
   "field": "gc_m4",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 245.897,
   "dec": -26.526,
@@ -574,7 +574,7 @@
  },
  {
   "field": "gc_m5",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 229.638,
   "dec": 2.081,
@@ -653,7 +653,7 @@
  },
  {
   "field": "gc_m92",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 259.281,
   "dec": 43.136,
@@ -756,7 +756,7 @@
  },
  {
   "field": "gc_ngc288",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 13.188,
   "dec": -26.583,
@@ -887,7 +887,7 @@
  },
  {
   "field": "gc_ngc6397",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 265.175,
   "dec": -53.674,
@@ -918,7 +918,7 @@
  },
  {
   "field": "gc_ngc6752",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 287.717,
   "dec": -59.985,
@@ -997,7 +997,7 @@
  },
  {
   "field": "gc_omegacen",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 201.697,
   "dec": -47.48,
@@ -1052,7 +1052,7 @@
  },
  {
   "field": "kep_291p44",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 291.23,
   "dec": 44.89806,
@@ -1119,7 +1119,7 @@
  },
  {
   "field": "lam_000p00",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 0.23278,
   "dec": 0.34889,
@@ -1250,7 +1250,7 @@
  },
  {
   "field": "lam_000p40",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 0.43111,
   "dec": 40.18861,
@@ -1305,7 +1305,7 @@
  },
  {
   "field": "lam_000p50",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 0.60278,
   "dec": 49.78,
@@ -1360,7 +1360,7 @@
  },
  {
   "field": "lam_009p10",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 8.92472,
   "dec": 9.62833,
@@ -1463,7 +1463,7 @@
  },
  {
   "field": "lam_014m05",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 14.32472,
   "dec": -4.99111,
@@ -1578,7 +1578,7 @@
  },
  {
   "field": "lam_015p38",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 15.52444,
   "dec": 37.81306,
@@ -1633,7 +1633,7 @@
  },
  {
   "field": "lam_018p30",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 17.87833,
   "dec": 29.92139,
@@ -1736,7 +1736,7 @@
  },
  {
   "field": "lam_020p45",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 19.45972,
   "dec": 44.76417,
@@ -1791,7 +1791,7 @@
  },
  {
   "field": "lam_035p25",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 35.42778,
   "dec": 24.9525,
@@ -1922,7 +1922,7 @@
  },
  {
   "field": "lam_045p30",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 45.10389,
   "dec": 30.45556,
@@ -1989,7 +1989,7 @@
  },
  {
   "field": "lam_048p50",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 48.72417,
   "dec": 49.98556,
@@ -2044,7 +2044,7 @@
  },
  {
   "field": "lam_054p30",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 54.37861,
   "dec": 29.77361,
@@ -2099,7 +2099,7 @@
  },
  {
   "field": "lam_060p20",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 60.10806,
   "dec": 20.275,
@@ -2154,7 +2154,7 @@
  },
  {
   "field": "lam_063p40",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 63.47806,
   "dec": 40.04222,
@@ -2209,7 +2209,7 @@
  },
  {
   "field": "lam_070p55",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 70.4025,
   "dec": 54.61222,
@@ -2264,7 +2264,7 @@
  },
  {
   "field": "lam_072p20",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 71.5175,
   "dec": 19.89778,
@@ -2319,7 +2319,7 @@
  },
  {
   "field": "lam_084p58",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 83.86583,
   "dec": 57.88139,
@@ -2374,7 +2374,7 @@
  },
  {
   "field": "lam_090p28",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 89.91889,
   "dec": 28.30444,
@@ -2429,7 +2429,7 @@
  },
  {
   "field": "lam_090p40",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 90.02778,
   "dec": 39.74111,
@@ -2484,7 +2484,7 @@
  },
  {
   "field": "lam_100p45",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 99.39944,
   "dec": 44.81056,
@@ -2587,7 +2587,7 @@
  },
  {
   "field": "lam_100p55",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 99.87694,
   "dec": 55.1225,
@@ -2718,7 +2718,7 @@
  },
  {
   "field": "lam_108p58",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 108.16722,
   "dec": 58.44556,
@@ -2821,7 +2821,7 @@
  },
  {
   "field": "lam_112p15",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 112.32056,
   "dec": 14.70667,
@@ -2888,7 +2888,7 @@
  },
  {
   "field": "lam_112p35",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 112.51917,
   "dec": 34.93167,
@@ -2991,7 +2991,7 @@
  },
  {
   "field": "lam_115p25",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 114.525,
   "dec": 25.12306,
@@ -3094,7 +3094,7 @@
  },
  {
   "field": "lam_126p00",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 126.19472,
   "dec": 0.15639,
@@ -3225,7 +3225,7 @@
  },
  {
   "field": "lam_126p05",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 125.68861,
   "dec": 5.32722,
@@ -3356,7 +3356,7 @@
  },
  {
   "field": "lam_130p30",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 129.81722,
   "dec": 30.13528,
@@ -3487,7 +3487,7 @@
  },
  {
   "field": "lam_135p10",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 134.59472,
   "dec": 10.19694,
@@ -3590,7 +3590,7 @@
  },
  {
   "field": "lam_140p55",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 140.13667,
   "dec": 54.59111,
@@ -3721,7 +3721,7 @@
  },
  {
   "field": "lam_153p10",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 153.23583,
   "dec": 9.98528,
@@ -3852,7 +3852,7 @@
  },
  {
   "field": "lam_156p50",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 156.5125,
   "dec": 49.96139,
@@ -3955,7 +3955,7 @@
  },
  {
   "field": "lam_160p40",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 159.4675,
   "dec": 39.8675,
@@ -4086,7 +4086,7 @@
  },
  {
   "field": "lam_161p15",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 160.68417,
   "dec": 15.32222,
@@ -4189,7 +4189,7 @@
  },
  {
   "field": "lam_162p10",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 162.00333,
   "dec": 9.55444,
@@ -4320,7 +4320,7 @@
  },
  {
   "field": "lam_171p20",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 170.9425,
   "dec": 20.45222,
@@ -4451,7 +4451,7 @@
  },
  {
   "field": "lam_180p20",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 180.10472,
   "dec": 19.62972,
@@ -4554,7 +4554,7 @@
  },
  {
   "field": "lam_180p50",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 180.61639,
   "dec": 50.22611,
@@ -4657,7 +4657,7 @@
  },
  {
   "field": "lam_189p10",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 189.38333,
   "dec": 9.77306,
@@ -4788,7 +4788,7 @@
  },
  {
   "field": "lam_198p30",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 197.69528,
   "dec": 30.37583,
@@ -4919,7 +4919,7 @@
  },
  {
   "field": "lam_200p25",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 200.35056,
   "dec": 25.32167,
@@ -5078,7 +5078,7 @@
  },
  {
   "field": "lam_203p05",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 203.24361,
   "dec": 5.36278,
@@ -5209,7 +5209,7 @@
  },
  {
   "field": "lam_210p25",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 210.49833,
   "dec": 24.90389,
@@ -5312,7 +5312,7 @@
  },
  {
   "field": "lam_216p10",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 216.09694,
   "dec": 9.80833,
@@ -5419,7 +5419,7 @@
  },
  {
   "field": "lam_240p30",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 239.95556,
   "dec": 29.60361,
@@ -5522,7 +5522,7 @@
  },
  {
   "field": "lam_250p10",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 250.14722,
   "dec": 9.66278,
@@ -5625,7 +5625,7 @@
  },
  {
   "field": "lam_252p40",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 252.47806,
   "dec": 39.77306,
@@ -5728,7 +5728,7 @@
  },
  {
   "field": "lam_261p20",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 261.02972,
   "dec": 19.55056,
@@ -5831,7 +5831,7 @@
  },
  {
   "field": "lam_261p30",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 260.94111,
   "dec": 29.54,
@@ -5934,7 +5934,7 @@
  },
  {
   "field": "lam_264p50",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 263.29667,
   "dec": 50.0375,
@@ -6037,7 +6037,7 @@
  },
  {
   "field": "lam_273p25",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 273.33889,
   "dec": 24.86333,
@@ -6116,7 +6116,7 @@
  },
  {
   "field": "lam_279p30",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 279.48833,
   "dec": 30.18167,
@@ -6171,7 +6171,7 @@
  },
  {
   "field": "lam_322m05",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 321.72556,
   "dec": -4.63139,
@@ -6322,7 +6322,7 @@
  },
  {
   "field": "lam_330p25",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 330.32,
   "dec": 25.23861,
@@ -6425,7 +6425,7 @@
  },
  {
   "field": "lam_342p20",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 341.69917,
   "dec": 19.72472,
@@ -6528,7 +6528,7 @@
  },
  {
   "field": "lam_343p15",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 342.94778,
   "dec": 15.24139,
@@ -6659,7 +6659,7 @@
  },
  {
   "field": "lam_351p30",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 351.07472,
   "dec": 30.45694,
@@ -6762,7 +6762,7 @@
  },
  {
   "field": "lmc_30dor",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 84.67,
   "dec": -69.1,
@@ -6841,7 +6841,7 @@
  },
  {
   "field": "lmc_bar",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 80.89,
   "dec": -69.76,
@@ -6872,7 +6872,7 @@
  },
  {
   "field": "lmc_north",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 81.0,
   "dec": -66.5,
@@ -6951,7 +6951,7 @@
  },
  {
   "field": "lmc_south",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 82.0,
   "dec": -72.0,
@@ -7030,7 +7030,7 @@
  },
  {
   "field": "lmc_west",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 74.0,
   "dec": -68.5,
@@ -7109,7 +7109,7 @@
  },
  {
   "field": "mag_bridge",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 33.0,
   "dec": -74.0,
@@ -7212,7 +7212,7 @@
  },
  {
   "field": "ngp_150m01",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 150.35,
   "dec": -0.72028,
@@ -7363,7 +7363,7 @@
  },
  {
   "field": "ngp_152m04",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 152.1975,
   "dec": -4.3725,
@@ -7494,7 +7494,7 @@
  },
  {
   "field": "ngp_156m04",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 156.33139,
   "dec": -3.67139,
@@ -7625,7 +7625,7 @@
  },
  {
   "field": "ngp_158p02",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 158.13056,
   "dec": 1.63861,
@@ -7784,7 +7784,7 @@
  },
  {
   "field": "ngp_160m02",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 159.85083,
   "dec": -1.21528,
@@ -7943,7 +7943,7 @@
  },
  {
   "field": "ngp_163m04",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 163.27833,
   "dec": -4.17444,
@@ -8074,7 +8074,7 @@
  },
  {
   "field": "ngp_165m01",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 165.16944,
   "dec": -0.83139,
@@ -8233,7 +8233,7 @@
  },
  {
   "field": "ngp_167m04",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 167.18972,
   "dec": -4.73972,
@@ -8364,7 +8364,7 @@
  },
  {
   "field": "ngp_170m02",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 170.07417,
   "dec": -1.39361,
@@ -8523,7 +8523,7 @@
  },
  {
   "field": "ngp_173p02",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 172.55417,
   "dec": 1.86611,
@@ -8682,7 +8682,7 @@
  },
  {
   "field": "ngp_175m03",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 175.37167,
   "dec": -2.89833,
@@ -8709,23 +8709,23 @@
    }
   },
   "high": {
-   "n": 74,
+   "n": 72,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 60,
-   "acc": 88.3,
-   "acc_cls": 88.3,
+   "n": 59,
+   "acc": 89.8,
+   "acc_cls": 89.8,
    "unknown": 0.0,
-   "bal": 90.7,
+   "bal": 91.8,
    "recall": {
     "STAR": [
      97.1,
      35
     ],
     "GALAXY": [
-     75.0,
-     24
+     78.3,
+     23
     ],
     "QSO": [
      100.0,
@@ -8734,7 +8734,7 @@
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 60,
+   "n": 59,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -8746,7 +8746,7 @@
     ],
     "GALAXY": [
      100.0,
-     24
+     23
     ],
     "QSO": [
      100.0,
@@ -8755,19 +8755,19 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 74,
-   "acc": 95.9,
-   "acc_cls": 95.9,
+   "n": 72,
+   "acc": 95.8,
+   "acc_cls": 95.8,
    "unknown": 0.0,
-   "bal": 97.4,
+   "bal": 97.2,
    "recall": {
     "STAR": [
      100.0,
      35
     ],
     "GALAXY": [
-     92.1,
-     38
+     91.7,
+     36
     ],
     "QSO": [
      100.0,
@@ -8776,19 +8776,19 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 74,
-   "acc": 97.3,
+   "n": 72,
+   "acc": 97.2,
    "acc_cls": 100.0,
-   "unknown": 2.7,
-   "bal": 98.2,
+   "unknown": 2.8,
+   "bal": 98.1,
    "recall": {
     "STAR": [
      100.0,
      35
     ],
     "GALAXY": [
-     94.7,
-     38
+     94.4,
+     36
     ],
     "QSO": [
      100.0,
@@ -8797,7 +8797,7 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 71,
+   "n": 69,
    "acc": 98.6,
    "acc_cls": 98.6,
    "unknown": 0.0,
@@ -8809,7 +8809,7 @@
     ],
     "GALAXY": [
      100.0,
-     38
+     36
     ],
     "QSO": [
      100.0,
@@ -8818,19 +8818,19 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 71,
-   "acc": 97.2,
+   "n": 69,
+   "acc": 97.1,
    "acc_cls": 100.0,
-   "unknown": 2.8,
-   "bal": 98.2,
+   "unknown": 2.9,
+   "bal": 98.1,
    "recall": {
     "STAR": [
      100.0,
      32
     ],
     "GALAXY": [
-     94.7,
-     38
+     94.4,
+     36
     ],
     "QSO": [
      100.0,
@@ -8841,7 +8841,7 @@
  },
  {
   "field": "ngp_177p02",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 177.1775,
   "dec": 1.71556,
@@ -9000,7 +9000,7 @@
  },
  {
   "field": "ngp_180m04",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 180.88194,
   "dec": -4.19028,
@@ -9131,7 +9131,7 @@
  },
  {
   "field": "ngp_182p02",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 182.30667,
   "dec": 1.84806,
@@ -9262,7 +9262,7 @@
  },
  {
   "field": "ngp_185m01",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 184.69083,
   "dec": -1.13028,
@@ -9421,7 +9421,7 @@
  },
  {
   "field": "ngp_188m04",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 187.54083,
   "dec": -4.43444,
@@ -9552,7 +9552,7 @@
  },
  {
   "field": "ngp_188p02",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 187.09444,
   "dec": 1.475,
@@ -9711,7 +9711,7 @@
  },
  {
   "field": "ngp_191m02",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 191.19278,
   "dec": -1.92472,
@@ -9870,7 +9870,7 @@
  },
  {
   "field": "ngp_194m04",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 194.85861,
   "dec": -4.18889,
@@ -10001,7 +10001,7 @@
  },
  {
   "field": "ngp_195p01",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 195.16806,
   "dec": 1.05472,
@@ -10160,7 +10160,7 @@
  },
  {
   "field": "ngp_202m04",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 201.41444,
   "dec": -3.54861,
@@ -10291,7 +10291,7 @@
  },
  {
   "field": "ngp_202p02",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 201.11111,
   "dec": 1.25,
@@ -10450,7 +10450,7 @@
  },
  {
   "field": "ngp_205m02",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 204.81167,
   "dec": -1.75472,
@@ -10609,7 +10609,7 @@
  },
  {
   "field": "ngp_208p02",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 208.29056,
   "dec": 1.24917,
@@ -10768,7 +10768,7 @@
  },
  {
   "field": "ngp_212m04",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 211.62028,
   "dec": -3.73139,
@@ -10899,7 +10899,7 @@
  },
  {
   "field": "ngp_212p02",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 212.43778,
   "dec": 2.05111,
@@ -11050,7 +11050,7 @@
  },
  {
   "field": "ngp_216m02",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 215.49167,
   "dec": -1.0475,
@@ -11209,7 +11209,7 @@
  },
  {
   "field": "ngp_220m01",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 220.12778,
   "dec": -0.67806,
@@ -11368,7 +11368,7 @@
  },
  {
   "field": "ngp_221m04",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 220.98583,
   "dec": -4.91306,
@@ -11499,7 +11499,7 @@
  },
  {
   "field": "oc_hyades",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 66.73,
   "dec": 15.87,
@@ -11554,7 +11554,7 @@
  },
  {
   "field": "oc_ic2391",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 130.1,
   "dec": -53.0,
@@ -11609,7 +11609,7 @@
  },
  {
   "field": "oc_m11",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 282.77,
   "dec": -6.27,
@@ -11640,7 +11640,7 @@
  },
  {
   "field": "oc_m35",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 92.25,
   "dec": 24.33,
@@ -11695,7 +11695,7 @@
  },
  {
   "field": "oc_m67",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 132.85,
   "dec": 11.81,
@@ -11810,7 +11810,7 @@
  },
  {
   "field": "oc_ngc188",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 12.11,
   "dec": 85.24,
@@ -11865,7 +11865,7 @@
  },
  {
   "field": "oc_ngc2420",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 114.6,
   "dec": 21.57,
@@ -11996,7 +11996,7 @@
  },
  {
   "field": "oc_ngc2516",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 119.52,
   "dec": -60.75,
@@ -12051,7 +12051,7 @@
  },
  {
   "field": "oc_ngc6791",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 290.22,
   "dec": 37.77,
@@ -12118,7 +12118,7 @@
  },
  {
   "field": "oc_ngc752",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 29.42,
   "dec": 37.78,
@@ -12173,7 +12173,7 @@
  },
  {
   "field": "oc_pleiades",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 56.75,
   "dec": 24.12,
@@ -12228,7 +12228,7 @@
  },
  {
   "field": "oc_praesepe",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 130.1,
   "dec": 19.67,
@@ -12331,7 +12331,7 @@
  },
  {
   "field": "s82_010p00",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 9.89278,
   "dec": -0.92444,
@@ -12462,7 +12462,7 @@
  },
  {
   "field": "s82_018m01",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 18.45056,
   "dec": -0.91028,
@@ -12565,7 +12565,7 @@
  },
  {
   "field": "s82_022p00",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 21.89417,
   "dec": -0.09,
@@ -12696,7 +12696,7 @@
  },
  {
   "field": "s82_026p00",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 26.2275,
   "dec": 0.295,
@@ -12799,7 +12799,7 @@
  },
  {
   "field": "s82_030p00",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 30.27861,
   "dec": -0.13472,
@@ -12902,7 +12902,7 @@
  },
  {
   "field": "s82_038p00",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 37.74889,
   "dec": -0.0975,
@@ -13061,7 +13061,7 @@
  },
  {
   "field": "s82_046p00",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 46.32056,
   "dec": -0.13806,
@@ -13212,7 +13212,7 @@
  },
  {
   "field": "s82_050p01",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 49.9925,
   "dec": 0.81278,
@@ -13363,7 +13363,7 @@
  },
  {
   "field": "s82_054m01",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 53.33389,
   "dec": -0.61472,
@@ -13522,7 +13522,7 @@
  },
  {
   "field": "s82_308p01",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 308.6225,
   "dec": 1.13167,
@@ -13625,7 +13625,7 @@
  },
  {
   "field": "s82_312m01",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 312.33056,
   "dec": -0.8825,
@@ -13740,7 +13740,7 @@
  },
  {
   "field": "s82_318p00",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 317.67722,
   "dec": 0.31639,
@@ -13843,7 +13843,7 @@
  },
  {
   "field": "s82_326p00",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 325.72944,
   "dec": -0.01556,
@@ -14002,7 +14002,7 @@
  },
  {
   "field": "s82_336p01",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 336.68778,
   "dec": 0.75583,
@@ -14153,7 +14153,7 @@
  },
  {
   "field": "s82_350p00",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 349.69667,
   "dec": -0.06667,
@@ -14304,7 +14304,7 @@
  },
  {
   "field": "s82_354p00",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 353.61278,
   "dec": -0.24028,
@@ -14447,7 +14447,7 @@
  },
  {
   "field": "sb_antennae",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 180.47,
   "dec": -18.87,
@@ -14562,7 +14562,7 @@
  },
  {
   "field": "sb_arp220",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 233.74,
   "dec": 23.5,
@@ -14665,7 +14665,7 @@
  },
  {
   "field": "sb_m83",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 204.25,
   "dec": -29.87,
@@ -14732,7 +14732,7 @@
  },
  {
   "field": "sb_ngc253",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 11.89,
   "dec": -25.29,
@@ -14835,7 +14835,7 @@
  },
  {
   "field": "sfr_carina",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 161.1,
   "dec": -59.8,
@@ -14890,7 +14890,7 @@
  },
  {
   "field": "sfr_chai",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 167.0,
   "dec": -77.6,
@@ -14945,7 +14945,7 @@
  },
  {
   "field": "sfr_cygob2",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 308.3,
   "dec": 41.3,
@@ -15000,7 +15000,7 @@
  },
  {
   "field": "sfr_ic348",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 56.13,
   "dec": 32.16,
@@ -15055,7 +15055,7 @@
  },
  {
   "field": "sfr_l1495",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 64.5,
   "dec": 28.3,
@@ -15110,7 +15110,7 @@
  },
  {
   "field": "sfr_lambdaori",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 83.78,
   "dec": 9.93,
@@ -15165,7 +15165,7 @@
  },
  {
   "field": "sfr_lupus3",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 242.5,
   "dec": -39.1,
@@ -15220,7 +15220,7 @@
  },
  {
   "field": "sfr_m8",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 270.92,
   "dec": -24.38,
@@ -15275,7 +15275,7 @@
  },
  {
   "field": "sfr_ngc1333",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 52.3,
   "dec": 31.3,
@@ -15330,7 +15330,7 @@
  },
  {
   "field": "sfr_ngc2264",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 100.24,
   "dec": 9.89,
@@ -15385,20 +15385,20 @@
  },
  {
   "field": "sfr_onc",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 83.82,
   "dec": -5.39,
   "n": 46,
   "ours": {
    "n": 46,
-   "acc": 82.6,
-   "acc_cls": 95.0,
-   "unknown": 13.0,
-   "bal": 42.2,
+   "acc": 87.0,
+   "acc_cls": 95.2,
+   "unknown": 8.7,
+   "bal": 44.5,
    "recall": {
     "STAR": [
-     84.4,
+     88.9,
      45
     ],
     "GALAXY": [
@@ -15408,8 +15408,8 @@
    }
   },
   "high": {
-   "n": 33,
-   "acc": 96.97
+   "n": 35,
+   "acc": 97.14
   },
   "Gaia DR3 DSC-Combmod": {
    "n": 38,
@@ -15430,13 +15430,13 @@
   },
   "Gaia DR3 DSC-Combmod | ours same": {
    "n": 38,
-   "acc": 84.2,
-   "acc_cls": 94.1,
-   "unknown": 10.5,
-   "bal": 43.2,
+   "acc": 89.5,
+   "acc_cls": 94.4,
+   "unknown": 5.3,
+   "bal": 46.0,
    "recall": {
     "STAR": [
-     86.5,
+     91.9,
      37
     ],
     "GALAXY": [
@@ -15452,7 +15452,7 @@
  },
  {
   "field": "sfr_rhooph",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 246.8,
   "dec": -24.5,
@@ -15507,7 +15507,7 @@
  },
  {
   "field": "sgp_000m36",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 0.28806,
   "dec": -36.36472,
@@ -15622,7 +15622,7 @@
  },
  {
   "field": "sgp_001m25",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 0.50667,
   "dec": -25.10583,
@@ -15753,7 +15753,7 @@
  },
  {
   "field": "sgp_001m30",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 1.20333,
   "dec": -30.42333,
@@ -15912,7 +15912,7 @@
  },
  {
   "field": "sgp_005m25",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 5.00806,
   "dec": -25.42667,
@@ -16043,7 +16043,7 @@
  },
  {
   "field": "sgp_005m29",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 4.79861,
   "dec": -28.66,
@@ -16202,7 +16202,7 @@
  },
  {
   "field": "sgp_009m25",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 9.50556,
   "dec": -25.06944,
@@ -16333,7 +16333,7 @@
  },
  {
   "field": "sgp_013m30",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 13.07167,
   "dec": -30.41389,
@@ -16492,7 +16492,7 @@
  },
  {
   "field": "sgp_017m25",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 17.4325,
   "dec": -24.89472,
@@ -16623,7 +16623,7 @@
  },
  {
   "field": "sgp_017m35",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 17.0,
   "dec": -35.0,
@@ -16754,7 +16754,7 @@
  },
  {
   "field": "sgp_020m30",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 20.19139,
   "dec": -29.58083,
@@ -16913,7 +16913,7 @@
  },
  {
   "field": "sgp_021m24",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 20.56472,
   "dec": -23.83556,
@@ -17016,7 +17016,7 @@
  },
  {
   "field": "sgp_025m35",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 24.58389,
   "dec": -34.68278,
@@ -17119,7 +17119,7 @@
  },
  {
   "field": "sgp_028m28",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 27.67361,
   "dec": -27.76917,
@@ -17278,7 +17278,7 @@
  },
  {
   "field": "sgp_030m33",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 30.26444,
   "dec": -32.83444,
@@ -17409,7 +17409,7 @@
  },
  {
   "field": "sgp_032m24",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 31.36194,
   "dec": -24.43944,
@@ -17512,7 +17512,7 @@
  },
  {
   "field": "sgp_040m28",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 40.47306,
   "dec": -28.52944,
@@ -17671,7 +17671,7 @@
  },
  {
   "field": "sgp_045m25",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 45.37361,
   "dec": -24.72278,
@@ -17774,7 +17774,7 @@
  },
  {
   "field": "sgp_049m32",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 48.57944,
   "dec": -32.24778,
@@ -17933,7 +17933,7 @@
  },
  {
   "field": "sgp_050m27",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 50.30111,
   "dec": -27.33028,
@@ -18064,7 +18064,7 @@
  },
  {
   "field": "sgp_052m24",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 52.59917,
   "dec": -24.40306,
@@ -18143,7 +18143,7 @@
  },
  {
   "field": "sgp_053m30",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 53.2425,
   "dec": -29.59444,
@@ -18274,7 +18274,7 @@
  },
  {
   "field": "sgp_053m35",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 53.33083,
   "dec": -35.34472,
@@ -18405,7 +18405,7 @@
  },
  {
   "field": "sgp_325m25",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 324.52056,
   "dec": -25.07167,
@@ -18496,7 +18496,7 @@
  },
  {
   "field": "sgp_325m35",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 324.5225,
   "dec": -35.15194,
@@ -18575,7 +18575,7 @@
  },
  {
   "field": "sgp_329m25",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 329.35278,
   "dec": -24.92083,
@@ -18674,7 +18674,7 @@
  },
  {
   "field": "sgp_337m25",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 337.03944,
   "dec": -24.60972,
@@ -18773,7 +18773,7 @@
  },
  {
   "field": "sgp_340m30",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 340.04361,
   "dec": -29.92722,
@@ -18892,7 +18892,7 @@
  },
  {
   "field": "sgp_346m36",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 346.2425,
   "dec": -35.80889,
@@ -19023,7 +19023,7 @@
  },
  {
   "field": "sgp_349m25",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 349.31417,
   "dec": -25.24306,
@@ -19122,7 +19122,7 @@
  },
  {
   "field": "sgp_350m30",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 349.98,
   "dec": -29.67417,
@@ -19281,7 +19281,7 @@
  },
  {
   "field": "sgp_356m28",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 356.76417,
   "dec": -28.11111,
@@ -19440,7 +19440,7 @@
  },
  {
   "field": "smc_bar",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 13.19,
   "dec": -72.83,
@@ -19448,8 +19448,8 @@
   "ours": {
    "n": 42,
    "acc": 92.9,
-   "acc_cls": 100.0,
-   "unknown": 7.1,
+   "acc_cls": 97.5,
+   "unknown": 4.8,
    "bal": 92.9,
    "recall": {
     "STAR": [
@@ -19471,7 +19471,7 @@
  },
  {
   "field": "smc_ne",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 16.0,
   "dec": -71.8,
@@ -19574,7 +19574,7 @@
  },
  {
   "field": "smc_north",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 12.5,
   "dec": -71.2,
@@ -19677,7 +19677,7 @@
  },
  {
   "field": "smc_wing",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 19.5,
   "dec": -73.4,
@@ -19756,7 +19756,7 @@
  },
  {
   "field": "sth_008m50",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 7.43139,
   "dec": -50.07472,
@@ -19887,7 +19887,7 @@
  },
  {
   "field": "sth_008m60",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 8.60278,
   "dec": -59.72972,
@@ -20018,7 +20018,7 @@
  },
  {
   "field": "sth_016m45",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 15.58889,
   "dec": -44.77028,
@@ -20141,7 +20141,7 @@
  },
  {
   "field": "sth_040m65",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 40.74722,
   "dec": -65.33028,
@@ -20248,7 +20248,7 @@
  },
  {
   "field": "sth_080m50",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 79.64444,
   "dec": -50.21556,
@@ -20379,7 +20379,7 @@
  },
  {
   "field": "sth_296m60",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 295.90833,
   "dec": -59.665,
@@ -20510,7 +20510,7 @@
  },
  {
   "field": "sth_296m65",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 296.41417,
   "dec": -65.16694,
@@ -20641,7 +20641,7 @@
  },
  {
   "field": "sth_312m45",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 312.38917,
   "dec": -44.99333,
@@ -20772,7 +20772,7 @@
  },
  {
   "field": "sth_312m50",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 312.24028,
   "dec": -49.65806,
@@ -20903,7 +20903,7 @@
  },
  {
   "field": "sth_320m40",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 319.86111,
   "dec": -40.3525,
@@ -21034,7 +21034,7 @@
  },
  {
   "field": "wigz_140p05",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 139.94556,
   "dec": 4.62833,
@@ -21165,7 +21165,7 @@
  },
  {
   "field": "wigz_330p00",
-  "root": "/home/user/Finding_objects/v2/benchmark/independent_fields",
+  "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
   "ra": 329.93,
   "dec": 0.88639,
