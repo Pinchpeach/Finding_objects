@@ -109,6 +109,8 @@ RAW_FIELDS = {
     "pmra_error",
     "pmdec",
     "pmdec_error",
+    "pmra_pmdec_corr",
+    "pmRApmDEcor",
     "class",
     "zwarning",
     # DESI DR1 Redrock / LAMOST DR5 spectral class (SPC-DESI-*, SPC-LAMOST-*)
@@ -340,11 +342,25 @@ def optical_r_mag(row):
     return r if r is not None and 5 < r < 30 else None
 
 
+# Proper-motion significance (2.38.0): Mahalanobis distance of the motion
+# from zero with the pmra-pmdec correlation (ignoring it biases the test),
+# divided by the scale s = 1.1485 of the scaled chi^2 (k = 2) that fits the
+# Gaia-CRF3 quasars (Li & Fynbo 2026, arXiv:2610.13742, Sect. 3.1; their
+# 2-sigma threshold D^2 < 7.097 = 1.1485 x 6.18).  Benchmarks with refitted
+# fusion: SDSS 98.69 -> 98.69 %, DESI 92.41 -> 92.62 %
+# (benchmark/compare_qso_options.py, option c2).
+PM_MAHALANOBIS_SCALE = 1.1485
+
+
 def _pm_sigma(src):
-    """Total proper-motion significance (diagonal errors), or None."""
+    """Proper-motion significance sqrt(D^2 / s) (full covariance), or None."""
     a, ae, d, de = (num(src, x) for x in ("pmra", "pmra_error", "pmdec", "pmdec_error"))
     if None not in (a, ae, d, de) and ae > 0 and de > 0:
-        return math.sqrt((a / ae) ** 2 + (d / de) ** 2)
+        rho = num(src, "pmra_pmdec_corr")
+        rho = num(src, "pmRApmDEcor") if rho is None else rho  # VizieR name
+        rho = 0.0 if rho is None or not -0.999 < rho < 0.999 else rho
+        x, y = a / ae, d / de
+        return math.sqrt((x * x - 2 * rho * x * y + y * y) / (1 - rho * rho) / PM_MAHALANOBIS_SCALE)
     return None
 
 
@@ -393,7 +409,7 @@ def evaluate(rule, row, namespaced=frozenset()):
                 "EXTRAGALACTIC",
                 1 - x / float(rule["threshold"]),
                 x,
-                "diagonal-error approximation; covariance unavailable",
+                "Mahalanobis distance with the pmra-pmdec correlation (2.38.0)",
             )
     elif rid == "AST-GAL-001":
         p, e = num(src, "parallax"), num(src, "parallax_error")

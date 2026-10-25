@@ -121,3 +121,28 @@ def test_magellanic_prior_suppresses_qso_odds_of_cloud_members_only():
     assert f[2] == 1.0  # the motion rules the Cloud out: the fusion's odds stand
     assert abs(f[3] - 6.6e3 / 1.09e6) < 1e-6
     assert f[4] == 1.0 and f[5] == 1.0
+
+
+def test_proper_motion_significance_uses_covariance_and_crf3_scale():
+    import importlib.util, math
+
+    spec = importlib.util.spec_from_file_location("s4", V2 / "Preprocess" / "04_build_evidence.py")
+    s4 = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(s4)
+    src = {"pmra": 3.0, "pmra_error": 1.0, "pmdec": 4.0, "pmdec_error": 1.0}
+    assert abs(s4._pm_sigma(src) - 5.0 / math.sqrt(1.1485)) < 1e-9  # uncorrelated
+    # strongly correlated errors: a motion along the correlation is less significant
+    assert s4._pm_sigma({**src, "pmra_pmdec_corr": 0.9}) < s4._pm_sigma(src)
+    assert s4._pm_sigma({**src, "pmRApmDEcor": 0.9}) == s4._pm_sigma({**src, "pmra_pmdec_corr": 0.9})
+
+
+def test_xray_star_line_flags_coronal_counterparts():
+    s5 = _stage5()
+    df = pd.DataFrame(
+        {
+            # bright W1 with modest X-ray flux: star side; faint W1: AGN side; no X-ray
+            "allwise__W1mag": [9.0, 16.0, 9.0],
+            "erosita_erass1__MLFlux1": [1e-13, 1e-13, np.nan],
+        }
+    )
+    assert s5.QSO_OPT.xray_star_side(df).tolist() == [True, False, False]
