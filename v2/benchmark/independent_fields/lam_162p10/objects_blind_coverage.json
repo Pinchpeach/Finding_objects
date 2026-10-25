@@ -3,30 +3,6 @@
  "attempted": 28,
  "failed": [
   {
-   "collector": "desi_legacy",
-   "catalog": "DESI Legacy Surveys DR10",
-   "status": "timeout",
-   "impact": "deep morphology and the faint-object (LS-GBM) classifier",
-   "key": true,
-   "error": "TapTimeout(\"Legacy Surveys TAP failed after 3 attempts: TimeoutError('Data Lab TAP exceeded 80 s')\")"
-  },
-  {
-   "collector": "sdss_spectroscopy",
-   "catalog": "SDSS spectroscopy",
-   "status": "error",
-   "impact": "spectroscopic classes and redshifts",
-   "key": false,
-   "error": "InconsistentTableError('Number of header columns (1) inconsistent with data columns in data line 9')"
-  },
-  {
-   "collector": "desi_fastspec",
-   "catalog": "DESI FastSpecFit",
-   "status": "error",
-   "impact": "emission-line sub-classes",
-   "key": false,
-   "error": "RuntimeError('Legacy Surveys TAP failed after 3 attempts: DALServiceError: 502 Server Error: Bad Gateway for url: https://datalab.noirlab.edu/tap/sync')"
-  },
-  {
    "collector": "atnf_pulsar",
    "catalog": "ATNF pulsars",
    "status": "error",
@@ -43,5 +19,5 @@
    "error": "DALFormatError: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
   }
  ],
- "key_failed": true
+ "key_failed": false
 }
