@@ -2,16 +2,16 @@
  "ra": 45.10389,
  "dec": 30.45556,
  "radius_arcmin": 12.0,
- "n_objects": 6893,
+ "n_objects": 6897,
  "seconds": {
-  "collect": 66.8,
-  "1_associate": 1.6,
-  "2_integrate": 2.2,
-  "3_features": 2.7,
-  "4_evidence": 2.6,
-  "5_coarse": 3.3,
-  "6_prepare": 2.6,
-  "7_classify": 3.6
+  "collect": 67.8,
+  "1_associate": 2.9,
+  "2_integrate": 4.3,
+  "3_features": 4.6,
+  "4_evidence": 4.9,
+  "5_coarse": 6.1,
+  "6_prepare": 5.1,
+  "7_classify": 7.2
  },
  "catalog_rows": {
   "Pan-STARRS1 DR2 MeanObject": 6075,
@@ -21,6 +21,7 @@
   "2MASS PSC": 551,
   "GALEX AIS": 306,
   "LAMOST DR catalog": 167,
+  "SIMBAD": 17,
   "VLASS": 13,
   "TGSS ADR1": 7,
   "NVSS": 6
