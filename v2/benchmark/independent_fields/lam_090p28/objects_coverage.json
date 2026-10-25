@@ -17,14 +17,6 @@
    "impact": "literature labels",
    "key": false,
    "error": "DALFormatError: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
-  },
-  {
-   "collector": "ned",
-   "catalog": "NED",
-   "status": "error",
-   "impact": "literature labels",
-   "key": false,
-   "error": "ExpatError('syntax error: line 1, column 49')"
   }
  ],
  "key_failed": false
