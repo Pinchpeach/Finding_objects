@@ -3,22 +3,6 @@
  "attempted": 28,
  "failed": [
   {
-   "collector": "sdss_dr18",
-   "catalog": "SDSS DR18 imaging",
-   "status": "timeout",
-   "impact": "SDSS morphology and u-band colours",
-   "key": false,
-   "error": "ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='skyserver.sdss.org', port=443): Max retries exceeded with url: /dr18/en/tools/search/x_results.aspx?cmd=select+%2A+from+dbo.fDocColumns%28%27Pho"
-  },
-  {
-   "collector": "sdss_spectroscopy",
-   "catalog": "SDSS spectroscopy",
-   "status": "timeout",
-   "impact": "spectroscopic classes and redshifts",
-   "key": false,
-   "error": "ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='skyserver.sdss.org', port=443): Max retries exceeded with url: /dr18/en/tools/search/x_results.aspx?cmd=select+%2A+from+dbo.fDocColumns%28%27Pho"
-  },
-  {
    "collector": "atnf_pulsar",
    "catalog": "ATNF pulsars",
    "status": "error",
