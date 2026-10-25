@@ -2,16 +2,16 @@
  "ra": 259.281,
  "dec": 43.136,
  "radius_arcmin": 6.0,
- "n_objects": 27808,
+ "n_objects": 27656,
  "seconds": {
-  "collect": 291.9,
-  "1_associate": 102.3,
-  "2_integrate": 30.0,
-  "3_features": 47.8,
-  "4_evidence": 31.7,
-  "5_coarse": 60.8,
-  "6_prepare": 53.3,
-  "7_classify": 51.2
+  "collect": 206.3,
+  "1_associate": 98.2,
+  "2_integrate": 27.3,
+  "3_features": 40.8,
+  "4_evidence": 30.1,
+  "5_coarse": 50.0,
+  "6_prepare": 41.8,
+  "7_classify": 43.7
  },
  "catalog_rows": {
   "Gaia DR3": 21634,
@@ -20,7 +20,6 @@
   "NED": 2519,
   "2MASS PSC": 1229,
   "AllWISE": 989,
-  "SIMBAD": 835,
   "GALEX AIS": 188,
   "DESI DR1 spectroscopy": 57,
   "Chandra CSC 2.0": 52,
@@ -31,7 +30,6 @@
   "LAMOST DR catalog": 6,
   "FIRST": 6,
   "VLASS": 5,
-  "ATNF Pulsar Catalog": 2,
   "SDSS DR18 spectroscopy": 2,
   "NVSS": 2,
   "SGA-2020": 1
