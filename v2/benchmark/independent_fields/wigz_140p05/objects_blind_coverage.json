@@ -3,12 +3,20 @@
  "attempted": 28,
  "failed": [
   {
-   "collector": "sdss_spectroscopy",
-   "catalog": "SDSS spectroscopy",
+   "collector": "desi_legacy",
+   "catalog": "DESI Legacy Surveys DR10",
    "status": "error",
-   "impact": "spectroscopic classes and redshifts",
+   "impact": "deep morphology and the faint-object (LS-GBM) classifier",
+   "key": true,
+   "error": "RuntimeError('Legacy Surveys TAP failed after 3 attempts: DALServiceError: 502 Server Error: Bad Gateway for url: https://datalab.noirlab.edu/tap/sync')"
+  },
+  {
+   "collector": "desi_fastspec",
+   "catalog": "DESI FastSpecFit",
+   "status": "error",
+   "impact": "emission-line sub-classes",
    "key": false,
-   "error": "InconsistentTableError('Number of header columns (1) inconsistent with data columns in data line 9')"
+   "error": "RuntimeError('Legacy Surveys TAP failed after 3 attempts: DALServiceError: 502 Server Error: Bad Gateway for url: https://datalab.noirlab.edu/tap/sync')"
   },
   {
    "collector": "atnf_pulsar",
@@ -19,5 +27,5 @@
    "error": "DALFormatError: SSLError: HTTPSConnectionPool(host='heasarc.gsfc.nasa.gov', port=443): Max retries exceeded with url: /xamin/vo/tap/sync (Caused by SSLError(SSLCertVerificationError(1, \"[SSL: CERTIFIC"
   }
  ],
- "key_failed": false
+ "key_failed": true
 }
