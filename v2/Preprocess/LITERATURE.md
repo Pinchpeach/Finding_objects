@@ -397,3 +397,26 @@ Measured and not adopted: dropping the LS colour kNN (LS-CKNN-001) where LS-GBM 
 | Decisive parallax without the C* gate | The C* gate (Riello et al. 2021, A&A 649, A3) was added for a spurious 14-sigma *proper motion* of a galaxy nucleus (2.22.0). Nebular background raises the BP/RP excess of genuine young stars (ONC, M8). Gaia quasar parallaxes scatter with width ~1.05-1.1 (Lindegren et al. 2021, A&A 649, A2); blended faint sources can have errors underestimated by ~1.5 (El-Badry, Rix & Heintz 2021; Fabricius et al. 2021, A&A 649, A5). 200-region truth: 151 of 152 C*-failing objects with parallax >= 15 sigma (reliability, association >= 0.8) are spectroscopic stars | AST-GAL-001 >= 15 sigma decisive whatever C*; proper motion keeps the gate |
 | Magellanic star-count prior | Gaia DR3 meets the same stellar contamination: 38 % of the DSC quasar labels lie in the LMC and 6.4 % in the SMC (Delchambre et al. 2023, A&A 674, A31), and excluding generous regions around the Clouds removes 41 % of the 6.6 M qso_candidates (Gaia Collaboration, Bailer-Jones et al. 2023, A&A 674, A41); Quaia adds a G−W1 / W1−W2 cut against Cloud stars (Storey-Fisher et al. 2024). ~25 quasars deg^-2 at I < 20 behind the Clouds vs > 10^6 stars deg^-2 (Kozłowski et al. 2013). (2.37.1 correction: 2.37.0 wrongly said the Gaia DR3 purer sample excludes the Clouds; it does not, and it shows Cloud overdensities.) Exponential profile fitted to the Gaia counts of the 11 Cloud fields of the 200-region validation (LMC rho0 = 1.2e6 deg^-2, h = 1.97 deg; SMC 1.09e6, 0.66 deg; 0.2 dex scatter); reference density = median of the fields at the same latitude away from the Clouds (1.2e4, 6.6e3) | GALAXY and QSO odds x rho_ref / rho(R), <= 1 (1 beyond 9.1 deg LMC, 3.4 deg SMC) |
 | Magellanic proper-motion likelihood ratio | Systemic motions: LMC (mu_a*, mu_d) 1.85-1.91, 0.23-0.39 mas/yr over HST and Gaia DR1-EDR3 (Kallivayalil et al. 2013, ApJ 764, 161; van der Marel & Sahlmann 2016, ApJ 832, L23; Gaia Collaboration, Helmi et al. 2018, A&A 616, A12; Luri et al. 2021, A&A 649, A7), disc rotation ~0.3 mas/yr at 50 kpc; SMC 0.69-0.87, -1.21..-1.24 (Zivick et al. 2018, ApJ 864, 55; Helmi et al. 2018). Adopted LMC (1.88, 0.31) +- 0.4, SMC (0.82, -1.21) +- 0.3; Gaia errors x 1.1 | odds x min(1, prior / LR(member : zero motion)); a motion that fits zero but not the Cloud restores the fusion's odds |
+
+## QSO-separation candidates compared (2.38.0, 2026-10-25)
+
+Candidates of `v2/LITERATURE_QSO.md` replayed on the same Stage-4 evidence (`benchmark/compare_qso_options.py`, table in `benchmark/qso_options/`).
+
+| Item | Literature | Rule | Measurement |
+|---|---|---|---|
+| Proper-motion significance with full covariance (adopted in 2.38.0, reverted in 2.39.0: 200-field Stage-5 accuracy 96.12 -> 96.01 %; option c2) | Li & Fynbo 2026 (arXiv:2610.13742): Mahalanobis distance from zero motion, scaled chi^2 (k = 2) with s = 1.1485 fitted to Gaia-CRF3; ignoring the pmra-pmdec correlation biases the test | AST-EXT-002 / AST-GAL-002 value sqrt(D^2/1.1485); `pmra_pmdec_corr` collected; fusion refitted | SDSS 98.69 -> 98.69 %, DESI 92.41 -> 92.62 % |
+| X-ray star line (adopted) | Salvato et al. 2018 (MNRAS 473, 4937) Eq. 2: [W1] = -1.625 log F(0.5-2 keV) - 8.8 separates stars (brighter W1) from AGN | X-ray counterpart on the stellar side: QSO odds x 0.1 | with the above: SDSS 98.74 %, DESI 92.62 %; real-sky QSO purity r 20-21 8.4 -> 10.6 % |
+| Magellanic systemic motions (adopted) | Gaia Collaboration, Luri et al. 2021 Table 4: LMC (1.871, 0.391), SMC (0.686, -1.237) mas/yr | MAGELLANIC in Stage 5 | no benchmark object; field check pending |
+| Magnitude prior, DESI tanh threshold (kept as options c1a, c3b) | Bovy et al. 2011; Jamal & Bailer-Jones 2024; Chaussidon et al. 2023 | V2_QSO_OPTIONS | real-sky QSO purity x2-3, QSO recall -16 to -49 %p |
+| Quaia colours, faint abstention (not adopted) | Storey-Fisher et al. 2024; Nakoneczny et al. 2019 | - | SDSS -0.6 %p; DESI -5.7 %p |
+
+### 200 independent fields (2.39.0)
+
+Stage-5 replay of every option on the blind evidence of the 200 fields (14,498 truth objects; `benchmark/qso_options/qso_options_fields.csv`).
+
+| Item | Literature | Rule | Measurement |
+|---|---|---|---|
+| Local stellar-density prior (adopted) | continuous position prior: Jamal & Bailer-Jones 2024 (A&A 687, A258); Hughes et al. 2022 (A&A 668, A99) | GALAXY/QSO odds x min(1, 5000 deg^-2 / Gaia density from the 10th neighbour); latitude + Magellanic priors where < 11 Gaia sources | 96.12 -> 96.16 %, QSO predictions -16 % (Clouds -59 %) |
+| DESI WISE cut (adopted) | Chaussidon et al. 2023 (ApJ 944, 107) Sect. 3: W1 < 22.3 and W2 < 22.3 | QSO odds x 0.1 otherwise | 96.21 %, QSO precision 77.1 -> 79.2 % |
+| Gaia DSC ignored in the Clouds (adopted) | Delchambre et al. 2023: 38 % of DSC quasars lie in the LMC, 6.4 % in the SMC | DSC-001 dropped where the Magellanic prior < 1 | Magellanic QSO 5,657 -> 3,162 |
+| Magnitude prior, half strength (option c1a_half) | Bovy et al. 2011; Jamal & Bailer-Jones 2024 | QSO odds x sqrt(real-sky / training odds) per r bin | 96.30 %, QSO precision 87 %, recall 96 -> 91 %; benchmarks SDSS -0.75, DESI -3.4 %p |

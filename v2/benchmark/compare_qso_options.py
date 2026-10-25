@@ -8,10 +8,10 @@ from the option alone.
           bins, and the real-sky QSO purity per r bin from the DESI recall
           matrix under the field class mix of natural_purity (2.36.0).
             python v2/benchmark/compare_qso_options.py bench --out DIR \\
-                --sdss-manifest M1 --desi-manifest M2 [--c2-model JSON]
-  field   one search: Stage 5 for every option on WORK/evidence.csv (Stage 4
-          re-run from WORK/features.csv for c2); writes object_id, r and
-          class / confidence per option (the validation workflow calls this).
+                --sdss-manifest M1 --desi-manifest M2
+  field   one search: Stage 5 for every option on WORK/evidence.csv; writes
+          object_id, r and class / confidence per option (the validation
+          workflow calls this).
             python v2/benchmark/compare_qso_options.py field WORK OUT.csv.gz
   score   the 200 independent fields (validation-data branch): truth accuracy
           and QSO numbers per option from the field files.
@@ -23,7 +23,6 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
-import os
 import sys
 import tempfile
 import time
@@ -36,11 +35,10 @@ B = Path(__file__).resolve().parent
 V2 = B.parent
 PRE = V2 / "Preprocess"
 C = ["STAR", "GALAXY", "QSO"]
-SINGLES = ["c1a", "c1a_half", "c1b", "c2", "c3a", "c3b", "c4", "c5", "c6", "c7", "c8"]
-# combinations of the options that did not lose accuracy on the benchmarks
-COMBOS = ["c2+c3a+c6", "c2+c3a+c5+c6+c7", "c2+c3b+c5+c6+c7", "c1a_half+c2+c3a+c5+c6+c7", "c1b+c2+c3a+c5+c6+c7"]
+# c1b, c3a, c5, c6, c7 are the default since 2.39.0 (Preprocess/qso_options.ADOPTED)
+SINGLES = ["c1a", "c1a_half", "c2", "c3b", "c4", "c8"]
+COMBOS = ["c1a_half+c3b"]
 SETS = ["base", *SINGLES, *COMBOS]
-C2_MODEL = PRE / "fusion_weights_c2.json"
 
 
 def load(path, name):
@@ -50,12 +48,8 @@ def load(path, name):
     return m
 
 
-def stage4(features, out, options=""):
-    os.environ["V2_QSO_OPTIONS"] = options
-    try:
-        load(PRE / "04_build_evidence.py", "s4_cmp").run(features, PRE / "classification_rules.csv", out)
-    finally:
-        os.environ["V2_QSO_OPTIONS"] = ""
+def stage4(features, out):
+    load(PRE / "04_build_evidence.py", "s4_cmp").run(features, PRE / "classification_rules.csv", out)
 
 
 def stage5(evidence, opt, model=None):
@@ -72,7 +66,7 @@ def stage5(evidence, opt, model=None):
 
 # ---------------------------------------------------------------- bench
 def bench_evidence(truth, root, cache):
-    """Stage-4 evidence of a benchmark (features cached for the c2 re-run)."""
+    """Stage-4 evidence of a benchmark (cached)."""
     f, e = cache / "features.csv", cache / "evidence.csv"
     if not e.exists():
         base = load(B / "evaluate_rule_baseline.py", "rb_cmp")
@@ -124,23 +118,16 @@ def bench(a):
         ("desi", B / "desi_external/truth.csv", B / "desi_external/catalog_features", a.desi_manifest),
     ):
         f, e = bench_evidence(truth, root, cache / name)
-        e2 = cache / name / "evidence_c2.csv"
-        if not e2.exists():
-            stage4(f, e2, "c2")
         tr = pd.read_csv(truth)
         tr["r_bin"] = tr.get("r_bin", pd.Series(np.nan, index=tr.index))
         m = pd.read_csv(man)
-        sets[name] = (e, e2, tr.merge(m[["benchmark_id", "split"]], on="benchmark_id"))
+        sets[name] = (e, tr.merge(m[["benchmark_id", "split"]], on="benchmark_id"))
     mix = natural_mix()
     rows = []
     for opt in SETS:
         row = {"option": opt}
-        for name, (e, e2, tr) in sets.items():
-            ev, model = (e2, a.c2_model) if "c2" in opt.split("+") else (e, None)
-            if model is not None and not Path(model).exists():
-                print("c2: no refitted model at", model, "- using the current weights")
-                model = None
-            pred, dt = stage5(ev, opt, model)
+        for name, (e, tr) in sets.items():
+            pred, dt = stage5(e, opt)
             t = tr.merge(pred, on="benchmark_id")
             t = t[t.split.eq("test")]
             for k, v in metrics(t).items():
@@ -164,17 +151,9 @@ def bench(a):
 def field(work, out):
     work = Path(work)
     s4 = work / "evidence.csv"
-    cols = ["object_id"]
-    base = None
     res = {}
     for opt in SETS:
-        ev, model = s4, None
-        if "c2" in opt.split("+"):
-            ev = work / "evidence_c2.csv"
-            if not ev.exists():
-                stage4(work / "features.csv", ev, "c2")
-            model = C2_MODEL if C2_MODEL.exists() else None
-        d, dt = stage5(ev, opt, model)
+        d, dt = stage5(s4, opt)
         res[opt] = d.set_index("object_id")
         print(f"{opt}: {dt:.1f} s, QSO {int((d.primary_class == 'QSO').sum())}", flush=True)
     s5 = load(PRE / "05_likelihood_vectors.py", "s5_r")
@@ -197,13 +176,13 @@ def score(a):
     for fdir in sorted(p for p in (B / "independent_fields").iterdir() if (p / "qso_options_blind.csv.gz").exists()):
         q = pd.read_csv(fdir / "qso_options_blind.csv.gz")
         m, _ = sf.field_matches(fdir, "blind", bench_pos)
-        mm = m.merge(q, on="object_id", how="inner")
+        m = m if "object_id" in m else pd.DataFrame(columns=["object_id", "t_truth"])  # field without truth
+        mm = m[["object_id", "t_truth"]].merge(q, on="object_id", how="inner")
         js = json.loads((fdir / "field.json").read_text())
         area = np.pi * (js["radius_arcmin"] / 60) ** 2
-        for opt in SETS:
+        # options as replayed in that run (the set changed in 2.38.0)
+        for opt in [c[: -len("_class")] for c in q.columns if c.endswith("_class")]:
             col = f"{opt}_class"
-            if col not in q:
-                continue
             rows.append(
                 pd.DataFrame(
                     {"field": fdir.name, "option": opt, "truth": mm.t_truth, "pred": mm[col].fillna("UNKNOWN"), "r": mm.r}
@@ -239,7 +218,6 @@ def main():
     b.add_argument("--out", type=Path, required=True)
     b.add_argument("--sdss-manifest", type=Path, required=True)
     b.add_argument("--desi-manifest", type=Path, required=True)
-    b.add_argument("--c2-model", type=Path, default=C2_MODEL)
     f = sub.add_parser("field")
     f.add_argument("work")
     f.add_argument("out")

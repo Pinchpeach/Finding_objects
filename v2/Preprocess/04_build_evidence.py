@@ -342,20 +342,23 @@ def optical_r_mag(row):
     return r if r is not None and 5 < r < 30 else None
 
 
-# Option c2 of the 2.38.0 QSO comparison (qso_options.py): Mahalanobis
-# distance of the proper motion from zero with the pmra-pmdec correlation,
-# scaled by s = 1.1485 fitted to Gaia-CRF3 quasars (Li & Fynbo 2026).
+# Option c2 (qso_options.py): Mahalanobis distance of the motion from zero
+# with the pmra-pmdec correlation, divided by the scale s = 1.1485 of the
+# scaled chi^2 fitted to Gaia-CRF3 quasars (Li & Fynbo 2026).  Default in
+# 2.38.0 with refitted fusion weights; reverted in 2.39.0: on the 200
+# independent fields it lowered the Stage-5 accuracy 96.12 -> 96.01 % and
+# added QSO predictions (benchmarks had gained 0.2 %p).
 PM_MAHALANOBIS = False
 PM_MAHALANOBIS_SCALE = 1.1485
 
 
 def _pm_sigma(src):
-    """Total proper-motion significance (diagonal errors), or None."""
+    """Total proper-motion significance (diagonal errors; option c2: full covariance), or None."""
     a, ae, d, de = (num(src, x) for x in ("pmra", "pmra_error", "pmdec", "pmdec_error"))
     if None not in (a, ae, d, de) and ae > 0 and de > 0:
         if PM_MAHALANOBIS:
             rho = num(src, "pmra_pmdec_corr")
-            rho = num(src, "pmRApmDEcor") if rho is None else rho
+            rho = num(src, "pmRApmDEcor") if rho is None else rho  # VizieR name
             rho = 0.0 if rho is None or not -0.999 < rho < 0.999 else rho
             x, y = a / ae, d / de
             return math.sqrt((x * x - 2 * rho * x * y + y * y) / (1 - rho * rho) / PM_MAHALANOBIS_SCALE)

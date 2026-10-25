@@ -1,4 +1,9 @@
-"""Experimental QSO-separation options for Stage 5 (2.38.0 comparison).
+"""QSO-separation options for Stage 5 (2.38.0 comparison).
+
+On by default (names still accepted and ignored): c5, c6 (2.38.0) and c1b,
+c3a, c7 (2.39.0), which improved or kept the accuracy on the benchmarks and
+on the 200 independent fields.  c2 was default in 2.38.0 and reverted in
+2.39.0 (the fields lost 0.11 %p).  The others stay switchable.
 
 Each option is one candidate of ``v2/LITERATURE_QSO.md`` Sect. 3; they are
 off by default and switched on with ``V2_QSO_OPTIONS`` (comma-separated
@@ -43,7 +48,9 @@ import os
 import numpy as np
 import pandas as pd
 
-KNOWN = ("c1a", "c1a_half", "c1b", "c2", "c3a", "c3b", "c4", "c5", "c6", "c7", "c8")
+KNOWN = ("c1a", "c1a_half", "c2", "c3b", "c4", "c8")
+# on by default: c5, c6 since 2.38.0; c1b, c3a, c7 since 2.39.0 (200-field replay)
+ADOPTED = ("c1b", "c3a", "c5", "c6", "c7")
 VETO = 0.1
 
 # Real-sky QSO fraction per r bin: true class mix of the 18 search fields
@@ -55,7 +62,6 @@ MAG_COLUMNS = ("ls_r_mag", "pan_starrs1_dr2_meanobject__rMeanPSFMag", "sdss_dr18
 # fields at |b| > 30 deg away from the Clouds (2026-10-24 counts).
 RHO_REF = 5.0e3
 KNN = 10
-LURI_2021 = {"LMC": (1.871, 0.391), "SMC": (0.686, -1.237)}
 # W1, W2 AB - Vega (Jarrett et al. 2011)
 W1_AB_VEGA, W2_AB_VEGA = 2.699, 3.339
 
@@ -65,6 +71,7 @@ def parse(options=None) -> frozenset:
     if isinstance(raw, str):
         raw = [x.strip() for x in raw.split(",")]
     opts = frozenset(x for x in raw if x)
+    opts = opts - set(ADOPTED)  # always on now
     bad = opts - set(KNOWN)
     if bad:
         raise ValueError(f"unknown V2_QSO_OPTIONS {sorted(bad)}; known: {KNOWN}")
@@ -113,10 +120,11 @@ def magnitude_prior(df, half=False) -> np.ndarray:
 
 
 def density_prior(df) -> np.ndarray:
-    """c1b: min(1, RHO_REF / local Gaia density) from the 10th Gaia neighbour."""
+    """c1b: min(1, RHO_REF / local Gaia density) from the 10th Gaia neighbour;
+    NaN where it cannot be measured (no position, <= KNN Gaia sources in the search)."""
     ra, dec = _col(df, "ra"), _col(df, "dec")
     g = np.isfinite(_col(df, "gaia_dr3__phot_g_mean_mag")) & np.isfinite(ra) & np.isfinite(dec)
-    f = np.ones(len(df))
+    f = np.full(len(df), np.nan)
     if g.sum() <= KNN:
         return f
     from scipy.spatial import cKDTree
@@ -130,8 +138,8 @@ def density_prior(df) -> np.ndarray:
     dist, _ = tree.query(xyz(ra[ok], dec[ok]), k=KNN + 1)
     theta = 2 * np.degrees(np.arcsin(np.clip(dist[:, -1] / 2, 0, 1)))  # chord -> deg
     rho = KNN / (np.pi * np.maximum(theta, 1e-6) ** 2)
-    f[ok] = np.minimum(1.0, RHO_REF / rho)
-    return np.maximum(f, 1e-4)
+    f[ok] = np.maximum(np.minimum(1.0, RHO_REF / rho), 1e-4)
+    return f
 
 
 def desi_wise_cut(df) -> np.ndarray:

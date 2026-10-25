@@ -374,18 +374,19 @@ def latitude_factor(df: pd.DataFrame) -> np.ndarray:
 #   * proper motion: the likelihood ratio of the Gaia proper motion under
 #     "Cloud member" (systemic motion with an internal spread) and
 #     "background source" (zero; errors scaled by 1.1 as for Gaia-CRF3
-#     quasars, Lindegren et al. 2021).  Systemic motions (mas/yr): LMC
-#     (1.88, 0.31) with spread 0.4, covering Gaia DR1-EDR3 and HST values
-#     (1.85-1.91, 0.23-0.39; van der Marel & Sahlmann 2016, Gaia
-#     Collaboration, Helmi et al. 2018, Luri et al. 2021, Kallivayalil et al.
-#     2013) and the disc rotation (~0.3 mas/yr at 50 kpc); SMC (0.82, -1.21)
-#     with spread 0.3 (Zivick et al. 2018; Helmi et al. 2018; 0.69-0.87).
+#     quasars, Lindegren et al. 2021).  Systemic motions (mas/yr): the
+#     linear fits at the Clouds' centres of Gaia Collaboration, Luri et al.
+#     2021 (A&A 649, A7, Table 4; checked against the paper text, 2.38.0):
+#     LMC (1.871, 0.391), SMC (0.686, -1.237); spreads 0.4 (LMC disc
+#     rotation ~0.3 mas/yr at 50 kpc; their LMC sample sigma 0.45/0.64) and
+#     0.3 (SMC sample sigma 0.37/0.30).  2.37.0 used (1.88, 0.31) and
+#     (0.82, -1.21) from the range of DR1-EDR3/HST values.
 #     A motion consistent with zero but not with the Cloud (bright
 #     quasars) raises the odds again, at most back to the fusion's.
 MAGELLANIC = (
     # name, centre (deg), rho0, scale length (deg), rho_ref (deg^-2), systemic PM, internal spread (mas/yr)
-    ("LMC", 80.89, -69.76, 1.2e6, 1.97, 1.2e4, (1.88, 0.31), 0.4),
-    ("SMC", 13.19, -72.83, 1.09e6, 0.66, 6.6e3, (0.82, -1.21), 0.3),
+    ("LMC", 80.89, -69.76, 1.2e6, 1.97, 1.2e4, (1.871, 0.391), 0.4),
+    ("SMC", 13.19, -72.83, 1.09e6, 0.66, 6.6e3, (0.686, -1.237), 0.3),
 )
 MAGELLANIC_PM_ERROR_SCALE = 1.1
 MAGELLANIC_MIN_RELIABILITY = 0.8
@@ -466,9 +467,11 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
             item_lists.append(json.loads(raw) if isinstance(raw, str) else [])
         except (json.JSONDecodeError, TypeError):
             item_lists.append([])
-    if "c7" in opts:  # Gaia DSC ignored inside the Magellanic Clouds
-        for i in np.flatnonzero(magellanic_region(df)):
-            item_lists[i] = [e for e in item_lists[i] if e.get("rule_id") != "DSC-001"]
+    # Gaia DSC is ignored inside the Magellanic Clouds, where 38 % of its
+    # quasar labels lie (Delchambre et al. 2023); 200-field replay (2.39.0):
+    # Magellanic QSO predictions 5,657 -> 3,162, other fields unchanged.
+    for i in np.flatnonzero(magellanic_region(df)):
+        item_lists[i] = [e for e in item_lists[i] if e.get("rule_id") != "DSC-001"]
     fused = fuse_many(item_lists, model, Path(model_path).parent)
     rows = []
     for items, hr, (p, used) in zip(item_lists, host_r, fused):
@@ -504,20 +507,32 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     prior = estimate_field_prior(P[eligible], train_prior) if estimable else np.array(train_prior)
     adjust = estimable and bool(field_prior)
     Q = P * (prior if adjust else np.array(train_prior)) / np.array(train_prior)
-    if "c1b" in opts:  # local stellar density replaces the latitude and Magellanic priors
-        lat = QSO_OPT.density_prior(df)
-    else:
-        lat = latitude_factor(df) * magellanic_factor(df, QSO_OPT.LURI_2021 if "c5" in opts else None)
+    # Local stellar-density prior (2.39.0): the Gaia source density at the
+    # object (10th neighbour) against the training sky, min(1, rho_ref/rho)
+    # -- a continuous position prior as in Jamal & Bailer-Jones 2024 and
+    # Hughes et al. 2022 that covers the plane, the bulge, clusters and the
+    # Clouds alike.  200-field replay: Stage-5 accuracy 96.12 -> 96.16 %,
+    # QSO predictions -16 % outside and -59 % inside the Clouds.  Where it
+    # cannot be measured (small searches, < 11 Gaia sources) the latitude and
+    # Magellanic priors above are used.
+    dens = QSO_OPT.density_prior(df)
+    lat = np.where(np.isfinite(dens), dens, latitude_factor(df) * magellanic_factor(df))
     Q[:, [CLASSES.index("GALAXY"), CLASSES.index("QSO")]] *= lat[:, None]
     qf = np.ones(len(df))
     if "c1a" in opts or "c1a_half" in opts:
         qf *= QSO_OPT.magnitude_prior(df, half="c1a" not in opts)
-    if "c3a" in opts or "c3b" in opts:
-        qf *= np.where(QSO_OPT.desi_wise_cut(df), QSO_OPT.VETO, 1.0)
+    # DESI QSO preselection W1 < 22.3 and W2 < 22.3 AB (Chaussidon et al.
+    # 2023, Sect. 3; removes stars faint in WISE, e.g. the Sagittarius
+    # stream): QSO odds x VETO otherwise (2.39.0; fields +0.09 %p, SDSS
+    # -0.10 %p, DESI +0.10 %p).
+    qf *= np.where(QSO_OPT.desi_wise_cut(df), QSO_OPT.VETO, 1.0)
     if "c4" in opts:
         qf *= np.where(QSO_OPT.quaia_fail(df), QSO_OPT.VETO, 1.0)
-    if "c6" in opts:
-        qf *= np.where(QSO_OPT.xray_star_side(df), QSO_OPT.VETO, 1.0)
+    # An X-ray source on the stellar side of the X-ray-flux / W1 relation
+    # (Salvato et al. 2018, MNRAS 473, 4937, Eq. 2; coronal stars are bright
+    # in W1 for their X-ray flux): QSO odds x VETO (2.38.0; SDSS 98.69 ->
+    # 98.74 % with the Mahalanobis motion test, DESI unchanged).
+    qf *= np.where(QSO_OPT.xray_star_side(df), QSO_OPT.VETO, 1.0)
     Q[:, CLASSES.index("QSO")] *= qf
     qso_min = QSO_OPT.desi_threshold(df) if "c3b" in opts else np.zeros(len(df))
     faint = QSO_OPT.r_mag(df) > 22 if "c8" in opts else np.zeros(len(df), bool)
