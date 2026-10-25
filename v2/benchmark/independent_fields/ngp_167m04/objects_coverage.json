@@ -3,12 +3,12 @@
  "attempted": 28,
  "failed": [
   {
-   "collector": "sdss_spectroscopy",
-   "catalog": "SDSS spectroscopy",
-   "status": "timeout",
-   "impact": "spectroscopic classes and redshifts",
+   "collector": "atnf_pulsar",
+   "catalog": "ATNF pulsars",
+   "status": "error",
+   "impact": "pulsar labels",
    "key": false,
-   "error": "ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='skyserver.sdss.org', port=443): Max retries exceeded with url: /dr18/en/tools/search/x_results.aspx?cmd=+SELECT%0D+s.specobjid%2C+s.bestobjid%2C"
+   "error": "DALFormatError: SSLError: HTTPSConnectionPool(host='heasarc.gsfc.nasa.gov', port=443): Max retries exceeded with url: /xamin/vo/tap/sync (Caused by SSLError(SSLCertVerificationError(1, \"[SSL: CERTIFIC"
   }
  ],
  "key_failed": false
