@@ -3,7 +3,7 @@
 
 The cloud session cannot reach arXiv; this runs on GitHub Actions and the
 excerpts are read from the job log.  Only short matched passages are printed
-(2 lines of context, at most MAX_HITS per pattern); no paper text is stored.
+(1 line of context, at most MAX_HITS per pattern); no paper text is stored.
 
     python .github/scripts/literature_excerpts.py SPEC.json
 SPEC: {"arXiv id": ["regex", ...], ...}
@@ -20,7 +20,7 @@ from pathlib import Path
 
 from pypdf import PdfReader
 
-MAX_HITS = 6
+MAX_HITS = 3
 UA = {"User-Agent": "Finding_objects literature check (GitHub Actions)"}
 
 
@@ -67,8 +67,8 @@ def main():
             hits = [i for i, x in enumerate(lines) if rx.search(x)]
             print(f"--- /{pat}/ : {len(hits)} hits")
             for i in hits[:MAX_HITS]:
-                ctx = " ⏎ ".join(x for x in lines[max(0, i - 2) : i + 3] if x)
-                print(f"  L{i}: {ctx[:600]}")
+                ctx = " ⏎ ".join(x for x in lines[max(0, i - 1) : i + 2] if x)
+                print(f"  L{i}: {ctx[:420]}")
 
 
 if __name__ == "__main__":
