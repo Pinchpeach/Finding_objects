@@ -1,0 +1,21 @@
+name: Literature excerpts
+
+# Print matched passages of arXiv papers (criteria, coefficients, purities)
+# for literature verification; the cloud session cannot reach arXiv.
+# Runs when the spec changes on a working branch; nothing is committed.
+on:
+  push:
+    paths: [".github/literature/*.json", ".github/scripts/literature_excerpts.py", ".github/workflows/literature-excerpts.yml"]
+  workflow_dispatch:
+
+jobs:
+  excerpts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install -q pypdf
+      - run: |
+          for f in .github/literature/*.json; do python -u .github/scripts/literature_excerpts.py "$f"; done

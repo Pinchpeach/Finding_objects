@@ -1,0 +1,11 @@
+{
+  "2306.17749": ["10\\s*\\^?\\s*0\\.4|18\\.25", "2\\.15|> ?0\\.4", "BP\\s*[-−–]\\s*G", "LMC|SMC|Magellanic", "diagonal", "contaminant"],
+  "2206.05681": ["purer", "LMC|SMC|Magellanic", "confusion", "host_galaxy_flag"],
+  "2010.05934": ["63 ", "efficien", "surface density|deg−2|deg-2"],
+  "2208.08511": ["tanh", "22\\.3", "Sagittarius|Sgr", "71 ?%|310"],
+  "2012.01771": ["^SMC ", "SMC -?0\\.0", "r_?sel|radius of"],
+  "2503.14141": ["log ?\\(?f ?PM0\\)? ?[<>≥≤]|threshold", "5 ?◦ radius|SMC \\(α"],
+  "2310.12704": ["log ?\\(?f ?PM0\\)? ?[<>≥≤]|> ?−4|≥ ?−4|-4"],
+  "2207.06792": ["purity of|purity is|purities", "Grade-A"],
+  "2405.01340": ["prior is|prior as|πk|π_k|log10|function of G"]
+}
