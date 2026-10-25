@@ -3,6 +3,22 @@
  "attempted": 28,
  "failed": [
   {
+   "collector": "sdss_dr18",
+   "catalog": "SDSS DR18 imaging",
+   "status": "timeout",
+   "impact": "SDSS morphology and u-band colours",
+   "key": false,
+   "error": "ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='skyserver.sdss.org', port=443): Read timed out. (read timeout=60)\"))"
+  },
+  {
+   "collector": "sdss_spectroscopy",
+   "catalog": "SDSS spectroscopy",
+   "status": "timeout",
+   "impact": "spectroscopic classes and redshifts",
+   "key": false,
+   "error": "ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='skyserver.sdss.org', port=443): Read timed out. (read timeout=60)\"))"
+  },
+  {
    "collector": "atnf_pulsar",
    "catalog": "ATNF pulsars",
    "status": "error",
