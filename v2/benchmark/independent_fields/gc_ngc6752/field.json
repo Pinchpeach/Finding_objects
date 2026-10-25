@@ -4,14 +4,14 @@
  "radius_arcmin": 6.0,
  "n_objects": 36022,
  "seconds": {
-  "collect": 208.4,
-  "1_associate": 53.8,
-  "2_integrate": 26.8,
-  "3_features": 46.3,
-  "4_evidence": 30.0,
-  "5_coarse": 52.8,
-  "6_prepare": 46.3,
-  "7_classify": 43.6
+  "collect": 206.6,
+  "1_associate": 68.6,
+  "2_integrate": 32.0,
+  "3_features": 48.5,
+  "4_evidence": 35.9,
+  "5_coarse": 57.5,
+  "6_prepare": 53.1,
+  "7_classify": 52.0
  },
  "catalog_rows": {
   "Gaia DR3": 35071,
@@ -22,7 +22,6 @@
   "AllWISE": 1020,
   "Chandra CSC 2.0": 63,
   "Gaia DR3 variability SOS": 5,
-  "ATNF Pulsar Catalog": 5,
   "eROSITA eRASS1": 5
  },
  "seeing": {
