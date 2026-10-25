@@ -1,6 +1,23 @@
 {
  "known": true,
  "attempted": 28,
- "failed": [],
+ "failed": [
+  {
+   "collector": "sdss_dr18",
+   "catalog": "SDSS DR18 imaging",
+   "status": "timeout",
+   "impact": "SDSS morphology and u-band colours",
+   "key": false,
+   "error": "ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='skyserver.sdss.org', port=443): Max retries exceeded with url: /dr18/en/tools/search/x_results.aspx?cmd=+SELECT%0D+p.objid%2C+p.ra%2C+p.dec%2C+p"
+  },
+  {
+   "collector": "atnf_pulsar",
+   "catalog": "ATNF pulsars",
+   "status": "error",
+   "impact": "pulsar labels",
+   "key": false,
+   "error": "DALFormatError: SSLError: HTTPSConnectionPool(host='heasarc.gsfc.nasa.gov', port=443): Max retries exceeded with url: /xamin/vo/tap/sync (Caused by SSLError(SSLCertVerificationError(1, \"[SSL: CERTIFIC"
+  }
+ ],
  "key_failed": false
 }
