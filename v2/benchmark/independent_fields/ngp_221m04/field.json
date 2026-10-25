@@ -2,15 +2,15 @@
  "ra": 220.98583,
  "dec": -4.91306,
  "radius_arcmin": 12.0,
- "n_objects": 16503,
+ "n_objects": 16504,
  "seconds": {
-  "collect": 79.2,
+  "collect": 69.3,
   "1_associate": 6.9,
-  "2_integrate": 12.4,
-  "3_features": 18.7,
-  "4_evidence": 15.3,
-  "5_coarse": 24.0,
-  "6_prepare": 20.2,
+  "2_integrate": 12.0,
+  "3_features": 18.2,
+  "4_evidence": 14.9,
+  "5_coarse": 23.3,
+  "6_prepare": 19.7,
   "7_classify": 20.1
  },
  "catalog_rows": {
