@@ -8,16 +8,17 @@ excerpts are read from the job log.  Only short matched passages are printed
     python .github/scripts/literature_excerpts.py SPEC.json
 SPEC: {"arXiv id": ["regex", ...], ...}
 """
+import io
 import json
 import random
 import re
-import subprocess
 import sys
-import tempfile
 import time
 import urllib.request
 import xml.etree.ElementTree as ET
 from pathlib import Path
+
+from pypdf import PdfReader
 
 MAX_HITS = 6
 UA = {"User-Agent": "Finding_objects literature check (GitHub Actions)"}
@@ -54,11 +55,11 @@ def main():
         except Exception as exc:  # keep going: one failure must not hide the others
             print("FETCH FAILED:", exc)
             continue
-        with tempfile.TemporaryDirectory() as d:
-            p = Path(d) / "p.pdf"
-            p.write_bytes(pdf)
-            subprocess.run(["pdftotext", "-layout", str(p), str(Path(d) / "p.txt")], check=False)
-            t = (Path(d) / "p.txt").read_text(errors="ignore") if (Path(d) / "p.txt").exists() else ""
+        try:
+            t = "\n".join(pg.extract_text() or "" for pg in PdfReader(io.BytesIO(pdf)).pages)
+        except Exception as exc:
+            print("PDF TEXT FAILED:", exc)
+            continue
         lines = [" ".join(x.split()) for x in t.splitlines()]
         print(f"text lines: {len(lines)}")
         for pat in pats:

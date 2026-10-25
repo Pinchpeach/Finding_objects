@@ -14,6 +14,8 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get install -y -q poppler-utils
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install -q pypdf
       - run: |
           for f in .github/literature/*.json; do python -u .github/scripts/literature_excerpts.py "$f"; done
