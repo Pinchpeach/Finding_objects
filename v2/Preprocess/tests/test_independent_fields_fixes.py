@@ -123,13 +123,15 @@ def test_magellanic_prior_suppresses_qso_odds_of_cloud_members_only():
     assert f[4] == 1.0 and f[5] == 1.0
 
 
-def test_proper_motion_significance_uses_covariance_and_crf3_scale():
+def test_option_c2_proper_motion_significance_uses_covariance_and_crf3_scale():
     import importlib.util, math
 
     spec = importlib.util.spec_from_file_location("s4", V2 / "Preprocess" / "04_build_evidence.py")
     s4 = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(s4)
     src = {"pmra": 3.0, "pmra_error": 1.0, "pmdec": 4.0, "pmdec_error": 1.0}
+    assert s4._pm_sigma({**src, "pmra_pmdec_corr": 0.9}) == 5.0  # default: diagonal (2.39.0)
+    s4.PM_MAHALANOBIS = True  # option c2
     assert abs(s4._pm_sigma(src) - 5.0 / math.sqrt(1.1485)) < 1e-9  # uncorrelated
     # strongly correlated errors: a motion along the correlation is less significant
     assert s4._pm_sigma({**src, "pmra_pmdec_corr": 0.9}) < s4._pm_sigma(src)
@@ -146,3 +148,14 @@ def test_xray_star_line_flags_coronal_counterparts():
         }
     )
     assert s5.QSO_OPT.xray_star_side(df).tolist() == [True, False, False]
+
+
+def test_density_prior_falls_back_without_enough_gaia_sources():
+    s5 = _stage5()
+    few = pd.DataFrame({"ra": [80.89, 80.9], "dec": [-69.76, -69.75], "gaia_dr3__phot_g_mean_mag": [20.0, 20.5]})
+    assert np.isnan(s5.QSO_OPT.density_prior(few)).all()
+    rng = np.random.default_rng(0)
+    n = 400  # 400 Gaia sources within ~0.01 deg^2: ~4e4 deg^-2, eight times the training sky
+    crowd = pd.DataFrame({"ra": 150 + rng.uniform(-0.05, 0.05, n), "dec": 2 + rng.uniform(-0.05, 0.05, n), "gaia_dr3__phot_g_mean_mag": 19.0})
+    f = s5.QSO_OPT.density_prior(crowd)
+    assert np.isfinite(f).all() and 0.02 < np.median(f) < 0.3

@@ -467,9 +467,11 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
             item_lists.append(json.loads(raw) if isinstance(raw, str) else [])
         except (json.JSONDecodeError, TypeError):
             item_lists.append([])
-    if "c7" in opts:  # Gaia DSC ignored inside the Magellanic Clouds
-        for i in np.flatnonzero(magellanic_region(df)):
-            item_lists[i] = [e for e in item_lists[i] if e.get("rule_id") != "DSC-001"]
+    # Gaia DSC is ignored inside the Magellanic Clouds, where 38 % of its
+    # quasar labels lie (Delchambre et al. 2023); 200-field replay (2.39.0):
+    # Magellanic QSO predictions 5,657 -> 3,162, other fields unchanged.
+    for i in np.flatnonzero(magellanic_region(df)):
+        item_lists[i] = [e for e in item_lists[i] if e.get("rule_id") != "DSC-001"]
     fused = fuse_many(item_lists, model, Path(model_path).parent)
     rows = []
     for items, hr, (p, used) in zip(item_lists, host_r, fused):
@@ -505,16 +507,25 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     prior = estimate_field_prior(P[eligible], train_prior) if estimable else np.array(train_prior)
     adjust = estimable and bool(field_prior)
     Q = P * (prior if adjust else np.array(train_prior)) / np.array(train_prior)
-    if "c1b" in opts:  # local stellar density replaces the latitude and Magellanic priors
-        lat = QSO_OPT.density_prior(df)
-    else:
-        lat = latitude_factor(df) * magellanic_factor(df)
+    # Local stellar-density prior (2.39.0): the Gaia source density at the
+    # object (10th neighbour) against the training sky, min(1, rho_ref/rho)
+    # -- a continuous position prior as in Jamal & Bailer-Jones 2024 and
+    # Hughes et al. 2022 that covers the plane, the bulge, clusters and the
+    # Clouds alike.  200-field replay: Stage-5 accuracy 96.12 -> 96.16 %,
+    # QSO predictions -16 % outside and -59 % inside the Clouds.  Where it
+    # cannot be measured (small searches, < 11 Gaia sources) the latitude and
+    # Magellanic priors above are used.
+    dens = QSO_OPT.density_prior(df)
+    lat = np.where(np.isfinite(dens), dens, latitude_factor(df) * magellanic_factor(df))
     Q[:, [CLASSES.index("GALAXY"), CLASSES.index("QSO")]] *= lat[:, None]
     qf = np.ones(len(df))
     if "c1a" in opts or "c1a_half" in opts:
         qf *= QSO_OPT.magnitude_prior(df, half="c1a" not in opts)
-    if "c3a" in opts or "c3b" in opts:
-        qf *= np.where(QSO_OPT.desi_wise_cut(df), QSO_OPT.VETO, 1.0)
+    # DESI QSO preselection W1 < 22.3 and W2 < 22.3 AB (Chaussidon et al.
+    # 2023, Sect. 3; removes stars faint in WISE, e.g. the Sagittarius
+    # stream): QSO odds x VETO otherwise (2.39.0; fields +0.09 %p, SDSS
+    # -0.10 %p, DESI +0.10 %p).
+    qf *= np.where(QSO_OPT.desi_wise_cut(df), QSO_OPT.VETO, 1.0)
     if "c4" in opts:
         qf *= np.where(QSO_OPT.quaia_fail(df), QSO_OPT.VETO, 1.0)
     # An X-ray source on the stellar side of the X-ray-flux / W1 relation
