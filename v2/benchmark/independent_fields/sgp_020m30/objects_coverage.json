@@ -3,6 +3,22 @@
  "attempted": 28,
  "failed": [
   {
+   "collector": "sdss_dr18",
+   "catalog": "SDSS DR18 imaging",
+   "status": "error",
+   "impact": "SDSS morphology and u-band colours",
+   "key": false,
+   "error": "InconsistentTableError('Number of header columns (1) inconsistent with data columns in data line 9')"
+  },
+  {
+   "collector": "sdss_spectroscopy",
+   "catalog": "SDSS spectroscopy",
+   "status": "error",
+   "impact": "spectroscopic classes and redshifts",
+   "key": false,
+   "error": "InconsistentTableError('Number of header columns (1) inconsistent with data columns in data line 9')"
+  },
+  {
    "collector": "atnf_pulsar",
    "catalog": "ATNF pulsars",
    "status": "error",
