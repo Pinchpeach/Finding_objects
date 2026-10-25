@@ -2,16 +2,16 @@
  "ra": 9.50556,
  "dec": -25.06944,
  "radius_arcmin": 12.0,
- "n_objects": 22798,
+ "n_objects": 22777,
  "seconds": {
-  "collect": 94.5,
-  "1_associate": 8.7,
-  "2_integrate": 17.3,
-  "3_features": 21.2,
-  "4_evidence": 22.3,
-  "5_coarse": 31.3,
-  "6_prepare": 25.7,
-  "7_classify": 29.4
+  "collect": 94.9,
+  "1_associate": 6.0,
+  "2_integrate": 9.2,
+  "3_features": 10.7,
+  "4_evidence": 14.1,
+  "5_coarse": 17.3,
+  "6_prepare": 12.3,
+  "7_classify": 16.5
  },
  "catalog_rows": {
   "DESI Legacy Surveys DR10": 20169,
@@ -22,11 +22,9 @@
   "Gaia DR3": 410,
   "2MASS PSC": 204,
   "VLASS": 174,
-  "SIMBAD": 74,
   "SGA-2020": 26,
   "NVSS": 7,
   "TGSS ADR1": 4,
-  "ATNF Pulsar Catalog": 1,
   "Roma-BZCAT": 1
  },
  "seeing": {
