@@ -4,14 +4,14 @@
  "radius_arcmin": 12.0,
  "n_objects": 5504,
  "seconds": {
-  "collect": 174.3,
-  "1_associate": 1.7,
-  "2_integrate": 3.3,
-  "3_features": 4.3,
-  "4_evidence": 3.6,
-  "5_coarse": 5.1,
-  "6_prepare": 4.5,
-  "7_classify": 5.3
+  "collect": 69.7,
+  "1_associate": 2.3,
+  "2_integrate": 4.5,
+  "3_features": 5.7,
+  "4_evidence": 5.0,
+  "5_coarse": 7.3,
+  "6_prepare": 6.2,
+  "7_classify": 7.6
  },
  "catalog_rows": {
   "Pan-STARRS1 DR2 MeanObject": 4800,
