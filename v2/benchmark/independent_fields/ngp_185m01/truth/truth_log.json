@@ -26,5 +26,12 @@
   "III/283/ravedr6": 1,
   "III/283/xgaia2": 1,
   "III/283/xgaiae3": 1
- }
+ },
+ "APOGEE DR17 (Abdurro'uf+2022)": {
+  "III/286/catalog": 181,
+  "III/286/allvis": 627
+ },
+ "Magellanic Quasars Survey (Kozlowski+2013)": {},
+ "Gaia-ESO DR5 (Randich+2022)": {},
+ "2dF SMC OBA stars (Evans+2004)": {}
 }
