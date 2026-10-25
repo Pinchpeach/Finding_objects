@@ -3,20 +3,20 @@
  "attempted": 28,
  "failed": [
   {
+   "collector": "sdss_spectroscopy",
+   "catalog": "SDSS spectroscopy",
+   "status": "error",
+   "impact": "spectroscopic classes and redshifts",
+   "key": false,
+   "error": "InconsistentTableError('Number of header columns (1) inconsistent with data columns in data line 9')"
+  },
+  {
    "collector": "atnf_pulsar",
    "catalog": "ATNF pulsars",
    "status": "error",
    "impact": "pulsar labels",
    "key": false,
    "error": "DALFormatError: SSLError: HTTPSConnectionPool(host='heasarc.gsfc.nasa.gov', port=443): Max retries exceeded with url: /xamin/vo/tap/sync (Caused by SSLError(SSLCertVerificationError(1, \"[SSL: CERTIFIC"
-  },
-  {
-   "collector": "ned",
-   "catalog": "NED",
-   "status": "timeout",
-   "impact": "literature labels",
-   "key": false,
-   "error": "ConnectionError(ReadTimeoutError(\"HTTPSConnectionPool(host='ned.ipac.caltech.edu', port=443): Read timed out.\"))"
   }
  ],
  "key_failed": false
