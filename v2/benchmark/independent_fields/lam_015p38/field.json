@@ -2,20 +2,19 @@
  "ra": 15.52444,
  "dec": 37.81306,
  "radius_arcmin": 12.0,
- "n_objects": 8491,
+ "n_objects": 8188,
  "seconds": {
-  "collect": 97.5,
-  "1_associate": 3.5,
+  "collect": 169.3,
+  "1_associate": 2.9,
   "2_integrate": 5.2,
   "3_features": 5.8,
-  "4_evidence": 6.2,
-  "5_coarse": 7.4,
+  "4_evidence": 6.1,
+  "5_coarse": 7.2,
   "6_prepare": 6.2,
-  "7_classify": 8.3
+  "7_classify": 8.5
  },
  "catalog_rows": {
   "Pan-STARRS1 DR2 MeanObject": 7498,
-  "NED": 2330,
   "AllWISE": 2032,
   "Gaia DR3": 1174,
   "2MASS PSC": 578,
