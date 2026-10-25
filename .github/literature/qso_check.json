@@ -1,0 +1,19 @@
+{
+  "2306.17749": ["10\\^", "18\\.25", "G\\s*[-−–]\\s*W1", "W1\\s*[-−–]\\s*W2", "BP\\s*[-−–]\\s*G", "Magellanic|LMC|SMC", "diagonal", "purity|contaminat"],
+  "2206.05681": ["purer", "Magellanic|LMC|SMC", "214", "classlabel_dsc_joint", "host_galaxy_flag"],
+  "2010.05934": ["63", "41 ", "efficien", "surface density", "deg\\^?-?2|deg−2"],
+  "2208.08511": ["tanh", "22\\.3", "TYPE|PSF", "Sagittarius|Sgr", "purity|contaminat|71 ?%|310"],
+  "2405.01340": ["prior", "purity", "Magellanic|LMC|SMC", "G ?≥ ?20|G>20|G ?> ?20"],
+  "2610.13742": ["Mahalanobis", "1\\.14|7\\.09", "RUWE", "purity|complete"],
+  "1706.09901": ["R90", "0\\.65|0\\.650", "13\\.86", "0\\.153", "0\\.71|C75"],
+  "1208.2530": ["0\\.315", "0\\.796", "3\\.172", "7\\.624", "0\\.222"],
+  "1705.10711": ["W1", "stars", "8\\.3|-?0\\.4 ?W1|1\\.625"],
+  "2310.12704": ["f_?\\{?PM", "PM0|zero proper", "0\\.95", "purity"],
+  "2012.01771": ["1\\.8[0-9]{2}|0\\.6[0-9]{2}|-1\\.2[0-9]{2}|0\\.38[0-9]|0\\.2[0-9]{2}", "systemic|centre of mass|center of mass", "81\\.28|12\\.80|80\\.9"],
+  "2206.06710": ["38 ?%|38\\.", "Magellanic|LMC|SMC", "prior", "11\\.54"],
+  "1305.6927": ["758", "deg", "purity|efficien|success", "ghost"],
+  "2207.06792": ["purity", "21\\.18", "complete"],
+  "2503.14141": ["Magellanic|LMC|SMC", "PM0|zero proper|f_?\\{?PM", "purity"],
+  "2401.17282": ["-3|−3", "p_coronal|coronal", "reliab"],
+  "1008.3143": ["chi|χ", "false", "99"]
+}
