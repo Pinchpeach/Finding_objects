@@ -351,9 +351,15 @@ def latitude_factor(df: pd.DataFrame) -> np.ndarray:
 # 1.3e6, smc_bar 1.1e6) against ~10^4 at the same latitudes elsewhere, while
 # background quasars stay at ~10^2 deg^-2, so a photometric QSO there is
 # almost always a faint Cloud star: the blind run predicted 2,900-5,900 QSO
-# per 6' field (~10^5 deg^-2).  Gaia DR3 drops the Clouds from its purer
-# quasar sample for the same reason (Gaia Collaboration, Bailer-Jones et al.
-# 2023, A&A 674, A41), as do Gaia-CRF3 and Quaia (Storey-Fisher et al. 2024).
+# per 6' field (~10^5 deg^-2).  Gaia DR3 meets the same contamination: 38 %
+# of its DSC quasar labels lie in the LMC and 6.4 % in the SMC (Delchambre et
+# al. 2023, A&A 674, A31), and excluding generous regions around the Clouds
+# removes 41 % of the 6.6 million qso_candidates (Gaia Collaboration,
+# Bailer-Jones et al. 2023, A&A 674, A41); Quaia adds a G-W1 / W1-W2 cut
+# against Cloud stars (Storey-Fisher et al. 2024, ApJ 964, 69).  Behind the
+# Clouds there are ~25 quasars deg^-2 at I < 20 against > 10^6 stars deg^-2
+# (Kozlowski et al. 2013, ApJ 775, 92).  (Corrected in 2.37.1; checked
+# against the papers' text, v2/LITERATURE_QSO.md.)
 # Two factors on the GALAXY and QSO odds, never above 1:
 #   * prior: the local star-count excess rho_ref / rho(R), rho(R) =
 #     rho0 exp(-R / h), fitted to the Gaia counts of the 11 Cloud fields

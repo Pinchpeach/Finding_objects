@@ -13,12 +13,12 @@ v2의 코드·문서·규칙표가 인용하는 논문, 카탈로그 출판물, 
 | [교차 대응·통계·분류 방법](#method) | 14 |
 | [별 분류](#star) | 40 |
 | [은하 분류](#galaxy) | 25 |
-| [퀘이사·AGN](#qso) | 15 |
+| [퀘이사·AGN](#qso) | 29 |
 | [전파·X선·밀집성](#radio) | 11 |
 | [행성상성운·초신성·과도 현상](#trans) | 8 |
 | [기타 문서](#doc) | 13 |
 | [분광 분류 기준](#spec) | 43 |
-| **합계** | **239** |
+| **합계** | **253** |
 
 <a id="gaia"></a>
 ## 측성·Gaia
@@ -29,7 +29,7 @@ Gaia 데이터 릴리스, Gaia 처리·검증 논문, 측성 품질 기준.
 |---|---|---|---|---|
 | Gaia Collaboration 2023 (Gaia DR3 summary/content paper) | A&A 674, A1; doi:10.1051/0004-6361/202243940 | — | `Classifier/LITERATURE.md`<br>`designations.py` | Gaia DR3 내용 요약; Gaia DR3 지정명 우선순위의 근거. designations.py는 'Gaia Collaboration 2023'으로만 표기(같은 논문으로 보고 병합) |
 | Creevey et al. 2023 (Gaia DR3 Apsis methods overview) | A&A 674, A26; doi:10.1051/0004-6361/202243688 | — | `Classifier/LITERATURE.md`<br>`Classifier/LITERATURE_SUBCLASS.md` (쌍성 후보 속성, Classifier/subclass.py GAIA_DSC_BINARY) | Gaia DSC의 QSO/은하/별/백색왜성/쌍성 사후확률; DSC 쌍성 확률 ≥ 0.8 → 쌍성 후보 |
-| Delchambre et al. 2023 (Gaia DR3 Apsis III: non-stellar content and source classification) | A&A 674, A31 | — | `Preprocess/LITERATURE.md` (DT-HIER-001)<br>`Preprocess/catalog_reliability.csv` (catalog_confidence_gaia_dsc) | Gaia DSC 분류기 구조(Specmod/Combmod), classlabel_dsc 확률 > 0.5 기준, 외부은하 순도 주의 |
+| Delchambre et al. 2023 (Gaia DR3 Apsis III: non-stellar content and source classification) | A&A 674, A31 | — | `Preprocess/LITERATURE.md` (DT-HIER-001)<br>`Preprocess/catalog_reliability.csv` (catalog_confidence_gaia_dsc)<br>`LITERATURE_QSO.md` | Gaia DSC 분류기 구조(Specmod/Combmod), classlabel_dsc 확률 > 0.5 기준, 외부은하 순도 주의 |
 | Andrae et al. 2023 (Gaia DR3 GSP-Phot) | A&A 674, A27; doi:10.1051/0004-6361/202243462 | — | `Classifier/subclass.py` (GAIA_TEFF 분광형, E(BP−RP), METAL_POOR)<br>`Classifier/LITERATURE.md`<br>`Classifier/LITERATURE_MULTI_AXIS.md`<br>`Classifier/LITERATURE_SUBCLASS.md`<br>`WORK_REPORT_2026-10-10.md` | BP/RP 기반 Teff·log g·[M/H]·소광; [M/H]는 참고용이라 '후보'로만 표시 |
 | Montegriffo et al. 2023 (Gaia DR3 synthetic photometry) | A&A 674, A33 | — | `Classifier/LITERATURE_MULTI_AXIS.md` | XP 스펙트럼 합성 측광과 백색왜성 DA/non-DA 목록 |
 | Eyer et al. 2023 (Gaia DR3 variability overview) (저장소 표기 그대로) | A&A 674, A13 | — | `Classifier/LITERATURE.md` | Gaia DR3 변광성 처리 개요(약 1천만 개, 약 20여 그룹); 변광 축을 STAR 세부 축으로 둔 근거 |
@@ -233,9 +233,9 @@ AGN/퀘이사 선택, 전파 세기, 광도, 가려진 퀘이사, 고적색편�
 | 인용 | 학술지·권·쪽 | ADS bibcode | 사용처 | 무엇에 쓰였나 |
 |---|---|---|---|---|
 | Stern et al. 2012 | ApJ 753, 30 | — | `Preprocess/classification_rules.csv` WISE-AGN-001 (Sec. 3.5 / Fig. 6)<br>`Preprocess/04_build_evidence.py`<br>`Preprocess/03_extract_features.py`<br>`Preprocess/catalog_reliability.csv` (catalog_confidence_allwise)<br>`Classifier/subclass.py` (galaxy_activity)<br>`Classifier/LITERATURE_SUBCLASS.md`<br>`WORK_REPORT_2026-10-10.md` | W1−W2 ≥ 0.8, W2 < 15.05 (Vega) 중적외선 AGN; COSMOS 신뢰도 ~95 %, 완전도 ~78 % |
-| Assef et al. 2018 (The WISE AGN Catalog) | ApJS 234, 23; DOI 10.3847/1538-4365/aaa00a | — | `Preprocess/classification_rules.csv` WISE-AGN-R90-001 (Eq. 4)<br>`Preprocess/04_build_evidence.py`<br>`Preprocess/LITERATURE.md` | AllWISE R90 경계 (α, β, γ) = (0.650, 0.153, 13.86) |
+| Assef et al. 2018 (The WISE AGN Catalog) | ApJS 234, 23; DOI 10.3847/1538-4365/aaa00a | — | `Preprocess/classification_rules.csv` WISE-AGN-R90-001 (Eq. 4)<br>`Preprocess/04_build_evidence.py`<br>`Preprocess/LITERATURE.md`<br>`LITERATURE_QSO.md` | AllWISE R90 경계 (α, β, γ) = (0.650, 0.153, 13.86) |
 | Bañados et al. 2016 (PS1 distant z > 5.6 quasar survey) | ApJS 227, 11; DOI 10.3847/0067-0049/227/1/11 | — | `Preprocess/classification_rules.csv` PS1-QSO-Z6-001 (Sec. 2.1.1, Eq. 1–3)<br>`Preprocess/04_build_evidence.py`<br>`Preprocess/LITERATURE.md` | i-dropout 선택(i−z > 2.0 등) z ≈ 6 퀘이사 후보 |
-| Chaussidon et al. 2023 (DESI QSO target selection) | ApJ 944, 107 | — | `Preprocess/classification_rules.csv` LS-MORPH-001/002, LS-COLOR-001<br>`Preprocess/03_extract_features.py`<br>`Preprocess/color_knn.py`<br>`Get_data/desi_legacy.py`<br>`Preprocess/COARSE_BENCHMARK_RESULTS.md`<br>`WORK_LOG_2026-10-08.md` | 퀘이사도 점광원(PSF 형태) → 점광원은 STAR/QSO 공통 증거; 중적외선 초과·청색 광학색 |
+| Chaussidon et al. 2023 (DESI QSO target selection) | ApJ 944, 107 | — | `Preprocess/classification_rules.csv` LS-MORPH-001/002, LS-COLOR-001<br>`Preprocess/03_extract_features.py`<br>`Preprocess/color_knn.py`<br>`Get_data/desi_legacy.py`<br>`Preprocess/COARSE_BENCHMARK_RESULTS.md`<br>`WORK_LOG_2026-10-08.md`<br>`LITERATURE_QSO.md` | 퀘이사도 점광원(PSF 형태) → 점광원은 STAR/QSO 공통 증거; 중적외선 초과·청색 광학색 |
 | Richards et al. 2002 (SDSS quasar target selection) | — | — | `Preprocess/LITERATURE.md` | 항성 궤적 거리 기반 선택 — 단순 색 절단으로 근사하지 않는다는 미채택 근거 |
 | Richards et al. 2006 | — | — | `Classifier/subclass.py` (qso_tags ABS_MAG_RICHARDS06)<br>`Classifier/LITERATURE_SUBCLASS.md` | M_i(z=2)와 연속 K-보정(α_ν = −0.5) |
 | Schneider et al. 2010 (SDSS DR7 quasar catalogue) | — | — | `Classifier/subclass.py` (H0, OMEGA_M, 퀘이사 광도 절단)<br>`Classifier/LITERATURE_SUBCLASS.md` | 퀘이사 M_i < −22 절단; 거리 계산용 평탄 ΛCDM H0 = 70, Ωm = 0.3 |
@@ -247,6 +247,20 @@ AGN/퀘이사 선택, 전파 세기, 광도, 가려진 퀘이사, 고적색편�
 | Fan et al. 2006 | — | — | `Classifier/subclass.py` (VERY_HIGH_Z)<br>`Classifier/LITERATURE_SUBCLASS.md` | z ≥ 5 재이온화 시대 퀘이사 |
 | Joshi & Shinde 2026 | Eur. Phys. J. C 86, 766; doi:10.1140/epjc/s10052-026-15968-7 | — | `Classifier/LITERATURE.md` | SDSS DR16Q 전파 세기 ML 분류; 불균형 문제·QSO 라우팅 후에만 평가 |
 | Massaro et al. 2015 (Roma-BZCAT 5th ed.) | Ap&SS 357, 75 | — | `Get_data/bzcat.py`<br>`Classifier/axes/extragalactic.py (BLAZAR)` | 블레이자 목록과 유형(BL Lac/FSRQ/모은하 우세/불확실) |
+| Heintz et al. 2020 (complete spectroscopy of astrometrically selected quasar candidates, Gaia DR2) | A&A 644, A17; doi:10.1051/0004-6361/202039262 | — | `LITERATURE_QSO.md` | G<20 정지 점광원 104개 중 퀘이사 63개(≈60 %), 퀘이사 밀도 20 deg⁻²: 운동 0은 약한 증거 |
+| Li & Fynbo 2026 (astrometric quasar selection with Gaia DR3; preprint) | arXiv:2610.13742 | — | `LITERATURE_QSO.md` | 마할라노비스 고유운동 검정, 척도 s=1.1485, D²<7.097, ruwe<1.4 |
+| Gaia Collaboration, Bailer-Jones et al. 2023 (Gaia DR3: the extragalactic content) | A&A 674, A41; doi:10.1051/0004-6361/202243232 | — | `LITERATURE_QSO.md`<br>`Preprocess/05_likelihood_vectors.py` (MAGELLANIC)<br>`Preprocess/LITERATURE.md` | qso_candidates 순도 50–70 %, purer ~95 %, confusion source 2.14억, LMC·SMC 과밀(마젤란을 빼면 59 %) |
+| Storey-Fisher et al. 2024 (Quaia, the Gaia-unWISE quasar catalog) | ApJ 964, 69; doi:10.3847/1538-4357/ad1328 | — | `LITERATURE_QSO.md`<br>`Preprocess/05_likelihood_vectors.py` (MAGELLANIC)<br>`Preprocess/LITERATURE.md` | 고유운동 기준 μ<10^{0.4(G−18.25)}, G−W1>2.15, W1−W2>0.4, BP−G>−0.3, 마젤란 별 제거 사선 기준 |
+| Jamal & Bailer-Jones 2024 (improved source classification with Gaia DR3) | A&A 687, A258; doi:10.1051/0004-6361/202449654 | — | `LITERATURE_QSO.md` | (G, 위도) 2D 순도·완전도, 마젤란 LMC 9°·SMC 6° 제외, G≥20 퀘이사 순도 20→62 % |
+| Fu et al. 2024 (CatNorth quasar candidate catalog) | ApJS 271, 54; doi:10.3847/1538-4365/ad2ae6 | — | `LITERATURE_QSO.md` | 영 고유운동 확률밀도 log f_PM0 ≥ −4, p_QSO>0.95, 순도 ~90 % |
+| Fu et al. 2025 (CatSouth and CatGlobe quasar candidate catalogs) | ApJS 279, 54; doi:10.3847/1538-4365/ade999 | — | `LITERATURE_QSO.md` | 마젤란 영역(LMC 10°, SMC 5°)에 더 엄격한 f_PM0 기준 |
+| He & Li 2022 (quasar candidate catalogs of DESI Legacy Imaging Survey DR9) | RAA (권·쪽 미확인); doi:10.1088/1674-4527/ac839b | — | `LITERATURE_QSO.md` | LS DR9 RF 퀘이사 후보, g=21.18에서 순도가 크게 달라짐 |
+| Mateos et al. 2012 (WISE colour wedge for luminous AGN) | MNRAS 426, 3271; doi:10.1111/j.1365-2966.2012.21843.x | — | `LITERATURE_QSO.md` | 3밴드 쐐기: y′=0.315x′+0.796/−0.222, y′=−3.172x′+7.624 |
+| Salvato et al. 2018 (Nway: Bayesian cross-matching of X-ray surveys) | MNRAS 473, 4937; doi:10.1093/mnras/stx2651 | — | `LITERATURE_QSO.md` | 별/AGN 경계 [W1]=−1.625 log F(0.5–2 keV)−8.8 |
+| Freund et al. 2024 (eROSITA eRASS1 coronal content, HamStar) | arXiv:2401.17282 (학술지 권·쪽 미확인) | — | `LITERATURE_QSO.md` | 코로나 X선 log(F_X/F_bol)≈−3 포화, 코로나 천체 138,800개 |
+| Butler & Bloom 2011 (optimal time-series selection of quasars) | AJ 141, 93; doi:10.1088/0004-6256/141/3/93 | — | `LITERATURE_QSO.md` | DRW 변광 통계, 완전도 99 %, 변광성 오경보 ≲3 % |
+| Kozłowski et al. 2013 (Magellanic Quasars Survey III: 758 AGNs) | ApJ 775, 92; doi:10.1088/0004-637X/775/2/92 | — | `LITERATURE_QSO.md`<br>`Preprocess/05_likelihood_vectors.py` (MAGELLANIC)<br>`Preprocess/LITERATURE.md` | 마젤란 뒤 I<20 퀘이사 ~25 deg⁻² vs 별 >10⁶ deg⁻², 표적 3,014개 중 758개 확인, ghost variable |
+| Gaia Collaboration, Luri et al. 2021 (Gaia EDR3: structure and properties of the Magellanic Clouds) | A&A 649, A7; doi:10.1051/0004-6361/202039588 | — | `LITERATURE_QSO.md`<br>`Preprocess/05_likelihood_vectors.py` (MAGELLANIC)<br>`Preprocess/LITERATURE.md` | 표 4 중심 고유운동 LMC (1.871, 0.391), SMC (0.686, −1.237) mas/yr; 선택 반경 20°·11° |
 
 <a id="radio"></a>
 ## 전파·X선·밀집성
