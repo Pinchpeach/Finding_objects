@@ -3,14 +3,6 @@
  "attempted": 28,
  "failed": [
   {
-   "collector": "sdss_dr18",
-   "catalog": "SDSS DR18 imaging",
-   "status": "timeout",
-   "impact": "SDSS morphology and u-band colours",
-   "key": false,
-   "error": "ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='skyserver.sdss.org', port=443): Max retries exceeded with url: /dr18/en/tools/search/x_results.aspx?cmd=+SELECT%0D+p.objid%2C+p.ra%2C+p.dec%2C+p"
-  },
-  {
    "collector": "atnf_pulsar",
    "catalog": "ATNF pulsars",
    "status": "error",
