@@ -4,14 +4,14 @@
  "radius_arcmin": 6.0,
  "n_objects": 6951,
  "seconds": {
-  "collect": 191.2,
-  "1_associate": 4.3,
-  "2_integrate": 7.1,
-  "3_features": 11.4,
-  "4_evidence": 7.5,
-  "5_coarse": 12.4,
-  "6_prepare": 11.8,
-  "7_classify": 11.2
+  "collect": 113.9,
+  "1_associate": 3.0,
+  "2_integrate": 4.7,
+  "3_features": 8.1,
+  "4_evidence": 5.2,
+  "5_coarse": 8.7,
+  "6_prepare": 7.9,
+  "7_classify": 8.0
  },
  "catalog_rows": {
   "NED": 6727,
