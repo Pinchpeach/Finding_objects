@@ -34,6 +34,7 @@ SOURCE = [
     "pmra_error",
     "pmdec",
     "pmdec_error",
+    "pmra_pmdec_corr",  # full proper-motion covariance for the zero-motion test (2.38.0; Li & Fynbo 2026)
     "ruwe",
     "phot_g_mean_flux",
     "phot_g_mean_flux_error",
@@ -229,6 +230,7 @@ def _vizier_fallback(ra: float, dec: float, radius_arcmin: float) -> pd.DataFram
         "e_pmRA": "pmra_error",
         "pmDE": "pmdec",
         "e_pmDE": "pmdec_error",
+        "pmRApmDEcor": "pmra_pmdec_corr",
         "RUWE": "ruwe",
         "Gmag": "phot_g_mean_mag",
         "BPmag": "phot_bp_mean_mag",

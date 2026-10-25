@@ -5,7 +5,7 @@ Transient event rows are associated in a separate entity layer from persistent h
 
 - requested samples: **9**
 - successfully executed: **9/9**
-- blind exact-axis matches: **9/9 (100.0%)**
+- blind exact-axis matches: **8/9 (88.9%)**
 
 | sample | axis | expected | blind | status | sep_arcsec |
 |---|---|---|---|---|---:|
@@ -13,7 +13,7 @@ Transient event rows are associated in a separate entity layer from persistent h
 | RR Lyr | variability | RR_LYRAE | RR_LYRAE | GAIA_DR3_VARIABLE_CANDIDATE | 3.591 |
 | delta Cep | variability | CEPHEID | CEPHEID | GAIA_DR3_VARIABLE_CANDIDATE | 0.239 |
 | Mira | physical | AGB | AGB | SUH2021_AGB_CATALOG_MATCH | 1.885 |
-| PSR B0531+21 | compact | PULSAR | PULSAR | ATNF_CATALOG_MATCH | 0.197 |
+| PSR B0531+21 | compact | PULSAR | UNKNOWN | NO_BLIND_CATALOG_EVIDENCE |  |
 | M 57 | phenomenon | PN | PN | HASH_PN_CATALOG_MATCH | 0.291 |
 | SN 2018fhw | phenomenon | SN | SN | ASASSN_SUPERNOVA_EVENT_MATCH | 2.531 |
 | SN 2011fe | phenomenon | SN | SN | ASIAGO_SUPERNOVA_EVENT_MATCH | 0.886 |
@@ -25,7 +25,7 @@ Transient event rows are associated in a separate entity layer from persistent h
 
 - measured fields: {"ra": 88.11543730306488, "dec": 15.886239315232913, "ref_epoch": 2016.0, "anchor_catalog": "Gaia DR3", "entity_kind": "persistent_source", "parallax": 19.5638180302216, "parallax_error": 0.055117156, "pmra": 76.72806594267264, "pmdec": -172.95960304595332, "ruwe": 0.9704604, "phot_g_mean_mag": 12.999769, "phot_bp_mean_mag": 12.853095, "phot_rp_mean_mag": 13.305408, "bp_rp": -0.45231247}
 - collectors: [{"collector": "gaia_dr3", "status": "ok", "rows": 1, "error": ""}, {"collector": "allwise", "status": "ok", "rows": 1, "error": ""}, {"collector": "twomass", "status": "ok", "rows": 1, "error": ""}]
-- candidates: [{"object_id": "OBJ000001", "sep_arcsec": 3.027416087455188, "catalogs": "2MASS PSC|AllWISE|Gaia DR3", "entity_kind": "persistent_source", "anchor_catalog": "Gaia DR3", "association_members": 3.0, "association_confidence_mean": 0.8162228619334471, "proper_motion_propagated_any": true, "primary_class": "STAR", "physical_class": "WD", "variability_class": "UNKNOWN", "compact_class": "UNKNOWN", "phenomenon_class": "UNKNOWN"}]
+- candidates: [{"object_id": "OBJ000001", "sep_arcsec": 3.0274349925130513, "catalogs": "2MASS PSC|AllWISE|Gaia DR3", "entity_kind": "persistent_source", "anchor_catalog": "Gaia DR3", "association_members": 3.0, "association_confidence_mean": 0.8162228619334471, "proper_motion_propagated_any": true, "primary_class": "STAR", "physical_class": "WD", "variability_class": "UNKNOWN", "compact_class": "UNKNOWN", "phenomenon_class": "UNKNOWN"}]
 
 ### RR Lyr
 
@@ -37,7 +37,7 @@ Transient event rows are associated in a separate entity layer from persistent h
 
 - measured fields: {"ra": 337.2928846512036, "dec": 58.41520817273959, "ref_epoch": 2016.0, "anchor_catalog": "Gaia DR3", "entity_kind": "persistent_source", "parallax": 3.5550642334569473, "parallax_error": 0.14753917, "pmra": 14.559642753326361, "pmdec": 3.2375195232330003, "ruwe": 2.7130983, "phot_g_mean_mag": 3.8505998, "phot_bp_mean_mag": 4.2316995, "phot_rp_mean_mag": 3.2610846, "bp_rp": 0.9706149, "teff_gspphot": 6355.6323, "logg_gspphot": 1.7987, "mh_gspphot": -0.129, "mass_flame": 5.560175, "evolstage_flame": 763.0, "best_class_name": "CEP", "best_class_score": 0.16061565, "gaia_dr3__in_vari_long_period_variable": false, "in_vari_long_period_variable": false}
 - collectors: [{"collector": "gaia_dr3", "status": "ok", "rows": 2, "error": ""}]
-- candidates: [{"object_id": "OBJ000001", "sep_arcsec": 0.23865132652179857, "catalogs": "Gaia DR3", "entity_kind": "persistent_source", "anchor_catalog": "Gaia DR3", "association_members": 1.0, "association_confidence_mean": 1.0, "proper_motion_propagated_any": false, "primary_class": "STAR", "physical_class": "UNKNOWN", "variability_class": "CEPHEID", "compact_class": "UNKNOWN", "phenomenon_class": "UNKNOWN"}, {"object_id": "OBJ000002", "sep_arcsec": 14.450252163412847, "catalogs": "Gaia DR3", "entity_kind": "persistent_source", "anchor_catalog": "Gaia DR3", "association_members": 1.0, "association_confidence_mean": 1.0, "proper_motion_propagated_any": false, "primary_class": "STAR", "physical_class": "UNKNOWN", "variability_class": "UNKNOWN", "compact_class": "UNKNOWN", "phenomenon_class": "UNKNOWN"}]
+- candidates: [{"object_id": "OBJ000001", "sep_arcsec": 0.23865279397449343, "catalogs": "Gaia DR3", "entity_kind": "persistent_source", "anchor_catalog": "Gaia DR3", "association_members": 1.0, "association_confidence_mean": 1.0, "proper_motion_propagated_any": false, "primary_class": "STAR", "physical_class": "UNKNOWN", "variability_class": "CEPHEID", "compact_class": "UNKNOWN", "phenomenon_class": "UNKNOWN"}, {"object_id": "OBJ000002", "sep_arcsec": 14.450248652708467, "catalogs": "Gaia DR3", "entity_kind": "persistent_source", "anchor_catalog": "Gaia DR3", "association_members": 1.0, "association_confidence_mean": 1.0, "proper_motion_propagated_any": false, "primary_class": "STAR", "physical_class": "UNKNOWN", "variability_class": "UNKNOWN", "compact_class": "UNKNOWN", "phenomenon_class": "UNKNOWN"}]
 
 ### Mira
 
@@ -47,9 +47,9 @@ Transient event rows are associated in a separate entity layer from persistent h
 
 ### PSR B0531+21
 
-- measured fields: {"ra": 83.63305654, "dec": 22.01449797, "anchor_catalog": "ATNF Pulsar Catalog", "entity_kind": "persistent_source", "parallax": 0.53, "parallax_error": 0.06, "atnf_pulsar_catalog__period": 0.0333924123, "period": 0.0333924123, "atnf_pulsar_catalog__period_error": 1.2e-09, "period_error": 1.2e-09, "atnf_pulsar_catalog__ref_period": "ljg+15", "ref_period": "ljg+15", "atnf_pulsar_catalog__period_dot": 4.20972e-13, "period_dot": 4.20972e-13, "atnf_pulsar_catalog__period_dot_error": 3e-18, "period_dot_error": 3e-18, "atnf_pulsar_catalog__ref_period_dot": "ljg+15", "ref_period_dot": "ljg+15", "atnf_pulsar_catalog__period_epoch": 48442.5, "period_epoch": 48442.5, "atnf_pulsar_catalog__dm": 56.7712, "atnf_pulsar_catalog__dm_error": 0.0003, "atnf_pulsar_catalog__dm_distance": 1.311, "atnf_pulsar_catalog__dm_sin_bii": -5.72, "atnf_pulsar_catalog__corr_period_dot": 4.21e-13, "corr_period_dot": 4.21e-13}
-- collectors: [{"collector": "atnf_pulsar", "status": "ok", "rows": 1, "error": ""}]
-- candidates: [{"object_id": "OBJ000001", "sep_arcsec": 0.1972017048961296, "catalogs": "ATNF Pulsar Catalog", "entity_kind": "persistent_source", "anchor_catalog": "ATNF Pulsar Catalog", "association_members": 1.0, "association_confidence_mean": 1.0, "proper_motion_propagated_any": false, "primary_class": "UNKNOWN", "physical_class": "UNKNOWN", "variability_class": "UNKNOWN", "compact_class": "PULSAR", "phenomenon_class": "UNKNOWN"}]
+- measured fields: {}
+- collectors: [{"collector": "atnf_pulsar", "status": "error", "rows": 0, "error": "DALFormatError: SSLError: HTTPSConnectionPool(host='heasarc.gsfc.nasa.gov', port=443): Max retries exceeded with url: /xamin/vo/tap/sync (Caused by SSLError(SSLCertVerificationError(1, \"[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'heasarc.gsfc.nasa.gov'. (_ssl.c:1016)\")))"}]
+- candidates: []
 
 ### M 57
 
@@ -67,7 +67,7 @@ Transient event rows are associated in a separate entity layer from persistent h
 
 - measured fields: {"ra": 210.77420833333332, "dec": 54.27372222222222, "ref_epoch": 2000.0, "anchor_catalog": "Asiago Supernova Catalog", "entity_kind": "transient_event", "sn_subtype": "Ia"}
 - collectors: [{"collector": "asiago_supernova", "status": "ok", "rows": 1, "error": ""}]
-- candidates: [{"object_id": "OBJ000001", "sep_arcsec": 0.885606880440357, "catalogs": "Asiago Supernova Catalog", "entity_kind": "transient_event", "anchor_catalog": "Asiago Supernova Catalog", "association_members": 1.0, "association_confidence_mean": 1.0, "proper_motion_propagated_any": false, "primary_class": "UNKNOWN", "physical_class": "UNKNOWN", "variability_class": "UNKNOWN", "compact_class": "UNKNOWN", "phenomenon_class": "SN"}]
+- candidates: [{"object_id": "OBJ000001", "sep_arcsec": 0.8855983937189965, "catalogs": "Asiago Supernova Catalog", "entity_kind": "transient_event", "anchor_catalog": "Asiago Supernova Catalog", "association_members": 1.0, "association_confidence_mean": 1.0, "proper_motion_propagated_any": false, "primary_class": "UNKNOWN", "physical_class": "UNKNOWN", "variability_class": "UNKNOWN", "compact_class": "UNKNOWN", "phenomenon_class": "SN"}]
 
 ### 3C 273
 
