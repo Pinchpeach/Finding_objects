@@ -2,16 +2,16 @@
  "ra": 64.5,
  "dec": 28.3,
  "radius_arcmin": 12.0,
- "n_objects": 11794,
+ "n_objects": 11793,
  "seconds": {
-  "collect": 89.4,
-  "1_associate": 4.5,
-  "2_integrate": 11.1,
-  "3_features": 16.8,
-  "4_evidence": 12.0,
-  "5_coarse": 17.9,
-  "6_prepare": 17.7,
-  "7_classify": 18.4
+  "collect": 71.1,
+  "1_associate": 2.8,
+  "2_integrate": 6.2,
+  "3_features": 11.6,
+  "4_evidence": 6.9,
+  "5_coarse": 12.5,
+  "6_prepare": 12.5,
+  "7_classify": 11.1
  },
  "catalog_rows": {
   "Pan-STARRS1 DR2 MeanObject": 9598,
@@ -24,6 +24,7 @@
   "XMM 4XMM-DR13": 36,
   "LAMOST DR catalog": 31,
   "Chandra CSC 2.0": 22,
+  "SDSS DR18 spectroscopy": 14,
   "VLASS": 9,
   "NVSS": 7,
   "TGSS ADR1": 2
