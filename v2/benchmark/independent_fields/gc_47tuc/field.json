@@ -2,16 +2,16 @@
  "ra": 6.024,
  "dec": -72.081,
  "radius_arcmin": 6.0,
- "n_objects": 47191,
+ "n_objects": 47190,
  "seconds": {
-  "collect": 233.8,
-  "1_associate": 84.5,
-  "2_integrate": 52.7,
-  "3_features": 83.4,
-  "4_evidence": 51.6,
-  "5_coarse": 94.7,
-  "6_prepare": 87.7,
-  "7_classify": 79.1
+  "collect": 212.3,
+  "1_associate": 78.5,
+  "2_integrate": 44.0,
+  "3_features": 71.8,
+  "4_evidence": 48.1,
+  "5_coarse": 84.4,
+  "6_prepare": 77.2,
+  "7_classify": 72.7
  },
  "catalog_rows": {
   "Gaia DR3": 45852,
@@ -22,7 +22,6 @@
   "AllWISE": 796,
   "Chandra CSC 2.0": 367,
   "Gaia DR3 variability SOS": 38,
-  "ATNF Pulsar Catalog": 28,
   "eROSITA eRASS1": 3,
   "GALEX AIS": 1
  },
