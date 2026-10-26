@@ -1,0 +1,318 @@
+name: v2 independent-truth field validation (set B)
+
+# Set B (2026-10-26): 200 further regions, each >= 3.5 deg from set A
+# (v2_independent_truth.yml) and from each other; list made by
+# v2/benchmark/select_fields_b.py; products in v2/benchmark/independent_fields_b/.
+#
+# 2026-10-21: validate v2 on many sky regions against spectroscopic classes
+# from surveys never used to train or tune it (LAMOST, 2QZ/6QZ, 2dFGRS,
+# 6dFGS, 2SLAQ, WiggleZ, RAVE; SDSS and DESI excluded).  Per region: fetch
+# every candidate truth catalogue within 40', put the 12' field on the truth
+# object with the most truth neighbours, run v2/pipeline.py there and commit
+# compact products to v2/benchmark/independent_fields/<region>/ for scoring
+# A second, "blind" run re-classifies the same collected data without the
+# spectroscopic and literature catalogues (LAMOST, SDSS/DESI spectra, SIMBAD,
+# NED, ...): these can carry the truth surveys' own labels (SIMBAD and NED
+# ingest 2QZ, 2dFGRS, 6dFGS; v2 collects LAMOST DR5 itself), so only the
+# blind run is an independent test.
+# by v2/benchmark/score_independent_fields.py.
+on:
+  workflow_dispatch:
+    inputs:
+      mode: {description: "'probe' lists VizieR catalogues only; 'fields' runs the regions", default: "fields"}
+      only: {description: "comma-separated region names to run (empty = all)", default: ""}
+      radius: {description: "field radius (arcmin)", default: "12"}
+
+permissions:
+  contents: write
+
+
+jobs:
+  probe:
+    if: ${{ github.event.inputs.mode == 'probe' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas numpy requests astropy astroquery pyvo
+      - run: python -u .github/scripts/independent_truth_field.py probe
+
+  field:
+    if: ${{ github.event.inputs.mode == 'fields' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    strategy:
+      fail-fast: false
+      max-parallel: 6  # spread the archive load (VizieR mirrors share it since 2.36.4) (each job also waits 3-5 s per request)
+      matrix:
+        region:
+          # name, nominal centre (deg), why this region
+          - {name: gc_m10, ra: 254.288, dec: -4.1, r: 6, fixed: true}    # globular M10, b~+23
+          - {name: gc_m22, ra: 279.1, dec: -23.905, r: 6, fixed: true}    # globular M22, b~-8
+          - {name: gc_m55, ra: 294.998, dec: -30.962, r: 6, fixed: true}    # globular M55, b~-23
+          - {name: gc_ngc1851, ra: 78.528, dec: -40.047, r: 6, fixed: true}    # globular NGC 1851, b~-35
+          - {name: gc_ngc2808, ra: 138.013, dec: -64.864, r: 6, fixed: true}    # globular NGC 2808, b~-11
+          - {name: gc_ngc6541, ra: 272.01, dec: -43.715, r: 6, fixed: true}    # globular NGC 6541, b~-11
+          - {name: gc_m53, ra: 198.23, dec: 18.168, r: 6, fixed: true}    # globular M53, b~+80
+          - {name: gc_m68, ra: 189.867, dec: -26.744, r: 6, fixed: true}    # globular M68, b~+36
+          - {name: gc_m79, ra: 81.046, dec: -24.525, r: 6, fixed: true}    # globular M79, b~-29
+          - {name: gc_ngc6362, ra: 262.979, dec: -67.048, r: 6, fixed: true}    # globular NGC 6362, b~-18
+          - {name: gc_m71, ra: 298.444, dec: 18.779, r: 6, fixed: true}    # globular M71, b~-5
+          - {name: gc_m56, ra: 289.148, dec: 30.184, r: 6, fixed: true}    # globular M56, b~+8
+          - {name: oc_ic4665, ra: 266.6, dec: 5.7, r: 12, fixed: true}    # open cluster IC 4665, b~+17
+          - {name: oc_ngc6633, ra: 276.85, dec: 6.57, r: 12, fixed: true}    # open cluster NGC 6633, b~+8
+          - {name: oc_ic2602, ra: 160.6, dec: -64.4, r: 12, fixed: true}    # open cluster IC 2602, b~-5
+          - {name: oc_ngc2547, ra: 122.6, dec: -49.2, r: 12, fixed: true}    # open cluster NGC 2547, b~-9
+          - {name: oc_m48, ra: 123.4, dec: -5.75, r: 12, fixed: true}    # open cluster M48, b~+15
+          - {name: oc_m50, ra: 105.7, dec: -8.3, r: 12, fixed: true}    # open cluster M50, b~-1
+          - {name: oc_ngc2243, ra: 97.4, dec: -31.3, r: 12, fixed: true}    # open cluster NGC 2243, b~-18
+          - {name: oc_cr261, ra: 189.5, dec: -68.4, r: 12, fixed: true}    # open cluster Collinder 261, b~-6
+          - {name: oc_ngc7789, ra: 359.3, dec: 56.7, r: 12, fixed: true}    # open cluster NGC 7789, b~-5
+          - {name: oc_m37, ra: 88.1, dec: 32.55, r: 12, fixed: true}    # open cluster M37, b~+3
+          - {name: oc_ngc6819, ra: 295.3, dec: 40.2, r: 12, fixed: true}    # open cluster NGC 6819, b~+9
+          - {name: oc_ngc2477, ra: 118.0, dec: -38.5, r: 12, fixed: true}    # open cluster NGC 2477, b~-6
+          - {name: sfr_serpens, ra: 277.45, dec: 1.25, r: 12, fixed: true}    # Serpens Main, b~+5
+          - {name: sfr_lupus1, ra: 235.6, dec: -34.6, r: 12, fixed: true}    # Lupus 1, b~+16
+          - {name: sfr_chaii, ra: 195.2, dec: -77.3, r: 12, fixed: true}    # Chamaeleon II, b~-14
+          - {name: sfr_cra, ra: 285.4, dec: -36.95, r: 12, fixed: true}    # Corona Australis, b~-18
+          - {name: sfr_ngc2024, ra: 85.42, dec: -1.9, r: 6, fixed: true}    # Orion B / NGC 2024, b~-16
+          - {name: sfr_ic5146, ra: 328.4, dec: 47.3, r: 12, fixed: true}    # IC 5146, b~-5
+          - {name: sfr_ngc7000, ra: 312.9, dec: 44.3, r: 6, fixed: true}    # North America Nebula, b~-0
+          - {name: sfr_ic1805, ra: 38.2, dec: 61.45, r: 6, fixed: true}    # W4 / IC 1805, b~+1
+          - {name: sfr_rosette, ra: 98.0, dec: 4.95, r: 6, fixed: true}    # Rosette / NGC 2244, b~-2
+          - {name: sfr_ngc6334, ra: 260.2, dec: -35.8, r: 6, fixed: true}    # NGC 6334, b~+1
+          - {name: sfr_ngc3603, ra: 168.8, dec: -61.3, r: 6, fixed: true}    # NGC 3603, b~-1
+          - {name: sfr_b59, ra: 257.8, dec: -27.4, r: 12, fixed: true}    # Pipe Nebula B59, b~+7
+          - {name: sfr_w51, ra: 290.9, dec: 14.1, r: 6, fixed: true}    # W51, b~-1
+          - {name: sb_ngc3628, ra: 170.071, dec: 13.589, r: 12, fixed: true}    # starburst edge-on NGC 3628 (Leo triplet), b~+65
+          - {name: sb_ngc3256, ra: 156.964, dec: -43.904, r: 12, fixed: true}    # starburst merger NGC 3256, b~+12
+          - {name: sb_ngc4945, ra: 196.364, dec: -49.468, r: 12, fixed: true}    # starburst galaxy NGC 4945, b~+13
+          - {name: sb_ngc2146, ra: 94.657, dec: 78.357, r: 12, fixed: true}    # starburst galaxy NGC 2146, b~+25
+          - {name: sb_m51, ra: 202.47, dec: 47.195, r: 12, fixed: true}    # interacting M51, b~+69
+          - {name: lmc_outer_nw, ra: 70.0, dec: -64.5, r: 6, fixed: true}    # LMC outer disc NW, b~-38
+          - {name: lmc_outer_ne, ra: 98.0, dec: -65.5, r: 6, fixed: true}    # LMC outer disc NE, b~-26
+          - {name: lmc_outer_se, ra: 95.0, dec: -73.5, r: 6, fixed: true}    # LMC outer disc SE, b~-28
+          - {name: lmc_outer_sw, ra: 66.5, dec: -71.0, r: 6, fixed: true}    # LMC outer disc SW, b~-37
+          - {name: lmc_outer_s, ra: 80.5, dec: -75.5, r: 6, fixed: true}    # LMC outer disc S, b~-32
+          - {name: smc_outer_s, ra: 1.0, dec: -76.0, r: 6, fixed: true}    # SMC outskirts S, b~-41
+          - {name: mag_bridge_w, ra: 46.0, dec: -71.5, r: 6, fixed: true}    # Magellanic Bridge, north, b~-42
+          - {name: mag_bridge_e, ra: 57.0, dec: -75.5, r: 6, fixed: true}    # Magellanic Bridge, south, b~-37
+          - {name: bsgp_333m36, ra: 332.7, dec: -35.77}    # sgp pool, b~-55
+          - {name: bsgp_329m33, ra: 328.81, dec: -33.04}    # sgp pool, b~-52
+          - {name: bsgp_354m25, ra: 353.67, dec: -24.66}    # sgp pool, b~-73
+          - {name: bsgp_342m34, ra: 341.9, dec: -33.88}    # sgp pool, b~-63
+          - {name: bsgp_040m33, ra: 40.28, dec: -33.49}    # sgp pool, b~-66
+          - {name: bsgp_345m29, ra: 345.42, dec: -29.11}    # sgp pool, b~-66
+          - {name: bsgp_025m24, ra: 25.44, dec: -23.95}    # sgp pool, b~-78
+          - {name: bsgp_012m36, ra: 11.7, dec: -36.23}    # sgp pool, b~-81
+          - {name: bsgp_041m23, ra: 41.2, dec: -22.64}    # sgp pool, b~-64
+          - {name: bsgp_326m30, ra: 326.05, dec: -29.91}    # sgp pool, b~-49
+          - {name: bsgp_355m36, ra: 354.57, dec: -36.06}    # sgp pool, b~-72
+          - {name: bsgp_033m31, ra: 33.47, dec: -31.01}    # sgp pool, b~-72
+          - {name: bsgp_037m25, ra: 37.42, dec: -25.17}    # sgp pool, b~-68
+          - {name: bsgp_039m37, ra: 39.0, dec: -37.47}    # sgp pool, b~-66
+          - {name: bsgp_046m35, ra: 46.4, dec: -35.23}    # sgp pool, b~-60
+          - {name: bsgp_007m35, ra: 7.39, dec: -34.78}    # sgp pool, b~-81
+          - {name: bsgp_337m36, ra: 337.43, dec: -35.89}    # sgp pool, b~-59
+          - {name: bsgp_034m37, ra: 34.26, dec: -37.35}    # sgp pool, b~-69
+          - {name: bsgp_332m28, ra: 332.33, dec: -28.31}    # sgp pool, b~-54
+          - {name: bsgp_333m24, ra: 332.92, dec: -23.96}    # sgp pool, b~-54
+          - {name: bsgp_045m32, ra: 44.75, dec: -31.54}    # sgp pool, b~-62
+          - {name: bsgp_003m33, ra: 3.08, dec: -33.36}    # sgp pool, b~-80
+          - {name: bsgp_343m25, ra: 343.08, dec: -24.9}    # sgp pool, b~-63
+          - {name: bsgp_030m37, ra: 29.53, dec: -37.23}    # sgp pool, b~-73
+          - {name: bsgp_024m31, ra: 24.0, dec: -30.78}    # sgp pool, b~-80
+          - {name: bsgp_357m33, ra: 356.54, dec: -32.94}    # sgp pool, b~-75
+          - {name: bsgp_049m23, ra: 48.86, dec: -22.57}    # sgp pool, b~-57
+          - {name: bsgp_336m32, ra: 335.79, dec: -32.17}    # sgp pool, b~-58
+          - {name: bsgp_350m34, ra: 349.57, dec: -33.81}    # sgp pool, b~-69
+          - {name: bsgp_009m31, ra: 8.67, dec: -30.92}    # sgp pool, b~-85
+          - {name: bngp_225m05, ra: 224.54, dec: -5.14}    # ngp pool, b~+46
+          - {name: bngp_217m05, ra: 216.88, dec: -5.21}    # ngp pool, b~+50
+          - {name: bngp_223p02, ra: 223.49, dec: 1.85}    # ngp pool, b~+51
+          - {name: bngp_207m05, ra: 207.41, dec: -5.01}    # ngp pool, b~+55
+          - {name: bngp_168p03, ra: 168.47, dec: 2.77}    # ngp pool, b~+56
+          - {name: bngp_160m05, ra: 159.62, dec: -5.12}    # ngp pool, b~+44
+          - {name: bngp_148p03, ra: 148.4, dec: 2.74}    # ngp pool, b~+41
+          - {name: bngp_191p03, ra: 191.45, dec: 2.95}    # ngp pool, b~+66
+          - {name: bngp_162p01, ra: 162.18, dec: 1.37}    # ngp pool, b~+51
+          - {name: bngp_184m05, ra: 184.42, dec: -5.19}    # ngp pool, b~+57
+          - {name: bngp_218p03, ra: 218.06, dec: 2.62}    # ngp pool, b~+56
+          - {name: bngp_155p01, ra: 154.52, dec: 1.31}    # ngp pool, b~+45
+          - {name: bngp_172m05, ra: 172.02, dec: -5.15}    # ngp pool, b~+52
+          - {name: bngp_224m02, ra: 224.02, dec: -1.64}    # ngp pool, b~+48
+          - {name: bngp_198m02, ra: 198.1, dec: -1.98}    # ngp pool, b~+60
+          - {name: bs82_304m01, ra: 303.57, dec: -0.88}    # s82 pool, b~-19
+          - {name: bs82_014p00, ra: 13.66, dec: 0.07}    # s82 pool, b~-63
+          - {name: bs82_005m00, ra: 4.88, dec: -0.4}    # s82 pool, b~-62
+          - {name: bs82_341m01, ra: 340.77, dec: -1.0}    # s82 pool, b~-50
+          - {name: bs82_042p01, ra: 41.81, dec: 1.23}    # s82 pool, b~-50
+          - {name: bs82_059m01, ra: 59.21, dec: -0.65}    # s82 pool, b~-38
+          - {name: bs82_034p00, ra: 33.72, dec: 0.09}    # s82 pool, b~-56
+          - {name: bs82_300p01, ra: 300.38, dec: 0.71}    # s82 pool, b~-15
+          - {name: bs82_345p01, ra: 345.24, dec: 0.65}    # s82 pool, b~-52
+          - {name: bsth_298m73, ra: 297.55, dec: -72.91}    # sth pool, b~-30
+          - {name: bsth_095m80, ra: 95.38, dec: -80.36}    # sth pool, b~-28
+          - {name: bsth_302m32, ra: 301.52, dec: -31.86}    # sth pool, b~-29
+          - {name: bsth_303m41, ra: 302.57, dec: -40.52}    # sth pool, b~-32
+          - {name: bsth_182m30, ra: 182.0, dec: -29.5}    # sth pool, b~+32
+          - {name: bsth_038m61, ra: 37.76, dec: -60.92}    # sth pool, b~-52
+          - {name: bsth_338m43, ra: 338.22, dec: -42.67}    # sth pool, b~-58
+          - {name: bsth_356m48, ra: 355.89, dec: -47.83}    # sth pool, b~-65
+          - {name: bsth_078m57, ra: 77.62, dec: -57.42}    # sth pool, b~-36
+          - {name: bsth_189m36, ra: 189.33, dec: -36.17}    # sth pool, b~+27
+          - {name: bsth_056m26, ra: 56.36, dec: -25.61}    # sth pool, b~-51
+          - {name: bsth_184m22, ra: 183.87, dec: -21.58}    # sth pool, b~+41
+          - {name: bsth_198m27, ra: 198.18, dec: -26.92}    # sth pool, b~+36
+          - {name: bsth_039m43, ra: 39.1, dec: -43.49}    # sth pool, b~-63
+          - {name: bsth_300m27, ra: 300.3, dec: -27.07}    # sth pool, b~-26
+          - {name: blam_002p44, ra: 1.73, dec: 44.2}    # lam pool, b~-18
+          - {name: blam_065p03, ra: 64.54, dec: 3.16}    # lam pool, b~-32
+          - {name: blam_082p06, ra: 81.83, dec: 5.86}    # lam pool, b~-16
+          - {name: blam_311p22, ra: 311.42, dec: 21.91}    # lam pool, b~-13
+          - {name: blam_022p35, ra: 21.73, dec: 34.64}    # lam pool, b~-28
+          - {name: blam_128p40, ra: 128.49, dec: 40.1}    # lam pool, b~+36
+          - {name: blam_050p24, ra: 49.66, dec: 24.22}    # lam pool, b~-28
+          - {name: blam_277p53, ra: 277.08, dec: 52.75}    # lam pool, b~+25
+          - {name: blam_037p43, ra: 36.7, dec: 42.91}    # lam pool, b~-17
+          - {name: blam_024p13, ra: 23.52, dec: 13.05}    # lam pool, b~-49
+          - {name: blam_015p13, ra: 14.74, dec: 12.56}    # lam pool, b~-50
+          - {name: blam_138p50, ra: 138.02, dec: 50.35}    # lam pool, b~+43
+          - {name: blam_273p37, ra: 273.5, dec: 36.58}    # lam pool, b~+23
+          - {name: blam_241p10, ra: 241.11, dec: 10.25}    # lam pool, b~+42
+          - {name: blam_280p58, ra: 280.17, dec: 58.01}    # lam pool, b~+24
+          - {name: blam_039p11, ra: 39.11, dec: 11.38}    # lam pool, b~-44
+          - {name: blam_168p55, ra: 167.72, dec: 54.71}    # lam pool, b~+57
+          - {name: blam_334p20, ra: 333.56, dec: 19.8}    # lam pool, b~-30
+          - {name: blam_120p18, ra: 120.11, dec: 18.45}    # lam pool, b~+23
+          - {name: blam_028p21, ra: 28.32, dec: 20.68}    # lam pool, b~-40
+          - {name: blam_335p37, ra: 334.8, dec: 37.18}    # lam pool, b~-16
+          - {name: blam_138p16, ra: 137.51, dec: 16.48}    # lam pool, b~+38
+          - {name: blam_298p52, ra: 297.83, dec: 51.7}    # lam pool, b~+12
+          - {name: blam_008p46, ra: 8.02, dec: 46.18}    # lam pool, b~-17
+          - {name: blam_044p05, ra: 44.21, dec: 4.89}    # lam pool, b~-46
+          - {name: blam_165p42, ra: 165.42, dec: 42.27}    # lam pool, b~+63
+          - {name: blam_246p39, ra: 245.51, dec: 38.68}    # lam pool, b~+45
+          - {name: blam_006p41, ra: 5.62, dec: 41.13}    # lam pool, b~-21
+          - {name: blam_266p15, ra: 265.81, dec: 14.87}    # lam pool, b~+22
+          - {name: blam_344p06, ra: 344.45, dec: 5.91}    # lam pool, b~-47
+          - {name: blam_197p43, ra: 197.19, dec: 43.16}    # lam pool, b~+74
+          - {name: blam_229p38, ra: 229.06, dec: 38.0}    # lam pool, b~+58
+          - {name: blam_329p31, ra: 329.05, dec: 31.26}    # lam pool, b~-18
+          - {name: blam_074m02, ra: 74.11, dec: -1.61}    # lam pool, b~-26
+          - {name: blam_020p41, ra: 19.82, dec: 40.75}    # lam pool, b~-22
+          - {name: blam_144p06, ra: 143.83, dec: 5.68}    # lam pool, b~+39
+          - {name: blam_340p24, ra: 340.0, dec: 24.35}    # lam pool, b~-30
+          - {name: blam_207p33, ra: 207.29, dec: 32.67}    # lam pool, b~+76
+          - {name: blam_353p08, ra: 352.97, dec: 8.14}    # lam pool, b~-50
+          - {name: blam_276p33, ra: 276.26, dec: 33.32}    # lam pool, b~+20
+          - {name: blam_075p03, ra: 75.13, dec: 3.38}    # lam pool, b~-23
+          - {name: blam_249p51, ra: 248.92, dec: 50.87}    # lam pool, b~+42
+          - {name: blam_131p45, ra: 130.89, dec: 45.06}    # lam pool, b~+38
+          - {name: blam_189p34, ra: 188.78, dec: 34.44}    # lam pool, b~+82
+          - {name: blam_288p58, ra: 287.83, dec: 58.12}    # lam pool, b~+20
+          - {name: blam_345m04, ra: 345.34, dec: -3.92}    # lam pool, b~-55
+          - {name: blam_268p58, ra: 267.77, dec: 58.08}    # lam pool, b~+31
+          - {name: blam_253p06, ra: 252.92, dec: 6.27}    # lam pool, b~+29
+          - {name: blam_010p16, ra: 10.17, dec: 15.58}    # lam pool, b~-47
+          - {name: blam_354p11, ra: 354.25, dec: 11.43}    # lam pool, b~-47
+          - {name: blam_208p49, ra: 208.37, dec: 49.12}    # lam pool, b~+65
+          - {name: blam_210p07, ra: 210.3, dec: 7.15}    # lam pool, b~+64
+          - {name: blam_175p56, ra: 174.69, dec: 55.99}    # lam pool, b~+58
+          - {name: blam_323p08, ra: 323.43, dec: 8.32}    # lam pool, b~-30
+          - {name: blam_034p32, ra: 34.4, dec: 32.5}    # lam pool, b~-27
+          - {name: blam_241p22, ra: 240.65, dec: 21.61}    # lam pool, b~+46
+          - {name: blam_003p18, ra: 2.67, dec: 18.47}    # lam pool, b~-43
+          - {name: blam_224p33, ra: 223.74, dec: 33.31}    # lam pool, b~+63
+          - {name: blam_195p15, ra: 195.03, dec: 14.57}    # lam pool, b~+77
+          - {name: blam_148p23, ra: 147.74, dec: 23.44}    # lam pool, b~+49
+          - {name: blam_253p13, ra: 252.56, dec: 12.68}    # lam pool, b~+33
+          - {name: blam_099p40, ra: 98.96, dec: 40.33}    # lam pool, b~+14
+          - {name: blam_221p40, ra: 221.14, dec: 40.17}    # lam pool, b~+63
+          - {name: blam_213p20, ra: 213.19, dec: 19.65}    # lam pool, b~+70
+          - {name: blam_221p23, ra: 221.01, dec: 22.75}    # lam pool, b~+64
+          - {name: blam_008p05, ra: 8.13, dec: 5.42}    # lam pool, b~-57
+          - {name: blam_252p59, ra: 251.75, dec: 59.13}    # lam pool, b~+39
+          - {name: blam_025p04, ra: 24.84, dec: 4.2}    # lam pool, b~-57
+          - {name: blam_090p56, ra: 89.71, dec: 56.0}    # lam pool, b~+15
+          - {name: blam_064p18, ra: 63.54, dec: 17.84}    # lam pool, b~-23
+          - {name: blam_326p28, ra: 325.96, dec: 27.83}    # lam pool, b~-19
+          - {name: blam_263p09, ra: 262.56, dec: 8.92}    # lam pool, b~+22
+          - {name: blam_003p23, ra: 2.57, dec: 23.37}    # lam pool, b~-39
+          - {name: blam_252p19, ra: 252.19, dec: 19.26}    # lam pool, b~+35
+          - {name: blam_294p57, ra: 294.37, dec: 57.46}    # lam pool, b~+17
+          - {name: blam_170p51, ra: 169.79, dec: 51.38}    # lam pool, b~+60
+          - {name: blam_270p11, ra: 269.96, dec: 10.76}    # lam pool, b~+16
+          - {name: blam_158p08, ra: 158.2, dec: 8.23}    # lam pool, b~+52
+          - {name: blam_132m03, ra: 131.63, dec: -3.45}    # lam pool, b~+24
+          - {name: blam_057p16, ra: 57.26, dec: 16.38}    # lam pool, b~-29
+          - {name: blam_258p56, ra: 257.87, dec: 56.44}    # lam pool, b~+36
+    env:
+      NAME: ${{ matrix.region.name }}
+      RA0: ${{ matrix.region.ra }}
+      DEC0: ${{ matrix.region.dec }}
+      # per-region radius (6' in crowded clusters / Magellanic Clouds) and fixed centre (2026-10-24)
+      R: ${{ matrix.region.r || github.event.inputs.radius || '12' }}
+      FIXED: ${{ matrix.region.fixed || false }}
+    steps:
+      - id: pick
+        run: |
+          only="${{ github.event.inputs.only }}"
+          if [ -z "$only" ] || echo ",$only," | grep -q ",$NAME,"; then echo "run=1" >> "$GITHUB_OUTPUT"; fi
+      - uses: actions/checkout@v4
+        if: steps.pick.outputs.run
+      - uses: actions/setup-python@v5
+        if: steps.pick.outputs.run
+        with: {python-version: "3.11"}
+      - if: steps.pick.outputs.run
+        run: pip install pandas numpy scipy requests astropy astroquery pyvo
+      - name: Independent truth within 40'
+        if: steps.pick.outputs.run
+        run: python -u .github/scripts/independent_truth_field.py truth $RA0 $DEC0 40 /tmp/truth
+      - name: Field centre with the most truth objects
+        if: steps.pick.outputs.run
+        run: |
+          read RA DEC N < <(python -u .github/scripts/independent_truth_field.py centre /tmp/truth $RA0 $DEC0 40 $R | tail -1)
+          if [ "$FIXED" = "true" ]; then RA=$RA0; DEC=$DEC0; echo "fixed centre (cluster / star-forming region / galaxy)"; fi
+          echo "centre $RA $DEC (densest truth cone holds $N truth positions)"
+          echo "RA=$RA" >> "$GITHUB_ENV"; echo "DEC=$DEC" >> "$GITHUB_ENV"
+      - name: Pipeline
+        if: steps.pick.outputs.run
+        run: python -u v2/pipeline.py --ra $RA --dec $DEC --radius $R --work /tmp/field
+      - name: Blind run (no spectroscopic or literature catalogues)
+        if: steps.pick.outputs.run
+        run: |
+          raw=$(ls -d /tmp/field/raw/*/ | head -1)
+          mkdir -p /tmp/blindraw
+          for f in "$raw"*.csv; do
+            case "$(basename "$f")" in
+              lamost_spectroscopy_*|sdss_spectroscopy_*|desi_spectroscopy_*|desi_fastspec_*|simbad_*|ned_*|bzcat_*|pn_spectroscopy_*|hash_pn_*|asas_sn_supernova_*|asiago_supernova_*|agb_suh2021_*|atnf_pulsar_*|galaxy_clusters_*) echo "blind: drop $(basename "$f")";;
+              *) cp "$f" /tmp/blindraw/;;
+            esac
+          done
+          python -u v2/pipeline.py --raw-dir /tmp/blindraw --ra $RA --dec $DEC --radius $R --work /tmp/blind
+      - name: Commit compact products
+        # raw products live on the validation-data branch (233 MB for 100 regions), never on main
+        if: steps.pick.outputs.run && github.ref_name != 'main'
+        run: |
+          out=v2/benchmark/independent_fields_b/$NAME
+          rm -rf "$out"; mkdir -p "$out/truth"
+          cp /tmp/truth/* "$out/truth/"
+          python -u .github/scripts/independent_truth_field.py compact /tmp/field $RA $DEC $R "$out"
+          python -u .github/scripts/independent_truth_field.py compact /tmp/blind $RA $DEC $R "$out" objects_blind
+          # QSO-separation options replayed on the same blind evidence (2.38.0 comparison)
+          python -u v2/benchmark/compare_qso_options.py field /tmp/blind "$out/qso_options_blind.csv.gz" || echo "qso options replay failed"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$out"
+          git commit -m "Independent-truth field $NAME ($RA, $DEC, r=$R')" || exit 0
+          bash .github/scripts/push_with_retry.sh "${{ github.ref_name }}"
+      - uses: actions/upload-artifact@v4
+        if: ${{ always() && steps.pick.outputs.run }}
+        with:
+          name: field-${{ matrix.region.name }}
+          path: /tmp/field/*.csv
+          retention-days: 7
+          if-no-files-found: ignore
