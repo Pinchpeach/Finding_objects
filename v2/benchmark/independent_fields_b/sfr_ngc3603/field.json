@@ -1,0 +1,46 @@
+{
+ "ra": 168.8,
+ "dec": -61.3,
+ "radius_arcmin": 6.0,
+ "n_objects": 9535,
+ "seconds": {
+  "collect": 203.0,
+  "1_associate": 4.7,
+  "2_integrate": 4.4,
+  "3_features": 6.6,
+  "4_evidence": 4.6,
+  "5_coarse": 8.5,
+  "6_prepare": 7.1,
+  "7_classify": 7.3
+ },
+ "catalog_rows": {
+  "Gaia DR3": 8432,
+  "2MASS PSC": 3063,
+  "Chandra CSC 2.0": 1547,
+  "AllWISE": 450,
+  "Gaia DR3 variability SOS": 35,
+  "eROSITA eRASS1": 5
+ },
+ "seeing": {
+  "g": NaN,
+  "r": NaN,
+  "z": NaN,
+  "n_psf": 0,
+  "source": "LS DR10 psfsize",
+  "ps1": {
+   "error": "EmptyDataError: No columns to parse from file",
+   "fwhm_columns": [
+    "gpsfMajorFWHM",
+    "gpsfMinorFWHM",
+    "rpsfMajorFWHM",
+    "rpsfMinorFWHM",
+    "ipsfMajorFWHM",
+    "ipsfMinorFWHM",
+    "zpsfMajorFWHM",
+    "zpsfMinorFWHM",
+    "ypsfMajorFWHM",
+    "ypsfMinorFWHM"
+   ]
+  }
+ }
+}
