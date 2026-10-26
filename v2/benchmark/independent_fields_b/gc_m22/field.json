@@ -1,0 +1,42 @@
+{
+ "ra": 279.1,
+ "dec": -23.905,
+ "radius_arcmin": 6.0,
+ "n_objects": 46694,
+ "seconds": {
+  "collect": 206.1,
+  "1_associate": 123.3,
+  "2_integrate": 41.8,
+  "3_features": 58.7,
+  "4_evidence": 46.5,
+  "5_coarse": 70.2,
+  "6_prepare": 62.5,
+  "7_classify": 66.0
+ },
+ "catalog_rows": {
+  "Gaia DR3": 37134,
+  "Pan-STARRS1 DR2 MeanObject": 36604,
+  "NED": 3768,
+  "2MASS PSC": 3366,
+  "AllWISE": 875,
+  "Gaia DR3 variability SOS": 29,
+  "Chandra CSC 2.0": 27,
+  "XMM 4XMM-DR13": 24,
+  "VLASS": 2,
+  "NVSS": 1
+ },
+ "seeing": {
+  "g": NaN,
+  "r": NaN,
+  "z": NaN,
+  "n_psf": 0,
+  "source": "LS DR10 psfsize",
+  "ps1": {
+   "source": "PS1 stack psfMajor/MinorFWHM",
+   "n": 24061,
+   "g": 1.32,
+   "r": 1.23,
+   "i": 1.21
+  }
+ }
+}
