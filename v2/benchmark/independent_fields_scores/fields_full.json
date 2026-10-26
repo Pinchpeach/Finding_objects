@@ -111,19 +111,19 @@
   "n": 189,
   "ours": {
    "n": 189,
-   "acc": 100.0,
+   "acc": 97.9,
    "acc_cls": 100.0,
-   "unknown": 0.0,
-   "bal": 100.0,
+   "unknown": 2.1,
+   "bal": 97.9,
    "recall": {
     "STAR": [
-     100.0,
+     97.9,
      189
     ]
    }
   },
   "high": {
-   "n": 188,
+   "n": 184,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": null,
@@ -324,24 +324,24 @@
   "n": 42,
   "ours": {
    "n": 42,
-   "acc": 90.5,
-   "acc_cls": 90.5,
+   "acc": 85.7,
+   "acc_cls": 85.7,
    "unknown": 0.0,
-   "bal": 66.7,
+   "bal": 50.0,
    "recall": {
     "STAR": [
      100.0,
      36
     ],
     "GALAXY": [
-     33.3,
+     0.0,
      6
     ]
    }
   },
   "high": {
    "n": 41,
-   "acc": 90.24
+   "acc": 87.8
   },
   "Gaia DR3 DSC-Combmod": {
    "n": 40,
@@ -362,17 +362,17 @@
   },
   "Gaia DR3 DSC-Combmod | ours same": {
    "n": 40,
-   "acc": 92.5,
-   "acc_cls": 92.5,
+   "acc": 90.0,
+   "acc_cls": 90.0,
    "unknown": 0.0,
-   "bal": 62.5,
+   "bal": 50.0,
    "recall": {
     "STAR": [
      100.0,
      36
     ],
     "GALAXY": [
-     25.0,
+     0.0,
      4
     ]
    }
@@ -396,17 +396,17 @@
   },
   "LS-GBM (LS photometry only) | ours same": {
    "n": 40,
-   "acc": 90.0,
-   "acc_cls": 90.0,
+   "acc": 87.5,
+   "acc_cls": 87.5,
    "unknown": 0.0,
-   "bal": 60.0,
+   "bal": 50.0,
    "recall": {
     "STAR": [
      100.0,
      35
     ],
     "GALAXY": [
-     20.0,
+     0.0,
      5
     ]
    }
@@ -526,19 +526,19 @@
   "n": 105,
   "ours": {
    "n": 105,
-   "acc": 100.0,
+   "acc": 99.0,
    "acc_cls": 100.0,
-   "unknown": 0.0,
-   "bal": 100.0,
+   "unknown": 1.0,
+   "bal": 99.0,
    "recall": {
     "STAR": [
-     100.0,
+     99.0,
      105
     ]
    }
   },
   "high": {
-   "n": 105,
+   "n": 104,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
@@ -1054,19 +1054,19 @@
   "field": "kep_291p44",
   "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
-  "ra": 291.23,
-  "dec": 44.89806,
-  "n": 171,
+  "ra": 291.24778,
+  "dec": 44.87972,
+  "n": 173,
   "ours": {
-   "n": 171,
-   "acc": 100.0,
+   "n": 173,
+   "acc": 98.8,
    "acc_cls": 100.0,
-   "unknown": 0.0,
-   "bal": 100.0,
+   "unknown": 1.2,
+   "bal": 99.4,
    "recall": {
     "STAR": [
-     100.0,
-     170
+     98.8,
+     172
     ],
     "GALAXY": [
      100.0,
@@ -1123,9 +1123,9 @@
   "which": "full",
   "ra": 0.23278,
   "dec": 0.34889,
-  "n": 39,
+  "n": 44,
   "ours": {
-   "n": 39,
+   "n": 44,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -1133,7 +1133,7 @@
    "recall": {
     "STAR": [
      100.0,
-     38
+     43
     ],
     "GALAXY": [
      100.0,
@@ -1142,11 +1142,11 @@
    }
   },
   "high": {
-   "n": 39,
+   "n": 43,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 37,
+   "n": 41,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -1154,7 +1154,7 @@
    "recall": {
     "STAR": [
      100.0,
-     36
+     40
     ],
     "GALAXY": [
      100.0,
@@ -1163,7 +1163,7 @@
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 37,
+   "n": 41,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -1171,7 +1171,7 @@
    "recall": {
     "STAR": [
      100.0,
-     36
+     40
     ],
     "GALAXY": [
      100.0,
@@ -1180,7 +1180,7 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 37,
+   "n": 41,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -1188,7 +1188,7 @@
    "recall": {
     "STAR": [
      100.0,
-     36
+     40
     ],
     "GALAXY": [
      100.0,
@@ -1197,7 +1197,7 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 37,
+   "n": 41,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -1205,7 +1205,7 @@
    "recall": {
     "STAR": [
      100.0,
-     36
+     40
     ],
     "GALAXY": [
      100.0,
@@ -1214,7 +1214,7 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 36,
+   "n": 40,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -1222,7 +1222,7 @@
    "recall": {
     "STAR": [
      100.0,
-     35
+     39
     ],
     "GALAXY": [
      100.0,
@@ -1231,7 +1231,7 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 36,
+   "n": 40,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -1239,7 +1239,7 @@
    "recall": {
     "STAR": [
      100.0,
-     35
+     39
     ],
     "GALAXY": [
      100.0,
@@ -1585,19 +1585,19 @@
   "n": 217,
   "ours": {
    "n": 217,
-   "acc": 99.5,
+   "acc": 100.0,
    "acc_cls": 100.0,
-   "unknown": 0.5,
-   "bal": 99.5,
+   "unknown": 0.0,
+   "bal": 100.0,
    "recall": {
     "STAR": [
-     99.5,
+     100.0,
      217
     ]
    }
   },
   "high": {
-   "n": 216,
+   "n": 217,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
@@ -1743,19 +1743,19 @@
   "n": 121,
   "ours": {
    "n": 121,
-   "acc": 97.5,
+   "acc": 98.3,
    "acc_cls": 100.0,
-   "unknown": 2.5,
-   "bal": 97.5,
+   "unknown": 1.7,
+   "bal": 98.3,
    "recall": {
     "STAR": [
-     97.5,
+     98.3,
      121
     ]
    }
   },
   "high": {
-   "n": 117,
+   "n": 118,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
@@ -1993,9 +1993,9 @@
   "which": "full",
   "ra": 48.72417,
   "dec": 49.98556,
-  "n": 112,
+  "n": 113,
   "ours": {
-   "n": 112,
+   "n": 113,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -2003,16 +2003,16 @@
    "recall": {
     "STAR": [
      100.0,
-     112
+     113
     ]
    }
   },
   "high": {
-   "n": 112,
+   "n": 113,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 108,
+   "n": 109,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -2020,12 +2020,12 @@
    "recall": {
     "STAR": [
      100.0,
-     108
+     109
     ]
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 108,
+   "n": 109,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -2033,7 +2033,7 @@
    "recall": {
     "STAR": [
      100.0,
-     108
+     109
     ]
    }
   },
@@ -2338,11 +2338,11 @@
    }
   },
   "high": {
-   "n": 65,
+   "n": 64,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 62,
+   "n": 61,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -2350,12 +2350,12 @@
    "recall": {
     "STAR": [
      100.0,
-     62
+     61
     ]
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 62,
+   "n": 61,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -2363,7 +2363,7 @@
    "recall": {
     "STAR": [
      100.0,
-     62
+     61
     ]
    }
   },
@@ -3098,9 +3098,9 @@
   "which": "full",
   "ra": 126.19472,
   "dec": 0.15639,
-  "n": 51,
+  "n": 61,
   "ours": {
-   "n": 51,
+   "n": 61,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -3108,7 +3108,7 @@
    "recall": {
     "STAR": [
      100.0,
-     50
+     60
     ],
     "GALAXY": [
      100.0,
@@ -3117,19 +3117,19 @@
    }
   },
   "high": {
-   "n": 51,
+   "n": 61,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 51,
-   "acc": 98.0,
-   "acc_cls": 98.0,
+   "n": 61,
+   "acc": 98.4,
+   "acc_cls": 98.4,
    "unknown": 0.0,
-   "bal": 99.0,
+   "bal": 99.2,
    "recall": {
     "STAR": [
-     98.0,
-     50
+     98.3,
+     60
     ],
     "GALAXY": [
      100.0,
@@ -3138,7 +3138,7 @@
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 51,
+   "n": 61,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -3146,7 +3146,7 @@
    "recall": {
     "STAR": [
      100.0,
-     50
+     60
     ],
     "GALAXY": [
      100.0,
@@ -3155,7 +3155,7 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 51,
+   "n": 61,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -3163,7 +3163,7 @@
    "recall": {
     "STAR": [
      100.0,
-     50
+     60
     ],
     "GALAXY": [
      100.0,
@@ -3172,7 +3172,7 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 51,
+   "n": 61,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -3180,7 +3180,7 @@
    "recall": {
     "STAR": [
      100.0,
-     50
+     60
     ],
     "GALAXY": [
      100.0,
@@ -3189,7 +3189,7 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 48,
+   "n": 58,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -3197,7 +3197,7 @@
    "recall": {
     "STAR": [
      100.0,
-     47
+     57
     ],
     "GALAXY": [
      100.0,
@@ -3206,7 +3206,7 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 48,
+   "n": 58,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -3214,7 +3214,7 @@
    "recall": {
     "STAR": [
      100.0,
-     47
+     57
     ],
     "GALAXY": [
      100.0,
@@ -3957,10 +3957,119 @@
   "field": "lam_160p40",
   "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
-  "ra": 159.4675,
-  "dec": 39.8675,
-  "n": 51,
+  "ra": 160.55167,
+  "dec": 40.17278,
+  "n": 59,
   "ours": {
+   "n": 59,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     49
+    ],
+    "GALAXY": [
+     100.0,
+     9
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "high": {
+   "n": 59,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
+   "n": 54,
+   "acc": 96.3,
+   "acc_cls": 96.3,
+   "unknown": 0.0,
+   "bal": 90.5,
+   "recall": {
+    "STAR": [
+     100.0,
+     46
+    ],
+    "GALAXY": [
+     71.4,
+     7
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 54,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     46
+    ],
+    "GALAXY": [
+     100.0,
+     7
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 55,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     45
+    ],
+    "GALAXY": [
+     100.0,
+     9
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 55,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     45
+    ],
+    "GALAXY": [
+     100.0,
+     9
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
    "n": 51,
    "acc": 100.0,
    "acc_cls": 100.0,
@@ -3969,105 +4078,20 @@
    "recall": {
     "STAR": [
      100.0,
-     48
+     41
     ],
     "GALAXY": [
      100.0,
-     3
-    ]
-   }
-  },
-  "high": {
-   "n": 50,
-   "acc": 100.0
-  },
-  "Gaia DR3 DSC-Combmod": {
-   "n": 49,
-   "acc": 100.0,
-   "acc_cls": 100.0,
-   "unknown": 0.0,
-   "bal": 100.0,
-   "recall": {
-    "STAR": [
-     100.0,
-     47
+     9
     ],
-    "GALAXY": [
+    "QSO": [
      100.0,
-     2
-    ]
-   }
-  },
-  "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 49,
-   "acc": 100.0,
-   "acc_cls": 100.0,
-   "unknown": 0.0,
-   "bal": 100.0,
-   "recall": {
-    "STAR": [
-     100.0,
-     47
-    ],
-    "GALAXY": [
-     100.0,
-     2
-    ]
-   }
-  },
-  "LS-GBM (LS photometry only)": {
-   "n": 50,
-   "acc": 100.0,
-   "acc_cls": 100.0,
-   "unknown": 0.0,
-   "bal": 100.0,
-   "recall": {
-    "STAR": [
-     100.0,
-     47
-    ],
-    "GALAXY": [
-     100.0,
-     3
-    ]
-   }
-  },
-  "LS-GBM (LS photometry only) | ours same": {
-   "n": 50,
-   "acc": 100.0,
-   "acc_cls": 100.0,
-   "unknown": 0.0,
-   "bal": 100.0,
-   "recall": {
-    "STAR": [
-     100.0,
-     47
-    ],
-    "GALAXY": [
-     100.0,
-     3
-    ]
-   }
-  },
-  "LS morphology + WISE W1-W2>=0.8": {
-   "n": 50,
-   "acc": 100.0,
-   "acc_cls": 100.0,
-   "unknown": 0.0,
-   "bal": 100.0,
-   "recall": {
-    "STAR": [
-     100.0,
-     47
-    ],
-    "GALAXY": [
-     100.0,
-     3
+     1
     ]
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 50,
+   "n": 51,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -4075,11 +4099,15 @@
    "recall": {
     "STAR": [
      100.0,
-     47
+     41
     ],
     "GALAXY": [
      100.0,
-     3
+     9
+    ],
+    "QSO": [
+     100.0,
+     1
     ]
    }
   }
@@ -4193,9 +4221,9 @@
   "which": "full",
   "ra": 162.00333,
   "dec": 9.55444,
-  "n": 56,
+  "n": 59,
   "ours": {
-   "n": 55,
+   "n": 58,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -4203,7 +4231,7 @@
    "recall": {
     "STAR": [
      100.0,
-     50
+     53
     ],
     "GALAXY": [
      100.0,
@@ -4212,19 +4240,19 @@
    }
   },
   "high": {
-   "n": 56,
-   "acc": 98.21
+   "n": 59,
+   "acc": 98.31
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 53,
-   "acc": 98.1,
-   "acc_cls": 98.1,
+   "n": 56,
+   "acc": 98.2,
+   "acc_cls": 98.2,
    "unknown": 0.0,
    "bal": 83.3,
    "recall": {
     "STAR": [
      100.0,
-     50
+     53
     ],
     "GALAXY": [
      66.7,
@@ -4233,7 +4261,7 @@
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 53,
+   "n": 56,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -4241,7 +4269,7 @@
    "recall": {
     "STAR": [
      100.0,
-     50
+     53
     ],
     "GALAXY": [
      100.0,
@@ -4250,7 +4278,7 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 55,
+   "n": 58,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -4258,7 +4286,7 @@
    "recall": {
     "STAR": [
      100.0,
-     50
+     53
     ],
     "GALAXY": [
      100.0,
@@ -4267,7 +4295,7 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 54,
+   "n": 57,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -4275,7 +4303,7 @@
    "recall": {
     "STAR": [
      100.0,
-     50
+     53
     ],
     "GALAXY": [
      100.0,
@@ -4284,7 +4312,7 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 54,
+   "n": 57,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -4292,7 +4320,7 @@
    "recall": {
     "STAR": [
      100.0,
-     49
+     52
     ],
     "GALAXY": [
      100.0,
@@ -4301,7 +4329,7 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 53,
+   "n": 56,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -4309,7 +4337,7 @@
    "recall": {
     "STAR": [
      100.0,
-     49
+     52
     ],
     "GALAXY": [
      100.0,
@@ -4453,11 +4481,11 @@
   "field": "lam_180p20",
   "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
-  "ra": 180.10472,
-  "dec": 19.62972,
-  "n": 14,
+  "ra": 179.53278,
+  "dec": 19.91306,
+  "n": 19,
   "ours": {
-   "n": 14,
+   "n": 19,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -4465,16 +4493,16 @@
    "recall": {
     "STAR": [
      100.0,
-     14
+     19
     ]
    }
   },
   "high": {
-   "n": 14,
+   "n": 19,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 14,
+   "n": 18,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -4482,12 +4510,12 @@
    "recall": {
     "STAR": [
      100.0,
-     14
+     18
     ]
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 14,
+   "n": 18,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -4495,12 +4523,12 @@
    "recall": {
     "STAR": [
      100.0,
-     14
+     18
     ]
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 14,
+   "n": 19,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -4508,12 +4536,12 @@
    "recall": {
     "STAR": [
      100.0,
-     14
+     19
     ]
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 14,
+   "n": 19,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -4521,12 +4549,12 @@
    "recall": {
     "STAR": [
      100.0,
-     14
+     19
     ]
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 14,
+   "n": 17,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -4534,12 +4562,12 @@
    "recall": {
     "STAR": [
      100.0,
-     14
+     17
     ]
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 14,
+   "n": 17,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -4547,7 +4575,7 @@
    "recall": {
     "STAR": [
      100.0,
-     14
+     17
     ]
    }
   }
@@ -4684,7 +4712,7 @@
    "acc": 98.21
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 55,
+   "n": 56,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -4692,7 +4720,7 @@
    "recall": {
     "STAR": [
      100.0,
-     51
+     52
     ],
     "GALAXY": [
      100.0,
@@ -4701,7 +4729,7 @@
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 55,
+   "n": 56,
    "acc": 98.2,
    "acc_cls": 98.2,
    "unknown": 0.0,
@@ -4709,7 +4737,7 @@
    "recall": {
     "STAR": [
      100.0,
-     51
+     52
     ],
     "GALAXY": [
      75.0,
@@ -4718,7 +4746,7 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 55,
+   "n": 56,
    "acc": 98.2,
    "acc_cls": 98.2,
    "unknown": 0.0,
@@ -4726,7 +4754,7 @@
    "recall": {
     "STAR": [
      100.0,
-     51
+     52
     ],
     "GALAXY": [
      75.0,
@@ -4735,7 +4763,7 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 55,
+   "n": 56,
    "acc": 98.2,
    "acc_cls": 98.2,
    "unknown": 0.0,
@@ -4743,7 +4771,7 @@
    "recall": {
     "STAR": [
      100.0,
-     51
+     52
     ],
     "GALAXY": [
      75.0,
@@ -4792,8 +4820,29 @@
   "which": "full",
   "ra": 197.69528,
   "dec": 30.37583,
-  "n": 69,
+  "n": 73,
   "ours": {
+   "n": 73,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     72
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "high": {
+   "n": 73,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
    "n": 69,
    "acc": 100.0,
    "acc_cls": 100.0,
@@ -4810,29 +4859,8 @@
     ]
    }
   },
-  "high": {
-   "n": 69,
-   "acc": 100.0
-  },
-  "Gaia DR3 DSC-Combmod": {
-   "n": 67,
-   "acc": 100.0,
-   "acc_cls": 100.0,
-   "unknown": 0.0,
-   "bal": 100.0,
-   "recall": {
-    "STAR": [
-     100.0,
-     66
-    ],
-    "GALAXY": [
-     100.0,
-     1
-    ]
-   }
-  },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 67,
+   "n": 69,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -4840,7 +4868,7 @@
    "recall": {
     "STAR": [
      100.0,
-     66
+     68
     ],
     "GALAXY": [
      100.0,
@@ -4849,7 +4877,7 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 67,
+   "n": 69,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -4857,7 +4885,7 @@
    "recall": {
     "STAR": [
      100.0,
-     66
+     68
     ],
     "GALAXY": [
      100.0,
@@ -4866,7 +4894,7 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 67,
+   "n": 69,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -4874,7 +4902,7 @@
    "recall": {
     "STAR": [
      100.0,
-     66
+     68
     ],
     "GALAXY": [
      100.0,
@@ -4883,7 +4911,7 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 63,
+   "n": 65,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -4891,7 +4919,7 @@
    "recall": {
     "STAR": [
      100.0,
-     62
+     64
     ],
     "GALAXY": [
      100.0,
@@ -4900,7 +4928,7 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 63,
+   "n": 65,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -4908,7 +4936,7 @@
    "recall": {
     "STAR": [
      100.0,
-     62
+     64
     ],
     "GALAXY": [
      100.0,
@@ -4923,9 +4951,9 @@
   "which": "full",
   "ra": 200.35056,
   "dec": 25.32167,
-  "n": 28,
+  "n": 30,
   "ours": {
-   "n": 28,
+   "n": 30,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -4933,7 +4961,7 @@
    "recall": {
     "STAR": [
      100.0,
-     25
+     27
     ],
     "GALAXY": [
      100.0,
@@ -4946,11 +4974,11 @@
    }
   },
   "high": {
-   "n": 28,
+   "n": 30,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 26,
+   "n": 28,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -4958,7 +4986,7 @@
    "recall": {
     "STAR": [
      100.0,
-     24
+     26
     ],
     "GALAXY": [
      100.0,
@@ -4971,7 +4999,7 @@
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 26,
+   "n": 28,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -4979,7 +5007,7 @@
    "recall": {
     "STAR": [
      100.0,
-     24
+     26
     ],
     "GALAXY": [
      100.0,
@@ -4992,7 +5020,7 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 27,
+   "n": 29,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -5000,7 +5028,7 @@
    "recall": {
     "STAR": [
      100.0,
-     24
+     26
     ],
     "GALAXY": [
      100.0,
@@ -5013,7 +5041,7 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 27,
+   "n": 29,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -5021,7 +5049,7 @@
    "recall": {
     "STAR": [
      100.0,
-     24
+     26
     ],
     "GALAXY": [
      100.0,
@@ -5034,7 +5062,7 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 24,
+   "n": 26,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -5042,7 +5070,7 @@
    "recall": {
     "STAR": [
      100.0,
-     21
+     23
     ],
     "GALAXY": [
      100.0,
@@ -5055,7 +5083,7 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 24,
+   "n": 26,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -5063,7 +5091,7 @@
    "recall": {
     "STAR": [
      100.0,
-     21
+     23
     ],
     "GALAXY": [
      100.0,
@@ -5423,8 +5451,25 @@
   "which": "full",
   "ra": 239.95556,
   "dec": 29.60361,
-  "n": 59,
+  "n": 60,
   "ours": {
+   "n": 60,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     60
+    ]
+   }
+  },
+  "high": {
+   "n": 60,
+   "acc": 100.0
+  },
+  "Gaia DR3 DSC-Combmod": {
    "n": 59,
    "acc": 100.0,
    "acc_cls": 100.0,
@@ -5437,25 +5482,8 @@
     ]
    }
   },
-  "high": {
-   "n": 59,
-   "acc": 100.0
-  },
-  "Gaia DR3 DSC-Combmod": {
-   "n": 58,
-   "acc": 100.0,
-   "acc_cls": 100.0,
-   "unknown": 0.0,
-   "bal": 100.0,
-   "recall": {
-    "STAR": [
-     100.0,
-     58
-    ]
-   }
-  },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 58,
+   "n": 59,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -5463,12 +5491,12 @@
    "recall": {
     "STAR": [
      100.0,
-     58
+     59
     ]
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 58,
+   "n": 59,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -5476,12 +5504,12 @@
    "recall": {
     "STAR": [
      100.0,
-     58
+     59
     ]
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 58,
+   "n": 59,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -5489,7 +5517,7 @@
    "recall": {
     "STAR": [
      100.0,
-     58
+     59
     ]
    }
   },
@@ -5629,9 +5657,9 @@
   "which": "full",
   "ra": 252.47806,
   "dec": 39.77306,
-  "n": 60,
+  "n": 62,
   "ours": {
-   "n": 60,
+   "n": 62,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -5639,16 +5667,16 @@
    "recall": {
     "STAR": [
      100.0,
-     60
+     62
     ]
    }
   },
   "high": {
-   "n": 60,
+   "n": 62,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 56,
+   "n": 58,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -5656,12 +5684,12 @@
    "recall": {
     "STAR": [
      100.0,
-     56
+     58
     ]
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 56,
+   "n": 58,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -5669,12 +5697,12 @@
    "recall": {
     "STAR": [
      100.0,
-     56
+     58
     ]
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 55,
+   "n": 57,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -5682,11 +5710,24 @@
    "recall": {
     "STAR": [
      100.0,
-     55
+     57
     ]
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
+   "n": 57,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     57
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
    "n": 55,
    "acc": 100.0,
    "acc_cls": 100.0,
@@ -5699,21 +5740,8 @@
     ]
    }
   },
-  "LS morphology + WISE W1-W2>=0.8": {
-   "n": 53,
-   "acc": 100.0,
-   "acc_cls": 100.0,
-   "unknown": 0.0,
-   "bal": 100.0,
-   "recall": {
-    "STAR": [
-     100.0,
-     53
-    ]
-   }
-  },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 53,
+   "n": 55,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -5721,7 +5749,7 @@
    "recall": {
     "STAR": [
      100.0,
-     53
+     55
     ]
    }
   }
@@ -5735,19 +5763,19 @@
   "n": 18,
   "ours": {
    "n": 18,
-   "acc": 94.4,
+   "acc": 100.0,
    "acc_cls": 100.0,
-   "unknown": 5.6,
-   "bal": 94.4,
+   "unknown": 0.0,
+   "bal": 100.0,
    "recall": {
     "STAR": [
-     94.4,
+     100.0,
      18
     ]
    }
   },
   "high": {
-   "n": 17,
+   "n": 18,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
@@ -5835,9 +5863,9 @@
   "which": "full",
   "ra": 260.94111,
   "dec": 29.54,
-  "n": 14,
+  "n": 16,
   "ours": {
-   "n": 14,
+   "n": 16,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -5845,16 +5873,16 @@
    "recall": {
     "STAR": [
      100.0,
-     14
+     16
     ]
    }
   },
   "high": {
-   "n": 14,
+   "n": 16,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 14,
+   "n": 16,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -5862,12 +5890,12 @@
    "recall": {
     "STAR": [
      100.0,
-     14
+     16
     ]
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 14,
+   "n": 16,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -5875,12 +5903,12 @@
    "recall": {
     "STAR": [
      100.0,
-     14
+     16
     ]
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 14,
+   "n": 16,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -5888,12 +5916,12 @@
    "recall": {
     "STAR": [
      100.0,
-     14
+     16
     ]
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 14,
+   "n": 16,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -5901,12 +5929,12 @@
    "recall": {
     "STAR": [
      100.0,
-     14
+     16
     ]
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 11,
+   "n": 12,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -5914,12 +5942,12 @@
    "recall": {
     "STAR": [
      100.0,
-     11
+     12
     ]
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 11,
+   "n": 12,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -5927,7 +5955,7 @@
    "recall": {
     "STAR": [
      100.0,
-     11
+     12
     ]
    }
   }
@@ -6178,17 +6206,17 @@
   "n": 73,
   "ours": {
    "n": 73,
-   "acc": 97.3,
-   "acc_cls": 97.3,
+   "acc": 95.9,
+   "acc_cls": 95.9,
    "unknown": 0.0,
-   "bal": 98.0,
+   "bal": 97.1,
    "recall": {
     "STAR": [
      100.0,
      37
     ],
     "GALAXY": [
-     94.1,
+     91.2,
      34
     ],
     "QSO": [
@@ -6198,7 +6226,7 @@
    }
   },
   "high": {
-   "n": 59,
+   "n": 60,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
@@ -6236,7 +6264,7 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 72,
+   "n": 73,
    "acc": 98.6,
    "acc_cls": 98.6,
    "unknown": 0.0,
@@ -6247,8 +6275,8 @@
      37
     ],
     "GALAXY": [
-     97.0,
-     33
+     97.1,
+     34
     ],
     "QSO": [
      100.0,
@@ -6257,19 +6285,19 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 72,
-   "acc": 97.2,
-   "acc_cls": 97.2,
+   "n": 73,
+   "acc": 95.9,
+   "acc_cls": 95.9,
    "unknown": 0.0,
-   "bal": 98.0,
+   "bal": 97.1,
    "recall": {
     "STAR": [
      100.0,
      37
     ],
     "GALAXY": [
-     93.9,
-     33
+     91.2,
+     34
     ],
     "QSO": [
      100.0,
@@ -6278,7 +6306,7 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 69,
+   "n": 70,
    "acc": 98.6,
    "acc_cls": 98.6,
    "unknown": 0.0,
@@ -6290,7 +6318,7 @@
     ],
     "GALAXY": [
      100.0,
-     33
+     34
     ],
     "QSO": [
      50.0,
@@ -6299,19 +6327,19 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 69,
-   "acc": 97.1,
-   "acc_cls": 97.1,
+   "n": 70,
+   "acc": 95.7,
+   "acc_cls": 95.7,
    "unknown": 0.0,
-   "bal": 98.0,
+   "bal": 97.1,
    "recall": {
     "STAR": [
      100.0,
      34
     ],
     "GALAXY": [
-     93.9,
-     33
+     91.2,
+     34
     ],
     "QSO": [
      100.0,
@@ -7216,17 +7244,17 @@
   "which": "full",
   "ra": 150.35,
   "dec": -0.72028,
-  "n": 84,
+  "n": 87,
   "ours": {
-   "n": 84,
-   "acc": 95.2,
-   "acc_cls": 96.4,
-   "unknown": 1.2,
+   "n": 87,
+   "acc": 95.4,
+   "acc_cls": 96.5,
+   "unknown": 1.1,
    "bal": 89.3,
    "recall": {
     "STAR": [
      100.0,
-     58
+     61
     ],
     "GALAXY": [
      75.0,
@@ -7239,11 +7267,11 @@
    }
   },
   "high": {
-   "n": 80,
-   "acc": 96.25
+   "n": 83,
+   "acc": 96.39
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 60,
+   "n": 63,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -7251,7 +7279,7 @@
    "recall": {
     "STAR": [
      100.0,
-     56
+     59
     ],
     "QSO": [
      100.0,
@@ -7260,7 +7288,7 @@
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 60,
+   "n": 63,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -7268,7 +7296,7 @@
    "recall": {
     "STAR": [
      100.0,
-     56
+     59
     ],
     "QSO": [
      100.0,
@@ -7277,15 +7305,15 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 80,
-   "acc": 97.5,
-   "acc_cls": 97.5,
+   "n": 83,
+   "acc": 97.6,
+   "acc_cls": 97.6,
    "unknown": 0.0,
    "bal": 93.3,
    "recall": {
     "STAR": [
      100.0,
-     56
+     59
     ],
     "GALAXY": [
      80.0,
@@ -7298,15 +7326,15 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 80,
-   "acc": 96.2,
-   "acc_cls": 96.2,
+   "n": 83,
+   "acc": 96.4,
+   "acc_cls": 96.4,
    "unknown": 0.0,
    "bal": 91.0,
    "recall": {
     "STAR": [
      100.0,
-     56
+     59
     ],
     "GALAXY": [
      80.0,
@@ -7319,15 +7347,15 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 68,
-   "acc": 88.2,
-   "acc_cls": 88.2,
+   "n": 71,
+   "acc": 88.7,
+   "acc_cls": 88.7,
    "unknown": 0.0,
    "bal": 75.1,
    "recall": {
     "STAR": [
      100.0,
-     48
+     51
     ],
     "GALAXY": [
      88.9,
@@ -7340,15 +7368,15 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 68,
-   "acc": 97.1,
-   "acc_cls": 97.1,
+   "n": 71,
+   "acc": 97.2,
+   "acc_cls": 97.2,
    "unknown": 0.0,
    "bal": 93.3,
    "recall": {
     "STAR": [
      100.0,
-     48
+     51
     ],
     "GALAXY": [
      88.9,
@@ -7517,7 +7545,7 @@
    }
   },
   "high": {
-   "n": 38,
+   "n": 37,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
@@ -7555,7 +7583,7 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 36,
+   "n": 35,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -7567,12 +7595,12 @@
     ],
     "GALAXY": [
      100.0,
-     16
+     15
     ]
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 36,
+   "n": 35,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -7584,12 +7612,12 @@
     ],
     "GALAXY": [
      100.0,
-     16
+     15
     ]
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 33,
+   "n": 32,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -7601,12 +7629,12 @@
     ],
     "GALAXY": [
      100.0,
-     16
+     15
     ]
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 33,
+   "n": 32,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -7618,7 +7646,7 @@
     ],
     "GALAXY": [
      100.0,
-     16
+     15
     ]
    }
   }
@@ -7788,21 +7816,21 @@
   "which": "full",
   "ra": 159.85083,
   "dec": -1.21528,
-  "n": 61,
+  "n": 63,
   "ours": {
-   "n": 61,
-   "acc": 100.0,
-   "acc_cls": 100.0,
+   "n": 63,
+   "acc": 98.4,
+   "acc_cls": 98.4,
    "unknown": 0.0,
-   "bal": 100.0,
+   "bal": 98.5,
    "recall": {
     "STAR": [
-     100.0,
-     21
+     95.5,
+     22
     ],
     "GALAXY": [
      100.0,
-     36
+     37
     ],
     "QSO": [
      100.0,
@@ -7947,17 +7975,17 @@
   "which": "full",
   "ra": 163.27833,
   "dec": -4.17444,
-  "n": 66,
+  "n": 70,
   "ours": {
-   "n": 66,
-   "acc": 98.5,
+   "n": 70,
+   "acc": 98.6,
    "acc_cls": 100.0,
-   "unknown": 1.5,
+   "unknown": 1.4,
    "bal": 98.3,
    "recall": {
     "STAR": [
      100.0,
-     36
+     40
     ],
     "GALAXY": [
      96.7,
@@ -7966,19 +7994,19 @@
    }
   },
   "high": {
-   "n": 62,
+   "n": 66,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 52,
-   "acc": 86.5,
-   "acc_cls": 86.5,
+   "n": 56,
+   "acc": 87.5,
+   "acc_cls": 87.5,
    "unknown": 0.0,
    "bal": 80.5,
    "recall": {
     "STAR": [
      100.0,
-     34
+     38
     ],
     "GALAXY": [
      61.1,
@@ -7987,15 +8015,15 @@
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 52,
-   "acc": 98.1,
+   "n": 56,
+   "acc": 98.2,
    "acc_cls": 100.0,
-   "unknown": 1.9,
+   "unknown": 1.8,
    "bal": 97.2,
    "recall": {
     "STAR": [
      100.0,
-     34
+     38
     ],
     "GALAXY": [
      94.4,
@@ -8004,15 +8032,15 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 61,
-   "acc": 98.4,
-   "acc_cls": 98.4,
+   "n": 65,
+   "acc": 98.5,
+   "acc_cls": 98.5,
    "unknown": 0.0,
    "bal": 98.2,
    "recall": {
     "STAR": [
      100.0,
-     34
+     38
     ],
     "GALAXY": [
      96.3,
@@ -8021,15 +8049,15 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 61,
-   "acc": 98.4,
+   "n": 65,
+   "acc": 98.5,
    "acc_cls": 100.0,
-   "unknown": 1.6,
+   "unknown": 1.5,
    "bal": 98.2,
    "recall": {
     "STAR": [
      100.0,
-     34
+     38
     ],
     "GALAXY": [
      96.3,
@@ -8038,15 +8066,15 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 59,
-   "acc": 98.3,
-   "acc_cls": 98.3,
+   "n": 63,
+   "acc": 98.4,
+   "acc_cls": 98.4,
    "unknown": 0.0,
    "bal": 98.2,
    "recall": {
     "STAR": [
      100.0,
-     32
+     36
     ],
     "GALAXY": [
      96.3,
@@ -8055,15 +8083,15 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 59,
-   "acc": 98.3,
+   "n": 63,
+   "acc": 98.4,
    "acc_cls": 100.0,
-   "unknown": 1.7,
+   "unknown": 1.6,
    "bal": 98.2,
    "recall": {
     "STAR": [
      100.0,
-     32
+     36
     ],
     "GALAXY": [
      96.3,
@@ -8078,21 +8106,21 @@
   "which": "full",
   "ra": 165.16944,
   "dec": -0.83139,
-  "n": 109,
+  "n": 112,
   "ours": {
-   "n": 109,
-   "acc": 96.3,
-   "acc_cls": 97.2,
-   "unknown": 0.9,
-   "bal": 98.3,
+   "n": 112,
+   "acc": 96.4,
+   "acc_cls": 98.2,
+   "unknown": 1.8,
+   "bal": 98.4,
    "recall": {
     "STAR": [
      100.0,
-     22
+     24
     ],
     "GALAXY": [
-     95.0,
-     80
+     95.1,
+     81
     ],
     "QSO": [
      100.0,
@@ -8101,23 +8129,23 @@
    }
   },
   "high": {
-   "n": 90,
+   "n": 92,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 35,
-   "acc": 88.6,
-   "acc_cls": 88.6,
+   "n": 36,
+   "acc": 88.9,
+   "acc_cls": 88.9,
    "unknown": 0.0,
-   "bal": 80.6,
+   "bal": 79.2,
    "recall": {
     "STAR": [
      100.0,
-     22
+     24
     ],
     "GALAXY": [
-     66.7,
-     9
+     62.5,
+     8
     ],
     "QSO": [
      75.0,
@@ -8126,7 +8154,7 @@
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 35,
+   "n": 36,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -8134,11 +8162,11 @@
    "recall": {
     "STAR": [
      100.0,
-     22
+     24
     ],
     "GALAXY": [
      100.0,
-     9
+     8
     ],
     "QSO": [
      100.0,
@@ -8147,15 +8175,15 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 106,
-   "acc": 95.3,
-   "acc_cls": 95.3,
+   "n": 108,
+   "acc": 95.4,
+   "acc_cls": 95.4,
    "unknown": 0.0,
    "bal": 97.8,
    "recall": {
     "STAR": [
      100.0,
-     22
+     24
     ],
     "GALAXY": [
      93.5,
@@ -8168,18 +8196,18 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 106,
-   "acc": 96.2,
-   "acc_cls": 97.1,
+   "n": 108,
+   "acc": 97.2,
+   "acc_cls": 98.1,
    "unknown": 0.9,
-   "bal": 98.3,
+   "bal": 98.7,
    "recall": {
     "STAR": [
      100.0,
-     22
+     24
     ],
     "GALAXY": [
-     94.8,
+     96.1,
      77
     ],
     "QSO": [
@@ -8189,7 +8217,7 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 96,
+   "n": 98,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -8197,7 +8225,7 @@
    "recall": {
     "STAR": [
      100.0,
-     19
+     21
     ],
     "GALAXY": [
      100.0,
@@ -8210,7 +8238,7 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 96,
+   "n": 98,
    "acc": 99.0,
    "acc_cls": 99.0,
    "unknown": 0.0,
@@ -8218,7 +8246,7 @@
    "recall": {
     "STAR": [
      100.0,
-     19
+     21
     ],
     "GALAXY": [
      98.6,
@@ -8368,17 +8396,17 @@
   "which": "full",
   "ra": 170.07417,
   "dec": -1.39361,
-  "n": 85,
+  "n": 88,
   "ours": {
-   "n": 85,
-   "acc": 98.8,
+   "n": 88,
+   "acc": 98.9,
    "acc_cls": 100.0,
-   "unknown": 1.2,
+   "unknown": 1.1,
    "bal": 99.0,
    "recall": {
     "STAR": [
      100.0,
-     45
+     48
     ],
     "GALAXY": [
      97.0,
@@ -8391,19 +8419,19 @@
    }
   },
   "high": {
-   "n": 80,
+   "n": 83,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 74,
-   "acc": 94.6,
-   "acc_cls": 94.6,
+   "n": 77,
+   "acc": 94.8,
+   "acc_cls": 94.8,
    "unknown": 0.0,
    "bal": 93.9,
    "recall": {
     "STAR": [
      100.0,
-     45
+     48
     ],
     "GALAXY": [
      81.8,
@@ -8416,15 +8444,15 @@
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 74,
-   "acc": 98.6,
+   "n": 77,
+   "acc": 98.7,
    "acc_cls": 100.0,
-   "unknown": 1.4,
+   "unknown": 1.3,
    "bal": 98.5,
    "recall": {
     "STAR": [
      100.0,
-     45
+     48
     ],
     "GALAXY": [
      95.5,
@@ -8437,7 +8465,7 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 76,
+   "n": 79,
    "acc": 98.7,
    "acc_cls": 98.7,
    "unknown": 0.0,
@@ -8445,7 +8473,7 @@
    "recall": {
     "STAR": [
      100.0,
-     45
+     48
     ],
     "GALAXY": [
      95.8,
@@ -8458,6 +8486,27 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
+   "n": 79,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     48
+    ],
+    "GALAXY": [
+     100.0,
+     24
+    ],
+    "QSO": [
+     100.0,
+     7
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
    "n": 76,
    "acc": 100.0,
    "acc_cls": 100.0,
@@ -8478,29 +8527,8 @@
     ]
    }
   },
-  "LS morphology + WISE W1-W2>=0.8": {
-   "n": 73,
-   "acc": 100.0,
-   "acc_cls": 100.0,
-   "unknown": 0.0,
-   "bal": 100.0,
-   "recall": {
-    "STAR": [
-     100.0,
-     42
-    ],
-    "GALAXY": [
-     100.0,
-     24
-    ],
-    "QSO": [
-     100.0,
-     7
-    ]
-   }
-  },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 73,
+   "n": 76,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -8508,7 +8536,7 @@
    "recall": {
     "STAR": [
      100.0,
-     42
+     45
     ],
     "GALAXY": [
      100.0,
@@ -8530,17 +8558,17 @@
   "n": 93,
   "ours": {
    "n": 93,
-   "acc": 98.9,
+   "acc": 97.8,
    "acc_cls": 98.9,
-   "unknown": 0.0,
-   "bal": 99.3,
+   "unknown": 1.1,
+   "bal": 98.6,
    "recall": {
     "STAR": [
      100.0,
      45
     ],
     "GALAXY": [
-     97.9,
+     95.7,
      47
     ],
     "QSO": [
@@ -8550,8 +8578,8 @@
    }
   },
   "high": {
-   "n": 89,
-   "acc": 98.88
+   "n": 90,
+   "acc": 98.89
   },
   "Gaia DR3 DSC-Combmod": {
    "n": 72,
@@ -8596,7 +8624,7 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 87,
+   "n": 88,
    "acc": 98.9,
    "acc_cls": 98.9,
    "unknown": 0.0,
@@ -8607,8 +8635,8 @@
      44
     ],
     "GALAXY": [
-     97.6,
-     42
+     97.7,
+     43
     ],
     "QSO": [
      100.0,
@@ -8617,7 +8645,7 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 87,
+   "n": 88,
    "acc": 98.9,
    "acc_cls": 98.9,
    "unknown": 0.0,
@@ -8628,8 +8656,8 @@
      44
     ],
     "GALAXY": [
-     97.6,
-     42
+     97.7,
+     43
     ],
     "QSO": [
      100.0,
@@ -8638,7 +8666,7 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 83,
+   "n": 84,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -8650,7 +8678,7 @@
     ],
     "GALAXY": [
      100.0,
-     42
+     43
     ],
     "QSO": [
      100.0,
@@ -8659,7 +8687,7 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 83,
+   "n": 84,
    "acc": 98.8,
    "acc_cls": 98.8,
    "unknown": 0.0,
@@ -8670,8 +8698,8 @@
      40
     ],
     "GALAXY": [
-     97.6,
-     42
+     97.7,
+     43
     ],
     "QSO": [
      100.0,
@@ -8689,17 +8717,17 @@
   "n": 81,
   "ours": {
    "n": 81,
-   "acc": 95.1,
-   "acc_cls": 100.0,
-   "unknown": 4.9,
-   "bal": 96.9,
+   "acc": 96.3,
+   "acc_cls": 98.7,
+   "unknown": 2.5,
+   "bal": 97.7,
    "recall": {
     "STAR": [
      100.0,
      37
     ],
     "GALAXY": [
-     90.7,
+     93.0,
      43
     ],
     "QSO": [
@@ -8709,7 +8737,7 @@
    }
   },
   "high": {
-   "n": 72,
+   "n": 73,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
@@ -8777,17 +8805,17 @@
   },
   "LS-GBM (LS photometry only) | ours same": {
    "n": 72,
-   "acc": 97.2,
-   "acc_cls": 100.0,
-   "unknown": 2.8,
-   "bal": 98.1,
+   "acc": 98.6,
+   "acc_cls": 98.6,
+   "unknown": 0.0,
+   "bal": 99.1,
    "recall": {
     "STAR": [
      100.0,
      35
     ],
     "GALAXY": [
-     94.4,
+     97.2,
      36
     ],
     "QSO": [
@@ -8819,17 +8847,17 @@
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
    "n": 69,
-   "acc": 97.1,
-   "acc_cls": 100.0,
-   "unknown": 2.9,
-   "bal": 98.1,
+   "acc": 98.6,
+   "acc_cls": 98.6,
+   "unknown": 0.0,
+   "bal": 99.1,
    "recall": {
     "STAR": [
      100.0,
      32
     ],
     "GALAXY": [
-     94.4,
+     97.2,
      36
     ],
     "QSO": [
@@ -8845,17 +8873,17 @@
   "which": "full",
   "ra": 177.1775,
   "dec": 1.71556,
-  "n": 76,
+  "n": 84,
   "ours": {
-   "n": 76,
-   "acc": 96.1,
-   "acc_cls": 97.3,
-   "unknown": 1.3,
-   "bal": 97.1,
+   "n": 84,
+   "acc": 96.4,
+   "acc_cls": 97.6,
+   "unknown": 1.2,
+   "bal": 97.3,
    "recall": {
     "STAR": [
-     96.1,
-     51
+     96.6,
+     59
     ],
     "GALAXY": [
      95.2,
@@ -8868,19 +8896,19 @@
    }
   },
   "high": {
-   "n": 72,
+   "n": 80,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 60,
-   "acc": 95.0,
-   "acc_cls": 95.0,
+   "n": 68,
+   "acc": 95.6,
+   "acc_cls": 95.6,
    "unknown": 0.0,
    "bal": 90.9,
    "recall": {
     "STAR": [
      100.0,
-     46
+     54
     ],
     "GALAXY": [
      72.7,
@@ -8893,7 +8921,7 @@
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 60,
+   "n": 68,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -8901,7 +8929,7 @@
    "recall": {
     "STAR": [
      100.0,
-     46
+     54
     ],
     "GALAXY": [
      100.0,
@@ -8914,15 +8942,15 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 72,
-   "acc": 98.6,
-   "acc_cls": 98.6,
+   "n": 80,
+   "acc": 98.8,
+   "acc_cls": 98.8,
    "unknown": 0.0,
-   "bal": 99.3,
+   "bal": 99.4,
    "recall": {
     "STAR": [
-     97.9,
-     48
+     98.2,
+     56
     ],
     "GALAXY": [
      100.0,
@@ -8935,15 +8963,15 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 72,
-   "acc": 98.6,
-   "acc_cls": 98.6,
+   "n": 80,
+   "acc": 98.8,
+   "acc_cls": 98.8,
    "unknown": 0.0,
-   "bal": 99.3,
+   "bal": 99.4,
    "recall": {
     "STAR": [
-     97.9,
-     48
+     98.2,
+     56
     ],
     "GALAXY": [
      100.0,
@@ -8956,15 +8984,15 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 68,
-   "acc": 95.6,
-   "acc_cls": 95.6,
+   "n": 75,
+   "acc": 96.0,
+   "acc_cls": 96.0,
    "unknown": 0.0,
-   "bal": 77.0,
+   "bal": 77.1,
    "recall": {
     "STAR": [
-     97.8,
-     45
+     98.1,
+     52
     ],
     "GALAXY": [
      100.0,
@@ -8977,15 +9005,15 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 68,
-   "acc": 98.5,
-   "acc_cls": 98.5,
+   "n": 75,
+   "acc": 98.7,
+   "acc_cls": 98.7,
    "unknown": 0.0,
-   "bal": 99.3,
+   "bal": 99.4,
    "recall": {
     "STAR": [
-     97.8,
-     45
+     98.1,
+     52
     ],
     "GALAXY": [
      100.0,
@@ -9264,157 +9292,157 @@
   "field": "ngp_185m01",
   "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
-  "ra": 184.69083,
-  "dec": -1.13028,
-  "n": 50,
+  "ra": 185.09167,
+  "dec": -1.25639,
+  "n": 49,
   "ours": {
-   "n": 50,
-   "acc": 92.0,
-   "acc_cls": 97.9,
-   "unknown": 6.0,
-   "bal": 94.9,
+   "n": 49,
+   "acc": 93.9,
+   "acc_cls": 93.9,
+   "unknown": 0.0,
+   "bal": 90.2,
    "recall": {
     "STAR": [
      100.0,
      23
     ],
     "GALAXY": [
-     84.6,
-     26
+     90.5,
+     21
     ],
     "QSO": [
-     100.0,
-     1
+     80.0,
+     5
     ]
    }
   },
   "high": {
-   "n": 43,
-   "acc": 100.0
+   "n": 46,
+   "acc": 95.65
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 37,
-   "acc": 83.8,
-   "acc_cls": 83.8,
+   "n": 33,
+   "acc": 90.9,
+   "acc_cls": 90.9,
    "unknown": 0.0,
-   "bal": 53.8,
+   "bal": 63.3,
    "recall": {
     "STAR": [
      100.0,
-     23
+     21
     ],
     "GALAXY": [
-     61.5,
-     13
+     90.0,
+     10
     ],
     "QSO": [
      0.0,
-     1
+     2
     ]
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 37,
-   "acc": 100.0,
-   "acc_cls": 100.0,
+   "n": 33,
+   "acc": 97.0,
+   "acc_cls": 97.0,
    "unknown": 0.0,
-   "bal": 100.0,
+   "bal": 83.3,
    "recall": {
     "STAR": [
      100.0,
-     23
+     21
     ],
     "GALAXY": [
      100.0,
-     13
+     10
     ],
     "QSO": [
-     100.0,
-     1
+     50.0,
+     2
     ]
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 43,
-   "acc": 100.0,
-   "acc_cls": 100.0,
+   "n": 47,
+   "acc": 87.2,
+   "acc_cls": 87.2,
    "unknown": 0.0,
-   "bal": 100.0,
+   "bal": 85.4,
    "recall": {
     "STAR": [
      100.0,
-     23
+     21
     ],
     "GALAXY": [
-     100.0,
-     19
+     76.2,
+     21
     ],
     "QSO": [
-     100.0,
-     1
+     80.0,
+     5
     ]
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 43,
-   "acc": 97.7,
-   "acc_cls": 97.7,
+   "n": 47,
+   "acc": 93.6,
+   "acc_cls": 93.6,
    "unknown": 0.0,
-   "bal": 98.2,
+   "bal": 90.2,
    "recall": {
     "STAR": [
      100.0,
-     23
+     21
     ],
     "GALAXY": [
-     94.7,
-     19
+     90.5,
+     21
     ],
     "QSO": [
-     100.0,
-     1
+     80.0,
+     5
     ]
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 41,
-   "acc": 95.1,
-   "acc_cls": 95.1,
+   "n": 43,
+   "acc": 95.3,
+   "acc_cls": 95.3,
    "unknown": 0.0,
-   "bal": 65.1,
+   "bal": 77.8,
    "recall": {
     "STAR": [
-     95.2,
-     21
-    ],
-    "GALAXY": [
      100.0,
      19
     ],
+    "GALAXY": [
+     100.0,
+     21
+    ],
     "QSO": [
-     0.0,
-     1
+     33.3,
+     3
     ]
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 41,
-   "acc": 97.6,
-   "acc_cls": 97.6,
+   "n": 43,
+   "acc": 93.0,
+   "acc_cls": 93.0,
    "unknown": 0.0,
-   "bal": 98.2,
+   "bal": 85.7,
    "recall": {
     "STAR": [
      100.0,
-     21
-    ],
-    "GALAXY": [
-     94.7,
      19
     ],
+    "GALAXY": [
+     90.5,
+     21
+    ],
     "QSO": [
-     100.0,
-     1
+     66.7,
+     3
     ]
    }
   }
@@ -9425,26 +9453,26 @@
   "which": "full",
   "ra": 187.54083,
   "dec": -4.43444,
-  "n": 55,
+  "n": 56,
   "ours": {
-   "n": 55,
-   "acc": 100.0,
-   "acc_cls": 100.0,
+   "n": 56,
+   "acc": 98.2,
+   "acc_cls": 98.2,
    "unknown": 0.0,
-   "bal": 100.0,
+   "bal": 98.2,
    "recall": {
     "STAR": [
-     100.0,
+     96.4,
      28
     ],
     "GALAXY": [
      100.0,
-     27
+     28
     ]
    }
   },
   "high": {
-   "n": 53,
+   "n": 52,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
@@ -9466,13 +9494,13 @@
   },
   "Gaia DR3 DSC-Combmod | ours same": {
    "n": 44,
-   "acc": 100.0,
-   "acc_cls": 100.0,
+   "acc": 97.7,
+   "acc_cls": 97.7,
    "unknown": 0.0,
-   "bal": 100.0,
+   "bal": 98.2,
    "recall": {
     "STAR": [
-     100.0,
+     96.3,
      27
     ],
     "GALAXY": [
@@ -9482,15 +9510,15 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 52,
-   "acc": 98.1,
-   "acc_cls": 98.1,
+   "n": 51,
+   "acc": 98.0,
+   "acc_cls": 98.0,
    "unknown": 0.0,
    "bal": 98.2,
    "recall": {
     "STAR": [
-     96.4,
-     28
+     96.3,
+     27
     ],
     "GALAXY": [
      100.0,
@@ -9499,7 +9527,7 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 52,
+   "n": 51,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -9507,7 +9535,7 @@
    "recall": {
     "STAR": [
      100.0,
-     28
+     27
     ],
     "GALAXY": [
      100.0,
@@ -9579,7 +9607,7 @@
    }
   },
   "high": {
-   "n": 63,
+   "n": 64,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
@@ -9625,7 +9653,7 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 61,
+   "n": 62,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -9637,7 +9665,7 @@
     ],
     "GALAXY": [
      100.0,
-     17
+     18
     ],
     "QSO": [
      100.0,
@@ -9646,7 +9674,7 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 61,
+   "n": 62,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -9658,7 +9686,7 @@
     ],
     "GALAXY": [
      100.0,
-     17
+     18
     ],
     "QSO": [
      100.0,
@@ -9667,7 +9695,7 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 55,
+   "n": 56,
    "acc": 96.4,
    "acc_cls": 96.4,
    "unknown": 0.0,
@@ -9679,7 +9707,7 @@
     ],
     "GALAXY": [
      100.0,
-     17
+     18
     ],
     "QSO": [
      50.0,
@@ -9688,7 +9716,7 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 55,
+   "n": 56,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -9700,7 +9728,7 @@
     ],
     "GALAXY": [
      100.0,
-     17
+     18
     ],
     "QSO": [
      100.0,
@@ -9715,17 +9743,17 @@
   "which": "full",
   "ra": 191.19278,
   "dec": -1.92472,
-  "n": 61,
+  "n": 75,
   "ours": {
-   "n": 61,
-   "acc": 98.4,
-   "acc_cls": 98.4,
+   "n": 75,
+   "acc": 98.7,
+   "acc_cls": 98.7,
    "unknown": 0.0,
-   "bal": 97.9,
+   "bal": 98.9,
    "recall": {
     "STAR": [
-     93.8,
-     16
+     96.7,
+     30
     ],
     "GALAXY": [
      100.0,
@@ -9738,19 +9766,19 @@
    }
   },
   "high": {
-   "n": 56,
-   "acc": 98.21
+   "n": 70,
+   "acc": 98.57
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 35,
-   "acc": 94.3,
-   "acc_cls": 94.3,
+   "n": 48,
+   "acc": 95.8,
+   "acc_cls": 95.8,
    "unknown": 0.0,
    "bal": 89.4,
    "recall": {
     "STAR": [
      100.0,
-     16
+     29
     ],
     "GALAXY": [
      93.3,
@@ -9763,15 +9791,15 @@
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 35,
-   "acc": 97.1,
-   "acc_cls": 97.1,
+   "n": 48,
+   "acc": 97.9,
+   "acc_cls": 97.9,
    "unknown": 0.0,
-   "bal": 97.9,
+   "bal": 98.9,
    "recall": {
     "STAR": [
-     93.8,
-     16
+     96.6,
+     29
     ],
     "GALAXY": [
      100.0,
@@ -9784,15 +9812,15 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 55,
-   "acc": 96.4,
-   "acc_cls": 96.4,
+   "n": 68,
+   "acc": 97.1,
+   "acc_cls": 97.1,
    "unknown": 0.0,
-   "bal": 97.0,
+   "bal": 97.9,
    "recall": {
     "STAR": [
-     93.8,
-     16
+     96.6,
+     29
     ],
     "GALAXY": [
      97.1,
@@ -9805,15 +9833,15 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 55,
-   "acc": 98.2,
-   "acc_cls": 98.2,
+   "n": 68,
+   "acc": 98.5,
+   "acc_cls": 98.5,
    "unknown": 0.0,
-   "bal": 97.9,
+   "bal": 98.9,
    "recall": {
     "STAR": [
-     93.8,
-     16
+     96.6,
+     29
     ],
     "GALAXY": [
      100.0,
@@ -9826,15 +9854,15 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 54,
-   "acc": 96.3,
-   "acc_cls": 96.3,
+   "n": 67,
+   "acc": 97.0,
+   "acc_cls": 97.0,
    "unknown": 0.0,
-   "bal": 89.4,
+   "bal": 90.5,
    "recall": {
     "STAR": [
-     93.3,
-     15
+     96.4,
+     28
     ],
     "GALAXY": [
      100.0,
@@ -9847,15 +9875,15 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 54,
-   "acc": 98.1,
-   "acc_cls": 98.1,
+   "n": 67,
+   "acc": 98.5,
+   "acc_cls": 98.5,
    "unknown": 0.0,
-   "bal": 97.8,
+   "bal": 98.8,
    "recall": {
     "STAR": [
-     93.3,
-     15
+     96.4,
+     28
     ],
     "GALAXY": [
      100.0,
@@ -9877,13 +9905,13 @@
   "n": 102,
   "ours": {
    "n": 102,
-   "acc": 96.1,
-   "acc_cls": 99.0,
+   "acc": 97.1,
+   "acc_cls": 100.0,
    "unknown": 2.9,
-   "bal": 96.0,
+   "bal": 98.1,
    "recall": {
     "STAR": [
-     95.7,
+     100.0,
      23
     ],
     "GALAXY": [
@@ -9893,40 +9921,40 @@
    }
   },
   "high": {
-   "n": 96,
-   "acc": 98.96
+   "n": 95,
+   "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 94,
-   "acc": 88.3,
-   "acc_cls": 88.3,
+   "n": 91,
+   "acc": 87.9,
+   "acc_cls": 87.9,
    "unknown": 0.0,
-   "bal": 92.3,
+   "bal": 92.0,
    "recall": {
     "STAR": [
      100.0,
      22
     ],
     "GALAXY": [
-     84.7,
-     72
+     84.1,
+     69
     ]
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 94,
-   "acc": 96.8,
+   "n": 91,
+   "acc": 97.8,
    "acc_cls": 100.0,
-   "unknown": 3.2,
-   "bal": 97.9,
+   "unknown": 2.2,
+   "bal": 98.5,
    "recall": {
     "STAR": [
      100.0,
      22
     ],
     "GALAXY": [
-     95.8,
-     72
+     97.1,
+     69
     ]
    }
   },
@@ -9949,13 +9977,13 @@
   },
   "LS-GBM (LS photometry only) | ours same": {
    "n": 93,
-   "acc": 98.9,
-   "acc_cls": 98.9,
+   "acc": 100.0,
+   "acc_cls": 100.0,
    "unknown": 0.0,
-   "bal": 97.8,
+   "bal": 100.0,
    "recall": {
     "STAR": [
-     95.7,
+     100.0,
      23
     ],
     "GALAXY": [
@@ -9983,13 +10011,13 @@
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
    "n": 91,
-   "acc": 98.9,
-   "acc_cls": 98.9,
+   "acc": 100.0,
+   "acc_cls": 100.0,
    "unknown": 0.0,
-   "bal": 97.6,
+   "bal": 100.0,
    "recall": {
     "STAR": [
-     95.2,
+     100.0,
      21
     ],
     "GALAXY": [
@@ -10005,17 +10033,17 @@
   "which": "full",
   "ra": 195.16806,
   "dec": 1.05472,
-  "n": 73,
+  "n": 75,
   "ours": {
-   "n": 73,
-   "acc": 100.0,
-   "acc_cls": 100.0,
+   "n": 75,
+   "acc": 98.7,
+   "acc_cls": 98.7,
    "unknown": 0.0,
-   "bal": 100.0,
+   "bal": 98.9,
    "recall": {
     "STAR": [
-     100.0,
-     29
+     96.8,
+     31
     ],
     "GALAXY": [
      100.0,
@@ -10032,19 +10060,19 @@
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 63,
-   "acc": 93.7,
-   "acc_cls": 93.7,
+   "n": 62,
+   "acc": 93.5,
+   "acc_cls": 93.5,
    "unknown": 0.0,
-   "bal": 95.2,
+   "bal": 95.1,
    "recall": {
     "STAR": [
      100.0,
      28
     ],
     "GALAXY": [
-     85.7,
-     28
+     85.2,
+     27
     ],
     "QSO": [
      100.0,
@@ -10053,7 +10081,7 @@
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 63,
+   "n": 62,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -10065,7 +10093,7 @@
     ],
     "GALAXY": [
      100.0,
-     28
+     27
     ],
     "QSO": [
      100.0,
@@ -10187,24 +10215,24 @@
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 46,
-   "acc": 95.7,
-   "acc_cls": 95.7,
+   "n": 44,
+   "acc": 95.5,
+   "acc_cls": 95.5,
    "unknown": 0.0,
-   "bal": 95.5,
+   "bal": 95.0,
    "recall": {
     "STAR": [
      100.0,
      24
     ],
     "GALAXY": [
-     90.9,
-     22
+     90.0,
+     20
     ]
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 46,
+   "n": 44,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -10216,7 +10244,7 @@
     ],
     "GALAXY": [
      100.0,
-     22
+     20
     ]
    }
   },
@@ -10477,23 +10505,23 @@
    }
   },
   "high": {
-   "n": 59,
+   "n": 57,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 54,
-   "acc": 90.7,
-   "acc_cls": 90.7,
+   "n": 53,
+   "acc": 90.6,
+   "acc_cls": 90.6,
    "unknown": 0.0,
-   "bal": 89.3,
+   "bal": 89.1,
    "recall": {
     "STAR": [
      100.0,
      22
     ],
     "GALAXY": [
-     84.6,
-     26
+     84.0,
+     25
     ],
     "QSO": [
      83.3,
@@ -10502,7 +10530,7 @@
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 54,
+   "n": 53,
    "acc": 98.1,
    "acc_cls": 98.1,
    "unknown": 0.0,
@@ -10513,8 +10541,8 @@
      22
     ],
     "GALAXY": [
-     96.2,
-     26
+     96.0,
+     25
     ],
     "QSO": [
      100.0,
@@ -10523,9 +10551,9 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 62,
-   "acc": 98.4,
-   "acc_cls": 98.4,
+   "n": 60,
+   "acc": 98.3,
+   "acc_cls": 98.3,
    "unknown": 0.0,
    "bal": 99.0,
    "recall": {
@@ -10534,8 +10562,8 @@
      22
     ],
     "GALAXY": [
-     97.1,
-     34
+     96.9,
+     32
     ],
     "QSO": [
      100.0,
@@ -10544,9 +10572,9 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 62,
-   "acc": 98.4,
-   "acc_cls": 98.4,
+   "n": 60,
+   "acc": 98.3,
+   "acc_cls": 98.3,
    "unknown": 0.0,
    "bal": 99.0,
    "recall": {
@@ -10555,8 +10583,8 @@
      22
     ],
     "GALAXY": [
-     97.1,
-     34
+     96.9,
+     32
     ],
     "QSO": [
      100.0,
@@ -10565,19 +10593,19 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 55,
-   "acc": 94.5,
-   "acc_cls": 94.5,
+   "n": 53,
+   "acc": 94.3,
+   "acc_cls": 94.3,
    "unknown": 0.0,
-   "bal": 91.4,
+   "bal": 91.3,
    "recall": {
     "STAR": [
      100.0,
      16
     ],
     "GALAXY": [
-     94.1,
-     34
+     93.8,
+     32
     ],
     "QSO": [
      80.0,
@@ -10586,9 +10614,9 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 55,
-   "acc": 98.2,
-   "acc_cls": 98.2,
+   "n": 53,
+   "acc": 98.1,
+   "acc_cls": 98.1,
    "unknown": 0.0,
    "bal": 99.0,
    "recall": {
@@ -10597,8 +10625,8 @@
      16
     ],
     "GALAXY": [
-     97.1,
-     34
+     96.9,
+     32
     ],
     "QSO": [
      100.0,
@@ -10611,23 +10639,23 @@
   "field": "ngp_208p02",
   "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
-  "ra": 208.29056,
-  "dec": 1.24917,
-  "n": 76,
+  "ra": 208.12917,
+  "dec": 1.76694,
+  "n": 59,
   "ours": {
-   "n": 76,
-   "acc": 100.0,
-   "acc_cls": 100.0,
-   "unknown": 0.0,
-   "bal": 100.0,
+   "n": 59,
+   "acc": 94.9,
+   "acc_cls": 98.2,
+   "unknown": 3.4,
+   "bal": 96.6,
    "recall": {
     "STAR": [
-     100.0,
-     56
+     94.1,
+     34
     ],
     "GALAXY": [
-     100.0,
-     18
+     95.7,
+     23
     ],
     "QSO": [
      100.0,
@@ -10636,23 +10664,23 @@
    }
   },
   "high": {
-   "n": 75,
+   "n": 56,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 67,
-   "acc": 89.6,
-   "acc_cls": 89.6,
+   "n": 47,
+   "acc": 85.1,
+   "acc_cls": 85.1,
    "unknown": 0.0,
-   "bal": 82.7,
+   "bal": 82.1,
    "recall": {
     "STAR": [
-     98.1,
-     53
+     100.0,
+     32
     ],
     "GALAXY": [
-     50.0,
-     12
+     46.2,
+     13
     ],
     "QSO": [
      100.0,
@@ -10661,19 +10689,19 @@
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 67,
-   "acc": 100.0,
+   "n": 47,
+   "acc": 95.7,
    "acc_cls": 100.0,
-   "unknown": 0.0,
-   "bal": 100.0,
+   "unknown": 4.3,
+   "bal": 97.9,
    "recall": {
     "STAR": [
-     100.0,
-     53
+     93.8,
+     32
     ],
     "GALAXY": [
      100.0,
-     12
+     13
     ],
     "QSO": [
      100.0,
@@ -10682,19 +10710,19 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 71,
-   "acc": 98.6,
-   "acc_cls": 98.6,
+   "n": 57,
+   "acc": 89.5,
+   "acc_cls": 89.5,
    "unknown": 0.0,
-   "bal": 97.9,
+   "bal": 92.1,
    "recall": {
     "STAR": [
-     100.0,
-     53
+     93.8,
+     32
     ],
     "GALAXY": [
-     93.8,
-     16
+     82.6,
+     23
     ],
     "QSO": [
      100.0,
@@ -10703,19 +10731,19 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 71,
-   "acc": 100.0,
-   "acc_cls": 100.0,
-   "unknown": 0.0,
-   "bal": 100.0,
+   "n": 57,
+   "acc": 94.7,
+   "acc_cls": 98.2,
+   "unknown": 3.5,
+   "bal": 96.5,
    "recall": {
     "STAR": [
-     100.0,
-     53
+     93.8,
+     32
     ],
     "GALAXY": [
-     100.0,
-     16
+     95.7,
+     23
     ],
     "QSO": [
      100.0,
@@ -10724,44 +10752,44 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 67,
-   "acc": 100.0,
-   "acc_cls": 100.0,
+   "n": 52,
+   "acc": 94.2,
+   "acc_cls": 94.2,
    "unknown": 0.0,
-   "bal": 100.0,
+   "bal": 96.2,
    "recall": {
     "STAR": [
-     100.0,
-     49
+     92.9,
+     28
     ],
     "GALAXY": [
-     100.0,
-     16
+     95.7,
+     23
     ],
     "QSO": [
      100.0,
-     2
+     1
     ]
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 67,
-   "acc": 100.0,
-   "acc_cls": 100.0,
-   "unknown": 0.0,
-   "bal": 100.0,
+   "n": 52,
+   "acc": 94.2,
+   "acc_cls": 98.0,
+   "unknown": 3.8,
+   "bal": 96.2,
    "recall": {
     "STAR": [
-     100.0,
-     49
+     92.9,
+     28
     ],
     "GALAXY": [
-     100.0,
-     16
+     95.7,
+     23
     ],
     "QSO": [
      100.0,
-     2
+     1
     ]
    }
   }
@@ -10907,8 +10935,8 @@
   "ours": {
    "n": 54,
    "acc": 96.3,
-   "acc_cls": 98.1,
-   "unknown": 1.9,
+   "acc_cls": 96.3,
+   "unknown": 0.0,
    "bal": 97.6,
    "recall": {
     "STAR": [
@@ -10987,8 +11015,8 @@
   "LS-GBM (LS photometry only) | ours same": {
    "n": 52,
    "acc": 96.2,
-   "acc_cls": 98.0,
-   "unknown": 1.9,
+   "acc_cls": 96.2,
+   "unknown": 0.0,
    "bal": 97.5,
    "recall": {
     "STAR": [
@@ -11216,17 +11244,17 @@
   "n": 141,
   "ours": {
    "n": 141,
-   "acc": 92.9,
-   "acc_cls": 97.0,
-   "unknown": 4.3,
-   "bal": 95.1,
+   "acc": 94.3,
+   "acc_cls": 97.1,
+   "unknown": 2.8,
+   "bal": 96.1,
    "recall": {
     "STAR": [
      98.3,
      60
     ],
     "GALAXY": [
-     87.0,
+     89.9,
      69
     ],
     "QSO": [
@@ -11282,9 +11310,9 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 137,
-   "acc": 94.2,
-   "acc_cls": 94.2,
+   "n": 136,
+   "acc": 94.1,
+   "acc_cls": 94.1,
    "unknown": 0.0,
    "bal": 95.8,
    "recall": {
@@ -11293,8 +11321,8 @@
      60
     ],
     "GALAXY": [
-     89.2,
-     65
+     89.1,
+     64
     ],
     "QSO": [
      100.0,
@@ -11303,19 +11331,19 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 137,
-   "acc": 93.4,
+   "n": 136,
+   "acc": 94.9,
    "acc_cls": 97.0,
-   "unknown": 3.6,
-   "bal": 95.3,
+   "unknown": 2.2,
+   "bal": 96.3,
    "recall": {
     "STAR": [
      98.3,
      60
     ],
     "GALAXY": [
-     87.7,
-     65
+     90.6,
+     64
     ],
     "QSO": [
      100.0,
@@ -11324,7 +11352,7 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 128,
+   "n": 127,
    "acc": 96.1,
    "acc_cls": 96.1,
    "unknown": 0.0,
@@ -11335,8 +11363,8 @@
      56
     ],
     "GALAXY": [
-     96.8,
-     62
+     96.7,
+     61
     ],
     "QSO": [
      90.0,
@@ -11345,19 +11373,19 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 128,
-   "acc": 93.8,
+   "n": 127,
+   "acc": 95.3,
    "acc_cls": 97.6,
-   "unknown": 3.9,
-   "bal": 95.6,
+   "unknown": 2.4,
+   "bal": 96.7,
    "recall": {
     "STAR": [
      98.2,
      56
     ],
     "GALAXY": [
-     88.7,
-     62
+     91.8,
+     61
     ],
     "QSO": [
      100.0,
@@ -11522,7 +11550,7 @@
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 69,
+   "n": 68,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -11530,12 +11558,12 @@
    "recall": {
     "STAR": [
      100.0,
-     69
+     68
     ]
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 69,
+   "n": 68,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -11543,7 +11571,7 @@
    "recall": {
     "STAR": [
      100.0,
-     69
+     68
     ]
    }
   },
@@ -11616,23 +11644,47 @@
   "n": 620,
   "ours": {
    "n": 620,
-   "acc": 99.7,
+   "acc": 99.8,
    "acc_cls": 100.0,
-   "unknown": 0.3,
-   "bal": 99.7,
+   "unknown": 0.2,
+   "bal": 99.8,
    "recall": {
     "STAR": [
-     99.7,
+     99.8,
      620
     ]
    }
   },
   "high": {
-   "n": 617,
+   "n": 618,
    "acc": 100.0
   },
-  "Gaia DR3 DSC-Combmod": null,
-  "Gaia DR3 DSC-Combmod | ours same": null,
+  "Gaia DR3 DSC-Combmod": {
+   "n": 616,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     616
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 616,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     616
+    ]
+   }
+  },
   "LS-GBM (LS photometry only)": null,
   "LS-GBM (LS photometry only) | ours same": null,
   "LS morphology + WISE W1-W2>=0.8": null,
@@ -12335,14 +12387,18 @@
   "which": "full",
   "ra": 9.89278,
   "dec": -0.92444,
-  "n": 61,
+  "n": 66,
   "ours": {
-   "n": 61,
-   "acc": 88.5,
-   "acc_cls": 93.1,
-   "unknown": 4.9,
-   "bal": 93.7,
+   "n": 66,
+   "acc": 89.4,
+   "acc_cls": 92.2,
+   "unknown": 3.0,
+   "bal": 95.8,
    "recall": {
+    "STAR": [
+     100.0,
+     5
+    ],
     "GALAXY": [
      87.3,
      55
@@ -12354,19 +12410,23 @@
    }
   },
   "high": {
-   "n": 36,
+   "n": 42,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 8,
-   "acc": 50.0,
-   "acc_cls": 50.0,
+   "n": 12,
+   "acc": 66.7,
+   "acc_cls": 66.7,
    "unknown": 0.0,
-   "bal": 53.4,
+   "bal": 63.3,
    "recall": {
+    "STAR": [
+     100.0,
+     5
+    ],
     "GALAXY": [
-     66.7,
-     3
+     50.0,
+     2
     ],
     "QSO": [
      40.0,
@@ -12375,15 +12435,19 @@
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 8,
-   "acc": 87.5,
-   "acc_cls": 87.5,
+   "n": 12,
+   "acc": 91.7,
+   "acc_cls": 91.7,
    "unknown": 0.0,
    "bal": 83.3,
    "recall": {
+    "STAR": [
+     100.0,
+     5
+    ],
     "GALAXY": [
-     66.7,
-     3
+     50.0,
+     2
     ],
     "QSO": [
      100.0,
@@ -12392,15 +12456,19 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 57,
-   "acc": 91.2,
-   "acc_cls": 91.2,
+   "n": 63,
+   "acc": 92.1,
+   "acc_cls": 92.1,
    "unknown": 0.0,
-   "bal": 95.1,
+   "bal": 96.8,
    "recall": {
+    "STAR": [
+     100.0,
+     5
+    ],
     "GALAXY": [
-     90.2,
-     51
+     90.4,
+     52
     ],
     "QSO": [
      100.0,
@@ -12409,15 +12477,19 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 57,
-   "acc": 89.5,
-   "acc_cls": 92.7,
-   "unknown": 3.5,
-   "bal": 94.1,
+   "n": 63,
+   "acc": 90.5,
+   "acc_cls": 91.9,
+   "unknown": 1.6,
+   "bal": 96.2,
    "recall": {
+    "STAR": [
+     100.0,
+     5
+    ],
     "GALAXY": [
-     88.2,
-     51
+     88.5,
+     52
     ],
     "QSO": [
      100.0,
@@ -12426,15 +12498,19 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 52,
+   "n": 59,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
    "bal": 100.0,
    "recall": {
+    "STAR": [
+     100.0,
+     5
+    ],
     "GALAXY": [
      100.0,
-     48
+     50
     ],
     "QSO": [
      100.0,
@@ -12443,15 +12519,19 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 52,
-   "acc": 94.2,
-   "acc_cls": 94.2,
+   "n": 59,
+   "acc": 93.2,
+   "acc_cls": 93.2,
    "unknown": 0.0,
-   "bal": 96.9,
+   "bal": 97.3,
    "recall": {
+    "STAR": [
+     100.0,
+     5
+    ],
     "GALAXY": [
-     93.8,
-     48
+     92.0,
+     50
     ],
     "QSO": [
      100.0,
@@ -12569,9 +12649,9 @@
   "which": "full",
   "ra": 21.89417,
   "dec": -0.09,
-  "n": 93,
+  "n": 94,
   "ours": {
-   "n": 93,
+   "n": 94,
    "acc": 98.9,
    "acc_cls": 98.9,
    "unknown": 0.0,
@@ -12579,7 +12659,7 @@
    "recall": {
     "STAR": [
      98.9,
-     87
+     88
     ],
     "GALAXY": [
      100.0,
@@ -12588,19 +12668,19 @@
    }
   },
   "high": {
-   "n": 93,
-   "acc": 98.92
+   "n": 94,
+   "acc": 98.94
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 85,
-   "acc": 96.5,
-   "acc_cls": 96.5,
+   "n": 84,
+   "acc": 96.4,
+   "acc_cls": 96.4,
    "unknown": 0.0,
    "bal": 74.4,
    "recall": {
     "STAR": [
      98.8,
-     81
+     80
     ],
     "GALAXY": [
      50.0,
@@ -12609,7 +12689,7 @@
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 85,
+   "n": 84,
    "acc": 98.8,
    "acc_cls": 98.8,
    "unknown": 0.0,
@@ -12617,7 +12697,7 @@
    "recall": {
     "STAR": [
      98.8,
-     81
+     80
     ],
     "GALAXY": [
      100.0,
@@ -12660,7 +12740,7 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 83,
+   "n": 82,
    "acc": 98.8,
    "acc_cls": 98.8,
    "unknown": 0.0,
@@ -12668,7 +12748,7 @@
    "recall": {
     "STAR": [
      98.7,
-     77
+     76
     ],
     "GALAXY": [
      100.0,
@@ -12677,7 +12757,7 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 83,
+   "n": 82,
    "acc": 98.8,
    "acc_cls": 98.8,
    "unknown": 0.0,
@@ -12685,7 +12765,7 @@
    "recall": {
     "STAR": [
      98.7,
-     77
+     76
     ],
     "GALAXY": [
      100.0,
@@ -12700,9 +12780,9 @@
   "which": "full",
   "ra": 26.2275,
   "dec": 0.295,
-  "n": 1,
+  "n": 5,
   "ours": {
-   "n": 1,
+   "n": 5,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -12710,16 +12790,16 @@
    "recall": {
     "STAR": [
      100.0,
-     1
+     5
     ]
    }
   },
   "high": {
-   "n": 1,
+   "n": 5,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 1,
+   "n": 5,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -12727,12 +12807,12 @@
    "recall": {
     "STAR": [
      100.0,
-     1
+     5
     ]
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 1,
+   "n": 5,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -12740,12 +12820,12 @@
    "recall": {
     "STAR": [
      100.0,
-     1
+     5
     ]
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 1,
+   "n": 5,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -12753,12 +12833,12 @@
    "recall": {
     "STAR": [
      100.0,
-     1
+     5
     ]
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 1,
+   "n": 5,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -12766,12 +12846,12 @@
    "recall": {
     "STAR": [
      100.0,
-     1
+     5
     ]
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 1,
+   "n": 5,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -12779,12 +12859,12 @@
    "recall": {
     "STAR": [
      100.0,
-     1
+     5
     ]
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 1,
+   "n": 5,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -12792,7 +12872,7 @@
    "recall": {
     "STAR": [
      100.0,
-     1
+     5
     ]
    }
   }
@@ -12801,11 +12881,11 @@
   "field": "s82_030p00",
   "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
-  "ra": 30.27861,
-  "dec": -0.13472,
-  "n": 42,
+  "ra": 30.095,
+  "dec": -0.29667,
+  "n": 47,
   "ours": {
-   "n": 42,
+   "n": 47,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -12813,16 +12893,20 @@
    "recall": {
     "STAR": [
      100.0,
-     42
+     45
+    ],
+    "GALAXY": [
+     100.0,
+     2
     ]
    }
   },
   "high": {
-   "n": 42,
+   "n": 46,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 41,
+   "n": 44,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -12830,12 +12914,16 @@
    "recall": {
     "STAR": [
      100.0,
-     41
+     43
+    ],
+    "GALAXY": [
+     100.0,
+     1
     ]
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 41,
+   "n": 44,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -12843,12 +12931,16 @@
    "recall": {
     "STAR": [
      100.0,
-     41
+     43
+    ],
+    "GALAXY": [
+     100.0,
+     1
     ]
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 41,
+   "n": 45,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -12856,12 +12948,16 @@
    "recall": {
     "STAR": [
      100.0,
-     41
+     43
+    ],
+    "GALAXY": [
+     100.0,
+     2
     ]
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 41,
+   "n": 45,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -12869,12 +12965,16 @@
    "recall": {
     "STAR": [
      100.0,
-     41
+     43
+    ],
+    "GALAXY": [
+     100.0,
+     2
     ]
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 39,
+   "n": 45,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -12882,12 +12982,16 @@
    "recall": {
     "STAR": [
      100.0,
-     39
+     43
+    ],
+    "GALAXY": [
+     100.0,
+     2
     ]
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 39,
+   "n": 45,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -12895,7 +12999,11 @@
    "recall": {
     "STAR": [
      100.0,
-     39
+     43
+    ],
+    "GALAXY": [
+     100.0,
+     2
     ]
    }
   }
@@ -12904,48 +13012,132 @@
   "field": "s82_038p00",
   "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
-  "ra": 37.74889,
-  "dec": -0.0975,
-  "n": 67,
+  "ra": 37.64278,
+  "dec": -0.26222,
+  "n": 74,
   "ours": {
-   "n": 67,
-   "acc": 100.0,
-   "acc_cls": 100.0,
-   "unknown": 0.0,
-   "bal": 100.0,
+   "n": 74,
+   "acc": 97.3,
+   "acc_cls": 98.6,
+   "unknown": 1.4,
+   "bal": 87.8,
    "recall": {
     "STAR": [
      100.0,
-     54
+     63
     ],
     "GALAXY": [
-     100.0,
-     6
+     80.0,
+     5
     ],
     "QSO": [
-     100.0,
-     7
+     83.3,
+     6
     ]
    }
   },
   "high": {
-   "n": 62,
-   "acc": 100.0
+   "n": 71,
+   "acc": 98.59
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 58,
-   "acc": 98.3,
-   "acc_cls": 98.3,
+   "n": 63,
+   "acc": 98.4,
+   "acc_cls": 98.4,
+   "unknown": 0.0,
+   "bal": 83.3,
+   "recall": {
+    "STAR": [
+     100.0,
+     60
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ],
+    "QSO": [
+     50.0,
+     2
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 63,
+   "acc": 98.4,
+   "acc_cls": 98.4,
+   "unknown": 0.0,
+   "bal": 83.3,
+   "recall": {
+    "STAR": [
+     100.0,
+     60
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ],
+    "QSO": [
+     50.0,
+     2
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only)": {
+   "n": 71,
+   "acc": 98.6,
+   "acc_cls": 98.6,
+   "unknown": 0.0,
+   "bal": 94.4,
+   "recall": {
+    "STAR": [
+     100.0,
+     61
+    ],
+    "GALAXY": [
+     100.0,
+     4
+    ],
+    "QSO": [
+     83.3,
+     6
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 71,
+   "acc": 98.6,
+   "acc_cls": 98.6,
+   "unknown": 0.0,
+   "bal": 94.4,
+   "recall": {
+    "STAR": [
+     100.0,
+     61
+    ],
+    "GALAXY": [
+     100.0,
+     4
+    ],
+    "QSO": [
+     83.3,
+     6
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 62,
+   "acc": 98.4,
+   "acc_cls": 98.4,
    "unknown": 0.0,
    "bal": 88.9,
    "recall": {
     "STAR": [
      100.0,
-     52
+     55
     ],
     "GALAXY": [
      100.0,
-     3
+     4
     ],
     "QSO": [
      66.7,
@@ -12953,108 +13145,24 @@
     ]
    }
   },
-  "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 58,
-   "acc": 100.0,
-   "acc_cls": 100.0,
-   "unknown": 0.0,
-   "bal": 100.0,
-   "recall": {
-    "STAR": [
-     100.0,
-     52
-    ],
-    "GALAXY": [
-     100.0,
-     3
-    ],
-    "QSO": [
-     100.0,
-     3
-    ]
-   }
-  },
-  "LS-GBM (LS photometry only)": {
-   "n": 64,
-   "acc": 100.0,
-   "acc_cls": 100.0,
-   "unknown": 0.0,
-   "bal": 100.0,
-   "recall": {
-    "STAR": [
-     100.0,
-     54
-    ],
-    "GALAXY": [
-     100.0,
-     3
-    ],
-    "QSO": [
-     100.0,
-     7
-    ]
-   }
-  },
-  "LS-GBM (LS photometry only) | ours same": {
-   "n": 64,
-   "acc": 100.0,
-   "acc_cls": 100.0,
-   "unknown": 0.0,
-   "bal": 100.0,
-   "recall": {
-    "STAR": [
-     100.0,
-     54
-    ],
-    "GALAXY": [
-     100.0,
-     3
-    ],
-    "QSO": [
-     100.0,
-     7
-    ]
-   }
-  },
-  "LS morphology + WISE W1-W2>=0.8": {
-   "n": 58,
-   "acc": 98.3,
-   "acc_cls": 98.3,
-   "unknown": 0.0,
-   "bal": 99.3,
-   "recall": {
-    "STAR": [
-     98.0,
-     51
-    ],
-    "GALAXY": [
-     100.0,
-     3
-    ],
-    "QSO": [
-     100.0,
-     4
-    ]
-   }
-  },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 58,
-   "acc": 100.0,
-   "acc_cls": 100.0,
+   "n": 62,
+   "acc": 98.4,
+   "acc_cls": 98.4,
    "unknown": 0.0,
-   "bal": 100.0,
+   "bal": 88.9,
    "recall": {
     "STAR": [
      100.0,
-     51
+     55
     ],
     "GALAXY": [
      100.0,
-     3
+     4
     ],
     "QSO": [
-     100.0,
-     4
+     66.7,
+     3
     ]
    }
   }
@@ -13065,9 +13173,9 @@
   "which": "full",
   "ra": 46.32056,
   "dec": -0.13806,
-  "n": 64,
+  "n": 70,
   "ours": {
-   "n": 64,
+   "n": 70,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -13075,7 +13183,7 @@
    "recall": {
     "STAR": [
      100.0,
-     56
+     62
     ],
     "GALAXY": [
      100.0,
@@ -13088,19 +13196,19 @@
    }
   },
   "high": {
-   "n": 61,
+   "n": 67,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 61,
-   "acc": 98.4,
-   "acc_cls": 98.4,
+   "n": 67,
+   "acc": 98.5,
+   "acc_cls": 98.5,
    "unknown": 0.0,
    "bal": 93.3,
    "recall": {
     "STAR": [
      100.0,
-     55
+     61
     ],
     "GALAXY": [
      80.0,
@@ -13113,7 +13221,7 @@
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 61,
+   "n": 67,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -13121,7 +13229,7 @@
    "recall": {
     "STAR": [
      100.0,
-     55
+     61
     ],
     "GALAXY": [
      100.0,
@@ -13134,7 +13242,7 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 61,
+   "n": 67,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -13142,7 +13250,7 @@
    "recall": {
     "STAR": [
      100.0,
-     55
+     61
     ],
     "GALAXY": [
      100.0,
@@ -13155,7 +13263,7 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 61,
+   "n": 67,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -13163,7 +13271,7 @@
    "recall": {
     "STAR": [
      100.0,
-     55
+     61
     ],
     "GALAXY": [
      100.0,
@@ -13176,7 +13284,7 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 54,
+   "n": 59,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -13184,7 +13292,7 @@
    "recall": {
     "STAR": [
      100.0,
-     49
+     54
     ],
     "GALAXY": [
      100.0,
@@ -13193,7 +13301,7 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 54,
+   "n": 59,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -13201,7 +13309,7 @@
    "recall": {
     "STAR": [
      100.0,
-     49
+     54
     ],
     "GALAXY": [
      100.0,
@@ -13744,9 +13852,9 @@
   "which": "full",
   "ra": 317.67722,
   "dec": 0.31639,
-  "n": 23,
+  "n": 28,
   "ours": {
-   "n": 23,
+   "n": 28,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -13754,16 +13862,16 @@
    "recall": {
     "STAR": [
      100.0,
-     23
+     28
     ]
    }
   },
   "high": {
-   "n": 23,
+   "n": 27,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 23,
+   "n": 27,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -13771,12 +13879,12 @@
    "recall": {
     "STAR": [
      100.0,
-     23
+     27
     ]
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 23,
+   "n": 27,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -13784,12 +13892,12 @@
    "recall": {
     "STAR": [
      100.0,
-     23
+     27
     ]
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 23,
+   "n": 27,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -13797,12 +13905,12 @@
    "recall": {
     "STAR": [
      100.0,
-     23
+     27
     ]
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 23,
+   "n": 27,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -13810,12 +13918,12 @@
    "recall": {
     "STAR": [
      100.0,
-     23
+     27
     ]
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 21,
+   "n": 25,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -13823,12 +13931,12 @@
    "recall": {
     "STAR": [
      100.0,
-     21
+     25
     ]
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 21,
+   "n": 25,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -13836,7 +13944,7 @@
    "recall": {
     "STAR": [
      100.0,
-     21
+     25
     ]
    }
   }
@@ -13847,17 +13955,17 @@
   "which": "full",
   "ra": 325.72944,
   "dec": -0.01556,
-  "n": 187,
+  "n": 189,
   "ours": {
-   "n": 187,
+   "n": 189,
    "acc": 96.3,
-   "acc_cls": 97.8,
-   "unknown": 1.6,
+   "acc_cls": 96.3,
+   "unknown": 0.0,
    "bal": 97.4,
    "recall": {
     "STAR": [
      100.0,
-     86
+     88
     ],
     "GALAXY": [
      92.3,
@@ -13871,18 +13979,18 @@
   },
   "high": {
    "n": 148,
-   "acc": 99.32
+   "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 94,
-   "acc": 93.6,
-   "acc_cls": 93.6,
+   "n": 96,
+   "acc": 93.8,
+   "acc_cls": 93.8,
    "unknown": 0.0,
    "bal": 46.7,
    "recall": {
     "STAR": [
      100.0,
-     86
+     88
     ],
     "GALAXY": [
      0.0,
@@ -13895,7 +14003,7 @@
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 94,
+   "n": 96,
    "acc": 97.9,
    "acc_cls": 97.9,
    "unknown": 0.0,
@@ -13903,7 +14011,7 @@
    "recall": {
     "STAR": [
      100.0,
-     86
+     88
     ],
     "GALAXY": [
      33.3,
@@ -13916,15 +14024,15 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 186,
-   "acc": 97.8,
-   "acc_cls": 97.8,
+   "n": 188,
+   "acc": 97.9,
+   "acc_cls": 97.9,
    "unknown": 0.0,
    "bal": 98.5,
    "recall": {
     "STAR": [
      100.0,
-     86
+     88
     ],
     "GALAXY": [
      95.6,
@@ -13937,15 +14045,15 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 186,
-   "acc": 96.2,
-   "acc_cls": 97.8,
-   "unknown": 1.6,
+   "n": 188,
+   "acc": 96.3,
+   "acc_cls": 96.3,
+   "unknown": 0.0,
    "bal": 97.4,
    "recall": {
     "STAR": [
      100.0,
-     86
+     88
     ],
     "GALAXY": [
      92.2,
@@ -13958,7 +14066,7 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 173,
+   "n": 175,
    "acc": 98.3,
    "acc_cls": 98.3,
    "unknown": 0.0,
@@ -13966,7 +14074,7 @@
    "recall": {
     "STAR": [
      100.0,
-     81
+     83
     ],
     "GALAXY": [
      96.5,
@@ -13979,18 +14087,18 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 173,
-   "acc": 97.7,
-   "acc_cls": 98.8,
-   "unknown": 1.2,
-   "bal": 98.4,
+   "n": 175,
+   "acc": 98.3,
+   "acc_cls": 98.3,
+   "unknown": 0.0,
+   "bal": 98.8,
    "recall": {
     "STAR": [
      100.0,
-     81
+     83
     ],
     "GALAXY": [
-     95.3,
+     96.5,
      85
     ],
     "QSO": [
@@ -14157,20 +14265,20 @@
   "which": "full",
   "ra": 349.69667,
   "dec": -0.06667,
-  "n": 86,
+  "n": 87,
   "ours": {
-   "n": 86,
-   "acc": 90.7,
-   "acc_cls": 90.7,
+   "n": 87,
+   "acc": 93.1,
+   "acc_cls": 93.1,
    "unknown": 0.0,
-   "bal": 93.4,
+   "bal": 94.9,
    "recall": {
     "STAR": [
-     90.9,
-     33
+     91.2,
+     34
     ],
     "GALAXY": [
-     89.4,
+     93.6,
      47
     ],
     "QSO": [
@@ -14180,19 +14288,19 @@
    }
   },
   "high": {
-   "n": 68,
-   "acc": 92.65
+   "n": 69,
+   "acc": 94.2
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 35,
-   "acc": 88.6,
-   "acc_cls": 88.6,
+   "n": 36,
+   "acc": 88.9,
+   "acc_cls": 88.9,
    "unknown": 0.0,
-   "bal": 60.9,
+   "bal": 61.0,
    "recall": {
     "STAR": [
-     96.8,
-     31
+     96.9,
+     32
     ],
     "QSO": [
      25.0,
@@ -14201,15 +14309,15 @@
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 35,
-   "acc": 97.1,
-   "acc_cls": 97.1,
+   "n": 36,
+   "acc": 97.2,
+   "acc_cls": 97.2,
    "unknown": 0.0,
-   "bal": 98.4,
+   "bal": 98.5,
    "recall": {
     "STAR": [
-     96.8,
-     31
+     96.9,
+     32
     ],
     "QSO": [
      100.0,
@@ -14218,15 +14326,15 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 81,
-   "acc": 93.8,
-   "acc_cls": 93.8,
+   "n": 82,
+   "acc": 93.9,
+   "acc_cls": 93.9,
    "unknown": 0.0,
    "bal": 95.6,
    "recall": {
     "STAR": [
-     93.8,
-     32
+     93.9,
+     33
     ],
     "GALAXY": [
      93.0,
@@ -14239,18 +14347,18 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 81,
-   "acc": 93.8,
-   "acc_cls": 93.8,
+   "n": 82,
+   "acc": 95.1,
+   "acc_cls": 95.1,
    "unknown": 0.0,
-   "bal": 95.6,
+   "bal": 96.4,
    "recall": {
     "STAR": [
-     93.8,
-     32
+     93.9,
+     33
     ],
     "GALAXY": [
-     93.0,
+     95.3,
      43
     ],
     "QSO": [
@@ -14260,15 +14368,15 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 75,
+   "n": 76,
    "acc": 94.7,
    "acc_cls": 94.7,
    "unknown": 0.0,
    "bal": 84.7,
    "recall": {
     "STAR": [
-     96.4,
-     28
+     96.6,
+     29
     ],
     "GALAXY": [
      97.6,
@@ -14281,15 +14389,15 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 75,
-   "acc": 96.0,
-   "acc_cls": 96.0,
+   "n": 76,
+   "acc": 96.1,
+   "acc_cls": 96.1,
    "unknown": 0.0,
-   "bal": 97.2,
+   "bal": 97.3,
    "recall": {
     "STAR": [
-     96.4,
-     28
+     96.6,
+     29
     ],
     "GALAXY": [
      95.2,
@@ -14306,53 +14414,57 @@
   "field": "s82_354p00",
   "root": "/tmp/claude-0/-home-user-Finding-objects/478e8639-5ba2-5a73-bf97-e278aea9035e/scratchpad/vd/v2/benchmark/independent_fields",
   "which": "full",
-  "ra": 353.61278,
-  "dec": -0.24028,
-  "n": 92,
+  "ra": 353.95528,
+  "dec": 0.44556,
+  "n": 96,
   "ours": {
-   "n": 92,
-   "acc": 98.9,
-   "acc_cls": 98.9,
-   "unknown": 0.0,
-   "bal": 99.3,
+   "n": 96,
+   "acc": 95.8,
+   "acc_cls": 96.8,
+   "unknown": 1.0,
+   "bal": 89.5,
    "recall": {
     "STAR": [
-     100.0,
-     45
-    ],
-    "GALAXY": [
      97.8,
      46
     ],
+    "GALAXY": [
+     95.7,
+     46
+    ],
     "QSO": [
-     100.0,
-     1
+     75.0,
+     4
     ]
    }
   },
   "high": {
-   "n": 83,
-   "acc": 100.0
+   "n": 80,
+   "acc": 98.75
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 44,
-   "acc": 100.0,
-   "acc_cls": 100.0,
+   "n": 50,
+   "acc": 90.0,
+   "acc_cls": 90.0,
    "unknown": 0.0,
-   "bal": 100.0,
+   "bal": 50.0,
    "recall": {
     "STAR": [
      100.0,
-     43
+     42
     ],
     "GALAXY": [
-     100.0,
-     1
+     50.0,
+     6
+    ],
+    "QSO": [
+     0.0,
+     2
     ]
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 44,
+   "n": 50,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -14360,87 +14472,99 @@
    "recall": {
     "STAR": [
      100.0,
-     43
+     42
     ],
     "GALAXY": [
      100.0,
-     1
+     6
+    ],
+    "QSO": [
+     100.0,
+     2
     ]
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 88,
-   "acc": 96.6,
-   "acc_cls": 96.6,
+   "n": 92,
+   "acc": 95.7,
+   "acc_cls": 95.7,
    "unknown": 0.0,
-   "bal": 97.7,
+   "bal": 97.1,
    "recall": {
     "STAR": [
      100.0,
-     43
+     42
     ],
     "GALAXY": [
-     93.2,
-     44
+     91.3,
+     46
     ],
     "QSO": [
      100.0,
-     1
+     4
     ]
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 88,
-   "acc": 98.9,
-   "acc_cls": 98.9,
+   "n": 92,
+   "acc": 96.7,
+   "acc_cls": 96.7,
    "unknown": 0.0,
-   "bal": 99.2,
+   "bal": 90.2,
    "recall": {
     "STAR": [
      100.0,
-     43
+     42
     ],
     "GALAXY": [
-     97.7,
-     44
+     95.7,
+     46
     ],
     "QSO": [
-     100.0,
-     1
+     75.0,
+     4
     ]
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 86,
-   "acc": 100.0,
-   "acc_cls": 100.0,
+   "n": 83,
+   "acc": 96.4,
+   "acc_cls": 96.4,
    "unknown": 0.0,
-   "bal": 100.0,
+   "bal": 66.7,
    "recall": {
     "STAR": [
      100.0,
-     43
+     35
     ],
     "GALAXY": [
      100.0,
-     43
+     45
+    ],
+    "QSO": [
+     0.0,
+     3
     ]
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 86,
-   "acc": 98.8,
-   "acc_cls": 98.8,
+   "n": 83,
+   "acc": 96.4,
+   "acc_cls": 96.4,
    "unknown": 0.0,
-   "bal": 98.8,
+   "bal": 87.4,
    "recall": {
     "STAR": [
      100.0,
-     43
+     35
     ],
     "GALAXY": [
-     97.7,
-     43
+     95.6,
+     45
+    ],
+    "QSO": [
+     66.7,
+     3
     ]
    }
   }
@@ -14673,8 +14797,8 @@
   "ours": {
    "n": 9,
    "acc": 77.8,
-   "acc_cls": 77.8,
-   "unknown": 0.0,
+   "acc_cls": 87.5,
+   "unknown": 11.1,
    "bal": 75.0,
    "recall": {
     "STAR": [
@@ -14688,8 +14812,8 @@
    }
   },
   "high": {
-   "n": 8,
-   "acc": 75.0
+   "n": 7,
+   "acc": 85.71
   },
   "Gaia DR3 DSC-Combmod": {
    "n": 9,
@@ -14711,8 +14835,8 @@
   "Gaia DR3 DSC-Combmod | ours same": {
    "n": 9,
    "acc": 77.8,
-   "acc_cls": 77.8,
-   "unknown": 0.0,
+   "acc_cls": 87.5,
+   "unknown": 11.1,
    "bal": 75.0,
    "recall": {
     "STAR": [
@@ -14739,13 +14863,13 @@
   "n": 6,
   "ours": {
    "n": 6,
-   "acc": 83.3,
-   "acc_cls": 83.3,
+   "acc": 100.0,
+   "acc_cls": 100.0,
    "unknown": 0.0,
-   "bal": 83.3,
+   "bal": 100.0,
    "recall": {
     "STAR": [
-     83.3,
+     100.0,
      6
     ]
    }
@@ -14769,13 +14893,13 @@
   },
   "Gaia DR3 DSC-Combmod | ours same": {
    "n": 6,
-   "acc": 83.3,
-   "acc_cls": 83.3,
+   "acc": 100.0,
+   "acc_cls": 100.0,
    "unknown": 0.0,
-   "bal": 83.3,
+   "bal": 100.0,
    "recall": {
     "STAR": [
-     83.3,
+     100.0,
      6
     ]
    }
@@ -14795,13 +14919,13 @@
   },
   "LS-GBM (LS photometry only) | ours same": {
    "n": 6,
-   "acc": 83.3,
-   "acc_cls": 83.3,
+   "acc": 100.0,
+   "acc_cls": 100.0,
    "unknown": 0.0,
-   "bal": 83.3,
+   "bal": 100.0,
    "recall": {
     "STAR": [
-     83.3,
+     100.0,
      6
     ]
    }
@@ -15074,11 +15198,11 @@
    }
   },
   "high": {
-   "n": 36,
+   "n": 38,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 36,
+   "n": 38,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -15086,12 +15210,12 @@
    "recall": {
     "STAR": [
      100.0,
-     36
+     38
     ]
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 36,
+   "n": 38,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -15099,7 +15223,7 @@
    "recall": {
     "STAR": [
      100.0,
-     36
+     38
     ]
    }
   },
@@ -15392,13 +15516,13 @@
   "n": 46,
   "ours": {
    "n": 46,
-   "acc": 87.0,
-   "acc_cls": 95.2,
-   "unknown": 8.7,
-   "bal": 44.5,
+   "acc": 82.6,
+   "acc_cls": 92.7,
+   "unknown": 10.9,
+   "bal": 42.2,
    "recall": {
     "STAR": [
-     88.9,
+     84.4,
      45
     ],
     "GALAXY": [
@@ -15408,8 +15532,8 @@
    }
   },
   "high": {
-   "n": 35,
-   "acc": 97.14
+   "n": 36,
+   "acc": 97.22
   },
   "Gaia DR3 DSC-Combmod": {
    "n": 38,
@@ -15430,13 +15554,13 @@
   },
   "Gaia DR3 DSC-Combmod | ours same": {
    "n": 38,
-   "acc": 89.5,
-   "acc_cls": 94.4,
-   "unknown": 5.3,
-   "bal": 46.0,
+   "acc": 92.1,
+   "acc_cls": 94.6,
+   "unknown": 2.6,
+   "bal": 47.3,
    "recall": {
     "STAR": [
-     91.9,
+     94.6,
      37
     ],
     "GALAXY": [
@@ -15459,19 +15583,19 @@
   "n": 19,
   "ours": {
    "n": 19,
-   "acc": 89.5,
+   "acc": 94.7,
    "acc_cls": 100.0,
-   "unknown": 10.5,
-   "bal": 89.5,
+   "unknown": 5.3,
+   "bal": 94.7,
    "recall": {
     "STAR": [
-     89.5,
+     94.7,
      19
     ]
    }
   },
   "high": {
-   "n": 12,
+   "n": 13,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
@@ -15757,20 +15881,20 @@
   "which": "full",
   "ra": 1.20333,
   "dec": -30.42333,
-  "n": 61,
+  "n": 89,
   "ours": {
-   "n": 61,
-   "acc": 91.8,
-   "acc_cls": 93.3,
-   "unknown": 1.6,
-   "bal": 96.8,
+   "n": 89,
+   "acc": 96.6,
+   "acc_cls": 97.7,
+   "unknown": 1.1,
+   "bal": 98.1,
    "recall": {
     "STAR": [
      100.0,
-     3
+     31
     ],
     "GALAXY": [
-     90.4,
+     94.2,
      52
     ],
     "QSO": [
@@ -15780,19 +15904,19 @@
    }
   },
   "high": {
-   "n": 51,
-   "acc": 98.04
+   "n": 80,
+   "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 43,
-   "acc": 86.0,
-   "acc_cls": 86.0,
+   "n": 71,
+   "acc": 91.5,
+   "acc_cls": 91.5,
    "unknown": 0.0,
    "bal": 94.1,
    "recall": {
     "STAR": [
      100.0,
-     3
+     31
     ],
     "GALAXY": [
      82.4,
@@ -15805,18 +15929,18 @@
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 43,
-   "acc": 97.7,
-   "acc_cls": 97.7,
+   "n": 71,
+   "acc": 100.0,
+   "acc_cls": 100.0,
    "unknown": 0.0,
-   "bal": 99.0,
+   "bal": 100.0,
    "recall": {
     "STAR": [
      100.0,
-     3
+     31
     ],
     "GALAXY": [
-     97.1,
+     100.0,
      34
     ],
     "QSO": [
@@ -15826,15 +15950,15 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 48,
-   "acc": 97.9,
-   "acc_cls": 97.9,
+   "n": 71,
+   "acc": 98.6,
+   "acc_cls": 98.6,
    "unknown": 0.0,
    "bal": 99.2,
    "recall": {
     "STAR": [
      100.0,
-     3
+     26
     ],
     "GALAXY": [
      97.5,
@@ -15847,7 +15971,7 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 48,
+   "n": 71,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -15855,7 +15979,7 @@
    "recall": {
     "STAR": [
      100.0,
-     3
+     26
     ],
     "GALAXY": [
      100.0,
@@ -15868,15 +15992,15 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 54,
-   "acc": 96.3,
-   "acc_cls": 96.3,
+   "n": 81,
+   "acc": 97.5,
+   "acc_cls": 97.5,
    "unknown": 0.0,
    "bal": 93.7,
    "recall": {
     "STAR": [
      100.0,
-     2
+     29
     ],
     "GALAXY": [
      97.8,
@@ -15889,18 +16013,18 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 54,
-   "acc": 92.6,
-   "acc_cls": 92.6,
+   "n": 81,
+   "acc": 97.5,
+   "acc_cls": 97.5,
    "unknown": 0.0,
-   "bal": 97.1,
+   "bal": 98.6,
    "recall": {
     "STAR": [
      100.0,
-     2
+     29
     ],
     "GALAXY": [
-     91.3,
+     95.7,
      46
     ],
     "QSO": [
@@ -16074,19 +16198,19 @@
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 21,
-   "acc": 90.5,
-   "acc_cls": 90.5,
+   "n": 19,
+   "acc": 89.5,
+   "acc_cls": 89.5,
    "unknown": 0.0,
-   "bal": 89.6,
+   "bal": 88.6,
    "recall": {
     "STAR": [
      100.0,
      7
     ],
     "GALAXY": [
-     88.9,
-     9
+     85.7,
+     7
     ],
     "QSO": [
      80.0,
@@ -16095,7 +16219,7 @@
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 21,
+   "n": 19,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -16107,7 +16231,7 @@
     ],
     "GALAXY": [
      100.0,
-     9
+     7
     ],
     "QSO": [
      100.0,
@@ -16116,19 +16240,19 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 32,
-   "acc": 96.9,
-   "acc_cls": 96.9,
+   "n": 30,
+   "acc": 96.7,
+   "acc_cls": 96.7,
    "unknown": 0.0,
-   "bal": 98.2,
+   "bal": 98.0,
    "recall": {
     "STAR": [
      100.0,
      7
     ],
     "GALAXY": [
-     94.7,
-     19
+     94.1,
+     17
     ],
     "QSO": [
      100.0,
@@ -16137,7 +16261,7 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 32,
+   "n": 30,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -16149,7 +16273,7 @@
     ],
     "GALAXY": [
      100.0,
-     19
+     17
     ],
     "QSO": [
      100.0,
@@ -16158,9 +16282,9 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 31,
-   "acc": 93.5,
-   "acc_cls": 93.5,
+   "n": 29,
+   "acc": 93.1,
+   "acc_cls": 93.1,
    "unknown": 0.0,
    "bal": 88.9,
    "recall": {
@@ -16170,7 +16294,7 @@
     ],
     "GALAXY": [
      100.0,
-     19
+     17
     ],
     "QSO": [
      66.7,
@@ -16179,7 +16303,7 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 31,
+   "n": 29,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -16191,7 +16315,7 @@
     ],
     "GALAXY": [
      100.0,
-     19
+     17
     ],
     "QSO": [
      100.0,
@@ -17126,17 +17250,17 @@
   "n": 40,
   "ours": {
    "n": 40,
-   "acc": 97.5,
-   "acc_cls": 97.5,
+   "acc": 95.0,
+   "acc_cls": 95.0,
    "unknown": 0.0,
-   "bal": 99.0,
+   "bal": 98.1,
    "recall": {
     "STAR": [
      100.0,
      2
     ],
     "GALAXY": [
-     97.1,
+     94.3,
      35
     ],
     "QSO": [
@@ -17150,7 +17274,7 @@
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 13,
+   "n": 14,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -17162,7 +17286,7 @@
     ],
     "GALAXY": [
      100.0,
-     8
+     9
     ],
     "QSO": [
      100.0,
@@ -17171,7 +17295,7 @@
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 13,
+   "n": 14,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -17183,7 +17307,7 @@
     ],
     "GALAXY": [
      100.0,
-     8
+     9
     ],
     "QSO": [
      100.0,
@@ -17192,9 +17316,9 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 30,
-   "acc": 96.7,
-   "acc_cls": 96.7,
+   "n": 31,
+   "acc": 96.8,
+   "acc_cls": 96.8,
    "unknown": 0.0,
    "bal": 98.7,
    "recall": {
@@ -17203,8 +17327,8 @@
      2
     ],
     "GALAXY": [
-     96.0,
-     25
+     96.2,
+     26
     ],
     "QSO": [
      100.0,
@@ -17213,19 +17337,19 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 30,
-   "acc": 96.7,
-   "acc_cls": 96.7,
+   "n": 31,
+   "acc": 93.5,
+   "acc_cls": 93.5,
    "unknown": 0.0,
-   "bal": 98.7,
+   "bal": 97.4,
    "recall": {
     "STAR": [
      100.0,
      2
     ],
     "GALAXY": [
-     96.0,
-     25
+     92.3,
+     26
     ],
     "QSO": [
      100.0,
@@ -17234,9 +17358,9 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 29,
-   "acc": 96.6,
-   "acc_cls": 96.6,
+   "n": 30,
+   "acc": 96.7,
+   "acc_cls": 96.7,
    "unknown": 0.0,
    "bal": 88.9,
    "recall": {
@@ -17246,7 +17370,7 @@
     ],
     "GALAXY": [
      100.0,
-     25
+     26
     ],
     "QSO": [
      66.7,
@@ -17255,19 +17379,19 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 29,
-   "acc": 96.6,
-   "acc_cls": 96.6,
+   "n": 30,
+   "acc": 93.3,
+   "acc_cls": 93.3,
    "unknown": 0.0,
-   "bal": 98.7,
+   "bal": 97.4,
    "recall": {
     "STAR": [
      100.0,
      1
     ],
     "GALAXY": [
-     96.0,
-     25
+     92.3,
+     26
     ],
     "QSO": [
      100.0,
@@ -17516,21 +17640,21 @@
   "which": "full",
   "ra": 40.47306,
   "dec": -28.52944,
-  "n": 44,
+  "n": 45,
   "ours": {
-   "n": 44,
-   "acc": 97.7,
+   "n": 45,
+   "acc": 95.6,
    "acc_cls": 97.7,
-   "unknown": 0.0,
-   "bal": 99.2,
+   "unknown": 2.2,
+   "bal": 98.4,
    "recall": {
     "STAR": [
      100.0,
      1
     ],
     "GALAXY": [
-     97.5,
-     40
+     95.1,
+     41
     ],
     "QSO": [
      100.0,
@@ -17543,19 +17667,19 @@
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 26,
-   "acc": 69.2,
-   "acc_cls": 69.2,
+   "n": 23,
+   "acc": 73.9,
+   "acc_cls": 73.9,
    "unknown": 0.0,
-   "bal": 78.3,
+   "bal": 80.1,
    "recall": {
     "STAR": [
      100.0,
      1
     ],
     "GALAXY": [
-     68.2,
-     22
+     73.7,
+     19
     ],
     "QSO": [
      66.7,
@@ -17564,19 +17688,19 @@
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 26,
-   "acc": 96.2,
-   "acc_cls": 96.2,
+   "n": 23,
+   "acc": 95.7,
+   "acc_cls": 95.7,
    "unknown": 0.0,
-   "bal": 98.5,
+   "bal": 98.2,
    "recall": {
     "STAR": [
      100.0,
      1
     ],
     "GALAXY": [
-     95.5,
-     22
+     94.7,
+     19
     ],
     "QSO": [
      100.0,
@@ -17585,9 +17709,9 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 37,
-   "acc": 97.3,
-   "acc_cls": 97.3,
+   "n": 36,
+   "acc": 97.2,
+   "acc_cls": 97.2,
    "unknown": 0.0,
    "bal": 99.0,
    "recall": {
@@ -17596,8 +17720,8 @@
      1
     ],
     "GALAXY": [
-     97.0,
-     33
+     96.9,
+     32
     ],
     "QSO": [
      100.0,
@@ -17606,9 +17730,9 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 37,
-   "acc": 97.3,
-   "acc_cls": 97.3,
+   "n": 36,
+   "acc": 97.2,
+   "acc_cls": 97.2,
    "unknown": 0.0,
    "bal": 99.0,
    "recall": {
@@ -17617,8 +17741,8 @@
      1
     ],
     "GALAXY": [
-     97.0,
-     33
+     96.9,
+     32
     ],
     "QSO": [
      100.0,
@@ -17627,9 +17751,9 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 36,
-   "acc": 97.2,
-   "acc_cls": 97.2,
+   "n": 35,
+   "acc": 97.1,
+   "acc_cls": 97.1,
    "unknown": 0.0,
    "bal": 83.3,
    "recall": {
@@ -17639,7 +17763,7 @@
     ],
     "GALAXY": [
      100.0,
-     33
+     32
     ],
     "QSO": [
      50.0,
@@ -17648,9 +17772,9 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 36,
-   "acc": 97.2,
-   "acc_cls": 97.2,
+   "n": 35,
+   "acc": 97.1,
+   "acc_cls": 97.1,
    "unknown": 0.0,
    "bal": 99.0,
    "recall": {
@@ -17659,8 +17783,8 @@
      1
     ],
     "GALAXY": [
-     97.0,
-     33
+     96.9,
+     32
     ],
     "QSO": [
      100.0,
@@ -17781,17 +17905,17 @@
   "n": 45,
   "ours": {
    "n": 45,
-   "acc": 95.6,
-   "acc_cls": 97.7,
+   "acc": 93.3,
+   "acc_cls": 95.5,
    "unknown": 2.2,
-   "bal": 98.0,
+   "bal": 97.1,
    "recall": {
     "STAR": [
      100.0,
      4
     ],
     "GALAXY": [
-     94.1,
+     91.2,
      34
     ],
     "QSO": [
@@ -17801,23 +17925,23 @@
    }
   },
   "high": {
-   "n": 32,
+   "n": 31,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 29,
-   "acc": 93.1,
-   "acc_cls": 93.1,
+   "n": 30,
+   "acc": 93.3,
+   "acc_cls": 93.3,
    "unknown": 0.0,
-   "bal": 96.3,
+   "bal": 96.5,
    "recall": {
     "STAR": [
      100.0,
      4
     ],
     "GALAXY": [
-     88.9,
-     18
+     89.5,
+     19
     ],
     "QSO": [
      100.0,
@@ -17826,19 +17950,19 @@
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 29,
-   "acc": 96.6,
-   "acc_cls": 96.6,
+   "n": 30,
+   "acc": 96.7,
+   "acc_cls": 96.7,
    "unknown": 0.0,
-   "bal": 98.1,
+   "bal": 98.2,
    "recall": {
     "STAR": [
      100.0,
      4
     ],
     "GALAXY": [
-     94.4,
-     18
+     94.7,
+     19
     ],
     "QSO": [
      100.0,
@@ -17869,17 +17993,17 @@
   },
   "LS-GBM (LS photometry only) | ours same": {
    "n": 40,
-   "acc": 97.5,
-   "acc_cls": 97.5,
+   "acc": 95.0,
+   "acc_cls": 95.0,
    "unknown": 0.0,
-   "bal": 98.9,
+   "bal": 97.7,
    "recall": {
     "STAR": [
      100.0,
      4
     ],
     "GALAXY": [
-     96.6,
+     93.1,
      29
     ],
     "QSO": [
@@ -17911,17 +18035,17 @@
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
    "n": 38,
-   "acc": 97.4,
-   "acc_cls": 97.4,
+   "acc": 94.7,
+   "acc_cls": 94.7,
    "unknown": 0.0,
-   "bal": 98.9,
+   "bal": 97.7,
    "recall": {
     "STAR": [
      100.0,
      3
     ],
     "GALAXY": [
-     96.6,
+     93.1,
      29
     ],
     "QSO": [
@@ -17937,21 +18061,21 @@
   "which": "full",
   "ra": 50.30111,
   "dec": -27.33028,
-  "n": 28,
+  "n": 29,
   "ours": {
-   "n": 28,
-   "acc": 96.4,
-   "acc_cls": 96.4,
+   "n": 29,
+   "acc": 96.6,
+   "acc_cls": 96.6,
    "unknown": 0.0,
-   "bal": 97.9,
+   "bal": 98.0,
    "recall": {
     "STAR": [
      100.0,
      4
     ],
     "GALAXY": [
-     95.8,
-     24
+     96.0,
+     25
     ]
    }
   },
@@ -17960,24 +18084,24 @@
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 20,
-   "acc": 90.0,
-   "acc_cls": 90.0,
+   "n": 18,
+   "acc": 88.9,
+   "acc_cls": 88.9,
    "unknown": 0.0,
-   "bal": 93.8,
+   "bal": 92.8,
    "recall": {
     "STAR": [
      100.0,
      4
     ],
     "GALAXY": [
-     87.5,
-     16
+     85.7,
+     14
     ]
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 20,
+   "n": 18,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -17989,7 +18113,7 @@
     ],
     "GALAXY": [
      100.0,
-     16
+     14
     ]
    }
   },
@@ -18301,7 +18425,7 @@
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 5,
+   "n": 4,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -18313,12 +18437,12 @@
     ],
     "GALAXY": [
      100.0,
-     3
+     2
     ]
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 5,
+   "n": 4,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -18330,12 +18454,12 @@
     ],
     "GALAXY": [
      100.0,
-     3
+     2
     ]
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 5,
+   "n": 4,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -18347,12 +18471,12 @@
     ],
     "GALAXY": [
      100.0,
-     3
+     2
     ]
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 5,
+   "n": 4,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -18364,12 +18488,12 @@
     ],
     "GALAXY": [
      100.0,
-     3
+     2
     ]
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 4,
+   "n": 3,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -18381,12 +18505,12 @@
     ],
     "GALAXY": [
      100.0,
-     3
+     2
     ]
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 4,
+   "n": 3,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -18398,7 +18522,7 @@
     ],
     "GALAXY": [
      100.0,
-     3
+     2
     ]
    }
   }
@@ -18598,7 +18722,7 @@
    }
   },
   "high": {
-   "n": 19,
+   "n": 18,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
@@ -18780,17 +18904,17 @@
   "n": 37,
   "ours": {
    "n": 37,
-   "acc": 83.8,
-   "acc_cls": 91.2,
-   "unknown": 8.1,
-   "bal": 90.5,
+   "acc": 97.3,
+   "acc_cls": 100.0,
+   "unknown": 2.7,
+   "bal": 98.4,
    "recall": {
     "STAR": [
      100.0,
      5
     ],
     "GALAXY": [
-     71.4,
+     95.2,
      21
     ],
     "QSO": [
@@ -18800,7 +18924,7 @@
    }
   },
   "high": {
-   "n": 18,
+   "n": 19,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
@@ -18826,17 +18950,17 @@
   },
   "Gaia DR3 DSC-Combmod | ours same": {
    "n": 25,
-   "acc": 96.0,
-   "acc_cls": 96.0,
+   "acc": 100.0,
+   "acc_cls": 100.0,
    "unknown": 0.0,
-   "bal": 97.0,
+   "bal": 100.0,
    "recall": {
     "STAR": [
      100.0,
      5
     ],
     "GALAXY": [
-     90.9,
+     100.0,
      11
     ],
     "QSO": [
@@ -18870,17 +18994,17 @@
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
    "n": 32,
-   "acc": 81.2,
-   "acc_cls": 89.7,
-   "unknown": 9.4,
-   "bal": 90.0,
+   "acc": 96.9,
+   "acc_cls": 100.0,
+   "unknown": 3.1,
+   "bal": 98.3,
    "recall": {
     "STAR": [
      100.0,
      1
     ],
     "GALAXY": [
-     70.0,
+     95.0,
      20
     ],
     "QSO": [
@@ -18899,23 +19023,23 @@
   "n": 22,
   "ours": {
    "n": 22,
-   "acc": 95.5,
-   "acc_cls": 95.5,
+   "acc": 90.9,
+   "acc_cls": 90.9,
    "unknown": 0.0,
-   "bal": 97.2,
+   "bal": 94.5,
    "recall": {
     "STAR": [
      100.0,
      4
     ],
     "GALAXY": [
-     94.4,
+     88.9,
      18
     ]
    }
   },
   "high": {
-   "n": 19,
+   "n": 18,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
@@ -18971,17 +19095,17 @@
   },
   "LS-GBM (LS photometry only) | ours same": {
    "n": 17,
-   "acc": 100.0,
-   "acc_cls": 100.0,
+   "acc": 94.1,
+   "acc_cls": 94.1,
    "unknown": 0.0,
-   "bal": 100.0,
+   "bal": 96.7,
    "recall": {
     "STAR": [
      100.0,
      2
     ],
     "GALAXY": [
-     100.0,
+     93.3,
      15
     ]
    }
@@ -19005,17 +19129,17 @@
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
    "n": 20,
-   "acc": 95.0,
-   "acc_cls": 95.0,
+   "acc": 90.0,
+   "acc_cls": 90.0,
    "unknown": 0.0,
-   "bal": 97.0,
+   "bal": 94.1,
    "recall": {
     "STAR": [
      100.0,
      3
     ],
     "GALAXY": [
-     94.1,
+     88.2,
      17
     ]
    }
@@ -19027,9 +19151,9 @@
   "which": "full",
   "ra": 349.31417,
   "dec": -25.24306,
-  "n": 33,
+  "n": 31,
   "ours": {
-   "n": 33,
+   "n": 31,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -19041,7 +19165,7 @@
     ],
     "GALAXY": [
      100.0,
-     32
+     30
     ]
    }
   },
@@ -19129,17 +19253,17 @@
   "n": 29,
   "ours": {
    "n": 29,
-   "acc": 86.2,
-   "acc_cls": 92.6,
-   "unknown": 6.9,
-   "bal": 84.1,
+   "acc": 93.1,
+   "acc_cls": 96.4,
+   "unknown": 3.4,
+   "bal": 96.8,
    "recall": {
     "STAR": [
-     66.7,
+     100.0,
      3
     ],
     "GALAXY": [
-     85.7,
+     90.5,
      21
     ],
     "QSO": [
@@ -19175,13 +19299,13 @@
   },
   "Gaia DR3 DSC-Combmod | ours same": {
    "n": 19,
-   "acc": 84.2,
-   "acc_cls": 88.9,
+   "acc": 89.5,
+   "acc_cls": 94.4,
    "unknown": 5.3,
-   "bal": 82.8,
+   "bal": 93.9,
    "recall": {
     "STAR": [
-     66.7,
+     100.0,
      3
     ],
     "GALAXY": [
@@ -19195,7 +19319,7 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 9,
+   "n": 8,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -19207,7 +19331,7 @@
     ],
     "GALAXY": [
      100.0,
-     6
+     5
     ],
     "QSO": [
      100.0,
@@ -19216,7 +19340,7 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 9,
+   "n": 8,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -19228,7 +19352,7 @@
     ],
     "GALAXY": [
      100.0,
-     6
+     5
     ],
     "QSO": [
      100.0,
@@ -19237,7 +19361,7 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 22,
+   "n": 21,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -19249,7 +19373,7 @@
     ],
     "GALAXY": [
      100.0,
-     18
+     17
     ],
     "QSO": [
      100.0,
@@ -19258,19 +19382,19 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 22,
-   "acc": 90.9,
+   "n": 21,
+   "acc": 95.2,
    "acc_cls": 95.2,
-   "unknown": 4.5,
-   "bal": 96.3,
+   "unknown": 0.0,
+   "bal": 98.0,
    "recall": {
     "STAR": [
      100.0,
      1
     ],
     "GALAXY": [
-     88.9,
-     18
+     94.1,
+     17
     ],
     "QSO": [
      100.0,
@@ -19288,17 +19412,17 @@
   "n": 109,
   "ours": {
    "n": 109,
-   "acc": 98.2,
-   "acc_cls": 98.2,
+   "acc": 100.0,
+   "acc_cls": 100.0,
    "unknown": 0.0,
-   "bal": 99.4,
+   "bal": 100.0,
    "recall": {
     "STAR": [
      100.0,
      2
     ],
     "GALAXY": [
-     98.1,
+     100.0,
      104
     ],
     "QSO": [
@@ -19308,7 +19432,7 @@
    }
   },
   "high": {
-   "n": 97,
+   "n": 99,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
@@ -19334,17 +19458,17 @@
   },
   "Gaia DR3 DSC-Combmod | ours same": {
    "n": 73,
-   "acc": 97.3,
-   "acc_cls": 97.3,
+   "acc": 100.0,
+   "acc_cls": 100.0,
    "unknown": 0.0,
-   "bal": 99.0,
+   "bal": 100.0,
    "recall": {
     "STAR": [
      100.0,
      2
     ],
     "GALAXY": [
-     97.1,
+     100.0,
      68
     ],
     "QSO": [
@@ -19447,19 +19571,19 @@
   "n": 42,
   "ours": {
    "n": 42,
-   "acc": 92.9,
-   "acc_cls": 97.5,
+   "acc": 95.2,
+   "acc_cls": 100.0,
    "unknown": 4.8,
-   "bal": 92.9,
+   "bal": 95.2,
    "recall": {
     "STAR": [
-     92.9,
+     95.2,
      42
     ]
    }
   },
   "high": {
-   "n": 39,
+   "n": 40,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": null,
@@ -19684,19 +19808,19 @@
   "n": 24,
   "ours": {
    "n": 24,
-   "acc": 95.8,
-   "acc_cls": 95.8,
+   "acc": 100.0,
+   "acc_cls": 100.0,
    "unknown": 0.0,
-   "bal": 95.8,
+   "bal": 100.0,
    "recall": {
     "STAR": [
-     95.8,
+     100.0,
      24
     ]
    }
   },
   "high": {
-   "n": 23,
+   "n": 24,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
@@ -19742,13 +19866,13 @@
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
    "n": 18,
-   "acc": 94.4,
-   "acc_cls": 94.4,
+   "acc": 100.0,
+   "acc_cls": 100.0,
    "unknown": 0.0,
-   "bal": 94.4,
+   "bal": 100.0,
    "recall": {
     "STAR": [
-     94.4,
+     100.0,
      18
     ]
    }
@@ -21038,9 +21162,9 @@
   "which": "full",
   "ra": 139.94556,
   "dec": 4.62833,
-  "n": 120,
+  "n": 121,
   "ours": {
-   "n": 120,
+   "n": 121,
    "acc": 98.3,
    "acc_cls": 99.2,
    "unknown": 0.8,
@@ -21048,7 +21172,7 @@
    "recall": {
     "STAR": [
      100.0,
-     78
+     79
     ],
     "GALAXY": [
      95.2,
@@ -21057,11 +21181,11 @@
    }
   },
   "high": {
-   "n": 109,
+   "n": 110,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 80,
+   "n": 81,
    "acc": 97.5,
    "acc_cls": 97.5,
    "unknown": 0.0,
@@ -21069,7 +21193,7 @@
    "recall": {
     "STAR": [
      100.0,
-     76
+     77
     ],
     "GALAXY": [
      50.0,
@@ -21078,7 +21202,7 @@
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 80,
+   "n": 81,
    "acc": 98.8,
    "acc_cls": 98.8,
    "unknown": 0.0,
@@ -21086,7 +21210,7 @@
    "recall": {
     "STAR": [
      100.0,
-     76
+     77
     ],
     "GALAXY": [
      75.0,
@@ -21095,7 +21219,7 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 114,
+   "n": 115,
    "acc": 97.4,
    "acc_cls": 97.4,
    "unknown": 0.0,
@@ -21103,7 +21227,7 @@
    "recall": {
     "STAR": [
      100.0,
-     76
+     77
     ],
     "GALAXY": [
      92.1,
@@ -21112,6 +21236,23 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
+   "n": 115,
+   "acc": 99.1,
+   "acc_cls": 99.1,
+   "unknown": 0.0,
+   "bal": 98.7,
+   "recall": {
+    "STAR": [
+     100.0,
+     77
+    ],
+    "GALAXY": [
+     97.4,
+     38
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
    "n": 114,
    "acc": 99.1,
    "acc_cls": 99.1,
@@ -21128,25 +21269,8 @@
     ]
    }
   },
-  "LS morphology + WISE W1-W2>=0.8": {
-   "n": 113,
-   "acc": 99.1,
-   "acc_cls": 99.1,
-   "unknown": 0.0,
-   "bal": 98.7,
-   "recall": {
-    "STAR": [
-     100.0,
-     75
-    ],
-    "GALAXY": [
-     97.4,
-     38
-    ]
-   }
-  },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 113,
+   "n": 114,
    "acc": 99.1,
    "acc_cls": 99.1,
    "unknown": 0.0,
@@ -21154,7 +21278,7 @@
    "recall": {
     "STAR": [
      100.0,
-     75
+     76
     ],
     "GALAXY": [
      97.4,
@@ -21169,21 +21293,21 @@
   "which": "full",
   "ra": 329.93,
   "dec": 0.88639,
-  "n": 130,
+  "n": 137,
   "ours": {
-   "n": 130,
-   "acc": 95.4,
-   "acc_cls": 95.4,
+   "n": 137,
+   "acc": 94.9,
+   "acc_cls": 94.9,
    "unknown": 0.0,
-   "bal": 85.7,
+   "bal": 85.3,
    "recall": {
     "STAR": [
-     92.7,
-     41
+     91.5,
+     47
     ],
     "GALAXY": [
      97.7,
-     86
+     87
     ],
     "QSO": [
      66.7,
@@ -21192,19 +21316,19 @@
    }
   },
   "high": {
-   "n": 102,
-   "acc": 94.12
+   "n": 106,
+   "acc": 94.34
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 38,
-   "acc": 92.1,
-   "acc_cls": 92.1,
+   "n": 43,
+   "acc": 93.0,
+   "acc_cls": 93.0,
    "unknown": 0.0,
    "bal": 61.1,
    "recall": {
     "STAR": [
      100.0,
-     33
+     38
     ],
     "GALAXY": [
      33.3,
@@ -21217,15 +21341,15 @@
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 38,
-   "acc": 97.4,
-   "acc_cls": 97.4,
+   "n": 43,
+   "acc": 97.7,
+   "acc_cls": 97.7,
    "unknown": 0.0,
    "bal": 88.9,
    "recall": {
     "STAR": [
      100.0,
-     33
+     38
     ],
     "GALAXY": [
      66.7,
@@ -21238,19 +21362,19 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 125,
-   "acc": 92.0,
-   "acc_cls": 92.0,
+   "n": 128,
+   "acc": 92.2,
+   "acc_cls": 92.2,
    "unknown": 0.0,
-   "bal": 82.6,
+   "bal": 83.1,
    "recall": {
     "STAR": [
-     84.6,
-     39
+     86.4,
+     44
     ],
     "GALAXY": [
-     96.4,
-     83
+     96.3,
+     81
     ],
     "QSO": [
      66.7,
@@ -21259,19 +21383,19 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 125,
-   "acc": 95.2,
-   "acc_cls": 95.2,
+   "n": 128,
+   "acc": 95.3,
+   "acc_cls": 95.3,
    "unknown": 0.0,
-   "bal": 85.5,
+   "bal": 85.8,
    "recall": {
     "STAR": [
-     92.3,
-     39
+     93.2,
+     44
     ],
     "GALAXY": [
-     97.6,
-     83
+     97.5,
+     81
     ],
     "QSO": [
      66.7,
@@ -21280,19 +21404,19 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 118,
+   "n": 120,
    "acc": 95.8,
    "acc_cls": 95.8,
    "unknown": 0.0,
-   "bal": 80.1,
+   "bal": 80.4,
    "recall": {
     "STAR": [
-     91.4,
-     35
+     92.5,
+     40
     ],
     "GALAXY": [
-     98.8,
-     81
+     98.7,
+     78
     ],
     "QSO": [
      50.0,
@@ -21301,19 +21425,19 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 118,
+   "n": 120,
    "acc": 95.8,
    "acc_cls": 95.8,
    "unknown": 0.0,
-   "bal": 80.6,
+   "bal": 80.8,
    "recall": {
     "STAR": [
-     94.3,
-     35
+     95.0,
+     40
     ],
     "GALAXY": [
-     97.5,
-     81
+     97.4,
+     78
     ],
     "QSO": [
      50.0,
