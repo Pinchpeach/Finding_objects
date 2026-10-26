@@ -2,20 +2,19 @@
  "ra": 5.04389,
  "dec": 41.24333,
  "radius_arcmin": 12.0,
- "n_objects": 7616,
+ "n_objects": 7193,
  "seconds": {
-  "collect": 278.1,
-  "1_associate": 3.6,
-  "2_integrate": 5.2,
-  "3_features": 5.7,
-  "4_evidence": 5.8,
-  "5_coarse": 7.6,
-  "6_prepare": 6.3,
-  "7_classify": 8.3
+  "collect": 68.9,
+  "1_associate": 1.6,
+  "2_integrate": 2.7,
+  "3_features": 2.9,
+  "4_evidence": 2.8,
+  "5_coarse": 4.0,
+  "6_prepare": 2.9,
+  "7_classify": 4.5
  },
  "catalog_rows": {
   "Pan-STARRS1 DR2 MeanObject": 6477,
-  "NED": 2623,
   "AllWISE": 2196,
   "Gaia DR3": 1649,
   "2MASS PSC": 697,
@@ -29,7 +28,11 @@
   "ZTF periodic variables": 2
  },
  "seeing": {
-  "error": "RuntimeError: Legacy Surveys TAP failed after 3 attempts: DALFormatError: ReadTimeout: HTTPSConnectionPool(host='datalab.noirlab.edu',",
+  "g": NaN,
+  "r": NaN,
+  "z": NaN,
+  "n_psf": 0,
+  "source": "LS DR10 psfsize",
   "ps1": {
    "source": "PS1 stack psfMajor/MinorFWHM",
    "n": 7643,
