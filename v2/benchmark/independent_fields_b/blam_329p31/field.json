@@ -1,0 +1,41 @@
+{
+ "ra": 329.05583,
+ "dec": 30.83417,
+ "radius_arcmin": 12.0,
+ "n_objects": 9801,
+ "seconds": {
+  "collect": 141.5,
+  "1_associate": 4.7,
+  "2_integrate": 6.1,
+  "3_features": 7.0,
+  "4_evidence": 6.9,
+  "5_coarse": 9.3,
+  "6_prepare": 8.1,
+  "7_classify": 9.8
+ },
+ "catalog_rows": {
+  "Pan-STARRS1 DR2 MeanObject": 8615,
+  "SDSS DR18 PhotoObj": 3664,
+  "Gaia DR3": 2766,
+  "NED": 2695,
+  "AllWISE": 2453,
+  "2MASS PSC": 1093,
+  "GALEX AIS": 481,
+  "LoTSS DR2": 52,
+  "SIMBAD": 52,
+  "DESI Legacy Surveys DR10": 50,
+  "LAMOST DR catalog": 37,
+  "VLASS": 8,
+  "NVSS": 5,
+  "ZTF periodic variables": 4,
+  "SDSS DR18 spectroscopy": 2,
+  "TGSS ADR1": 2
+ },
+ "seeing": {
+  "g": NaN,
+  "r": NaN,
+  "z": 1.54,
+  "n_psf": 34,
+  "source": "LS DR10 psfsize"
+ }
+}
