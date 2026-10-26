@@ -2,16 +2,16 @@
  "ra": 346.2425,
  "dec": -35.80889,
  "radius_arcmin": 12.0,
- "n_objects": 9721,
+ "n_objects": 9708,
  "seconds": {
-  "collect": 72.1,
-  "1_associate": 2.4,
-  "2_integrate": 3.8,
-  "3_features": 4.4,
-  "4_evidence": 5.8,
-  "5_coarse": 7.0,
-  "6_prepare": 4.9,
-  "7_classify": 6.9
+  "collect": 61.0,
+  "1_associate": 3.1,
+  "2_integrate": 4.8,
+  "3_features": 4.9,
+  "4_evidence": 6.8,
+  "5_coarse": 8.4,
+  "6_prepare": 5.6,
+  "7_classify": 8.5
  },
  "catalog_rows": {
   "DESI Legacy Surveys DR10": 9316,
@@ -20,7 +20,6 @@
   "Gaia DR3": 504,
   "GALEX AIS": 268,
   "2MASS PSC": 235,
-  "SIMBAD": 41,
   "VLASS": 11,
   "NVSS": 9,
   "TGSS ADR1": 4
