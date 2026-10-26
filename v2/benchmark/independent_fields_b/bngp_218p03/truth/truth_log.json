@@ -1,0 +1,28 @@
+{
+ "LAMOST DR5 (Luo+2019)": {
+  "V/164/dr5": 429,
+  "V/164/stellar5": 204,
+  "V/164/astars5": 12,
+  "V/164/mstars5": 17
+ },
+ "2QZ/6QZ (Croom+2004)": {
+  "VII/241/2qz": 6
+ },
+ "2dFGRS (Colless+2003)": {
+  "VII/250/parent": 33,
+  "VII/250/photo": 33
+ },
+ "6dFGS DR3 (Jones+2009)": {},
+ "2SLAQ QSO (Croom+2009)": {},
+ "WiggleZ final (Drinkwater+2018)": {
+  "J/MNRAS/474/4151/wigglez": 462
+ },
+ "RAVE DR6 (Steinmetz+2020)": {},
+ "APOGEE DR17 (Abdurro'uf+2022)": {
+  "III/286/catalog": 7,
+  "III/286/allvis": 14
+ },
+ "Magellanic Quasars Survey (Kozlowski+2013)": {},
+ "Gaia-ESO DR5 (Randich+2022)": {},
+ "2dF SMC OBA stars (Evans+2004)": {}
+}
