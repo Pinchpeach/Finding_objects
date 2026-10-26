@@ -1,0 +1,39 @@
+{
+ "ra": 7.62056,
+ "dec": 46.02083,
+ "radius_arcmin": 12.0,
+ "n_objects": 9160,
+ "seconds": {
+  "collect": 190.0,
+  "1_associate": 4.6,
+  "2_integrate": 6.0,
+  "3_features": 6.5,
+  "4_evidence": 7.1,
+  "5_coarse": 8.7,
+  "6_prepare": 7.2,
+  "7_classify": 9.6
+ },
+ "catalog_rows": {
+  "Pan-STARRS1 DR2 MeanObject": 8348,
+  "NED": 2675,
+  "AllWISE": 2498,
+  "Gaia DR3": 2353,
+  "2MASS PSC": 894,
+  "GALEX AIS": 657,
+  "LAMOST DR catalog": 121,
+  "VLASS": 13,
+  "NVSS": 9,
+  "TGSS ADR1": 4,
+  "ZTF periodic variables": 1
+ },
+ "seeing": {
+  "error": "TapTimeout: Legacy Surveys TAP failed after 3 attempts: TimeoutError('Data Lab TAP exceeded 80 s')",
+  "ps1": {
+   "source": "PS1 stack psfMajor/MinorFWHM",
+   "n": 8498,
+   "g": 1.3,
+   "r": 1.11,
+   "i": 0.96
+  }
+ }
+}
