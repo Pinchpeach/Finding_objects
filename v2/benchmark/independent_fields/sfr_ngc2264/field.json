@@ -2,16 +2,16 @@
  "ra": 100.24,
  "dec": 9.89,
  "radius_arcmin": 12.0,
- "n_objects": 14316,
+ "n_objects": 14314,
  "seconds": {
-  "collect": 135.1,
-  "1_associate": 6.2,
-  "2_integrate": 8.8,
-  "3_features": 17.5,
-  "4_evidence": 9.1,
-  "5_coarse": 18.8,
-  "6_prepare": 17.7,
-  "7_classify": 15.7
+  "collect": 107.1,
+  "1_associate": 8.4,
+  "2_integrate": 12.8,
+  "3_features": 23.4,
+  "4_evidence": 13.5,
+  "5_coarse": 25.9,
+  "6_prepare": 24.7,
+  "7_classify": 21.2
  },
  "catalog_rows": {
   "Pan-STARRS1 DR2 MeanObject": 9321,
