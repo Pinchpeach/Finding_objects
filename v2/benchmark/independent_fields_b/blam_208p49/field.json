@@ -1,0 +1,44 @@
+{
+ "ra": 208.9625,
+ "dec": 49.18889,
+ "radius_arcmin": 12.0,
+ "n_objects": 10296,
+ "seconds": {
+  "collect": 146.9,
+  "1_associate": 5.6,
+  "2_integrate": 8.9,
+  "3_features": 10.9,
+  "4_evidence": 10.7,
+  "5_coarse": 14.6,
+  "6_prepare": 12.3,
+  "7_classify": 14.4
+ },
+ "catalog_rows": {
+  "DESI Legacy Surveys DR10": 7104,
+  "Pan-STARRS1 DR2 MeanObject": 4641,
+  "SDSS DR18 PhotoObj": 3705,
+  "AllWISE": 1914,
+  "Gaia DR3": 398,
+  "2MASS PSC": 155,
+  "DESI DR1 spectroscopy": 140,
+  "LoTSS DR2": 134,
+  "DESI DR1 FastSpecFit": 114,
+  "SIMBAD": 63,
+  "SDSS DR18 spectroscopy": 61,
+  "LAMOST DR catalog": 36,
+  "FIRST": 9,
+  "SGA-2020": 7,
+  "VLASS": 5,
+  "NVSS": 3,
+  "Gaia DR3 variability SOS": 1,
+  "ZTF periodic variables": 1,
+  "TGSS ADR1": 1
+ },
+ "seeing": {
+  "g": 1.97,
+  "r": 1.38,
+  "z": 1.24,
+  "n_psf": 2640,
+  "source": "LS DR10 psfsize"
+ }
+}
