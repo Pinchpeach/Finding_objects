@@ -1,0 +1,31 @@
+{
+ "known": true,
+ "attempted": 28,
+ "failed": [
+  {
+   "collector": "desi_legacy",
+   "catalog": "DESI Legacy Surveys DR10",
+   "status": "timeout",
+   "impact": "deep morphology and the faint-object (LS-GBM) classifier",
+   "key": true,
+   "error": "TapTimeout(\"Legacy Surveys TAP failed after 3 attempts: TimeoutError('Data Lab TAP exceeded 80 s')\")"
+  },
+  {
+   "collector": "desi_fastspec",
+   "catalog": "DESI FastSpecFit",
+   "status": "timeout",
+   "impact": "emission-line sub-classes",
+   "key": false,
+   "error": "RuntimeError(\"Legacy Surveys TAP failed after 3 attempts: DALFormatError: ReadTimeout: HTTPSConnectionPool(host='datalab.noirlab.edu', port=443): Read timed out. (read timeout=80.0)\")"
+  },
+  {
+   "collector": "atnf_pulsar",
+   "catalog": "ATNF pulsars",
+   "status": "error",
+   "impact": "pulsar labels",
+   "key": false,
+   "error": "DALFormatError: SSLError: HTTPSConnectionPool(host='heasarc.gsfc.nasa.gov', port=443): Max retries exceeded with url: /xamin/vo/tap/sync (Caused by SSLError(SSLCertVerificationError(1, \"[SSL: CERTIFIC"
+  }
+ ],
+ "key_failed": true
+}
