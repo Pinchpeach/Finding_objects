@@ -173,7 +173,7 @@ def score(a):
 
     bench_pos = sf.benchmark_positions()
     rows, per_field = [], []
-    for fdir in sorted(p for p in (B / "independent_fields").iterdir() if (p / "qso_options_blind.csv.gz").exists()):
+    for fdir in sorted(p for p in a.root.iterdir() if (p / "qso_options_blind.csv.gz").exists()):
         q = pd.read_csv(fdir / "qso_options_blind.csv.gz")
         m, _ = sf.field_matches(fdir, "blind", bench_pos)
         m = m if "object_id" in m else pd.DataFrame(columns=["object_id", "t_truth"])  # field without truth
@@ -223,6 +223,7 @@ def main():
     f.add_argument("out")
     s = sub.add_parser("score")
     s.add_argument("--out", type=Path, required=True)
+    s.add_argument("--root", type=Path, default=B / "independent_fields", help="independent_fields (set A) or independent_fields_b")
     a = ap.parse_args()
     {"bench": bench, "field": lambda a: field(a.work, a.out), "score": score}[a.mode](a)
 
