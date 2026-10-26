@@ -1,8 +1,10 @@
 """QSO-separation options for Stage 5 (2.38.0 comparison).
 
-On by default (names still accepted and ignored): c5, c6 (2.38.0) and c1b,
-c3a, c7 (2.39.0), which improved or kept the accuracy on the benchmarks and
-on the 200 independent fields.  c2 was default in 2.38.0 and reverted in
+On by default (names still accepted and ignored): c5, c6 (2.38.0), c1b,
+c3a, c7 (2.39.0) and c1a_half (2.40.0, user decision after the 200-field
+confirmation): all improved or kept the accuracy on the 200 independent
+fields; c1a_half costs accuracy on the QSO-rich benchmarks (SDSS -0.75,
+DESI -3.4 %p) for real-sky QSO purity.  c2 was default in 2.38.0 and reverted in
 2.39.0 (the fields lost 0.11 %p).  The others stay switchable.
 
 Each option is one candidate of ``v2/LITERATURE_QSO.md`` Sect. 3; they are
@@ -48,9 +50,10 @@ import os
 import numpy as np
 import pandas as pd
 
-KNOWN = ("c1a", "c1a_half", "c2", "c3b", "c4", "c8")
-# on by default: c5, c6 since 2.38.0; c1b, c3a, c7 since 2.39.0 (200-field replay)
-ADOPTED = ("c1b", "c3a", "c5", "c6", "c7")
+KNOWN = ("c1a", "c2", "c3b", "c4", "c8")
+# on by default: c5, c6 since 2.38.0; c1b, c3a, c7 since 2.39.0 (200-field
+# replay); c1a_half since 2.40.0 (c1a = the full-strength prior instead)
+ADOPTED = ("c1a_half", "c1b", "c3a", "c5", "c6", "c7")
 VETO = 0.1
 
 # Real-sky QSO fraction per r bin: true class mix of the 18 search fields

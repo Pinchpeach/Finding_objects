@@ -35,9 +35,9 @@ B = Path(__file__).resolve().parent
 V2 = B.parent
 PRE = V2 / "Preprocess"
 C = ["STAR", "GALAXY", "QSO"]
-# c1b, c3a, c5, c6, c7 are the default since 2.39.0 (Preprocess/qso_options.ADOPTED)
-SINGLES = ["c1a", "c1a_half", "c2", "c3b", "c4", "c8"]
-COMBOS = ["c1a_half+c3b"]
+# c1a_half, c1b, c3a, c5, c6, c7 are the default since 2.40.0 (Preprocess/qso_options.ADOPTED)
+SINGLES = ["c1a", "c2", "c3b", "c4", "c8"]
+COMBOS = ["c1a+c3b"]
 SETS = ["base", *SINGLES, *COMBOS]
 
 
