@@ -118,6 +118,8 @@ classified_objects.csv
 | 고신뢰로 표시된 천체 | 13,566개, 그중 99.76 % 정확 |
 | full (모든 목록 사용) | 98.8 % |
 
+처음 보는 200개 영역(세트 B, 2.40.0, 세트 A와 3.5° 이상 떨어짐)에서는 blind 98.6 %(10,205개), 고신뢰 99.78 %, 재현율 별/은하/QSO 99.5 / 93.3 / 94.3 %였다([`v2/benchmark/VALIDATION_SET_B_2026-10-26.md`](v2/benchmark/VALIDATION_SET_B_2026-10-26.md)).
+
 2.40.0의 밝기별 QSO 사전확률은 같은 영역 재생에서 1차 분류 정확도 96.21 → 96.31 %, QSO 정밀도 79.5 → 86.9 %, QSO 재현율 94.4 → 90.9 %였다([`v2/benchmark/qso_options/`](v2/benchmark/qso_options/)).
 
 ### 실제 하늘 비율 기준 순도 (blind, 18개 영역, 2.36.0 측정)
