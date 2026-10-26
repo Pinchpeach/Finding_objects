@@ -519,8 +519,16 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     lat = np.where(np.isfinite(dens), dens, latitude_factor(df) * magellanic_factor(df))
     Q[:, [CLASSES.index("GALAXY"), CLASSES.index("QSO")]] *= lat[:, None]
     qf = np.ones(len(df))
-    if "c1a" in opts or "c1a_half" in opts:
-        qf *= QSO_OPT.magnitude_prior(df, half="c1a" not in opts)
+    # Magnitude prior on the QSO odds (2.40.0): the fusion was trained with
+    # about equal classes, the sky has 0.07-0.8 % quasars per r bin
+    # (natural_purity, 2.36.0), so the QSO odds are scaled by the square
+    # root of the real-sky / training odds (a tempered label-shift prior,
+    # Saerens et al. 2002; number-count priors as in Bovy et al. 2011 and
+    # Jamal & Bailer-Jones 2024).  2.39.0 200-field replay: Stage-5 accuracy
+    # 96.21 -> 96.31 %, QSO precision 79.5 -> 86.9 %, recall 94.4 -> 90.9 %;
+    # QSO-rich benchmarks lose (SDSS -0.75, DESI -3.4 %p).  Option c1a
+    # applies the full prior.
+    qf *= QSO_OPT.magnitude_prior(df, half="c1a" not in opts)
     # DESI QSO preselection W1 < 22.3 and W2 < 22.3 AB (Chaussidon et al.
     # 2023, Sect. 3; removes stars faint in WISE, e.g. the Sagittarius
     # stream): QSO odds x VETO otherwise (2.39.0; fields +0.09 %p, SDSS
