@@ -3,22 +3,6 @@
  "attempted": 28,
  "failed": [
   {
-   "collector": "desi_legacy",
-   "catalog": "DESI Legacy Surveys DR10",
-   "status": "timeout",
-   "impact": "deep morphology and the faint-object (LS-GBM) classifier",
-   "key": true,
-   "error": "exceeded 300 s collector budget"
-  },
-  {
-   "collector": "desi_fastspec",
-   "catalog": "DESI FastSpecFit",
-   "status": "timeout",
-   "impact": "emission-line sub-classes",
-   "key": false,
-   "error": "RuntimeError(\"Legacy Surveys TAP failed after 3 attempts: DALFormatError: ReadTimeout: HTTPSConnectionPool(host='datalab.noirlab.edu', port=443): Read timed out. (read timeout=80.0)\")"
-  },
-  {
    "collector": "atnf_pulsar",
    "catalog": "ATNF pulsars",
    "status": "error",
@@ -29,10 +13,10 @@
   {
    "collector": "simbad",
    "catalog": "SIMBAD",
-   "status": "error",
+   "status": "timeout",
    "impact": "literature labels",
    "key": false,
-   "error": "DALFormatError: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+   "error": "exceeded 300 s collector budget"
   },
   {
    "collector": "ned",
@@ -43,5 +27,5 @@
    "error": "ExpatError('syntax error: line 1, column 49')"
   }
  ],
- "key_failed": true
+ "key_failed": false
 }
