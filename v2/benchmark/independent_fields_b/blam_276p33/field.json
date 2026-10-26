@@ -1,0 +1,43 @@
+{
+ "ra": 276.26,
+ "dec": 33.32,
+ "radius_arcmin": 12.0,
+ "n_objects": 19724,
+ "seconds": {
+  "collect": 184.0,
+  "1_associate": 8.8,
+  "2_integrate": 9.7,
+  "3_features": 10.9,
+  "4_evidence": 14.3,
+  "5_coarse": 17.7,
+  "6_prepare": 12.5,
+  "7_classify": 17.5
+ },
+ "catalog_rows": {
+  "DESI Legacy Surveys DR10": 15273,
+  "Pan-STARRS1 DR2 MeanObject": 11410,
+  "Gaia DR3": 3176,
+  "NED": 2903,
+  "AllWISE": 2702,
+  "2MASS PSC": 1179,
+  "GALEX AIS": 466,
+  "SIMBAD": 28,
+  "VLASS": 10,
+  "LoTSS DR2": 9,
+  "NVSS": 6,
+  "ZTF periodic variables": 4,
+  "SGA-2020": 4,
+  "TGSS ADR1": 3,
+  "Gaia DR3 variability SOS": 1
+ },
+ "seeing": {
+  "error": "RuntimeError: Legacy Surveys TAP failed after 3 attempts: DALServiceError: 502 Server Error: Bad Gateway for url: https://datalab.noir",
+  "ps1": {
+   "source": "PS1 stack psfMajor/MinorFWHM",
+   "n": 11787,
+   "g": 1.25,
+   "r": 1.14,
+   "i": 1.08
+  }
+ }
+}
