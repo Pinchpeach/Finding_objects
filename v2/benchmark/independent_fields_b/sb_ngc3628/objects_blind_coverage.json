@@ -17,14 +17,6 @@
    "impact": "literature labels",
    "key": false,
    "error": "DALFormatError: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
-  },
-  {
-   "collector": "ned",
-   "catalog": "NED",
-   "status": "timeout",
-   "impact": "literature labels",
-   "key": false,
-   "error": "ConnectionError(ReadTimeoutError(\"HTTPSConnectionPool(host='ned.ipac.caltech.edu', port=443): Read timed out.\"))"
   }
  ],
  "key_failed": false
