@@ -247,7 +247,21 @@ def fuse_many(item_lists, model=None, base_dir=None):
 CSTAR_MAX_SIGMA = 5.0
 
 
+# Inside bright nebulae C* is raised by the nebular background, not by a
+# spurious solution.  Rybizki et al. (2022, MNRAS 510, 2597) trained a
+# classifier on Gaia's own astrometric quality columns that separates good from
+# spurious solutions with 99.3 % purity and 97.3 % completeness; with
+# fidelity_v2 >= FIDELITY_MIN (their strict example cut) the astrometry is
+# used whatever C* (2.42.0).
+FIDELITY_MIN = 0.9
+
+
 def _point_like(e):
+    try:
+        if float(e.get("fidelity")) >= FIDELITY_MIN:
+            return True
+    except (TypeError, ValueError):
+        pass
     try:
         return float(e.get("cstar_sigma")) <= CSTAR_MAX_SIGMA
     except (TypeError, ValueError):

@@ -212,6 +212,45 @@ def _merge_optional(
     return base
 
 
+# Astrometric fidelity (Rybizki et al. 2022, MNRAS 510, 2597): the
+# probability that the EDR3 = DR3 astrometric solution is not spurious,
+# served by GAVO's TAP (table gedr3spur.main, keyed by source_id).  Used by
+# Stage 5 to trust proper motions inside bright nebulae, where the BP/RP
+# excess C* is raised by the nebula rather than by a bad solution (2.42.0).
+FIDELITY_TAP = "https://dc.zah.uni-heidelberg.de/tap"
+FIDELITY_TABLE = "gedr3spur.main"
+
+
+def _merge_fidelity(base: pd.DataFrame, deadline: float | None = None) -> pd.DataFrame:
+    if base.empty:
+        base["fidelity_v2"] = pd.Series(dtype="float")
+        return base
+    ids = [str(int(x)) for x in pd.to_numeric(base["source_id"], errors="coerce").dropna().unique()]
+    status = "ok"
+    try:
+        import pyvo
+
+        svc = pyvo.dal.TAPService(FIDELITY_TAP)
+        pieces = []
+        for start in range(0, len(ids), OPTIONAL_CHUNK):
+            left = OPTIONAL_TAP_BUDGET_S if deadline is None else min(OPTIONAL_TAP_BUDGET_S, deadline - time.monotonic())
+            if left <= 0:
+                raise TimeoutError("fidelity: shared deadline passed")
+            q = f"SELECT source_id, fidelity_v2 FROM {FIDELITY_TABLE} WHERE source_id IN ({','.join(ids[start:start + OPTIONAL_CHUNK])})"
+            pieces.append(_bounded(lambda q=q, deadline=None: svc.run_sync(q).to_table().to_pandas(), left))
+        opt = pd.concat(pieces, ignore_index=True) if pieces else pd.DataFrame()
+        if not opt.empty:
+            opt["source_id"] = pd.to_numeric(opt["source_id"], errors="coerce").astype("Int64")
+            base["source_id"] = pd.to_numeric(base["source_id"], errors="coerce").astype("Int64")
+            base = base.merge(opt.drop_duplicates("source_id"), on="source_id", how="left")
+    except Exception as exc:
+        status = "error:" + type(exc).__name__
+    if "fidelity_v2" not in base:
+        base["fidelity_v2"] = pd.NA
+    base["gaia_fidelity_query_status"] = status
+    return base
+
+
 def _vizier_fallback(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     src = vizier_cone(RELEASES["DR3"].vizier_source, ra, dec, radius_arcmin)
     if src is None:
@@ -354,6 +393,8 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
             df = _merge_optional(
                 df, _table(rel, "vari_summary"), VAR_SUMMARY, "gaia_vari_summary_query_status", opt_deadline
             )
+            if rel.name == "DR3":  # the classifier was trained on (E)DR3 solutions
+                df = _merge_fidelity(df, opt_deadline)
     except Exception:
         # The VizieR mirror is DR3: label the rows DR3 (epoch 2016.0) even
         # when another release was requested, so propagation stays correct.
