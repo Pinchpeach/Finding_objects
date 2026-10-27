@@ -48,6 +48,7 @@ from __future__ import annotations
 import json
 import math
 import re
+from pathlib import Path
 import numpy as np
 import pandas as pd
 
@@ -413,6 +414,122 @@ def attach_ps1_fragments(out: pd.DataFrame, assoc: pd.DataFrame, explain: dict |
         if "unknown_reason" in out:
             name = out.at[h, "designation"] if "designation" in out else host
             out.at[i, "unknown_reason"] = f"Pan-STARRS1 measurement of the galaxy {name} (grouped under it)"
+    counts = out.parent_object_id.dropna().value_counts()
+    out["n_components"] = out.object_id.map(counts).fillna(0).astype(int)
+    return out
+
+
+# Fragments and duplicate rows of small galaxies (2.41.0).  The Tractor
+# models large, complex galaxies poorly and leaves spurious faint sources in
+# their light (Dey et al. 2019, AJ 157, 168, sec. 8); DESI BGS removes such
+# "fragments of shredded galaxies" with a fibre-magnitude cut (Hahn et al.
+# 2023, AJ 165, 253) and GAMA inspects faint sources near a large galaxy as
+# possible deblends (Baldry et al. 2010, MNRAS 404, 86).  The association
+# then gives a fragment the galaxy's own 2MASS/AllWISE/PS1 rows, or leaves
+# those rows alone next to the galaxy (Marrese et al. 2019 keep such extra
+# entries of one source as "mates").  In the 400 independent regions of
+# 2.40.0, 142 of the 245 galaxy errors had a correctly classified object of
+# the true class within 3", the misclassified one a faint LS source (median
+# r 21.9 against 17.6) or a single-survey AllWISE/GALEX/SDSS row.
+# A top-level object is grouped under an extended LS galaxy (classified
+# GALAXY) when it lies within max(FRAG_RADII * r_e, FRAG_MIN_ARCSEC) of its
+# centre -- the light-radius-normalised separation d_DLR used to assign
+# transients to hosts (Sullivan et al. 2006; Gupta et al. 2016 use d_DLR < 4)
+# -- and
+#   * as an LS source it is >= FRAG_FAINTER_MAG fainter in r than the galaxy
+#     (a fragment carries a small part of the light), or
+#   * it has no LS measurement and no Gaia source (a row of a shallower or
+#     lower-resolution survey that the deeper LS imaging does not show as a
+#     separate source);
+# and it is not a separate object by its own evidence: no Gaia parallax or
+# proper motion at >= FRAG_MOTION_SNR (or above 1 mas / 3 mas/yr where the
+# errors are not at hand) and no good spectrum of its own.
+FRAG_RADII = 1.0
+FRAG_MIN_ARCSEC = 1.0
+FRAG_FAINTER_MAG = 2.0
+FRAG_MOTION_SNR = 5.0
+FRAG_KINDS = ("ls", "steal", "survey")
+STOLEN_CATALOGS = frozenset({"2MASS PSC", "AllWISE", PS1, SDSS, "GALEX AIS"})
+
+
+def _fragment_moving(out):
+    plx = pd.to_numeric(out.get("gaia_dr3__parallax", pd.Series(np.nan, index=out.index)), errors="coerce")
+    pmra = pd.to_numeric(out.get("gaia_dr3__pmra", pd.Series(np.nan, index=out.index)), errors="coerce")
+    pmde = pd.to_numeric(out.get("gaia_dr3__pmdec", pd.Series(np.nan, index=out.index)), errors="coerce")
+    pm = np.hypot(pmra, pmde)
+    if "gaia_dr3__parallax_error" in out and "gaia_dr3__pmra_error" in out:
+        e_plx = pd.to_numeric(out.gaia_dr3__parallax_error, errors="coerce")
+        e_pm = np.hypot(
+            pd.to_numeric(out.gaia_dr3__pmra_error, errors="coerce"),
+            pd.to_numeric(out.get("gaia_dr3__pmdec_error", out.gaia_dr3__pmra_error), errors="coerce"),
+        ) / math.sqrt(2)
+        return ((plx / e_plx >= FRAG_MOTION_SNR) | (pm / e_pm >= FRAG_MOTION_SNR)).to_numpy(bool)
+    return ((plx > 1.0) | (pm > 3.0)).to_numpy(bool)
+
+
+def attach_galaxy_fragments(out: pd.DataFrame) -> pd.DataFrame:
+    """Group faint LS fragments and unconfirmed survey rows under their galaxy."""
+    if out.empty or "catalogs" not in out or "desi_legacy_surveys_dr10__type" not in out:
+        return out
+    out = out.copy()
+    for c, default in (("parent_object_id", None), ("component_role", ""), ("n_components", 0)):
+        if c not in out:
+            out[c] = default
+    for c in ("parent_object_id", "component_role", "unknown_reason"):
+        if c in out:
+            out[c] = out[c].astype(object)
+    top = out.parent_object_id.isna().to_numpy()
+    typ = out.desi_legacy_surveys_dr10__type.astype(str).str.strip().str.upper()
+    shape = pd.to_numeric(out.get("desi_legacy_surveys_dr10__shape_r", pd.Series(np.nan, index=out.index)), errors="coerce")
+    r = pd.to_numeric(out.get("std_mag__ls_r", pd.Series(np.nan, index=out.index)), errors="coerce").to_numpy(float)
+    cls = out.get("primary_class", pd.Series("", index=out.index)).astype(str)
+    host = top & typ.isin(EXTENDED_TYPES).to_numpy() & (shape > 0).to_numpy() & np.isfinite(r) & cls.eq("GALAXY").to_numpy()
+    hi = np.flatnonzero(host)
+    if not len(hi):
+        return out
+    cats = out.catalogs.fillna("").astype(str)
+    has_ls = cats.str.contains(LS, regex=False).to_numpy()
+    has_gaia = cats.str.contains("Gaia DR3", regex=False).to_numpy()
+    import importlib.util  # noqa: PLC0415
+
+    sp = importlib.util.spec_from_file_location("v2_hc_frag", Path(__file__).resolve().parent / "high_confidence.py")
+    hc = importlib.util.module_from_spec(sp)
+    sp.loader.exec_module(hc)
+    spec = hc.spectroscopic(out).to_numpy() != ""
+    cand = top & ~host & ~_fragment_moving(out) & ~spec
+    cand &= np.where(has_ls & np.isfinite(r), "ls" in FRAG_KINDS, ("survey" in FRAG_KINDS) & ~has_ls & ~has_gaia)
+    ci = np.flatnonzero(cand)
+    survey_sets = cats.map(lambda c: frozenset(c.split("|")) & STOLEN_CATALOGS).to_numpy()
+    if not len(ci):
+        return out
+    ra, dec = out.ra.to_numpy(float), out.dec.to_numpy(float)
+    d0 = np.radians(np.nanmedian(dec[hi]))
+    x = ((ra - ra[hi[0]] + 180.0) % 360.0 - 180.0) * math.cos(d0) * 3600.0
+    y = (dec - dec[hi[0]]) * 3600.0
+    lim = np.maximum(FRAG_RADII * shape.to_numpy(float)[hi], FRAG_MIN_ARCSEC)
+    from scipy.spatial import cKDTree  # noqa: PLC0415
+
+    tree = cKDTree(np.c_[x[hi], y[hi]])
+    near = tree.query_ball_point(np.c_[x[ci], y[ci]], r=float(lim.max()))
+    oid = out.object_id.to_numpy()
+    designation = out.designation.to_numpy() if "designation" in out else oid
+    for i, ks in zip(ci, near):
+        if not ks:
+            continue
+        ks = np.asarray(ks)
+        d = np.hypot(x[hi[ks]] - x[i], y[hi[ks]] - y[i]) / lim[ks]
+        if d.min() > 1:
+            continue
+        h = hi[ks[int(np.argmin(d))]]
+        if np.isfinite(r[i]) and has_ls[i]:
+            if r[i] - r[h] < FRAG_FAINTER_MAG:
+                continue
+            if "steal" in FRAG_KINDS and not (survey_sets[i] - survey_sets[h]):
+                continue
+        out.iat[i, out.columns.get_loc("parent_object_id")] = oid[h]
+        out.iat[i, out.columns.get_loc("component_role")] = "fragment"
+        if "unknown_reason" in out:
+            out.iat[i, out.columns.get_loc("unknown_reason")] = f"fragment or duplicate row of the galaxy {designation[h]} (grouped under it)"
     counts = out.parent_object_id.dropna().value_counts()
     out["n_components"] = out.object_id.map(counts).fillna(0).astype(int)
     return out

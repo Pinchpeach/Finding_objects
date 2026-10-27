@@ -56,6 +56,7 @@ def num(row, name):
 
 
 R90_MIN_SNR2 = 5.0
+NIR_POINT = "_nir_bright_point_source"  # row key set in run() (nir_star.py)
 # AST-EXT-001 is the Gaia-CRF3 consistency cut |(plx+0.017)/sigma| < 5
 # (Klioner+2022 Eq. 2), which Klioner et al. apply only to filter catalogued
 # QSO candidates.  As positive EXTRAGALACTIC evidence it is informative only
@@ -465,9 +466,17 @@ def evaluate(rule, row, namespaced=frozenset()):
         # outside |b| <= 10 deg and 30 deg of the Galactic Centre (YSOs, AGB
         # stars, PNe mimic AGN colours there).  cc_flags = 0 is already
         # enforced by catalog_confidence_allwise.  (2.16.0; was S/N >= 3 only.)
+        # Not for a clean 2MASS point source with Ks < 13 (2.41.0): quasars
+        # are <= 0.1 deg^-2 that bright (Maddox et al. 2008), while young
+        # stars with discs have W1-W2 = 0.25-1.5 (Koenig & Leisawitz 2014,
+        # ApJ 791, 131) and Orion, Taurus and Ophiuchus lie inside the R90
+        # sky; YSO surveys keep AGN out by a W1 floor of 13-14 mag (same
+        # paper; Gutermuth et al. 2009 [3.6] <= 14.5).  The Ks form of that
+        # floor removes 5 of 2,812 R90 hits on the SDSS benchmark (W1 < 13:
+        # 68, of them 65 quasars) with the same accuracy.
         w1, w2, s1, s2 = (num(src, x) for x in ("W1mag", "W2mag", "snr1", "snr2"))
         ra, dec = num(src, "RAJ2000"), num(src, "DEJ2000")
-        if None not in (w1, w2, s1, s2) and s1 >= 3 and s2 > R90_MIN_SNR2 and w1 > 8 and w2 > 7 and _r90_sky(ra, dec):
+        if None not in (w1, w2, s1, s2) and s1 >= 3 and s2 > R90_MIN_SNR2 and w1 > 8 and w2 > 7 and _r90_sky(ra, dec) and not row.get(NIR_POINT):
             cut = 0.650 if w2 <= 13.86 else 0.650 * math.exp(0.153 * (w2 - 13.86) ** 2)
             color = w1 - w2
             if color > cut:
@@ -754,7 +763,9 @@ def run(features: Path, rules_path: Path, out: Path) -> Path:
     rule_list = rules.to_dict("records")
     knn = _color_knn_evidence(df, rule_list)
     gbm = _ls_gbm_evidence(df, rule_list)
+    nir = _import_local("nir_star").bright_point_source(df)
     for i, row in enumerate(df[_rule_columns(df.columns)].to_dict("records")):
+        row[NIR_POINT] = bool(nir[i])
         ev = []
         for rule in rule_list:
             ev.extend(evaluate(rule, row, namespaced))
