@@ -39,6 +39,9 @@ _gbm_s.loader.exec_module(TREES)
 _qo_s = _tio_u.spec_from_file_location("v2_qso_options", Path(__file__).resolve().parent / "qso_options.py")
 QSO_OPT = _tio_u.module_from_spec(_qo_s)
 _qo_s.loader.exec_module(QSO_OPT)
+_nir_s = _tio_u.spec_from_file_location("v2_nir_star", Path(__file__).resolve().parent / "nir_star.py")
+NIR = _tio_u.module_from_spec(_nir_s)
+_nir_s.loader.exec_module(NIR)
 CLASSES = ("STAR", "GALAXY", "QSO")
 WEIGHT = {"direct_probability": 1.0, "catalog_label": 1.5, "continuous_score": 0.35, "binary_evidence": 0.35}
 MIN_CONFIDENCE = 0.50
@@ -490,12 +493,12 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
                 strong.add(c)
         conflict = bool(items) and len(strong) > 1
         in_host = hr < HOST_RADIUS and not _gaia_foreground_star(items) and not _spectroscopic(items)
-        rows.append((np.array([p[c] for c in CLASSES]), used, conflict, in_host, _decisive_motion(items)))
+        rows.append((np.array([p[c] for c in CLASSES]), used, conflict and "STAR" in strong, conflict, in_host, _decisive_motion(items)))
     P = np.array([r[0] for r in rows]).reshape(len(rows), len(CLASSES))
     # Field-prior adjustment needs calibrated posteriors (fitted model) and
     # enough independent objects in the field to estimate the class mix.
     eligible = np.array(
-        [used > 0 and not conflict and not in_host for _, used, conflict, in_host, _ in rows], dtype=bool
+        [used > 0 and not conflict and not in_host for _, used, _, conflict, in_host, _ in rows], dtype=bool
     )
     train_prior = [float((model or {}).get("training_prior", {}).get(c, 1 / len(CLASSES))) for c in CLASSES]
     # The EM estimate assumes pure label shift with calibrated posteriors.
@@ -544,23 +547,40 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     Q[:, CLASSES.index("QSO")] *= qf
     qso_min = QSO_OPT.desi_threshold(df) if "c3b" in opts else np.zeros(len(df))
     faint = QSO_OPT.r_mag(df) > 22 if "c8" in opts else np.zeros(len(df), bool)
+    # Bright clean 2MASS point sources (2.41.0, nir_star.py): where the
+    # evidence is absent or conflicting with STAR among it, the sky counts
+    # decide (stars outnumber galaxies >= 25:1 and quasars >= 10^4:1 at
+    # Ks < 13 with gal_contam = 0).  Young stars in nebulae and crowded
+    # cluster stars, independent regions A+B: 64 stars against <= 3 galaxies.
+    nir = NIR.bright_point_source(df)
+    nir_p = NIR.star_probability(df)
     Q = Q / Q.sum(axis=1, keepdims=True) if len(Q) else Q
     labels = []
     confidence = []
     margins = []
     statuses = []
+    basis = []
     best_candidates = []
     best_candidate_scores = []
-    for q, (_, used, conflict, in_host, moving), qmin, qfaint in zip(Q, rows, qso_min, faint):
+    for q, (_, used, star_conflict, conflict, in_host, moving), qmin, qfaint, nir_i, nir_pi in zip(
+        Q, rows, qso_min, faint, nir, nir_p
+    ):
         order = np.argsort(-q)
         conf = float(q[order[0]])
         margin = conf - float(q[order[1]])
         top = CLASSES[order[0]]
+        how = "evidence"
         # Inside a large galaxy the host status is the most informative one,
         # with or without evidence (e.g. Legacy Surveys DUP sources there).
         if in_host:
             label = "UNKNOWN"
             status = "WITHIN_LARGE_GALAXY"
+        elif nir_i and (used == 0 or (star_conflict and not moving and (not model or conf < CONFLICT_RESOLVED_P))):
+            label = top = "STAR"
+            status = "CLASSIFIED"
+            conf = float(nir_pi) if used == 0 else max(float(nir_pi), float(q[CLASSES.index("STAR")]))
+            margin = 2 * conf - 1
+            how = NIR.BASIS
         elif used == 0:
             label = "UNKNOWN"
             status = "NO_EVIDENCE"
@@ -588,7 +608,8 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
         confidence.append(conf)
         margins.append(margin)
         statuses.append(status)
-        if used == 0:
+        basis.append(how)
+        if used == 0 and how == "evidence":
             best_candidates.append("UNKNOWN")
             best_candidate_scores.append(float("nan"))
         else:
@@ -613,6 +634,7 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
             "primary_confidence": confidence,
             "primary_margin": margins,
             "classification_status": statuses,
+            "classification_basis": basis,
             "best_candidate_class": best_candidates,
             "best_candidate_probability": best_candidate_scores,
         }
