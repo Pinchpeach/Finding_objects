@@ -4,14 +4,14 @@
  "radius_arcmin": 6.0,
  "n_objects": 8383,
  "seconds": {
-  "collect": 203.4,
-  "1_associate": 5.7,
-  "2_integrate": 4.0,
-  "3_features": 4.4,
-  "4_evidence": 4.4,
-  "5_coarse": 7.1,
-  "6_prepare": 5.0,
-  "7_classify": 7.0
+  "collect": 211.2,
+  "1_associate": 7.8,
+  "2_integrate": 5.5,
+  "3_features": 5.9,
+  "4_evidence": 6.3,
+  "5_coarse": 9.2,
+  "6_prepare": 6.6,
+  "7_classify": 9.4
  },
  "catalog_rows": {
   "Gaia DR3": 7997,
