@@ -2,16 +2,16 @@
  "ra": 229.638,
  "dec": 2.081,
  "radius_arcmin": 6.0,
- "n_objects": 33821,
+ "n_objects": 33640,
  "seconds": {
-  "collect": 205.0,
-  "1_associate": 131.1,
-  "2_integrate": 38.0,
-  "3_features": 55.1,
-  "4_evidence": 43.8,
-  "5_coarse": 70.0,
-  "6_prepare": 59.7,
-  "7_classify": 58.8
+  "collect": 207.9,
+  "1_associate": 124.0,
+  "2_integrate": 38.9,
+  "3_features": 58.8,
+  "4_evidence": 48.2,
+  "5_coarse": 74.0,
+  "6_prepare": 64.2,
+  "7_classify": 61.5
  },
  "catalog_rows": {
   "Pan-STARRS1 DR2 MeanObject": 27558,
@@ -19,7 +19,6 @@
   "DESI Legacy Surveys DR10": 26254,
   "NED": 3078,
   "2MASS PSC": 2356,
-  "SIMBAD": 1525,
   "AllWISE": 1046,
   "DESI DR1 spectroscopy": 136,
   "Gaia DR3 variability SOS": 88,
