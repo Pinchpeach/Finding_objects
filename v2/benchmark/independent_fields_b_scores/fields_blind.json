@@ -14995,17 +14995,17 @@
   "n": 8,
   "ours": {
    "n": 8,
-   "acc": 75.0,
+   "acc": 87.5,
    "acc_cls": 100.0,
-   "unknown": 25.0,
-   "bal": 85.7,
+   "unknown": 12.5,
+   "bal": 92.8,
    "recall": {
     "STAR": [
      100.0,
      1
     ],
     "GALAXY": [
-     71.4,
+     85.7,
      7
     ]
    }
@@ -18822,13 +18822,13 @@
   "n": 119,
   "ours": {
    "n": 119,
-   "acc": 99.2,
+   "acc": 100.0,
    "acc_cls": 100.0,
-   "unknown": 0.8,
-   "bal": 99.2,
+   "unknown": 0.0,
+   "bal": 100.0,
    "recall": {
     "STAR": [
-     99.2,
+     100.0,
      119
     ]
    }
@@ -18889,35 +18889,11 @@
    }
   },
   "high": {
-   "n": 775,
+   "n": 773,
    "acc": 99.87
   },
-  "Gaia DR3 DSC-Combmod": {
-   "n": 772,
-   "acc": 99.9,
-   "acc_cls": 99.9,
-   "unknown": 0.0,
-   "bal": 99.9,
-   "recall": {
-    "STAR": [
-     99.9,
-     772
-    ]
-   }
-  },
-  "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 772,
-   "acc": 99.9,
-   "acc_cls": 99.9,
-   "unknown": 0.0,
-   "bal": 99.9,
-   "recall": {
-    "STAR": [
-     99.9,
-     772
-    ]
-   }
-  },
+  "Gaia DR3 DSC-Combmod": null,
+  "Gaia DR3 DSC-Combmod | ours same": null,
   "LS-GBM (LS photometry only)": null,
   "LS-GBM (LS photometry only) | ours same": null,
   "LS morphology + WISE W1-W2>=0.8": null,
@@ -18932,13 +18908,13 @@
   "n": 197,
   "ours": {
    "n": 197,
-   "acc": 99.5,
+   "acc": 100.0,
    "acc_cls": 100.0,
-   "unknown": 0.5,
-   "bal": 99.5,
+   "unknown": 0.0,
+   "bal": 100.0,
    "recall": {
     "STAR": [
-     99.5,
+     100.0,
      197
     ]
    }
@@ -19445,13 +19421,13 @@
   "n": 29,
   "ours": {
    "n": 29,
-   "acc": 96.6,
+   "acc": 100.0,
    "acc_cls": 100.0,
-   "unknown": 3.4,
-   "bal": 96.6,
+   "unknown": 0.0,
+   "bal": 100.0,
    "recall": {
     "STAR": [
-     96.6,
+     100.0,
      29
     ]
    }
@@ -19559,13 +19535,13 @@
   "n": 58,
   "ours": {
    "n": 58,
-   "acc": 79.3,
+   "acc": 86.2,
    "acc_cls": 100.0,
-   "unknown": 20.7,
-   "bal": 79.3,
+   "unknown": 13.8,
+   "bal": 86.2,
    "recall": {
     "STAR": [
-     79.3,
+     86.2,
      58
     ]
    }
@@ -19589,13 +19565,13 @@
   },
   "Gaia DR3 DSC-Combmod | ours same": {
    "n": 52,
-   "acc": 88.5,
+   "acc": 94.2,
    "acc_cls": 100.0,
-   "unknown": 11.5,
-   "bal": 88.5,
+   "unknown": 5.8,
+   "bal": 94.2,
    "recall": {
     "STAR": [
-     88.5,
+     94.2,
      52
     ]
    }
