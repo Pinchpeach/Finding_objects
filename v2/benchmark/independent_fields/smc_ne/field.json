@@ -2,23 +2,22 @@
  "ra": 16.0,
  "dec": -71.8,
  "radius_arcmin": 6.0,
- "n_objects": 7832,
+ "n_objects": 7814,
  "seconds": {
-  "collect": 204.1,
-  "1_associate": 5.4,
-  "2_integrate": 4.8,
-  "3_features": 6.3,
-  "4_evidence": 5.7,
-  "5_coarse": 9.7,
-  "6_prepare": 7.0,
-  "7_classify": 8.2
+  "collect": 202.4,
+  "1_associate": 6.6,
+  "2_integrate": 5.8,
+  "3_features": 7.4,
+  "4_evidence": 6.7,
+  "5_coarse": 11.1,
+  "6_prepare": 8.3,
+  "7_classify": 9.7
  },
  "catalog_rows": {
   "Gaia DR3": 7706,
   "DESI Legacy Surveys DR10": 7706,
   "AllWISE": 828,
   "2MASS PSC": 572,
-  "SIMBAD": 349,
   "Gaia DR3 variability SOS": 29,
   "XMM 4XMM-DR13": 29,
   "Chandra CSC 2.0": 27
