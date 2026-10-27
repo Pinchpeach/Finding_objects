@@ -2,16 +2,16 @@
  "ra": 74.0,
  "dec": -68.5,
  "radius_arcmin": 6.0,
- "n_objects": 16824,
+ "n_objects": 16813,
  "seconds": {
-  "collect": 201.0,
-  "1_associate": 16.8,
-  "2_integrate": 11.3,
-  "3_features": 16.7,
-  "4_evidence": 11.3,
-  "5_coarse": 22.4,
-  "6_prepare": 18.4,
-  "7_classify": 18.9
+  "collect": 210.8,
+  "1_associate": 22.6,
+  "2_integrate": 14.8,
+  "3_features": 21.6,
+  "4_evidence": 15.4,
+  "5_coarse": 29.5,
+  "6_prepare": 23.2,
+  "7_classify": 24.1
  },
  "catalog_rows": {
   "Gaia DR3": 16466,
@@ -19,7 +19,6 @@
   "NED": 2877,
   "2MASS PSC": 871,
   "AllWISE": 752,
-  "SIMBAD": 174,
   "Gaia DR3 variability SOS": 44,
   "XMM 4XMM-DR13": 10,
   "Chandra CSC 2.0": 6,
