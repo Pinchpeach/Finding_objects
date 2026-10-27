@@ -42,6 +42,9 @@ _qo_s.loader.exec_module(QSO_OPT)
 _nir_s = _tio_u.spec_from_file_location("v2_nir_star", Path(__file__).resolve().parent / "nir_star.py")
 NIR = _tio_u.module_from_spec(_nir_s)
 _nir_s.loader.exec_module(NIR)
+_bgs_s = _tio_u.spec_from_file_location("v2_bgs_galaxy", Path(__file__).resolve().parent / "bgs_galaxy.py")
+BGS = _tio_u.module_from_spec(_bgs_s)
+_bgs_s.loader.exec_module(BGS)
 CLASSES = ("STAR", "GALAXY", "QSO")
 WEIGHT = {"direct_probability": 1.0, "catalog_label": 1.5, "continuous_score": 0.35, "binary_evidence": 0.35}
 MIN_CONFIDENCE = 0.50
@@ -58,6 +61,9 @@ HOST_RADIUS = 1.0
 # to re-estimate the field's class mix.
 FIELD_PRIOR_MIN_OBJECTS = 50
 CONFLICT_RESOLVED_P = 0.99
+# The BGS Gaia galaxy test (bgs_galaxy.py) does not overrule evidence that
+# already classifies at this probability.
+BGS_KEEP_P = 0.9
 # A Gaia parallax or proper motion measured at >= 10 sigma is physically
 # incompatible with a galaxy or a quasar: Gaia DR3 quasars scatter about
 # zero with normalised parallax/proper-motion widths of ~1.05-1.1
@@ -554,6 +560,12 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     # cluster stars, independent regions A+B: 64 stars against <= 3 galaxies.
     nir = NIR.bright_point_source(df)
     nir_p = NIR.star_probability(df)
+    # DESI BGS Gaia star-galaxy test (2.42.0, bgs_galaxy.py): a resolved LS
+    # source with G - r_raw > 0.6 or without a Gaia source at r < 20 is a
+    # galaxy (Ruiz-Macias et al. 2021); used where the evidence does not
+    # already give a class at >= BGS_KEEP_P.  Independent regions A+B
+    # (replay): 31 fixed, 1 broken, mostly the 2dFGRS SGP strip.
+    bgs = BGS.galaxy_test(df)
     Q = Q / Q.sum(axis=1, keepdims=True) if len(Q) else Q
     labels = []
     confidence = []
@@ -562,14 +574,21 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     basis = []
     best_candidates = []
     best_candidate_scores = []
-    for q, (_, used, star_conflict, conflict, in_host, moving), qmin, qfaint, nir_i, nir_pi in zip(
-        Q, rows, qso_min, faint, nir, nir_p
+    for q, (_, used, star_conflict, conflict, in_host, moving), qmin, qfaint, nir_i, nir_pi, bgs_i in zip(
+        Q, rows, qso_min, faint, nir, nir_p, bgs
     ):
         order = np.argsort(-q)
         conf = float(q[order[0]])
         margin = conf - float(q[order[1]])
         top = CLASSES[order[0]]
         how = "evidence"
+        settled = (
+            used > 0
+            and not (conflict and (not model or conf < CONFLICT_RESOLVED_P))
+            and conf >= max(min_conf, BGS_KEEP_P)
+            and margin >= min_margin
+            and not (top == "QSO" and (conf < qmin or qfaint))
+        )
         # Inside a large galaxy the host status is the most informative one,
         # with or without evidence (e.g. Legacy Surveys DUP sources there).
         if in_host:
@@ -581,6 +600,12 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
             conf = float(nir_pi) if used == 0 else max(float(nir_pi), float(q[CLASSES.index("STAR")]))
             margin = 2 * conf - 1
             how = NIR.BASIS
+        elif bgs_i and not moving and not settled:
+            label = top = "GALAXY"
+            status = "CLASSIFIED"
+            conf = max(BGS.P_GALAXY, float(q[CLASSES.index("GALAXY")]))
+            margin = 2 * conf - 1
+            how = BGS.BASIS
         elif used == 0:
             label = "UNKNOWN"
             status = "NO_EVIDENCE"

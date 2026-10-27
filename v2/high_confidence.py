@@ -91,9 +91,10 @@ def apply(df: pd.DataFrame, coverage: dict | None = None, table: dict | None = N
         mag = magnitude(df, table["magnitude_columns"])
         bins = pd.cut(mag, edges, labels=table["labels"]).astype(object).to_numpy()
         conf = _num(df, "primary_confidence").to_numpy()
-        # Classes set by the 2MASS count prior (2.41.0) were not part of the
-        # purity measurement behind the thresholds.
-        conf = np.where(df.get("classification_basis", pd.Series("", index=df.index)).astype(str).str.startswith("2MASS"), np.nan, conf)
+        # Classes set by the 2MASS count prior (2.41.0) or the BGS Gaia test
+        # (2.42.0) were not part of the purity measurement behind the thresholds.
+        basis_col = df.get("classification_basis", pd.Series("evidence", index=df.index)).fillna("evidence").astype(str)
+        conf = np.where(basis_col.isin(["evidence", "nan", ""]), conf, np.nan)
         cls = df.primary_class.astype(str).to_numpy()
         lower = table.get("purity_lower_bound", {})
         for b, per_class in table["thresholds"].items():
