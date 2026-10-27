@@ -6,8 +6,14 @@ Reffert 2023/2024 cluster members, the Rybizki et al. 2022 Gaia astrometric
 fidelity (GAVO TAP gedr3spur.main), and the 2MASS PSC flags of the stars the
 2.41.0 count prior left unclassified.  Nothing is stored.
 """
+import sys
 import time
 import traceback
+
+sys.path.insert(0, "v2/Get_data")
+import throttle  # noqa: E402  (VizieR mirror switching, 2.36.4)
+
+throttle.install()
 
 import astropy.units as u
 from astropy.coordinates import SkyCoord
@@ -79,5 +85,4 @@ if __name__ == "__main__":
     show("SFiNCs J/ApJS/229/28", vizier_catalog("J/ApJS/229/28"))
     show("Hunt & Reffert 2023 J/A+A/673/A114", vizier_catalog("J/A+A/673/A114"))
     show("Hunt & Reffert 2024 J/A+A/686/A42", vizier_catalog("J/A+A/686/A42"))
-    show("Rybizki+2022 fidelity (GAVO TAP)", tap_fidelity)
     show("2MASS flags of unclassified nebula stars", twomass_flags)
