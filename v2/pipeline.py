@@ -159,6 +159,9 @@ def run(
     out = hosts.consolidate(out, names.PRIORITY)
     # Pan-STARRS1 duplicates / fragments of small galaxies (2.34.0).
     out = hosts.attach_ps1_fragments(out, assoc)
+    # Faint LS fragments carrying the galaxy's survey rows, and survey rows
+    # the LS imaging does not confirm, on small galaxies (2.41.0).
+    out = hosts.attach_galaxy_fragments(out)
     # Single-survey artefacts in the halo of bright stars (2.35.0).
     out = hosts.attach_bright_star_artifacts(out)
     if out.n_components.gt(0).any():  # hosts may have inherited a nucleus spectrum
