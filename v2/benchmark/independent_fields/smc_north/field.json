@@ -2,16 +2,16 @@
  "ra": 12.5,
  "dec": -71.2,
  "radius_arcmin": 6.0,
- "n_objects": 4142,
+ "n_objects": 4130,
  "seconds": {
-  "collect": 70.2,
-  "1_associate": 1.2,
-  "2_integrate": 2.1,
-  "3_features": 2.6,
-  "4_evidence": 2.6,
-  "5_coarse": 3.6,
-  "6_prepare": 2.9,
-  "7_classify": 3.7
+  "collect": 74.2,
+  "1_associate": 0.8,
+  "2_integrate": 1.3,
+  "3_features": 1.6,
+  "4_evidence": 1.7,
+  "5_coarse": 2.4,
+  "6_prepare": 1.8,
+  "7_classify": 2.5
  },
  "catalog_rows": {
   "NED": 4077,
@@ -20,7 +20,6 @@
   "AllWISE": 703,
   "2MASS PSC": 209,
   "GALEX AIS": 148,
-  "SIMBAD": 89,
   "Gaia DR3 variability SOS": 6,
   "eROSITA eRASS1": 3
  },
