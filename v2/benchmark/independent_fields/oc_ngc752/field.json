@@ -2,16 +2,16 @@
  "ra": 29.42,
  "dec": 37.78,
  "radius_arcmin": 12.0,
- "n_objects": 7974,
+ "n_objects": 7918,
  "seconds": {
-  "collect": 71.4,
-  "1_associate": 4.0,
-  "2_integrate": 8.3,
-  "3_features": 12.9,
-  "4_evidence": 8.9,
-  "5_coarse": 14.3,
-  "6_prepare": 13.6,
-  "7_classify": 13.0
+  "collect": 217.1,
+  "1_associate": 2.3,
+  "2_integrate": 4.6,
+  "3_features": 8.3,
+  "4_evidence": 5.2,
+  "5_coarse": 9.1,
+  "6_prepare": 9.3,
+  "7_classify": 7.7
  },
  "catalog_rows": {
   "Pan-STARRS1 DR2 MeanObject": 7060,
@@ -19,7 +19,6 @@
   "AllWISE": 1863,
   "Gaia DR3": 1244,
   "2MASS PSC": 588,
-  "SIMBAD": 195,
   "Chandra CSC 2.0": 154,
   "XMM 4XMM-DR13": 111,
   "LoTSS DR2": 91,
