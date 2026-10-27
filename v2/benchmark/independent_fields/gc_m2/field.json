@@ -2,16 +2,16 @@
  "ra": 323.363,
  "dec": -0.823,
  "radius_arcmin": 6.0,
- "n_objects": 28300,
+ "n_objects": 28298,
  "seconds": {
-  "collect": 207.0,
-  "1_associate": 102.1,
-  "2_integrate": 37.2,
-  "3_features": 57.4,
-  "4_evidence": 41.1,
-  "5_coarse": 70.4,
-  "6_prepare": 62.6,
-  "7_classify": 58.2
+  "collect": 204.6,
+  "1_associate": 58.2,
+  "2_integrate": 19.5,
+  "3_features": 40.3,
+  "4_evidence": 25.3,
+  "5_coarse": 49.9,
+  "6_prepare": 46.6,
+  "7_classify": 37.1
  },
  "catalog_rows": {
   "Gaia DR3": 21480,
