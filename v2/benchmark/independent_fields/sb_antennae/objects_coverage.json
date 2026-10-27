@@ -9,6 +9,14 @@
    "impact": "pulsar labels",
    "key": false,
    "error": "DALFormatError: SSLError: HTTPSConnectionPool(host='heasarc.gsfc.nasa.gov', port=443): Max retries exceeded with url: /xamin/vo/tap/sync (Caused by SSLError(SSLCertVerificationError(1, \"[SSL: CERTIFIC"
+  },
+  {
+   "collector": "ned",
+   "catalog": "NED",
+   "status": "timeout",
+   "impact": "literature labels",
+   "key": false,
+   "error": "ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='ned.ipac.caltech.edu', port=443): Read timed out. (read timeout=60)\"))"
   }
  ],
  "key_failed": false
