@@ -43,6 +43,7 @@ IMPACT = {
     "xmm": ("4XMM", "X-ray detections (AGN evidence)", False),
     "chandra": ("Chandra CSC", "X-ray detections (AGN evidence)", False),
     "erosita": ("eROSITA eRASS1", "X-ray detections (AGN, clusters)", False),
+    "mystix_mpcm": ("MYStIX MPCM", "young-star members of massive star-forming regions", False),
     "sdss_spectroscopy": ("SDSS spectroscopy", "spectroscopic classes and redshifts", False),
     "desi_spectroscopy": ("DESI DR1 spectroscopy", "spectroscopic classes and redshifts", False),
     "desi_fastspec": ("DESI FastSpecFit", "emission-line sub-classes", False),

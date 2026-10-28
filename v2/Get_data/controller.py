@@ -42,6 +42,7 @@ COLLECTORS = [
     "xmm",
     "chandra",
     "erosita",
+    "mystix_mpcm",
     "sdss_spectroscopy",
     "desi_spectroscopy",
     "desi_fastspec",

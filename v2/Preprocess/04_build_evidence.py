@@ -104,6 +104,7 @@ class CatalogFields:
 # Rows are materialized with only these plus derived/confidence columns, so a
 # rule reading a new raw field must list it here.
 RAW_FIELDS = {
+    "fidelity_v2",
     "parallax",
     "parallax_error",
     "pmra",
@@ -202,6 +203,10 @@ def _tag_cstar(out, rid, src):
         cs = cstar_sigma(src)
         if cs is not None:
             out[-1]["cstar_sigma"] = round(cs, 2)
+        # Rybizki et al. 2022 astrometric fidelity (GAVO gedr3spur, 2.42.0)
+        fid = num(src, "fidelity_v2")
+        if fid is not None:
+            out[-1]["fidelity"] = round(fid, 4)
 
 
 def emit(out, rule, cls, score, value=None, note="", reliability=1.0, association_reliability=1.0):

@@ -140,7 +140,9 @@ KEEP = re.compile(
     r"parent_object_id|component_role|unknown_reason|subclass|gaia_dr3__classprob_dsc_combmod_\w+|"
     r"desi_legacy_surveys_dr10__(type|shape_r|sersic|maskbits)|allwise__W[12]mag|"
     r"pan_starrs1_dr2_meanobject__(iMeanPSFMag|iMeanKronMag|nDetections)|std_mag__\w+|gaia_dr3__phot_g_mean_mag|"
-    r"gaia_dr3__(pmra|pmdec|parallax|parallax_over_error|ruwe)|high_confidence|high_confidence_basis|"
+    r"gaia_dr3__(pmra|pmdec|parallax|parallax_error|pmra_error|pmdec_error|parallax_over_error|ruwe|fidelity_v2|phot_bp_rp_excess_factor|bp_rp)|"
+    r"gaia_dr3__hr_\w+|2mass_psc__(Kmag|Qflg|Cflg|Xflg)|desi_legacy_surveys_dr10__flux_(g|r|z)|classification_basis|"
+    r"high_confidence|high_confidence_basis|"
     r"sdss_dr18_spectroscopy__class|desi_dr1_spectroscopy__OType|lamost_dr_catalog__Class)$"
 )
 
