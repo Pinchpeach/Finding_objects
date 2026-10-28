@@ -1,7 +1,15 @@
 {
  "known": true,
- "attempted": 28,
+ "attempted": 29,
  "failed": [
+  {
+   "collector": "gaia_dr3_variability_sos_vizier",
+   "catalog": "Gaia DR3 variability",
+   "status": "timeout",
+   "impact": "variable-star sub-classes",
+   "key": false,
+   "error": "exceeded 300 s collector budget"
+  },
   {
    "collector": "atnf_pulsar",
    "catalog": "ATNF pulsars",
