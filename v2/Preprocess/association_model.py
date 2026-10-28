@@ -64,6 +64,9 @@ PROFILES = {
     # the resolution scale); survey Dec 2019 - Jun 2020 (corrected 2.16.0).
     "eROSITA eRASS1": SurveyProfile(2020.2, 4.5, 30.0, 20.0),
     "ATNF Pulsar Catalog": SurveyProfile(None, 0.5, None, 5.0),
+    # MYStIX MPCM: X-ray (Chandra ACIS), UKIDSS/2MASS or Spitzer positions;
+    # ePos is the 1-sigma error, 0-2.1" (Broos et al. 2013, Table 2).
+    "MYStIX MPCM": SurveyProfile(None, 0.5, None, 5.0),
     # Roma-BZCAT: radio (VLA/ATCA) or optical positions, ~1" (Massaro+2015).
     "Roma-BZCAT": SurveyProfile(2000.0, 1.0, None, 5.0),
     "HASH PN Catalog": SurveyProfile(None, 1.0, None, 8.0),
@@ -232,7 +235,7 @@ def infer_poserr_arcsec(catalog: str, row: Mapping[str, Any]) -> float:
     # eRASS1 POS_ERR (VizieR posErr) and 4XMM SC_POSERR (VizieR ePos) are
     # 1-sigma with systematics included (Merloni+2024; Webb+2020).  Column
     # names checked on the live VizieR tables (2.19.1 probe).
-    if catalog in ("eROSITA eRASS1", "XMM 4XMM-DR13"):
+    if catalog in ("eROSITA eRASS1", "XMM 4XMM-DR13", "MYStIX MPCM"):
         e = _first(row, ("pos_err", "poserr", "e_pos", "epos", "sc_poserr"))
         if e is not None and e > 0:
             return e

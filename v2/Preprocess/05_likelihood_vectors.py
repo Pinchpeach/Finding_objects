@@ -64,6 +64,9 @@ CONFLICT_RESOLVED_P = 0.99
 # The BGS Gaia galaxy test (bgs_galaxy.py) does not overrule evidence that
 # already classifies at this probability.
 BGS_KEEP_P = 0.9
+MEMBER_CATALOG = "MYStIX MPCM"
+MEMBER_P = 0.95
+MEMBER_BASIS = "young-star membership (MYStIX)"
 # A Gaia parallax or proper motion measured at >= 10 sigma is physically
 # incompatible with a galaxy or a quasar: Gaia DR3 quasars scatter about
 # zero with normalised parallax/proper-motion widths of ~1.05-1.1
@@ -580,6 +583,14 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     # already give a class at >= BGS_KEEP_P.  Independent regions A+B
     # (replay): 31 fixed, 1 broken, mostly the 2dFGRS SGP strip.
     bgs = BGS.galaxy_test(df)
+    # Young-star membership (2.42.0): an X-ray- or IR-excess-selected MYStIX
+    # Probable Complex Member (Broos et al. 2013) is a star; its own spectrum
+    # still decides.  Covers nebula stars whose Gaia colours, DSC and PS1
+    # morphology the nebula spoils, including embedded ones without Gaia.
+    cats = df["catalogs"].fillna("").astype(str) if "catalogs" in df else pd.Series("", index=df.index)
+    member = (cats.str.contains(MEMBER_CATALOG, regex=False).to_numpy()) & ~np.array(
+        [_spectroscopic(items) for items in item_lists], dtype=bool
+    )
     Q = Q / Q.sum(axis=1, keepdims=True) if len(Q) else Q
     labels = []
     confidence = []
@@ -588,8 +599,8 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     basis = []
     best_candidates = []
     best_candidate_scores = []
-    for q, (_, used, star_conflict, conflict, in_host, moving), qmin, qfaint, nir_i, nir_pi, bgs_i in zip(
-        Q, rows, qso_min, faint, nir, nir_p, bgs
+    for q, (_, used, star_conflict, conflict, in_host, moving), qmin, qfaint, nir_i, nir_pi, bgs_i, member_i in zip(
+        Q, rows, qso_min, faint, nir, nir_p, bgs, member
     ):
         order = np.argsort(-q)
         conf = float(q[order[0]])
@@ -608,6 +619,12 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
         if in_host:
             label = "UNKNOWN"
             status = "WITHIN_LARGE_GALAXY"
+        elif member_i and not moving:
+            label = top = "STAR"
+            status = "CLASSIFIED"
+            conf = max(MEMBER_P, float(q[CLASSES.index("STAR")]))
+            margin = 2 * conf - 1
+            how = MEMBER_BASIS
         elif nir_i and (used == 0 or (star_conflict and not moving and (not model or conf < CONFLICT_RESOLVED_P))):
             label = top = "STAR"
             status = "CLASSIFIED"
