@@ -1,15 +1,7 @@
 {
  "known": true,
- "attempted": 28,
+ "attempted": 29,
  "failed": [
-  {
-   "collector": "sdss_spectroscopy",
-   "catalog": "SDSS spectroscopy",
-   "status": "timeout",
-   "impact": "spectroscopic classes and redshifts",
-   "key": false,
-   "error": "ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='skyserver.sdss.org', port=443): Max retries exceeded with url: /dr18/en/tools/search/x_results.aspx?cmd=+SELECT%0D+s.specobjid%2C+s.bestobjid%2C"
-  },
   {
    "collector": "atnf_pulsar",
    "catalog": "ATNF pulsars",
@@ -24,7 +16,7 @@
    "status": "error",
    "impact": "literature labels",
    "key": false,
-   "error": "DALFormatError: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+   "error": "DALServiceError: Unable to access the capabilities endpoint at:\n- https://simbad.cds.unistra.fr/simbad/sim-tap/capabilities: Connection failed (Possible causes: incorrect URL, DNS issue, or service is"
   }
  ],
  "key_failed": false
