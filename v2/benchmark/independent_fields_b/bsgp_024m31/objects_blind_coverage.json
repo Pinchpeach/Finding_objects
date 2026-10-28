@@ -3,108 +3,12 @@
  "attempted": 29,
  "failed": [
   {
-   "collector": "gaia_dr3_variability_sos_vizier",
-   "catalog": "Gaia DR3 variability",
-   "status": "timeout",
-   "impact": "variable-star sub-classes",
-   "key": false,
-   "error": "exceeded 300 s collector budget"
-  },
-  {
-   "collector": "desi_legacy",
-   "catalog": "DESI Legacy Surveys DR10",
-   "status": "timeout",
-   "impact": "deep morphology and the faint-object (LS-GBM) classifier",
-   "key": true,
-   "error": "exceeded 300 s collector budget"
-  },
-  {
-   "collector": "twomass",
-   "catalog": "2MASS",
-   "status": "timeout",
-   "impact": "near-IR colours of bright stars",
-   "key": false,
-   "error": "exceeded 300 s collector budget"
-  },
-  {
-   "collector": "lotss",
-   "catalog": "LoTSS DR2",
-   "status": "timeout",
-   "impact": "radio detections",
-   "key": false,
-   "error": "exceeded 300 s collector budget"
-  },
-  {
-   "collector": "nvss",
-   "catalog": "NVSS",
-   "status": "timeout",
-   "impact": "radio detections",
-   "key": false,
-   "error": "exceeded 300 s collector budget"
-  },
-  {
-   "collector": "xmm",
-   "catalog": "4XMM",
-   "status": "timeout",
-   "impact": "X-ray detections (AGN evidence)",
-   "key": false,
-   "error": "exceeded 300 s collector budget"
-  },
-  {
-   "collector": "desi_fastspec",
-   "catalog": "DESI FastSpecFit",
-   "status": "error",
-   "impact": "emission-line sub-classes",
-   "key": false,
-   "error": "RuntimeError('Legacy Surveys TAP failed after 3 attempts: DALServiceError: 502 Server Error: Bad Gateway for url: https://datalab.noirlab.edu/tap/sync')"
-  },
-  {
-   "collector": "lamost_spectroscopy",
-   "catalog": "LAMOST DR5",
-   "status": "timeout",
-   "impact": "spectroscopic classes and stellar parameters",
-   "key": false,
-   "error": "exceeded 300 s collector budget"
-  },
-  {
-   "collector": "ztf_periodic",
-   "catalog": "ZTF periodic variables",
-   "status": "timeout",
-   "impact": "variable-star sub-classes",
-   "key": false,
-   "error": "exceeded 300 s collector budget"
-  },
-  {
    "collector": "atnf_pulsar",
    "catalog": "ATNF pulsars",
    "status": "error",
    "impact": "pulsar labels",
    "key": false,
    "error": "DALFormatError: SSLError: HTTPSConnectionPool(host='heasarc.gsfc.nasa.gov', port=443): Max retries exceeded with url: /xamin/vo/tap/sync (Caused by SSLError(SSLCertVerificationError(1, \"[SSL: CERTIFIC"
-  },
-  {
-   "collector": "bzcat",
-   "catalog": "Roma-BZCAT",
-   "status": "timeout",
-   "impact": "blazar labels",
-   "key": false,
-   "error": "exceeded 300 s collector budget"
-  },
-  {
-   "collector": "agb_suh2021",
-   "catalog": "AGB catalogue (Suh 2021)",
-   "status": "timeout",
-   "impact": "AGB labels",
-   "key": false,
-   "error": "exceeded 300 s collector budget"
-  },
-  {
-   "collector": "sga2020",
-   "catalog": "Siena Galaxy Atlas",
-   "status": "timeout",
-   "impact": "large-galaxy grouping",
-   "key": false,
-   "error": "exceeded 300 s collector budget"
   },
   {
    "collector": "simbad",
@@ -115,5 +19,5 @@
    "error": "DALServiceError: Unable to access the capabilities endpoint at:\n- https://simbad.cds.unistra.fr/simbad/sim-tap/capabilities: Connection failed (Possible causes: incorrect URL, DNS issue, or service is"
   }
  ],
- "key_failed": true
+ "key_failed": false
 }

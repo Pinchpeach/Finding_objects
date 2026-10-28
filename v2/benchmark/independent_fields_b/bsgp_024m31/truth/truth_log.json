@@ -13,7 +13,7 @@
   "VII/259/6dfgs": 5
  },
  "2SLAQ QSO (Croom+2009)": {},
- "WiggleZ final (Drinkwater+2018)": "failed: ConnectionError: HTTPSConnectionPool(host='vizier.china-vo.org', port=443): Max retries exceeded with url: /viz-bin/votable (Caused by Ne",
+ "WiggleZ final (Drinkwater+2018)": {},
  "RAVE DR6 (Steinmetz+2020)": {
   "III/283/ravedr6": 4,
   "III/283/xgaia2": 4,
