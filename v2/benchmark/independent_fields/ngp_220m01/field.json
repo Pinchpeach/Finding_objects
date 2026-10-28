@@ -2,16 +2,16 @@
  "ra": 220.12778,
  "dec": -0.67806,
  "radius_arcmin": 12.0,
- "n_objects": 28357,
+ "n_objects": 28305,
  "seconds": {
-  "collect": 81.4,
-  "1_associate": 12.7,
-  "2_integrate": 17.0,
-  "3_features": 31.6,
-  "4_evidence": 20.5,
-  "5_coarse": 36.9,
-  "6_prepare": 33.5,
-  "7_classify": 28.9
+  "collect": 448.8,
+  "1_associate": 21.7,
+  "2_integrate": 30.7,
+  "3_features": 46.2,
+  "4_evidence": 36.7,
+  "5_coarse": 58.3,
+  "6_prepare": 48.9,
+  "7_classify": 47.1
  },
  "catalog_rows": {
   "DESI Legacy Surveys DR10": 25117,
@@ -22,10 +22,10 @@
   "DESI DR1 spectroscopy": 946,
   "Gaia DR3": 687,
   "DESI DR1 FastSpecFit": 672,
-  "SIMBAD": 302,
   "2MASS PSC": 288,
   "GALEX AIS": 278,
   "LAMOST DR catalog": 58,
+  "SDSS DR18 spectroscopy": 48,
   "XMM 4XMM-DR13": 14,
   "FIRST": 14,
   "NVSS": 11,
@@ -35,13 +35,10 @@
   "TGSS ADR1": 3
  },
  "seeing": {
-  "error": "TapTimeout: Legacy Surveys TAP failed after 3 attempts: TimeoutError('Data Lab TAP exceeded 80 s')",
-  "ps1": {
-   "source": "PS1 stack psfMajor/MinorFWHM",
-   "n": 6936,
-   "g": 1.32,
-   "r": 1.01,
-   "i": 1.07
-  }
+  "g": 1.53,
+  "r": 1.18,
+  "z": 0.99,
+  "n_psf": 10395,
+  "source": "LS DR10 psfsize"
  }
 }
