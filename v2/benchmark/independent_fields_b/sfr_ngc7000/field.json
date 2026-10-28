@@ -2,16 +2,16 @@
  "ra": 312.9,
  "dec": 44.3,
  "radius_arcmin": 6.0,
- "n_objects": 5698,
+ "n_objects": 5685,
  "seconds": {
-  "collect": 182.0,
-  "1_associate": 3.0,
-  "2_integrate": 3.9,
-  "3_features": 5.9,
-  "4_evidence": 4.5,
-  "5_coarse": 7.3,
-  "6_prepare": 6.3,
-  "7_classify": 6.4
+  "collect": 442.2,
+  "1_associate": 4.0,
+  "2_integrate": 4.8,
+  "3_features": 6.7,
+  "4_evidence": 5.2,
+  "5_coarse": 8.3,
+  "6_prepare": 7.3,
+  "7_classify": 7.7
  },
  "catalog_rows": {
   "Pan-STARRS1 DR2 MeanObject": 4312,
@@ -19,7 +19,6 @@
   "2MASS PSC": 1158,
   "Gaia DR3": 955,
   "AllWISE": 645,
-  "SIMBAD": 102,
   "Chandra CSC 2.0": 29,
   "VLASS": 25,
   "XMM 4XMM-DR13": 15,
