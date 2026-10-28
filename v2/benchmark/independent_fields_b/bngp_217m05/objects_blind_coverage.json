@@ -11,14 +11,6 @@
    "error": "UFuncTypeError(<ufunc 'add'>, (dtype('<U6'), dtype('float64'), None))"
   },
   {
-   "collector": "desi_legacy",
-   "catalog": "DESI Legacy Surveys DR10",
-   "status": "error",
-   "impact": "deep morphology and the faint-object (LS-GBM) classifier",
-   "key": true,
-   "error": "RuntimeError('Legacy Surveys TAP failed after 3 attempts: DALServiceError: 502 Server Error: Bad Gateway for url: https://datalab.noirlab.edu/tap/sync')"
-  },
-  {
    "collector": "atnf_pulsar",
    "catalog": "ATNF pulsars",
    "status": "error",
@@ -35,5 +27,5 @@
    "error": "DALServiceError: Unable to access the capabilities endpoint at:\n- https://simbad.cds.unistra.fr/simbad/sim-tap/capabilities: Connection failed (Possible causes: incorrect URL, DNS issue, or service is"
   }
  ],
- "key_failed": true
+ "key_failed": false
 }
