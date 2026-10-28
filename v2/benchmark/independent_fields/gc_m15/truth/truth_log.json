@@ -1,10 +1,5 @@
 {
- "LAMOST DR5 (Luo+2019)": {
-  "V/164/dr5": 200,
-  "V/164/stellar5": 182,
-  "V/164/astars5": 4,
-  "V/164/dr5_plan": 1
- },
+ "LAMOST DR5 (Luo+2019)": {},
  "2QZ/6QZ (Croom+2004)": {},
  "2dFGRS (Colless+2003)": {},
  "6dFGS DR3 (Jones+2009)": {},
