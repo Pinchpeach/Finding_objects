@@ -2,18 +2,19 @@
  "ra": 300.20278,
  "dec": -27.49556,
  "radius_arcmin": 12.0,
- "n_objects": 12201,
+ "n_objects": 21756,
  "seconds": {
-  "collect": 521.4,
-  "1_associate": 6.1,
-  "2_integrate": 7.5,
-  "3_features": 7.9,
-  "4_evidence": 8.9,
-  "5_coarse": 10.7,
-  "6_prepare": 8.7,
-  "7_classify": 12.3
+  "collect": 443.4,
+  "1_associate": 13.0,
+  "2_integrate": 13.7,
+  "3_features": 15.2,
+  "4_evidence": 15.5,
+  "5_coarse": 19.1,
+  "6_prepare": 16.9,
+  "7_classify": 21.8
  },
  "catalog_rows": {
+  "DESI Legacy Surveys DR10": 17415,
   "Pan-STARRS1 DR2 MeanObject": 11424,
   "Gaia DR3": 3242,
   "NED": 2663,
