@@ -2,16 +2,16 @@
  "ra": 198.23,
  "dec": 18.168,
  "radius_arcmin": 6.0,
- "n_objects": 21079,
+ "n_objects": 21030,
  "seconds": {
-  "collect": 204.1,
-  "1_associate": 65.4,
-  "2_integrate": 31.3,
-  "3_features": 54.0,
-  "4_evidence": 35.0,
-  "5_coarse": 64.2,
-  "6_prepare": 58.9,
-  "7_classify": 48.3
+  "collect": 482.6,
+  "1_associate": 62.3,
+  "2_integrate": 30.3,
+  "3_features": 53.9,
+  "4_evidence": 35.2,
+  "5_coarse": 63.9,
+  "6_prepare": 57.7,
+  "7_classify": 50.6
  },
  "catalog_rows": {
   "Pan-STARRS1 DR2 MeanObject": 16106,
@@ -20,7 +20,6 @@
   "NED": 2241,
   "2MASS PSC": 891,
   "AllWISE": 836,
-  "SIMBAD": 486,
   "SDSS DR18 PhotoObj": 440,
   "GALEX AIS": 170,
   "Gaia DR3 variability SOS": 46,
