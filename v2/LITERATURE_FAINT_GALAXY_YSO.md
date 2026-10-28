@@ -126,3 +126,22 @@
 - SDSS·DESI 벤치마크 예측 변화는 0이다.
 
 **버린 방법:** 밴드가 빠진 곳에서 색 kNN·색 특징을 끄는 방법. 오히려 18–20건이 나빠졌다. 부분 색으로도 kNN은 쓸모가 있었다.
+
+## 4. 성운 속 젊은 별: 구성원 목록과 Gaia 천체측정 신뢰도 (2.42.0)
+
+| 근거 | 내용 | 표시 |
+|---|---|---|
+| Broos et al. 2013, ApJS 209, 32 (MYStIX) | MPCM은 X선 원천의 naive Bayes 분류(중앙 에너지, 변광, J, [4.5], IR 초과, 국소 밀도)로 고른 구성원, IR 초과 구성원(Povich et al. 2013), 그리고 B3보다 이른 분광형의 OB 별(문헌 분광)의 합집합이다 | **V** |
+| Rybizki et al. 2022, MNRAS 510, 2597 | Gaia (E)DR3 천체측정 해의 신뢰도 fidelity_v2를 분류기로 계산했다. 시험 자료에서 순도 99.3 %, 완전도 97.3 %. 예시 컷으로 fidelity_v2 > 0.9를 쓴다. 제공처는 GAVO TAP `gedr3spur.main` | **V** |
+| Hunt & Reffert 2023, A&A 673, A114 / 2024, A&A 686, A42 | Gaia DR3 HDBSCAN 성단 구성원 목록(열 `GaiaDR3`, `Prob`) | 열 이름은 Actions에서 확인 |
+
+### 4.1 확인한 것 (Actions 탐침, run 40604763801)
+- **MPCM 표:** `J/ApJS/209/32/mpcm`. 6′ 안 구성원 수는 ONC 1,101, NGC 2024 397, M8 595다. 선택 근거 열은 `Xind`(X선), `Iind`(IR 초과), `Olab`(OB 목록)이다.
+- **Hunt & Reffert:** 같은 영역에서 구성원이 19 / 2 / 75로 적다. 게다가 Gaia 운동으로 정한 소속이라 우리 Gaia 운동 근거와 겹친다. 그래서 쓰지 않았다.
+- **2.41.0 규칙에서 빠진 이유:** NGC 2024·ONC의 밝은 미분류 별 10개는 2MASS `Xflg` = 1–2였다. 2MASS 확장원 목록에 성운 자체가 들어 있어서 그렇다. 은하 오염 방지 조건이 옳게 작동한 것이므로 그 조건을 풀지 않고, 구성원 목록으로 해결했다.
+- **fidelity:** GAVO에서 ONC·NGC 2024·M8의 Gaia 원천 각각 365·61·281개에 값이 있다.
+
+### 4.2 우리 적용
+- **`Get_data/mystix_mpcm.py`:** X선 또는 IR 초과로 뽑힌 구성원만 남긴다. OB 별은 문헌 분광형으로 뽑힌 것이라 blind 검증에 넣을 수 없어 뺐다.
+- **Stage 5:** MPCM 행을 가진 천체는 STAR로 판정한다(확신도 0.95, 근거 표시 "young-star membership (MYStIX)"). 단, 자기 분광이 있으면 분광이 정한다.
+- **Gaia 수집기:** GAVO에서 fidelity_v2를 붙인다. Stage 5에서는 fidelity_v2 ≥ 0.9이면 C*(성운 배경으로 커진 BP/RP 초과)와 상관없이 그 천체의 시차·고유운동을 쓴다.

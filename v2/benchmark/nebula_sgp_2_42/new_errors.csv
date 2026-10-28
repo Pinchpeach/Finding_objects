@@ -1,0 +1,11 @@
+set,field,t_truth,ours_old,ours,basis,classification_status
+A,ngp_150m01,QSO,QSO,STAR,evidence,CLASSIFIED
+A,ngp_150m01,QSO,QSO,GALAXY,evidence,CLASSIFIED
+A,ngp_150m01,QSO,QSO,GALAXY,Gaia star-galaxy test (DESI BGS),CLASSIFIED
+A,ngp_150m01,QSO,QSO,GALAXY,evidence,CLASSIFIED
+A,ngp_165m01,QSO,QSO,STAR,evidence,CLASSIFIED
+A,ngp_212m04,STAR,STAR,GALAXY,Gaia star-galaxy test (DESI BGS),CLASSIFIED
+A,s82_050p01,QSO,QSO,GALAXY,evidence,CLASSIFIED
+A,s82_326p00,QSO,QSO,STAR,evidence,CLASSIFIED
+A,s82_354p00,QSO,QSO,GALAXY,evidence,CLASSIFIED
+A,sgp_340m30,QSO,QSO,GALAXY,evidence,CLASSIFIED

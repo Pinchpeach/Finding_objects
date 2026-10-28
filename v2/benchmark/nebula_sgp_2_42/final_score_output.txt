@@ -1,0 +1,43 @@
+A n 14503 acc 98.88 {'STAR': '99.5', 'GALAXY': '96.6', 'QSO': '89.8'} unknown 0.41 HC n 13484 HC acc 99.74
+B n 10202 acc 99.10 {'STAR': '99.6', 'GALAXY': '96.1', 'QSO': '94.3'} unknown 0.40 HC n 9658 HC acc 99.81
+paired 24170 fixed 59 new errors 10
+ok                                        False  True 
+basis                            t_truth              
+2MASS point-source counts        STAR         0      3
+Gaia star-galaxy test (DESI BGS) GALAXY       0     21
+                                 QSO          1      0
+                                 STAR         1      0
+evidence                         GALAXY       0     14
+                                 QSO          8      0
+                                 STAR         0      6
+young-star membership (MYStIX)   STAR         0     15
+ok    False  True 
+kind              
+kep       0      2
+ngp       6     13
+s82       3      1
+sfr       0     17
+sgp       1     22
+sth       0      1
+wigz      0      3
+kind    n   new   old
+ des    4 100.0 100.0
+  gc 2405  99.0  99.0
+ kep  171 100.0  98.8
+ lam 8301  99.6  99.6
+ lmc   54  98.1  98.1
+ mag    3 100.0 100.0
+ ngp 3260  97.6  97.4
+  oc 5195  99.9  99.9
+ s82 1319  97.6  97.7
+  sb  114  96.5  96.5
+ sfr 1642  99.5  98.5
+ sgp 1651  96.5  95.2
+ smc   71  97.2  97.2
+ sth  260  99.6  99.2
+wigz  255  97.6  96.5
+sfr_onc 45 84.4 -> 95.6
+sfr_ngc2024 58 86.2 -> 98.3
+sfr_m8 122 97.5 -> 100.0
+sfr_ngc2264 395 99.7 -> 100.0
+sfr_carina 246 100.0 -> 100.0
