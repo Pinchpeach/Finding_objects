@@ -3,22 +3,6 @@
  "attempted": 29,
  "failed": [
   {
-   "collector": "gaia_dr3",
-   "catalog": "Gaia DR3",
-   "status": "timeout",
-   "impact": "parallax / proper motion (decisive STAR evidence), DSC class probabilities",
-   "key": true,
-   "error": "exceeded 300 s collector budget"
-  },
-  {
-   "collector": "sdss_spectroscopy",
-   "catalog": "SDSS spectroscopy",
-   "status": "error",
-   "impact": "spectroscopic classes and redshifts",
-   "key": false,
-   "error": "InconsistentTableError('Number of header columns (1) inconsistent with data columns in data line 9')"
-  },
-  {
    "collector": "atnf_pulsar",
    "catalog": "ATNF pulsars",
    "status": "error",
@@ -33,7 +17,15 @@
    "impact": "literature labels",
    "key": false,
    "error": "DALServiceError: Unable to access the capabilities endpoint at:\n- https://simbad.cds.unistra.fr/simbad/sim-tap/capabilities: Connection failed (Possible causes: incorrect URL, DNS issue, or service is"
+  },
+  {
+   "collector": "ned",
+   "catalog": "NED",
+   "status": "timeout",
+   "impact": "literature labels",
+   "key": false,
+   "error": "ConnectionError(ReadTimeoutError(\"HTTPSConnectionPool(host='ned.ipac.caltech.edu', port=443): Read timed out.\"))"
   }
  ],
- "key_failed": true
+ "key_failed": false
 }
