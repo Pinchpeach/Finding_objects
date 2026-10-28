@@ -3,14 +3,6 @@
  "attempted": 29,
  "failed": [
   {
-   "collector": "desi_legacy",
-   "catalog": "DESI Legacy Surveys DR10",
-   "status": "timeout",
-   "impact": "deep morphology and the faint-object (LS-GBM) classifier",
-   "key": true,
-   "error": "exceeded 300 s collector budget"
-  },
-  {
    "collector": "atnf_pulsar",
    "catalog": "ATNF pulsars",
    "status": "error",
@@ -27,5 +19,5 @@
    "error": "DALServiceError: Unable to access the capabilities endpoint at:\n- https://simbad.cds.unistra.fr/simbad/sim-tap/capabilities: Connection failed (Possible causes: incorrect URL, DNS issue, or service is"
   }
  ],
- "key_failed": true
+ "key_failed": false
 }
