@@ -2,16 +2,16 @@
  "ra": 300.38,
  "dec": 0.71,
  "radius_arcmin": 12.0,
- "n_objects": 20810,
+ "n_objects": 20813,
  "seconds": {
-  "collect": 202.5,
-  "1_associate": 13.2,
-  "2_integrate": 11.6,
-  "3_features": 12.6,
-  "4_evidence": 13.5,
-  "5_coarse": 17.5,
-  "6_prepare": 13.7,
-  "7_classify": 18.0
+  "collect": 470.6,
+  "1_associate": 9.9,
+  "2_integrate": 7.9,
+  "3_features": 8.9,
+  "4_evidence": 9.2,
+  "5_coarse": 12.5,
+  "6_prepare": 9.9,
+  "7_classify": 13.0
  },
  "catalog_rows": {
   "Pan-STARRS1 DR2 MeanObject": 19062,
@@ -22,7 +22,6 @@
   "DESI Legacy Surveys DR10": 2269,
   "2MASS PSC": 2014,
   "GALEX AIS": 418,
-  "SIMBAD": 34,
   "VLASS": 4,
   "ZTF periodic variables": 4,
   "NVSS": 2
