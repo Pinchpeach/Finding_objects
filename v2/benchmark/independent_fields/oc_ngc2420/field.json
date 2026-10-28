@@ -2,25 +2,25 @@
  "ra": 114.6,
  "dec": 21.57,
  "radius_arcmin": 12.0,
- "n_objects": 19242,
+ "n_objects": 19513,
  "seconds": {
-  "collect": 218.7,
-  "1_associate": 7.1,
-  "2_integrate": 10.5,
-  "3_features": 17.0,
-  "4_evidence": 12.2,
-  "5_coarse": 21.7,
-  "6_prepare": 17.9,
-  "7_classify": 18.0
+  "collect": 454.3,
+  "1_associate": 8.1,
+  "2_integrate": 10.4,
+  "3_features": 16.7,
+  "4_evidence": 12.1,
+  "5_coarse": 21.5,
+  "6_prepare": 18.1,
+  "7_classify": 17.5
  },
  "catalog_rows": {
   "DESI Legacy Surveys DR10": 14704,
   "Pan-STARRS1 DR2 MeanObject": 9400,
+  "NED": 4818,
   "SDSS DR18 PhotoObj": 4726,
   "Gaia DR3": 2649,
   "AllWISE": 2279,
   "2MASS PSC": 1321,
-  "SIMBAD": 1232,
   "GALEX AIS": 646,
   "DESI DR1 spectroscopy": 224,
   "SDSS DR18 spectroscopy": 190,
@@ -36,10 +36,13 @@
   "eROSITA eRASS1": 1
  },
  "seeing": {
-  "g": 1.68,
-  "r": 1.64,
-  "z": 1.62,
-  "n_psf": 9316,
-  "source": "LS DR10 psfsize"
+  "error": "RuntimeError: Legacy Surveys TAP failed after 3 attempts: DALFormatError: ReadTimeout: HTTPSConnectionPool(host='datalab.noirlab.edu',",
+  "ps1": {
+   "source": "PS1 stack psfMajor/MinorFWHM",
+   "n": 9678,
+   "g": 1.27,
+   "r": 1.14,
+   "i": 1.03
+  }
  }
 }
