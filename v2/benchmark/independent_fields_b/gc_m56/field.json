@@ -2,16 +2,16 @@
  "ra": 289.148,
  "dec": 30.184,
  "radius_arcmin": 6.0,
- "n_objects": 18345,
+ "n_objects": 18330,
  "seconds": {
-  "collect": 205.7,
-  "1_associate": 34.8,
-  "2_integrate": 7.3,
-  "3_features": 7.2,
-  "4_evidence": 9.9,
-  "5_coarse": 11.9,
-  "6_prepare": 8.3,
-  "7_classify": 12.7
+  "collect": 476.6,
+  "1_associate": 33.5,
+  "2_integrate": 6.9,
+  "3_features": 6.4,
+  "4_evidence": 9.3,
+  "5_coarse": 11.0,
+  "6_prepare": 7.4,
+  "7_classify": 11.5
  },
  "catalog_rows": {
   "Gaia DR3": 13937,
@@ -19,7 +19,6 @@
   "NED": 1741,
   "2MASS PSC": 1468,
   "AllWISE": 789,
-  "SIMBAD": 159,
   "ZTF periodic variables": 14,
   "Gaia DR3 variability SOS": 10,
   "LAMOST DR catalog": 7
