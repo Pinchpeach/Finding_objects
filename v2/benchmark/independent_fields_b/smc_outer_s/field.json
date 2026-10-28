@@ -2,18 +2,19 @@
  "ra": 1.0,
  "dec": -76.0,
  "radius_arcmin": 6.0,
- "n_objects": 828,
+ "n_objects": 6580,
  "seconds": {
-  "collect": 542.9,
-  "1_associate": 0.4,
-  "2_integrate": 0.4,
-  "3_features": 0.5,
-  "4_evidence": 0.6,
-  "5_coarse": 1.0,
-  "6_prepare": 0.6,
-  "7_classify": 0.8
+  "collect": 440.3,
+  "1_associate": 1.4,
+  "2_integrate": 2.5,
+  "3_features": 3.2,
+  "4_evidence": 3.9,
+  "5_coarse": 5.3,
+  "6_prepare": 3.8,
+  "7_classify": 5.0
  },
  "catalog_rows": {
+  "DESI Legacy Surveys DR10": 6506,
   "NED": 692,
   "AllWISE": 660,
   "Gaia DR3": 296,
@@ -22,21 +23,10 @@
   "eROSITA eRASS1": 3
  },
  "seeing": {
-  "error": "RuntimeError: Legacy Surveys TAP failed after 3 attempts: DALFormatError: ReadTimeout: HTTPSConnectionPool(host='datalab.noirlab.edu',",
-  "ps1": {
-   "error": "EmptyDataError: No columns to parse from file",
-   "fwhm_columns": [
-    "gpsfMajorFWHM",
-    "gpsfMinorFWHM",
-    "rpsfMajorFWHM",
-    "rpsfMinorFWHM",
-    "ipsfMajorFWHM",
-    "ipsfMinorFWHM",
-    "zpsfMajorFWHM",
-    "zpsfMinorFWHM",
-    "ypsfMajorFWHM",
-    "ypsfMinorFWHM"
-   ]
-  }
+  "g": 1.4,
+  "r": 1.16,
+  "z": 1.3,
+  "n_psf": 3143,
+  "source": "LS DR10 psfsize"
  }
 }
