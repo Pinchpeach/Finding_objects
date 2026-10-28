@@ -2,26 +2,26 @@
  "ra": 260.2,
  "dec": -35.8,
  "radius_arcmin": 6.0,
- "n_objects": 3620,
+ "n_objects": 3843,
  "seconds": {
-  "collect": 181.2,
-  "1_associate": 1.8,
-  "2_integrate": 3.3,
-  "3_features": 4.7,
-  "4_evidence": 3.3,
-  "5_coarse": 5.7,
-  "6_prepare": 5.0,
-  "7_classify": 5.2
+  "collect": 457.7,
+  "1_associate": 2.5,
+  "2_integrate": 3.6,
+  "3_features": 5.1,
+  "4_evidence": 3.5,
+  "5_coarse": 5.9,
+  "6_prepare": 5.3,
+  "7_classify": 5.4
  },
  "catalog_rows": {
+  "NED": 3368,
   "2MASS PSC": 2279,
-  "SIMBAD": 1369,
   "Gaia DR3": 1037,
+  "MYStIX MPCM": 636,
   "AllWISE": 433,
   "Chandra CSC 2.0": 326,
   "NVSS": 5,
-  "eROSITA eRASS1": 3,
-  "Gaia DR3 variability SOS": 2
+  "eROSITA eRASS1": 3
  },
  "seeing": {
   "g": NaN,
