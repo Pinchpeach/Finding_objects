@@ -22,6 +22,6 @@
  },
  "APOGEE DR17 (Abdurro'uf+2022)": {},
  "Magellanic Quasars Survey (Kozlowski+2013)": {},
- "Gaia-ESO DR5 (Randich+2022)": {},
+ "Gaia-ESO DR5 (Randich+2022)": "failed: ConnectionError: HTTPSConnectionPool(host='vizier.china-vo.org', port=443): Max retries exceeded with url: /viz-bin/votable (Caused by Ne",
  "2dF SMC OBA stars (Evans+2004)": {}
 }
