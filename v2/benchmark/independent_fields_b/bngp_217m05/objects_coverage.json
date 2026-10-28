@@ -1,6 +1,6 @@
 {
  "known": true,
- "attempted": 28,
+ "attempted": 29,
  "failed": [
   {
    "collector": "sdss_dr18",
@@ -11,13 +11,29 @@
    "error": "UFuncTypeError(<ufunc 'add'>, (dtype('<U6'), dtype('float64'), None))"
   },
   {
+   "collector": "desi_legacy",
+   "catalog": "DESI Legacy Surveys DR10",
+   "status": "error",
+   "impact": "deep morphology and the faint-object (LS-GBM) classifier",
+   "key": true,
+   "error": "RuntimeError('Legacy Surveys TAP failed after 3 attempts: DALServiceError: 502 Server Error: Bad Gateway for url: https://datalab.noirlab.edu/tap/sync')"
+  },
+  {
    "collector": "atnf_pulsar",
    "catalog": "ATNF pulsars",
    "status": "error",
    "impact": "pulsar labels",
    "key": false,
    "error": "DALFormatError: SSLError: HTTPSConnectionPool(host='heasarc.gsfc.nasa.gov', port=443): Max retries exceeded with url: /xamin/vo/tap/sync (Caused by SSLError(SSLCertVerificationError(1, \"[SSL: CERTIFIC"
+  },
+  {
+   "collector": "simbad",
+   "catalog": "SIMBAD",
+   "status": "error",
+   "impact": "literature labels",
+   "key": false,
+   "error": "DALServiceError: Unable to access the capabilities endpoint at:\n- https://simbad.cds.unistra.fr/simbad/sim-tap/capabilities: Connection failed (Possible causes: incorrect URL, DNS issue, or service is"
   }
  ],
- "key_failed": false
+ "key_failed": true
 }
