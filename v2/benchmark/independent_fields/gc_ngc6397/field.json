@@ -2,26 +2,33 @@
  "ra": 265.175,
  "dec": -53.674,
  "radius_arcmin": 6.0,
- "n_objects": 26310,
+ "n_objects": 26644,
  "seconds": {
-  "collect": 824.6,
-  "1_associate": 17.3,
-  "2_integrate": 13.4,
-  "3_features": 19.8,
-  "4_evidence": 14.3,
-  "5_coarse": 26.3,
-  "6_prepare": 23.8,
-  "7_classify": 24.4
+  "collect": 475.2,
+  "1_associate": 42.7,
+  "2_integrate": 23.5,
+  "3_features": 34.7,
+  "4_evidence": 24.3,
+  "5_coarse": 41.0,
+  "6_prepare": 36.5,
+  "7_classify": 37.7
  },
  "catalog_rows": {
   "Gaia DR3": 25798,
   "NED": 4768,
+  "2MASS PSC": 3833,
+  "AllWISE": 980,
   "Chandra CSC 2.0": 179,
+  "Gaia DR3 variability SOS": 4,
   "eROSITA eRASS1": 4,
   "XMM 4XMM-DR13": 3
  },
  "seeing": {
-  "error": "RuntimeError: Legacy Surveys TAP failed after 3 attempts: DALServiceError: 502 Server Error: Bad Gateway for url: https://datalab.noir",
+  "g": NaN,
+  "r": NaN,
+  "z": NaN,
+  "n_psf": 0,
+  "source": "LS DR10 psfsize",
   "ps1": {
    "error": "EmptyDataError: No columns to parse from file",
    "fwhm_columns": [

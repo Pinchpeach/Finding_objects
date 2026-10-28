@@ -3,62 +3,6 @@
  "attempted": 29,
  "failed": [
   {
-   "collector": "gaia_dr3_variability_sos_vizier",
-   "catalog": "Gaia DR3 variability",
-   "status": "timeout",
-   "impact": "variable-star sub-classes",
-   "key": false,
-   "error": "exceeded 300 s collector budget"
-  },
-  {
-   "collector": "desi_legacy",
-   "catalog": "DESI Legacy Surveys DR10",
-   "status": "timeout",
-   "impact": "deep morphology and the faint-object (LS-GBM) classifier",
-   "key": true,
-   "error": "exceeded 300 s collector budget"
-  },
-  {
-   "collector": "galex",
-   "catalog": "GALEX",
-   "status": "timeout",
-   "impact": "UV colours",
-   "key": false,
-   "error": "exceeded 300 s collector budget"
-  },
-  {
-   "collector": "twomass",
-   "catalog": "2MASS",
-   "status": "timeout",
-   "impact": "near-IR colours of bright stars",
-   "key": false,
-   "error": "exceeded 300 s collector budget"
-  },
-  {
-   "collector": "allwise",
-   "catalog": "AllWISE",
-   "status": "timeout",
-   "impact": "mid-IR AGN colours (QSO evidence)",
-   "key": true,
-   "error": "exceeded 300 s collector budget"
-  },
-  {
-   "collector": "lotss",
-   "catalog": "LoTSS DR2",
-   "status": "timeout",
-   "impact": "radio detections",
-   "key": false,
-   "error": "exceeded 300 s collector budget"
-  },
-  {
-   "collector": "desi_fastspec",
-   "catalog": "DESI FastSpecFit",
-   "status": "timeout",
-   "impact": "emission-line sub-classes",
-   "key": false,
-   "error": "RuntimeError(\"Legacy Surveys TAP failed after 3 attempts: DALFormatError: ReadTimeout: HTTPSConnectionPool(host='datalab.noirlab.edu', port=443): Read timed out. (read timeout=80.0)\")"
-  },
-  {
    "collector": "atnf_pulsar",
    "catalog": "ATNF pulsars",
    "status": "error",
@@ -75,5 +19,5 @@
    "error": "DALServiceError: Unable to access the capabilities endpoint at:\n- https://simbad.cds.unistra.fr/simbad/sim-tap/capabilities: Connection failed (Possible causes: incorrect URL, DNS issue, or service is"
   }
  ],
- "key_failed": true
+ "key_failed": false
 }
