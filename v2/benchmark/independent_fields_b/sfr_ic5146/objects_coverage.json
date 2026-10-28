@@ -1,6 +1,6 @@
 {
  "known": true,
- "attempted": 28,
+ "attempted": 29,
  "failed": [
   {
    "collector": "atnf_pulsar",
@@ -11,12 +11,12 @@
    "error": "DALFormatError: SSLError: HTTPSConnectionPool(host='heasarc.gsfc.nasa.gov', port=443): Max retries exceeded with url: /xamin/vo/tap/sync (Caused by SSLError(SSLCertVerificationError(1, \"[SSL: CERTIFIC"
   },
   {
-   "collector": "ned",
-   "catalog": "NED",
-   "status": "timeout",
+   "collector": "simbad",
+   "catalog": "SIMBAD",
+   "status": "error",
    "impact": "literature labels",
    "key": false,
-   "error": "ConnectionError(ReadTimeoutError(\"HTTPSConnectionPool(host='ned.ipac.caltech.edu', port=443): Read timed out.\"))"
+   "error": "DALServiceError: Unable to access the capabilities endpoint at:\n- https://simbad.cds.unistra.fr/simbad/sim-tap/capabilities: Connection failed (Possible causes: incorrect URL, DNS issue, or service is"
   }
  ],
  "key_failed": false
