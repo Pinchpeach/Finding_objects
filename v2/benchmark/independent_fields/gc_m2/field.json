@@ -2,16 +2,16 @@
  "ra": 323.363,
  "dec": -0.823,
  "radius_arcmin": 6.0,
- "n_objects": 28298,
+ "n_objects": 28241,
  "seconds": {
-  "collect": 204.6,
-  "1_associate": 58.2,
-  "2_integrate": 19.5,
-  "3_features": 40.3,
-  "4_evidence": 25.3,
-  "5_coarse": 49.9,
-  "6_prepare": 46.6,
-  "7_classify": 37.1
+  "collect": 475.7,
+  "1_associate": 102.9,
+  "2_integrate": 39.8,
+  "3_features": 62.9,
+  "4_evidence": 42.0,
+  "5_coarse": 71.8,
+  "6_prepare": 63.3,
+  "7_classify": 56.7
  },
  "catalog_rows": {
   "Gaia DR3": 21480,
@@ -20,7 +20,6 @@
   "NED": 2655,
   "2MASS PSC": 1500,
   "AllWISE": 895,
-  "SIMBAD": 707,
   "SDSS DR18 PhotoObj": 438,
   "GALEX AIS": 167,
   "DESI DR1 spectroscopy": 73,
