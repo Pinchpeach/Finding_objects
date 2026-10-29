@@ -1,0 +1,12 @@
+{
+  "2505.17174": ["dchisq", "feature", "purity|completeness|accuracy", "COSMOS|HST"],
+  "2208.08515": ["z ?[−-] ?W1 ?> ?0\\.8|0\\.8 ?\\(r ?[−-] ?z\\)|0\\.8 ?× ?\\(r", "star"],
+  "2208.08511": ["0\\.015", "Δχ|delta ?chi|chi2|χ ?2", "PSF|extended"],
+  "2102.09568": ["membership probabilit", "0\\.9|threshold", "Zenodo|catalogue"],
+  "2012.06242": ["BP/RP|BP and RP", "globular", "complete"],
+  "2206.05681": ["two-parameter|2-parameter", "purity", "outnumber|1000|500"],
+  "2203.11217": ["1\\.734|3\\.916|0\\.0771|0\\.261", "wedge|selection"],
+  "1609.06721": ["W1 ?[−-] ?W2 ?≥? ?0\\.8|0\\.8", "compact|blue|starburst"],
+  "1208.2530": ["0\\.315|7\\.624|0\\.796|0\\.222", "wedge"],
+  "1508.04121": ["91|97|98 ?%|efficien", "variab"]
+}

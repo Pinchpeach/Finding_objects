@@ -1,8 +1,0 @@
-{
-  "2007.14950": ["G ?[−-] ?r ?raw|rraw|r_raw", "0\\.6", "no ?Gaia|Gaia (counterpart|match)|G ?= ?0"],
-  "2208.08512": ["G ?[−-] ?r|rraw|r_raw", "0\\.6", "Gaia"],
-  "2208.09335": ["M ?10|completeness", "density|crowd", "10 ?\\^? ?5|10 ?\\^? ?6|deg ?[−-] ?2"],
-  "2101.11641": ["fidelity", "0\\.5|> ?0\\.5", "spurious", "purity|completeness"],
-  "1309.4500": ["MPCM|probable complex member", "naive Bayes|na[iï]ve", "OB stars|published"],
-  "2303.13424": ["probability|Prob", "CST|signal", "member"]
-}
