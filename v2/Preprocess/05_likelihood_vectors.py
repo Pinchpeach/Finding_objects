@@ -45,6 +45,9 @@ _nir_s.loader.exec_module(NIR)
 _bgs_s = _tio_u.spec_from_file_location("v2_bgs_galaxy", Path(__file__).resolve().parent / "bgs_galaxy.py")
 BGS = _tio_u.module_from_spec(_bgs_s)
 _bgs_s.loader.exec_module(BGS)
+_sp_s = _tio_u.spec_from_file_location("v2_sparse_priors", Path(__file__).resolve().parent / "sparse_priors.py")
+SPARSE = _tio_u.module_from_spec(_sp_s)
+_sp_s.loader.exec_module(SPARSE)
 CLASSES = ("STAR", "GALAXY", "QSO")
 WEIGHT = {"direct_probability": 1.0, "catalog_label": 1.5, "continuous_score": 0.35, "binary_evidence": 0.35}
 MIN_CONFIDENCE = 0.50
@@ -583,6 +586,10 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     # already give a class at >= BGS_KEEP_P.  Independent regions A+B
     # (replay): 31 fixed, 1 broken, mostly the 2dFGRS SGP strip.
     bgs = BGS.galaxy_test(df)
+    # Priors for evidence-free objects (2.43.0, sparse_priors.py): crowded-
+    # field Gaia sources are stars, mid-IR-only red W2-W3 sources galaxies.
+    gaia_star = SPARSE.gaia_point_star(df)
+    wise_gal = SPARSE.wise_only_galaxy(df)
     # Young-star membership (2.42.0): an X-ray- or IR-excess-selected MYStIX
     # Probable Complex Member (Broos et al. 2013) is a star; its own spectrum
     # still decides.  Covers nebula stars whose Gaia colours, DSC and PS1
@@ -599,8 +606,8 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     basis = []
     best_candidates = []
     best_candidate_scores = []
-    for q, (_, used, star_conflict, conflict, in_host, moving), qmin, qfaint, nir_i, nir_pi, bgs_i, member_i in zip(
-        Q, rows, qso_min, faint, nir, nir_p, bgs, member
+    for q, (_, used, star_conflict, conflict, in_host, moving), qmin, qfaint, nir_i, nir_pi, bgs_i, member_i, gstar_i, wgal_i in zip(
+        Q, rows, qso_min, faint, nir, nir_p, bgs, member, gaia_star, wise_gal
     ):
         order = np.argsort(-q)
         conf = float(q[order[0]])
@@ -637,6 +644,12 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
             conf = max(BGS.P_GALAXY, float(q[CLASSES.index("GALAXY")]))
             margin = 2 * conf - 1
             how = BGS.BASIS
+        elif used == 0 and (gstar_i or wgal_i):
+            label = top = "STAR" if gstar_i else "GALAXY"
+            status = "CLASSIFIED"
+            conf = SPARSE.P_GAIA_STAR if gstar_i else SPARSE.P_WISE_GALAXY
+            margin = 2 * conf - 1
+            how = SPARSE.GAIA_BASIS if gstar_i else SPARSE.WISE_BASIS
         elif used == 0:
             label = "UNKNOWN"
             status = "NO_EVIDENCE"
