@@ -124,6 +124,8 @@ classified_objects.csv
 
 2.42.0(MYStIX 젊은 별 구성원, Gaia 천체측정 신뢰도, DESI BGS Gaia 별·은하 구분)에서 blind는 세트 A 98.88 %, 세트 B 99.10 %다. 별 생성 영역은 99.5 %(ONC 95.6 %, NGC 2024 98.3 %), SGP 띠는 96.5 %다([`v2/WORK_REPORT_2026-10-28.md`](v2/WORK_REPORT_2026-10-28.md)).
 
+2.43.0(근거 없는 천체의 Gaia 점광원·중적외선 사전확률)에서 blind는 세트 A 98.99 %, 세트 B 99.14 %, 구상성단 영역은 99.6 %다([`v2/WORK_REPORT_2026-10-29.md`](v2/WORK_REPORT_2026-10-29.md)).
+
 2.40.0의 밝기별 QSO 사전확률은 같은 영역 재생에서 1차 분류 정확도 96.21 → 96.31 %, QSO 정밀도 79.5 → 86.9 %, QSO 재현율 94.4 → 90.9 %였다([`v2/benchmark/qso_options/`](v2/benchmark/qso_options/)).
 
 ### 실제 하늘 비율 기준 순도 (blind, 18개 영역, 2.36.0 측정)
