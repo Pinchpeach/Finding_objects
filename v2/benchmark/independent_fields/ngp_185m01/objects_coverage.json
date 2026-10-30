@@ -3,14 +3,6 @@
  "attempted": 29,
  "failed": [
   {
-   "collector": "sdss_spectroscopy",
-   "catalog": "SDSS spectroscopy",
-   "status": "error",
-   "impact": "spectroscopic classes and redshifts",
-   "key": false,
-   "error": "InconsistentTableError('Number of header columns (1) inconsistent with data columns in data line 3')"
-  },
-  {
    "collector": "simbad",
    "catalog": "SIMBAD",
    "status": "error",
