@@ -91,6 +91,12 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     # ra_ivar/dec_ivar (1/deg^2) and ref_epoch give the per-source position
     # error and, for Gaia-matched stars, the epoch of the position (Dey+2019
     # sec. 8; LS DR10 catalogue schema) -- used by the association (2.16.0).
+    # dchisq_1..5 are the chi^2 improvements of the PSF, REX, DEV, EXP and SER
+    # models over no source (Dey+2019 sec. 6); the REX-PSF difference and the
+    # half-light-radius significance shape_r*sqrt(shape_r_ivar) measure how
+    # extended a faint source is beyond the discrete TYPE (Liu et al. 2025,
+    # PASP 137, 084501; Chaussidon et al. 2023, ApJ 944, 107).  fracflux_*
+    # (flux share of neighbours) and fiberflux_r flag blended fits (2.44.0).
     extra = ", ra_ivar, dec_ivar, ref_epoch"
     query = f"""
         SELECT ls_id, ra, dec, type, release, brickid, objid{{extra}},
@@ -101,7 +107,9 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
                nobs_g, nobs_r, nobs_i, nobs_z, maskbits,
                flux_w1, flux_w2, flux_ivar_w1, flux_ivar_w2,
                mw_transmission_w1, mw_transmission_w2,
-               sersic, shape_r
+               sersic, shape_r, shape_r_ivar,
+               dchisq_1, dchisq_2, dchisq_3, dchisq_4, dchisq_5,
+               fiberflux_r, fracflux_g, fracflux_r, fracflux_z
         FROM {TABLE}
         WHERE 't' = Q3C_RADIAL_QUERY(
             ra, dec, {float(ra):.10f}, {float(dec):.10f}, {radius_deg:.10f}
