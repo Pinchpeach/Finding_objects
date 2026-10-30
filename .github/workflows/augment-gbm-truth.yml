@@ -5,9 +5,6 @@ name: Add Tractor fit-quality columns to the LS-GBM training set
 # preserved training data.
 on:
   workflow_dispatch:
-  push:  # TEMP: first run before the file exists on main (removed before merge)
-    branches: [claude/code-review-7ox8zn]
-    paths: [.github/workflows/augment-gbm-truth.yml]
 concurrency:
   group: augment-gbm-truth-${{ github.ref }}
   cancel-in-progress: true
