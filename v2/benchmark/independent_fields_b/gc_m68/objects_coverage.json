@@ -3,12 +3,20 @@
  "attempted": 29,
  "failed": [
   {
-   "collector": "atnf_pulsar",
-   "catalog": "ATNF pulsars",
-   "status": "error",
-   "impact": "pulsar labels",
+   "collector": "gaia_dr3",
+   "catalog": "Gaia DR3",
+   "status": "timeout",
+   "impact": "parallax / proper motion (decisive STAR evidence), DSC class probabilities",
+   "key": true,
+   "error": "exceeded 300 s collector budget"
+  },
+  {
+   "collector": "gaia_dr3_variability_sos_vizier",
+   "catalog": "Gaia DR3 variability",
+   "status": "timeout",
+   "impact": "variable-star sub-classes",
    "key": false,
-   "error": "DALFormatError: SSLError: HTTPSConnectionPool(host='heasarc.gsfc.nasa.gov', port=443): Max retries exceeded with url: /xamin/vo/tap/sync (Caused by SSLError(SSLCertVerificationError(1, \"[SSL: CERTIFIC"
+   "error": "exceeded 300 s collector budget"
   },
   {
    "collector": "simbad",
@@ -19,5 +27,5 @@
    "error": "DALServiceError: Unable to access the capabilities endpoint at:\n- https://simbad.cds.unistra.fr/simbad/sim-tap/capabilities: Connection failed (Possible causes: incorrect URL, DNS issue, or service is"
   }
  ],
- "key_failed": false
+ "key_failed": true
 }
