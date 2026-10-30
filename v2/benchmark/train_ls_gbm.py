@@ -49,6 +49,11 @@ def production_frame(d: pd.DataFrame) -> pd.DataFrame:
     out[P + "type"] = d.get("p_morphtype", pd.Series("", index=d.index)).astype(str)
     out[P + "shape_r"] = pd.to_numeric(d.get("p_shape_r"), errors="coerce")
     out[P + "sersic"] = pd.to_numeric(d.get("p_sersic"), errors="coerce")
+    # Tractor fit quality (augment_gbm_truth.py, 2.44.0): desi_dr1.photometry
+    # names the chi^2 gains by model, the DR10 tractor table by position.
+    for i, m in enumerate(("psf", "rex", "dev", "exp", "ser"), 1):
+        out[P + f"dchisq_{i}"] = pd.to_numeric(d.get(f"p_dchisq_{m}"), errors="coerce")
+    out[P + "shape_r_ivar"] = pd.to_numeric(d.get("p_shape_r_ivar"), errors="coerce")
     return out
 
 
@@ -122,12 +127,12 @@ def main() -> None:
     # move faint stars from QSO to STAR but cost as many quasars.
     p.add_argument("--balance", action="store_true", help="class-balance each 0.5-mag r bin (see balance_weights)")
     p.add_argument("--snr", action="store_true", help="add the per-band S/N features (ls_gbm.SNR_FEATURES)")
+    p.add_argument("--fit", action="store_true", help="add the Tractor fit / locus features (ls_gbm.FIT_FEATURES)")
     a = p.parse_args()
     d = pd.read_csv(BENCH / "desi_gbm_truth" / "train.csv.gz", low_memory=False)
     d = d[d.spectype.isin(ls_gbm.CLASSES)].reset_index(drop=True)
-    X = ls_gbm.features(production_frame(d))
-    names = ls_gbm.ALL_FEATURES if a.snr else ls_gbm.FEATURES
-    X = X[:, : len(names)]
+    names = ls_gbm.FEATURES + (ls_gbm.SNR_FEATURES if a.snr else ()) + (ls_gbm.FIT_FEATURES if a.fit else ())
+    X = ls_gbm.features(production_frame(d), names=names)
     y = d.spectype.map({c: i for i, c in enumerate(ls_gbm.CLASSES)}).to_numpy()
     keep = np.isfinite(X[:, 0]) | np.isfinite(X[:, 3])
     X, y = X[keep], y[keep]

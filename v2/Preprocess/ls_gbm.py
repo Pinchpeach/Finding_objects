@@ -38,15 +38,22 @@ FEATURES = ("r_mag", "g_r", "r_z", "z_w1", "w1_w2", "r_w1", "log_snr_r", *[f"typ
 # shipped model uses FEATURES only; inference takes as many columns as the
 # model was trained on.
 SNR_FEATURES = ("log_snr_g", "log_snr_z", "log_snr_w1", "log_snr_w2")
-ALL_FEATURES = FEATURES + SNR_FEATURES
+# Tractor extent beyond the discrete TYPE and the stellar-locus distance in
+# z-W1 (2.44.0, train_ls_gbm.py --fit): the relative REX-PSF chi^2 gain
+# (Chaussidon et al. 2023, ApJ 944, 107; Liu et al. 2025, PASP 137, 084501),
+# the half-light-radius significance and z-W1 - [0.8(r-z) - 0.6] (Zhou et al.
+# 2023, AJ 165, 58).  Trees split on one feature at a time, so the locus
+# distance, a linear combination of two inputs, is given explicitly.
+FIT_FEATURES = ("dchisq_rex_rel_log", "size_sig_log", "zw1_excess")
+ALL_FEATURES = FEATURES + SNR_FEATURES + FIT_FEATURES
 
 
 def _col(df, name):
     return pd.to_numeric(df[name], errors="coerce").to_numpy(float) if name in df else np.full(len(df), np.nan)
 
 
-def features(df: pd.DataFrame, prefix: str = P) -> np.ndarray:
-    """Feature matrix from Legacy Surveys Tractor columns (``<prefix>flux_g`` ...).
+def features(df: pd.DataFrame, prefix: str = P, names=ALL_FEATURES) -> np.ndarray:
+    """Feature matrix (columns ``names``) from Legacy Surveys Tractor columns (``<prefix>flux_g`` ...).
 
     Dereddened AB magnitudes 22.5 - 2.5 log10(flux / mw_transmission); a
     non-positive flux gives NaN (handled as missing).  Rows without any LS
@@ -73,23 +80,29 @@ def features(df: pd.DataFrame, prefix: str = P) -> np.ndarray:
     typ = np.where(typ == "GPSF", "PSF", typ)  # DR9 Gaia point source = point-source model
     known = np.isin(typ, TYPES)
     onehot = [np.where(known, (typ == t).astype(float), np.nan) for t in TYPES]
-    X = np.column_stack(
-        [
-            mag["r"],
-            mag["g"] - mag["r"],
-            mag["r"] - mag["z"],
-            mag["z"] - mag["w1"],
-            mag["w1"] - mag["w2"],
-            mag["r"] - mag["w1"],
-            snr["r"],
-            *onehot,
-            snr["g"],
-            snr["z"],
-            snr["w1"],
-            snr["w2"],
-        ]
-    )
-    return X
+    d_psf, d_rex = _col(df, f"{prefix}dchisq_1"), _col(df, f"{prefix}dchisq_2")
+    r_e, r_iv = _col(df, f"{prefix}shape_r"), _col(df, f"{prefix}shape_r_ivar")
+    with np.errstate(divide="ignore", invalid="ignore"):
+        rel = np.clip((d_rex - d_psf) / np.where(d_psf > 0, d_psf, np.nan), 0, None)
+        size = np.log10(1.0 + np.clip(r_e, 0, None) * np.sqrt(np.where(r_iv >= 0, r_iv, np.nan)))
+    cols = {
+        "r_mag": mag["r"],
+        "g_r": mag["g"] - mag["r"],
+        "r_z": mag["r"] - mag["z"],
+        "z_w1": mag["z"] - mag["w1"],
+        "w1_w2": mag["w1"] - mag["w2"],
+        "r_w1": mag["r"] - mag["w1"],
+        "log_snr_r": snr["r"],
+        **{f"type_{t}": v for t, v in zip(TYPES, onehot)},
+        "log_snr_g": snr["g"],
+        "log_snr_z": snr["z"],
+        "log_snr_w1": snr["w1"],
+        "log_snr_w2": snr["w2"],
+        "dchisq_rex_rel_log": np.log10(rel + 1e-4),
+        "size_sig_log": size,
+        "zw1_excess": (mag["z"] - mag["w1"]) - (0.8 * (mag["r"] - mag["z"]) - 0.6),
+    }
+    return np.column_stack([cols[n] for n in names])
 
 
 @lru_cache(maxsize=1)
@@ -125,11 +138,12 @@ def raw_scores(X: np.ndarray, model: dict) -> np.ndarray:
 def predict_proba(df: pd.DataFrame, prefix: str = P) -> np.ndarray:
     """(n, 3) STAR/GALAXY/QSO probabilities; NaN rows where there is no LS photometry or no model."""
     model = load_model()
-    X = features(df, prefix)
-    if model is not None:  # the columns the model was trained on (older models: FEATURES only)
-        X = X[:, : len(model["features"])]
+    # the columns the model was trained on, by name
+    names = [str(n) for n in model["features"]] if model is not None else list(FEATURES)
+    X = features(df, prefix, [*names, "r_mag", "log_snr_r", "z_w1"])
     probs = np.full((len(df), len(CLASSES)), np.nan)
-    has = np.isfinite(X[:, [0, 6]]).any(axis=1) | np.isfinite(X[:, 3])  # r mag, r S/N or z-W1
+    has = np.isfinite(X[:, -3:]).any(axis=1)  # r mag, r S/N or z-W1
+    X = X[:, :-3]
     # The model only saw DESI targets, which all have g, r and z imaging
     # (NOBS >= 1 per band; Myers et al. 2023, AJ 165, 50).  A source outside
     # that footprint, e.g. DR10 DECam areas without r (field 340/-30,
