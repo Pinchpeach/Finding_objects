@@ -11,6 +11,7 @@ on:
       - .github/workflows/v2_nebula_probe.yml
       - .github/scripts/probe_nebula_catalogs.py
       - .github/scripts/probe_ls_columns.py
+      - .github/scripts/probe_archive_speed.py
 
 permissions:
   contents: read
@@ -24,4 +25,4 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: "3.11"}
       - run: pip install -q numpy astropy astroquery pyvo
-      - run: python -u .github/scripts/probe_ls_columns.py
+      - run: python -u .github/scripts/probe_archive_speed.py
