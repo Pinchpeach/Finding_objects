@@ -1,4 +1,4 @@
-"""Time a Gaia DR3 TAP cone and a VizieR cone (archive health before a field rerun, 2.44.0; re-run 19:17 UTC)."""
+"""Time a Gaia DR3 TAP cone and a VizieR cone (archive health before a field rerun, 2.44.0; re-run 22:38 UTC)."""
 import time
 
 from astroquery.gaia import Gaia
