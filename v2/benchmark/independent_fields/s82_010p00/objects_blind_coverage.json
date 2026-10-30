@@ -3,12 +3,20 @@
  "attempted": 29,
  "failed": [
   {
-   "collector": "gaia_dr3",
-   "catalog": "Gaia DR3",
+   "collector": "desi_legacy",
+   "catalog": "DESI Legacy Surveys DR10",
    "status": "timeout",
-   "impact": "parallax / proper motion (decisive STAR evidence), DSC class probabilities",
+   "impact": "deep morphology and the faint-object (LS-GBM) classifier",
    "key": true,
    "error": "exceeded 300 s collector budget"
+  },
+  {
+   "collector": "desi_fastspec",
+   "catalog": "DESI FastSpecFit",
+   "status": "timeout",
+   "impact": "emission-line sub-classes",
+   "key": false,
+   "error": "RuntimeError(\"Legacy Surveys TAP failed after 3 attempts: DALFormatError: ReadTimeout: HTTPSConnectionPool(host='datalab.noirlab.edu', port=443): Read timed out. (read timeout=80.0)\")"
   },
   {
    "collector": "simbad",
@@ -17,14 +25,6 @@
    "impact": "literature labels",
    "key": false,
    "error": "DALServiceError: Unable to access the capabilities endpoint at:\n- https://simbad.cds.unistra.fr/simbad/sim-tap/capabilities: Connection failed (Possible causes: incorrect URL, DNS issue, or service is"
-  },
-  {
-   "collector": "ned",
-   "catalog": "NED",
-   "status": "timeout",
-   "impact": "literature labels",
-   "key": false,
-   "error": "ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='ned.ipac.caltech.edu', port=443): Read timed out. (read timeout=60)\"))"
   }
  ],
  "key_failed": true
