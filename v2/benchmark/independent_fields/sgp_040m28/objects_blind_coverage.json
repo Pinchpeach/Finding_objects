@@ -3,20 +3,20 @@
  "attempted": 29,
  "failed": [
   {
-   "collector": "gaia_dr3",
-   "catalog": "Gaia DR3",
+   "collector": "desi_legacy",
+   "catalog": "DESI Legacy Surveys DR10",
    "status": "timeout",
-   "impact": "parallax / proper motion (decisive STAR evidence), DSC class probabilities",
+   "impact": "deep morphology and the faint-object (LS-GBM) classifier",
    "key": true,
-   "error": "exceeded 300 s collector budget"
+   "error": "TapTimeout(\"Legacy Surveys TAP failed after 3 attempts: TimeoutError('Data Lab TAP exceeded 80 s')\")"
   },
   {
-   "collector": "gaia_dr3_variability_sos_vizier",
-   "catalog": "Gaia DR3 variability",
+   "collector": "desi_fastspec",
+   "catalog": "DESI FastSpecFit",
    "status": "timeout",
-   "impact": "variable-star sub-classes",
+   "impact": "emission-line sub-classes",
    "key": false,
-   "error": "exceeded 300 s collector budget"
+   "error": "TapTimeout(\"Legacy Surveys TAP failed after 3 attempts: TimeoutError('Data Lab TAP exceeded 80 s')\")"
   },
   {
    "collector": "simbad",
