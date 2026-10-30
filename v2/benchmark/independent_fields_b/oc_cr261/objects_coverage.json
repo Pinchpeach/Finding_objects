@@ -3,12 +3,20 @@
  "attempted": 29,
  "failed": [
   {
-   "collector": "atnf_pulsar",
-   "catalog": "ATNF pulsars",
+   "collector": "gaia_dr3",
+   "catalog": "Gaia DR3",
+   "status": "timeout",
+   "impact": "parallax / proper motion (decisive STAR evidence), DSC class probabilities",
+   "key": true,
+   "error": "exceeded 300 s collector budget"
+  },
+  {
+   "collector": "desi_legacy",
+   "catalog": "DESI Legacy Surveys DR10",
    "status": "error",
-   "impact": "pulsar labels",
-   "key": false,
-   "error": "DALFormatError: SSLError: HTTPSConnectionPool(host='heasarc.gsfc.nasa.gov', port=443): Max retries exceeded with url: /xamin/vo/tap/sync (Caused by SSLError(SSLCertVerificationError(1, \"[SSL: CERTIFIC"
+   "impact": "deep morphology and the faint-object (LS-GBM) classifier",
+   "key": true,
+   "error": "RuntimeError('Legacy Surveys TAP failed after 3 attempts: DALServiceError: 502 Server Error: Bad Gateway for url: https://datalab.noirlab.edu/tap/sync')"
   },
   {
    "collector": "simbad",
@@ -24,8 +32,8 @@
    "status": "timeout",
    "impact": "literature labels",
    "key": false,
-   "error": "ConnectionError(ReadTimeoutError(\"HTTPSConnectionPool(host='ned.ipac.caltech.edu', port=443): Read timed out.\"))"
+   "error": "ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='ned.ipac.caltech.edu', port=443): Read timed out. (read timeout=60)\"))"
   }
  ],
- "key_failed": false
+ "key_failed": true
 }
