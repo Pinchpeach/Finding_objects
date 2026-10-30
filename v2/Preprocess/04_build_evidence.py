@@ -166,7 +166,7 @@ RAW_FIELDS = {
     # ZTF light-curve statistics (ZTF-VAR-001; Get_data/ztf_lightcurve.py)
     *(f"ztf_{b}_{k}" for b in ("g", "r") for k in ("n", "mag", "rms", "chi2r", "exvar", "sf_a", "sf_gamma")),
 }
-DERIVED_PREFIXES = ("association_confidence__", "catalog_confidence_", "ps1_", "ls_", "catalogs")
+DERIVED_PREFIXES = ("association_confidence__", "catalog_confidence_", "ps1_", "ls_", "wise_", "catalogs")
 
 
 def _rule_columns(columns):
