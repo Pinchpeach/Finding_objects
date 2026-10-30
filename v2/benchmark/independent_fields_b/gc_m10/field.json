@@ -2,22 +2,20 @@
  "ra": 254.288,
  "dec": -4.1,
  "radius_arcmin": 6.0,
- "n_objects": 32118,
+ "n_objects": 31746,
  "seconds": {
-  "collect": 481.2,
-  "1_associate": 79.7,
-  "2_integrate": 16.4,
-  "3_features": 19.0,
-  "4_evidence": 17.2,
-  "5_coarse": 24.8,
-  "6_prepare": 19.5,
-  "7_classify": 22.9
+  "collect": 449.7,
+  "1_associate": 63.5,
+  "2_integrate": 24.3,
+  "3_features": 30.1,
+  "4_evidence": 28.9,
+  "5_coarse": 39.1,
+  "6_prepare": 32.2,
+  "7_classify": 41.5
  },
  "catalog_rows": {
-  "Gaia DR3": 26997,
   "DESI Legacy Surveys DR10": 26997,
   "Pan-STARRS1 DR2 MeanObject": 23651,
-  "NED": 2890,
   "2MASS PSC": 2297,
   "AllWISE": 1045,
   "GALEX AIS": 288,
@@ -27,6 +25,7 @@
   "ZTF periodic variables": 3,
   "NVSS": 3,
   "VLASS": 2,
+  "ATNF Pulsar Catalog": 2,
   "TGSS ADR1": 1
  },
  "seeing": {
