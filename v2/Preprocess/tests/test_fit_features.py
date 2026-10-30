@@ -68,3 +68,15 @@ def test_stage3_and_stage4_emit_the_features(tmp_path):
     assert feats[1]["FEATURE:wise_w2_w3"] == 3.5 and feats[1]["FEATURE:wise_w1_w2"] == 0.5
     assert "FEATURE:wise_w2_w3" not in feats[0]  # W3 below S/N 3
     assert feats[0]["FEATURE:size_sig_log"] == 0.0
+
+
+def test_wise_colours_alone_are_not_evidence():
+    s5 = _load("s5f", "05_likelihood_vectors.py")
+    model = s5.load_model(s5.MODEL_PATH)
+    wise = [
+        {"class": "FEATURE:wise_w1_w2", "rule_id": "WISE-COLOR-001", "value": 0.1, "kind": "linear_feature"},
+        {"class": "FEATURE:wise_w1_w2_present", "rule_id": "WISE-COLOR-001", "value": 1.0, "kind": "linear_feature"},
+    ]
+    gbm = [{"class": c, "rule_id": "LS-GBM-001", "score": p, "raw_score": p, "kind": "direct_probability"} for c, p in (("STAR", 0.9), ("GALAXY", 0.05), ("QSO", 0.05))]
+    (_, used_alone), (_, used_with) = s5.fuse_many([wise, wise + gbm], model)
+    assert used_alone == 0 and used_with >= 1
