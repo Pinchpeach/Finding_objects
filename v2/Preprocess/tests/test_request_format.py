@@ -84,3 +84,4 @@ def test_sdss_rectangle_keeps_full_precision():
     wrapped = cu._sdss()._rectangle_sql(359.95, -0.0667, 0.2, height=0.1333)
     assert "(p.ra >= 359.85000000) OR (p.ra <= 0.05000000)" in wrapped
     assert "-0.00005000" in wrapped and "e-" not in wrapped
+

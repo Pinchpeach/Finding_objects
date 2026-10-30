@@ -18,6 +18,14 @@ connection from the validation runners for hours, and later answered so
 slowly that every query ran into the 60 s read timeout; either stopped every
 VizieR-backed collector.  A mirror that answered is preferred for
 MIRROR_STICKY_S, then Strasbourg is tried first again.
+
+Connect timeout (2.44.0): a VizieR request waits at most CONNECT_TIMEOUT_S
+for the TCP connection (the read timeout the client asked for is kept).  On
+2026-10-30 the Strasbourg server stopped accepting connections; each request
+waited astroquery's full 60 s before failing over, a collector made several,
+and VizieR-backed collectors took ~270 s, pushing Gaia (whose VizieR copy is
+the fallback for a slow ESA TAP) past the 300 s collector budget in every
+validation field.  A healthy server connects in well under a second.
 """
 
 from __future__ import annotations
@@ -37,6 +45,7 @@ VIZIER_HOSTS = (
     "vizier.idia.ac.za",
 )
 MIRROR_STICKY_S = 600.0
+CONNECT_TIMEOUT_S = 10.0
 RETRY_STATUS = {502, 503, 504}
 _preferred = {"host": None, "until": 0.0}
 
@@ -88,6 +97,9 @@ def _with_mirrors(send):
         if parts.hostname not in VIZIER_HOSTS:
             return send(self, method, url, *args, **kwargs)
         hosts = _vizier_order(parts.hostname)
+        read = kwargs.get("timeout")
+        read = read[1] if isinstance(read, tuple) else read
+        kwargs["timeout"] = (CONNECT_TIMEOUT_S, read)
         last = None
         for i, host in enumerate(hosts):
             if i:
