@@ -2,16 +2,16 @@
  "ra": 129.81722,
  "dec": 30.13528,
  "radius_arcmin": 12.0,
- "n_objects": 13488,
+ "n_objects": 13490,
  "seconds": {
-  "collect": 66.7,
-  "1_associate": 5.0,
-  "2_integrate": 12.4,
-  "3_features": 25.9,
-  "4_evidence": 13.4,
-  "5_coarse": 26.9,
-  "6_prepare": 24.5,
-  "7_classify": 18.2
+  "collect": 465.8,
+  "1_associate": 6.2,
+  "2_integrate": 14.7,
+  "3_features": 28.3,
+  "4_evidence": 17.0,
+  "5_coarse": 32.7,
+  "6_prepare": 30.7,
+  "7_classify": 23.9
  },
  "catalog_rows": {
   "DESI Legacy Surveys DR10": 11234,
@@ -19,7 +19,6 @@
   "SDSS DR18 PhotoObj": 3246,
   "NED": 3034,
   "AllWISE": 1793,
-  "Gaia DR3": 653,
   "GALEX AIS": 484,
   "2MASS PSC": 273,
   "LAMOST DR catalog": 136,
