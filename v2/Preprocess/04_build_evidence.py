@@ -576,6 +576,24 @@ def evaluate(rule, row, namespaced=frozenset()):
             if v is not None:
                 feature(name, max(-3.0, min(6.0, v)), "dereddened AB colour")
                 feature(f"{name}_present", 1.0, "colour available")
+        # 2.44.0: stellar-locus excess and Tractor extent (03_extract_features.py)
+        for name, lo, hi, note in (
+            ("zw1_excess", -3.0, 6.0, "z-W1 above the stellar locus 0.8(r-z)-0.6 (Zhou+2023)"),
+            ("dchisq_rex_rel_log", -4.0, 2.0, "log10 relative REX-PSF chi^2 gain (Chaussidon+2023)"),
+            ("size_sig_log", 0.0, 4.0, "log10(1 + r_e / sigma(r_e))"),
+        ):
+            v = num(row, f"ls_{name}")
+            if v is not None:
+                feature(name, max(lo, min(hi, v)), note)
+                feature(f"{name}_present", 1.0, "feature available")
+    elif rid == "WISE-COLOR-001":
+        # AllWISE colours as continuous features (2.44.0): W1-W2 and, with W3
+        # detected, W2-W3 (Vega); weights only from the fitted Stage-5 model.
+        for name in ("w1_w2", "w2_w3"):
+            v = num(row, f"wise_{name}_color")
+            if v is not None:
+                feature(f"wise_{name}", max(-2.0, min(7.0, v)), "AllWISE Vega colour")
+                feature(f"wise_{name}_present", 1.0, "colour available")
     elif rid == "PS1-VAR-001":
         # Multi-epoch variability of point sources (2.36.0).  Quasars vary
         # stochastically by ~0.1-0.3 mag over years (MacLeod et al. 2010,

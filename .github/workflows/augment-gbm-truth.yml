@@ -1,0 +1,35 @@
+name: Add Tractor fit-quality columns to the LS-GBM training set
+
+# Fetches dchisq_*, shape_r_ivar, fiberflux_r and fracflux_* from
+# desi_dr1.photometry by TARGETID (2.44.0).  Manual only: it rewrites the
+# preserved training data.
+on:
+  workflow_dispatch:
+concurrency:
+  group: augment-gbm-truth-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pandas numpy astropy pyvo requests
+      - name: Build
+        run: python -u v2/benchmark/augment_gbm_truth.py
+      - name: Commit
+        if: ${{ !cancelled() }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add v2/benchmark/desi_gbm_truth || true
+          if git diff --cached --quiet; then echo "nothing to commit"; exit 0; fi
+          git commit -m "Add Tractor fit-quality columns to the LS-GBM training set"
+          bash .github/scripts/push_with_retry.sh

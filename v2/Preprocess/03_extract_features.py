@@ -148,6 +148,33 @@ def run(objects: Path, rules_path: Path, out: Path) -> Path:
     for b1, b2 in (("g", "r"), ("r", "z"), ("z", "w1"), ("w1", "w2")):
         if ls_mags[b1] is not None and ls_mags[b2] is not None:
             derived[f"ls_{b1}_{b2}_color"] = ls_mags[b1] - ls_mags[b2]
+    # Distance from the stellar locus in z-W1 vs r-z (2.44.0): stars follow
+    # z-W1 ~ 0.8(r-z) - 0.6 (AB) and are removed below it in the DESI LRG
+    # selection (Zhou et al. 2023, AJ 165, 58, eq. 1); galaxies and quasars lie
+    # above it through their K-corrected or power-law near-IR light.
+    if {"ls_r_z_color", "ls_z_w1_color"} <= derived.keys():
+        derived["ls_zw1_excess"] = derived["ls_z_w1_color"] - (0.8 * derived["ls_r_z_color"] - 0.6)
+
+    # Tractor fit quality beyond the discrete TYPE (2.44.0).  dchisq_1..5 are
+    # the chi^2 gains of the PSF, REX, DEV, EXP and SER models over no source
+    # (Dey et al. 2019, AJ 157, 168, sec. 6); the relative REX - PSF gain
+    # measures extent continuously -- DESI keeps quasars with (REX - PSF) / PSF
+    # < 0.015 (Chaussidon et al. 2023, ApJ 944, 107) and Liu et al. (2025,
+    # PASP 137, 084501) separate faint stars and galaxies with dchisq
+    # differences.  The half-light radius over its error is the significance
+    # of the size.  Log scale, as both span decades.
+    def ls_num(n):
+        c = ls(n)
+        return pd.to_numeric(df[c], errors="coerce") if c else None
+
+    d_psf, d_rex = ls_num("dchisq_1"), ls_num("dchisq_2")
+    if d_psf is not None and d_rex is not None:
+        rel = ((d_rex - d_psf) / d_psf.where(d_psf > 0)).clip(lower=0)
+        derived["ls_dchisq_rex_rel_log"] = np.log10(rel + 1e-4)
+    r_e, r_iv = ls_num("shape_r"), ls_num("shape_r_ivar")
+    if r_e is not None and r_iv is not None:
+        sig = r_e.clip(lower=0) * np.sqrt(r_iv.where(r_iv >= 0))
+        derived["ls_size_sig_log"] = np.log10(1.0 + sig)
 
     # WISE Vega colours and propagated errors.
     wise = lambda n: field("allwise", n)
@@ -159,6 +186,16 @@ def run(objects: Path, rules_path: Path, out: Path) -> Path:
             e1 = pd.to_numeric(df[wise("e_W1mag")], errors="coerce")
             e2 = pd.to_numeric(df[wise("e_W2mag")], errors="coerce")
             derived["wise_w1_w2_color_err"] = np.sqrt(e1 * e1 + e2 * e2)
+    # W2-W3 (Vega) where W3 is detected (snr3 >= 3): stellar photospheres sit
+    # near 0, star-forming galaxies at 2-4 and quasars at 2-3.5 (Wright et
+    # al. 2010, AJ 140, 1868, fig. 12; Jarrett et al. 2011, ApJ 735, 112),
+    # the axis of the WISE colour-colour diagram that W1-W2 alone lacks (2.44.0).
+    if wise("W2mag") and wise("W3mag"):
+        w2 = pd.to_numeric(df[wise("W2mag")], errors="coerce")
+        w3 = pd.to_numeric(df[wise("W3mag")], errors="coerce")
+        s3 = pd.to_numeric(df[wise("snr3")], errors="coerce") if wise("snr3") else None
+        c = w2 - w3
+        derived["wise_w2_w3_color"] = c.where(s3 >= 3) if s3 is not None else c
 
     # Catalog observation-confidence indices. These are [0,1] project quality
     # indices anchored to published catalog quality diagnostics; they are NOT
