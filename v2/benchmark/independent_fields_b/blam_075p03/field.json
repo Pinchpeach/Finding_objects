@@ -1,37 +1,27 @@
 {
- "ra": 74.90389,
- "dec": 2.98556,
+ "ra": 75.13,
+ "dec": 3.38,
  "radius_arcmin": 12.0,
- "n_objects": 15692,
+ "n_objects": 13163,
  "seconds": {
-  "collect": 73.5,
-  "1_associate": 7.2,
-  "2_integrate": 11.1,
-  "3_features": 14.1,
-  "4_evidence": 14.3,
-  "5_coarse": 19.4,
-  "6_prepare": 15.6,
-  "7_classify": 19.0
+  "collect": 312.2,
+  "1_associate": 3.7,
+  "2_integrate": 3.6,
+  "3_features": 2.7,
+  "4_evidence": 7.3,
+  "5_coarse": 7.3,
+  "6_prepare": 3.8,
+  "7_classify": 6.9
  },
  "catalog_rows": {
-  "DESI Legacy Surveys DR10": 10113,
-  "Pan-STARRS1 DR2 MeanObject": 9294,
-  "NED": 2218,
-  "AllWISE": 2175,
-  "Gaia DR3": 1395,
-  "2MASS PSC": 486,
-  "LAMOST DR catalog": 40,
-  "VLASS": 14,
-  "NVSS": 4,
-  "TGSS ADR1": 4,
-  "eROSITA eRASS1": 4,
-  "ZTF periodic variables": 3
+  "DESI Legacy Surveys DR10": 9295,
+  "Pan-STARRS1 DR2 MeanObject": 7553
  },
  "seeing": {
-  "g": 1.41,
-  "r": 1.25,
-  "z": 1.26,
-  "n_psf": 4853,
+  "g": 1.45,
+  "r": 1.24,
+  "z": 1.27,
+  "n_psf": 4788,
   "source": "LS DR10 psfsize"
  }
 }
