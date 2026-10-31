@@ -12,11 +12,7 @@
  },
  "2SLAQ QSO (Croom+2009)": {},
  "WiggleZ final (Drinkwater+2018)": {},
- "RAVE DR6 (Steinmetz+2020)": {
-  "III/283/ravedr6": 46,
-  "III/283/xgaia2": 46,
-  "III/283/xgaiae3": 46
- },
+ "RAVE DR6 (Steinmetz+2020)": "failed: ConnectionError: HTTPSConnectionPool(host='vizier.china-vo.org', port=443): Max retries exceeded with url: /viz-bin/votable (Caused by Ne",
  "APOGEE DR17 (Abdurro'uf+2022)": {},
  "Magellanic Quasars Survey (Kozlowski+2013)": {},
  "Gaia-ESO DR5 (Randich+2022)": {},
