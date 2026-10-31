@@ -3,14 +3,6 @@
  "attempted": 29,
  "failed": [
   {
-   "collector": "gaia_dr3",
-   "catalog": "Gaia DR3",
-   "status": "timeout",
-   "impact": "parallax / proper motion (decisive STAR evidence), DSC class probabilities",
-   "key": true,
-   "error": "exceeded 300 s collector budget"
-  },
-  {
    "collector": "simbad",
    "catalog": "SIMBAD",
    "status": "error",
@@ -21,11 +13,11 @@
   {
    "collector": "ned",
    "catalog": "NED",
-   "status": "error",
+   "status": "timeout",
    "impact": "literature labels",
    "key": false,
-   "error": "ExpatError('syntax error: line 1, column 49')"
+   "error": "ConnectionError(ReadTimeoutError(\"HTTPSConnectionPool(host='ned.ipac.caltech.edu', port=443): Read timed out.\"))"
   }
  ],
- "key_failed": true
+ "key_failed": false
 }
