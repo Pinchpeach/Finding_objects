@@ -2,20 +2,19 @@
  "ra": 130.1,
  "dec": -53.0,
  "radius_arcmin": 12.0,
- "n_objects": 14492,
+ "n_objects": 12760,
  "seconds": {
-  "collect": 475.4,
-  "1_associate": 9.5,
-  "2_integrate": 13.8,
-  "3_features": 20.4,
-  "4_evidence": 14.3,
-  "5_coarse": 24.4,
-  "6_prepare": 21.8,
-  "7_classify": 22.4
+  "collect": 306.7,
+  "1_associate": 4.4,
+  "2_integrate": 8.1,
+  "3_features": 12.8,
+  "4_evidence": 8.5,
+  "5_coarse": 16.2,
+  "6_prepare": 13.9,
+  "7_classify": 14.3
  },
  "catalog_rows": {
-  "Gaia DR3": 12471,
-  "NED": 8228,
+  "Gaia DR3": 12472,
   "2MASS PSC": 3517,
   "AllWISE": 2770,
   "XMM 4XMM-DR13": 41,
@@ -24,7 +23,11 @@
   "Gaia DR3 variability SOS": 1
  },
  "seeing": {
-  "error": "TapTimeout: Legacy Surveys TAP failed after 3 attempts: TimeoutError('Data Lab TAP exceeded 80 s')",
+  "g": NaN,
+  "r": NaN,
+  "z": NaN,
+  "n_psf": 0,
+  "source": "LS DR10 psfsize",
   "ps1": {
    "error": "EmptyDataError: No columns to parse from file",
    "fwhm_columns": [
