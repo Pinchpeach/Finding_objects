@@ -3,148 +3,12 @@
  "attempted": 29,
  "failed": [
   {
-   "collector": "gaia_dr3",
-   "catalog": "Gaia DR3",
+   "collector": "sdss_dr18",
+   "catalog": "SDSS DR18 imaging",
    "status": "error",
-   "impact": "parallax / proper motion (decisive STAR evidence), DSC class probabilities",
-   "key": true,
-   "error": "HTTPError('500 Server Error: Internal Server Error for url: https://vizier.idia.ac.za/viz-bin/votable')"
-  },
-  {
-   "collector": "galex",
-   "catalog": "GALEX",
-   "status": "error",
-   "impact": "UV colours",
+   "impact": "SDSS morphology and u-band colours",
    "key": false,
-   "error": "HTTPError('500 Server Error: Internal Server Error for url: https://vizier.idia.ac.za/viz-bin/votable')"
-  },
-  {
-   "collector": "twomass",
-   "catalog": "2MASS",
-   "status": "error",
-   "impact": "near-IR colours of bright stars",
-   "key": false,
-   "error": "HTTPError('500 Server Error: Internal Server Error for url: https://vizier.idia.ac.za/viz-bin/votable')"
-  },
-  {
-   "collector": "allwise",
-   "catalog": "AllWISE",
-   "status": "error",
-   "impact": "mid-IR AGN colours (QSO evidence)",
-   "key": true,
-   "error": "HTTPError('500 Server Error: Internal Server Error for url: https://vizier.idia.ac.za/viz-bin/votable')"
-  },
-  {
-   "collector": "nvss",
-   "catalog": "NVSS",
-   "status": "error",
-   "impact": "radio detections",
-   "key": false,
-   "error": "HTTPError('500 Server Error: Internal Server Error for url: https://vizier.idia.ac.za/viz-bin/votable')"
-  },
-  {
-   "collector": "tgss",
-   "catalog": "TGSS ADR1",
-   "status": "error",
-   "impact": "radio detections",
-   "key": false,
-   "error": "HTTPError('500 Server Error: Internal Server Error for url: https://vizier.idia.ac.za/viz-bin/votable')"
-  },
-  {
-   "collector": "vlass",
-   "catalog": "VLASS",
-   "status": "error",
-   "impact": "radio detections",
-   "key": false,
-   "error": "HTTPError('500 Server Error: Internal Server Error for url: https://vizier.idia.ac.za/viz-bin/votable')"
-  },
-  {
-   "collector": "xmm",
-   "catalog": "4XMM",
-   "status": "error",
-   "impact": "X-ray detections (AGN evidence)",
-   "key": false,
-   "error": "HTTPError('500 Server Error: Internal Server Error for url: https://vizier.idia.ac.za/viz-bin/votable')"
-  },
-  {
-   "collector": "chandra",
-   "catalog": "Chandra CSC",
-   "status": "error",
-   "impact": "X-ray detections (AGN evidence)",
-   "key": false,
-   "error": "HTTPError('500 Server Error: Internal Server Error for url: https://vizier.idia.ac.za/viz-bin/votable')"
-  },
-  {
-   "collector": "erosita",
-   "catalog": "eROSITA eRASS1",
-   "status": "error",
-   "impact": "X-ray detections (AGN, clusters)",
-   "key": false,
-   "error": "HTTPError('500 Server Error: Internal Server Error for url: https://vizier.idia.ac.za/viz-bin/votable')"
-  },
-  {
-   "collector": "mystix_mpcm",
-   "catalog": "MYStIX MPCM",
-   "status": "error",
-   "impact": "young-star members of massive star-forming regions",
-   "key": false,
-   "error": "HTTPError('500 Server Error: Internal Server Error for url: https://vizier.idia.ac.za/viz-bin/votable')"
-  },
-  {
-   "collector": "desi_spectroscopy",
-   "catalog": "DESI DR1 spectroscopy",
-   "status": "error",
-   "impact": "spectroscopic classes and redshifts",
-   "key": false,
-   "error": "HTTPError('500 Server Error: Internal Server Error for url: https://vizier.idia.ac.za/viz-bin/votable')"
-  },
-  {
-   "collector": "lamost_spectroscopy",
-   "catalog": "LAMOST DR5",
-   "status": "error",
-   "impact": "spectroscopic classes and stellar parameters",
-   "key": false,
-   "error": "HTTPError('500 Server Error: Internal Server Error for url: https://vizier.idia.ac.za/viz-bin/votable')"
-  },
-  {
-   "collector": "ztf_periodic",
-   "catalog": "ZTF periodic variables",
-   "status": "error",
-   "impact": "variable-star sub-classes",
-   "key": false,
-   "error": "HTTPError('500 Server Error: Internal Server Error for url: https://vizier.idia.ac.za/viz-bin/votable')"
-  },
-  {
-   "collector": "bzcat",
-   "catalog": "Roma-BZCAT",
-   "status": "error",
-   "impact": "blazar labels",
-   "key": false,
-   "error": "HTTPError('500 Server Error: Internal Server Error for url: https://vizier.idia.ac.za/viz-bin/votable')"
-  },
-  {
-   "collector": "agb_suh2021",
-   "catalog": "AGB catalogue (Suh 2021)",
-   "status": "error",
-   "impact": "AGB labels",
-   "key": false,
-   "error": "RuntimeError('Suh 2021 AGB tables failed: table9:HTTPError, table10:HTTPError, table11:HTTPError, table12:HTTPError')"
-  },
-  {
-   "collector": "sga2020",
-   "catalog": "Siena Galaxy Atlas",
-   "status": "error",
-   "impact": "large-galaxy grouping",
-   "key": false,
-   "error": "HTTPError('500 Server Error: Internal Server Error for url: https://vizier.idia.ac.za/viz-bin/votable')"
-  },
-  {
-   "collector": "galaxy_clusters",
-   "catalog": "galaxy cluster catalogues",
-   "status": "error",
-   "impact": "cluster membership",
-   "key": false,
-   "error": "RuntimeError('WH24: 500 Server Error: Internal Server Error for url: https://vizier.idia.ac.za/viz-bin/votable; eRASS1: 500 Server Error: Internal Server Error for url: https://vizier.idia.ac.za/viz-b"
+   "error": "InconsistentTableError('Number of header columns (1) inconsistent with data columns in data line 9')"
   },
   {
    "collector": "simbad",
@@ -153,15 +17,7 @@
    "impact": "literature labels",
    "key": false,
    "error": "DALServiceError: Unable to access the capabilities endpoint at:\n- https://simbad.cds.unistra.fr/simbad/sim-tap/capabilities: Connection failed (Possible causes: incorrect URL, DNS issue, or service is"
-  },
-  {
-   "collector": "ned",
-   "catalog": "NED",
-   "status": "error",
-   "impact": "literature labels",
-   "key": false,
-   "error": "ConnectionError(ProtocolError('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer')))"
   }
  ],
- "key_failed": true
+ "key_failed": false
 }
