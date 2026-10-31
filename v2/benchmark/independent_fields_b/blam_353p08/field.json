@@ -1,45 +1,33 @@
 {
- "ra": 353.3975,
- "dec": 8.09333,
+ "ra": 352.97,
+ "dec": 8.14,
  "radius_arcmin": 12.0,
- "n_objects": 14881,
+ "n_objects": 13592,
  "seconds": {
-  "collect": 141.9,
-  "1_associate": 7.6,
-  "2_integrate": 12.1,
-  "3_features": 15.0,
-  "4_evidence": 14.2,
-  "5_coarse": 20.2,
-  "6_prepare": 16.3,
-  "7_classify": 19.1
+  "collect": 490.0,
+  "1_associate": 5.9,
+  "2_integrate": 5.2,
+  "3_features": 4.8,
+  "4_evidence": 8.6,
+  "5_coarse": 9.6,
+  "6_prepare": 5.8,
+  "7_classify": 9.4
  },
  "catalog_rows": {
-  "DESI Legacy Surveys DR10": 10983,
+  "DESI Legacy Surveys DR10": 10128,
   "Pan-STARRS1 DR2 MeanObject": 5763,
-  "SDSS DR18 PhotoObj": 3449,
-  "NED": 1701,
-  "AllWISE": 1648,
-  "Gaia DR3": 510,
-  "GALEX AIS": 391,
-  "2MASS PSC": 258,
-  "DESI DR1 spectroscopy": 156,
-  "DESI DR1 FastSpecFit": 145,
-  "LAMOST DR catalog": 71,
-  "SIMBAD": 40,
-  "SDSS DR18 spectroscopy": 35,
-  "VLASS": 14,
-  "SGA-2020": 9,
-  "NVSS": 6,
-  "FIRST": 3
+  "SDSS DR18 PhotoObj": 3478,
+  "NED": 1646,
+  "DESI DR1 FastSpecFit": 131,
+  "LAMOST DR catalog": 47,
+  "SDSS DR18 spectroscopy": 36,
+  "SGA-2020": 4
  },
  "seeing": {
-  "error": "RuntimeError: Legacy Surveys TAP failed after 3 attempts: DALFormatError: ReadTimeout: HTTPSConnectionPool(host='datalab.noirlab.edu',",
-  "ps1": {
-   "source": "PS1 stack psfMajor/MinorFWHM",
-   "n": 6360,
-   "g": 1.26,
-   "r": 1.22,
-   "i": 0.97
-  }
+  "g": 1.66,
+  "r": 1.53,
+  "z": 1.71,
+  "n_psf": 4249,
+  "source": "LS DR10 psfsize"
  }
 }

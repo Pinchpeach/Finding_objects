@@ -1,11 +1,6 @@
 {
- "LAMOST DR5 (Luo+2019)": {
-  "V/164/dr5": 585,
-  "V/164/stellar5": 367,
-  "V/164/astars5": 6,
-  "V/164/mstars5": 59
- },
- "2QZ/6QZ (Croom+2004)": {},
+ "LAMOST DR5 (Luo+2019)": "failed: HTTPError: 504 Server Error: Gateway Timeout for url: https://vizier.idia.ac.za/viz-bin/votable",
+ "2QZ/6QZ (Croom+2004)": "failed: ConnectionError: HTTPSConnectionPool(host='vizier.china-vo.org', port=443): Max retries exceeded with url: /viz-bin/votable (Caused by Ne",
  "2dFGRS (Colless+2003)": {},
  "6dFGS DR3 (Jones+2009)": {},
  "2SLAQ QSO (Croom+2009)": {},
