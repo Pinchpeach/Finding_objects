@@ -2,21 +2,31 @@
  "ra": 294.225,
  "dec": 57.22472,
  "radius_arcmin": 12.0,
- "n_objects": 17427,
+ "n_objects": 17704,
  "seconds": {
-  "collect": 303.5,
-  "1_associate": 7.1,
-  "2_integrate": 5.1,
-  "3_features": 3.7,
-  "4_evidence": 10.3,
-  "5_coarse": 10.2,
-  "6_prepare": 5.3,
-  "7_classify": 9.9
+  "collect": 308.6,
+  "1_associate": 10.7,
+  "2_integrate": 12.2,
+  "3_features": 13.2,
+  "4_evidence": 16.2,
+  "5_coarse": 21.3,
+  "6_prepare": 15.6,
+  "7_classify": 20.9
  },
  "catalog_rows": {
   "DESI Legacy Surveys DR10": 13920,
   "Pan-STARRS1 DR2 MeanObject": 9846,
-  "NED": 2866
+  "Gaia DR3": 3172,
+  "NED": 2866,
+  "AllWISE": 2655,
+  "2MASS PSC": 1062,
+  "GALEX AIS": 446,
+  "LAMOST DR catalog": 22,
+  "VLASS": 8,
+  "ZTF periodic variables": 4,
+  "NVSS": 4,
+  "TGSS ADR1": 2,
+  "SGA-2020": 1
  },
  "seeing": {
   "g": 1.62,
