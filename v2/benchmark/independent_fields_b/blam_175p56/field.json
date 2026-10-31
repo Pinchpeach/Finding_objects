@@ -1,30 +1,43 @@
 {
- "ra": 174.69,
- "dec": 55.99,
+ "ra": 175.08556,
+ "dec": 55.88194,
  "radius_arcmin": 12.0,
- "n_objects": 10953,
+ "n_objects": 13091,
  "seconds": {
-  "collect": 340.8,
-  "1_associate": 3.2,
-  "2_integrate": 2.9,
-  "3_features": 2.4,
-  "4_evidence": 5.3,
-  "5_coarse": 5.1,
-  "6_prepare": 3.1,
-  "7_classify": 5.1
+  "collect": 308.1,
+  "1_associate": 7.6,
+  "2_integrate": 14.5,
+  "3_features": 22.4,
+  "4_evidence": 15.6,
+  "5_coarse": 27.5,
+  "6_prepare": 24.6,
+  "7_classify": 23.5
  },
  "catalog_rows": {
-  "DESI Legacy Surveys DR10": 6502,
-  "Pan-STARRS1 DR2 MeanObject": 6474,
-  "SDSS DR18 PhotoObj": 2826,
-  "DESI DR1 FastSpecFit": 180,
-  "SDSS DR18 spectroscopy": 74
+  "DESI Legacy Surveys DR10": 7196,
+  "Pan-STARRS1 DR2 MeanObject": 7074,
+  "SDSS DR18 PhotoObj": 3314,
+  "NED": 3073,
+  "AllWISE": 1966,
+  "GALEX AIS": 557,
+  "Gaia DR3": 423,
+  "2MASS PSC": 250,
+  "DESI DR1 spectroscopy": 237,
+  "LoTSS DR2": 181,
+  "DESI DR1 FastSpecFit": 177,
+  "LAMOST DR catalog": 88,
+  "SGA-2020": 27,
+  "VLASS": 14,
+  "FIRST": 13,
+  "NVSS": 9,
+  "TGSS ADR1": 4,
+  "Chandra CSC 2.0": 3
  },
  "seeing": {
-  "g": 2.3,
-  "r": 1.39,
-  "z": 1.24,
-  "n_psf": 2436,
+  "g": 2.14,
+  "r": 1.29,
+  "z": 1.28,
+  "n_psf": 2600,
   "source": "LS DR10 psfsize"
  }
 }
