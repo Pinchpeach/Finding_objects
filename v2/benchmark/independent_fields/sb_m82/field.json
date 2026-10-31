@@ -2,16 +2,16 @@
  "ra": 148.97,
  "dec": 69.68,
  "radius_arcmin": 12.0,
- "n_objects": 17502,
+ "n_objects": 17501,
  "seconds": {
-  "collect": 538.7,
-  "1_associate": 11.0,
-  "2_integrate": 13.8,
-  "3_features": 23.6,
-  "4_evidence": 16.9,
-  "5_coarse": 27.8,
-  "6_prepare": 25.5,
-  "7_classify": 23.1
+  "collect": 310.8,
+  "1_associate": 15.3,
+  "2_integrate": 18.1,
+  "3_features": 29.2,
+  "4_evidence": 20.6,
+  "5_coarse": 35.2,
+  "6_prepare": 30.6,
+  "7_classify": 28.7
  },
  "catalog_rows": {
   "DESI Legacy Surveys DR10": 10131,
@@ -24,6 +24,7 @@
   "XMM 4XMM-DR13": 280,
   "Chandra CSC 2.0": 240,
   "DESI DR1 spectroscopy": 174,
+  "DESI DR1 FastSpecFit": 88,
   "VLASS": 14,
   "SGA-2020": 10,
   "NVSS": 9,
@@ -31,13 +32,10 @@
   "TGSS ADR1": 2
  },
  "seeing": {
-  "error": "RuntimeError: Legacy Surveys TAP failed after 3 attempts: DALServiceError: 502 Server Error: Bad Gateway for url: https://datalab.noir",
-  "ps1": {
-   "source": "PS1 stack psfMajor/MinorFWHM",
-   "n": 8211,
-   "g": 1.35,
-   "r": 1.14,
-   "i": 1.27
-  }
+  "g": 1.95,
+  "r": 1.55,
+  "z": 1.39,
+  "n_psf": 3884,
+  "source": "LS DR10 psfsize"
  }
 }
