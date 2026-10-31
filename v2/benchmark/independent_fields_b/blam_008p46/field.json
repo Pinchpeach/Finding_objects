@@ -2,20 +2,19 @@
  "ra": 7.62056,
  "dec": 46.02083,
  "radius_arcmin": 12.0,
- "n_objects": 9160,
+ "n_objects": 8979,
  "seconds": {
-  "collect": 190.0,
-  "1_associate": 4.6,
+  "collect": 377.1,
+  "1_associate": 3.8,
   "2_integrate": 6.0,
-  "3_features": 6.5,
-  "4_evidence": 7.1,
-  "5_coarse": 8.7,
-  "6_prepare": 7.2,
+  "3_features": 6.4,
+  "4_evidence": 7.0,
+  "5_coarse": 9.0,
+  "6_prepare": 7.3,
   "7_classify": 9.6
  },
  "catalog_rows": {
   "Pan-STARRS1 DR2 MeanObject": 8348,
-  "NED": 2675,
   "AllWISE": 2498,
   "Gaia DR3": 2353,
   "2MASS PSC": 894,
@@ -27,7 +26,11 @@
   "ZTF periodic variables": 1
  },
  "seeing": {
-  "error": "TapTimeout: Legacy Surveys TAP failed after 3 attempts: TimeoutError('Data Lab TAP exceeded 80 s')",
+  "g": NaN,
+  "r": NaN,
+  "z": NaN,
+  "n_psf": 0,
+  "source": "LS DR10 psfsize",
   "ps1": {
    "source": "PS1 stack psfMajor/MinorFWHM",
    "n": 8498,
