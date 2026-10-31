@@ -2,16 +2,16 @@
  "ra": 259.281,
  "dec": 43.136,
  "radius_arcmin": 6.0,
- "n_objects": 27657,
+ "n_objects": 27658,
  "seconds": {
-  "collect": 471.9,
-  "1_associate": 76.2,
-  "2_integrate": 19.5,
-  "3_features": 37.0,
-  "4_evidence": 22.2,
-  "5_coarse": 46.2,
-  "6_prepare": 42.4,
-  "7_classify": 34.4
+  "collect": 301.9,
+  "1_associate": 99.3,
+  "2_integrate": 29.7,
+  "3_features": 52.7,
+  "4_evidence": 35.3,
+  "5_coarse": 63.3,
+  "6_prepare": 58.1,
+  "7_classify": 48.4
  },
  "catalog_rows": {
   "Gaia DR3": 21634,
@@ -30,6 +30,7 @@
   "LAMOST DR catalog": 6,
   "FIRST": 6,
   "VLASS": 5,
+  "ATNF Pulsar Catalog": 2,
   "SDSS DR18 spectroscopy": 2,
   "NVSS": 2,
   "SGA-2020": 1
