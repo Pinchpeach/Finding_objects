@@ -2,16 +2,16 @@
  "ra": 322.493,
  "dec": 12.167,
  "radius_arcmin": 6.0,
- "n_objects": 30920,
+ "n_objects": 30921,
  "seconds": {
-  "collect": 472.8,
-  "1_associate": 116.4,
-  "2_integrate": 40.7,
-  "3_features": 63.1,
-  "4_evidence": 47.2,
-  "5_coarse": 78.0,
-  "6_prepare": 69.5,
-  "7_classify": 61.9
+  "collect": 305.5,
+  "1_associate": 116.2,
+  "2_integrate": 46.1,
+  "3_features": 73.4,
+  "4_evidence": 51.7,
+  "5_coarse": 89.7,
+  "6_prepare": 79.0,
+  "7_classify": 70.5
  },
  "catalog_rows": {
   "DESI Legacy Surveys DR10": 23986,
@@ -25,6 +25,7 @@
   "Chandra CSC 2.0": 54,
   "SDSS DR18 PhotoObj": 20,
   "DESI DR1 spectroscopy": 18,
+  "ATNF Pulsar Catalog": 13,
   "SGA-2020": 8,
   "XMM 4XMM-DR13": 7,
   "LAMOST DR catalog": 6,
