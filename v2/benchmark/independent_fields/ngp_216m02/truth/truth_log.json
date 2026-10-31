@@ -1,10 +1,5 @@
 {
- "LAMOST DR5 (Luo+2019)": {
-  "V/164/dr5": 564,
-  "V/164/stellar5": 395,
-  "V/164/astars5": 9,
-  "V/164/mstars5": 17
- },
+ "LAMOST DR5 (Luo+2019)": "failed: ChunkedEncodingError: Response ended prematurely",
  "2QZ/6QZ (Croom+2004)": {
   "VII/241/2qz": 109
  },
