@@ -4,14 +4,14 @@
  "radius_arcmin": 12.0,
  "n_objects": 25954,
  "seconds": {
-  "collect": 543.7,
-  "1_associate": 7.5,
-  "2_integrate": 14.6,
-  "3_features": 17.7,
-  "4_evidence": 20.0,
-  "5_coarse": 27.5,
-  "6_prepare": 19.8,
-  "7_classify": 26.0
+  "collect": 320.0,
+  "1_associate": 7.9,
+  "2_integrate": 15.2,
+  "3_features": 18.0,
+  "4_evidence": 21.1,
+  "5_coarse": 28.9,
+  "6_prepare": 20.7,
+  "7_classify": 27.1
  },
  "catalog_rows": {
   "DESI Legacy Surveys DR10": 25661,
@@ -25,21 +25,10 @@
   "TGSS ADR1": 5
  },
  "seeing": {
-  "error": "RuntimeError: Legacy Surveys TAP failed after 3 attempts: DALFormatError: ReadTimeout: HTTPSConnectionPool(host='datalab.noirlab.edu',",
-  "ps1": {
-   "error": "EmptyDataError: No columns to parse from file",
-   "fwhm_columns": [
-    "gpsfMajorFWHM",
-    "gpsfMinorFWHM",
-    "rpsfMajorFWHM",
-    "rpsfMinorFWHM",
-    "ipsfMajorFWHM",
-    "ipsfMinorFWHM",
-    "zpsfMajorFWHM",
-    "zpsfMinorFWHM",
-    "ypsfMajorFWHM",
-    "ypsfMinorFWHM"
-   ]
-  }
+  "g": 1.36,
+  "r": 1.23,
+  "z": 1.18,
+  "n_psf": 9860,
+  "source": "LS DR10 psfsize"
  }
 }
