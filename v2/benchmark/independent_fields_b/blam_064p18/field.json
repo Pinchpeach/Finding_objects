@@ -1,21 +1,31 @@
 {
- "ra": 63.54,
- "dec": 17.84,
+ "ra": 63.93972,
+ "dec": 17.75139,
  "radius_arcmin": 12.0,
- "n_objects": 5774,
+ "n_objects": 6266,
  "seconds": {
-  "collect": 305.5,
-  "1_associate": 0.7,
-  "2_integrate": 0.7,
-  "3_features": 0.5,
-  "4_evidence": 1.1,
-  "5_coarse": 1.0,
-  "6_prepare": 0.6,
-  "7_classify": 1.4
+  "collect": 310.4,
+  "1_associate": 2.9,
+  "2_integrate": 4.3,
+  "3_features": 4.8,
+  "4_evidence": 4.8,
+  "5_coarse": 6.3,
+  "6_prepare": 5.1,
+  "7_classify": 6.8
  },
  "catalog_rows": {
-  "Pan-STARRS1 DR2 MeanObject": 5169,
-  "NED": 1747
+  "Pan-STARRS1 DR2 MeanObject": 5088,
+  "NED": 1941,
+  "AllWISE": 1895,
+  "SDSS DR18 PhotoObj": 1490,
+  "Gaia DR3": 847,
+  "2MASS PSC": 374,
+  "GALEX AIS": 116,
+  "LAMOST DR catalog": 115,
+  "VLASS": 6,
+  "NVSS": 6,
+  "TGSS ADR1": 2,
+  "ZTF periodic variables": 1
  },
  "seeing": {
   "g": NaN,
@@ -25,10 +35,10 @@
   "source": "LS DR10 psfsize",
   "ps1": {
    "source": "PS1 stack psfMajor/MinorFWHM",
-   "n": 5076,
-   "g": 1.06,
-   "r": 0.99,
-   "i": 1.02
+   "n": 5312,
+   "g": 1.03,
+   "r": 1.0,
+   "i": 0.98
   }
  }
 }
