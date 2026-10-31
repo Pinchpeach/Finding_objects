@@ -2,26 +2,24 @@
  "ra": 280.07444,
  "dec": 58.06417,
  "radius_arcmin": 12.0,
- "n_objects": 15248,
+ "n_objects": 9820,
  "seconds": {
-  "collect": 72.4,
-  "1_associate": 4.4,
-  "2_integrate": 6.4,
-  "3_features": 8.6,
-  "4_evidence": 8.1,
-  "5_coarse": 12.4,
-  "6_prepare": 10.0,
-  "7_classify": 12.1
+  "collect": 449.7,
+  "1_associate": 2.6,
+  "2_integrate": 4.9,
+  "3_features": 5.6,
+  "4_evidence": 5.7,
+  "5_coarse": 7.5,
+  "6_prepare": 6.0,
+  "7_classify": 8.1
  },
  "catalog_rows": {
-  "DESI Legacy Surveys DR10": 10535,
   "Pan-STARRS1 DR2 MeanObject": 8932,
   "AllWISE": 2631,
   "Gaia DR3": 1613,
   "2MASS PSC": 654,
   "GALEX AIS": 497,
   "DESI DR1 spectroscopy": 141,
-  "DESI DR1 FastSpecFit": 106,
   "LAMOST DR catalog": 37,
   "VLASS": 34,
   "NVSS": 14,
@@ -31,7 +29,7 @@
   "ZTF periodic variables": 1
  },
  "seeing": {
-  "error": "RuntimeError: Legacy Surveys TAP failed after 3 attempts: DALFormatError: ReadTimeout: HTTPSConnectionPool(host='datalab.noirlab.edu',",
+  "error": "RuntimeError: Legacy Surveys TAP failed after 3 attempts: DALServiceError: 502 Server Error: Bad Gateway for url: https://datalab.noir",
   "ps1": {
    "source": "PS1 stack psfMajor/MinorFWHM",
    "n": 8688,
