@@ -2,19 +2,18 @@
  "ra": 39.25306,
  "dec": 11.48583,
  "radius_arcmin": 12.0,
- "n_objects": 12406,
+ "n_objects": 6245,
  "seconds": {
-  "collect": 83.0,
-  "1_associate": 3.6,
-  "2_integrate": 6.1,
-  "3_features": 8.9,
-  "4_evidence": 8.0,
-  "5_coarse": 12.0,
-  "6_prepare": 10.0,
-  "7_classify": 10.8
+  "collect": 415.8,
+  "1_associate": 2.4,
+  "2_integrate": 4.4,
+  "3_features": 5.0,
+  "4_evidence": 5.0,
+  "5_coarse": 6.6,
+  "6_prepare": 5.6,
+  "7_classify": 7.3
  },
  "catalog_rows": {
-  "DESI Legacy Surveys DR10": 9146,
   "Pan-STARRS1 DR2 MeanObject": 5221,
   "NED": 1903,
   "AllWISE": 1870,
@@ -22,9 +21,7 @@
   "GALEX AIS": 259,
   "2MASS PSC": 234,
   "DESI DR1 spectroscopy": 176,
-  "DESI DR1 FastSpecFit": 173,
   "LAMOST DR catalog": 48,
-  "SIMBAD": 46,
   "SGA-2020": 14,
   "XMM 4XMM-DR13": 14,
   "NVSS": 6,
@@ -32,7 +29,7 @@
   "TGSS ADR1": 1
  },
  "seeing": {
-  "error": "TapTimeout: Legacy Surveys TAP failed after 3 attempts: TimeoutError('Data Lab TAP exceeded 80 s')",
+  "error": "RuntimeError: Legacy Surveys TAP failed after 3 attempts: DALServiceError: 502 Server Error: Bad Gateway for url: https://datalab.noir",
   "ps1": {
    "source": "PS1 stack psfMajor/MinorFWHM",
    "n": 5932,
