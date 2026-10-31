@@ -2,16 +2,16 @@
  "ra": 323.363,
  "dec": -0.823,
  "radius_arcmin": 6.0,
- "n_objects": 28241,
+ "n_objects": 28249,
  "seconds": {
-  "collect": 475.7,
-  "1_associate": 102.9,
-  "2_integrate": 39.8,
-  "3_features": 62.9,
-  "4_evidence": 42.0,
-  "5_coarse": 71.8,
-  "6_prepare": 63.3,
-  "7_classify": 56.7
+  "collect": 303.1,
+  "1_associate": 101.1,
+  "2_integrate": 44.4,
+  "3_features": 73.7,
+  "4_evidence": 48.5,
+  "5_coarse": 90.6,
+  "6_prepare": 82.4,
+  "7_classify": 65.2
  },
  "catalog_rows": {
   "Gaia DR3": 21480,
@@ -28,6 +28,7 @@
   "Chandra CSC 2.0": 23,
   "SDSS DR18 spectroscopy": 12,
   "VLASS": 11,
+  "ATNF Pulsar Catalog": 7,
   "LAMOST DR catalog": 5,
   "FIRST": 3,
   "ZTF periodic variables": 2,
