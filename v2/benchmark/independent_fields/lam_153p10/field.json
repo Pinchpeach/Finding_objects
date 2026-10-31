@@ -2,16 +2,16 @@
  "ra": 153.23583,
  "dec": 9.98528,
  "radius_arcmin": 12.0,
- "n_objects": 13477,
+ "n_objects": 13475,
  "seconds": {
-  "collect": 70.5,
-  "1_associate": 7.1,
-  "2_integrate": 13.6,
-  "3_features": 19.5,
-  "4_evidence": 15.7,
-  "5_coarse": 25.3,
-  "6_prepare": 21.5,
-  "7_classify": 21.5
+  "collect": 278.4,
+  "1_associate": 6.7,
+  "2_integrate": 13.1,
+  "3_features": 19.2,
+  "4_evidence": 16.4,
+  "5_coarse": 24.4,
+  "6_prepare": 20.5,
+  "7_classify": 20.9
  },
  "catalog_rows": {
   "DESI Legacy Surveys DR10": 10942,
@@ -26,7 +26,6 @@
   "DESI DR1 FastSpecFit": 63,
   "LAMOST DR catalog": 51,
   "SDSS DR18 spectroscopy": 40,
-  "SIMBAD": 32,
   "FIRST": 12,
   "SGA-2020": 9,
   "NVSS": 7,
