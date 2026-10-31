@@ -3,20 +3,12 @@
  "attempted": 29,
  "failed": [
   {
-   "collector": "desi_legacy",
-   "catalog": "DESI Legacy Surveys DR10",
-   "status": "timeout",
-   "impact": "deep morphology and the faint-object (LS-GBM) classifier",
-   "key": true,
-   "error": "exceeded 300 s collector budget"
-  },
-  {
-   "collector": "desi_fastspec",
-   "catalog": "DESI FastSpecFit",
-   "status": "timeout",
-   "impact": "emission-line sub-classes",
+   "collector": "sdss_spectroscopy",
+   "catalog": "SDSS spectroscopy",
+   "status": "error",
+   "impact": "spectroscopic classes and redshifts",
    "key": false,
-   "error": "RuntimeError(\"Legacy Surveys TAP failed after 3 attempts: DALFormatError: ReadTimeout: HTTPSConnectionPool(host='datalab.noirlab.edu', port=443): Read timed out. (read timeout=80.0)\")"
+   "error": "InconsistentTableError('Number of header columns (1) inconsistent with data columns in data line 9')"
   },
   {
    "collector": "simbad",
@@ -25,15 +17,7 @@
    "impact": "literature labels",
    "key": false,
    "error": "DALServiceError: Unable to access the capabilities endpoint at:\n- https://simbad.cds.unistra.fr/simbad/sim-tap/capabilities: Connection failed (Possible causes: incorrect URL, DNS issue, or service is"
-  },
-  {
-   "collector": "ned",
-   "catalog": "NED",
-   "status": "error",
-   "impact": "literature labels",
-   "key": false,
-   "error": "ConnectionError(ProtocolError('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer')))"
   }
  ],
- "key_failed": true
+ "key_failed": false
 }
