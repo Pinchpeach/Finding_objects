@@ -1,28 +1,44 @@
 {
- "ra": 89.71,
- "dec": 56.0,
+ "ra": 88.93583,
+ "dec": 55.93583,
  "radius_arcmin": 12.0,
- "n_objects": 9054,
+ "n_objects": 8848,
  "seconds": {
-  "collect": 305.6,
-  "1_associate": 2.1,
-  "2_integrate": 2.2,
-  "3_features": 1.8,
-  "4_evidence": 3.6,
-  "5_coarse": 3.4,
-  "6_prepare": 2.2,
-  "7_classify": 4.2
+  "collect": 296.1,
+  "1_associate": 4.1,
+  "2_integrate": 5.8,
+  "3_features": 5.9,
+  "4_evidence": 6.7,
+  "5_coarse": 8.3,
+  "6_prepare": 6.5,
+  "7_classify": 9.1
  },
  "catalog_rows": {
-  "Pan-STARRS1 DR2 MeanObject": 8446,
-  "NED": 2550,
-  "DESI Legacy Surveys DR10": 477
+  "Pan-STARRS1 DR2 MeanObject": 8226,
+  "NED": 2515,
+  "AllWISE": 2300,
+  "Gaia DR3": 2179,
+  "2MASS PSC": 1082,
+  "GALEX AIS": 53,
+  "LAMOST DR catalog": 24,
+  "VLASS": 14,
+  "NVSS": 9,
+  "ZTF periodic variables": 4,
+  "TGSS ADR1": 3,
+  "Gaia DR3 variability SOS": 1
  },
  "seeing": {
   "g": NaN,
   "r": NaN,
-  "z": 1.16,
-  "n_psf": 333,
-  "source": "LS DR10 psfsize"
+  "z": NaN,
+  "n_psf": 0,
+  "source": "LS DR10 psfsize",
+  "ps1": {
+   "source": "PS1 stack psfMajor/MinorFWHM",
+   "n": 8426,
+   "g": 1.5,
+   "r": 1.21,
+   "i": 1.08
+  }
  }
 }
