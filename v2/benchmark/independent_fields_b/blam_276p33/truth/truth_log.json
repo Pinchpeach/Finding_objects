@@ -7,7 +7,7 @@
  "2dFGRS (Colless+2003)": {},
  "6dFGS DR3 (Jones+2009)": {},
  "2SLAQ QSO (Croom+2009)": {},
- "WiggleZ final (Drinkwater+2018)": {},
+ "WiggleZ final (Drinkwater+2018)": "failed: HTTPError: 504 Server Error: Gateway Timeout for url: https://vizier.idia.ac.za/viz-bin/votable",
  "RAVE DR6 (Steinmetz+2020)": {},
  "APOGEE DR17 (Abdurro'uf+2022)": {},
  "Magellanic Quasars Survey (Kozlowski+2013)": {},
