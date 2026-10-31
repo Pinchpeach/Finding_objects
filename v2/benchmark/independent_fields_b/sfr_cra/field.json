@@ -2,19 +2,18 @@
  "ra": 285.4,
  "dec": -36.95,
  "radius_arcmin": 12.0,
- "n_objects": 3956,
+ "n_objects": 3618,
  "seconds": {
-  "collect": 447.7,
-  "1_associate": 2.2,
-  "2_integrate": 4.2,
-  "3_features": 6.4,
-  "4_evidence": 4.3,
-  "5_coarse": 7.7,
-  "6_prepare": 6.8,
-  "7_classify": 6.6
+  "collect": 304.3,
+  "1_associate": 1.5,
+  "2_integrate": 3.6,
+  "3_features": 5.4,
+  "4_evidence": 3.8,
+  "5_coarse": 6.8,
+  "6_prepare": 5.7,
+  "7_classify": 5.7
  },
  "catalog_rows": {
-  "NED": 2826,
   "Gaia DR3": 2273,
   "AllWISE": 2103,
   "2MASS PSC": 1060,
