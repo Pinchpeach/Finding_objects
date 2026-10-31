@@ -4,14 +4,14 @@
  "radius_arcmin": 12.0,
  "n_objects": 22777,
  "seconds": {
-  "collect": 443.9,
-  "1_associate": 8.3,
-  "2_integrate": 12.9,
-  "3_features": 14.0,
-  "4_evidence": 17.6,
-  "5_coarse": 22.5,
-  "6_prepare": 16.2,
-  "7_classify": 22.1
+  "collect": 316.7,
+  "1_associate": 8.5,
+  "2_integrate": 16.1,
+  "3_features": 20.2,
+  "4_evidence": 21.0,
+  "5_coarse": 29.7,
+  "6_prepare": 22.6,
+  "7_classify": 26.4
  },
  "catalog_rows": {
   "DESI Legacy Surveys DR10": 20169,
@@ -25,6 +25,7 @@
   "SGA-2020": 26,
   "NVSS": 7,
   "TGSS ADR1": 4,
+  "ATNF Pulsar Catalog": 1,
   "Roma-BZCAT": 1
  },
  "seeing": {
