@@ -9,6 +9,14 @@
    "impact": "literature labels",
    "key": false,
    "error": "DALServiceError: Unable to access the capabilities endpoint at:\n- https://simbad.cds.unistra.fr/simbad/sim-tap/capabilities: Connection failed (Possible causes: incorrect URL, DNS issue, or service is"
+  },
+  {
+   "collector": "ned",
+   "catalog": "NED",
+   "status": "timeout",
+   "impact": "literature labels",
+   "key": false,
+   "error": "ConnectionError(ReadTimeoutError(\"HTTPSConnectionPool(host='ned.ipac.caltech.edu', port=443): Read timed out.\"))"
   }
  ],
  "key_failed": false
