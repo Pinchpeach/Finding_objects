@@ -3,12 +3,12 @@
  "attempted": 29,
  "failed": [
   {
-   "collector": "atnf_pulsar",
-   "catalog": "ATNF pulsars",
+   "collector": "desi_legacy",
+   "catalog": "DESI Legacy Surveys DR10",
    "status": "error",
-   "impact": "pulsar labels",
-   "key": false,
-   "error": "DALFormatError: SSLError: HTTPSConnectionPool(host='heasarc.gsfc.nasa.gov', port=443): Max retries exceeded with url: /xamin/vo/tap/sync (Caused by SSLError(SSLCertVerificationError(1, \"[SSL: CERTIFIC"
+   "impact": "deep morphology and the faint-object (LS-GBM) classifier",
+   "key": true,
+   "error": "RuntimeError('Legacy Surveys TAP failed after 3 attempts: DALServiceError: 502 Server Error: Bad Gateway for url: https://datalab.noirlab.edu/tap/sync')"
   },
   {
    "collector": "simbad",
@@ -17,7 +17,15 @@
    "impact": "literature labels",
    "key": false,
    "error": "DALServiceError: Unable to access the capabilities endpoint at:\n- https://simbad.cds.unistra.fr/simbad/sim-tap/capabilities: Connection failed (Possible causes: incorrect URL, DNS issue, or service is"
+  },
+  {
+   "collector": "ned",
+   "catalog": "NED",
+   "status": "error",
+   "impact": "literature labels",
+   "key": false,
+   "error": "ConnectionError(ProtocolError('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer')))"
   }
  ],
- "key_failed": false
+ "key_failed": true
 }
