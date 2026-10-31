@@ -2,19 +2,19 @@
  "ra": 201.697,
  "dec": -47.48,
  "radius_arcmin": 6.0,
- "n_objects": 34294,
+ "n_objects": 34306,
  "seconds": {
-  "collect": 597.1,
-  "1_associate": 76.8,
-  "2_integrate": 31.9,
-  "3_features": 46.3,
-  "4_evidence": 31.4,
-  "5_coarse": 51.0,
-  "6_prepare": 49.4,
-  "7_classify": 49.2
+  "collect": 301.9,
+  "1_associate": 39.4,
+  "2_integrate": 17.8,
+  "3_features": 33.6,
+  "4_evidence": 18.5,
+  "5_coarse": 40.3,
+  "6_prepare": 33.9,
+  "7_classify": 31.6
  },
  "catalog_rows": {
-  "Gaia DR3": 33618,
+  "Gaia DR3": 33620,
   "DESI Legacy Surveys DR10": 23349,
   "NED": 5959,
   "2MASS PSC": 5425,
@@ -22,24 +22,14 @@
   "Chandra CSC 2.0": 151,
   "Gaia DR3 variability SOS": 69,
   "XMM 4XMM-DR13": 44,
+  "ATNF Pulsar Catalog": 18,
   "eROSITA eRASS1": 3
  },
  "seeing": {
-  "error": "RuntimeError: Legacy Surveys TAP failed after 3 attempts: DALServiceError: 502 Server Error: Bad Gateway for url: https://datalab.noir",
-  "ps1": {
-   "error": "EmptyDataError: No columns to parse from file",
-   "fwhm_columns": [
-    "gpsfMajorFWHM",
-    "gpsfMinorFWHM",
-    "rpsfMajorFWHM",
-    "rpsfMinorFWHM",
-    "ipsfMajorFWHM",
-    "ipsfMinorFWHM",
-    "zpsfMajorFWHM",
-    "zpsfMinorFWHM",
-    "ypsfMajorFWHM",
-    "ypsfMinorFWHM"
-   ]
-  }
+  "g": NaN,
+  "r": 1.01,
+  "z": 0.84,
+  "n_psf": 23349,
+  "source": "LS DR10 psfsize"
  }
 }
