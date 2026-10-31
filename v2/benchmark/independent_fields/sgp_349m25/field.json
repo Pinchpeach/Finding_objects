@@ -4,14 +4,14 @@
  "radius_arcmin": 12.0,
  "n_objects": 12835,
  "seconds": {
-  "collect": 440.6,
-  "1_associate": 5.2,
-  "2_integrate": 6.1,
-  "3_features": 6.1,
-  "4_evidence": 7.6,
-  "5_coarse": 8.6,
-  "6_prepare": 6.8,
-  "7_classify": 10.3
+  "collect": 296.3,
+  "1_associate": 3.0,
+  "2_integrate": 3.5,
+  "3_features": 3.6,
+  "4_evidence": 4.4,
+  "5_coarse": 5.8,
+  "6_prepare": 3.7,
+  "7_classify": 6.1
  },
  "catalog_rows": {
   "DESI Legacy Surveys DR10": 10159,
@@ -25,13 +25,10 @@
   "TGSS ADR1": 3
  },
  "seeing": {
-  "error": "TapTimeout: Legacy Surveys TAP failed after 3 attempts: TimeoutError('Data Lab TAP exceeded 80 s')",
-  "ps1": {
-   "source": "PS1 stack psfMajor/MinorFWHM",
-   "n": 6160,
-   "g": 1.48,
-   "r": 1.2,
-   "i": 1.14
-  }
+  "g": 1.72,
+  "r": NaN,
+  "z": 1.22,
+  "n_psf": 3930,
+  "source": "LS DR10 psfsize"
  }
 }
