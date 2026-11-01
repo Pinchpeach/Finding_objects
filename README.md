@@ -1,3 +1,9 @@
+[![Finding Objects v2 — pipeline and tech stack (v2.44.0)](v2/document/PIPELINE_STACK_v2.44.0_preview.png)](v2/document/PIPELINE_STACK_v2.44.0.pdf)
+
+**Pipeline and tech stack overview (v2.44.0, 12 slides):** [PDF](v2/document/PIPELINE_STACK_v2.44.0.pdf) · [PPTX](v2/document/PIPELINE_STACK_v2.44.0.pptx)
+
+---
+
 # Finding Objects — 프로그램 개요
 
 버전 2.36.2 · 전 파장대 관측 자료로 하늘 영역의 천체를 찾고 분류하는 프로그램
