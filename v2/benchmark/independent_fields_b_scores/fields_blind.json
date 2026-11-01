@@ -1,7 +1,7 @@
 [
  {
   "field": "blam_002p44",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 1.86861,
   "dec": 44.65194,
@@ -56,7 +56,7 @@
  },
  {
   "field": "blam_003p18",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 2.63222,
   "dec": 18.92389,
@@ -118,17 +118,17 @@
   },
   "LS-GBM (LS photometry only)": {
    "n": 63,
-   "acc": 100.0,
-   "acc_cls": 100.0,
+   "acc": 98.4,
+   "acc_cls": 98.4,
    "unknown": 0.0,
-   "bal": 100.0,
+   "bal": 75.0,
    "recall": {
     "STAR": [
      100.0,
      61
     ],
     "GALAXY": [
-     100.0,
+     50.0,
      2
     ]
    }
@@ -187,7 +187,7 @@
  },
  {
   "field": "blam_003p23",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 2.56722,
   "dec": 23.32139,
@@ -290,7 +290,7 @@
  },
  {
   "field": "blam_006p41",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 5.04389,
   "dec": 41.24333,
@@ -357,30 +357,30 @@
  },
  {
   "field": "blam_008p05",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 8.40556,
   "dec": 5.05444,
   "n": 46,
   "ours": {
    "n": 46,
-   "acc": 97.8,
-   "acc_cls": 97.8,
+   "acc": 100.0,
+   "acc_cls": 100.0,
    "unknown": 0.0,
-   "bal": 92.8,
+   "bal": 100.0,
    "recall": {
     "STAR": [
      100.0,
      39
     ],
     "GALAXY": [
-     85.7,
+     100.0,
      7
     ]
    }
   },
   "high": {
-   "n": 45,
+   "n": 46,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
@@ -419,23 +419,6 @@
   },
   "LS-GBM (LS photometry only)": {
    "n": 46,
-   "acc": 100.0,
-   "acc_cls": 100.0,
-   "unknown": 0.0,
-   "bal": 100.0,
-   "recall": {
-    "STAR": [
-     100.0,
-     39
-    ],
-    "GALAXY": [
-     100.0,
-     7
-    ]
-   }
-  },
-  "LS-GBM (LS photometry only) | ours same": {
-   "n": 46,
    "acc": 97.8,
    "acc_cls": 97.8,
    "unknown": 0.0,
@@ -447,6 +430,23 @@
     ],
     "GALAXY": [
      85.7,
+     7
+    ]
+   }
+  },
+  "LS-GBM (LS photometry only) | ours same": {
+   "n": 46,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     39
+    ],
+    "GALAXY": [
+     100.0,
      7
     ]
    }
@@ -470,17 +470,17 @@
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
    "n": 42,
-   "acc": 97.6,
-   "acc_cls": 97.6,
+   "acc": 100.0,
+   "acc_cls": 100.0,
    "unknown": 0.0,
-   "bal": 91.7,
+   "bal": 100.0,
    "recall": {
     "STAR": [
      100.0,
      36
     ],
     "GALAXY": [
-     83.3,
+     100.0,
      6
     ]
    }
@@ -488,7 +488,7 @@
  },
  {
   "field": "blam_008p46",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 7.62056,
   "dec": 46.02083,
@@ -543,7 +543,7 @@
  },
  {
   "field": "blam_010p16",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 10.19167,
   "dec": 15.9925,
@@ -658,7 +658,7 @@
  },
  {
   "field": "blam_015p13",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 14.66944,
   "dec": 12.10028,
@@ -761,7 +761,7 @@
  },
  {
   "field": "blam_020p41",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 19.72806,
   "dec": 41.12,
@@ -828,7 +828,7 @@
  },
  {
   "field": "blam_022p35",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 21.40694,
   "dec": 34.26667,
@@ -947,7 +947,7 @@
  },
  {
   "field": "blam_024p13",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 23.04972,
   "dec": 12.97722,
@@ -1050,7 +1050,7 @@
  },
  {
   "field": "blam_025p04",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 24.52417,
   "dec": 4.51944,
@@ -1112,17 +1112,17 @@
   },
   "LS-GBM (LS photometry only)": {
    "n": 22,
-   "acc": 100.0,
-   "acc_cls": 100.0,
+   "acc": 95.5,
+   "acc_cls": 95.5,
    "unknown": 0.0,
-   "bal": 100.0,
+   "bal": 91.7,
    "recall": {
     "STAR": [
      100.0,
      16
     ],
     "GALAXY": [
-     100.0,
+     83.3,
      6
     ]
    }
@@ -1181,7 +1181,7 @@
  },
  {
   "field": "blam_028p21",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 28.15639,
   "dec": 20.88444,
@@ -1284,7 +1284,7 @@
  },
  {
   "field": "blam_034p32",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 34.30833,
   "dec": 32.13833,
@@ -1387,7 +1387,7 @@
  },
  {
   "field": "blam_037p43",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 36.36417,
   "dec": 42.75222,
@@ -1454,7 +1454,7 @@
  },
  {
   "field": "blam_039p11",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 39.25306,
   "dec": 11.48583,
@@ -1585,7 +1585,7 @@
  },
  {
   "field": "blam_044p05",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 44.17889,
   "dec": 4.57028,
@@ -1744,7 +1744,7 @@
  },
  {
   "field": "blam_050p24",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 49.60694,
   "dec": 24.66111,
@@ -1799,7 +1799,7 @@
  },
  {
   "field": "blam_057p16",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 57.12639,
   "dec": 16.77611,
@@ -1866,7 +1866,7 @@
  },
  {
   "field": "blam_064p18",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 63.93972,
   "dec": 17.75139,
@@ -1874,8 +1874,8 @@
   "ours": {
    "n": 114,
    "acc": 97.4,
-   "acc_cls": 97.4,
-   "unknown": 0.0,
+   "acc_cls": 100.0,
+   "unknown": 2.6,
    "bal": 97.4,
    "recall": {
     "STAR": [
@@ -1885,8 +1885,8 @@
    }
   },
   "high": {
-   "n": 113,
-   "acc": 97.35
+   "n": 110,
+   "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
    "n": 110,
@@ -1921,7 +1921,7 @@
  },
  {
   "field": "blam_065p03",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 64.18806,
   "dec": 3.14028,
@@ -2024,7 +2024,7 @@
  },
  {
   "field": "blam_074m02",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 73.71194,
   "dec": -1.74611,
@@ -2139,7 +2139,7 @@
  },
  {
   "field": "blam_075p03",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 74.90389,
   "dec": 2.98556,
@@ -2242,7 +2242,7 @@
  },
  {
   "field": "blam_082p06",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 81.44083,
   "dec": 5.89889,
@@ -2297,7 +2297,7 @@
  },
  {
   "field": "blam_090p56",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 88.93583,
   "dec": 55.93583,
@@ -2352,7 +2352,7 @@
  },
  {
   "field": "blam_099p40",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 99.54889,
   "dec": 40.21194,
@@ -2455,7 +2455,7 @@
  },
  {
   "field": "blam_120p18",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 119.70806,
   "dec": 18.43361,
@@ -2586,7 +2586,7 @@
  },
  {
   "field": "blam_128p40",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 128.90361,
   "dec": 40.44056,
@@ -2745,7 +2745,7 @@
  },
  {
   "field": "blam_131p45",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 130.44167,
   "dec": 45.07861,
@@ -2848,7 +2848,7 @@
  },
  {
   "field": "blam_132m03",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 131.47917,
   "dec": -3.28194,
@@ -2979,7 +2979,7 @@
  },
  {
   "field": "blam_138p16",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 137.95972,
   "dec": 16.36278,
@@ -3082,7 +3082,7 @@
  },
  {
   "field": "blam_138p50",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 138.71333,
   "dec": 50.24917,
@@ -3185,7 +3185,7 @@
  },
  {
   "field": "blam_144p06",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 143.88722,
   "dec": 6.10333,
@@ -3193,8 +3193,8 @@
   "ours": {
    "n": 55,
    "acc": 96.4,
-   "acc_cls": 96.4,
-   "unknown": 0.0,
+   "acc_cls": 98.1,
+   "unknown": 1.8,
    "bal": 98.2,
    "recall": {
     "GALAXY": [
@@ -3208,7 +3208,7 @@
    }
   },
   "high": {
-   "n": 41,
+   "n": 40,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
@@ -3239,13 +3239,13 @@
   },
   "LS-GBM (LS photometry only)": {
    "n": 53,
-   "acc": 88.7,
-   "acc_cls": 88.7,
+   "acc": 96.2,
+   "acc_cls": 96.2,
    "unknown": 0.0,
-   "bal": 94.2,
+   "bal": 98.1,
    "recall": {
     "GALAXY": [
-     88.5,
+     96.2,
      52
     ],
     "QSO": [
@@ -3257,8 +3257,8 @@
   "LS-GBM (LS photometry only) | ours same": {
    "n": 53,
    "acc": 96.2,
-   "acc_cls": 96.2,
-   "unknown": 0.0,
+   "acc_cls": 98.1,
+   "unknown": 1.9,
    "bal": 98.1,
    "recall": {
     "GALAXY": [
@@ -3308,7 +3308,7 @@
  },
  {
   "field": "blam_148p23",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 147.98972,
   "dec": 23.46389,
@@ -3411,7 +3411,7 @@
  },
  {
   "field": "blam_158p08",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 158.43917,
   "dec": 7.86333,
@@ -3473,17 +3473,17 @@
   },
   "LS-GBM (LS photometry only)": {
    "n": 47,
-   "acc": 100.0,
-   "acc_cls": 100.0,
+   "acc": 97.9,
+   "acc_cls": 97.9,
    "unknown": 0.0,
-   "bal": 100.0,
+   "bal": 95.0,
    "recall": {
     "STAR": [
      100.0,
      37
     ],
     "GALAXY": [
-     100.0,
+     90.0,
      10
     ]
    }
@@ -3542,7 +3542,7 @@
  },
  {
   "field": "blam_165p42",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 165.62083,
   "dec": 42.68194,
@@ -3701,7 +3701,7 @@
  },
  {
   "field": "blam_168p55",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 168.1825,
   "dec": 54.35028,
@@ -3832,7 +3832,7 @@
  },
  {
   "field": "blam_170p51",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 169.50472,
   "dec": 51.56833,
@@ -3963,7 +3963,7 @@
  },
  {
   "field": "blam_175p56",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 175.08556,
   "dec": 55.88194,
@@ -4094,7 +4094,7 @@
  },
  {
   "field": "blam_189p34",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 189.00028,
   "dec": 34.84639,
@@ -4197,7 +4197,7 @@
  },
  {
   "field": "blam_195p15",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 195.06,
   "dec": 15.01639,
@@ -4300,7 +4300,7 @@
  },
  {
   "field": "blam_197p43",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 196.86778,
   "dec": 42.93639,
@@ -4361,7 +4361,7 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 26,
+   "n": 27,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -4369,7 +4369,7 @@
    "recall": {
     "STAR": [
      100.0,
-     24
+     25
     ],
     "GALAXY": [
      100.0,
@@ -4378,7 +4378,7 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 26,
+   "n": 27,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -4386,7 +4386,7 @@
    "recall": {
     "STAR": [
      100.0,
-     24
+     25
     ],
     "GALAXY": [
      100.0,
@@ -4396,13 +4396,13 @@
   },
   "LS morphology + WISE W1-W2>=0.8": {
    "n": 26,
-   "acc": 92.3,
-   "acc_cls": 92.3,
+   "acc": 100.0,
+   "acc_cls": 100.0,
    "unknown": 0.0,
-   "bal": 95.8,
+   "bal": 100.0,
    "recall": {
     "STAR": [
-     91.7,
+     100.0,
      24
     ],
     "GALAXY": [
@@ -4431,7 +4431,7 @@
  },
  {
   "field": "blam_207p33",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 206.94917,
   "dec": 33.01222,
@@ -4590,7 +4590,7 @@
  },
  {
   "field": "blam_208p49",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 208.9625,
   "dec": 49.18889,
@@ -4693,30 +4693,30 @@
  },
  {
   "field": "blam_210p07",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 210.1425,
   "dec": 6.73389,
   "n": 88,
   "ours": {
    "n": 88,
-   "acc": 96.6,
-   "acc_cls": 97.7,
+   "acc": 97.7,
+   "acc_cls": 98.9,
    "unknown": 1.1,
-   "bal": 96.5,
+   "bal": 97.7,
    "recall": {
     "STAR": [
      97.9,
      48
     ],
     "GALAXY": [
-     95.0,
+     97.5,
      40
     ]
    }
   },
   "high": {
-   "n": 83,
+   "n": 84,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
@@ -4772,17 +4772,17 @@
   },
   "LS-GBM (LS photometry only) | ours same": {
    "n": 86,
-   "acc": 97.7,
-   "acc_cls": 97.7,
+   "acc": 98.8,
+   "acc_cls": 98.8,
    "unknown": 0.0,
-   "bal": 97.5,
+   "bal": 98.7,
    "recall": {
     "STAR": [
      100.0,
      47
     ],
     "GALAXY": [
-     94.9,
+     97.4,
      39
     ]
    }
@@ -4806,17 +4806,17 @@
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
    "n": 81,
-   "acc": 97.5,
-   "acc_cls": 97.5,
+   "acc": 98.8,
+   "acc_cls": 98.8,
    "unknown": 0.0,
-   "bal": 97.3,
+   "bal": 98.7,
    "recall": {
     "STAR": [
      100.0,
      44
     ],
     "GALAXY": [
-     94.6,
+     97.3,
      37
     ]
    }
@@ -4824,7 +4824,7 @@
  },
  {
   "field": "blam_213p20",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 213.28139,
   "dec": 19.78028,
@@ -4983,24 +4983,24 @@
  },
  {
   "field": "blam_221p23",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 220.585,
   "dec": 22.72944,
   "n": 49,
   "ours": {
    "n": 49,
-   "acc": 98.0,
-   "acc_cls": 98.0,
+   "acc": 100.0,
+   "acc_cls": 100.0,
    "unknown": 0.0,
-   "bal": 83.3,
+   "bal": 100.0,
    "recall": {
     "STAR": [
      100.0,
      46
     ],
     "GALAXY": [
-     66.7,
+     100.0,
      3
     ]
    }
@@ -5062,17 +5062,17 @@
   },
   "LS-GBM (LS photometry only) | ours same": {
    "n": 48,
-   "acc": 97.9,
-   "acc_cls": 97.9,
+   "acc": 100.0,
+   "acc_cls": 100.0,
    "unknown": 0.0,
-   "bal": 83.3,
+   "bal": 100.0,
    "recall": {
     "STAR": [
      100.0,
      45
     ],
     "GALAXY": [
-     66.7,
+     100.0,
      3
     ]
    }
@@ -5096,17 +5096,17 @@
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
    "n": 45,
-   "acc": 97.8,
-   "acc_cls": 97.8,
+   "acc": 100.0,
+   "acc_cls": 100.0,
    "unknown": 0.0,
-   "bal": 83.3,
+   "bal": 100.0,
    "recall": {
     "STAR": [
      100.0,
      42
     ],
     "GALAXY": [
-     66.7,
+     100.0,
      3
     ]
    }
@@ -5114,7 +5114,7 @@
  },
  {
   "field": "blam_221p40",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 221.14861,
   "dec": 39.73528,
@@ -5237,7 +5237,7 @@
  },
  {
   "field": "blam_224p33",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 223.87389,
   "dec": 32.90111,
@@ -5368,7 +5368,7 @@
  },
  {
   "field": "blam_229p38",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 228.66,
   "dec": 37.68806,
@@ -5429,7 +5429,7 @@
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 34,
+   "n": 35,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -5437,7 +5437,7 @@
    "recall": {
     "STAR": [
      100.0,
-     31
+     32
     ],
     "GALAXY": [
      100.0,
@@ -5446,7 +5446,7 @@
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 34,
+   "n": 35,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -5454,7 +5454,7 @@
    "recall": {
     "STAR": [
      100.0,
-     31
+     32
     ],
     "GALAXY": [
      100.0,
@@ -5499,7 +5499,7 @@
  },
  {
   "field": "blam_241p10",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 241.16306,
   "dec": 10.65583,
@@ -5630,7 +5630,7 @@
  },
  {
   "field": "blam_241p22",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 240.31222,
   "dec": 21.92194,
@@ -5761,7 +5761,7 @@
  },
  {
   "field": "blam_246p39",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 245.51,
   "dec": 38.79444,
@@ -5864,7 +5864,7 @@
  },
  {
   "field": "blam_252p19",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 251.76611,
   "dec": 19.37472,
@@ -5967,7 +5967,7 @@
  },
  {
   "field": "blam_252p59",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 251.435,
   "dec": 59.15444,
@@ -6070,7 +6070,7 @@
  },
  {
   "field": "blam_253p06",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 252.83306,
   "dec": 6.51222,
@@ -6173,7 +6173,7 @@
  },
  {
   "field": "blam_253p13",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 252.81639,
   "dec": 13.04056,
@@ -6304,7 +6304,7 @@
  },
  {
   "field": "blam_258p56",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 258.51833,
   "dec": 56.45583,
@@ -6407,7 +6407,7 @@
  },
  {
   "field": "blam_263p09",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 262.84194,
   "dec": 8.74972,
@@ -6486,7 +6486,7 @@
  },
  {
   "field": "blam_266p15",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 265.78611,
   "dec": 15.2725,
@@ -6589,7 +6589,7 @@
  },
  {
   "field": "blam_268p58",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 267.18333,
   "dec": 57.96889,
@@ -6692,7 +6692,7 @@
  },
  {
   "field": "blam_270p11",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 269.72528,
   "dec": 10.73139,
@@ -6747,7 +6747,7 @@
  },
  {
   "field": "blam_273p37",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 273.20722,
   "dec": 36.80889,
@@ -6850,7 +6850,7 @@
  },
  {
   "field": "blam_277p53",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 276.37417,
   "dec": 52.83806,
@@ -6953,7 +6953,7 @@
  },
  {
   "field": "blam_280p58",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 280.07444,
   "dec": 58.06417,
@@ -6976,7 +6976,7 @@
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 38,
+   "n": 37,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -6984,12 +6984,12 @@
    "recall": {
     "STAR": [
      100.0,
-     38
+     37
     ]
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 38,
+   "n": 37,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -6997,12 +6997,12 @@
    "recall": {
     "STAR": [
      100.0,
-     38
+     37
     ]
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 35,
+   "n": 36,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -7010,12 +7010,12 @@
    "recall": {
     "STAR": [
      100.0,
-     35
+     36
     ]
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 35,
+   "n": 36,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -7023,7 +7023,7 @@
    "recall": {
     "STAR": [
      100.0,
-     35
+     36
     ]
    }
   },
@@ -7056,7 +7056,7 @@
  },
  {
   "field": "blam_288p58",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 286.97833,
   "dec": 57.99694,
@@ -7159,7 +7159,7 @@
  },
  {
   "field": "blam_294p57",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 294.225,
   "dec": 57.22472,
@@ -7262,7 +7262,7 @@
  },
  {
   "field": "blam_298p52",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 298.07167,
   "dec": 51.35361,
@@ -7317,7 +7317,7 @@
  },
  {
   "field": "blam_323p08",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 323.84306,
   "dec": 8.40389,
@@ -7448,7 +7448,7 @@
  },
  {
   "field": "blam_326p28",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 326.32167,
   "dec": 28.1625,
@@ -7551,7 +7551,7 @@
  },
  {
   "field": "blam_329p31",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 329.05583,
   "dec": 30.83417,
@@ -7606,7 +7606,7 @@
  },
  {
   "field": "blam_334p20",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 333.21333,
   "dec": 19.77167,
@@ -7709,7 +7709,7 @@
  },
  {
   "field": "blam_335p37",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 334.96583,
   "dec": 36.87028,
@@ -7764,7 +7764,7 @@
  },
  {
   "field": "blam_340p24",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 340.38917,
   "dec": 24.06611,
@@ -7867,7 +7867,7 @@
  },
  {
   "field": "blam_344p06",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 344.23528,
   "dec": 5.50889,
@@ -7998,7 +7998,7 @@
  },
  {
   "field": "blam_345m04",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 345.56333,
   "dec": -3.56083,
@@ -8101,7 +8101,7 @@
  },
  {
   "field": "blam_353p08",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 353.3975,
   "dec": 8.09333,
@@ -8232,7 +8232,7 @@
  },
  {
   "field": "blam_354p11",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 354.10056,
   "dec": 11.31333,
@@ -8363,7 +8363,7 @@
  },
  {
   "field": "bngp_148p03",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 148.75722,
   "dec": 2.85667,
@@ -8494,24 +8494,24 @@
  },
  {
   "field": "bngp_155p01",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 154.95389,
   "dec": 1.43889,
   "n": 101,
   "ours": {
    "n": 101,
-   "acc": 96.0,
-   "acc_cls": 96.0,
+   "acc": 97.0,
+   "acc_cls": 97.0,
    "unknown": 0.0,
-   "bal": 98.2,
+   "bal": 98.6,
    "recall": {
     "STAR": [
      100.0,
      19
     ],
     "GALAXY": [
-     94.6,
+     95.9,
      74
     ],
     "QSO": [
@@ -8521,7 +8521,7 @@
    }
   },
   "high": {
-   "n": 82,
+   "n": 83,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
@@ -8589,17 +8589,17 @@
   },
   "LS-GBM (LS photometry only) | ours same": {
    "n": 96,
-   "acc": 95.8,
-   "acc_cls": 95.8,
+   "acc": 96.9,
+   "acc_cls": 96.9,
    "unknown": 0.0,
-   "bal": 98.1,
+   "bal": 98.6,
    "recall": {
     "STAR": [
      100.0,
      19
     ],
     "GALAXY": [
-     94.2,
+     95.7,
      69
     ],
     "QSO": [
@@ -8631,17 +8631,17 @@
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
    "n": 93,
-   "acc": 96.8,
-   "acc_cls": 96.8,
+   "acc": 97.8,
+   "acc_cls": 97.8,
    "unknown": 0.0,
-   "bal": 98.5,
+   "bal": 99.0,
    "recall": {
     "STAR": [
      100.0,
      18
     ],
     "GALAXY": [
-     95.5,
+     97.0,
      67
     ],
     "QSO": [
@@ -8653,7 +8653,7 @@
  },
  {
   "field": "bngp_160m05",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 159.63472,
   "dec": -5.57194,
@@ -8676,7 +8676,7 @@
    }
   },
   "high": {
-   "n": 43,
+   "n": 44,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
@@ -8715,17 +8715,17 @@
   },
   "LS-GBM (LS photometry only)": {
    "n": 46,
-   "acc": 95.7,
-   "acc_cls": 95.7,
+   "acc": 97.8,
+   "acc_cls": 97.8,
    "unknown": 0.0,
-   "bal": 96.0,
+   "bal": 98.0,
    "recall": {
     "STAR": [
      100.0,
      21
     ],
     "GALAXY": [
-     92.0,
+     96.0,
      25
     ]
    }
@@ -8784,7 +8784,7 @@
  },
  {
   "field": "bngp_162p01",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 161.71667,
   "dec": 1.35889,
@@ -8811,8 +8811,8 @@
    }
   },
   "high": {
-   "n": 105,
-   "acc": 99.05
+   "n": 106,
+   "acc": 99.06
   },
   "Gaia DR3 DSC-Combmod": {
    "n": 57,
@@ -8943,7 +8943,7 @@
  },
  {
   "field": "bngp_168p03",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 168.38111,
   "dec": 2.33278,
@@ -9074,7 +9074,7 @@
  },
  {
   "field": "bngp_172m05",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 171.75222,
   "dec": -5.35306,
@@ -9101,66 +9101,83 @@
    "acc": 98.78
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 76,
-   "acc": 85.5,
-   "acc_cls": 85.5,
+   "n": 75,
+   "acc": 86.7,
+   "acc_cls": 86.7,
    "unknown": 0.0,
-   "bal": 81.7,
+   "bal": 82.8,
    "recall": {
     "STAR": [
      100.0,
      46
     ],
     "GALAXY": [
-     63.3,
-     30
+     65.5,
+     29
     ]
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 76,
-   "acc": 97.4,
+   "n": 75,
+   "acc": 98.7,
    "acc_cls": 98.7,
-   "unknown": 1.3,
-   "bal": 96.7,
+   "unknown": 0.0,
+   "bal": 98.3,
    "recall": {
     "STAR": [
      100.0,
      46
     ],
     "GALAXY": [
-     93.3,
-     30
+     96.6,
+     29
     ]
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 82,
-   "acc": 97.6,
-   "acc_cls": 97.6,
+   "n": 83,
+   "acc": 96.4,
+   "acc_cls": 96.4,
    "unknown": 0.0,
-   "bal": 97.2,
+   "bal": 96.0,
    "recall": {
     "STAR": [
      100.0,
      46
     ],
     "GALAXY": [
-     94.4,
-     36
+     91.9,
+     37
     ]
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 82,
+   "n": 83,
    "acc": 97.6,
    "acc_cls": 98.8,
    "unknown": 1.2,
-   "bal": 97.2,
+   "bal": 97.3,
    "recall": {
     "STAR": [
      100.0,
      46
+    ],
+    "GALAXY": [
+     94.6,
+     37
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 77,
+   "acc": 97.4,
+   "acc_cls": 97.4,
+   "unknown": 0.0,
+   "bal": 97.2,
+   "recall": {
+    "STAR": [
+     100.0,
+     41
     ],
     "GALAXY": [
      94.4,
@@ -9168,44 +9185,27 @@
     ]
    }
   },
-  "LS morphology + WISE W1-W2>=0.8": {
-   "n": 76,
-   "acc": 98.7,
-   "acc_cls": 98.7,
-   "unknown": 0.0,
-   "bal": 98.5,
-   "recall": {
-    "STAR": [
-     100.0,
-     41
-    ],
-    "GALAXY": [
-     97.1,
-     35
-    ]
-   }
-  },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 76,
+   "n": 77,
    "acc": 98.7,
    "acc_cls": 98.7,
    "unknown": 0.0,
-   "bal": 98.5,
+   "bal": 98.6,
    "recall": {
     "STAR": [
      100.0,
      41
     ],
     "GALAXY": [
-     97.1,
-     35
+     97.2,
+     36
     ]
    }
   }
  },
  {
   "field": "bngp_184m05",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 184.735,
   "dec": -5.00528,
@@ -9364,7 +9364,7 @@
  },
  {
   "field": "bngp_191p03",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 191.275,
   "dec": 3.08167,
@@ -9523,7 +9523,7 @@
  },
  {
   "field": "bngp_198m02",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 197.95,
   "dec": -1.55278,
@@ -9550,7 +9550,7 @@
    }
   },
   "high": {
-   "n": 64,
+   "n": 65,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
@@ -9597,17 +9597,17 @@
   },
   "LS-GBM (LS photometry only)": {
    "n": 77,
-   "acc": 98.7,
-   "acc_cls": 98.7,
+   "acc": 97.4,
+   "acc_cls": 97.4,
    "unknown": 0.0,
-   "bal": 99.1,
+   "bal": 98.2,
    "recall": {
     "STAR": [
      100.0,
      32
     ],
     "GALAXY": [
-     97.3,
+     94.6,
      37
     ],
     "QSO": [
@@ -9682,20 +9682,20 @@
  },
  {
   "field": "bngp_207m05",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 207.77806,
   "dec": -4.90333,
   "n": 61,
   "ours": {
    "n": 61,
-   "acc": 100.0,
-   "acc_cls": 100.0,
-   "unknown": 0.0,
-   "bal": 100.0,
+   "acc": 96.7,
+   "acc_cls": 98.3,
+   "unknown": 1.6,
+   "bal": 97.9,
    "recall": {
     "STAR": [
-     100.0,
+     95.8,
      48
     ],
     "GALAXY": [
@@ -9706,42 +9706,10 @@
   },
   "high": {
    "n": 57,
-   "acc": 100.0
+   "acc": 98.25
   },
-  "Gaia DR3 DSC-Combmod": {
-   "n": 53,
-   "acc": 96.2,
-   "acc_cls": 96.2,
-   "unknown": 0.0,
-   "bal": 83.3,
-   "recall": {
-    "STAR": [
-     100.0,
-     47
-    ],
-    "GALAXY": [
-     66.7,
-     6
-    ]
-   }
-  },
-  "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 53,
-   "acc": 100.0,
-   "acc_cls": 100.0,
-   "unknown": 0.0,
-   "bal": 100.0,
-   "recall": {
-    "STAR": [
-     100.0,
-     47
-    ],
-    "GALAXY": [
-     100.0,
-     6
-    ]
-   }
-  },
+  "Gaia DR3 DSC-Combmod": null,
+  "Gaia DR3 DSC-Combmod | ours same": null,
   "LS-GBM (LS photometry only)": {
    "n": 57,
    "acc": 100.0,
@@ -9761,13 +9729,13 @@
   },
   "LS-GBM (LS photometry only) | ours same": {
    "n": 57,
-   "acc": 100.0,
-   "acc_cls": 100.0,
+   "acc": 98.2,
+   "acc_cls": 98.2,
    "unknown": 0.0,
-   "bal": 100.0,
+   "bal": 99.0,
    "recall": {
     "STAR": [
-     100.0,
+     97.9,
      47
     ],
     "GALAXY": [
@@ -9777,7 +9745,7 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 53,
+   "n": 52,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -9785,7 +9753,7 @@
    "recall": {
     "STAR": [
      100.0,
-     43
+     42
     ],
     "GALAXY": [
      100.0,
@@ -9794,7 +9762,7 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 53,
+   "n": 52,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -9802,7 +9770,7 @@
    "recall": {
     "STAR": [
      100.0,
-     43
+     42
     ],
     "GALAXY": [
      100.0,
@@ -9813,7 +9781,7 @@
  },
  {
   "field": "bngp_217m05",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 216.80639,
   "dec": -4.96889,
@@ -9936,24 +9904,24 @@
  },
  {
   "field": "bngp_218p03",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 217.96833,
   "dec": 2.19806,
   "n": 82,
   "ours": {
    "n": 82,
-   "acc": 96.3,
-   "acc_cls": 97.5,
-   "unknown": 1.2,
-   "bal": 92.0,
+   "acc": 95.1,
+   "acc_cls": 95.1,
+   "unknown": 0.0,
+   "bal": 91.4,
    "recall": {
     "STAR": [
      100.0,
      26
     ],
     "GALAXY": [
-     96.1,
+     94.1,
      51
     ],
     "QSO": [
@@ -9963,7 +9931,7 @@
    }
   },
   "high": {
-   "n": 66,
+   "n": 65,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
@@ -10010,17 +9978,17 @@
   },
   "LS-GBM (LS photometry only)": {
    "n": 79,
-   "acc": 93.7,
-   "acc_cls": 93.7,
+   "acc": 94.9,
+   "acc_cls": 94.9,
    "unknown": 0.0,
-   "bal": 90.6,
+   "bal": 91.3,
    "recall": {
     "STAR": [
      100.0,
      25
     ],
     "GALAXY": [
-     91.8,
+     93.9,
      49
     ],
     "QSO": [
@@ -10031,17 +9999,17 @@
   },
   "LS-GBM (LS photometry only) | ours same": {
    "n": 79,
-   "acc": 96.2,
-   "acc_cls": 97.4,
-   "unknown": 1.3,
-   "bal": 92.0,
+   "acc": 94.9,
+   "acc_cls": 94.9,
+   "unknown": 0.0,
+   "bal": 91.3,
    "recall": {
     "STAR": [
      100.0,
      25
     ],
     "GALAXY": [
-     95.9,
+     93.9,
      49
     ],
     "QSO": [
@@ -10073,17 +10041,17 @@
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
    "n": 75,
-   "acc": 96.0,
+   "acc": 97.3,
    "acc_cls": 97.3,
-   "unknown": 1.3,
-   "bal": 90.2,
+   "unknown": 0.0,
+   "bal": 90.9,
    "recall": {
     "STAR": [
      100.0,
      25
     ],
     "GALAXY": [
-     95.7,
+     97.8,
      46
     ],
     "QSO": [
@@ -10095,13 +10063,13 @@
  },
  {
   "field": "bngp_223p02",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 223.545,
   "dec": 1.46389,
-  "n": 112,
+  "n": 111,
   "ours": {
-   "n": 112,
+   "n": 111,
    "acc": 99.1,
    "acc_cls": 99.1,
    "unknown": 0.0,
@@ -10109,7 +10077,7 @@
    "recall": {
     "STAR": [
      100.0,
-     67
+     66
     ],
     "GALAXY": [
      100.0,
@@ -10169,17 +10137,17 @@
   },
   "LS-GBM (LS photometry only)": {
    "n": 109,
-   "acc": 99.1,
-   "acc_cls": 99.1,
+   "acc": 97.2,
+   "acc_cls": 97.2,
    "unknown": 0.0,
-   "bal": 99.1,
+   "bal": 97.4,
    "recall": {
     "STAR": [
      100.0,
      66
     ],
     "GALAXY": [
-     97.4,
+     92.3,
      39
     ],
     "QSO": [
@@ -10254,24 +10222,24 @@
  },
  {
   "field": "bngp_224m02",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 224.10833,
   "dec": -1.26278,
   "n": 85,
   "ours": {
    "n": 85,
-   "acc": 95.3,
-   "acc_cls": 95.3,
+   "acc": 96.5,
+   "acc_cls": 96.5,
    "unknown": 0.0,
-   "bal": 89.4,
+   "bal": 90.2,
    "recall": {
     "STAR": [
      100.0,
      37
     ],
     "GALAXY": [
-     93.2,
+     95.5,
      44
     ],
     "QSO": [
@@ -10281,7 +10249,7 @@
    }
   },
   "high": {
-   "n": 66,
+   "n": 67,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
@@ -10349,17 +10317,17 @@
   },
   "LS-GBM (LS photometry only) | ours same": {
    "n": 82,
-   "acc": 95.1,
-   "acc_cls": 95.1,
+   "acc": 96.3,
+   "acc_cls": 96.3,
    "unknown": 0.0,
-   "bal": 89.3,
+   "bal": 90.1,
    "recall": {
     "STAR": [
      100.0,
      36
     ],
     "GALAXY": [
-     92.9,
+     95.2,
      42
     ],
     "QSO": [
@@ -10391,17 +10359,17 @@
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
    "n": 79,
-   "acc": 96.2,
-   "acc_cls": 96.2,
+   "acc": 97.5,
+   "acc_cls": 97.5,
    "unknown": 0.0,
-   "bal": 97.6,
+   "bal": 98.4,
    "recall": {
     "STAR": [
      100.0,
      35
     ],
     "GALAXY": [
-     92.9,
+     95.2,
      42
     ],
     "QSO": [
@@ -10413,7 +10381,7 @@
  },
  {
   "field": "bngp_225m05",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 224.72583,
   "dec": -4.94917,
@@ -10544,7 +10512,7 @@
  },
  {
   "field": "bs82_005m00",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 4.95639,
   "dec": -0.19278,
@@ -10703,24 +10671,24 @@
  },
  {
   "field": "bs82_014p00",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 13.71639,
   "dec": -0.39306,
   "n": 66,
   "ours": {
    "n": 66,
-   "acc": 97.0,
-   "acc_cls": 97.0,
+   "acc": 98.5,
+   "acc_cls": 98.5,
    "unknown": 0.0,
-   "bal": 95.7,
+   "bal": 96.3,
    "recall": {
     "STAR": [
      100.0,
      4
     ],
     "GALAXY": [
-     98.1,
+     100.0,
      53
     ],
     "QSO": [
@@ -10730,8 +10698,8 @@
    }
   },
   "high": {
-   "n": 46,
-   "acc": 97.83
+   "n": 47,
+   "acc": 97.87
   },
   "Gaia DR3 DSC-Combmod": {
    "n": 10,
@@ -10769,17 +10737,17 @@
   },
   "LS-GBM (LS photometry only)": {
    "n": 65,
-   "acc": 93.8,
-   "acc_cls": 93.8,
+   "acc": 95.4,
+   "acc_cls": 95.4,
    "unknown": 0.0,
-   "bal": 94.4,
+   "bal": 95.0,
    "recall": {
     "STAR": [
      100.0,
      4
     ],
     "GALAXY": [
-     94.2,
+     96.2,
      52
     ],
     "QSO": [
@@ -10790,17 +10758,17 @@
   },
   "LS-GBM (LS photometry only) | ours same": {
    "n": 65,
-   "acc": 96.9,
-   "acc_cls": 96.9,
+   "acc": 98.5,
+   "acc_cls": 98.5,
    "unknown": 0.0,
-   "bal": 95.7,
+   "bal": 96.3,
    "recall": {
     "STAR": [
      100.0,
      4
     ],
     "GALAXY": [
-     98.1,
+     100.0,
      52
     ],
     "QSO": [
@@ -10832,17 +10800,17 @@
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
    "n": 61,
-   "acc": 96.7,
-   "acc_cls": 96.7,
+   "acc": 98.4,
+   "acc_cls": 98.4,
    "unknown": 0.0,
-   "bal": 93.8,
+   "bal": 94.4,
    "recall": {
     "STAR": [
      100.0,
      3
     ],
     "GALAXY": [
-     98.1,
+     100.0,
      52
     ],
     "QSO": [
@@ -10854,7 +10822,7 @@
  },
  {
   "field": "bs82_034p00",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 33.38167,
   "dec": 0.11472,
@@ -10928,13 +10896,13 @@
   },
   "LS-GBM (LS photometry only)": {
    "n": 68,
-   "acc": 98.5,
-   "acc_cls": 98.5,
+   "acc": 100.0,
+   "acc_cls": 100.0,
    "unknown": 0.0,
-   "bal": 99.4,
+   "bal": 100.0,
    "recall": {
     "STAR": [
-     98.3,
+     100.0,
      58
     ],
     "GALAXY": [
@@ -11013,7 +10981,7 @@
  },
  {
   "field": "bs82_042p01",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 41.7625,
   "dec": 0.81361,
@@ -11144,7 +11112,7 @@
  },
  {
   "field": "bs82_059m01",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 58.75722,
   "dec": -0.76028,
@@ -11247,7 +11215,7 @@
  },
  {
   "field": "bs82_304m01",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 303.23278,
   "dec": -0.77611,
@@ -11326,7 +11294,7 @@
  },
  {
   "field": "bs82_341m01",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 340.38278,
   "dec": -1.12944,
@@ -11457,7 +11425,7 @@
  },
  {
   "field": "bs82_345p01",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 345.48472,
   "dec": 0.58889,
@@ -11616,7 +11584,7 @@
  },
  {
   "field": "bsgp_003m33",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 3.37139,
   "dec": -33.00028,
@@ -11639,8 +11607,8 @@
    }
   },
   "high": {
-   "n": 23,
-   "acc": 95.65
+   "n": 25,
+   "acc": 96.0
   },
   "Gaia DR3 DSC-Combmod": {
    "n": 21,
@@ -11678,17 +11646,17 @@
   },
   "LS-GBM (LS photometry only)": {
    "n": 28,
-   "acc": 89.3,
-   "acc_cls": 89.3,
+   "acc": 92.9,
+   "acc_cls": 92.9,
    "unknown": 0.0,
-   "bal": 94.0,
+   "bal": 96.0,
    "recall": {
     "STAR": [
      100.0,
      3
     ],
     "GALAXY": [
-     88.0,
+     92.0,
      25
     ]
    }
@@ -11747,7 +11715,7 @@
  },
  {
   "field": "bsgp_007m35",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 7.30472,
   "dec": -35.04972,
@@ -11797,13 +11765,13 @@
   },
   "LS-GBM (LS photometry only)": {
    "n": 46,
-   "acc": 97.8,
-   "acc_cls": 97.8,
+   "acc": 100.0,
+   "acc_cls": 100.0,
    "unknown": 0.0,
-   "bal": 97.8,
+   "bal": 100.0,
    "recall": {
     "GALAXY": [
-     97.8,
+     100.0,
      46
     ]
    }
@@ -11850,7 +11818,7 @@
  },
  {
   "field": "bsgp_009m31",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 9.19083,
   "dec": -30.80583,
@@ -11877,7 +11845,7 @@
    }
   },
   "high": {
-   "n": 34,
+   "n": 33,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
@@ -11924,17 +11892,17 @@
   },
   "LS-GBM (LS photometry only)": {
    "n": 42,
-   "acc": 95.2,
-   "acc_cls": 95.2,
+   "acc": 97.6,
+   "acc_cls": 97.6,
    "unknown": 0.0,
-   "bal": 97.9,
+   "bal": 99.0,
    "recall": {
     "STAR": [
      100.0,
      7
     ],
     "GALAXY": [
-     93.8,
+     96.9,
      32
     ],
     "QSO": [
@@ -12009,7 +11977,7 @@
  },
  {
   "field": "bsgp_012m36",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 11.52389,
   "dec": -35.80361,
@@ -12132,7 +12100,7 @@
  },
  {
   "field": "bsgp_024m31",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 23.57139,
   "dec": -30.49722,
@@ -12159,8 +12127,8 @@
    }
   },
   "high": {
-   "n": 24,
-   "acc": 95.83
+   "n": 25,
+   "acc": 96.0
   },
   "Gaia DR3 DSC-Combmod": {
    "n": 22,
@@ -12291,7 +12259,7 @@
  },
  {
   "field": "bsgp_025m24",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 25.39472,
   "dec": -23.82306,
@@ -12394,7 +12362,7 @@
  },
  {
   "field": "bsgp_030m37",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 29.91028,
   "dec": -37.00472,
@@ -12497,7 +12465,7 @@
  },
  {
   "field": "bsgp_033m31",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 33.60361,
   "dec": -30.56639,
@@ -12656,7 +12624,7 @@
  },
  {
   "field": "bsgp_034m37",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 34.54806,
   "dec": -37.22639,
@@ -12718,17 +12686,17 @@
   },
   "LS-GBM (LS photometry only)": {
    "n": 3,
-   "acc": 66.7,
-   "acc_cls": 66.7,
+   "acc": 33.3,
+   "acc_cls": 33.3,
    "unknown": 0.0,
-   "bal": 75.0,
+   "bal": 50.0,
    "recall": {
     "STAR": [
      100.0,
      1
     ],
     "GALAXY": [
-     50.0,
+     0.0,
      2
     ]
    }
@@ -12787,7 +12755,7 @@
  },
  {
   "field": "bsgp_037m25",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 37.37917,
   "dec": -25.44694,
@@ -12910,7 +12878,7 @@
  },
  {
   "field": "bsgp_039m37",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 39.18889,
   "dec": -37.15611,
@@ -13017,7 +12985,7 @@
  },
  {
   "field": "bsgp_040m33",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 40.01806,
   "dec": -33.27722,
@@ -13040,7 +13008,7 @@
    }
   },
   "high": {
-   "n": 21,
+   "n": 22,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
@@ -13079,13 +13047,13 @@
   },
   "LS-GBM (LS photometry only)": {
    "n": 25,
-   "acc": 88.0,
-   "acc_cls": 88.0,
+   "acc": 92.0,
+   "acc_cls": 92.0,
    "unknown": 0.0,
-   "bal": 70.7,
+   "bal": 95.7,
    "recall": {
     "STAR": [
-     50.0,
+     100.0,
      2
     ],
     "GALAXY": [
@@ -13148,7 +13116,7 @@
  },
  {
   "field": "bsgp_041m23",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 41.4575,
   "dec": -22.93056,
@@ -13251,7 +13219,7 @@
  },
  {
   "field": "bsgp_045m32",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 44.52611,
   "dec": -31.65083,
@@ -13410,7 +13378,7 @@
  },
  {
   "field": "bsgp_046m35",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 46.67278,
   "dec": -35.17889,
@@ -13525,7 +13493,7 @@
  },
  {
   "field": "bsgp_049m23",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 49.09472,
   "dec": -22.92222,
@@ -13604,7 +13572,7 @@
  },
  {
   "field": "bsgp_326m30",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 326.50694,
   "dec": -30.06056,
@@ -13631,8 +13599,8 @@
    }
   },
   "high": {
-   "n": 28,
-   "acc": 96.43
+   "n": 26,
+   "acc": 96.15
   },
   "Gaia DR3 DSC-Combmod": {
    "n": 34,
@@ -13723,7 +13691,7 @@
  },
  {
   "field": "bsgp_329m33",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 328.75278,
   "dec": -33.06417,
@@ -13731,8 +13699,8 @@
   "ours": {
    "n": 22,
    "acc": 95.5,
-   "acc_cls": 95.5,
-   "unknown": 0.0,
+   "acc_cls": 100.0,
+   "unknown": 4.5,
    "bal": 97.6,
    "recall": {
     "STAR": [
@@ -13785,17 +13753,17 @@
   },
   "LS-GBM (LS photometry only)": {
    "n": 11,
-   "acc": 90.9,
-   "acc_cls": 90.9,
+   "acc": 81.8,
+   "acc_cls": 81.8,
    "unknown": 0.0,
-   "bal": 95.0,
+   "bal": 90.0,
    "recall": {
     "STAR": [
      100.0,
      1
     ],
     "GALAXY": [
-     90.0,
+     80.0,
      10
     ]
    }
@@ -13803,8 +13771,8 @@
   "LS-GBM (LS photometry only) | ours same": {
    "n": 11,
    "acc": 90.9,
-   "acc_cls": 90.9,
-   "unknown": 0.0,
+   "acc_cls": 100.0,
+   "unknown": 9.1,
    "bal": 95.0,
    "recall": {
     "STAR": [
@@ -13837,8 +13805,8 @@
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
    "n": 22,
    "acc": 95.5,
-   "acc_cls": 95.5,
-   "unknown": 0.0,
+   "acc_cls": 100.0,
+   "unknown": 4.5,
    "bal": 97.6,
    "recall": {
     "STAR": [
@@ -13854,7 +13822,7 @@
  },
  {
   "field": "bsgp_332m28",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 332.68306,
   "dec": -28.04528,
@@ -13862,8 +13830,8 @@
   "ours": {
    "n": 63,
    "acc": 96.8,
-   "acc_cls": 98.4,
-   "unknown": 1.6,
+   "acc_cls": 96.8,
+   "unknown": 0.0,
    "bal": 95.2,
    "recall": {
     "STAR": [
@@ -13881,8 +13849,8 @@
    }
   },
   "high": {
-   "n": 49,
-   "acc": 97.96
+   "n": 44,
+   "acc": 97.73
   },
   "Gaia DR3 DSC-Combmod": {
    "n": 41,
@@ -13907,17 +13875,17 @@
   },
   "Gaia DR3 DSC-Combmod | ours same": {
    "n": 41,
-   "acc": 97.6,
-   "acc_cls": 97.6,
+   "acc": 95.1,
+   "acc_cls": 95.1,
    "unknown": 0.0,
-   "bal": 95.8,
+   "bal": 94.7,
    "recall": {
     "STAR": [
      100.0,
      4
     ],
     "GALAXY": [
-     100.0,
+     96.6,
      29
     ],
     "QSO": [
@@ -13973,30 +13941,30 @@
  },
  {
   "field": "bsgp_333m24",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 333.13889,
   "dec": -23.7175,
   "n": 37,
   "ours": {
    "n": 37,
-   "acc": 89.2,
-   "acc_cls": 100.0,
-   "unknown": 10.8,
-   "bal": 94.0,
+   "acc": 91.9,
+   "acc_cls": 97.1,
+   "unknown": 5.4,
+   "bal": 95.5,
    "recall": {
     "STAR": [
      100.0,
      4
     ],
     "GALAXY": [
-     87.9,
+     90.9,
      33
     ]
    }
   },
   "high": {
-   "n": 33,
+   "n": 31,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
@@ -14054,17 +14022,17 @@
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
    "n": 31,
-   "acc": 93.5,
-   "acc_cls": 100.0,
-   "unknown": 6.5,
-   "bal": 96.5,
+   "acc": 96.8,
+   "acc_cls": 96.8,
+   "unknown": 0.0,
+   "bal": 98.2,
    "recall": {
     "STAR": [
      100.0,
      3
     ],
     "GALAXY": [
-     92.9,
+     96.4,
      28
     ]
    }
@@ -14072,7 +14040,7 @@
  },
  {
   "field": "bsgp_333m36",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 332.22167,
   "dec": -35.73833,
@@ -14203,153 +14171,177 @@
  },
  {
   "field": "bsgp_336m32",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 335.84722,
   "dec": -32.12972,
-  "n": 35,
+  "n": 39,
   "ours": {
-   "n": 35,
-   "acc": 94.3,
-   "acc_cls": 97.1,
-   "unknown": 2.9,
-   "bal": 96.9,
+   "n": 39,
+   "acc": 92.3,
+   "acc_cls": 92.3,
+   "unknown": 0.0,
+   "bal": 97.1,
    "recall": {
     "STAR": [
      100.0,
-     3
+     4
     ],
     "GALAXY": [
-     93.8,
-     32
+     91.2,
+     34
+    ],
+    "QSO": [
+     100.0,
+     1
     ]
    }
   },
   "high": {
-   "n": 32,
-   "acc": 96.88
+   "n": 35,
+   "acc": 94.29
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 18,
-   "acc": 77.8,
-   "acc_cls": 77.8,
+   "n": 20,
+   "acc": 80.0,
+   "acc_cls": 80.0,
    "unknown": 0.0,
-   "bal": 86.7,
+   "bal": 91.1,
    "recall": {
     "STAR": [
      100.0,
-     3
+     4
     ],
     "GALAXY": [
      73.3,
      15
+    ],
+    "QSO": [
+     100.0,
+     1
     ]
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 18,
-   "acc": 94.4,
-   "acc_cls": 94.4,
+   "n": 20,
+   "acc": 95.0,
+   "acc_cls": 95.0,
    "unknown": 0.0,
-   "bal": 96.7,
+   "bal": 97.8,
    "recall": {
     "STAR": [
      100.0,
-     3
+     4
     ],
     "GALAXY": [
      93.3,
      15
+    ],
+    "QSO": [
+     100.0,
+     1
     ]
    }
   },
   "LS-GBM (LS photometry only)": {
-   "n": 31,
-   "acc": 90.3,
-   "acc_cls": 90.3,
+   "n": 34,
+   "acc": 91.2,
+   "acc_cls": 91.2,
    "unknown": 0.0,
-   "bal": 94.7,
+   "bal": 96.6,
    "recall": {
     "STAR": [
      100.0,
-     3
+     4
     ],
     "GALAXY": [
-     89.3,
-     28
+     89.7,
+     29
+    ],
+    "QSO": [
+     100.0,
+     1
     ]
    }
   },
   "LS-GBM (LS photometry only) | ours same": {
-   "n": 31,
-   "acc": 96.8,
-   "acc_cls": 96.8,
-   "unknown": 0.0,
-   "bal": 98.2,
-   "recall": {
-    "STAR": [
-     100.0,
-     3
-    ],
-    "GALAXY": [
-     96.4,
-     28
-    ]
-   }
-  },
-  "LS morphology + WISE W1-W2>=0.8": {
    "n": 34,
    "acc": 97.1,
    "acc_cls": 97.1,
    "unknown": 0.0,
-   "bal": 98.4,
+   "bal": 98.9,
    "recall": {
     "STAR": [
      100.0,
-     3
+     4
     ],
     "GALAXY": [
-     96.8,
-     31
+     96.6,
+     29
+    ],
+    "QSO": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "LS morphology + WISE W1-W2>=0.8": {
+   "n": 38,
+   "acc": 94.7,
+   "acc_cls": 94.7,
+   "unknown": 0.0,
+   "bal": 65.7,
+   "recall": {
+    "STAR": [
+     100.0,
+     4
+    ],
+    "GALAXY": [
+     97.0,
+     33
+    ],
+    "QSO": [
+     0.0,
+     1
     ]
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 34,
-   "acc": 97.1,
-   "acc_cls": 100.0,
-   "unknown": 2.9,
-   "bal": 98.4,
+   "n": 38,
+   "acc": 94.7,
+   "acc_cls": 94.7,
+   "unknown": 0.0,
+   "bal": 98.0,
    "recall": {
     "STAR": [
      100.0,
-     3
+     4
     ],
     "GALAXY": [
-     96.8,
-     31
+     93.9,
+     33
+    ],
+    "QSO": [
+     100.0,
+     1
     ]
    }
   }
  },
  {
   "field": "bsgp_337m36",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 337.33389,
   "dec": -36.33556,
-  "n": 10,
+  "n": 4,
   "ours": {
-   "n": 10,
+   "n": 4,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
    "bal": 100.0,
    "recall": {
-    "STAR": [
-     100.0,
-     6
-    ],
     "GALAXY": [
      100.0,
      4
@@ -14357,20 +14349,16 @@
    }
   },
   "high": {
-   "n": 10,
+   "n": 4,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
-   "n": 10,
+   "n": 4,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
    "bal": 100.0,
    "recall": {
-    "STAR": [
-     100.0,
-     6
-    ],
     "GALAXY": [
      100.0,
      4
@@ -14378,16 +14366,12 @@
    }
   },
   "Gaia DR3 DSC-Combmod | ours same": {
-   "n": 10,
+   "n": 4,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
    "bal": 100.0,
    "recall": {
-    "STAR": [
-     100.0,
-     6
-    ],
     "GALAXY": [
      100.0,
      4
@@ -14397,16 +14381,12 @@
   "LS-GBM (LS photometry only)": null,
   "LS-GBM (LS photometry only) | ours same": null,
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 8,
+   "n": 2,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
    "bal": 100.0,
    "recall": {
-    "STAR": [
-     100.0,
-     6
-    ],
     "GALAXY": [
      100.0,
      2
@@ -14414,16 +14394,12 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 8,
+   "n": 2,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
    "bal": 100.0,
    "recall": {
-    "STAR": [
-     100.0,
-     6
-    ],
     "GALAXY": [
      100.0,
      2
@@ -14433,24 +14409,24 @@
  },
  {
   "field": "bsgp_342m34",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 341.46778,
   "dec": -34.11056,
   "n": 48,
   "ours": {
    "n": 48,
-   "acc": 91.7,
-   "acc_cls": 95.7,
+   "acc": 93.8,
+   "acc_cls": 97.8,
    "unknown": 4.2,
-   "bal": 95.5,
+   "bal": 96.6,
    "recall": {
     "STAR": [
      100.0,
      4
     ],
     "GALAXY": [
-     90.9,
+     93.2,
      44
     ]
    }
@@ -14514,17 +14490,17 @@
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
    "n": 41,
-   "acc": 90.2,
-   "acc_cls": 94.9,
+   "acc": 92.7,
+   "acc_cls": 97.4,
    "unknown": 4.9,
-   "bal": 94.6,
+   "bal": 96.0,
    "recall": {
     "STAR": [
      100.0,
      4
     ],
     "GALAXY": [
-     89.2,
+     91.9,
      37
     ]
    }
@@ -14532,7 +14508,7 @@
  },
  {
   "field": "bsgp_343m25",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 342.86417,
   "dec": -24.76583,
@@ -14555,7 +14531,7 @@
    }
   },
   "high": {
-   "n": 44,
+   "n": 43,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
@@ -14631,24 +14607,24 @@
  },
  {
   "field": "bsgp_345m29",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 345.68333,
   "dec": -29.15222,
   "n": 39,
   "ours": {
    "n": 39,
-   "acc": 94.9,
-   "acc_cls": 94.9,
-   "unknown": 0.0,
-   "bal": 97.6,
+   "acc": 87.2,
+   "acc_cls": 91.9,
+   "unknown": 5.1,
+   "bal": 94.0,
    "recall": {
     "STAR": [
      100.0,
      7
     ],
     "GALAXY": [
-     92.9,
+     82.1,
      28
     ],
     "QSO": [
@@ -14658,8 +14634,8 @@
    }
   },
   "high": {
-   "n": 28,
-   "acc": 96.43
+   "n": 29,
+   "acc": 93.1
   },
   "Gaia DR3 DSC-Combmod": {
    "n": 30,
@@ -14728,17 +14704,17 @@
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
    "n": 32,
-   "acc": 96.9,
-   "acc_cls": 96.9,
-   "unknown": 0.0,
-   "bal": 98.6,
+   "acc": 87.5,
+   "acc_cls": 93.3,
+   "unknown": 6.2,
+   "bal": 94.2,
    "recall": {
     "STAR": [
      100.0,
      5
     ],
     "GALAXY": [
-     95.7,
+     82.6,
      23
     ],
     "QSO": [
@@ -14750,7 +14726,7 @@
  },
  {
   "field": "bsgp_350m34",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 349.87472,
   "dec": -34.18194,
@@ -14881,7 +14857,7 @@
  },
  {
   "field": "bsgp_354m25",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 353.57611,
   "dec": -24.22222,
@@ -14960,7 +14936,7 @@
  },
  {
   "field": "bsgp_355m36",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 354.12611,
   "dec": -35.94972,
@@ -15091,7 +15067,7 @@
  },
  {
   "field": "bsgp_357m33",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 356.57056,
   "dec": -33.11583,
@@ -15222,7 +15198,7 @@
  },
  {
   "field": "bsth_038m61",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 37.96611,
   "dec": -60.51444,
@@ -15245,7 +15221,7 @@
    }
   },
   "high": {
-   "n": 5,
+   "n": 6,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
@@ -15353,7 +15329,7 @@
  },
  {
   "field": "bsth_039m43",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 39.195,
   "dec": -43.94917,
@@ -15484,7 +15460,7 @@
  },
  {
   "field": "bsth_056m26",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 56.25111,
   "dec": -25.58972,
@@ -15587,7 +15563,7 @@
  },
  {
   "field": "bsth_078m57",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 77.05944,
   "dec": -57.06972,
@@ -15718,7 +15694,7 @@
  },
  {
   "field": "bsth_095m80",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 95.38,
   "dec": -80.36,
@@ -15849,7 +15825,7 @@
  },
  {
   "field": "bsth_182m30",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 181.5725,
   "dec": -29.33167,
@@ -15980,7 +15956,7 @@
  },
  {
   "field": "bsth_184m22",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 184.0425,
   "dec": -21.53056,
@@ -16095,7 +16071,7 @@
  },
  {
   "field": "bsth_189m36",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 189.66417,
   "dec": -35.83028,
@@ -16226,7 +16202,7 @@
  },
  {
   "field": "bsth_198m27",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 198.08194,
   "dec": -26.56444,
@@ -16357,7 +16333,7 @@
  },
  {
   "field": "bsth_298m73",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 297.64333,
   "dec": -72.63528,
@@ -16480,7 +16456,7 @@
  },
  {
   "field": "bsth_300m27",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 300.20278,
   "dec": -27.49556,
@@ -16559,20 +16535,20 @@
  },
  {
   "field": "bsth_302m32",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 301.81972,
   "dec": -31.67222,
   "n": 15,
   "ours": {
    "n": 15,
-   "acc": 93.3,
+   "acc": 100.0,
    "acc_cls": 100.0,
-   "unknown": 6.7,
-   "bal": 93.3,
+   "unknown": 0.0,
+   "bal": 100.0,
    "recall": {
     "STAR": [
-     93.3,
+     100.0,
      15
     ]
    }
@@ -16638,7 +16614,7 @@
  },
  {
   "field": "bsth_303m41",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 302.57,
   "dec": -40.52,
@@ -16769,7 +16745,7 @@
  },
  {
   "field": "bsth_338m43",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 338.47111,
   "dec": -42.36028,
@@ -16900,7 +16876,7 @@
  },
  {
   "field": "bsth_356m48",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 355.26889,
   "dec": -47.81861,
@@ -17031,7 +17007,7 @@
  },
  {
   "field": "gc_m10",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 254.288,
   "dec": -4.1,
@@ -17057,8 +17033,40 @@
    "n": 78,
    "acc": 98.72
   },
-  "Gaia DR3 DSC-Combmod": null,
-  "Gaia DR3 DSC-Combmod | ours same": null,
+  "Gaia DR3 DSC-Combmod": {
+   "n": 78,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     77
+    ],
+    "GALAXY": [
+     100.0,
+     1
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 78,
+   "acc": 98.7,
+   "acc_cls": 98.7,
+   "unknown": 0.0,
+   "bal": 50.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     77
+    ],
+    "GALAXY": [
+     0.0,
+     1
+    ]
+   }
+  },
   "LS-GBM (LS photometry only)": null,
   "LS-GBM (LS photometry only) | ours same": null,
   "LS morphology + WISE W1-W2>=0.8": {
@@ -17098,7 +17106,7 @@
  },
  {
   "field": "gc_m22",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 279.1,
   "dec": -23.905,
@@ -17120,8 +17128,32 @@
    "n": 182,
    "acc": 100.0
   },
-  "Gaia DR3 DSC-Combmod": null,
-  "Gaia DR3 DSC-Combmod | ours same": null,
+  "Gaia DR3 DSC-Combmod": {
+   "n": 182,
+   "acc": 99.5,
+   "acc_cls": 99.5,
+   "unknown": 0.0,
+   "bal": 99.5,
+   "recall": {
+    "STAR": [
+     99.5,
+     182
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 182,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     182
+    ]
+   }
+  },
   "LS-GBM (LS photometry only)": null,
   "LS-GBM (LS photometry only) | ours same": null,
   "LS morphology + WISE W1-W2>=0.8": null,
@@ -17129,7 +17161,7 @@
  },
  {
   "field": "gc_m53",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 198.23,
   "dec": 18.168,
@@ -17232,7 +17264,7 @@
  },
  {
   "field": "gc_m55",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 294.998,
   "dec": -30.962,
@@ -17254,8 +17286,32 @@
    "n": 63,
    "acc": 100.0
   },
-  "Gaia DR3 DSC-Combmod": null,
-  "Gaia DR3 DSC-Combmod | ours same": null,
+  "Gaia DR3 DSC-Combmod": {
+   "n": 63,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     63
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 63,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     63
+    ]
+   }
+  },
   "LS-GBM (LS photometry only)": null,
   "LS-GBM (LS photometry only) | ours same": null,
   "LS morphology + WISE W1-W2>=0.8": {
@@ -17287,7 +17343,7 @@
  },
  {
   "field": "gc_m56",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 289.148,
   "dec": 30.184,
@@ -17342,7 +17398,7 @@
  },
  {
   "field": "gc_m68",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 189.867,
   "dec": -26.744,
@@ -17445,7 +17501,7 @@
  },
  {
   "field": "gc_m71",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 298.444,
   "dec": 18.779,
@@ -17500,7 +17556,7 @@
  },
  {
   "field": "gc_m79",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 81.046,
   "dec": -24.525,
@@ -17575,7 +17631,7 @@
    }
   },
   "LS morphology + WISE W1-W2>=0.8": {
-   "n": 61,
+   "n": 60,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -17583,12 +17639,12 @@
    "recall": {
     "STAR": [
      100.0,
-     61
+     60
     ]
    }
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
-   "n": 61,
+   "n": 60,
    "acc": 100.0,
    "acc_cls": 100.0,
    "unknown": 0.0,
@@ -17596,14 +17652,14 @@
    "recall": {
     "STAR": [
      100.0,
-     61
+     60
     ]
    }
   }
  },
  {
   "field": "gc_ngc1851",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 78.528,
   "dec": -40.047,
@@ -17706,30 +17762,54 @@
  },
  {
   "field": "gc_ngc2808",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 138.013,
   "dec": -64.864,
   "n": 248,
   "ours": {
    "n": 248,
-   "acc": 98.8,
+   "acc": 100.0,
    "acc_cls": 100.0,
-   "unknown": 1.2,
-   "bal": 98.8,
+   "unknown": 0.0,
+   "bal": 100.0,
    "recall": {
     "STAR": [
-     98.8,
+     100.0,
      248
     ]
    }
   },
   "high": {
-   "n": 245,
+   "n": 248,
    "acc": 100.0
   },
-  "Gaia DR3 DSC-Combmod": null,
-  "Gaia DR3 DSC-Combmod | ours same": null,
+  "Gaia DR3 DSC-Combmod": {
+   "n": 247,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     247
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 247,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     247
+    ]
+   }
+  },
   "LS-GBM (LS photometry only)": null,
   "LS-GBM (LS photometry only) | ours same": null,
   "LS morphology + WISE W1-W2>=0.8": {
@@ -17747,13 +17827,13 @@
   },
   "LS morphology + WISE W1-W2>=0.8 | ours same": {
    "n": 156,
-   "acc": 99.4,
+   "acc": 100.0,
    "acc_cls": 100.0,
-   "unknown": 0.6,
-   "bal": 99.4,
+   "unknown": 0.0,
+   "bal": 100.0,
    "recall": {
     "STAR": [
-     99.4,
+     100.0,
      156
     ]
    }
@@ -17761,7 +17841,7 @@
  },
  {
   "field": "gc_ngc6362",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 262.979,
   "dec": -67.048,
@@ -17783,8 +17863,32 @@
    "n": 5,
    "acc": 100.0
   },
-  "Gaia DR3 DSC-Combmod": null,
-  "Gaia DR3 DSC-Combmod | ours same": null,
+  "Gaia DR3 DSC-Combmod": {
+   "n": 5,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     5
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 5,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     5
+    ]
+   }
+  },
   "LS-GBM (LS photometry only)": null,
   "LS-GBM (LS photometry only) | ours same": null,
   "LS morphology + WISE W1-W2>=0.8": {
@@ -17816,7 +17920,7 @@
  },
  {
   "field": "gc_ngc6541",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 272.01,
   "dec": -43.715,
@@ -17838,8 +17942,32 @@
    "n": 4,
    "acc": 100.0
   },
-  "Gaia DR3 DSC-Combmod": null,
-  "Gaia DR3 DSC-Combmod | ours same": null,
+  "Gaia DR3 DSC-Combmod": {
+   "n": 4,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     4
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 4,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     4
+    ]
+   }
+  },
   "LS-GBM (LS photometry only)": null,
   "LS-GBM (LS photometry only) | ours same": null,
   "LS morphology + WISE W1-W2>=0.8": null,
@@ -17847,24 +17975,24 @@
  },
  {
   "field": "lmc_outer_ne",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 98.0,
   "dec": -65.5,
   "n": 3,
   "ours": {
    "n": 3,
-   "acc": 66.7,
+   "acc": 100.0,
    "acc_cls": 100.0,
-   "unknown": 33.3,
-   "bal": 75.0,
+   "unknown": 0.0,
+   "bal": 100.0,
    "recall": {
     "STAR": [
      100.0,
      1
     ],
     "GALAXY": [
-     50.0,
+     100.0,
      2
     ]
    }
@@ -17892,17 +18020,17 @@
   },
   "Gaia DR3 DSC-Combmod | ours same": {
    "n": 3,
-   "acc": 66.7,
+   "acc": 100.0,
    "acc_cls": 100.0,
-   "unknown": 33.3,
-   "bal": 75.0,
+   "unknown": 0.0,
+   "bal": 100.0,
    "recall": {
     "STAR": [
      100.0,
      1
     ],
     "GALAXY": [
-     50.0,
+     100.0,
      2
     ]
    }
@@ -17978,7 +18106,7 @@
  },
  {
   "field": "lmc_outer_nw",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 70.0,
   "dec": -64.5,
@@ -18081,7 +18209,7 @@
  },
  {
   "field": "lmc_outer_s",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 80.5,
   "dec": -75.5,
@@ -18184,7 +18312,7 @@
  },
  {
   "field": "lmc_outer_se",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 95.0,
   "dec": -73.5,
@@ -18287,7 +18415,7 @@
  },
  {
   "field": "lmc_outer_sw",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 66.5,
   "dec": -71.0,
@@ -18390,7 +18518,7 @@
  },
  {
   "field": "oc_cr261",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 189.5,
   "dec": -68.4,
@@ -18412,8 +18540,32 @@
    "n": 17,
    "acc": 100.0
   },
-  "Gaia DR3 DSC-Combmod": null,
-  "Gaia DR3 DSC-Combmod | ours same": null,
+  "Gaia DR3 DSC-Combmod": {
+   "n": 17,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     17
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 17,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     17
+    ]
+   }
+  },
   "LS-GBM (LS photometry only)": null,
   "LS-GBM (LS photometry only) | ours same": null,
   "LS morphology + WISE W1-W2>=0.8": null,
@@ -18421,30 +18573,54 @@
  },
  {
   "field": "oc_ic2602",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 160.6,
   "dec": -64.4,
   "n": 118,
   "ours": {
    "n": 118,
-   "acc": 99.2,
+   "acc": 100.0,
    "acc_cls": 100.0,
-   "unknown": 0.8,
-   "bal": 99.2,
+   "unknown": 0.0,
+   "bal": 100.0,
    "recall": {
     "STAR": [
-     99.2,
+     100.0,
      118
     ]
    }
   },
   "high": {
-   "n": 117,
+   "n": 118,
    "acc": 100.0
   },
-  "Gaia DR3 DSC-Combmod": null,
-  "Gaia DR3 DSC-Combmod | ours same": null,
+  "Gaia DR3 DSC-Combmod": {
+   "n": 118,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     118
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 118,
+   "acc": 100.0,
+   "acc_cls": 100.0,
+   "unknown": 0.0,
+   "bal": 100.0,
+   "recall": {
+    "STAR": [
+     100.0,
+     118
+    ]
+   }
+  },
   "LS-GBM (LS photometry only)": null,
   "LS-GBM (LS photometry only) | ours same": null,
   "LS morphology + WISE W1-W2>=0.8": null,
@@ -18452,7 +18628,7 @@
  },
  {
   "field": "oc_ic4665",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 266.6,
   "dec": 5.7,
@@ -18507,7 +18683,7 @@
  },
  {
   "field": "oc_m37",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 88.1,
   "dec": 32.55,
@@ -18562,7 +18738,7 @@
  },
  {
   "field": "oc_m48",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 123.4,
   "dec": -5.75,
@@ -18641,7 +18817,7 @@
  },
  {
   "field": "oc_ngc2243",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 97.4,
   "dec": -31.3,
@@ -18708,7 +18884,7 @@
  },
  {
   "field": "oc_ngc2477",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 118.0,
   "dec": -38.5,
@@ -18763,7 +18939,7 @@
  },
  {
   "field": "oc_ngc2547",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 122.6,
   "dec": -49.2,
@@ -18818,7 +18994,7 @@
  },
  {
   "field": "oc_ngc6633",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 276.85,
   "dec": 6.57,
@@ -18837,11 +19013,35 @@
    }
   },
   "high": {
-   "n": 773,
+   "n": 775,
    "acc": 99.87
   },
-  "Gaia DR3 DSC-Combmod": null,
-  "Gaia DR3 DSC-Combmod | ours same": null,
+  "Gaia DR3 DSC-Combmod": {
+   "n": 772,
+   "acc": 99.9,
+   "acc_cls": 99.9,
+   "unknown": 0.0,
+   "bal": 99.9,
+   "recall": {
+    "STAR": [
+     99.9,
+     772
+    ]
+   }
+  },
+  "Gaia DR3 DSC-Combmod | ours same": {
+   "n": 772,
+   "acc": 99.9,
+   "acc_cls": 99.9,
+   "unknown": 0.0,
+   "bal": 99.9,
+   "recall": {
+    "STAR": [
+     99.9,
+     772
+    ]
+   }
+  },
   "LS-GBM (LS photometry only)": null,
   "LS-GBM (LS photometry only) | ours same": null,
   "LS morphology + WISE W1-W2>=0.8": null,
@@ -18849,7 +19049,7 @@
  },
  {
   "field": "oc_ngc6819",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 295.3,
   "dec": 40.2,
@@ -18904,7 +19104,7 @@
  },
  {
   "field": "oc_ngc7789",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 359.3,
   "dec": 56.7,
@@ -18959,7 +19159,7 @@
  },
  {
   "field": "sb_m51",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 202.47,
   "dec": 47.195,
@@ -19118,7 +19318,7 @@
  },
  {
   "field": "sb_ngc3256",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 156.964,
   "dec": -43.904,
@@ -19185,7 +19385,7 @@
  },
  {
   "field": "sb_ngc4945",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 196.364,
   "dec": -49.468,
@@ -19252,7 +19452,7 @@
  },
  {
   "field": "sfr_cra",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 285.4,
   "dec": -36.95,
@@ -19307,7 +19507,7 @@
  },
  {
   "field": "sfr_ic1805",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 38.2,
   "dec": 61.45,
@@ -19362,7 +19562,7 @@
  },
  {
   "field": "sfr_ic5146",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 328.4,
   "dec": 47.3,
@@ -19417,7 +19617,7 @@
  },
  {
   "field": "sfr_lupus1",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 235.6,
   "dec": -34.6,
@@ -19476,7 +19676,7 @@
  },
  {
   "field": "sfr_ngc2024",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 85.42,
   "dec": -1.9,
@@ -19495,7 +19695,7 @@
    }
   },
   "high": {
-   "n": 28,
+   "n": 29,
    "acc": 100.0
   },
   "Gaia DR3 DSC-Combmod": {
@@ -19513,13 +19713,13 @@
   },
   "Gaia DR3 DSC-Combmod | ours same": {
    "n": 51,
-   "acc": 98.0,
+   "acc": 100.0,
    "acc_cls": 100.0,
-   "unknown": 2.0,
-   "bal": 98.0,
+   "unknown": 0.0,
+   "bal": 100.0,
    "recall": {
     "STAR": [
-     98.0,
+     100.0,
      51
     ]
    }
@@ -19531,7 +19731,7 @@
  },
  {
   "field": "sfr_ngc3603",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 168.8,
   "dec": -61.3,
@@ -19586,7 +19786,7 @@
  },
  {
   "field": "sfr_rosette",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 98.0,
   "dec": 4.95,
@@ -19641,7 +19841,7 @@
  },
  {
   "field": "sfr_w51",
-  "root": "v2/benchmark/independent_fields_b",
+  "root": "/tmp/vdwt/v2/benchmark/independent_fields_b",
   "which": "blind",
   "ra": 290.9,
   "dec": 14.1,
