@@ -10,7 +10,7 @@ scripted clients (CDS blocks a host that sends SIMBAD more than a few queries
 per second); the random jitter keeps parallel collectors out of lock-step.
 
 VizieR mirrors (2.36.4): a VizieR request whose connection is refused,
-that times out (connecting or reading), or that answers 502/503/504, is sent
+that times out (connecting or reading), or that answers 500/502/503/504, is sent
 again to the next official
 mirror (CDS list of VizieR sites: Strasbourg, CfA, NAOJ, IUCAA, China-VO,
 IDIA; same catalogues).  On 2026-10-24 the Strasbourg server refused every
@@ -18,6 +18,14 @@ connection from the validation runners for hours, and later answered so
 slowly that every query ran into the 60 s read timeout; either stopped every
 VizieR-backed collector.  A mirror that answered is preferred for
 MIRROR_STICKY_S, then Strasbourg is tried first again.
+
+Connect timeout (2.44.0): a VizieR request waits at most CONNECT_TIMEOUT_S
+for the TCP connection (the read timeout the client asked for is kept).  On
+2026-10-30 the Strasbourg server stopped accepting connections; each request
+waited astroquery's full 60 s before failing over, a collector made several,
+and VizieR-backed collectors took ~270 s, pushing Gaia (whose VizieR copy is
+the fallback for a slow ESA TAP) past the 300 s collector budget in every
+validation field.  A healthy server connects in well under a second.
 """
 
 from __future__ import annotations
@@ -37,7 +45,11 @@ VIZIER_HOSTS = (
     "vizier.idia.ac.za",
 )
 MIRROR_STICKY_S = 600.0
-RETRY_STATUS = {502, 503, 504}
+CONNECT_TIMEOUT_S = 10.0
+# 500 added in 2.44.0: on 2026-10-31 the IDIA mirror, preferred after
+# Strasbourg failed, answered 500 to every query for hours (48 fields lost
+# every VizieR catalogue).
+RETRY_STATUS = {500, 502, 503, 504}
 _preferred = {"host": None, "until": 0.0}
 
 _local = threading.local()
@@ -88,6 +100,9 @@ def _with_mirrors(send):
         if parts.hostname not in VIZIER_HOSTS:
             return send(self, method, url, *args, **kwargs)
         hosts = _vizier_order(parts.hostname)
+        read = kwargs.get("timeout")
+        read = read[1] if isinstance(read, tuple) else read
+        kwargs["timeout"] = (CONNECT_TIMEOUT_S, read)
         last = None
         for i, host in enumerate(hosts):
             if i:

@@ -71,3 +71,33 @@ def test_read_timeout_falls_over():
     req = throttle._with_mirrors(_send({"vizier.cds.unistra.fr": "slow"}, seen))
     assert req(None, "GET", "https://vizier.cds.unistra.fr/x").status_code == 200
     assert "vizier.cfa.harvard.edu" in seen[-1]
+
+
+def test_short_connect_timeout_keeps_the_read_timeout():
+    import requests
+
+    seen = []
+
+    def send(self, method, url, *args, **kwargs):
+        seen.append((url.split("/")[2], kwargs.get("timeout")))
+        if "unistra" in url:
+            raise requests.exceptions.ConnectTimeout("down")
+        return Resp(200)
+
+    r = throttle._with_mirrors(send)(None, "GET", "https://vizier.cds.unistra.fr/viz-bin/votable", timeout=60)
+    assert r.status_code == 200
+    t = (throttle.CONNECT_TIMEOUT_S, 60)
+    assert seen == [("vizier.cds.unistra.fr", t), ("vizier.cfa.harvard.edu", t)]
+
+
+def test_server_error_moves_to_the_next_mirror():
+    seen = []
+
+    def send(self, method, url, *args, **kwargs):
+        host = url.split("/")[2]
+        seen.append(host)
+        return Resp(500 if host == "vizier.idia.ac.za" else 200)
+
+    throttle._preferred.update(host="vizier.idia.ac.za", until=throttle.time.monotonic() + 600)
+    r = throttle._with_mirrors(send)(None, "GET", "https://vizier.cds.unistra.fr/viz-bin/votable")
+    assert r.status_code == 200 and seen[:2] == ["vizier.idia.ac.za", "vizier.cds.unistra.fr"]

@@ -160,6 +160,22 @@ def fuse(items, model=None):
     return _fuse_linear(*evidence_features(items), model)
 
 
+# Continuous features of these rules are never the only evidence of a
+# training object: every benchmark object has optical photometry, and the
+# augmentation that drops LS/PS1 drops WISE with them.  An AllWISE-only
+# source with just its colours is therefore outside the fitted range (the
+# trees called most such sources in a b = -10 deg open cluster GALAXY,
+# 2.44.0 field run), so these features add to the class odds but do not
+# make an object "with evidence"; the sparse priors handle it instead.
+SUPPORT_ONLY_RULES = ("WISE-COLOR-001:",)
+
+
+def _counts(key, kind, fitted):
+    if kind != "linear_feature":
+        return 1
+    return int(fitted and not key.startswith(SUPPORT_ONLY_RULES))
+
+
 def _fuse_linear(x, kinds, model):
     """Linear log-odds fusion of ``evidence_features`` output."""
     coef = (model or {}).get("coef", {})
@@ -177,7 +193,7 @@ def _fuse_linear(x, kinds, model):
             for t in CLASSES:
                 logit[t] += w.get(t, 0.0) * v
         # A continuous feature without a fitted weight carries no evidence.
-        used += int(kinds[key] != "linear_feature" or key in coef)
+        used += _counts(key, kinds[key], key in coef)
     return _softmax(logit), used
 
 
@@ -229,7 +245,7 @@ def fuse_many(item_lists, model=None, base_dir=None):
         used = 0
         for key, v in x.items():
             if key in col:
-                used += 1
+                used += _counts(key, kinds[key], True)
                 continue
             _add_prior(logit, key, kinds[key], v)
             used += int(kinds[key] != "linear_feature")

@@ -1,6 +1,7 @@
 name: Add LS DR10 morphology columns to benchmark features
 
-# Fetches sersic, shape_r and W1/W2 inverse variances by ls_id (2.11.0).
+# Fetches sersic, shape_r, W1/W2 inverse variances (2.11.0) and dchisq,
+# shape_r_ivar, fiberflux_r, fracflux (2.44.0) by ls_id.
 # Manual only (2.24.0): it rewrites preserved benchmark / truth data, which
 # must change only on purpose (an automatic run on a code push replaced the
 # DESI benchmark with a partial re-collection on 2026-10-14).
@@ -30,7 +31,7 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add v2/benchmark/catalog_features v2/benchmark/desi_external/catalog_features || true
+          git add v2/benchmark/catalog_features v2/benchmark/desi_external/catalog_features v2/benchmark/desi_fusion/catalog_features || true
           if git diff --cached --quiet; then echo "nothing to commit"; exit 0; fi
           git commit -m "Add LS DR10 morphology columns to benchmark features"
           bash .github/scripts/push_with_retry.sh

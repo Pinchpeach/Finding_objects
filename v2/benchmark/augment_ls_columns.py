@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Add the Legacy Surveys DR10 columns the production collector now returns
-(sersic, shape_r, flux_ivar_w1, flux_ivar_w2) to the preserved benchmark
-features, by ls_id (2.11.0).
+(sersic, shape_r, flux_ivar_w1, flux_ivar_w2 in 2.11.0; shape_r_ivar,
+dchisq_1..5, fiberflux_r and fracflux_g/r/z in 2.44.0) to the preserved
+benchmark features, by ls_id.
 
 Re-collecting every benchmark object by cone search took longer than the 4 h
 Actions limit; the objects are already matched, so their Tractor rows are
@@ -22,8 +23,13 @@ BENCH = Path(__file__).resolve().parent
 FILES = [
     BENCH / "catalog_features" / "desi_legacy_trd.csv.gz",
     BENCH / "desi_external" / "catalog_features" / "desi_legacy_trd.csv.gz",
+    BENCH / "desi_fusion" / "catalog_features" / "desi_legacy_trd.csv.gz",
 ]
-COLS = ["sersic", "shape_r", "flux_ivar_w1", "flux_ivar_w2"]
+COLS = [
+    "sersic", "shape_r", "flux_ivar_w1", "flux_ivar_w2", "shape_r_ivar",
+    "dchisq_1", "dchisq_2", "dchisq_3", "dchisq_4", "dchisq_5",
+    "fiberflux_r", "fracflux_g", "fracflux_r", "fracflux_z",
+]
 TAP = "https://datalab.noirlab.edu/tap"
 
 

@@ -143,6 +143,9 @@ KEEP = re.compile(
     r"gaia_dr3__(pmra|pmdec|parallax|parallax_error|pmra_error|pmdec_error|parallax_over_error|ruwe|fidelity_v2|phot_bp_rp_excess_factor|bp_rp)|"
     r"gaia_dr3__hr_\w+|2mass_psc__(Kmag|Qflg|Cflg|Xflg)|desi_legacy_surveys_dr10__flux_(g|r|z)|classification_basis|"
     r"high_confidence|high_confidence_basis|"
+    # 2.44.0: Tractor fit quality, LS photometry for LS-GBM replays, AllWISE W3, derived features
+    r"desi_legacy_surveys_dr10__(ls_id|dchisq_[12]|shape_r_ivar|fracflux_r|flux_(i|w1|w2)|flux_ivar_\w+|mw_transmission_\w+)|"
+    r"allwise__(W3mag|snr3)|ls_(zw1_excess|dchisq_rex_rel_log|size_sig_log)|wise_w2_w3_color|"
     r"sdss_dr18_spectroscopy__class|desi_dr1_spectroscopy__OType|lamost_dr_catalog__Class)$"
 )
 

@@ -115,6 +115,9 @@ OPTIONAL_CHUNK = 2000
 # (worst case was 50 + 3 tables x ceil(N/500) x 80 s, capped here).
 OPTIONAL_TOTAL_BUDGET_S = 180.0
 SYNC_MAX_ROWS = 2000
+# Fidelity for the VizieR fallback rows: 50 s base + VizieR + this stays
+# inside the 300 s controller budget.
+FALLBACK_FIDELITY_BUDGET_S = 60.0
 
 
 def _bounded(fn, budget_s, *args):
@@ -400,6 +403,8 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
         # when another release was requested, so propagation stays correct.
         df = _vizier_fallback(ra, dec, radius_arcmin)
         used = RELEASES["DR3"]
+        if not df.empty:  # fidelity is keyed on the DR3 source_id the copy carries (2.44.0)
+            df = _merge_fidelity(df, time.monotonic() + FALLBACK_FIDELITY_BUDGET_S)
     if df.empty:
         return pd.DataFrame(
             columns=BASE + SOURCE[2:] + AP + SPEC_AP + ["best_class_name", "best_class_score"] + VAR_SUMMARY
