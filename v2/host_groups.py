@@ -547,13 +547,19 @@ def attach_galaxy_fragments(out: pd.DataFrame) -> pd.DataFrame:
 # Radius: the Legacy Surveys BRIGHT-star mask, half the radius-magnitude locus
 # R(G) = 1630" x 1.396^-G of legacypipe (mask_radius_for_mag; LS DR9/DR10
 # bitmask documentation: MEDIUM = R, BRIGHT = R/2), applied to Gaia stars
-# brighter than the MEDIUM-mask limit G = 16.  Only rows seen by a single
-# survey qualify: a real neighbour in the halo is also measured by the deeper
-# Legacy Surveys or by Gaia.  That premise needs Legacy Surveys imaging: where
+# brighter than the MEDIUM-mask limit G = 16.  Only rows seen by none of
+# Gaia and the Legacy Surveys qualify: a real neighbour in the halo is also
+# measured by the deeper Legacy Surveys or by Gaia.  That premise needs Legacy Surveys imaging: where
 # a star has no LS source within LS_COVER_ARCSEC (Kepler field, M31 area,
 # Galactic plane), a PS1-only row is often a real faint star, so only the
 # inner quarter of the locus, where the measured excess was >= 4-9 times the
 # background (>= 75-90 % artefacts), is used.
+# 2.45.0: rows seen by several of the shallow surveys qualify too.  PS1 and
+# SDSS both saturate on the same star and split the same spike, so the
+# premise is the absence of Gaia and Legacy Surveys, not the number of
+# shallow catalogues.  In the 2.44.0 independent fields all 206 truth objects
+# without their own Gaia source inside this radius of a G < 14 star were the
+# star; 21 multi-survey rows among them had been left UNKNOWN.
 HALO_G_MAX = 16.0
 HALO_MIN_ARCSEC = 2.0
 HALO_CATALOGS = {PS1, "AllWISE", "GALEX AIS", SDSS, "2MASS PSC"}
@@ -567,7 +573,7 @@ def halo_radius_arcsec(g, ls_imaging=True):
 
 
 def attach_bright_star_artifacts(out: pd.DataFrame) -> pd.DataFrame:
-    """Group single-survey rows in the halo of a bright Gaia star under the star."""
+    """Group rows seen only by shallow surveys in the halo of a bright Gaia star under the star."""
     need = {"catalogs", "ra", "dec", "primary_class", "gaia_dr3__phot_g_mean_mag"}
     if out.empty or not need <= set(out.columns):
         return out
@@ -582,7 +588,7 @@ def attach_bright_star_artifacts(out: pd.DataFrame) -> pd.DataFrame:
     g = pd.to_numeric(out.gaia_dr3__phot_g_mean_mag, errors="coerce")
     stars = out.index[top & out.primary_class.eq("STAR") & g.lt(HALO_G_MAX)]
     cats = out.catalogs.astype(str).map(lambda s: frozenset(c for c in s.split("|") if c) - LITERATURE)
-    cand = out.index[top & cats.map(lambda c: len(c) == 1 and c <= HALO_CATALOGS)]
+    cand = out.index[top & cats.map(lambda c: bool(c) and c <= HALO_CATALOGS)]
     if not len(stars) or not len(cand):
         return out
     s_ra, s_dec = out.loc[stars, "ra"].to_numpy(float), out.loc[stars, "dec"].to_numpy(float)
@@ -607,7 +613,7 @@ def attach_bright_star_artifacts(out: pd.DataFrame) -> pd.DataFrame:
         if "unknown_reason" in out:
             name = out.at[h, "designation"] if "designation" in out else out.at[h, "object_id"]
             out.at[i, "unknown_reason"] = (
-                f"{next(iter(cats[i]))} row {d[k]:.1f}\" from the bright star {name} (G {g[h]:.1f}): "
+                f"{'/'.join(sorted(cats[i]))} row {d[k]:.1f}\" from the bright star {name} (G {g[h]:.1f}): "
                 "a saturation/halo artefact or the star's own unmatched measurement (grouped under it)"
             )
     counts = out.parent_object_id.dropna().value_counts()
