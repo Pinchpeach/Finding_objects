@@ -3,7 +3,7 @@
 대상: 독립 영역 blind 검증(정답 24,663개, 2.45.0 정확도 99.294 %)에서 남은 오류 174개.
 
 - 문헌 원문 확인: arXiv PDF 원문에서 해당 문장을 찾아 확인했다(`.github/scripts/literature_excerpts.py`, GitHub Actions run 42214842433).
-- 인용 수: OpenAlex `cited_by_count`(DOI 기준, run 42216112308)를 썼고, Semantic Scholar는 요청 제한으로 대부분 실패했다. 인용 수는 2026-11 시점 값이다.
+- 인용 수: OpenAlex `cited_by_count`(DOI 기준, run 42216112308)를 썼고, Semantic Scholar는 요청 제한으로 대부분 실패했다. 인용 수는 2026-11 시점 값이다. \*Wilson & Naylor 2018의 OpenAlex 값(3)은 DOI 연결 문제로 보이며 실제보다 적다(연구 분야가 좁은 방법 논문). 인용 수가 적은 문헌(< 50)은 방법의 근거로만 쓰고 수치 기준으로는 쓰지 않았다.
 - 측정: Stage 5를 저장된 영역 근거에 다시 돌리는 재현(replay) 방식이다. 바뀐 행만 2.45.0 답 대신 새 답으로 바꿔 같은 채점 코드로 비교했다.
 
 ## 1. 오류 유형별 원천 근거
@@ -14,15 +14,15 @@
 
 | 문헌 | 인용 | 원문에서 확인한 내용 | 우리에게 주는 방법 |
 |---|---|---|---|
-| Henrion et al. 2011, MNRAS 412, 2286 | {C_HENRION} | "prior knowledge about the star and galaxy populations"; 형태 통계와 함께 기준 밴드의 **유형별 수 세기 dN_t/dm**을 사전확률로 쓴다; UKIDSS 불일치율 0.022(파이프라인 0.044), 검출 한계 근처 0.068(0.075) | 등급·은위별 경험적 사전확률(M1) |
-| Fadely, Hogg & Willman 2012, ApJ 760, 15 | {C_FADELY} | 계층 베이즈 템플릿 적합이 ML보다 낫고 "∼80 % completeness, purity ∼60–90 %"; 완벽한 알고리즘은 없음 | 사전확률을 자료에서 배우는 것이 핵심 |
-| Soumagnac et al. 2015, MNRAS 450, 666 | {C_SOUMAGNAC} | i > 23에서 다변수(ANN)가 형태 분류기보다 별 순도 최대 20 %, 은하 12 % 개선 | 형태 + 색 결합(우리는 이미 GBM으로 결합) |
-| Sevilla-Noarbe et al. 2018, MNRAS 481, 5451 | {C_SEVILLA18} | 다중 시기와 **적외선** 외부 자료로 오염을 O(1 %)로 줄일 수 있음 | IR(WISE) 색 활용(2.44.0에서 이미 반영) |
-| DES Y3 Gold, Sevilla-Noarbe et al. 2021, ApJS 254, 24 | {C_SEVILLA21} | 은하 선택 효율 > 98 %, 순도 > 99 %(19 < i < 22.5) | 깊은 영상(DES 깊이)이 있어야 가능한 수준 |
-| Baldry et al. 2010 (GAMA), MNRAS 404, 86 | {C_BALDRY} | Δsg = r_psf − r_model과 J−K 색 분리 Δsg,jk > 0.2 결합 | J−K: 우리 영역은 2MASS 깊이가 r ≈ 21 은하에 못 미침 |
-| Kim, Brunner & Carrasco Kind 2015, MNRAS 453, 507 | {C_KIM} | 여러 분류기의 베이즈 결합이 개별 방법보다 낫다 | 우리 하이브리드 융합과 같은 방향 |
-| Jurić et al. 2008, ApJ 673, 864 | {C_JURIC} | 원반 척도 높이 300/900 pc, 헤일로 ρ ∝ r^−2.8, c/a = 0.64 | 은위에 따른 별 밀도(사전확률의 은위 의존 근거) |
-| Yasuda et al. 2001, AJ 122, 1104 | {C_YASUDA} | 은하 수 세기 N ∝ 10^0.6m(r < 16), 12 ≤ r ≤ 21 | 어두울수록 은하 비율이 급증(사전확률의 등급 의존 근거) |
+| Henrion et al. 2011, MNRAS 412, 2286 | 29 | "prior knowledge about the star and galaxy populations"; 형태 통계와 함께 기준 밴드의 **유형별 수 세기 dN_t/dm**을 사전확률로 쓴다; UKIDSS 불일치율 0.022(파이프라인 0.044), 검출 한계 근처 0.068(0.075) | 등급·은위별 경험적 사전확률(M1) |
+| Fadely, Hogg & Willman 2012, ApJ 760, 15 | 81 | 계층 베이즈 템플릿 적합이 ML보다 낫고 "∼80 % completeness, purity ∼60–90 %"; 완벽한 알고리즘은 없음 | 사전확률을 자료에서 배우는 것이 핵심 |
+| Soumagnac et al. 2015, MNRAS 450, 666 | 72 | i > 23에서 다변수(ANN)가 형태 분류기보다 별 순도 최대 20 %, 은하 12 % 개선 | 형태 + 색 결합(우리는 이미 GBM으로 결합) |
+| Sevilla-Noarbe et al. 2018, MNRAS 481, 5451 | 36 | 다중 시기와 **적외선** 외부 자료로 오염을 O(1 %)로 줄일 수 있음 | IR(WISE) 색 활용(2.44.0에서 이미 반영) |
+| DES Y3 Gold, Sevilla-Noarbe et al. 2021, ApJS 254, 24 | 194 | 은하 선택 효율 > 98 %, 순도 > 99 %(19 < i < 22.5) | 깊은 영상(DES 깊이)이 있어야 가능한 수준 |
+| Baldry et al. 2010 (GAMA), MNRAS 404, 86 | 266 | Δsg = r_psf − r_model과 J−K 색 분리 Δsg,jk > 0.2 결합 | J−K: 우리 영역은 2MASS 깊이가 r ≈ 21 은하에 못 미침 |
+| Kim, Brunner & Carrasco Kind 2015, MNRAS 453, 507 | 51 | 여러 분류기의 베이즈 결합이 개별 방법보다 낫다 | 우리 하이브리드 융합과 같은 방향 |
+| Jurić et al. 2008, ApJ 673, 864 | 1318 | 원반 척도 높이 300/900 pc, 헤일로 ρ ∝ r^−2.8, c/a = 0.64 | 은위에 따른 별 밀도(사전확률의 은위 의존 근거) |
+| Yasuda et al. 2001, AJ 122, 1104 | 261 | 은하 수 세기 N ∝ 10^0.6m(r < 16), 12 ≤ r ≤ 21 | 어두울수록 은하 비율이 급증(사전확률의 등급 의존 근거) |
 
 **원천 근거 요약:** 어두운 쪽 별/은하 분리의 한계는 **영상 해상도와 깊이**에서 온다. 문헌이 제시하는 표준 해법은 세 가지다.
 1. 사전확률: 등급·은위에 따라 별과 은하의 수가 다르다(Henrion; Jurić; Yasuda).
@@ -37,13 +37,13 @@
 
 | 문헌 | 인용 | 원문에서 확인한 내용 | 의미 |
 |---|---|---|---|
-| Schneider et al. 2010 (SDSS DR7Q), AJ 139, 2360 | {C_SCHNEIDER} | (PDF 텍스트 추출 실패. 정의 M_i < −22.0과 넓은 선 FWHM > 1000 km/s는 카탈로그 문서 기준) | "QSO"는 **광도 기준**: 밝은 핵. 같은 AGN이라도 어두우면 GALAXY |
-| Bolton et al. 2012 (BOSS 분광 분류), AJ 144, 144 | {C_BOLTON} | GALAXY/QSO에 하위분류 BROADLINE(선폭 > 200 km/s, 5σ) | SDSS는 AGN 은하를 **GALAXY + AGN 하위분류**로 둔다(정답 정의의 원천) |
-| Lyke et al. 2020 (DR16Q), ApJS 250, 8 | {C_LYKE} | 99.8 % 완전, 오염 0.3–1.3 % | 분광 QSO 목록 자체는 깨끗함 → 혼동은 정의 경계에서 생김 |
-| Stern et al. 2012, ApJ 753, 30 | {C_STERN} | W1−W2 ≥ 0.8(W2 < 15)이면 AGN; 형 1·형 2 모두 잡음 | 우리 WISE AGN 근거는 **AGN**을 잡지 **QSO**를 잡는 것이 아님 |
-| Assef et al. 2018 (WISE AGN Catalog), ApJS 234, 23 | {C_ASSEF} | R90: (α, β, γ) = (0.650, 0.153, 13.86) | 같은 문제: 숙주 은하가 보이는 AGN 포함 |
-| Hickox & Alexander 2018, ARA&A 56, 625 | {C_HICKOX} | 가려진 AGN에서는 숙주 은하 빛이 지배 | IR AGN 선택은 은하처럼 보이는 AGN을 다수 포함 |
-| Chaussidon et al. 2023 (DESI QSO TS), ApJ 944, 107 | {C_CHAUSSIDON} | QSO는 "point-like morphology"; RF 선택 16.5 < r < 23 | DESI QSO 표적은 점광원 위주(확장형 QSO는 드묾) |
+| Schneider et al. 2010 (SDSS DR7Q), AJ 139, 2360 | 937 | (PDF 텍스트 추출 실패. 정의 M_i < −22.0과 넓은 선 FWHM > 1000 km/s는 카탈로그 문서 기준) | "QSO"는 **광도 기준**: 밝은 핵. 같은 AGN이라도 어두우면 GALAXY |
+| Bolton et al. 2012 (BOSS 분광 분류), AJ 144, 144 | 644 | GALAXY/QSO에 하위분류 BROADLINE(선폭 > 200 km/s, 5σ) | SDSS는 AGN 은하를 **GALAXY + AGN 하위분류**로 둔다(정답 정의의 원천) |
+| Lyke et al. 2020 (DR16Q), ApJS 250, 8 | 561 | 99.8 % 완전, 오염 0.3–1.3 % | 분광 QSO 목록 자체는 깨끗함 → 혼동은 정의 경계에서 생김 |
+| Stern et al. 2012, ApJ 753, 30 | 875 | W1−W2 ≥ 0.8(W2 < 15)이면 AGN; 형 1·형 2 모두 잡음 | 우리 WISE AGN 근거는 **AGN**을 잡지 **QSO**를 잡는 것이 아님 |
+| Assef et al. 2018 (WISE AGN Catalog), ApJS 234, 23 | 255 | R90: (α, β, γ) = (0.650, 0.153, 13.86) | 같은 문제: 숙주 은하가 보이는 AGN 포함 |
+| Hickox & Alexander 2018, ARA&A 56, 625 | 487 | 가려진 AGN에서는 숙주 은하 빛이 지배 | IR AGN 선택은 은하처럼 보이는 AGN을 다수 포함 |
+| Chaussidon et al. 2023 (DESI QSO TS), ApJ 944, 107 | 213 | QSO는 "point-like morphology"; RF 선택 16.5 < r < 23 | DESI QSO 표적은 점광원 위주(확장형 QSO는 드묾) |
 
 **원천 근거 요약:** 혼동의 근본 원인은 **분류 정의의 차이**다. 분광 목록(SDSS/DESI)은 "핵이 숙주보다 밝고 넓은 선이 있다"는 기준으로 QSO를 정한다. 그 밖의 AGN은 GALAXY(+AGN 하위분류)다. 우리 WISE·X선 AGN 근거는 AGN 존재를 말해 줄 뿐 QSO 기준(핵 광도 우세)을 판단하지 못한다.
 
@@ -51,13 +51,13 @@
 
 | 문헌 | 인용 | 원문에서 확인한 내용 | 의미 |
 |---|---|---|---|
-| Budavári & Szalay 2008, ApJ 679, 301 | {C_BUDAVARI} | 위치 오차로 계산한 베이즈 인자로 다중 목록 교차 일치 | 우리 Stage 1 연관의 기반 |
-| Naylor, Broos & Feigelson 2013, ApJS 209, 30 | {C_NAYLOR} | 밝기 분포를 함께 쓰면 붐비는 영역에서 최근접 일치의 **10–20 %**가 장(field) 별로 바뀜 | 붐비는 곳에서는 밝기 정보가 필요 |
-| Wilson & Naylor 2018, MNRAS 473, 5570 | {C_WILSON} | 밝기 정보를 넣으면 베이즈 인자가 약 10배 개선; 오염원이 위치를 흔드는 효과 고려 | 밝기 일관성 검사(M3) |
-| Salvato et al. 2018 (Nway), MNRAS 473, 4937 | {C_SALVATO} | 색·밝기 사전확률로 신뢰도 94.7 %(2RXS), 97.4 %(XMMSL2) | 같은 방향 |
-| Pineau et al. 2017, A&A 597, A89 | {C_PINEAU} | χ 검정(2(n−1) 자유도)으로 n개 목록 후보 선택, 천체측정과 측광 가능도는 따로 계산해 합침 | 같은 방향 |
-| Ruiz-Macias et al. 2021 (DESI BGS), MNRAS 502, 4328 | {C_RUIZ} | FRACMASKED·FRACFLUX·FRACIN 품질 컷 | LS 혼합 지표 FRACFLUX 사용 근거 |
-| Sanchez et al. 2021, JCAP 07, 043 | {C_SANCHEZ} | LSST 깊이에서 은하의 약 62 %가 화소 빛의 1 % 이상을 이웃과 공유 | 혼합은 깊이가 깊어질수록 흔해짐 |
+| Budavári & Szalay 2008, ApJ 679, 301 | 139 | 위치 오차로 계산한 베이즈 인자로 다중 목록 교차 일치 | 우리 Stage 1 연관의 기반 |
+| Naylor, Broos & Feigelson 2013, ApJS 209, 30 | 41 | 밝기 분포를 함께 쓰면 붐비는 영역에서 최근접 일치의 **10–20 %**가 장(field) 별로 바뀜 | 붐비는 곳에서는 밝기 정보가 필요 |
+| Wilson & Naylor 2018, MNRAS 473, 5570 | 3* | 밝기 정보를 넣으면 베이즈 인자가 약 10배 개선; 오염원이 위치를 흔드는 효과 고려 | 밝기 일관성 검사(M3) |
+| Salvato et al. 2018 (Nway), MNRAS 473, 4937 | 185 | 색·밝기 사전확률로 신뢰도 94.7 %(2RXS), 97.4 %(XMMSL2) | 같은 방향 |
+| Pineau et al. 2017, A&A 597, A89 | 71 | χ 검정(2(n−1) 자유도)으로 n개 목록 후보 선택, 천체측정과 측광 가능도는 따로 계산해 합침 | 같은 방향 |
+| Ruiz-Macias et al. 2021 (DESI BGS), MNRAS 502, 4328 | 28 | FRACMASKED·FRACFLUX·FRACIN 품질 컷 | LS 혼합 지표 FRACFLUX 사용 근거 |
+| Sanchez et al. 2021, JCAP 07, 043 | 22 | LSST 깊이에서 은하의 약 62 %가 화소 빛의 1 % 이상을 이웃과 공유 | 혼합은 깊이가 깊어질수록 흔해짐 |
 
 ## 2. 문헌 방법 적용과 개선 폭
 
@@ -95,7 +95,7 @@
 
 ## 3. 결론과 권고
 
-1. **M1만 채택할 가치가 있다** (+4 / −0, 99.294 → 99.311 %).
+1. **M1만 채택할 가치가 있다** (+4 / −0, 99.294 → 99.311 %). 방법 논문(Henrion 2011)은 인용 29회로 적지만, 사전확률의 근거인 별 밀도(Jurić 2008, 1318회)와 은하 수 세기(Yasuda 2001, 261회)는 널리 인용된다.
    - 적용 범위는 r ≥ 20, STAR와 GALAXY 두 유형으로 제한한다.
    - 사전확률표는 정답이 아니라 우리 분류 결과로 만든다. 정답 누설은 없다.
    - 그래도 같은 영역에서 만들고 평가했으므로, 실제 적용 시에는 벤치마크 밖 자료로 만든 표를 쓰는 것이 바람직하다.
