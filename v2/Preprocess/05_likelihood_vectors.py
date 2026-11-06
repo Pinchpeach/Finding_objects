@@ -346,6 +346,16 @@ def _spectroscopic(items):
     return any(str(e.get("rule_id", "")).startswith("SPC-") and float(e.get("raw_score", 0) or 0) >= 0.5 for e in items)
 
 
+def _atlas_galaxy(items):
+    """The object is itself a Siena Galaxy Atlas 2020 galaxy (SGA-001).  The
+    atlas fits overlapping large galaxies together as groups (Moustakas et al.
+    2023, ApJS 269, 3, sec. 3), so an atlas galaxy inside a neighbour's D26
+    ellipse is a pair or group member, not a piece of that neighbour (2.45.0:
+    in the 2.44.0 independent fields 19 of 801 atlas rows were left UNKNOWN
+    this way, and the 11 truth objects grouped under them with them)."""
+    return any(e.get("rule_id") == "SGA-001" and e.get("class") == "GALAXY" for e in items)
+
+
 def estimate_field_prior(P, train_prior, iters=200, tol=1e-7):
     """EM re-estimation of class priors under label shift.
 
@@ -534,7 +544,9 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
             if c in CLASSES and s >= 0.8 and not str(e.get("rule_id", "")).endswith(("-CKNN-001", "-GBM-001")):
                 strong.add(c)
         conflict = bool(items) and len(strong) > 1
-        in_host = hr < HOST_RADIUS and not _gaia_foreground_star(items) and not _spectroscopic(items)
+        in_host = (
+            hr < HOST_RADIUS and not _gaia_foreground_star(items) and not _spectroscopic(items) and not _atlas_galaxy(items)
+        )
         rows.append((np.array([p[c] for c in CLASSES]), used, conflict and "STAR" in strong, conflict, in_host, _decisive_motion(items)))
     P = np.array([r[0] for r in rows]).reshape(len(rows), len(CLASSES))
     # Field-prior adjustment needs calibrated posteriors (fitted model) and
