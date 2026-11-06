@@ -42,7 +42,18 @@ def meta(aid):
     doi = e.findtext("x:doi", "", ns) or "-"
     year = (e.findtext("a:published", "", ns) or "")[:4]
     au = ", ".join(authors[:3]) + (" et al." if len(authors) > 3 else "")
-    return f"{au} ({year}) {title} | journal_ref: {jref} | doi: {doi}"
+    return f"{au} ({year}) {title} | journal_ref: {jref} | doi: {doi} | citations: {citations(aid)}"
+
+
+def citations(aid):
+    """Semantic Scholar citation count (graph API, by arXiv id), or '?'."""
+    try:
+        time.sleep(random.uniform(3, 5))
+        url = f"https://api.semanticscholar.org/graph/v1/paper/arXiv:{aid}?fields=citationCount"
+        with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=60) as r:
+            return json.loads(r.read()).get("citationCount", "?")
+    except Exception as exc:
+        return f"? ({type(exc).__name__})"
 
 
 def main():

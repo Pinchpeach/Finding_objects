@@ -1,0 +1,109 @@
+{
+ "1011.5770": [
+  "prior",
+  "0\\.022|0\\.044|mismatch|misclassif",
+  "magnitude bin|number count"
+ ],
+ "1206.4306": [
+  "hierarchical",
+  "80 ?%|complete|purity",
+  "SVM|support vector"
+ ],
+ "1805.02427": [
+  "infrared|VHS|near-IR",
+  "contamination",
+  "1 ?%|purity"
+ ],
+ "2011.03407": [
+  "EXTENDED_CLASS",
+  "purity|efficiency",
+  "98|99"
+ ],
+ "0910.5120": [
+  "Δ ?sg|sg,jk|J ?[−-] ?K",
+  "0\\.2",
+  "g ?[−-] ?i"
+ ],
+ "1505.02200": [
+  "combination|BMC|Bayesian model",
+  "purity|completeness"
+ ],
+ "1306.5236": [
+  "purity",
+  "neural|PCA",
+  "23"
+ ],
+ "astro-ph/0510520": [
+  "scale height|300|900",
+  "halo",
+  "0\\.64|2\\.8"
+ ],
+ "astro-ph/0105545": [
+  "counts?|log ?N",
+  "r\\*? ?[<=]|magnitude"
+ ],
+ "1004.1167": [
+  "M_?i ?< ?[−-] ?22|−22\\.0|-22\\.0",
+  "1000 ?km"
+ ],
+ "1207.7326": [
+  "AGN|BROADLINE",
+  "GALAXY",
+  "200 ?km"
+ ],
+ "2007.09001": [
+  "M_?i|absolute magnitude|luminosity",
+  "contamination|complete"
+ ],
+ "1205.0811": [
+  "W1 ?[−-] ?W2 ?≥? ?0\\.8|0\\.8",
+  "15\\.0|W2 ?<",
+  "host|galaxy"
+ ],
+ "1706.09901": [
+  "0\\.65|0\\.153|13\\.86",
+  "0\\.71|C75",
+  "R90"
+ ],
+ "1806.04680": [
+  "dilution|host",
+  "complete|selection"
+ ],
+ "2208.08511": [
+  "PSF|morpholog",
+  "extended|REX",
+  "random forest"
+ ],
+ "0707.1611": [
+  "Bayes factor|B ?=",
+  "ψ|psi|separation"
+ ],
+ "1309.4491": [
+  "magnitude",
+  "nearest|reassign|10 ?%|20 ?%",
+  "likelihood"
+ ],
+ "1710.04896": [
+  "photometr|magnitude",
+  "symmetric|counterpart",
+  "contamin"
+ ],
+ "1705.10711": [
+  "prior",
+  "magnitude|colou?r",
+  "reliab|94|97"
+ ],
+ "1609.00818": [
+  "χ ?2|chi.?2|degrees of freedom",
+  "Bayes|probabilit"
+ ],
+ "2007.14950": [
+  "G ?[−-] ?r|0\\.6",
+  "FRACFLUX|fracflux|fracin|fracmasked",
+  "5|0\\.4|0\\.3"
+ ],
+ "2103.02078": [
+  "blend",
+  "%|per ?cent|fraction"
+ ]
+}
