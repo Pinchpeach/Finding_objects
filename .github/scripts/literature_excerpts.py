@@ -42,7 +42,8 @@ def meta(aid):
     doi = e.findtext("x:doi", "", ns) or "-"
     year = (e.findtext("a:published", "", ns) or "")[:4]
     au = ", ".join(authors[:3]) + (" et al." if len(authors) > 3 else "")
-    return f"{au} ({year}) {title} | journal_ref: {jref} | doi: {doi} | citations: {citations(aid)}"
+    return (f"{au} ({year}) {title} | journal_ref: {jref} | doi: {doi} | "
+            f"citations: S2 {citations(aid)}, OpenAlex {openalex(doi)}")
 
 
 def citations(aid):
@@ -56,12 +57,27 @@ def citations(aid):
         return f"? ({type(exc).__name__})"
 
 
+def openalex(doi):
+    """OpenAlex cited_by_count for the journal DOI (fallback when S2 rate-limits), or '?'."""
+    if not doi or doi == "-":
+        return "?"
+    try:
+        time.sleep(1)
+        url = f"https://api.openalex.org/works/doi:{doi}?select=cited_by_count"
+        with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=60) as r:
+            return json.loads(r.read()).get("cited_by_count", "?")
+    except Exception as exc:
+        return f"? ({type(exc).__name__})"
+
+
 def main():
     spec = json.loads(Path(sys.argv[1]).read_text())
     for aid, pats in spec.items():
         print(f"\n######## arXiv:{aid}")
         try:
             print("META:", meta(aid))
+            if not pats:  # citation lookup only
+                continue
             pdf = get(f"https://export.arxiv.org/pdf/{aid}")
         except Exception as exc:  # keep going: one failure must not hide the others
             print("FETCH FAILED:", exc)
