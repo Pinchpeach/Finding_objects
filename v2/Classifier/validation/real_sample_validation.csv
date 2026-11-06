@@ -1,7 +1,7 @@
 name,truth_axis,truth_class,resolved_name,ra,dec,truth_otype,truth_sp,nearest_sep_arcsec,primary_class,blind_class,blind_status,error_traceback,blind_match,catalog_assisted_class,catalog_assisted_match,science_json,collector_json,candidate_json
-GD 71,physical,WD,,,,,,,,ERROR,NameResolveError('All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: \n https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?GD%2071: timed out\nhttp://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?GD%2071: Request took longer than the allowed 10.0 seconds'),"stedtoolcache/Python/3.11.17/x64/lib/python3.11/concurrent/futures/_base.py"", line 401, in __get_result
+GD 71,physical,WD,,,,,,,,ERROR,NameResolveError('All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: \n https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?GD%2071: timed out\nhttp://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?GD%2071: Request took longer than the allowed 10.0 seconds'),"stedtoolcache/Python/3.11.18/x64/lib/python3.11/concurrent/futures/_base.py"", line 401, in __get_result
     raise self._exception
-  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/concurrent/futures/thread.py"", line 58, in run
+  File ""/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/concurrent/futures/thread.py"", line 58, in run
     result = self.fn(*self.args, **self.kwargs)
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/validate_real_samples.py"", line 298, in validate_one
@@ -10,19 +10,18 @@ GD 71,physical,WD,,,,,,,,ERROR,NameResolveError('All Sesame queries failed. Unab
   File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/validate_real_samples.py"", line 83, in resolve
     c = SkyCoord.from_name(name)
         ^^^^^^^^^^^^^^^^^^^^^^^^
-  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/astropy/coordinates/sky_coordinate.py"", line 1864, in from_name
+  File ""/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/astropy/coordinates/sky_coordinate.py"", line 1864, in from_name
     icrs_coord = get_icrs_coordinates(name, parse, cache=cache)
                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/astropy/coordinates/name_resolve.py"", line 196, in get_icrs_coordinates
+  File ""/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/astropy/coordinates/name_resolve.py"", line 196, in get_icrs_coordinates
     raise NameResolveError(
 astropy.coordinates.name_resolve.NameResolveError: All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: 
  https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?GD%2071: timed out
 http://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?GD%2071: Request took longer than the allowed 10.0 seconds
 ",False,ERROR,False,{},[],[]
-RR Lyr,variability,RR_LYRAE,,,,,,,,ERROR,NameResolveError('All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: \n https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?RR%20Lyr: timed out\nhttp://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?RR%20Lyr: Bad Gateway')," ^^^^^^^^^^^^^^^^^^^
-  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/concurrent/futures/_base.py"", line 401, in __get_result
+RR Lyr,variability,RR_LYRAE,,,,,,,,ERROR,NameResolveError('All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: \n https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?RR%20Lyr: timed out\nhttp://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?RR%20Lyr: Request took longer than the allowed 10.0 seconds'),"edtoolcache/Python/3.11.18/x64/lib/python3.11/concurrent/futures/_base.py"", line 401, in __get_result
     raise self._exception
-  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/concurrent/futures/thread.py"", line 58, in run
+  File ""/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/concurrent/futures/thread.py"", line 58, in run
     result = self.fn(*self.args, **self.kwargs)
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/validate_real_samples.py"", line 298, in validate_one
@@ -31,18 +30,18 @@ RR Lyr,variability,RR_LYRAE,,,,,,,,ERROR,NameResolveError('All Sesame queries fa
   File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/validate_real_samples.py"", line 83, in resolve
     c = SkyCoord.from_name(name)
         ^^^^^^^^^^^^^^^^^^^^^^^^
-  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/astropy/coordinates/sky_coordinate.py"", line 1864, in from_name
+  File ""/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/astropy/coordinates/sky_coordinate.py"", line 1864, in from_name
     icrs_coord = get_icrs_coordinates(name, parse, cache=cache)
                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/astropy/coordinates/name_resolve.py"", line 196, in get_icrs_coordinates
+  File ""/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/astropy/coordinates/name_resolve.py"", line 196, in get_icrs_coordinates
     raise NameResolveError(
 astropy.coordinates.name_resolve.NameResolveError: All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: 
  https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?RR%20Lyr: timed out
-http://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?RR%20Lyr: Bad Gateway
+http://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?RR%20Lyr: Request took longer than the allowed 10.0 seconds
 ",False,ERROR,False,{},[],[]
-delta Cep,variability,CEPHEID,,,,,,,,ERROR,NameResolveError('All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: \n https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?delta%20Cep: timed out\nhttp://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?delta%20Cep: Request took longer than the allowed 10.0 seconds'),"cache/Python/3.11.17/x64/lib/python3.11/concurrent/futures/_base.py"", line 401, in __get_result
+delta Cep,variability,CEPHEID,,,,,,,,ERROR,NameResolveError('All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: \n https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?delta%20Cep: timed out\nhttp://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?delta%20Cep: Request took longer than the allowed 10.0 seconds'),"cache/Python/3.11.18/x64/lib/python3.11/concurrent/futures/_base.py"", line 401, in __get_result
     raise self._exception
-  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/concurrent/futures/thread.py"", line 58, in run
+  File ""/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/concurrent/futures/thread.py"", line 58, in run
     result = self.fn(*self.args, **self.kwargs)
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/validate_real_samples.py"", line 298, in validate_one
@@ -51,18 +50,18 @@ delta Cep,variability,CEPHEID,,,,,,,,ERROR,NameResolveError('All Sesame queries 
   File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/validate_real_samples.py"", line 83, in resolve
     c = SkyCoord.from_name(name)
         ^^^^^^^^^^^^^^^^^^^^^^^^
-  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/astropy/coordinates/sky_coordinate.py"", line 1864, in from_name
+  File ""/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/astropy/coordinates/sky_coordinate.py"", line 1864, in from_name
     icrs_coord = get_icrs_coordinates(name, parse, cache=cache)
                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/astropy/coordinates/name_resolve.py"", line 196, in get_icrs_coordinates
+  File ""/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/astropy/coordinates/name_resolve.py"", line 196, in get_icrs_coordinates
     raise NameResolveError(
 astropy.coordinates.name_resolve.NameResolveError: All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: 
  https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?delta%20Cep: timed out
 http://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?delta%20Cep: Request took longer than the allowed 10.0 seconds
 ",False,ERROR,False,{},[],[]
-Mira,physical,AGB,,,,,,,,ERROR,NameResolveError('All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: \n https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?Mira: timed out\nhttp://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?Mira: Request took longer than the allowed 10.0 seconds'),"opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/concurrent/futures/_base.py"", line 401, in __get_result
+Mira,physical,AGB,,,,,,,,ERROR,NameResolveError('All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: \n https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?Mira: timed out\nhttp://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?Mira: Request took longer than the allowed 10.0 seconds'),"opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/concurrent/futures/_base.py"", line 401, in __get_result
     raise self._exception
-  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/concurrent/futures/thread.py"", line 58, in run
+  File ""/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/concurrent/futures/thread.py"", line 58, in run
     result = self.fn(*self.args, **self.kwargs)
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/validate_real_samples.py"", line 298, in validate_one
@@ -71,18 +70,18 @@ Mira,physical,AGB,,,,,,,,ERROR,NameResolveError('All Sesame queries failed. Unab
   File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/validate_real_samples.py"", line 83, in resolve
     c = SkyCoord.from_name(name)
         ^^^^^^^^^^^^^^^^^^^^^^^^
-  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/astropy/coordinates/sky_coordinate.py"", line 1864, in from_name
+  File ""/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/astropy/coordinates/sky_coordinate.py"", line 1864, in from_name
     icrs_coord = get_icrs_coordinates(name, parse, cache=cache)
                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/astropy/coordinates/name_resolve.py"", line 196, in get_icrs_coordinates
+  File ""/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/astropy/coordinates/name_resolve.py"", line 196, in get_icrs_coordinates
     raise NameResolveError(
 astropy.coordinates.name_resolve.NameResolveError: All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: 
  https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?Mira: timed out
 http://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?Mira: Request took longer than the allowed 10.0 seconds
 ",False,ERROR,False,{},[],[]
-PSR B0531+21,compact,PULSAR,,,,,,,,ERROR,NameResolveError('All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: \n https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?PSR%20B0531%2B21: timed out\nhttp://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?PSR%20B0531%2B21: Request took longer than the allowed 10.0 seconds'),"on/3.11.17/x64/lib/python3.11/concurrent/futures/_base.py"", line 401, in __get_result
+PSR B0531+21,compact,PULSAR,,,,,,,,ERROR,NameResolveError('All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: \n https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?PSR%20B0531%2B21: timed out\nhttp://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?PSR%20B0531%2B21: Request took longer than the allowed 10.0 seconds'),"on/3.11.18/x64/lib/python3.11/concurrent/futures/_base.py"", line 401, in __get_result
     raise self._exception
-  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/concurrent/futures/thread.py"", line 58, in run
+  File ""/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/concurrent/futures/thread.py"", line 58, in run
     result = self.fn(*self.args, **self.kwargs)
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/validate_real_samples.py"", line 298, in validate_one
@@ -91,18 +90,18 @@ PSR B0531+21,compact,PULSAR,,,,,,,,ERROR,NameResolveError('All Sesame queries fa
   File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/validate_real_samples.py"", line 83, in resolve
     c = SkyCoord.from_name(name)
         ^^^^^^^^^^^^^^^^^^^^^^^^
-  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/astropy/coordinates/sky_coordinate.py"", line 1864, in from_name
+  File ""/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/astropy/coordinates/sky_coordinate.py"", line 1864, in from_name
     icrs_coord = get_icrs_coordinates(name, parse, cache=cache)
                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/astropy/coordinates/name_resolve.py"", line 196, in get_icrs_coordinates
+  File ""/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/astropy/coordinates/name_resolve.py"", line 196, in get_icrs_coordinates
     raise NameResolveError(
 astropy.coordinates.name_resolve.NameResolveError: All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: 
  https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?PSR%20B0531%2B21: timed out
 http://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?PSR%20B0531%2B21: Request took longer than the allowed 10.0 seconds
 ",False,ERROR,False,{},[],[]
-M 57,phenomenon,PN,,,,,,,,ERROR,NameResolveError('All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: \n https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?M%2057: timed out\nhttp://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?M%2057: Request took longer than the allowed 10.0 seconds'),"hostedtoolcache/Python/3.11.17/x64/lib/python3.11/concurrent/futures/_base.py"", line 401, in __get_result
+M 57,phenomenon,PN,,,,,,,,ERROR,NameResolveError('All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: \n https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?M%2057: timed out\nhttp://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?M%2057: Request took longer than the allowed 10.0 seconds'),"hostedtoolcache/Python/3.11.18/x64/lib/python3.11/concurrent/futures/_base.py"", line 401, in __get_result
     raise self._exception
-  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/concurrent/futures/thread.py"", line 58, in run
+  File ""/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/concurrent/futures/thread.py"", line 58, in run
     result = self.fn(*self.args, **self.kwargs)
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/validate_real_samples.py"", line 298, in validate_one
@@ -111,18 +110,18 @@ M 57,phenomenon,PN,,,,,,,,ERROR,NameResolveError('All Sesame queries failed. Una
   File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/validate_real_samples.py"", line 83, in resolve
     c = SkyCoord.from_name(name)
         ^^^^^^^^^^^^^^^^^^^^^^^^
-  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/astropy/coordinates/sky_coordinate.py"", line 1864, in from_name
+  File ""/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/astropy/coordinates/sky_coordinate.py"", line 1864, in from_name
     icrs_coord = get_icrs_coordinates(name, parse, cache=cache)
                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/astropy/coordinates/name_resolve.py"", line 196, in get_icrs_coordinates
+  File ""/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/astropy/coordinates/name_resolve.py"", line 196, in get_icrs_coordinates
     raise NameResolveError(
 astropy.coordinates.name_resolve.NameResolveError: All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: 
  https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?M%2057: timed out
 http://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?M%2057: Request took longer than the allowed 10.0 seconds
 ",False,ERROR,False,{},[],[]
-SN 2018fhw,phenomenon,SN,,,,,,,,ERROR,NameResolveError('All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: \n https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?SN%202018fhw: timed out\nhttp://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?SN%202018fhw: Request took longer than the allowed 10.0 seconds'),"che/Python/3.11.17/x64/lib/python3.11/concurrent/futures/_base.py"", line 401, in __get_result
+SN 2018fhw,phenomenon,SN,,,,,,,,ERROR,NameResolveError('All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: \n https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?SN%202018fhw: timed out\nhttp://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?SN%202018fhw: Request took longer than the allowed 10.0 seconds'),"che/Python/3.11.18/x64/lib/python3.11/concurrent/futures/_base.py"", line 401, in __get_result
     raise self._exception
-  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/concurrent/futures/thread.py"", line 58, in run
+  File ""/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/concurrent/futures/thread.py"", line 58, in run
     result = self.fn(*self.args, **self.kwargs)
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/validate_real_samples.py"", line 298, in validate_one
@@ -131,18 +130,18 @@ SN 2018fhw,phenomenon,SN,,,,,,,,ERROR,NameResolveError('All Sesame queries faile
   File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/validate_real_samples.py"", line 83, in resolve
     c = SkyCoord.from_name(name)
         ^^^^^^^^^^^^^^^^^^^^^^^^
-  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/astropy/coordinates/sky_coordinate.py"", line 1864, in from_name
+  File ""/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/astropy/coordinates/sky_coordinate.py"", line 1864, in from_name
     icrs_coord = get_icrs_coordinates(name, parse, cache=cache)
                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/astropy/coordinates/name_resolve.py"", line 196, in get_icrs_coordinates
+  File ""/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/astropy/coordinates/name_resolve.py"", line 196, in get_icrs_coordinates
     raise NameResolveError(
 astropy.coordinates.name_resolve.NameResolveError: All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: 
  https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?SN%202018fhw: timed out
 http://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?SN%202018fhw: Request took longer than the allowed 10.0 seconds
 ",False,ERROR,False,{},[],[]
-SN 2011fe,phenomenon,SN,,,,,,,,ERROR,NameResolveError('All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: \n https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?SN%202011fe: timed out\nhttp://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?SN%202011fe: Request took longer than the allowed 10.0 seconds'),"cache/Python/3.11.17/x64/lib/python3.11/concurrent/futures/_base.py"", line 401, in __get_result
+SN 2011fe,phenomenon,SN,,,,,,,,ERROR,NameResolveError('All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: \n https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?SN%202011fe: timed out\nhttp://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?SN%202011fe: Request took longer than the allowed 10.0 seconds'),"cache/Python/3.11.18/x64/lib/python3.11/concurrent/futures/_base.py"", line 401, in __get_result
     raise self._exception
-  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/concurrent/futures/thread.py"", line 58, in run
+  File ""/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/concurrent/futures/thread.py"", line 58, in run
     result = self.fn(*self.args, **self.kwargs)
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/validate_real_samples.py"", line 298, in validate_one
@@ -151,18 +150,18 @@ SN 2011fe,phenomenon,SN,,,,,,,,ERROR,NameResolveError('All Sesame queries failed
   File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/validate_real_samples.py"", line 83, in resolve
     c = SkyCoord.from_name(name)
         ^^^^^^^^^^^^^^^^^^^^^^^^
-  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/astropy/coordinates/sky_coordinate.py"", line 1864, in from_name
+  File ""/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/astropy/coordinates/sky_coordinate.py"", line 1864, in from_name
     icrs_coord = get_icrs_coordinates(name, parse, cache=cache)
                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/astropy/coordinates/name_resolve.py"", line 196, in get_icrs_coordinates
+  File ""/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/astropy/coordinates/name_resolve.py"", line 196, in get_icrs_coordinates
     raise NameResolveError(
 astropy.coordinates.name_resolve.NameResolveError: All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: 
  https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?SN%202011fe: timed out
 http://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?SN%202011fe: Request took longer than the allowed 10.0 seconds
 ",False,ERROR,False,{},[],[]
-3C 273,extragalactic,AGN,,,,,,,,ERROR,NameResolveError('All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: \n https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?3C%20273: timed out\nhttp://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?3C%20273: Request took longer than the allowed 10.0 seconds'),"edtoolcache/Python/3.11.17/x64/lib/python3.11/concurrent/futures/_base.py"", line 401, in __get_result
+3C 273,extragalactic,AGN,,,,,,,,ERROR,NameResolveError('All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: \n https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?3C%20273: timed out\nhttp://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?3C%20273: Request took longer than the allowed 10.0 seconds'),"edtoolcache/Python/3.11.18/x64/lib/python3.11/concurrent/futures/_base.py"", line 401, in __get_result
     raise self._exception
-  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/concurrent/futures/thread.py"", line 58, in run
+  File ""/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/concurrent/futures/thread.py"", line 58, in run
     result = self.fn(*self.args, **self.kwargs)
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/validate_real_samples.py"", line 298, in validate_one
@@ -171,10 +170,10 @@ http://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?SN%202011fe: Request took l
   File ""/home/runner/work/Finding_objects/Finding_objects/v2/Classifier/validate_real_samples.py"", line 83, in resolve
     c = SkyCoord.from_name(name)
         ^^^^^^^^^^^^^^^^^^^^^^^^
-  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/astropy/coordinates/sky_coordinate.py"", line 1864, in from_name
+  File ""/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/astropy/coordinates/sky_coordinate.py"", line 1864, in from_name
     icrs_coord = get_icrs_coordinates(name, parse, cache=cache)
                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File ""/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/astropy/coordinates/name_resolve.py"", line 196, in get_icrs_coordinates
+  File ""/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/astropy/coordinates/name_resolve.py"", line 196, in get_icrs_coordinates
     raise NameResolveError(
 astropy.coordinates.name_resolve.NameResolveError: All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: 
  https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?3C%20273: timed out
