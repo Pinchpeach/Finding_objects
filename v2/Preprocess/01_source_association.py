@@ -48,6 +48,16 @@ TARGET_IMAGING = "DESI Legacy Surveys DR10"
 # confidence is then the normalised posterior of that candidate among all
 # candidates (Budavari & Szalay 2008, ApJ 679, 301; Pineau et al. 2017,
 # A&A 597, A89), which down-weights their evidence when the choice is unsure.
+# Radio surveys (2.47.0).  An NVSS (45" beam) or TGSS (25") position often
+# holds several optical sources within its error circle, so each radio row
+# was "ambiguous" and became its own object: the NVSS and TGSS rows of one
+# pulsar ended up apart and the 150 MHz - 1.4 GHz spectral index of the
+# pulsar test (Frail et al. 2018) was never measured (reference objects:
+# 0 of 10 pulsars).  Radio catalogues are cross-matched to each other by
+# position, as in the TGSS-NVSS spectral-index work of de Gasperin, Intema
+# & Frail (2018, MNRAS 474, 5008); an ambiguous radio row therefore joins the
+# radio-only object among its candidates when there is exactly one.
+RADIO_CATALOGS = frozenset({"NVSS", "TGSS ADR1", "VLASS", "FIRST", "LoTSS DR2"})
 ANNOTATION_CATALOGS = frozenset(
     {
         "NED",
@@ -331,6 +341,11 @@ def run(raw_dir: Path, out: Path):
         elif det["catalog"] in TARGET_SPECTRA and target_taken:
             candidates = []
         ambiguous = len(candidates) > 1 and candidates[1][0] >= candidates[0][0] * AMBIG_SCORE_RATIO
+        if ambiguous and det["catalog"] in RADIO_CATALOGS:
+            radio = [c for c in candidates if groups[c[2]]["catalogs"] <= RADIO_CATALOGS]
+            if len(radio) == 1:
+                candidates = radio
+                ambiguous = False
         if ambiguous and det["catalog"] in ANNOTATION_CATALOGS:
             total = sum(c[0] for c in candidates)
             best = dict(candidates[0][3])

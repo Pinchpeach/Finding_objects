@@ -63,11 +63,38 @@ GAIA_MAP = {
     "SPB": "PULSATING",
     "ACYG": "PULSATING",
     "SDB": "PULSATING",
-    "RS": "OTHER_VARIABLE",
+    # RS Canum Venaticorum stars are spotted, chromospherically active
+    # binaries whose light varies with rotation (GCVS type RS, a rotating
+    # variable; Gaia DR3 class 16 "RS Canum Venaticorum variable (RS)",
+    # Rimoldini et al. 2023, A&A 674, A14).  Before 2.47.0: OTHER_VARIABLE.
+    "RS": "ROTATIONAL",
     "S": "OTHER_VARIABLE",
     "SYST": "OTHER_VARIABLE",
     "YSO": "YSO",
     "BE|GCAS|SDOR|WR": "OTHER_VARIABLE",
+}
+# Leaf of a Gaia DR3 classifier label (2.47.0).  The Gaia classes are the
+# leaf a user reads (Rimoldini et al. 2023, Sect. 2: "delta Scuti (DSCT) or
+# gamma Doradus (GDOR) or SX Phoenicis (SXPHE) star ... labelled as
+# DSCT|GDOR|SXPHE"; "solar-like star (SOLAR_LIKE), including BY Draconis
+# type (BY), rotating spotted star (ROT)"; "cataclysmic variable (CV)";
+# "RS Canum Venaticorum variable (RS)").  Before 2.47.0 only the family was
+# reported, so a delta Scuti star read "PULSATING" and a CV "ERUPTIVE".
+GAIA_LEAF = {
+    "DSCT|GDOR|SXPHE": "DSCT|GDOR|SXPHE",
+    "SOLAR_LIKE": "BY_DRA|ROT",
+    "RS": "RS_CVN",
+    "CV": "CV",
+    "BCEP": "BCEP",
+    "SPB": "SPB",
+    "ACYG": "ACYG",
+    "SDB": "SDB_PULSATOR",
+    "RCB": "RCB",
+    "ECL": "ECL",
+    "ELL": "ELL",
+    "ACV|CP|MCP|ROAM|ROAP|SXARI": "ACV|CP|ROAP",
+    "BE|GCAS|SDOR|WR": "BE|GCAS|SDOR|WR",
+    "YSO": "YSO",
 }
 # ZTF periodic variables (Chen et al. 2020, ApJS 249, 18): types from period,
 # g/r amplitude and light-curve shape (Fourier R21 / phi21); Mira and SR are
@@ -276,7 +303,7 @@ def classify(row):
     # 63.6 -> 62.4 % exact).  The score stays in the evidence and the label's
     # confidence is the rule precision measured per class (2.15.0).
     if raw in GAIA_MAP:
-        return _result(GAIA_MAP[raw], score, "GAIA_DR3_VARIABLE_CANDIDATE", evidence)
+        return _result(GAIA_MAP[raw], score, "GAIA_DR3_VARIABLE_CANDIDATE", evidence, GAIA_LEAF.get(raw))
     if raw in EVENT_CLASSES:
         return _result("UNKNOWN", None, "ROUTED_TO_PHENOMENON", evidence)
     if raw in NON_STELLAR:

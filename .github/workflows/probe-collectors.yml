@@ -1,0 +1,36 @@
+name: Probe collectors (AllWISE / 2MASS / GALEX)
+
+# Diagnostic: these VizieR collectors returned nothing in every reference-
+# object run (2.46.2).  Runs them directly and through the controller.
+on:
+  push:
+    branches-ignore: [main, validation-data]
+    paths: [".github/workflows/probe-collectors.yml"]
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas numpy scipy requests astropy astroquery pyvo
+      - name: Direct
+        run: |
+          cd v2/Get_data
+          python - <<'PY'
+          import traceback, importlib
+          for name in ("allwise", "twomass", "galex", "nvss"):
+              m = importlib.import_module(name)
+              for r in (0.3, 1.0):
+                  try:
+                      df = m.fetch(296.69275, -25.37747, r)
+                      print(name, r, "rows", len(df), list(df.columns)[:8], flush=True)
+                  except Exception:
+                      print(name, r, "FAILED"); traceback.print_exc()
+          PY
+      - name: Controller (as the pipeline runs it)
+        run: |
+          python -u v2/Get_data/controller.py --ra 296.69275 --dec -25.37747 --radius 0.3 --out-dir /tmp/raw --workers 6 2>&1 | grep -E "^\[(allwise|twomass|galex|nvss)\]|Error|error" | head -40
