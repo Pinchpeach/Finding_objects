@@ -4,6 +4,9 @@ name: Validate on reference objects
 # scored per type (v2/benchmark/validate_reference_objects.py).  Manual.
 on:
   workflow_dispatch:
+    inputs:
+      plan: {description: "plan file", default: "v2/reference_objects/validation/plan.csv"}
+      keep: {description: "1 = upload per-object association tables (probe)", default: "0"}
   push:
     branches-ignore: [main, validation-data]
     paths: ["v2/reference_objects/validation/plan.csv"]
@@ -26,7 +29,10 @@ jobs:
         with: {python-version: "3.11"}
       - run: pip install pandas numpy scipy requests astropy astroquery pyvo
       - name: Run shard
-        run: python -u v2/benchmark/validate_reference_objects.py run --plan v2/reference_objects/validation/plan.csv --shard ${{ matrix.shard }} --out /tmp/refval
+        run: |
+          plan="${{ github.event.inputs.plan || 'v2/reference_objects/validation/plan.csv' }}"
+          extra=""; [ "${{ github.event.inputs.keep }}" = "1" ] && extra="--keep /tmp/refval/keep"
+          python -u v2/benchmark/validate_reference_objects.py run --plan "$plan" --shard ${{ matrix.shard }} --out /tmp/refval $extra
       - uses: actions/upload-artifact@v4
         if: always()
         with:
