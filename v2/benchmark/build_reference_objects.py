@@ -155,12 +155,12 @@ def first_col(df, *cands):
 
 
 def radec(df):
-    ra = first_col(df, "RAJ2000", "_RAJ2000", "RA_ICRS", "RAdeg", "RA", "ra")
-    de = first_col(df, "DEJ2000", "_DEJ2000", "DE_ICRS", "DEdeg", "DEC", "Dec", "dec")
+    ra = first_col(df, "_RAJ2000", "RAJ2000", "RA_ICRS", "RAdeg", "RA", "ra")
+    de = first_col(df, "_DEJ2000", "DEJ2000", "DE_ICRS", "DEdeg", "DEC", "Dec", "dec")
     if ra is None or de is None:
         return pd.Series(np.nan, index=df.index), pd.Series(np.nan, index=df.index)
     r, d = df[ra], df[de]
-    if r.dtype == object:  # sexagesimal
+    if not pd.api.types.is_numeric_dtype(r):  # sexagesimal strings
         from astropy.coordinates import SkyCoord
         import astropy.units as u
 
