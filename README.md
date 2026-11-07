@@ -138,6 +138,8 @@ classified_objects.csv
 
 2.46.0(어두운 천체의 등급·은위별 별:은하 사전확률, Henrion+2011; AGN 은하의 GALAXY/QSO 이중 표기)에서 blind는 세트 A 99.30 %, 세트 B 99.33 %다(고침 4, 깨짐 0). 이중 표기 중 하나가 맞으면 정답으로 치면 A 99.34 %, B 99.37 %다([`v2/WORK_REPORT_2026-11-07.md`](v2/WORK_REPORT_2026-11-07.md)).
 
+문헌으로 정체가 확정된 천체 520개(52종류, [`v2/reference_objects/`](v2/reference_objects/))로 한 검증(2.47.0): blind 큰 범주 89.5 %, 세부 종류 45.8 %; full 큰 범주 87.9 %, 세부 종류 55.0 %([`REFERENCE_VALIDATION_2026-11-07.md`](v2/reference_objects/validation/REFERENCE_VALIDATION_2026-11-07.md)).
+
 2.40.0의 밝기별 QSO 사전확률은 같은 영역 재생에서 1차 분류 정확도 96.21 → 96.31 %, QSO 정밀도 79.5 → 86.9 %, QSO 재현율 94.4 → 90.9 %였다([`v2/benchmark/qso_options/`](v2/benchmark/qso_options/)).
 
 ### 실제 하늘 비율 기준 순도 (blind, 18개 영역, 2.36.0 측정)
