@@ -213,4 +213,62 @@ def classify(row):
     if raw in GAIA_EVENTS:
         label, status = GAIA_EVENTS[raw]
         return _result(label, score, status, evidence)
+    pn = pn_ir_colours(row)
+    if pn is not None:
+        return _result("PN", None, "IR_COLOUR_PN_CANDIDATE_AKRAS2019", [pn], "PN_CANDIDATE")
     return _result("UNKNOWN", None, "NO_VALIDATED_PHENOMENON_EVIDENCE", evidence)
+
+
+# Planetary-nebula candidates from near/mid-IR colours (2.47.0).  Akras,
+# Guzman-Ramirez & Goncalves (2019, MNRAS 488, 3238; checked against the
+# arXiv text, 1907.10026) separate compact PNe from other IR-bright sources
+# (YSOs, symbiotic and Be stars, galaxies, ...) with classification trees
+# whose cuts are two colours each, in the 2MASS / AllWISE (Vega) systems:
+#   M1  W1 - W4 >= 7.87 and J - H < 1.10
+#   M2  H - W2  >= 2.24 and J - H < 0.50
+#   M3  Ks - W3 >= 6.42 and J - H < 1.31
+# The hot dust of the nebula drives the red W4/W3/W2 excess while J - H
+# stays blue (nebular continuum + hot central star).  A source passing one
+# model is reported as a PN candidate; HASH / Acker / SIMBAD identities, when
+# present, still decide first.  Standardised magnitudes are AB (units.py),
+# so the Vega offsets are removed here.
+_WISE_AB = {"w1": 2.699, "w2": 3.339, "w3": 5.174, "w4": 6.620}
+_TMASS_AB = {"j": 0.91, "h": 1.39, "ks": 1.85}
+PN_MODELS = (
+    ("M1", ("w1", "w4"), 7.87, 1.10),
+    ("M2", ("h", "w2"), 2.24, 0.50),
+    ("M3", ("ks", "w3"), 6.42, 1.31),
+)
+
+
+def _vega(row, band):
+    if band in _WISE_AB:
+        v = _num(row, f"std_mag__wise_{band}")
+        return None if v is None else v - _WISE_AB[band]
+    v = _num(row, f"std_mag__2mass_{band}")
+    return None if v is None else v - _TMASS_AB[band]
+
+
+def pn_ir_colours(row):
+    # PNe are Galactic nebulae: a source the coarse stage calls a galaxy or
+    # quasar (dusty starbursts and AGN can be as red in W1 - W4) is not tested.
+    if str(row.get("primary_class", "")) in ("GALAXY", "QSO"):
+        return None
+    j, h = _vega(row, "j"), _vega(row, "h")
+    if j is None or h is None:
+        return None
+    jh = j - h
+    for name, (a, b), red_min, jh_max in PN_MODELS:
+        ma, mb = _vega(row, a), _vega(row, b)
+        if ma is None or mb is None:
+            continue
+        if ma - mb >= red_min and jh < jh_max:
+            return {
+                "kind": "ir_colour_pn_tree",
+                "model": name,
+                "colour": f"{a.upper()}-{b.upper()}",
+                "value": round(ma - mb, 2),
+                "j_minus_h": round(jh, 2),
+                "reference": "Akras, Guzman-Ramirez & Goncalves 2019, MNRAS 488, 3238",
+            }
+    return None

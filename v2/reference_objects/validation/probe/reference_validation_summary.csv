@@ -1,0 +1,9 @@
+mode,type,coarse,n,matched,type_ok,type_or_parent_ok,labels,coarse_ok,coarse_either,unknown
+full,GALAXY_CLUSTER,OTHER,2,2,1,1,UNKNOWN:1; GALAXY:1,,,
+full,AGB_CARBON_RICH,STAR,4,4,1,1,STAR:3; UNKNOWN:1,3.0,3.0,1.0
+full,SUPERNOVA_IB_IC,OTHER,2,1,0,0,GALAXY:1,,,
+full,SUPERNOVA_IA,OTHER,4,4,1,1,UNKNOWN:2; GALAXY:2,,,
+blind,GALAXY_CLUSTER,OTHER,2,1,0,0,GALAXY:1,,,
+blind,AGB_CARBON_RICH,STAR,4,3,1,1,STAR:3,3.0,3.0,0.0
+blind,SUPERNOVA_IB_IC,OTHER,2,1,0,0,UNKNOWN:1,,,
+blind,SUPERNOVA_IA,OTHER,4,4,0,0,UNKNOWN:2; GALAXY:2,,,

@@ -101,3 +101,36 @@ def test_server_error_moves_to_the_next_mirror():
     throttle._preferred.update(host="vizier.idia.ac.za", until=throttle.time.monotonic() + 600)
     r = throttle._with_mirrors(send)(None, "GET", "https://vizier.cds.unistra.fr/viz-bin/votable")
     assert r.status_code == 200 and seen[:2] == ["vizier.idia.ac.za", "vizier.cds.unistra.fr"]
+
+
+def test_tableless_mirror_answer_is_not_trusted():
+    """2.47.0: CfA answered 200 with a VOTable holding no table for every
+    catalogue while Strasbourg was down; the next mirror's table wins."""
+    import requests
+
+    class V:
+        def __init__(self, text):
+            self.status_code, self.text, self.headers = 200, text, {"Content-Type": "text/xml;content=x-votable"}
+
+    seen = []
+
+    def send(self, method, url, *a, **k):
+        seen.append(url)
+        if "cds.unistra" in url:
+            raise requests.exceptions.ConnectionError("refused")
+        if "cfa.harvard" in url:
+            return V("<VOTABLE><RESOURCE></RESOURCE></VOTABLE>")
+        return V("<VOTABLE><RESOURCE><TABLE><TR><TD>1</TD></TR></TABLE></RESOURCE></VOTABLE>")
+
+    r = throttle._with_mirrors(send)(None, "POST", "https://vizier.cds.unistra.fr/viz-bin/votable")
+    assert "<TABLE>" in r.text
+    assert "cfa.harvard" not in str(throttle._preferred["host"])
+
+
+def test_tableless_everywhere_is_a_real_empty_cone():
+    class V:
+        def __init__(self):
+            self.status_code, self.text, self.headers = 200, "<VOTABLE><RESOURCE></RESOURCE></VOTABLE>", {}
+
+    r = throttle._with_mirrors(lambda self, m, url, *a, **k: V())(None, "POST", "https://vizier.cds.unistra.fr/viz-bin/votable")
+    assert "<TABLE" not in r.text

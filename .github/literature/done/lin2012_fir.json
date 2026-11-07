@@ -1,0 +1,8 @@
+{
+ "1207.1913": [
+  "IR flux|infrared flux|IR \ufb02ux|infrared \ufb02ux",
+  "optical flux|optical \ufb02ux",
+  "FIR.{0,30}(defin|calculat|comput|estimat|Ks|K-band|J,? H)",
+  "(defin|calculat|comput|estimat).{0,40}FIR"
+ ]
+}

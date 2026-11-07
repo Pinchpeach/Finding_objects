@@ -70,9 +70,29 @@ def openalex(doi):
         return f"? ({type(exc).__name__})"
 
 
+def search(query):
+    """arXiv id of the best match for "q:<words>" (arXiv API, relevance order)."""
+    q = urllib.request.quote(query)
+    x = ET.fromstring(get(f"https://export.arxiv.org/api/query?search_query=all:{q}&sortBy=relevance&max_results=3"))
+    ns = {"a": "http://www.w3.org/2005/Atom"}
+    for e in x.findall("a:entry", ns):
+        print("  candidate:", e.findtext("a:id", "", ns), "|", " ".join((e.findtext("a:title", "", ns) or "").split())[:120])
+    e = x.find("a:entry", ns)
+    return e.findtext("a:id", "", ns).rsplit("/abs/", 1)[-1].split("v")[0] if e is not None else None
+
+
 def main():
     spec = json.loads(Path(sys.argv[1]).read_text())
     for aid, pats in spec.items():
+        if aid.startswith("q:"):
+            print(f"\n######## search: {aid[2:]}")
+            try:
+                aid = search(aid[2:])
+            except Exception as exc:
+                print("SEARCH FAILED:", exc)
+                continue
+            if not aid:
+                continue
         print(f"\n######## arXiv:{aid}")
         try:
             print("META:", meta(aid))

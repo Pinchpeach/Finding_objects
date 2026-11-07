@@ -208,6 +208,13 @@ def run(a):
                     rec[f"blind_{c}"] = (row or {}).get(c)
             if rc != 0:
                 rec["error"] = tail
+            if a.keep:
+                k = a.keep / f"{r.type}_{str(r.code).replace('/', '_')}"
+                k.mkdir(parents=True, exist_ok=True)
+                for mode in ("full", "blind"):
+                    for f in ("source_association.csv", "classified_objects.csv"):
+                        if (td / mode / f).exists():
+                            shutil.copy(td / mode / f, k / f"{mode}_{f}")
         print(f"{r.type:28s} {r.catalog_name} {r.code}: full {rec.get('full_primary_class')} / blind {rec.get('blind_primary_class')} ({rec['full_seconds']} s)", flush=True)
         out.append(rec)
         pd.DataFrame(out).to_csv(a.out / f"shard_{a.shard:02d}.csv", index=False)
@@ -256,6 +263,7 @@ def main():
     r.add_argument("--plan", type=Path, required=True)
     r.add_argument("--shard", type=int, required=True)
     r.add_argument("--out", type=Path, required=True)
+    r.add_argument("--keep", type=Path, help="copy each object's association and classified tables here")
     s = sub.add_parser("score")
     s.add_argument("--in", dest="inp", type=Path, required=True)
     s.add_argument("--out", type=Path, required=True)

@@ -1,0 +1,21 @@
+{
+ "2211.17238": [
+  "\\bRS\\b",
+  "SOLAR_LIKE|solar-like",
+  "DSCT|GDOR|SXPHE",
+  "\\bCV\\b|cataclysmic",
+  "BY Dra|rotation"
+ ],
+ "1907.10026": [
+  "W1 ?[\u2212-] ?W4",
+  "W3 ?[\u2212-] ?W4|W2 ?[\u2212-] ?W3",
+  "J ?[\u2212-] ?H|H ?[\u2212-] ?K",
+  ">|<"
+ ],
+ "1207.1913": [
+  "F_?X ?/ ?F|flux ratio|fX/fopt|fX ?/ ?fopt",
+  "X-ray binar|XRB",
+  "stars? .*(?:<|>)",
+  "log ?\\(?F"
+ ]
+}

@@ -4,6 +4,9 @@ name: Validate on reference objects
 # scored per type (v2/benchmark/validate_reference_objects.py).  Manual.
 on:
   workflow_dispatch:
+    inputs:
+      plan: {description: "plan file", default: "v2/reference_objects/validation/plan.csv"}
+      keep: {description: "1 = upload per-object association tables (probe)", default: "0"}
   push:
     branches-ignore: [main, validation-data]
     paths: ["v2/reference_objects/validation/plan.csv"]
@@ -17,7 +20,7 @@ jobs:
     timeout-minutes: 300
     strategy:
       fail-fast: false
-      max-parallel: 13
+      max-parallel: 26
       matrix:
         shard: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25]
     steps:
@@ -26,7 +29,10 @@ jobs:
         with: {python-version: "3.11"}
       - run: pip install pandas numpy scipy requests astropy astroquery pyvo
       - name: Run shard
-        run: python -u v2/benchmark/validate_reference_objects.py run --plan v2/reference_objects/validation/plan.csv --shard ${{ matrix.shard }} --out /tmp/refval
+        run: |
+          plan="${{ github.event.inputs.plan || 'v2/reference_objects/validation/plan.csv' }}"
+          extra=""; [ "${{ github.event.inputs.keep }}" = "1" ] && extra="--keep /tmp/refval/keep"
+          python -u v2/benchmark/validate_reference_objects.py run --plan "$plan" --shard ${{ matrix.shard }} --out /tmp/refval $extra
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -35,7 +41,7 @@ jobs:
           if-no-files-found: ignore
   score:
     needs: run
-    if: always()
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -50,7 +56,16 @@ jobs:
           path: /tmp/refval
           merge-multiple: true
       - name: Score
-        run: python -u v2/benchmark/validate_reference_objects.py score --in /tmp/refval --out v2/reference_objects/validation
+        run: |
+          if [ "${{ github.event.inputs.keep }}" = "1" ]; then
+            # probe: keep the per-object tables, leave the main results alone
+            mkdir -p v2/reference_objects/validation/probe
+            cp -r /tmp/refval/keep/* v2/reference_objects/validation/probe/ || true
+            find v2/reference_objects/validation/probe -name "*.csv" -exec gzip -f {} \;
+            python -u v2/benchmark/validate_reference_objects.py score --in /tmp/refval --out v2/reference_objects/validation/probe
+          else
+            python -u v2/benchmark/validate_reference_objects.py score --in /tmp/refval --out v2/reference_objects/validation
+          fi
       - name: Commit
         run: |
           git config user.name "github-actions[bot]"

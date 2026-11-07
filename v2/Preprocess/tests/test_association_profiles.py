@@ -162,3 +162,51 @@ def test_spectrum_finds_its_target_when_another_survey_anchors_the_group(tmp_pat
     _stage1().run(tmp_path, out)
     a = pd.read_csv(out).set_index("catalog").object_id
     assert a["DESI DR1 spectroscopy"] == a["DESI DR1 FastSpecFit"] == a["DESI Legacy Surveys DR10"]
+
+
+def _annotation_field(tmp_path, ned):
+    import pandas as pd
+
+    dec = 30.0
+    cosd = math.cos(math.radians(dec))
+    pd.DataFrame(
+        [{"catalog": "Pan-STARRS1 DR2 MeanObject", "catalog_object_id": "ps0", "ra": 250.0, "dec": dec}]
+    ).to_csv(tmp_path / "panstarrs1.csv", index=False)
+    pd.DataFrame(
+        [
+            {"catalog": "NED", "catalog_object_id": name, "ra": 250.0 + dx / 3600 / cosd, "dec": dec, "Type": t}
+            for name, dx, t in ned
+        ]
+    ).to_csv(tmp_path / "ned.csv", index=False)
+    out = tmp_path / "assoc.csv"
+    _stage1().run(tmp_path, out)
+    return pd.read_csv(out)
+
+
+def test_band_only_ned_entries_join_one_star(tmp_path):
+    # 2.47.0: NED keeps a star's 2MASS / WISE entries apart until it
+    # cross-identifies them; they describe the photometric object.
+    a = _annotation_field(tmp_path, [("2MASS J1", 0.1, "IrS"), ("WISEA J1", 0.2, "IrS"), ("CGCS 1", 0.05, "C*")])
+    assert a.object_id.nunique() == 1
+
+
+def test_supernova_and_its_host_galaxy_stay_apart(tmp_path):
+    # Reference-object probe (SN 2005mq): NED lists the supernova and its host
+    # at one position; both carry a physical type, so they are two objects.
+    a = _annotation_field(tmp_path, [("SDSS J1", 0.0, "G"), ("SN 2005mq", 0.0, "SN")])
+    ned = a[a.catalog == "NED"].set_index("catalog_object_id")
+    assert ned.object_id["SDSS J1"] != ned.object_id["SN 2005mq"]
+
+
+def test_physical_ned_type_is_read_before_band_detection(tmp_path):
+    a = _annotation_field(tmp_path, [("CGCS 1", 0.05, "C*"), ("WISEA J1", 0.0, "IrS")])
+    a.to_csv(tmp_path / "assoc.csv", index=False)
+    s = importlib.util.spec_from_file_location("s2", PRE / "02_integrate_objects.py")
+    m = importlib.util.module_from_spec(s)
+    s.loader.exec_module(m)
+    out = tmp_path / "objects.csv"
+    m.run(tmp_path / "assoc.csv", tmp_path, out)
+    import pandas as pd
+
+    o = pd.read_csv(out)
+    assert len(o) == 1 and o["ned__Type"].iloc[0] == "C*"
