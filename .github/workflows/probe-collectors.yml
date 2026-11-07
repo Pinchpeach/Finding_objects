@@ -17,20 +17,22 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: "3.11"}
       - run: pip install pandas numpy scipy requests astropy astroquery pyvo
-      - name: Direct
+      - name: Variants
         run: |
-          cd v2/Get_data
+          pip list 2>/dev/null | grep -iE "astroquery|astropy |pyvo"
           python - <<'PY'
-          import traceback, importlib
-          for name in ("allwise", "twomass", "galex", "nvss"):
-              m = importlib.import_module(name)
-              for r in (0.3, 1.0):
+          import astropy.units as u
+          from astropy.coordinates import SkyCoord
+          from astroquery.vizier import Vizier
+          c = SkyCoord(296.69275*u.deg, -25.37747*u.deg)
+          for cat in ("II/328/allwise", "II/246/out", "VIII/65/nvss"):
+              for kw in (dict(columns=["**"], row_limit=-1), dict(columns=["**"], row_limit=50000), dict(row_limit=-1), dict(columns=["*"], row_limit=1000)):
                   try:
-                      df = m.fetch(296.69275, -25.37747, r)
-                      print(name, r, "rows", len(df), list(df.columns)[:8], flush=True)
-                  except Exception:
-                      print(name, r, "FAILED"); traceback.print_exc()
+                      t = Vizier(**kw).query_region(c, radius=1*u.arcmin, catalog=cat)
+                      print(cat, kw, "tables", len(t), "rows", len(t[0]) if len(t) else 0, flush=True)
+                  except Exception as e:
+                      print(cat, kw, "ERR", repr(e)[:200], flush=True)
+          v = Vizier(columns=["**"], row_limit=-1)
+          q = v.query_region(c, radius=1*u.arcmin, catalog="II/328/allwise", get_query_payload=True)
+          print("payload", q)
           PY
-      - name: Controller (as the pipeline runs it)
-        run: |
-          python -u v2/Get_data/controller.py --ra 296.69275 --dec -25.37747 --radius 0.3 --out-dir /tmp/raw --workers 6 2>&1 | grep -E "^\[(allwise|twomass|galex|nvss)\]|Error|error" | head -40
