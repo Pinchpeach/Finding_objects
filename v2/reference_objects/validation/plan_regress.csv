@@ -1,0 +1,13 @@
+code,identity,type,catalog_name,source,bibcode,name,coarse_class,source_catalog,ra,dec,shard
+150,은하단,GALAXY_CLUSTER,Abell,"Abell, Corwin & Olowin 1989, ApJS 70, 1 (rich clusters of galaxies)",1989ApJS...70....1A,Abell 150,OTHER,VII/110A,17.3095,13.1662,0
+J21333948+5236412,점근거성가지(AGB) 탄소별,AGB_CARBON_RICH,2MASS,"Suh 2021, ApJS 256, 43 (catalogue of AGB stars, C-rich / O-rich from IR spectra and photometry)",2021ApJS..256...43S,2MASS J21333948+5236412,STAR,J/ApJS/256/43,323.4144965,52.6114262,1
+2004cf,Ib/c형 초신성,SUPERNOVA_IB_IC,SN,"Barbon et al. 1999, A&AS 139, 531 (Asiago Supernova Catalogue, updated; VizieR B/sn)",1999A&AS..139..531B,SN 2004cf,OTHER,B/sn,212.77404167,-11.73594444,2
+2195,은하단,GALAXY_CLUSTER,Abell,"Abell, Corwin & Olowin 1989, ApJS 70, 1 (rich clusters of galaxies)",1989ApJS...70....1A,Abell 2195,OTHER,VII/110A,246.6514,48.5389,3
+J14434121-5808573,점근거성가지(AGB) 탄소별,AGB_CARBON_RICH,2MASS,"Suh 2021, ApJS 256, 43 (catalogue of AGB stars, C-rich / O-rich from IR spectra and photometry)",2021ApJS..256...43S,2MASS J14434121-5808573,STAR,J/ApJS/256/43,220.92165,-58.1492722,4
+J03162642-2810479,점근거성가지(AGB) 탄소별,AGB_CARBON_RICH,2MASS,"Suh 2021, ApJS 256, 43 (catalogue of AGB stars, C-rich / O-rich from IR spectra and photometry)",2021ApJS..256...43S,2MASS J03162642-2810479,STAR,J/ApJS/256/43,49.110243,-28.1800632,5
+2001fu,Ia형 초신성,SUPERNOVA_IA,SN,"Barbon et al. 1999, A&AS 139, 531 (Asiago Supernova Catalogue, updated; VizieR B/sn)",1999A&AS..139..531B,SN 2001fu,OTHER,B/sn,133.06908333,-17.74161111,6
+1997dg,Ia형 초신성,SUPERNOVA_IA,SN,"Barbon et al. 1999, A&AS 139, 531 (Asiago Supernova Catalogue, updated; VizieR B/sn)",1999A&AS..139..531B,SN 1997dg,OTHER,B/sn,355.05920833,26.20327778,7
+2005mq,Ia형 초신성,SUPERNOVA_IA,SN,"Barbon et al. 1999, A&AS 139, 531 (Asiago Supernova Catalogue, updated; VizieR B/sn)",1999A&AS..139..531B,SN 2005mq,OTHER,B/sn,350.09079167,-0.34988889,8
+2008ao,Ib/c형 초신성,SUPERNOVA_IB_IC,SN,"Barbon et al. 1999, A&AS 139, 531 (Asiago Supernova Catalogue, updated; VizieR B/sn)",1999A&AS..139..531B,SN 2008ao,OTHER,B/sn,46.94441667,38.36838889,9
+2007ql,Ia형 초신성,SUPERNOVA_IA,SN,"Barbon et al. 1999, A&AS 139, 531 (Asiago Supernova Catalogue, updated; VizieR B/sn)",1999A&AS..139..531B,SN 2007ql,OTHER,B/sn,322.43191667,0.44461111,10
+J042925.12+553717.6,점근거성가지(AGB) 탄소별,AGB_CARBON_RICH,WISEA,"Suh 2021, ApJS 256, 43 (catalogue of AGB stars, C-rich / O-rich from IR spectra and photometry)",2021ApJS..256...43S,WISEA J042925.12+553717.6,STAR,J/ApJS/256/43,67.3546913,55.6215577,11
