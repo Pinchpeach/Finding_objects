@@ -69,8 +69,8 @@ EXPECT = {
     "GALAXY_LENTICULAR": ("EARLY_TYPE", "QUIESCENT", "LENTICULAR"),
     "GALAXY_SPIRAL": ("DISK", "SPIRAL", "STAR_FORMING"),
     "GALAXY_INTERACTING_PECULIAR": ("INTERACTING", "IG", "MERGER", "PECULIAR"),
-    "WHITE_DWARF_DA": ("WHITE_DWARF", "WD", "DA"),
-    "WHITE_DWARF_DB": ("WHITE_DWARF", "WD", "DB"),
+    "WHITE_DWARF_DA": ("WHITE_DWARF", "WD", "WHITE_DWARF_CANDIDATE", "DA"),
+    "WHITE_DWARF_DB": ("WHITE_DWARF", "WD", "WHITE_DWARF_CANDIDATE", "DB"),
     "HOT_SUBDWARF_SDB": ("HOT_SUBDWARF", "SDB"),
     "HOT_SUBDWARF_SDO": ("HOT_SUBDWARF", "SDO"),
     "HOT_SUBDWARF_SDOB": ("HOT_SUBDWARF", "SDOB"),
@@ -106,6 +106,21 @@ EXPECT = {
     "SUPERNOVA_II": ("SN", "SUPERNOVA"),
     "SUPERNOVA_IB_IC": ("SN", "SUPERNOVA"),
     "GALAXY_CLUSTER": ("CLUSTER", "GROUP", "GALAXY_CLUSTER"),
+}
+
+
+# Coarser labels one level up the classifier's hierarchy (credited separately as "parent").
+PARENT = {
+    **{t: ("PULSATING",) for t in ("RR_LYRAE_AB", "RR_LYRAE_C", "CEPHEID_CLASSICAL", "CEPHEID_TYPE_II_CWA", "CEPHEID_TYPE_II_CWB", "DELTA_SCUTI", "DELTA_SCUTI_HADS")},
+    **{t: ("LPV", "PULSATING", "MIRA") for t in ("MIRA", "SEMIREGULAR_VARIABLE")},
+    "ROTATIONAL_VARIABLE": ("OTHER_VARIABLE", "VARIABLE"),
+    "YSO_VARIABLE": ("VARIABLE", "OTHER_VARIABLE", "ERUPTIVE"),
+    **{t: ("BINARY", "ECLIPSING") for t in ("ECLIPSING_ALGOL", "ECLIPSING_BETA_LYR", "ECLIPSING_W_UMA")},
+    **{t: ("ERUPTIVE", "CV", "WD", "WHITE_DWARF_CANDIDATE") for t in ("CATACLYSMIC_DWARF_NOVA", "CATACLYSMIC_POLAR", "NOVA_CLASSICAL")},
+    **{t: ("AGN", "QUASAR", "RADIO_LOUD") for t in ("SEYFERT_1", "SEYFERT_2", "LINER", "BLAZAR_BL_LAC", "BLAZAR_FSRQ")},
+    **{t: ("AGB", "MIRA", "LPV", "C_STAR_CANDIDATE") for t in ("AGB_CARBON_RICH", "AGB_OXYGEN_RICH")},
+    **{t: ("WHITE_DWARF_CANDIDATE", "WD") for t in ("WHITE_DWARF_DA", "WHITE_DWARF_DB")},
+    "PLANETARY_NEBULA": ("NEBULA", "PN"),
 }
 
 
@@ -199,7 +214,9 @@ def run(a):
 
 
 def score(a):
-    d = pd.concat([pd.read_csv(f, low_memory=False) for f in sorted(Path(a.inp).glob("shard_*.csv"))], ignore_index=True)
+    src = Path(a.inp)
+    files = [src] if src.is_file() else sorted(src.glob("shard_*.csv"))
+    d = pd.concat([pd.read_csv(f, low_memory=False) for f in files], ignore_index=True)
     a.out.mkdir(parents=True, exist_ok=True)
     d.to_csv(a.out / "reference_validation_objects.csv.gz", index=False)
     rows = []
@@ -219,6 +236,8 @@ def score(a):
                 r["unknown"] = int((m & (pc == "UNKNOWN")).sum())
             if exp:
                 r["type_ok"] = int((m & hit).sum())
+                par = exp | set(PARENT.get(typ, ()))
+                r["type_or_parent_ok"] = int((m & pd.Series([bool(t & par) for t in tok], index=g.index)).sum())
             r["labels"] = "; ".join(f"{k}:{v}" for k, v in pc[m].value_counts().head(3).items())
             rows.append(r)
     res = pd.DataFrame(rows)
