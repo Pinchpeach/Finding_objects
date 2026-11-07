@@ -42,7 +42,32 @@ def meta(aid):
     doi = e.findtext("x:doi", "", ns) or "-"
     year = (e.findtext("a:published", "", ns) or "")[:4]
     au = ", ".join(authors[:3]) + (" et al." if len(authors) > 3 else "")
-    return f"{au} ({year}) {title} | journal_ref: {jref} | doi: {doi}"
+    return (f"{au} ({year}) {title} | journal_ref: {jref} | doi: {doi} | "
+            f"citations: S2 {citations(aid)}, OpenAlex {openalex(doi)}")
+
+
+def citations(aid):
+    """Semantic Scholar citation count (graph API, by arXiv id), or '?'."""
+    try:
+        time.sleep(random.uniform(3, 5))
+        url = f"https://api.semanticscholar.org/graph/v1/paper/arXiv:{aid}?fields=citationCount"
+        with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=60) as r:
+            return json.loads(r.read()).get("citationCount", "?")
+    except Exception as exc:
+        return f"? ({type(exc).__name__})"
+
+
+def openalex(doi):
+    """OpenAlex cited_by_count for the journal DOI (fallback when S2 rate-limits), or '?'."""
+    if not doi or doi == "-":
+        return "?"
+    try:
+        time.sleep(1)
+        url = f"https://api.openalex.org/works/doi:{doi}?select=cited_by_count"
+        with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=60) as r:
+            return json.loads(r.read()).get("cited_by_count", "?")
+    except Exception as exc:
+        return f"? ({type(exc).__name__})"
 
 
 def main():
@@ -51,6 +76,8 @@ def main():
         print(f"\n######## arXiv:{aid}")
         try:
             print("META:", meta(aid))
+            if not pats:  # citation lookup only
+                continue
             pdf = get(f"https://export.arxiv.org/pdf/{aid}")
         except Exception as exc:  # keep going: one failure must not hide the others
             print("FETCH FAILED:", exc)

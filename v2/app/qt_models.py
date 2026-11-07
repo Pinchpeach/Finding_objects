@@ -11,6 +11,7 @@ CLASS_COLORS = {"STAR": "#d9822b", "GALAXY": "#2b6cb0", "QSO": "#7b3fb5", "UNKNO
 TABLE_COLUMNS = [
     "designation",
     "primary_class",
+    "secondary_class",
     "subclass",
     "subclass_tags",
     "primary_confidence",
@@ -33,6 +34,7 @@ HEADERS = {
     "designation_catalog": "Name from",
     "separation_arcmin": "Dist (′)",
     "primary_class": "Class",
+    "secondary_class": "Also",
     "primary_confidence": "Confidence",
     "classification_status": "Status",
     "p_star": "P(star)",
@@ -154,7 +156,7 @@ class DataFrameModel(QAbstractTableModel):
                     return ""
                 return f"{value:.5f}" if col in ("ra", "dec") else f"{value:.3f}"
             return "" if value is None else str(value)
-        if role == Qt.ForegroundRole and col == "primary_class":
+        if role == Qt.ForegroundRole and col in ("primary_class", "secondary_class"):
             return class_color(value)
         if role == Qt.DecorationRole and index.column() == 0:
             return self._icon(index.row())

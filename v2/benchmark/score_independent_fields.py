@@ -234,6 +234,11 @@ def field_matches(fdir, which, bench):
         part = m.parent_object_id.notna()
         cls[part] = m.parent_object_id[part].map(host)
     m["ours"] = cls
+    # Dual GALAXY/QSO reading (2.46.0): the secondary class, from the parent for grouped rows.
+    alt = m["secondary_class"].fillna("").astype(str) if "secondary_class" in m else pd.Series("", index=m.index)
+    if has_parent and "secondary_class" in o:
+        alt[part] = m.parent_object_id[part].map(o.set_index("object_id").secondary_class).fillna("").astype(str)
+    m["ours_alt"] = alt
     m = pd.concat([t.add_prefix("t_"), m], axis=1)
     m = m[m.t_matched & ~m.t_in_benchmark]
     return m, dict(info=info, n_truth=len(t), conflicts=conflicts, unmatched=int((~t.matched).sum()), in_bench=int(t.in_benchmark.sum()))
@@ -334,6 +339,8 @@ def main():
     M = pd.concat(allm, ignore_index=True)
     print(f"\n=== ALL FIELDS ({a.which}): {len(M)} objects; truth mix {M.t_truth.value_counts().to_dict()}")
     print("ours:", score(M.ours, M.t_truth))
+    either = M.ours.where(M.ours == M.t_truth, M.ours_alt.where(M.ours_alt == M.t_truth, M.ours))
+    print(f"ours, either of the dual GALAXY/QSO labels: {score(either, M.t_truth)} ({int(M.ours_alt.ne('').sum())} dual labels)")
     print("high confidence:", high_confidence_score(M))
     print(pd.crosstab(M.t_truth, M.ours, margins=True).to_string())
     lab, pe = other_labels(M)

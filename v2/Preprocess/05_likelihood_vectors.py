@@ -48,6 +48,12 @@ _bgs_s.loader.exec_module(BGS)
 _sp_s = _tio_u.spec_from_file_location("v2_sparse_priors", Path(__file__).resolve().parent / "sparse_priors.py")
 SPARSE = _tio_u.module_from_spec(_sp_s)
 _sp_s.loader.exec_module(SPARSE)
+_fp_s = _tio_u.spec_from_file_location("v2_faint_class_prior", Path(__file__).resolve().parent / "faint_class_prior.py")
+FAINT = _tio_u.module_from_spec(_fp_s)
+_fp_s.loader.exec_module(FAINT)
+_ah_s = _tio_u.spec_from_file_location("v2_agn_host", Path(__file__).resolve().parent / "agn_host.py")
+AGN_HOST = _tio_u.module_from_spec(_ah_s)
+_ah_s.loader.exec_module(AGN_HOST)
 CLASSES = ("STAR", "GALAXY", "QSO")
 WEIGHT = {"direct_probability": 1.0, "catalog_label": 1.5, "continuous_score": 0.35, "binary_evidence": 0.35}
 MIN_CONFIDENCE = 0.50
@@ -634,8 +640,9 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     basis = []
     best_candidates = []
     best_candidate_scores = []
-    for q, (_, used, star_conflict, conflict, in_host, moving), qmin, qfaint, nir_i, nir_pi, bgs_i, member_i, gstar_i, wgal_i in zip(
-        Q, rows, qso_min, faint, nir, nir_p, bgs, member, gaia_star, wise_gal
+    faint_prior = FAINT.star_galaxy_factors(df)
+    for q, (_, used, star_conflict, conflict, in_host, moving), qmin, qfaint, nir_i, nir_pi, bgs_i, member_i, gstar_i, wgal_i, faint_i in zip(
+        Q, rows, qso_min, faint, nir, nir_p, bgs, member, gaia_star, wise_gal, faint_prior
     ):
         order = np.argsort(-q)
         conf = float(q[order[0]])
@@ -701,6 +708,13 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
         else:
             label = top
             status = "CLASSIFIED"
+            # Faint star:galaxy number-count prior (2.46.0, faint_class_prior.py;
+            # Henrion et al. 2011): STAR/GALAXY only, never QSO or moving stars.
+            if label in ("STAR", "GALAXY"):
+                redo = FAINT.apply(q, faint_i, CLASSES)
+                if redo is not None and redo[0] != "QSO":
+                    label, conf, margin = redo
+                    top = label
         labels.append(label)
         confidence.append(conf)
         margins.append(margin)
@@ -736,6 +750,10 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
             "best_candidate_probability": best_candidate_scores,
         }
     )
+    # Dual GALAXY/QSO reading of active galaxies (2.46.0, agn_host.py).
+    sec, why = AGN_HOST.secondary(df, labels, item_lists)
+    result_columns["secondary_class"] = sec
+    result_columns["secondary_class_reason"] = why
     df = pd.concat([df, pd.DataFrame(result_columns, index=df.index)], axis=1)
     out.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(out, index=False)
