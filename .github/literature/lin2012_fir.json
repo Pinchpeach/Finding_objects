@@ -1,8 +1,8 @@
 {
  "1207.1913": [
-  "F_?IR ?=|FIR ?=|F_?O ?=|FO ?=",
-  "\\bKs?\\b.*band|K ?band|2MASS",
-  "0\\.2.?12 ?keV|0\\.5.?12|energy band",
-  "zero.?point|erg ?s.?1 ?cm.?2"
+  "IR flux|infrared flux|IR \ufb02ux|infrared \ufb02ux",
+  "optical flux|optical \ufb02ux",
+  "FIR.{0,30}(defin|calculat|comput|estimat|Ks|K-band|J,? H)",
+  "(defin|calculat|comput|estimat).{0,40}FIR"
  ]
 }
