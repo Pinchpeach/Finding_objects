@@ -5315,305 +5315,305 @@
 
 | 천체 코드 | 정체 | 카탈로그 | 논문 출처 |
 |---|---|---|---|
-| J001702.49+604809.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J001403.25+605910.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J001921.94-734347.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J002003.09+631047.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J002407.10-735625.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J002459.41-732136.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J003046.77-733754.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J003322.98-732306.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J003435.27-732125.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J003538.05-715503.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J003438.24-741204.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J003532.91+641714.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J003603.26-735558.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J003618.04-734624.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J003644.48+621627.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J003655.69-735628.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J003817.06-734852.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J004003.39+641423.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J004121.89-703707.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J004029.10-725239.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J004040.85-735642.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J004329.56-730009.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J004342.11-741048.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J004438.34-730812.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J004629.87+633236.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J004903.36-723206.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J005020.25-730729.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J005650.45-732330.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J005720.05+552620.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J005732.51+630923.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J005830.00-722703.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J005918.35-725119.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J005931.45-725450.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J010102.74-721154.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J010116.70-721457.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J010157.94-721149.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J005148.76-730922.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J005448.08-722633.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J005630.28-714317.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J005949.87-731222.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J010039.79-724404.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J010214.59-732059.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J010221.91-711007.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J010230.42-732642.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J010336.91-715146.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J010237.45-720507.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J010326.72-733647.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J010406.85-730023.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J010441.90-732559.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J010524.69-721450.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J010539.29-734006.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J010555.91-722622.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J010453.39-713905.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J010618.00-715330.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J010619.13-740644.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J010652.95-723504.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J010722.90-705314.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J010751.05-713116.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J010757.09-721653.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J010807.53-730327.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J010857.10-711554.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J010924.97-711809.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J010928.81-735912.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J011013.53-712003.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J011042.21-712857.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J011312.19-725234.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J011354.65-713718.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J011417.01-724301.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J011630.87-725254.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J011816.33-714129.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J011204.32-720228.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J011219.16-713447.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J011238.28-730150.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J011325.52-733739.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J011327.86-722822.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J011601.17+613714.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J011613.74-714108.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J011950.97-740114.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J012121.03+640603.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J012142.38+614607.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J013218.18+562958.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J013859.96+645921.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J013001.14+621702.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J020502.15+570834.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J025439.95+633317.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J022656.66+603417.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J023352.66+570139.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J030552.38+565823.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J030554.69+574544.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J031339.16-102632.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J031454.53+555248.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J031107.35+553029.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J032347.90+592120.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J033113.90+635844.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J034608.27+584703.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J040130.96+550243.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J040245.11+521217.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J033511.96+581740.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J035729.68+545617.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J035822.58+592807.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J041005.47+614638.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J041541.50+492525.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J042351.32-765442.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J043931.09-691543.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J044119.48-672007.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J044357.88+405005.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J041246.21+515504.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J041331.09+411907.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J042145.61+340410.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J042319.17+441413.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J043033.48+480442.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J044157.98-692601.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J044201.93-703849.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J044534.60-702214.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J044639.13-701557.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J044941.41-703738.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J045030.63-693013.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J045124.86+381119.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J044851.28-692122.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J044908.90-705042.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J044912.48-690940.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J045026.61-703327.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J045133.52+474719.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J045214.74-663532.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J045225.91-712417.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J045247.75-683847.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J045305.69-661905.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J045310.09-701307.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J045359.56-710637.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J045523.15+441815.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J045342.75-702311.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J045530.21-661924.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J045541.38-680655.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J045602.27-712859.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J045705.80-660638.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J045840.67-670603.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J045542.58-711306.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J045756.41-684855.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J045822.91-710231.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J045932.89-680044.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J045942.34-680714.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J050015.04-654340.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J050055.02-693446.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J050104.98-682705.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J050105.86-704938.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J050125.01-700418.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J050126.91-673559.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J050131.73-704056.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J050144.13-704233.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J050150.34-715748.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J050210.29-693223.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J050243.36-661144.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J050250.18-681411.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J050303.55-664337.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J050152.46-692322.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J050200.56-685524.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J050237.61-664455.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J050343.88-654509.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J050415.64-690136.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J050351.33-685256.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J050402.51-682130.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J050418.03-683400.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J050445.52-672314.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J050456.40-653626.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J050639.75-682511.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J050456.96-715344.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J050508.72-691511.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J050517.36-695419.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J050517.55+235613.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J050538.11-714712.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J050557.69-682617.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J050704.18-704135.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J050755.59+330323.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J050834.83+473404.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J050845.82-653940.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J050848.50-665505.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J050848.69-653150.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J050907.15-662821.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J051005.46-641242.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J051122.93-660145.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J051153.49-662315.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J051157.26-674638.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J051241.47-665919.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J051015.32-662527.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J051040.20+494115.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J051044.86-661207.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J051117.32-653150.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J051309.93-702643.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J051349.71-702605.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J051450.78-662048.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J051501.19-663739.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J051519.33-655841.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J051527.16+372221.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J051422.41-654055.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J051545.29-661400.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J051624.57-703310.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J051742.04-663853.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J051847.95+135912.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J052038.83-661507.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J052141.13-651810.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J052321.88-661825.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J052603.91-660233.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J052640.52-720330.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J052811.15-662551.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J052858.51+284201.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J053002.78-662822.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J053153.12-673500.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J052233.41-663426.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J052430.10-715415.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J052725.63-652103.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J052732.17-661817.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J052838.16-695800.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J052916.65-672821.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J053223.27-685944.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J053307.65-705521.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J053359.26-673815.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J053411.98-672310.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J053436.67+261208.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J053345.82-674435.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J053407.76+321909.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J053617.08-703057.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J053722.20-681647.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J053630.60-663633.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J053855.95-700830.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J053957.49-662628.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J054147.77-671357.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J054154.21-673456.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J054204.95-682223.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J054250.23-680034.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J054251.13-700811.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J054414.02+373512.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J054239.05-684015.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J054451.66-682832.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J054457.17-662311.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J054510.09-665310.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J054606.32-701149.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J054636.26-681103.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J054650.75+313553.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J054806.84-713021.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J054933.09-710504.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J054940.20-670027.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J055010.98-694121.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J055036.56-700941.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J055042.29-671031.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J054500.81-674444.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J054556.33-670605.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J054643.14-674820.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J054803.14-671229.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J054840.01-695734.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J055050.77-670830.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J055100.47-692532.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J055213.05-680631.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J055216.14-740739.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J055242.59-672222.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J055518.44-672151.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J055552.81-700938.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J055107.61-672502.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J055109.37-674731.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J055137.43-670916.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J055407.16-673344.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J055443.89-675653.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J055740.84-671821.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J055830.04-690637.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J060024.13-683322.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J060051.69-674832.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J060524.44+284722.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J060531.97-665637.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J060725.45+110907.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J062722.91+085823.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J055920.05-673450.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J060224.26-691514.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J060544.70+131424.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J060556.22-681722.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J061158.30-684445.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J061559.86+234451.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J061713.86+022837.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J061852.38-673636.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J062040.28+080858.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J062136.09+040424.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J063105.45-020848.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J063114.54+115101.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J063210.93+063913.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J065052.28-012545.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J064533.69+074858.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J064742.99-134000.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J065048.70-075850.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J065201.03-124543.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J065252.07-032443.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J065639.80+001124.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J065212.23-024824.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J065411.49-073952.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J065645.87-153815.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J070024.87-202554.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J070638.09-154808.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J071038.05-070722.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J070354.95-175247.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J070708.63-074742.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J071140.27-265840.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J071344.39-214327.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J071606.27-205300.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J071639.07-221049.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J071640.38-243010.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J071659.43-151825.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J072107.45-213037.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J072440.69-261118.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J072840.17-292038.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J073002.52-234026.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J073335.59-255036.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J073453.49-265120.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J074511.79-365829.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J071931.29-234806.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J072021.43-343007.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J072145.31-263200.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J072315.12-294320.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J073104.47-221650.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J073518.78-313951.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J073754.49-292617.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J074652.07-303957.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J074750.45-321114.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J074807.98-345324.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J075348.71-302737.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J075450.59-373720.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J075749.77-292302.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J075909.12-431030.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J080048.39-374940.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J080458.70-285139.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J080511.03-342136.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J081024.74-382825.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J075345.02-365813.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J075612.49-323609.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J075922.32-332125.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J075947.67-420141.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J081025.85-323117.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J081145.17-441019.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J081401.63-420906.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J082200.12-381842.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J082116.75-384515.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J082217.31-461941.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J082915.63-464457.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J083606.58-491555.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J083821.90-494843.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J083855.58-494610.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J083908.01-372231.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J084127.56-473858.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J084952.46-461309.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J090835.26-531149.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J091956.19-542634.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J092212.75-530350.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J092757.86-521858.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J091822.17-542444.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J092302.91-492810.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J092535.27-532510.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J093323.88-524521.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J094611.89-595816.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J094826.89-580104.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J095238.28-535029.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J101702.64-581602.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J095617.45-544508.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J101124.34-612910.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J101501.48-585255.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J103020.77-602933.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J103051.56-590338.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J103254.10-583115.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J103437.21-580122.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J103626.98-621133.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J104253.92-610125.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J104823.09-603913.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J105232.94-603136.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J105427.01-612049.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J105926.09-592911.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J110025.11-605935.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J110114.48-600659.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J112218.41-605410.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J114119.38-621553.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J114858.88-622543.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J113123.22-603500.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J113317.69-631432.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J114248.28-585936.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J115056.60-650826.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J115440.39-621720.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J115753.67-623845.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J120640.26-623548.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J121733.60-654514.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J122240.23-620935.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J122331.85-642815.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J123423.43-611415.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J123803.75-383124.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J131345.18-685311.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J132629.92-630945.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J140149.83-572016.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J142450.99-343945.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J125312.38-675751.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J125343.98-655358.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J133127.60-651937.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J133426.46-642215.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J134724.88-681459.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J143730.38-633732.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J153805.11-584139.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J161555.56-510714.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J163010.15-571952.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J163500.89-183744.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J162744.64-564708.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J164734.72-293612.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J164749.61-224634.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J165340.10-332041.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J165353.39-644723.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J171725.44-371907.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J173553.44-442224.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J174012.60-712912.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J165601.99-312737.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J173740.72-214103.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J174131.98+054719.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J174712.51-384101.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J175207.49-010506.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J175811.71-335038.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J174740.60-413343.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J180150.93+041100.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J181130.72-155533.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J181334.51-651413.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J180844.38-321311.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J181153.80-373914.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J181415.83-092020.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J181610.70-334455.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J181817.62-532220.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J181824.73-345623.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J182550.88-121959.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J182629.78-244918.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J183251.28-165630.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J183040.09+252440.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J183122.38-125543.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J184121.84-010640.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J184226.70-052026.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J184438.23-042458.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J185557.94+120013.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J185632.38+104843.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J185653.48-024303.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J193045.29+192219.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J193202.64+130236.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J193630.51+200229.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J194503.53+311950.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J194757.90+260000.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J195413.18+292039.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J195424.41+301406.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J185724.36-004348.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J190931.32+114854.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J193320.52+201705.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J193415.63+193414.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J194034.98+191708.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J194807.25-260932.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J195732.89+380530.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J195840.10+274101.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J195853.44+242342.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J195909.03+324143.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J200232.61+004250.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J195933.73+334445.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J200046.27+305427.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J200242.48-033634.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J200334.70+390934.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J200520.66+323932.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J201113.67+352448.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J201306.69+374822.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J200314.04+304709.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J200404.50+390615.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J200729.48+352047.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J201309.07+323711.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J201356.24+351940.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J204237.22+382725.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J205100.94+430823.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J205404.91+083305.3 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J205425.66+454331.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J205916.93+443346.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J204058.09+432744.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J205126.45+460716.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J205130.46+281421.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J210015.75+482657.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J210746.54+464413.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J210602.79+490633.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J211659.94+514556.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J211839.91+504732.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J212535.46+523911.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J212922.99+490635.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J213454.68+555632.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J214518.38+542946.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J214806.66+511530.5 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J215144.46+550810.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J215341.28+542102.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J215752.71+560950.0 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J220240.86+592708.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J214755.77+542057.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J215134.82+553738.9 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J221936.83+574243.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J222014.53+604613.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J222116.69+543156.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J222327.41+583200.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J224456.44+602817.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J230121.11+575201.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J232912.70+632227.4 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J233320.27+610708.6 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J233848.33+592330.7 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J233927.25+622220.1 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J231915.14+111838.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J232228.39+624525.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J232534.86+644725.8 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J235424.53+620858.2 | 고전 세페이드 (CEPHEID_CLASSICAL) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 
 ## 2형 세페이드(CWA) — CEPHEID_TYPE_II_CWA (300개)
@@ -5633,7 +5633,6 @@
 | J005556.04-715902.8 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J005753.25-722446.3 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J005905.35-720344.4 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J010317.57-723304.6 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J010400.35-721358.9 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J010424.66-720034.5 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J010645.59-731623.5 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
@@ -5658,6 +5657,7 @@
 | J015704.55-651131.7 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J020259.69-740325.1 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J022049.37-730508.2 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J022714.54+493042.2 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J025440.36+514929.0 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J030058.13+533839.2 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J032209.09+565248.8 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
@@ -5666,7 +5666,6 @@
 | J044250.25+464204.9 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J044518.62-691638.6 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J044537.22-701504.1 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J044706.94-691739.5 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J045003.22-681535.1 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J045247.76-682055.9 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J045423.83-705405.7 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
@@ -5677,6 +5676,7 @@
 | J045745.04-654230.5 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J045750.95-675019.0 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J045751.10-695730.0 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J045805.65-692715.5 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J045810.88-695658.8 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J045832.85-702046.0 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J045836.21-700638.4 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
@@ -5684,6 +5684,7 @@
 | J045848.26-671908.2 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J045941.23-692722.2 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J050055.09-663814.7 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J050252.60-714201.5 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J050308.05-661352.0 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J050326.49-690856.6 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J050346.21-685237.0 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
@@ -5704,10 +5705,13 @@
 | J052055.56-663943.7 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J052112.41-690307.3 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J052429.20-721706.6 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J052508.29-673839.3 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J052548.49-672107.1 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J052655.87-695848.8 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J052700.49-713835.6 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J052925.62-661423.6 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J053002.45-655602.2 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J053013.44-692615.3 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J053048.14-711132.0 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J053258.69-664326.4 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J053423.28+210019.7 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
@@ -5717,6 +5721,7 @@
 | J054116.96-721154.9 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J054846.16+235129.2 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J055429.01-681653.2 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J060225.29+550006.3 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J060923.57-065148.7 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J061254.69-675824.8 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J062337.57+585821.5 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
@@ -5738,6 +5743,8 @@
 | J084636.38-804923.3 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J085221.14-492854.8 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J090502.83-202055.3 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J090723.48-623713.1 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J091209.71-502233.5 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J091720.14-374303.9 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J093234.58-384518.8 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J094822.23-372030.6 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
@@ -5764,12 +5771,10 @@
 | J145210.51-455414.5 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J152400.93-405431.8 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J152435.71-481320.7 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J153121.93-641301.4 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J154424.32-605828.7 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J154926.16-573943.6 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J160722.78-295711.9 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J161114.89-165139.9 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J161652.59-225716.1 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J162335.45-535514.0 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J162421.75-374951.1 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J162428.94-665012.8 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
@@ -5789,7 +5794,7 @@
 | J165838.00-324212.3 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J165932.27-325709.4 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J170655.52-233305.4 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J171022.05-304405.1 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J170655.66-233305.0 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J171022.11-040336.3 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J171625.69-335341.3 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J171648.05-220103.8 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
@@ -5807,11 +5812,9 @@
 | J173048.85-190102.0 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J173119.16-544220.9 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J173404.52-440134.1 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J173701.46-152512.2 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J173721.07-031244.8 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J173958.79-141013.3 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J174134.57-485436.0 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J174235.17-405140.9 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J174256.67-401756.9 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J174454.60-192345.0 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J174655.98-095550.9 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
@@ -5826,9 +5829,7 @@
 | J175418.63-414250.5 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J175820.12-361544.7 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J175925.02-340948.7 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J175938.89+004709.3 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J180009.61-341411.9 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J180050.40-015246.7 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J180050.45-313306.4 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J180113.78-302037.0 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J180120.23-310403.2 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
@@ -5841,18 +5842,18 @@
 | J180407.48-334658.3 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J180528.86+075421.1 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J180638.47-324417.3 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J180700.49-273619.1 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J180702.37-093655.3 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J180708.15-332714.1 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J180717.68-334526.5 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J180722.80-305219.6 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J180834.74-345642.3 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J180933.11-274213.2 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J181101.11-283535.4 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J181511.58-370651.7 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J181525.53-310409.8 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J181550.45+120544.5 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J181616.61-333742.1 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J181720.37-332052.5 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J181808.98-325917.4 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J182021.21-293344.2 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J182046.03-294846.9 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J182058.50-291214.9 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
@@ -5875,6 +5876,7 @@
 | J184619.22-063406.7 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J184740.46-483603.4 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J184809.86-200736.0 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J184840.99-260904.6 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J184920.88-131604.5 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J185113.92-321519.0 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J185211.19-144031.6 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
@@ -5901,7 +5903,6 @@
 | J193906.63-204913.8 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J194026.09-131134.8 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J195246.45+124008.7 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J195730.09+432549.2 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J195954.37+384641.8 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J200032.26+090937.8 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J200201.56+203429.3 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
@@ -5911,7 +5912,6 @@
 | J202411.79-245700.9 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J202920.11-424444.0 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J204735.94+314403.0 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J205400.22+382320.5 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J205609.46+272125.9 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J205957.35+452908.1 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J211037.69+323134.0 | 2형 세페이드(CWA) (CEPHEID_TYPE_II_CWA) | ASASSN-V | Jayasinghe et al. 2019-2021 |
@@ -6072,306 +6072,306 @@
 
 | 천체 코드 | 정체 | 카탈로그 | 논문 출처 |
 |---|---|---|---|
-| J000051.46+484909.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J000520.97+570907.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J001328.83+020343.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J001700.98+543920.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J001727.15+582559.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J001815.88+350758.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J002031.02-095135.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J005000.43+434418.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J010110.51-684306.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J010606.76-310650.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J010618.39+084613.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J010800.76+844724.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J015913.33+612917.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J020206.73+481712.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J020938.95+595504.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J021418.54+630127.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J022444.57+552556.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J025633.00+372411.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J030045.72+512012.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J032242.47+390634.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J032611.41-592125.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J032700.91+224258.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J034909.91+054044.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J040115.45-463049.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J043754.62+613401.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J044614.94+764343.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J044909.61+233018.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J045735.63+680938.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J050602.32+443643.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J001847.94+714222.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J004341.52+472408.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J010718.97+481244.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J013859.10+433322.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J013920.87+473154.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J015655.33+085350.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J015811.74+554218.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J021507.50+180427.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J022053.50+344858.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J022421.87+324720.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J023152.57-411923.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J023516.89+452906.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J024048.24-070617.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J024059.94+454320.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J024338.88+601813.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J035909.55+582115.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J041221.27+252355.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J041331.18+460531.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J041703.06+263741.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J041750.52+262720.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J045113.03+434558.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J045244.41+434100.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J045721.36+171641.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J045759.64-455533.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J045808.91+340850.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J050740.53+493602.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J051441.25+625757.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J052028.01-473847.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J052107.82+420407.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J052249.72+565254.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J052555.54-460944.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J052815.47+383951.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J053149.10+430151.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J053211.40+095355.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J054959.42+574510.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J055150.07+101443.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J055405.97+111040.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J055557.85+285032.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J055923.10-164840.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J055955.92-463400.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J060224.28+440353.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J052455.40-383329.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J052853.06+483611.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J052923.51+785741.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J053241.37-001328.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J053528.45-205557.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J055920.86+282334.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J060220.70-060348.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J060255.79+594837.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J060440.44+083432.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J061247.64+432954.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J061500.02-580530.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J061700.93+030036.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J062206.57-482847.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J062929.95+061558.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J063602.58+141831.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J064003.82+121156.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J064121.42-154340.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J064226.03-145227.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J064426.81+260026.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J065407.54+050434.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J065408.36+063259.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J065653.21+040748.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J065825.12+055024.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J065841.00-392631.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J065927.00+332611.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J070100.85-201332.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J060324.07+251052.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J060809.07+050011.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J061107.91-334600.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J061132.16+122707.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J061729.04-120252.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J062308.93-701617.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J062410.16+315123.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J062554.40+041851.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J063334.18+314835.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J063427.71+451017.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J063916.24+184418.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J064451.68+225902.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J064717.98+061003.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J065340.87-010345.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J065707.55+135512.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J065731.85+172040.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J065829.95-574110.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J070136.80-505410.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J070215.13+200415.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J070319.58+184523.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J070709.10-164135.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J070758.00+131738.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J070823.30-025205.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J071005.67-043521.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J071058.43-272100.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J071102.01+165131.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J071231.03-042008.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J071615.84-045834.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J071700.70+281117.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J071900.47+102212.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J072039.63-054944.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J072126.20+065619.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J072307.17-543640.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J072429.78-045620.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J072827.18-020759.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J072839.63-130409.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J073134.82+073922.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J073713.09-442906.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J073758.42+055227.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J074156.59-053559.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J074306.41-142737.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J074726.64-065108.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J074735.37-784334.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J075233.44-471214.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J080020.88-475051.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J080224.63+590937.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J080408.51-460122.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J070457.43-505943.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J070550.85-401357.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J070558.08-334912.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J070808.92-275551.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J071036.62-410350.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J071224.83-611151.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J071746.31-094640.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J072110.43+055818.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J072754.37-490816.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J073243.43-015731.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J073355.93-311640.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J073750.24-062411.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J073758.35-325705.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J074645.18-140855.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J074913.69+443049.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J074917.75-191119.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J075028.83+102053.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J075233.31-100143.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J075510.01-503634.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J080039.77-074418.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J080802.87-622318.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J080903.40-284908.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J080932.47-401358.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J081106.15-342257.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J081321.65+101025.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J081551.35-490343.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J083143.49-243012.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J084117.98-312451.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J084301.31+405952.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J084507.96-495351.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J090221.64-605352.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J090612.20-004808.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J091116.89+351700.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J091125.49+230716.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J091303.14-272017.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J092010.35+494438.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J092815.61-333810.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J093023.98+612034.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J093828.37-364156.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J081049.14-643742.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J081323.59-583852.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J082142.72-535332.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J082234.74-100700.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J082306.54-234352.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J082357.25+314159.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J083226.56-491424.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J084349.20-540147.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J084733.25-582536.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J085652.05-374240.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J085854.73+152210.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J091023.07-083202.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J091024.85-404043.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J091029.75-151426.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J091436.10-675150.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J091830.81-542834.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J091918.18-353904.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J092200.41-413641.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J092811.66-360253.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J093012.60-253147.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J093325.51-560054.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J093352.81+774317.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J093604.79+444041.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J094058.78+094202.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J094334.03-405216.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J094657.05-355045.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J095821.62-611941.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J095953.29-390211.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J100930.24-491032.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J094919.41-510302.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J095011.25-244058.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J095237.20-232828.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J100135.50-245715.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J100830.34-633542.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J100906.68-412411.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J101004.51-371036.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J101752.76-540018.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J102321.21+592221.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J102631.55-482004.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J103357.41-360934.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J105758.31-014111.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J105947.69-013612.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J110249.54-521453.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J110356.18-685438.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J112425.30+774215.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J113143.44-074220.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J114421.76-674811.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J114508.94-243716.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J114842.13+544308.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J115740.70-712556.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J120429.18-481734.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J120819.82-585851.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J120839.89-524527.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J121547.28-361405.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J122252.46+322250.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J123132.69-684529.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J102336.34-633232.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J102339.23-071446.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J103420.45-515536.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J104342.28-501431.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J105310.16-613545.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J105316.29-634526.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J105941.26-461337.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J110759.54-474109.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J111551.70-312948.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J111802.76-293604.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J113744.03-741657.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J114341.01-063348.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J114349.86-683406.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J114607.42-615438.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J115911.96-073352.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J120623.45-514851.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J121915.06-371205.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J121927.86-652154.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J124008.03-662042.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J125149.83-572500.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J125606.91-501800.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J125624.21-040533.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J131744.16-673503.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J131805.92-512103.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J133545.73-662511.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J133623.81-494045.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J133717.40+653116.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J133821.92-454550.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J125901.62-363424.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J125910.49-464825.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J131344.21-243316.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J131433.14-730452.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J131559.90-360604.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J131740.25-422841.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J133050.64+540745.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J133430.69-722312.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J133726.98-484226.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J133920.40-444303.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J134154.51-291427.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J134251.55-054952.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J134434.45-653855.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J134521.64+541151.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J134838.26-772028.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J135342.03-711445.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J135418.30-582411.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J135430.66-292046.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J140407.88-771733.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J142416.67-004815.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J143256.27-565610.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J143611.66-405450.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J143653.84-392238.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J144510.90-470257.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J145007.66+381455.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J134842.98-215452.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J134908.28-565829.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J134926.28-564901.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J140139.22-461614.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J141441.28-614457.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J141537.18-391936.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J141809.79-040522.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J142721.26-443943.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J143132.03-225533.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J143133.52-441440.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J143216.77-265721.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J143234.87-083536.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J143616.66-264729.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J143856.18-562310.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J143930.61-730711.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J145223.70+031831.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J145226.12-641018.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J145307.33-410016.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J145420.55+095555.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J145456.27-331949.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J150012.86-625401.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J150421.58-202549.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J150900.33-115500.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J151508.46-295751.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J151528.87-531311.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J152155.12-615438.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J152207.44-163602.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J152216.85-470619.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J152338.24-825146.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J152807.34+060802.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J153332.18-501634.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J153515.60-264612.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J153837.24-271608.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J154238.92+041215.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J154437.81-773543.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J154711.29+300829.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J154851.42+055255.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J145321.61-382623.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J145627.93+095329.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J145803.24-520710.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J145847.04+070754.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J150035.48+044517.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J150909.96-425111.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J151941.39-222357.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J152036.19-094119.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J152221.48+325844.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J152315.41-560341.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J152902.99-634832.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J153142.16-474358.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J154050.42-305613.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J154857.71-423030.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J154936.68-193226.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J155035.74-752657.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J155521.80+184408.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J160610.74-313016.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J161045.11+143237.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J161453.32-341052.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J161856.83-602532.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J162916.92-204948.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J163509.32-694323.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J163600.90-250718.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J163956.76-020539.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J164032.29-514940.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J164838.65-195954.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J165024.32-515431.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J165624.97-292009.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J165701.80-003945.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J170001.14+390930.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J170938.72+542141.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J170943.90-125136.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J171327.04-094032.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J172030.62-530023.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J161159.64-264332.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J161434.28-322910.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J161614.16+080905.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J161709.05+030318.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J162555.03-212727.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J162643.01+232941.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J164627.62-193445.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J164745.27-013919.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J170009.15+144001.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J170314.78-665747.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J170315.75-533310.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J170355.99+130046.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J170841.87-692119.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J171210.09-230656.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J172110.65-180219.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J172124.06+062728.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J172342.75-161120.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J172453.07-220539.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J172814.71-462842.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J173459.97-452454.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J173550.86-530447.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J173922.03+612639.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J173038.60-534500.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J173356.60-683511.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J173548.99-090550.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J174039.63-695030.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J174357.46+074425.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J174728.51+183021.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J175145.90-001055.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J175252.39+100826.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J175644.29-613831.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J175708.63+084659.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J175845.61-574219.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J180201.72+153528.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J180334.53+165945.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J180927.54+042850.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J181110.12-582859.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J182332.94-243922.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J183358.58-453818.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J183522.39+091128.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J183731.06-392016.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J183923.76-533650.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J184316.48-442014.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J184351.38+230820.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J184835.08-355050.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J185031.90+305914.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J185143.64+273850.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J185324.64+201217.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J185723.66+282614.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J190432.97-273647.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J190448.47-501557.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J190626.32+682901.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J190728.21-444316.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J190930.94+330758.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J191329.99-021617.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J192227.39-562227.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J192455.82-744744.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J192602.64+154846.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J193045.91+350924.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J193154.92-195603.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J193755.93-280832.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J193955.88+523510.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J174721.80+151551.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J174811.72+592733.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J180517.97+122234.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J180833.17-401158.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J180944.49+223607.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J181111.09+052449.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J181412.13-634822.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J181525.20+163047.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J181532.52-415421.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J181815.70+063325.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J182030.13+034801.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J182033.14+391001.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J182602.91+253937.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J182625.44+082549.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J183008.14-324533.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J183501.96+072402.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J184959.07+172924.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J185206.63-200244.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J185211.10-410009.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J185622.75-442029.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J185840.07-005625.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J190124.28-102655.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J190213.68+434147.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J190255.71-172436.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J190601.13+183649.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J191005.23-233650.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J191359.41-184839.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J191427.48-111056.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J191527.55+090601.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J191630.33-184838.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J191800.36+285541.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J192136.31+485117.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J192534.44-023113.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J192649.20+253216.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J192909.60+465804.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J192936.69+073304.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J193230.32+065611.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J193402.89+521554.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J193817.81+125641.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J194110.02-320829.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J194149.52-533246.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J194506.32+055510.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J194552.78+191706.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J194609.91+400947.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J194650.08+631508.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J194951.10+165655.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J195039.04+582408.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J195130.97+341120.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J195422.99+151538.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J195548.01+111128.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J195755.32-504054.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J195837.99+032730.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J195924.49-254517.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J195932.45-135327.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J194218.30-084346.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J194401.50+721238.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J194556.41-341401.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J194804.36+525405.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J195128.16+104744.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J195233.78-530352.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J195339.34+514132.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J195342.25-064855.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J195615.71+140514.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J195624.96+043448.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J195641.49+015247.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J195704.89+133740.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J195723.42+385024.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J195801.54-283413.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J195845.72+460356.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J195903.89+504639.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J200358.03-593951.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J200744.86+352323.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J200756.66-290004.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J201022.44-231100.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J201248.88+373349.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J201328.48+045037.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J201349.23-182936.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J201703.44-371423.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J201940.63+680602.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J202408.44-050934.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J202637.34+513953.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J203628.83+520344.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J204205.14-090748.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J204444.06+293430.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J204614.96-384541.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J205025.38+120442.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J201111.40+004038.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J201226.91-212449.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J201925.68+100652.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J202427.15+142635.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J202500.24-415950.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J203046.11+073349.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J203053.92+012235.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J203204.03+600632.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J203844.79+513233.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J204636.84+284741.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J204944.28+061954.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J205143.02-255637.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J205334.55-525610.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J210023.53-780308.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J210315.10+232358.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J205311.94+295740.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J205851.88+141422.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J205949.22+140104.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J210028.74+060438.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J210249.94+321444.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J211006.39-483644.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J211110.80+260506.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J211225.98-441412.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J211348.16+475810.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J212420.13-575154.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J212428.22+382151.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J212707.32+285610.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J212743.29+423736.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J213305.07+204219.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J213607.20-013841.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J213734.17+060505.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J213934.38-050020.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J214619.21-291215.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J214636.65+441257.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J214711.44+395258.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J215230.71+210209.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J215512.82+580226.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J215717.62+473005.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J215923.07+592456.7 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J220223.15+443038.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J221240.59+434943.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J222208.35-500648.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J222511.47+763209.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J224143.99+414220.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J224700.99-022722.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J225359.34+020448.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J232202.12+603022.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J233753.35-400355.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J233802.04+565021.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J233927.31+521420.2 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J235138.40+330348.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J211615.20+394124.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J211909.84+340349.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J212609.32+145317.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J213059.88+373010.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J213731.25+364001.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J213950.21+281505.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J214137.62-185030.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J214619.06-204801.5 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J214652.90+365309.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J214745.80+122726.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J214758.85+593543.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J215044.69+464246.3 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J215305.48+235303.9 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J222148.64+493007.6 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J222750.39-705906.8 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J230137.02-220513.0 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J230241.80-153625.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J232335.34+734740.1 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J233645.40+125419.4 | 고진폭 방패자리 델타형 변광성 (DELTA_SCUTI_HADS) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 
 ## 방패자리 델타형 변광성 — DELTA_SCUTI (300개)
 
@@ -6379,306 +6379,306 @@
 
 | 천체 코드 | 정체 | 카탈로그 | 논문 출처 |
 |---|---|---|---|
-| J000205.94+582043.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J001016.17+392815.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J002224.96+582104.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J003515.27+512940.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J004628.12+635433.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J005008.65+043130.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J005112.17+463245.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J005143.58+563420.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J005247.94+740808.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J010553.20+493840.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J012223.01+582408.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J012656.13+541858.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J015828.29+375634.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J020209.43+565234.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J023000.76+522945.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J023752.72+505902.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J025157.82+580324.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J030316.09+453118.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J031350.98+494233.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J032128.49+660803.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J033143.35+494244.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J035354.30+131437.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J035631.99+632004.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J041836.96+314314.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J042137.80+474139.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J042236.18+465836.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J042527.36+145423.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J042926.73-152423.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J043504.28-274412.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J043936.58+323134.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J044306.28+335807.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J044644.50+415812.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J044722.69-014122.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J044751.44+445754.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J045514.33-655734.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J045851.42+542931.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J045920.52+360723.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J050252.91+263029.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J050430.66-081925.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J051053.32+163123.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J051945.78+502833.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J051956.76+353722.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J052416.91+561256.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J052649.33+613247.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J052842.71-005946.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J053308.84+593044.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J053414.36+493943.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J053502.33+130812.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J053805.06+253535.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J054135.25+210717.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J054232.92+432335.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J054303.37+165603.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J054354.89+393820.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J054743.33-335145.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J055138.35+414110.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J055302.82+174360.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J000414.38+592525.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J003527.62+561210.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J010833.18+614854.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J012038.45-445021.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J013254.83+604245.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J014243.92+530513.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J014914.27+542810.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J014916.67+542934.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J015011.77+373717.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J015046.85-520604.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J015924.24-555435.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J020158.48+481958.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J020250.97+044827.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J020411.62+183437.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J021703.02+545335.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J022021.50-410705.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J024656.89+572411.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J025622.61+510317.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J030550.71+500150.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J032921.74+540513.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J033011.38+174715.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J034051.10+382720.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J034342.98+375005.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J034422.60+391047.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J034657.77+413009.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J040202.40+024941.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J040746.13+341541.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J041231.69+235013.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J041803.17+352154.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J042008.48+471335.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J042202.14+483315.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J042758.34+285956.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J043904.88+604509.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J044417.60+390609.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J044740.41+401725.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J044821.61+353747.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J050059.56+481423.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J050338.75+053830.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J050700.89+283606.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J051107.85+223852.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J051351.54+392724.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J051538.57+423323.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J052350.93+135011.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J052858.79-451112.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J052910.66+162907.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J053524.92+041027.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J053705.97+394614.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J054222.88+290202.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J054230.38+075937.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J054500.78+260203.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J054622.19+420055.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J054647.24+430840.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J054846.06+163334.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J055013.34+092002.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J055041.75+312624.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J055110.48+370700.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J055310.44+323347.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J060448.21-080607.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J060651.80+453102.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J061453.31-044031.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J055700.81-304414.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J055842.42-062207.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J060134.98+420407.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J060641.16-391058.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J060813.70-410906.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J061841.23+451932.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J061917.73+230607.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J062142.24-301040.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J062306.38+294521.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J062331.80+245256.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J062610.07+435825.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J062759.32+214703.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J063441.26-064713.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J063827.41+125331.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J064031.53+082032.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J064151.47+770100.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J064325.30-043544.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J061955.19-142554.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J062236.26+290001.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J062252.57-141542.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J062743.11+302730.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J062838.48-124236.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J062945.90+390036.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J063027.93+640317.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J063124.65+781708.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J063128.87-695800.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J063415.45+385410.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J063636.18+252515.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J063822.77+240544.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J064615.40-332322.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J064659.58+590113.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J064707.76+333329.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J064709.21+342037.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J065049.91-003940.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J065155.13+305117.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J065305.03+163720.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J065539.06+072522.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J065634.61-352137.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J065648.98+213259.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J065903.94-054537.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J070048.70+020857.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J070119.41+560750.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J064910.83+242303.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J064945.27-442226.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J065012.70-055449.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J065049.91-003940.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J065152.95-000026.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J065215.50-052955.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J065226.69+212319.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J065607.21+271159.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J065834.96+043424.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J065842.38-165429.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J065848.49+221408.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J070127.87-245034.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J070231.74+204830.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J070449.67+160514.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J070644.45+014345.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J070647.37-365547.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J071031.34-062914.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J071246.16-022701.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J071434.50-022834.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J070408.04-295757.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J070430.42-133702.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J070452.77+123505.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J070740.68+151725.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J070750.49-070133.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J070832.34+104532.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J070902.52-335350.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J071318.03+243835.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J071401.53-185559.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J071535.45-435951.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J071741.65-383439.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J071826.13-030836.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J071847.90-184528.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J072133.15+115109.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J072246.31+024904.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J072530.04+120919.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J072637.20+434805.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J073047.22+095100.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J073238.99-204652.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J073255.24+064021.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J073516.68-020425.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J073842.30-134045.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J073918.01+115745.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J074045.12-311117.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J074123.56+024624.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J074153.40-015053.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J075929.73-442454.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J080242.70-254423.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J080346.31-443505.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J080809.75-293518.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J080957.16-134002.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J081353.33-263051.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J072819.78-193826.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J072901.41-285638.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J073033.48-020624.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J073218.40-075545.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J073357.58-202734.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J073530.69+013723.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J073636.50-291204.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J073830.38-121757.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J074110.61+010503.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J074504.02-055111.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J075210.97-363945.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J075650.28-395846.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J075918.15+031204.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J080051.39-153220.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J080303.22-273453.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J080941.27-381902.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J081359.00-124133.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J081647.21-165203.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J081758.53-295522.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J081651.98-381124.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J082038.97-255531.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J082245.80-473225.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J082435.82-221506.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J082534.50-331951.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J082830.24-180153.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J083026.76-233200.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J083202.28-603608.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J083233.07-622834.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J083808.52-461426.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J083928.31-440550.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J084106.91-233014.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J084257.20-142756.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J085235.74-371810.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J085642.75-551608.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J090014.37-352638.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J091002.43+450044.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J091125.60+230713.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J091931.59-443729.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J092515.63+165343.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J093535.76-612045.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J093706.54-532956.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J094329.66+645754.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J094715.24-335836.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J095949.88-471742.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J100116.49-535628.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J100423.74+633557.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J100558.65-353501.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J100641.42-585655.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J100806.54-404004.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J100807.39-590109.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J102313.71-363807.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J103039.26-584818.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J103158.35-514737.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J103217.70-532813.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J103237.78-034754.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J104035.31-524459.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J104148.12+075534.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J082444.50+455614.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J083028.81-311914.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J083333.48-220751.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J083831.85-454052.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J083834.74-234942.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J083934.24-020524.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J084406.32-460605.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J084920.40-215209.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J085054.08-232750.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J085129.76-203744.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J085457.65-031059.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J085523.63-312921.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J085745.40-392628.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J090055.80-575004.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J090529.47-272900.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J090913.34-240251.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J091248.44-330249.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J091313.29-301157.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J091606.07-393545.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J091805.96-543412.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J091819.23-604731.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J092054.89-422336.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J092136.51-512208.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J093547.29+440709.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J094538.87-345550.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J095219.03-365851.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J095248.21-450742.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J095431.02-492534.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J095507.81-580945.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J095816.51-503616.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J100853.00-191839.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J101506.78-202333.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J102048.40-591615.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J102156.36-332613.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J103856.06-463325.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J104240.51-135322.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J104641.71-664039.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J105805.33-720257.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J111257.29-242948.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J113608.29-704427.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J114301.88-615909.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J114520.93-603346.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J115155.81-475316.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J115305.70-695631.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J115557.56-691551.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J120030.38+201654.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J121852.37-655404.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J122127.22-622206.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J104930.16+015513.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J105709.22+070035.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J110050.00-553856.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J110256.43-395941.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J111226.32-682206.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J111339.18-573850.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J112432.87-523258.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J112533.74-540912.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J113904.82-780115.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J114231.31-551138.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J114927.17-601925.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J115414.52-461353.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J115612.80-681837.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J123228.61-395702.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J123422.22-750531.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J123741.26-561228.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J123916.91-630620.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J125932.95-501318.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J130652.92-535919.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J131156.18-591508.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J131421.11-542651.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J131509.83-504057.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J130920.14-611605.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J131654.31-572012.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J131852.01-565841.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J133315.89-645535.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J133333.07-632606.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J134123.76-544003.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J135716.35-230924.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J135901.50-510210.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J135922.12-534948.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J140530.17+165743.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J141245.82-380355.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J135550.57-425241.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J142141.11-563933.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J142527.64-760250.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J142753.31+841815.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J143058.20-431404.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J143130.91-515158.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J143814.60-463227.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J142229.40-652123.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J143659.00-684431.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J144025.80-582650.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J144141.59-405209.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J144620.15+562200.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J144701.74-475848.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J154437.65+184734.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J160842.02-554245.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J162218.68-463529.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J162302.27-145211.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J162913.05-302910.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J163731.22-612311.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J163832.13-270238.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J163910.49-461444.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J165342.76-641934.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J165646.42-484607.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J165938.48-352748.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J170023.91-300822.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J170815.96-533024.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J152256.49+105424.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J152716.86+393737.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J153024.24-590804.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J154120.81-752529.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J160634.52-294521.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J160659.03-683854.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J160855.78-464417.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J161059.63-542137.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J161344.93-231306.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J161534.15-453728.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J161715.33-522637.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J165339.33-643937.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J170406.02-112319.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J170411.78-480459.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J170456.96-531630.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J170829.69+423149.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J171103.91-265102.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J171142.90-710430.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J171403.36+152808.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J171717.28-391247.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J172219.50+064611.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J172243.16-423845.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J172707.66-573743.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J173835.20-383814.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J173917.77+185148.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J174057.68-382027.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J174156.66-452625.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J174257.59-412838.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J174329.53-541224.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J175040.21-455031.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J175614.63-315921.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J175959.58+140615.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J181618.73-420530.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J182830.55+151518.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J171451.42-304700.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J172043.27+100104.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J172045.58-303432.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J172630.72+054231.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J172836.03-383515.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J174744.75-045059.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J175518.03-150656.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J180221.46+110142.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J180545.03-403022.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J181631.67+310129.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J183321.83+210829.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J183559.48+335624.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J183621.35-335542.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J184034.50+112923.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J184125.81+171603.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J184129.04-332852.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J184448.47-130939.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J184923.87-451603.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J185252.14+143506.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J185825.75-191927.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J190620.89-172522.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J190750.62+462912.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J191311.52-101108.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J191621.76+263212.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J191838.98-564606.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J191840.31+362158.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J183710.84+084110.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J183722.28+493403.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J183829.98+221616.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J183901.35+190324.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J184010.94+151001.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J184044.82-223511.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J184116.46+421342.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J184549.48-140850.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J184659.88+135439.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J184754.89+301653.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J185739.13+200518.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J185829.46-170332.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J190214.97+114206.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J191226.16-055120.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J191431.84+692940.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J191852.43+613535.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J192026.40+260819.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J192028.45+610648.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J192131.93+514032.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J192305.19-540900.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J192522.38+213739.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J192532.33+081053.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J192610.94-252235.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J193136.14-074543.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J193505.36-665714.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J193545.78+483413.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J193935.63+063412.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J194214.48+180510.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J194219.38+412713.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J194546.16+304143.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J194901.09+002715.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J195123.19+454027.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J195636.10+341104.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J195715.84+103340.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J200114.39+394026.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J192344.22-233600.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J192407.33+453433.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J193149.74+255049.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J193155.72+072104.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J194759.96+153346.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J195134.11-102358.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J195501.43+091247.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J195520.42-285120.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J195931.69+381413.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J200252.76+540649.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J200730.14+413212.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J201229.46+403416.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J201452.08-404239.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J201538.49+254314.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J201716.13+692051.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J202917.40+494356.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J203000.12+330618.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J203102.97-502035.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J203111.62+511110.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J203416.34+504336.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J203834.06+235809.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J203959.76+205644.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J204718.96+142209.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J204725.81+335705.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J204926.34+453926.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J205048.59+565335.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J205211.82+334109.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J205329.35+374321.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J200412.06+152721.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J200456.66+270534.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J200807.51+354350.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J201206.69+405114.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J201210.16+091708.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J201616.20-621634.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J202956.00+643115.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J203119.05+494638.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J203330.68+333048.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J204423.39+355249.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J204444.66+295534.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J204837.95+353237.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J205125.34+473518.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J205730.25+393955.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J205921.25+462536.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J210719.00+311844.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J210915.48+364439.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J211424.53+191652.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J211645.42+433630.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J212031.15+791726.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J212614.77+423613.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J211115.41+453834.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J211134.40+441200.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J211352.15+480335.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J211412.48-065708.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J213125.14+491319.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J213743.54+523700.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J215706.57+524805.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J220143.54+290618.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J220525.74+502915.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J220807.38+675014.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J221052.89+570507.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J221111.20+384951.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J221346.54+463156.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J221418.82+514255.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J221448.53+575343.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J221511.01+541918.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J214357.05+530314.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J215014.98+681435.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J215103.73+322843.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J215259.87+031143.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J215308.66+591201.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J215524.69+552146.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J220339.51+020418.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J220536.43+540124.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J221444.88-673209.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J221734.53+153134.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J221840.31+410433.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J222028.94+343918.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J222246.38-231024.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J223147.81+561726.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J223309.04+603602.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J223648.50+460950.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J223714.21+473350.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J223822.62+542245.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J224141.36+554904.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J224534.01+490702.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J224552.62+505642.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J225648.62+521038.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J224119.34+545404.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J224619.98-725235.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J225044.69+675242.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J225146.00+523411.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J225337.22-051921.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J225340.41+494735.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J225958.36+510534.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J230339.67+474233.2 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J230625.09-470820.3 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J232253.89+401326.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J232529.92+500628.6 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J230232.47-083107.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J231207.26+532513.4 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J231224.27+553030.7 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J231315.49+721630.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J232918.34+580516.5 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J232927.52+521711.9 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J234558.41+560129.1 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J234806.69+735956.0 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J234226.99+553444.8 | 방패자리 델타형 변광성 (DELTA_SCUTI) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 
 ## 식쌍성(거문고자리 베타형) — ECLIPSING_BETA_LYR (300개)
 
@@ -6686,306 +6686,306 @@
 
 | 천체 코드 | 정체 | 카탈로그 | 논문 출처 |
 |---|---|---|---|
-| J002456.87+372602.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J002642.20+563436.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J003124.02+625716.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J003437.91+501233.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J004934.69-405951.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J005058.37+594306.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J010139.74+583131.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J010218.34+202938.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J011115.48-142518.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J014055.14+542045.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J014736.04+650520.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J014853.58+573603.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J015236.84+820732.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J021109.54+613241.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J000848.31+524701.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J001433.04+511338.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J002220.09+573002.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J002344.58+692232.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J003154.78-035251.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J004240.77+411006.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J011159.77+281927.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J011600.42+533656.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J011818.50-005643.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J012054.04-652223.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J012123.22+355011.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J012249.18+711441.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J012436.89+391508.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J012942.52+220302.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J014941.82+594310.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J020117.37+425319.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J021226.07+202338.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J021451.66+534049.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J021938.60+690039.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J022722.43+522438.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J022917.80+552328.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J023216.37+515312.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J024431.24+530641.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J033052.97+783028.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J033718.34+415752.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J033746.32+760826.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J034009.09+494138.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J021320.85+421656.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J021717.14-010247.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J022015.97+244026.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J022656.04+112509.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J022904.14+552952.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J023414.87+465244.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J023652.04+443809.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J024506.93+372420.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J025149.52+452034.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J025653.83+433227.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J031246.90+423224.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J031427.36+115440.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J033144.56+064829.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J034702.90-033559.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J034908.69-420303.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J035450.81+790423.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J035731.12+024656.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J041045.11+534724.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J042021.75+274233.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J042922.83+452943.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J043714.23-462104.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J044611.81-072814.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J050019.88+740458.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J050832.75+383841.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J051005.78+513846.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J051117.28+284007.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J051248.86+360849.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J051702.28+605102.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J051717.43+380513.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J052315.54-391354.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J052332.24+190247.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J053132.97+450805.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J053807.80-231418.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J053814.26-410317.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J053817.65+213004.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J055005.96+011103.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J060720.50-380849.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J060742.44+644506.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J060911.46+084052.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J061011.80+230139.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J061251.36+155111.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J062431.02+205931.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J062527.79-363214.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J062755.52+000720.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J063035.35+381425.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J063252.54+635141.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J063457.33+495334.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J063628.83+065643.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J064052.45-135613.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J064455.49-413011.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J064909.61+095556.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J064918.38-115215.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J035036.21-605609.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J035539.86+543953.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J040207.38+424629.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J040648.61-445700.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J041628.11-455340.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J042003.08+450651.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J043237.20+140624.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J043420.81+204721.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J043646.50-503844.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J043948.25+443630.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J044048.24+190406.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J045835.83-072659.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J045925.99-192102.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J050246.92+421552.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J050247.93+454119.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J050255.29+363347.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J050739.83+240101.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J051530.44+664935.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J052304.52+113704.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J052551.62-193626.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J052704.13+532027.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J053636.37-174031.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J054601.30-274108.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J054940.05+403059.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J060236.75+160333.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J060300.15+415519.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J060720.65+354120.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J061949.58-373646.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J062438.69-032602.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J062821.14-323307.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J063115.74-243543.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J063430.07+193042.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J063447.97-431815.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J063652.17+304405.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J064113.55+185703.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J064121.09+062553.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J064123.06-000604.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J064207.51+180915.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J064640.09-250030.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J064820.69-463545.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J065000.10+312103.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J065227.96-003932.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J065234.50-075756.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J065248.37-294755.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J065315.26-185331.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J065358.74-121721.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J065401.88-342039.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J065707.53+174125.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J070101.41+221645.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J070247.60-065901.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J070548.65+023021.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J070553.96+144212.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J070635.86-394039.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J070912.95-183841.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J071534.05-134722.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J071623.71+240527.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J071648.96+111740.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J071945.16+210643.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J072253.93+445508.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J072716.25-274508.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J072912.82-193103.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J072951.19-624839.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J073529.88-213224.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J073624.61-011616.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J073624.65-011617.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J073704.73-120454.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J073730.60-070916.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J073826.28-004428.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J074711.66+512524.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J074802.68-363303.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J075350.07-434825.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J075816.44-321051.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J080438.05-262223.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J080607.11-483505.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J080753.20-395600.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J081011.69-071620.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J081219.93-361636.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J081242.78-580950.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J081316.17-690411.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J081403.37-224607.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J082003.38-421504.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J082140.05-060302.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J082456.60-190901.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J083544.31+054700.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J083846.75-604247.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J084258.84-004119.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J084628.78-112928.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J084641.60-450155.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J084759.68-281249.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J085843.89-330754.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J090119.01+840530.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J090143.72-270530.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J091843.61-323834.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J092056.04-705308.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J092818.41-340821.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J093506.23-445032.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J093617.90-370337.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J093748.88-191023.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J094630.83-385311.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J094640.39-701211.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J094644.05-464346.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J094708.49-635636.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J094833.10-555520.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J095041.44-281741.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J095402.23-111655.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J095742.73-632108.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J100208.10-505139.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J100728.17-495123.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J100802.13-461019.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J102742.46+052934.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J103005.94+234819.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J103143.08-450100.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J103352.94-583950.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J103452.37-454917.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J103812.61-430240.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J104141.52-533351.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J104455.18-635145.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J104717.54-335143.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J104802.04-695209.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J105220.76-580119.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J111045.09-412035.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J111443.92+443937.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J112110.31-371440.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J112206.24-633450.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J112653.16-621154.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J112718.47-700522.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J114135.39-473726.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J114828.39-623300.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J114905.13-652602.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J121241.75-701953.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J121331.46-441549.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J121530.90-621852.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J123157.78-194517.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J123550.17-564826.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J125317.53-460022.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J130811.87-640939.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J132319.66-804806.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J132801.52-654916.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J133321.94-532338.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J133602.30-582829.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J135314.30-372314.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J135316.87-424959.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J135527.99-684444.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J135555.32-425857.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J135827.84-213547.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J140254.39-404810.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J141301.50-401624.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J141502.61-472305.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J142836.84-452447.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J143351.61-625211.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J143714.65-582421.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J143831.02-443432.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J144314.07-592523.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J144348.91-494508.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J145401.58-793143.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J145634.37-613717.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J145838.71-744538.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J145930.04-382106.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J150003.76-614436.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J150513.39-534301.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J150848.70-750711.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J151546.70-504106.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J152340.12-243118.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J153222.79+292314.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J154240.47-654138.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J065315.01-434852.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J065816.70+115852.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J070004.90-401456.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J070044.72+084903.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J070709.20-025552.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J070840.43+063326.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J070928.08-691750.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J071633.61-474944.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J071724.18-484209.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J071801.40-001258.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J071829.83+260016.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J071909.88+091218.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J071935.34-383930.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J072031.60-014912.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J072234.32-212758.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J072351.03-083458.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J072457.19-522918.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J072610.45+442744.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J072621.88-015130.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J072731.23-213134.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J072749.68-000757.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J072924.04-242307.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J073112.48-312217.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J073359.78-182527.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J073431.00-275433.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J074706.09+214037.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J075347.99+104204.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J075418.89-071043.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J075928.56-141411.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J081526.13-453426.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J081659.31-325954.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J082737.77-564527.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J083805.56-381913.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J083838.67-461407.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J083907.42-290453.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J084200.26-105342.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J084317.68-430552.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J084756.97-494059.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J084839.17-233439.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J085111.56-633308.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J085203.87-580700.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J085634.37-751322.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J085646.52+820749.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J090241.16-191852.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J090305.91-503954.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J090415.72-540916.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J091630.31-244114.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J091733.59-193412.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J092103.33-543349.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J093115.04-501600.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J093132.84-625244.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J093844.15-571927.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J094006.92-600408.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J094133.90-652455.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J095237.06-672902.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J095331.95-551001.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J095808.09+401822.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J095901.02+421947.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J100233.89-360852.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J100553.46-604950.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J100758.23-574037.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J101722.68-645215.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J101825.68-612247.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J102306.08-520401.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J102352.76-604919.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J103505.26-182933.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J103949.27-384919.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J104929.96-101636.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J105624.61-652038.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J110448.67-675206.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J110454.81-535147.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J110539.08-313907.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J110628.95+484242.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J111722.33-670447.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J112205.61+464333.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J113417.38-323456.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J114321.56-694509.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J114634.98-594317.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J114653.66-593327.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J120003.95+632552.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J122954.84-632326.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J123347.76-610212.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J123745.77-610059.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J124108.39-483137.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J124704.32-361632.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J130356.39+030353.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J130900.27-594426.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J132042.53-642952.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J132321.27-564846.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J132640.89-640803.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J133315.35-545234.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J134157.38+053125.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J134328.43-540813.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J134637.27-603405.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J135112.57-445939.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J135313.63-594141.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J135552.53-391518.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J135647.53+751826.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J140250.22-000946.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J140438.72+765149.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J140648.81-754955.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J140919.16-504349.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J141327.76-473232.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J142424.61-423328.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J142743.25+052038.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J143310.04-593954.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J143519.49-634916.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J144348.88-463205.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J145726.98-733115.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J152241.27-140852.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J153454.24-631527.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J154346.34+110746.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J154503.66-433038.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J154610.67-274339.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J154713.44-365109.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J154854.55-322350.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J155408.34-450224.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J160457.18-155414.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J161939.90-522938.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J162155.12-381029.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J162211.88-544908.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J163108.41-350121.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J163845.91-590247.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J163914.70-652439.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J164711.08-465154.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J164847.94+391320.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J165126.73-454941.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J165305.51-502155.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J165308.64+121926.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J165713.89-382333.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J165815.65+131815.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J170357.54-242336.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J170515.96+075822.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J171159.64+513346.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J171226.59-321303.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J172516.64+392432.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J172715.85-175947.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J172844.85-542053.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J172907.00-454805.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J172931.67+401030.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J173201.89-391901.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J155025.43-373458.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J155651.33-264340.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J155655.82-201919.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J160520.94-443852.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J162426.51-665828.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J162558.21-051602.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J162933.04+504633.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J162948.35+221833.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J164223.61-512514.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J164336.02-335009.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J164855.26-410943.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J165215.08-575520.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J165355.97-193323.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J170410.73+274629.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J170441.57-552318.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J171132.65-581335.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J171148.83+324403.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J171313.27-374407.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J171845.74-574630.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J172255.07+074150.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J172817.59-111301.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J173246.77+142534.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J173858.40-551339.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J173911.25-161625.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J174056.61+191053.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J174120.82+102018.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J174138.89-624239.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J175136.17+002500.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J175605.63-275426.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J180530.61-574343.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J180638.42-402119.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J180706.99+145144.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J180719.17-694351.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J180808.04-505925.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J180820.23+092147.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J180925.52+161614.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J181349.98+544902.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J181619.43+040403.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J181645.72+032228.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J182032.89+270910.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J182710.96+572409.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J182902.19+095528.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J183132.42-581954.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J183539.05-143732.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J183552.25+191040.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J183851.67-142517.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J184921.68+335001.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J185427.18-123635.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J185857.73+483332.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J190646.74-232219.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J190746.09-033322.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J190847.61+335633.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J191055.66+562246.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J191154.20+013835.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J191224.72-020649.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J192316.53-340254.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J192443.81+031748.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J192535.55+345453.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J192541.81-712927.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J193557.83-413802.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J193928.72-134222.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J194125.90+284626.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J194418.83-310129.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J194556.08+603912.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J194655.54+032023.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J195225.80+380914.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J195245.92-312914.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J195607.16+041156.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J195622.49+094524.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J195701.72-105823.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J195732.01-001107.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J195914.96-270729.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J195929.37+525048.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J200705.50+360451.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J200939.28+302313.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J201056.73-410916.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J201116.37+400025.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J201220.14+013110.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J201315.96-621453.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J201738.74+170029.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J202529.02+425605.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J202538.03+584536.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J202728.89+224906.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J204151.54+360012.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J204551.98+632812.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J204854.41+240153.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J204950.25+572810.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J205406.74+235725.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J205448.17+322303.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J205719.42-131247.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J205808.70+512222.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J210300.37+335139.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J210332.82+445514.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J210716.25+384957.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J212849.51+463710.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J174230.28-482323.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J174817.69-275017.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J180129.25+141745.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J181446.56-193324.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J182125.97+110744.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J182151.29-404014.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J182609.61-423129.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J182629.06+091856.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J183231.73-063820.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J183355.70+331237.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J183607.46+140427.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J184107.78-054014.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J184242.74+065539.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J184520.71-414414.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J184649.45-095556.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J184811.49+070949.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J184947.32+304311.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J185546.98-400443.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J185649.64-802356.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J190045.79-231437.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J190349.76-295927.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J190441.23-174011.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J190446.22+585704.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J190552.39-212024.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J190833.46+004055.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J191304.82-141724.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J191355.98-143154.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J191738.10-423353.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J191834.99-793237.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J191911.03-043033.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J191930.51-013543.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J192318.88+490208.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J192406.19+024007.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J193014.91+543906.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J193518.01-081033.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J193713.98-321359.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J193726.55+215550.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J193938.78+310023.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J194229.94-533905.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J194718.85-704504.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J194923.17-023421.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J195001.24+484616.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J195217.29+005014.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J195313.55-021706.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J200222.41-120318.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J200451.18-374334.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J200553.01+420936.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J201346.30+133740.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J201918.36+330037.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J202157.48-180032.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J202750.54-113716.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J202828.08+512628.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J203125.08-590406.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J203923.59+394744.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J204022.49+205737.8 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J204343.37+460941.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J205720.01-333352.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J210201.56+373738.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J210833.32-302856.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J211049.36+424920.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J211059.61-141814.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J212837.87+474218.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J212944.68-463943.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J213028.92+420726.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J213450.40+144525.9 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J213535.67+655118.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J213753.15+602638.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J215112.09+350503.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J215225.26+591143.1 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J215539.65+524009.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J220647.08-012332.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J221148.24+680618.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J221349.41-715243.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J221415.29+483051.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J223613.48+762619.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J225320.46-292458.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J225815.72+573008.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J230319.75+271959.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J233707.66+153236.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J214258.14+440520.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J214348.00+101750.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J215246.98+365623.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J215557.83+430251.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J220025.09+594130.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J220220.14+073906.3 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J220602.94+461722.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J220604.57+470956.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J220958.59+704837.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J221049.63+011233.0 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J222810.77+535611.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J222842.73+464241.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J223847.07+580538.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J224841.58+873012.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J232640.68+504943.5 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J233915.41+780651.6 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J234710.00-461802.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J235116.59-851725.7 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J234828.74+105448.2 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J235854.11+505128.4 | 식쌍성(거문고자리 베타형) (ECLIPSING_BETA_LYR) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 
 ## 자전 변광성 — ROTATIONAL_VARIABLE (300개)
 
@@ -6993,306 +6993,306 @@
 
 | 천체 코드 | 정체 | 카탈로그 | 논문 출처 |
 |---|---|---|---|
-| J000943.03+565542.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J001023.50+164852.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J001245.42+551047.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J001428.01+502338.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J002011.15-341616.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J002025.23+384652.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J002238.70+032737.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J002757.62+382911.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J003825.92+505652.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J004050.72+003629.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J004945.22-635123.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J005453.67+361558.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J010446.69-562144.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J011221.95+294955.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J011321.99-613952.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J011519.18+290841.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J012137.23+104500.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J023235.93+030323.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J023745.31+283513.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J024418.49-241552.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J030124.00+760251.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J030207.00-384108.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J031712.38+250942.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J031759.60+603329.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J032302.47+220040.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J032517.45+340154.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J033941.80+521818.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J034204.78+255308.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J034242.84+251653.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J034520.69+294657.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J034603.12+360333.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J034606.50+243402.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J035116.78+234935.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J035444.97+343706.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J035812.74+093222.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J040538.97+054441.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J041045.26-125706.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J041103.36+365013.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J041204.64-631542.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J041953.72+300954.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J042031.79+491032.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J043120.43-015900.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J043714.09+620432.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J050101.64-204825.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J050154.87+341850.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J050216.74+061356.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J050401.89-201925.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J051205.39+472024.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J051307.18+184452.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J052202.92-210638.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J052303.24-012916.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J052510.51+013559.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J052703.06+204150.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J052731.01+401214.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J052818.05-014809.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J052824.93+033338.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J052925.35-285227.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J053208.94-050231.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J053247.13-040903.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J053255.33+073102.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J053337.25-052652.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J053620.51+095217.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J053712.38-060703.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J053816.55-450505.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J053957.01+255449.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J054915.56-374331.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J055108.01+652712.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J061646.61-011020.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J061807.14+750603.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J062101.01-212744.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J062654.51+341803.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J063130.80-853825.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J063447.82-092323.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J064253.66-252535.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J064520.03-265715.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J064743.47-031157.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J064945.49-643745.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J065217.53+190105.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J065235.61+162211.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J065249.90-715614.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J065355.00-055306.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J070321.12+632130.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J071201.59-563124.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J071202.73-474924.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J071341.78+384643.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J071918.82+061114.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J072109.17-280039.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J072859.88-205543.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J073526.06+025644.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J074051.04-451436.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J074316.37+292425.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J075046.08-482912.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J075717.22-253541.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J080615.33-031207.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J080821.01+055212.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J080905.67-510744.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J081115.84-144315.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J081422.72-303440.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J081807.32-590210.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J081844.53-044737.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J081844.84-471003.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J081901.29+092353.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J082050.30-372742.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J082218.77-580057.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J082336.34-182951.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J082632.68-453510.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J082654.97-434628.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J083606.11-045015.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J085047.62-390220.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J085343.93-614326.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J090424.36-505927.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J091717.88+155847.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J092019.96+614750.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J092444.88-360555.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J093754.17-381105.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J094011.58+813655.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J094119.85-700609.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J094845.83-054801.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J094904.62-382834.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J095036.70-293328.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J095413.93-664108.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J095603.59-345900.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J100956.90-623256.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J102854.40-524457.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J103251.72-431526.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J103323.42-452759.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J104314.83-180624.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J105138.70+310349.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J110309.92+363909.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J110917.64-762757.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J111554.93+610103.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J112442.85-524844.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J113420.88-712759.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J114032.89-665903.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J115639.52-345210.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J115736.09+355145.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J120851.81-570432.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J120901.71-533659.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J121258.78-793128.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J123156.22-784833.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J123506.23-461956.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J124940.06-515645.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J125007.12-611632.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J125553.97-503853.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J130534.99-241522.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J130739.47-035134.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J130811.29-231412.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J131050.46-730933.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J131110.15-652835.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J131434.96-461801.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J132502.29-513743.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J132650.37-223628.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J132945.82-703711.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J133153.55-743248.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J134704.20-690345.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J134733.02-325301.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J135007.47-731739.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J135220.00+184315.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J140606.89+405915.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J141442.70-051223.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J143002.39+002329.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J143011.05-674153.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J143736.78-495048.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J145244.53-533104.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J145810.59-690551.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J145925.08+361832.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J150602.53-412739.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J151659.01-661837.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J151719.77-540441.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J152500.63-005719.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J152606.60-165943.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J152725.52+051317.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J152759.22-385932.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J152826.59-044734.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J153307.84+150723.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J153350.92-384003.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J153716.47-464523.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J153739.10-124643.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J154500.06-284057.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J155128.20-470703.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J160031.34-202705.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J161259.34+250040.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J161533.10-270758.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J161545.21-602627.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J162424.01+361147.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J163306.62+271730.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J163654.21-252019.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J163746.67-384844.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J163858.54-362033.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J164103.63-370502.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J164647.53+493631.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J164832.72+175137.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J165043.82-303528.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J165357.09-115854.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J165525.82+003521.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J165648.50-382057.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J165846.43-611226.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J170535.59+174758.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J170905.65+320631.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J171031.55-810445.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J171403.99-280010.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J172243.14-030410.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J172533.57-251706.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J172711.00+525357.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J173646.15-021235.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J174019.21-661119.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J175127.99-644918.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J175208.97+033956.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J175614.11+171149.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J175638.05+080731.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J175949.94+342443.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J180007.31-030807.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J180817.09-130908.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J181300.38+081560.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J181459.52-445151.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J181505.16+100823.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J181630.11+034336.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J183011.28-204928.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J183109.07-140643.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J183205.36+402957.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J183344.29+144348.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J183352.83+165607.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J183500.28+441131.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J184138.80+191644.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J184259.36+293356.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J185001.51+124015.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J185116.19-384604.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J185404.40-041636.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J185643.79+480702.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J185729.00+122449.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J185940.68-110507.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J185941.24+455820.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J185958.79+240324.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J190443.55-264438.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J190514.86-272417.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J190727.05-080049.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J191151.70+405441.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J191704.28+312116.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J191938.42-122742.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J191956.42+314851.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J192058.60-024718.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J192200.87-342010.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J192825.57+590051.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J192907.35+423754.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J193633.33+370905.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J193807.90-811110.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J193834.85+413455.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J194031.05+434517.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J194118.96-461213.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J194536.53-514602.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J195136.79+492353.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J000123.04+334640.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J000752.38+330533.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J001443.69+475122.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J001513.07+432441.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J002714.95+220829.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J003147.09+771858.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J005219.42+505333.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J005946.14+122317.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J010756.52-290038.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J011838.33+492451.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J012416.58+634313.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J013100.67+701151.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J014422.83+390728.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J015243.75+510906.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J020946.67+623409.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J022225.79+472921.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J023123.21-652503.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J023845.62+411517.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J025014.52+254629.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J032432.08+491826.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J032532.70-645607.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J033049.60+352217.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J033337.20-442336.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J033640.62+274957.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J034030.28+790736.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J035059.87+115930.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J035252.14+020238.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J035257.39+270016.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J040140.36+390723.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J041923.38-180633.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J042149.79-602905.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J042318.14-275910.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J042329.29+062604.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J042725.07-453037.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J043157.89-054712.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J044444.11+120053.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J045136.29+333216.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J045219.75+214128.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J045223.56+042531.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J045904.70+142055.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J050110.84+133556.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J051407.78+632816.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J052025.42+611726.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J052553.25-025614.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J052631.38+010435.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J052914.57+420545.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J053259.50-474739.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J053310.72-013135.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J053405.36-004717.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J053428.85-054713.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J053428.93-051415.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J053710.63+165457.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J053724.45-105249.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J053759.87-015012.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J053928.42+170028.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J054040.31-011833.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J054052.50-020046.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J054115.81+020716.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J054235.93+540138.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J054357.50-093933.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J054836.07+365012.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J055012.83+081431.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J055813.86+590550.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J055904.53-110051.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J060536.67-094432.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J060728.89+103647.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J061115.35+373401.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J061447.01+062057.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J061648.73-251735.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J062201.62-124411.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J062455.15+394205.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J062538.47+572946.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J062710.05-273532.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J063525.86-312712.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J064527.59+253944.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J064810.69-405400.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J070152.86+090315.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J070748.69+255752.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J070813.38+184638.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J070848.40-525328.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J070959.55+265454.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J071036.41-400434.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J071406.04-364153.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J071948.37+214259.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J072127.71-043518.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J072150.73-221453.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J072513.66-074819.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J072905.42-813807.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J073217.39-725607.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J073622.72-142332.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J074258.77+273959.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J074323.85-615521.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J074641.72-495310.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J074711.19-212033.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J075551.92+021600.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J075644.52-462443.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J075801.51-625017.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J075823.80-394821.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J075848.50-573650.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J080240.33-652845.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J080701.71-715352.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J081243.10-723651.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J081255.26+025446.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J081637.73+751014.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J082100.09-204302.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J082507.69+294706.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J082528.33-413238.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J082604.60-323727.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J083131.97-551311.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J083200.22-553904.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J083525.42-283633.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J083724.57-525411.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J084030.28-580913.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J084046.32-480533.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J084539.60-825915.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J085222.52-432847.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J085535.79-642122.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J090106.31+461837.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J090138.79-560226.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J091505.65+711930.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J092747.14-272206.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J093426.62-632023.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J094119.30-042442.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J100540.96-380839.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J101037.64-632816.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J101431.52+021317.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J101908.56-282814.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J103557.39-680545.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J104523.92-254632.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J104611.01-500314.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J104814.19-583052.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J105655.05-403322.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J112009.82-472720.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J112155.76-502634.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J112727.36-522958.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J112951.30-214611.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J113354.21-651751.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J113832.95-222818.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J115056.76-413417.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J115410.28-045602.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J121601.20-561408.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J122511.01-722703.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J122544.91+085741.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J122710.84-432355.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J123457.25-795923.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J123935.29-502712.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J125355.57-604450.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J130416.26-262714.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J130550.92-530418.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J131027.30-020327.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J131335.20-220636.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J132459.61-664759.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J132916.86-284858.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J133105.59-623951.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J142227.59+073812.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J142636.38+015224.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J143352.28-512837.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J143405.64+091603.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J143827.00+283017.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J144423.94-330738.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J144542.47+164001.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J144627.82-590343.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J150406.27+485853.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J150754.22-473029.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J150838.89-210251.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J152504.37-501027.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J152859.98-375031.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J152936.58-323125.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J153213.74-365721.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J153511.87+872421.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J153524.25+731442.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J153946.77-363159.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J154527.55-581346.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J154829.02-382655.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J155047.41-702146.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J155219.47-381932.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J155234.57-281516.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J155519.82-534400.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J155521.37-255432.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J155807.51-452206.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J160356.15-835539.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J160814.71-190833.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J160830.68-382827.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J161108.36-683630.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J161206.68-301027.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J161807.56-241411.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J162322.07-212549.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J162811.01-233634.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J163727.20-003133.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J163734.80-690824.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J164243.09-765141.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J164250.26-275112.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J165358.11-570743.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J170012.71+104455.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J170120.91+084740.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J170123.65-535513.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J170757.89+291915.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J170926.81-742930.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J171546.78-824704.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J173152.00-063919.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J173544.66-435650.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J174017.88-632955.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J175508.82+040425.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J175801.20-653053.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J175802.66-305745.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J180747.92+154827.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J181734.30-004539.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J181847.98+342235.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J181918.86+275823.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J182050.66+030108.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J182613.89+573609.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J183116.28-604220.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J183157.71-205135.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J183315.79-373013.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J184142.99+053435.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J184219.90-321727.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J185057.73-561133.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J185127.31+434028.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J185345.44+272702.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J185746.86+174704.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J190133.47+665225.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J190411.23+644943.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J190442.69+293101.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J190804.44-213923.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J191238.79-562817.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J191251.46+384549.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J191407.13-294144.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J191452.69-224834.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J191540.17+024645.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J191606.33-102533.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J191714.65-340442.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J191955.08+363454.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J192114.63+045655.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J192338.30-220611.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J192423.48+394258.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J192840.51+092056.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J192856.37-403759.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J192947.81-011545.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J192952.82+592717.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J193040.23-202319.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J193158.95+001607.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J193222.70-731745.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J193251.55-285912.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J193403.43-533644.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J193758.49+464151.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J194455.91-022022.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J194811.13+080010.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J194940.36-121846.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J195109.39-140438.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J195148.35-182136.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J195247.51-113136.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J195447.52+151134.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J195624.54+051439.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J195810.02+190807.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J195928.55-361024.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J200627.44+475642.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J200723.06+181053.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J200936.12+144021.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J201346.25+045757.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J201452.60+380125.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J201843.42-345045.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J201956.05+162434.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J202158.06-821238.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J202812.82+051108.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J203102.16+302433.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J203347.49+201054.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J203832.41+543948.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J204711.67+062315.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J204859.71+492558.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J204938.07+362519.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J205540.42+290100.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J210817.69+745549.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J211132.02+025601.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J211649.43+385013.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J211700.26+142621.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J213144.40+430503.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J213241.75+853216.5 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J213359.07-731216.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J213649.79+351107.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J213726.99-374133.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J213816.06+573654.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J214856.36-004052.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J215242.90+132851.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J215558.36+364927.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J220451.60-473201.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J220838.13+305248.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J220958.70+444214.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J221706.72+404115.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J222310.61-114431.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J222558.18+210842.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J222705.22+652131.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J224147.37-254514.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J224603.48+663036.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J225057.72+451026.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J225123.76+461843.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J231811.20+350820.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J231815.55-200018.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J232407.64+434305.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J234134.41+753120.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J235456.74+335625.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J235602.75-024940.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J200111.53+720613.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J200117.20+485913.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J200131.81-233307.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J200322.74-262046.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J200814.06-621130.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J200916.97+124647.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J201237.79-124038.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J202457.48+392939.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J203118.47-591305.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J204348.68+571448.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J204608.37-312612.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J205154.50+445434.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J205546.08-543540.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J205859.38+483951.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J210154.30+123615.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J210517.79+171021.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J210901.17+093021.4 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J211013.92+014036.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J211020.17-264618.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J212213.91+423835.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J212511.67-085737.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J213510.25+342750.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J213937.86+375715.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J214034.55-161958.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J214037.62+424921.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J214532.81-095230.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J214954.09+383230.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J215024.21+471010.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J215446.57+390032.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J220407.55+263510.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J220441.00+491043.9 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J220621.28-030635.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J221832.46+192410.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J221920.82+301505.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J222633.25-055739.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J224337.67-010927.6 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J224737.28+231415.2 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J224919.07+550925.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J225004.38-075248.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J231436.80+102139.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J232443.50+572352.8 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J232633.21+315322.7 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J233146.37+502537.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J233146.76+455919.3 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J234754.29+540256.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J234920.13+782949.1 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J235454.99+512908.0 | 자전 변광성 (ROTATIONAL_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 
 ## 젊은 별 변광성 — YSO_VARIABLE (300개)
 
@@ -7304,9 +7304,9 @@
 | J002751.03+492204.4 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J002910.27+564255.7 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J003125.92-680524.5 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J004453.10-721606.0 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J004911.15+503956.7 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J010101.02-705011.0 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J011529.95-705821.5 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J011732.62-750706.4 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J011740.15+582950.4 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J012110.69-755700.6 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
@@ -7332,7 +7332,6 @@
 | J044145.66+230157.5 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J044307.39-634540.0 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J044538.78-690315.7 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J044901.07-641238.1 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J044916.92+485009.6 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J045221.95-755646.6 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J045510.97+302158.7 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
@@ -7370,9 +7369,7 @@
 | J053550.91-051509.7 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J053554.08-050414.8 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J053559.53-053711.2 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J053638.04+094050.8 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J053652.25-012123.9 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J053718.85-060941.1 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J053722.54-025937.2 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J053755.87+093423.7 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J053802.84-725517.1 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
@@ -7382,10 +7379,8 @@
 | J053926.07-043745.2 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J053956.02-025123.0 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J054005.45-062139.5 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J054012.85-022201.8 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J054243.77-091039.2 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J054419.20+091235.0 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J054423.21+091203.9 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J054356.02-630901.6 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J054706.95+000047.6 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J054902.38+010731.4 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J055416.93+043503.8 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
@@ -7404,6 +7399,7 @@
 | J063857.54-691154.2 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J064012.61+100540.8 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J064040.02+093503.7 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J064053.63+093324.8 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J064056.79+093748.7 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J064059.43+095945.7 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J064116.59+092952.0 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
@@ -7413,6 +7409,7 @@
 | J065239.35-105552.5 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J065245.48-032441.8 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J065718.66-040207.3 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J071950.41-185645.5 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J073121.90-465744.7 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J073822.10-280340.2 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J074520.55-712034.8 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
@@ -7422,14 +7419,14 @@
 | J075546.53-342551.4 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J080210.46+101558.1 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J080839.25-360501.3 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J081109.71-465038.7 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J081309.56-382719.0 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J081443.17-421051.5 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J081730.16-481119.0 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J081739.12-824328.9 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J082147.38-253623.5 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J082710.97-502057.3 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J083210.16-372415.3 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J084227.30-785748.5 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J090341.12-532637.1 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J105907.40-770140.8 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J111340.56-644901.3 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J111719.00-172915.3 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
@@ -7443,27 +7440,28 @@
 | J123815.30-120039.6 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J130923.92-642806.6 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J131246.79-561024.5 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J132147.70-655055.5 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J133557.13+062354.9 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J134745.60+125625.6 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J135301.42+004714.6 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J140810.08-412353.2 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J142631.28-594850.0 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J144251.85-045751.3 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J145040.32-584316.5 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J144644.38+051241.0 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J145207.55-010259.8 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J145208.30-080727.4 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J145610.27-544506.7 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J150106.92-053138.7 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J151511.04-133228.6 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J151612.66-550015.2 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J151640.72-521438.5 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J153101.99-341634.7 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J153532.33-531429.0 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J153910.62-154639.2 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J155458.27-500717.0 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J155609.24-375608.1 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J155744.53-404928.0 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J155820.39-403306.6 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J160131.89-500847.1 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J160849.97-283552.8 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J161156.25-194323.3 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J161431.75-514719.6 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J162740.18-242204.3 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
@@ -7475,8 +7473,10 @@
 | J164129.54-514838.2 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J164258.93-441058.8 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J164525.99-250317.2 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J164601.31-381408.8 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J164717.44-411248.9 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J164846.84-410701.8 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J170152.36-444527.6 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J170750.01+202617.1 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J170854.30-271233.3 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J171053.67-422859.7 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
@@ -7484,28 +7484,27 @@
 | J171206.09-321703.6 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J171335.26-305211.9 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J171829.67-281449.4 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J172121.30-311153.0 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J172237.02-304657.4 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J172640.42-235010.2 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J172820.16-224643.1 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J173131.53-322353.1 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J173244.86-322431.4 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J173340.62-172302.4 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J173459.18-182439.6 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J173515.77-271403.1 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J173516.90+113228.5 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J174038.13-233423.8 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J174056.46-223620.5 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J174102.60-275429.0 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J174430.37-104324.8 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J174627.82-241821.8 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J174638.45-354122.3 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J174807.38-240002.2 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J174849.35-344350.5 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J174852.06-300246.8 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J174905.29-293602.9 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J174906.61-294359.5 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J174912.79-293652.3 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J174932.92-294324.9 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J174955.02-292130.7 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J174957.05-301921.3 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J175012.52-290735.0 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J175013.76-291402.3 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J175018.37-355100.9 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J175021.23-335027.5 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
@@ -7516,6 +7515,7 @@
 | J175138.50-303303.6 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J175146.94-312334.6 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J175155.31-195817.7 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J175301.57-293312.5 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J175316.66-265250.2 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J175341.70-312848.1 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J175349.25-304738.9 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
@@ -7531,6 +7531,7 @@
 | J175618.91-340623.8 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J175633.47-303447.0 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J175706.54-143213.1 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J175736.18-292943.3 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J175826.10-304306.0 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J175848.79-333512.7 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J175851.04-281947.8 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
@@ -7539,6 +7540,7 @@
 | J180250.28-161740.9 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J180427.74-273722.7 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J180444.05-241939.4 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J180448.41-242903.9 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J180526.12-270729.5 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J180548.59-293359.8 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J180737.21-254220.8 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
@@ -7556,26 +7558,23 @@
 | J182129.90-161713.3 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J182211.00-181419.6 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J182304.22-155935.2 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J182307.28-014601.6 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J182359.57+033915.8 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J182528.84+025354.7 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J182529.94-172841.3 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J182722.06-264924.2 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J182810.15-281959.6 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J183451.35+041128.1 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J183547.20-245230.9 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J184021.34-112352.4 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J184713.08-122757.2 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J184715.62-103232.0 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J184808.73+190428.7 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J185127.49-052452.1 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J185339.40-032947.8 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J185355.77-060657.5 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J185514.86-005003.7 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J185554.38-102122.4 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J190351.62-020018.8 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J192038.80+081358.0 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J192055.67+222312.5 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J192155.44+201158.2 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J192728.62+123215.9 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J193042.17+142959.2 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J193253.99+074843.3 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
@@ -7585,8 +7584,8 @@
 | J203726.16-322358.5 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J204404.88+293953.4 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J205653.67+405845.5 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
-| J205952.30-153218.6 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J205959.77+781523.1 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J210209.62+181119.5 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J210406.36+501446.8 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J211444.37+812003.4 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J213658.51+572324.9 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
@@ -7597,6 +7596,7 @@
 | J223759.54+395919.8 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J223815.31+385658.3 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J224131.27-074050.8 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
+| J224339.27+750630.5 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J231554.54+650601.8 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J234458.32+580935.2 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
 | J234812.05+073813.5 | 젊은 별 변광성 (YSO_VARIABLE) | ASASSN-V | Jayasinghe et al. 2019-2021 |
@@ -12331,306 +12331,306 @@
 
 | 천체 코드 | 정체 | 카탈로그 | 논문 출처 |
 |---|---|---|---|
-| J000000.45+092308.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000001.47+211636.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000001.81+141150.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000002.97+225645.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000005.10-104850.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000006.78+062501.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000007.30+312138.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000008.13+001634.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000009.27-044943.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000010.09+194729.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000010.42-080844.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000011.11+264717.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000012.24-034301.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000013.20+225735.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000014.08+341633.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000015.01+195359.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000015.17+004833.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000016.30+231847.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000016.86-034204.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000017.38-085123.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000018.12+281310.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000018.34+035703.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000020.59+032357.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000021.47+202247.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000022.28-041018.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000022.36+181122.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000022.44-031041.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000025.62+071759.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000027.52+084312.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000032.90+214059.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000033.77+054957.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000033.79+033934.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000034.94+275031.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000035.49+295527.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000040.65-021259.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000042.48+222211.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000042.90+005539.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000043.77+244232.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000046.11+042326.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000047.36-033657.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000050.13-105545.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000051.33+075147.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000054.52-021441.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000054.60+240502.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000055.38+022610.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000056.37-004133.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000056.89-010409.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000058.81-075802.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000059.33+070859.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000059.98+333635.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000102.44+334410.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000102.61+005730.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000104.52+002753.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000107.19+305135.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000107.52+004113.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000108.71+045114.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000108.72+250924.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000111.15-054628.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000111.71+025026.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000113.25+303957.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000115.21-023405.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000116.62+195153.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000117.65+013427.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000118.89+041926.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000119.26+204041.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000122.10+254718.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000122.40+304256.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000122.41-000130.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000126.33+293005.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000126.49+272310.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000126.65+000018.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000127.11+002620.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000127.99+091812.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000128.59+035104.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000129.04+253544.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000130.63+192851.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000133.50+184133.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000134.18+075915.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000134.97+184540.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000139.32+331947.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000139.90-034813.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000142.37+300744.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000146.95+001428.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000150.28-032947.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000151.29-004454.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000151.58+232857.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000152.19+005543.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000152.78+085141.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000154.58+232031.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000154.89-002209.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000156.35+333053.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000156.63+222149.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000156.92+194036.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000159.56+135933.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000200.07+291810.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000201.57-000941.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000202.61+162702.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000203.01+035348.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000203.11+315153.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000203.63+300358.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000205.58+320727.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000205.94+132406.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000208.74+242014.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000212.17+005500.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000212.94+280331.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000213.60+104015.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000217.21+111203.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000217.86+112005.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000218.70+064801.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000219.47+222308.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000220.78+220513.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000223.10+001747.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000224.92+311835.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000225.80+350723.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000226.57+310349.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000231.23+305144.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000232.80+192520.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000233.98+185747.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000234.52+264954.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000235.29+260141.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000235.54+324740.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000237.45+042701.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000237.68+084018.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000239.35+114015.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000239.60+252120.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000240.45+281937.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000241.75-082249.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000242.70+055035.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000243.03+260535.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000243.89+003423.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000245.07-012018.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000245.12+285639.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000245.53-040138.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000246.11+104143.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000247.28+043947.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000247.60+043818.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000252.60-034345.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000254.09-012254.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000254.40+074235.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000255.45+353352.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000258.26+240316.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000301.72+083518.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000303.85+003446.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000304.56-043818.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000305.78+122009.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000305.79+081946.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000306.24-004930.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000308.77+243643.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000309.46+145523.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000309.84+320458.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000311.57+235250.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000312.89+292544.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000313.35+070340.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000314.32-014258.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000314.36+200945.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000314.89+341450.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000315.85+061331.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000315.86+290223.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000317.36+261546.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000320.19-023700.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000323.38+013232.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000325.20-004420.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000325.32+132617.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000325.92+101652.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000326.49+121850.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000329.02+223755.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000329.22+213300.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000333.91+304625.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000333.96+031521.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000335.30-023013.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000336.07+004743.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000344.99+033815.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000345.23-110818.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000347.33+340701.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000348.59-015014.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000350.08+015255.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000352.83+273244.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000353.37+265250.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000354.45-024636.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000355.48+035826.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000356.40+302914.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000356.77+320700.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000357.69+080327.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000357.69+321743.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000358.04+350246.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000358.93+255259.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000359.21-030416.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000402.06+213332.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000406.96-002156.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000407.26+272756.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000407.59+280410.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000408.37+002710.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000409.41+243605.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000409.52+020226.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000409.69+060618.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000409.93-024135.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000411.30+041227.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000412.27+050832.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000412.51-074357.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000414.58+194620.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000419.28+345551.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000420.09-024830.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000422.60+205716.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000425.38+045057.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000429.28+023106.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000430.26+033148.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000431.05+255749.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000431.92+034248.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000432.08+045802.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000434.01-100452.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000435.89+000204.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000442.03+003021.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000443.31+321401.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000444.30+020801.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000446.42+100819.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000447.65+224512.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000448.62-021545.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000449.68+130347.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000450.69+315129.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000450.97-013915.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000452.24-010124.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000452.95+330325.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000453.33-003659.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000453.44+225214.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000453.49+031253.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000453.70-040018.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000455.44-110637.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000455.60-023336.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000455.66+160722.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000457.78+243855.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000458.79-022629.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000502.09+071840.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000506.17+174844.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000506.59+292135.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000507.07-013245.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000507.20+252741.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000507.89+313458.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000510.26+050522.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000511.81+024955.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000513.05-001018.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000513.53+233658.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000515.51+150614.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000515.64+215650.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000515.93-003730.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000516.05+104040.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000517.81+232718.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000519.10+252912.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000521.02+324738.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000524.90+282111.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000525.39+222833.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000525.92+071429.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000526.13+042343.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000527.31-002117.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000531.41+001455.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000532.84+200717.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000537.93+342634.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000538.72+055340.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000538.83+050237.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000540.34+062610.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000540.70+332718.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000542.49-003022.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000546.32-073640.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000548.93-005847.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000549.77+331048.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000550.29+171201.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000550.91+225458.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000551.31+092119.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000552.02-010803.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000552.33-000655.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000553.32-031200.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000553.63+272003.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000554.08+073749.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000557.23+002837.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000557.65+110431.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000559.22+000011.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000600.66+255006.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000601.82-052845.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000603.42-045904.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000606.56+211948.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000607.53+004900.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000608.93+273802.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000610.06+002559.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000612.35+190020.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000612.39+125046.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000613.07+323602.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000613.56+233509.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000613.84+001909.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000615.09-013132.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000615.92-011609.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000616.45+065325.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000617.70+192012.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000617.97+194524.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000619.16-030126.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000619.74+042031.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000621.41+224455.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000623.26+054905.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000623.94+323626.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000625.41+100622.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000623.51+110703.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000624.49+190338.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
 | J000625.63-011800.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
-| J000625.76+260110.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000626.73-055513.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000628.96+332522.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000631.75+351609.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000632.07+191026.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000632.40+344430.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000633.30+050238.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000634.20+090544.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000634.49+130550.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000635.03+293958.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000635.96+230217.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000637.88+341313.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000638.43+250949.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000639.27-010202.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000639.31+082242.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000640.75+261054.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000641.74-021350.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000642.37+332757.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000643.46+003421.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000643.70-001200.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000646.31+104858.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000647.35-085558.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000648.52+135837.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000648.70-011957.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000648.71+264916.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000651.23+250915.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000654.07+072510.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000658.90-044033.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000659.42+265458.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000659.44+301344.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000700.36+234739.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000701.05+011215.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000705.64+263254.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000707.15+111437.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000707.41+062628.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000710.75+043727.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000711.94+004003.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000712.82+274116.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000715.00+324008.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000716.22+345709.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000718.77+350435.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000719.11+003932.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000719.80+010303.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000720.67+360814.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000721.01-015957.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000722.80+054023.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000723.28+344821.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000724.18+210643.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000726.03+263815.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000726.07+021221.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000728.12-020556.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000730.14-021459.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000730.82+160732.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000731.76+244705.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000731.87+314922.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000735.04+335008.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000735.69+035456.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000737.07+284723.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000739.61+043127.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000741.42+011209.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000742.49+033742.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000743.08+035632.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000744.25+040233.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000747.00-012916.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000747.74+264153.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000747.96-072238.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000752.30+162853.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000752.51-024525.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000752.58+063511.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000753.14+262023.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000753.64-090850.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000754.06+071324.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000754.24+171904.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000755.32+321652.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000759.22+271120.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000800.14+265608.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000801.15+320259.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000804.47+325847.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000805.40-001001.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000807.58+104315.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000812.43+252707.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000815.34+102143.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000816.08-001153.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000816.42+340422.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000817.11+250459.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000817.68+201240.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000819.26+285423.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000819.57+102433.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000821.83+123801.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000822.05+070156.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000822.33-105631.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000824.93-025951.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000825.80+180733.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000827.47+101758.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000828.78-005707.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000830.18+244239.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000830.28-015233.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000830.43+344748.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000832.05+201836.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000832.53-005706.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000835.31+285253.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000840.10+013459.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000840.76-042116.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000841.09+003720.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000844.16-010241.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000844.97-004445.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000845.76+091109.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000846.34-100645.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000847.58-001949.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000851.71+113238.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000853.56+280521.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000854.02+022249.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000854.72+150444.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000859.26+255305.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000900.38+265024.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000901.59+323539.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000902.08+340111.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000902.83-101227.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000903.49-073819.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000905.73+003730.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000905.77+273224.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000908.38+194819.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000908.67+250918.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000909.48+262456.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000910.20-001231.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000910.85+004028.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000910.93+102621.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000911.62+293243.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000912.53+265022.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000912.54+285507.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000912.65+014657.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000913.20+183220.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000913.98+023612.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000914.69+093601.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000920.37+052208.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000921.90+324747.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000922.13-043719.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000923.32+360836.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000926.10+060710.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000929.23+230500.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000931.53+030741.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000932.79+235325.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000933.66+044739.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000933.72+270925.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000933.96-032539.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000935.93-035005.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000936.56-030359.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000937.29-020905.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000938.59+071705.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000939.18+253536.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000939.50-090706.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000940.24+005519.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000941.24+061906.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000941.45+141650.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000943.56+304315.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000943.56+335034.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000945.47+015012.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000948.86+212651.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000951.15+295616.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000954.08-034520.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000954.43-001106.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000955.63+151022.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000956.63-035445.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J000959.63+222949.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001000.21+012404.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001004.01+201305.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001004.02+350349.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001005.28+190829.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001005.86+063828.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001014.60+200643.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001014.72+233110.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001017.22+215704.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001018.25+043854.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001020.24-103059.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001022.10-004701.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001022.56+022849.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001023.32+110446.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001024.00+261553.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001024.68+103609.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001024.90-102938.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001025.85+072648.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001025.91+005447.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001026.46+272628.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001027.41+063302.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001027.64+185533.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001030.82+114750.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001037.29+344143.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001037.76+232810.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001038.24-032840.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001038.88-005143.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001039.52+102514.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001039.61+045553.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001039.68+001822.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001039.97+304234.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001041.46+045335.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001042.93+064633.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001043.66+270428.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001045.03+015951.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001049.54+204702.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001051.54+071202.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001054.79-042724.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001057.59+011011.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001101.16+360518.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001102.47-004157.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001103.48+010032.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001104.66+012256.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001104.71+034256.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001106.76-040050.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001108.95+303101.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001114.20+034419.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001115.55+181526.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001116.51+010049.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001118.96-000734.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001119.78-041848.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001120.94-035702.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001121.52-042941.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001121.94+250515.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001122.41+343713.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001124.30+215126.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001125.59+292923.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001125.88+114155.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001125.95+012721.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001126.07+145631.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001126.20+141250.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001128.67-005234.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001128.80-042806.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001128.82+062440.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001130.67-111036.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001131.42+004718.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001133.82-083626.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001134.41+014023.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001138.86+020307.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001140.00+271915.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001140.23+165905.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001141.63+251359.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001144.94+005957.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001146.60+322219.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001148.21+302309.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001148.92-075633.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001150.54-035234.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001150.91+283457.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001151.21+181720.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001151.62-014842.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001152.62-015517.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001153.72-014622.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001155.91+200206.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001200.18+000850.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001200.71+335534.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001200.99+191423.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001201.12+114045.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001202.35+005313.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001207.06+240419.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001207.98+332534.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001213.49+222726.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001213.98+095621.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001214.15+052022.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001215.04+254804.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001215.77+192908.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001218.00-005252.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001222.76+352119.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001225.22+064754.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001226.50+023613.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001227.09+340745.0 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001228.46+324035.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001228.76+232501.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001229.38-012300.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001229.78+135744.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001231.33+275551.3 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001231.60+025918.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001231.97+071359.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001234.95+255311.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001235.84-002438.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001237.25+011634.4 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001238.44+185838.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001239.75+190808.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001240.95-050550.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001243.76+343155.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001245.33+231014.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001247.21+014817.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001247.97+060706.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001249.86+035707.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001249.89+285552.6 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001250.40+003830.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001251.00+101956.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001251.38+202008.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001252.83+072632.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001253.21+220152.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001253.52+241941.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001254.25+193707.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001255.52-050033.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001255.67+053150.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001257.63+083248.2 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001257.97-010901.5 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001301.32+265745.7 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001301.88+182356.1 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001303.08+290839.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001303.17+293930.9 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
+| J001303.31+150430.8 | 퀘이사(분광 확인) (QSO_SPECTROSCOPIC) | SDSS | Lyke et al. 2020, ApJS 250, 8 |
 
 ## 블레이자(BL Lac형) — BLAZAR_BL_LAC (300개)
 
