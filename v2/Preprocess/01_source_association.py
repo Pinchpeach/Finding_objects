@@ -32,6 +32,33 @@ AMBIG_SCORE_RATIO = 0.67
 # became an evidence-less object (fields RA 250 and RA 20).
 TARGET_SPECTRA = ("DESI DR1 spectroscopy", "DESI DR1 FastSpecFit")
 TARGET_IMAGING = "DESI Legacy Surveys DR10"
+# Literature annotation catalogues (2.47.0).  NED, SIMBAD and the compiled
+# object catalogues give identifications of a source measured elsewhere, not
+# detections of their own: NED holds separate entries for the optical, IR,
+# X-ray and radio names of one star when it has not cross-identified them
+# (Mazzarella et al. 2007, ASPC 382, 165), and SIMBAD coordinates are taken
+# from the best published measurement (Wenger et al. 2000, A&AS 143, 9).
+# The rule "one row per catalogue per object" therefore split one star into an
+# identified photometric object plus evidence-less NED objects at the same
+# position (reference-object validation, 2.46.2: 42 of 520 objects became
+# UNKNOWN only because the nearest "object" was such a row).  Annotation rows
+# are associated after every measurement (they never anchor a group), may
+# join a group that already holds a row of their catalogue, and are given to
+# the most probable candidate even when several are close.  Their membership
+# confidence is then the normalised posterior of that candidate among all
+# candidates (Budavari & Szalay 2008, ApJ 679, 301; Pineau et al. 2017,
+# A&A 597, A89), which down-weights their evidence when the choice is unsure.
+ANNOTATION_CATALOGS = frozenset(
+    {
+        "NED",
+        "SIMBAD",
+        "Roma-BZCAT",
+        "Suh 2021 AGB Catalog",
+        "HASH PN Catalog",
+        "Acker PN Spectroscopy",
+        "ATNF Pulsar Catalog",
+    }
+)
 TARGET_MATCH_ARCSEC = 0.3
 # Spatial pre-selection.  Any accepted pair is within the larger profile cap
 # (<= 45 arcsec) after proper-motion propagation; the index searches that cap
@@ -216,6 +243,7 @@ def run(raw_dir: Path, out: Path):
     # because its filename sorts earlier.
     detections.sort(
         key=lambda d: (
+            d.get("catalog") in ANNOTATION_CATALOGS,
             d.get("catalog") in TARGET_SPECTRA,
             *_anchor_key(d),
             str(d.get("catalog")),
@@ -263,7 +291,7 @@ def run(raw_dir: Path, out: Path):
                 group = groups[gi]
                 if group["entity_kind"] == "transient_event":
                     continue
-                if det["catalog"] in group["catalogs"]:
+                if det["catalog"] in group["catalogs"] and det["catalog"] not in ANNOTATION_CATALOGS:
                     # A second spectrum of a target already holding one is a
                     # duplicate, not evidence for a neighbour (field RA 20).
                     target_taken |= det["catalog"] in TARGET_SPECTRA and _target_sep(group, det) <= TARGET_MATCH_ARCSEC
@@ -303,6 +331,16 @@ def run(raw_dir: Path, out: Path):
         elif det["catalog"] in TARGET_SPECTRA and target_taken:
             candidates = []
         ambiguous = len(candidates) > 1 and candidates[1][0] >= candidates[0][0] * AMBIG_SCORE_RATIO
+        if ambiguous and det["catalog"] in ANNOTATION_CATALOGS:
+            total = sum(c[0] for c in candidates)
+            best = dict(candidates[0][3])
+            best["association_posterior"] = min(
+                float(best.get("association_posterior", best.get("association_score", 1.0)) or 0.0),
+                candidates[0][0] / total if total > 0 else 0.0,
+            )
+            best["association_method"] = "annotation_most_probable"
+            candidates = [(candidates[0][0], candidates[0][1], candidates[0][2], best)] + candidates[1:]
+            ambiguous = False
 
         if candidates and not ambiguous:
             _, _, gi, match = candidates[0]

@@ -106,6 +106,13 @@ def run(associations, raw_dir, out):
         groups.setdefault(a["object_id"], []).append(a)
     rows = []
     for oid, g in groups.items():
+        # An object can hold several rows of one annotation catalogue (2.47.0,
+        # e.g. two NED entries of one star); the most confident one is read
+        # last so its fields are the ones kept.
+        first = {}
+        for i, a in enumerate(g):
+            first.setdefault(a["catalog"], i)
+        g = sorted(g, key=lambda a: (first[a["catalog"]], _float(a.get("association_confidence")) if _float(a.get("association_confidence")) == _float(a.get("association_confidence")) else -1.0))
         conf = [_float(a.get("association_confidence")) for a in g]
         finite = [c for c in conf if c == c]
         rec = {
