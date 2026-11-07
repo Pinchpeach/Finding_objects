@@ -1,6 +1,6 @@
 # Reference objects of confirmed nature
 
-13614 objects, 50 types (`build_reference_objects.py`).
+13893 objects, 50 types (`build_reference_objects.py`).
 
 | coarse | type | n | source |
 |---|---|---|---|
@@ -34,6 +34,7 @@
 | STAR | HOT_SUBDWARF_SDB | 300 | Geier et al. 2017, A&A 600, A50 (catalogue of known hot subdwarf stars) |
 | STAR | HOT_SUBDWARF_SDO | 300 | Geier et al. 2017, A&A 600, A50 (catalogue of known hot subdwarf stars) |
 | STAR | HOT_SUBDWARF_SDOB | 300 | Geier et al. 2017, A&A 600, A50 (catalogue of known hot subdwarf stars) |
+| STAR | ULTRACOOL_T_DWARF | 300 | Kirkpatrick et al. 2021, ApJS 253, 7 (20 pc census of L, T, Y dwarfs) |
 | STAR | YSO_TAURUS_MEMBER | 300 | Esplin & Luhman 2019, AJ 158, 54 (spectroscopic members of Taurus) |
 | STAR | CEPHEID_CLASSICAL | 300 | Jayasinghe et al. 2019-2021 (ASAS-SN variable stars; VizieR II/366, Christy et al. 2023) |
 | STAR | CEPHEID_TYPE_II_CWA | 300 | Jayasinghe et al. 2019-2021 (ASAS-SN variable stars; VizieR II/366, Christy et al. 2023) |
@@ -48,7 +49,6 @@
 | OTHER | SUPERNOVA_II | 300 | Barbon et al. 1999, A&AS 139, 531 (Asiago Supernova Catalogue, updated; VizieR B/sn) |
 | OTHER | SUPERNOVA_IB_IC | 300 | Barbon et al. 1999, A&AS 139, 531 (Asiago Supernova Catalogue, updated; VizieR B/sn) |
 | STAR | CATACLYSMIC_DWARF_NOVA | 300 | Ritter & Kolb 2003, A&A 404, 301 (catalogue of CVs, LMXBs and related objects, final ed. 7.24) |
-| STAR | CATACLYSMIC_NOVA | 21 | Ritter & Kolb 2003, A&A 404, 301 (catalogue of CVs, LMXBs and related objects, final ed. 7.24) |
 | STAR | CATACLYSMIC_POLAR | 268 | Ritter & Kolb 2003, A&A 404, 301 (catalogue of CVs, LMXBs and related objects, final ed. 7.24) |
 | STAR | X_RAY_BINARY_LOW_MASS | 108 | Ritter & Kolb 2003, A&A 404, 301 (catalogue of CVs, LMXBs and related objects, final ed. 7.24) |
 | STAR | NOVA_CLASSICAL | 300 | Samus et al. 2017, Astron. Rep. 61, 80 (General Catalogue of Variable Stars, GCVS 5.1) |
