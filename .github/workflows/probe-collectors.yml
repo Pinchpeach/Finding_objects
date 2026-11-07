@@ -17,22 +17,22 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: "3.11"}
       - run: pip install pandas numpy scipy requests astropy astroquery pyvo
-      - name: Variants
+      - name: Mirrors
+        timeout-minutes: 15
         run: |
-          pip list 2>/dev/null | grep -iE "astroquery|astropy |pyvo"
           python - <<'PY'
-          import astropy.units as u
-          from astropy.coordinates import SkyCoord
-          from astroquery.vizier import Vizier
-          c = SkyCoord(296.69275*u.deg, -25.37747*u.deg)
+          import requests, time
+          hosts = ("vizier.cds.unistra.fr","vizier.cfa.harvard.edu","vizier.nao.ac.jp","vizier.iucaa.in","vizier.china-vo.org","vizier.idia.ac.za")
           for cat in ("II/328/allwise", "II/246/out", "VIII/65/nvss"):
-              for kw in (dict(columns=["**"], row_limit=-1), dict(columns=["**"], row_limit=50000), dict(row_limit=-1), dict(columns=["*"], row_limit=1000)):
+              for h in hosts:
+                  url = f"https://{h}/viz-bin/votable/-A?-source={cat}&-c=296.69275%20-25.37747&-c.rm=1&-out.max=50"
+                  t = time.time()
                   try:
-                      t = Vizier(**kw).query_region(c, radius=1*u.arcmin, catalog=cat)
-                      print(cat, kw, "tables", len(t), "rows", len(t[0]) if len(t) else 0, flush=True)
+                      r = requests.get(url, timeout=(10, 40))
+                      body = r.text
+                      print(f"{cat:16s} {h:26s} {r.status_code} {len(body):7d}B {time.time()-t:5.1f}s TR={body.count('<TR>')} TABLE={'<TABLE' in body} err={'QUERY_STATUS' in body and 'ERROR' in body}", flush=True)
+                      if r.status_code == 200 and body.count('<TR>') == 0:
+                          i = body.find('INFO'); print('    ', body[i:i+300].replace(chr(10),' '), flush=True)
                   except Exception as e:
-                      print(cat, kw, "ERR", repr(e)[:200], flush=True)
-          v = Vizier(columns=["**"], row_limit=-1)
-          q = v.query_region(c, radius=1*u.arcmin, catalog="II/328/allwise", get_query_payload=True)
-          print("payload", q)
+                      print(f"{cat:16s} {h:26s} EXC {type(e).__name__} {time.time()-t:5.1f}s", flush=True)
           PY
