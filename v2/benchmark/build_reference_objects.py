@@ -323,6 +323,18 @@ def remote_sources(only=None):
     return parts
 
 
+def write_list(ref: pd.DataFrame) -> None:
+    """Full list, per type: name (catalogue designation) / type / paper."""
+    out = ["# Reference objects by type", "", "Name (catalogue designation) / type / source paper. Positions are in `reference_objects.csv.gz`.", ""]
+    for coarse in ("STAR", "GALAXY", "QSO", "OTHER"):
+        for typ, g in ref[ref.coarse_class == coarse].groupby("type", sort=False):
+            out += [f"## {typ} ({coarse}, {len(g)})", "", f"Source: {g.source.iloc[0]} [{g.bibcode.iloc[0]}]", "", "| name | type | source |", "|---|---|---|"]
+            short = g.source.iloc[0].split(" (")[0]
+            out += [f"| {n} | {typ} | {short} |" for n in g.name.sort_values()]
+            out.append("")
+    (OUT / "REFERENCE_OBJECTS.md").write_text("\n".join(out) + "\n")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--only", nargs="*", help="remote source keys to fetch (default all)")
@@ -348,6 +360,7 @@ def main():
     lines = ["# Reference objects of confirmed nature", "", f"{len(ref)} objects, {s.type.nunique()} types (`build_reference_objects.py`).", "", "| coarse | type | n | source |", "|---|---|---|---|"]
     lines += [f"| {r.coarse_class} | {r.type} | {r.n} | {r.source} |" for r in s.itertuples()]
     (OUT / "SUMMARY.md").write_text("\n".join(lines) + "\n")
+    write_list(ref)
     print("\n".join(lines))
 
 
