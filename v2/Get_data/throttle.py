@@ -89,6 +89,20 @@ def _vizier_order(host: str) -> list[str]:
     return hosts
 
 
+def _tableless_votable(resp) -> bool:
+    """A 200 VOTable answer without any <TABLE> (no rows for any catalogue)."""
+    if getattr(resp, "status_code", None) != 200:
+        return False
+    try:
+        text = resp.text or ""
+    except Exception:
+        return False
+    head = str(getattr(resp, "headers", {}).get("Content-Type", "")).lower()
+    if "votable" not in head and "<VOTABLE" not in text[:2000].upper():
+        return False
+    return "<TABLE" not in text.upper()
+
+
 def _with_mirrors(send):
     """requests.Session.request that fails over between VizieR mirrors."""
     from urllib.parse import urlsplit, urlunsplit
@@ -104,6 +118,7 @@ def _with_mirrors(send):
         read = read[1] if isinstance(read, tuple) else read
         kwargs["timeout"] = (CONNECT_TIMEOUT_S, read)
         last = None
+        empty = None
         for i, host in enumerate(hosts):
             if i:
                 pause()  # every retry is an archive request too
@@ -116,11 +131,24 @@ def _with_mirrors(send):
             if resp.status_code in RETRY_STATUS and i < len(hosts) - 1:
                 last = resp
                 continue
+            # A mirror's table-less answer is not trusted on its own (2.47.0):
+            # on 2026-11-07, with Strasbourg unreachable, the CfA mirror
+            # answered 200 with a VOTable holding no table for every
+            # catalogue (AllWISE, 2MASS, NVSS) while IDIA returned the
+            # AllWISE rows; the empty answer was accepted and made the
+            # preferred mirror, so every VizieR collector of the 520
+            # reference-object runs came back empty.  Such an answer is kept
+            # only if no other mirror returns a table.
+            if host != VIZIER_HOSTS[0] and _tableless_votable(resp):
+                empty = empty or resp
+                continue
             if host != VIZIER_HOSTS[0]:
                 _preferred.update(host=host, until=time.monotonic() + MIRROR_STICKY_S)
             elif _preferred["host"]:
                 _preferred.update(host=None, until=0.0)
             return resp
+        if empty is not None:
+            return empty
         if isinstance(last, Exception):
             raise last
         return last

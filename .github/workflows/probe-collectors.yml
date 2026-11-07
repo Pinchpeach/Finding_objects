@@ -17,24 +17,7 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: "3.11"}
       - run: pip install pandas numpy scipy requests astropy astroquery pyvo
-      - name: Mirrors via astroquery
-        timeout-minutes: 15
+      - name: Controller after the mirror fix
+        timeout-minutes: 20
         run: |
-          python - <<'PY'
-          import time, astropy.units as u
-          from astropy.coordinates import SkyCoord
-          from astroquery.vizier import Vizier
-          c = SkyCoord(296.69275*u.deg, -25.37747*u.deg)
-          for h in ("vizier.cfa.harvard.edu", "vizier.idia.ac.za", "vizier.cds.unistra.fr"):
-              for cat in ("II/328/allwise", "VIII/65/nvss"):
-                  t = time.time()
-                  try:
-                      v = Vizier(columns=["**"], row_limit=-1, vizier_server=h, timeout=40)
-                      r = v.query_region(c, radius=1*u.arcmin, catalog=cat)
-                      print(h, cat, "tables", len(r), "rows", len(r[0]) if len(r) else 0, f"{time.time()-t:.1f}s", flush=True)
-                      if not len(r):
-                          resp = v._request("POST", url=v._server_to_url(return_type="votable"), data=v.query_region(c, radius=1*u.arcmin, catalog=cat, get_query_payload=True), timeout=40)
-                          i = resp.text.find("INFO"); print("   ", resp.status_code, resp.text[i:i+400].replace(chr(10), " "), flush=True)
-                  except Exception as e:
-                      print(h, cat, "EXC", repr(e)[:200], f"{time.time()-t:.1f}s", flush=True)
-          PY
+          python -u v2/Get_data/controller.py --ra 296.69275 --dec -25.37747 --radius 0.3 --out-dir /tmp/raw --workers 6 2>&1 | grep -E "^\[(allwise|twomass|galex|nvss|tgss|vlass|sga2020|gaia_dr3_variability_sos_vizier)\]" | head -40
