@@ -1,0 +1,28 @@
+{
+ "q:Gaia DR3 all-sky classification of 12.4 million variable sources": [
+  "RS Canum|RS CVn|\\bRS\\b",
+  "SOLAR_LIKE|solar-like",
+  "DSCT\\|GDOR|delta Scuti|\\bGDOR",
+  "\\bCV\\b|cataclysmic",
+  "purity|completeness"
+ ],
+ "q:compact planetary nebulae improved IR diagnostic criteria classification tree": [
+  "W1 ?[\u2212-] ?W4|W3 ?[\u2212-] ?W4|W2 ?[\u2212-] ?W3",
+  "J ?[\u2212-] ?H|H ?[\u2212-] ?Ks?",
+  "criteri"
+ ],
+ "q:classification of X-ray sources XMM-Newton serendipitous source catalog Lin Webb Barret": [
+  "F_?X ?/ ?F|flux ratio|fX/fopt",
+  "X-ray binar",
+  "log ?\\(?F"
+ ],
+ "q:XRBcats Galactic high mass X-ray binary catalogue": [
+  "selection|criteri",
+  "Be/X|supergiant",
+  "Gaia"
+ ],
+ "q:pulsars spectral indices population Jankowski": [
+  "mean spectral index|\u22121\\.6|-1\\.6",
+  "steep"
+ ]
+}

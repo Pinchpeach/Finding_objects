@@ -41,7 +41,7 @@ jobs:
           if-no-files-found: ignore
   score:
     needs: run
-    if: always()
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
