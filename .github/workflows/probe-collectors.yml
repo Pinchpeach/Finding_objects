@@ -17,22 +17,24 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: "3.11"}
       - run: pip install pandas numpy scipy requests astropy astroquery pyvo
-      - name: Mirrors
+      - name: Mirrors via astroquery
         timeout-minutes: 15
         run: |
           python - <<'PY'
-          import requests, time
-          hosts = ("vizier.cds.unistra.fr","vizier.cfa.harvard.edu","vizier.nao.ac.jp","vizier.iucaa.in","vizier.china-vo.org","vizier.idia.ac.za")
-          for cat in ("II/328/allwise", "II/246/out", "VIII/65/nvss"):
-              for h in hosts:
-                  url = f"https://{h}/viz-bin/votable/-A?-source={cat}&-c=296.69275%20-25.37747&-c.rm=1&-out.max=50"
+          import time, astropy.units as u
+          from astropy.coordinates import SkyCoord
+          from astroquery.vizier import Vizier
+          c = SkyCoord(296.69275*u.deg, -25.37747*u.deg)
+          for h in ("vizier.cfa.harvard.edu", "vizier.idia.ac.za", "vizier.cds.unistra.fr"):
+              for cat in ("II/328/allwise", "VIII/65/nvss"):
                   t = time.time()
                   try:
-                      r = requests.get(url, timeout=(10, 40))
-                      body = r.text
-                      print(f"{cat:16s} {h:26s} {r.status_code} {len(body):7d}B {time.time()-t:5.1f}s TR={body.count('<TR>')} TABLE={'<TABLE' in body} err={'QUERY_STATUS' in body and 'ERROR' in body}", flush=True)
-                      if r.status_code == 200 and body.count('<TR>') == 0:
-                          i = body.find('INFO'); print('    ', body[i:i+300].replace(chr(10),' '), flush=True)
+                      v = Vizier(columns=["**"], row_limit=-1, vizier_server=h, timeout=40)
+                      r = v.query_region(c, radius=1*u.arcmin, catalog=cat)
+                      print(h, cat, "tables", len(r), "rows", len(r[0]) if len(r) else 0, f"{time.time()-t:.1f}s", flush=True)
+                      if not len(r):
+                          resp = v._request("POST", url=v._server_to_url(return_type="votable"), data=v.query_region(c, radius=1*u.arcmin, catalog=cat, get_query_payload=True), timeout=40)
+                          i = resp.text.find("INFO"); print("   ", resp.status_code, resp.text[i:i+400].replace(chr(10), " "), flush=True)
                   except Exception as e:
-                      print(f"{cat:16s} {h:26s} EXC {type(e).__name__} {time.time()-t:5.1f}s", flush=True)
+                      print(h, cat, "EXC", repr(e)[:200], f"{time.time()-t:.1f}s", flush=True)
           PY
