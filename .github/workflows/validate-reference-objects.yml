@@ -56,7 +56,16 @@ jobs:
           path: /tmp/refval
           merge-multiple: true
       - name: Score
-        run: python -u v2/benchmark/validate_reference_objects.py score --in /tmp/refval --out v2/reference_objects/validation
+        run: |
+          if [ "${{ github.event.inputs.keep }}" = "1" ]; then
+            # probe: keep the per-object tables, leave the main results alone
+            mkdir -p v2/reference_objects/validation/probe
+            cp -r /tmp/refval/keep/* v2/reference_objects/validation/probe/ || true
+            find v2/reference_objects/validation/probe -name "*.csv" -exec gzip -f {} \;
+            python -u v2/benchmark/validate_reference_objects.py score --in /tmp/refval --out v2/reference_objects/validation/probe
+          else
+            python -u v2/benchmark/validate_reference_objects.py score --in /tmp/refval --out v2/reference_objects/validation
+          fi
       - name: Commit
         run: |
           git config user.name "github-actions[bot]"
