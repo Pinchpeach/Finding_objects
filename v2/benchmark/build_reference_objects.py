@@ -262,9 +262,14 @@ def remote_sources(only=None):
     if want("kirk21"):
         d = fetch("J/ApJS/253/7", limit=3000, need=("SpTO", "SpTIR"))
         if d is not None:
-            # encoding of the spectral types checked against known objects before use
-            with pd.option_context("display.width", 200):
-                print(d[[c for c in ("Name", "T", "SpTO", "SpTIR", "SpAd", "r_SpTO") if c in d]].head(40).to_string(), flush=True)
+            # Numeric types: L0 = 0, T0 = 10, Y0 = 20 (checked: SDSS 0000+2554 T4.5 -> 14.5,
+            # 2MASS 0036+1821 L3.5 -> 3.5, WISE 0005+3737 T9 -> 19).  Adopted type SpAd; only
+            # objects with a measured optical or near-IR spectral type (not photometric estimates).
+            num = lambda c: pd.to_numeric(d[c], errors="coerce")  # noqa: E731
+            spec = num("SpTO").notna() | num("SpTIR").notna()
+            ad = num("SpAd")
+            for lo, hi, typ in ((0, 10, "ULTRACOOL_L_DWARF"), (10, 20, "ULTRACOOL_T_DWARF"), (20, 30, "ULTRACOOL_Y_DWARF")):
+                add("kirk21", d, typ, "STAR", "kirk21", ("Name",), "J/ApJS/253/7", lambda d, lo=lo, hi=hi: spec & (ad >= lo) & (ad < hi))
     if want("esplin19"):
         d = fetch("J/AJ/158/54/table1", limit=2000, need=("2MASS",))
         add("esplin19", d, "YSO_TAURUS_MEMBER", "STAR", "esplin19", lambda d: ("2MASS J" + d["2MASS"].astype(str).str.strip()).where(d["2MASS"].astype(str).str.strip().ne(""), d["Gaia"].astype(str)), "J/AJ/158/54")
