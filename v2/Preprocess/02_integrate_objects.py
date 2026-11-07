@@ -107,12 +107,21 @@ def run(associations, raw_dir, out):
     rows = []
     for oid, g in groups.items():
         # An object can hold several rows of one annotation catalogue (2.47.0,
-        # e.g. two NED entries of one star); the most confident one is read
-        # last so its fields are the ones kept.
+        # e.g. NED entries of one star under its 2MASS and WISE names).  The
+        # row read last is the one whose fields are kept: a row with a physical
+        # type (a galaxy, a carbon star) before band-only detections
+        # (association_model.BAND_ONLY_TYPES), then the most confident.
         first = {}
         for i, a in enumerate(g):
             first.setdefault(a["catalog"], i)
-        g = sorted(g, key=lambda a: (first[a["catalog"]], _float(a.get("association_confidence")) if _float(a.get("association_confidence")) == _float(a.get("association_confidence")) else -1.0))
+
+        def _order(a):
+            c = _float(a.get("association_confidence"))
+            t = a.get("annotation_type")
+            typed = isinstance(t, str) and t.strip() not in {"", "nan"}
+            return (first[a["catalog"]], typed, c if c == c else -1.0)
+
+        g = sorted(g, key=_order)
         conf = [_float(a.get("association_confidence")) for a in g]
         finite = [c for c in conf if c == c]
         rec = {

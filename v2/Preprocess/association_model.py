@@ -125,6 +125,31 @@ def _first(row: Mapping[str, Any], keys: tuple[str, ...]) -> float | None:
     return None
 
 
+# Object types that only say in which band something was detected (NED
+# IrS/UvS/XrayS/RadioS/VisS, SIMBAD IR/X/Rad/UV/...): NED keeps such entries
+# apart from the object until a cross-identification is made (Mazzarella et
+# al. 2007, ASPC 382, 165), so several of them can describe one star.  An
+# entry with a physical type (galaxy, supernova, cluster of galaxies, ...)
+# is an object NED/SIMBAD hold as distinct: a supernova and its host galaxy,
+# or an Abell cluster and its brightest galaxy, are separate entries at
+# nearly the same position (2.47.0 reference-object probe).
+BAND_ONLY_TYPES = frozenset(
+    {"IR", "X", "Rad", "UV", "mR", "cm", "smm", "Opt", "?", "Unknown", "IrS", "RadioS", "UvS", "XrayS", "VisS"}
+)
+TYPED_ANNOTATIONS = {"NED": "Type", "SIMBAD": "otype"}
+
+
+def annotation_physical_type(catalog: str, row: Mapping[str, Any]) -> str:
+    """The physical object type of a NED / SIMBAD row ('' when the row has
+    none or only a band-detection type)."""
+    col = TYPED_ANNOTATIONS.get(catalog)
+    if not col:
+        return ""
+    v = row.get(col)
+    t = "" if v is None else str(v).strip()
+    return "" if t.lower() in {"", "nan", "none", "<na>"} or t in BAND_ONLY_TYPES else t
+
+
 def canonical_aliases(catalog: str, row: Mapping[str, Any], catalog_object_id: str | None = None) -> set[str]:
     """Return namespaced cross-catalog identifiers safe for direct association.
 

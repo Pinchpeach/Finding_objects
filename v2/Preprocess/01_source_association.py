@@ -9,6 +9,7 @@ from pathlib import Path
 import pandas as pd
 
 from association_model import (
+    annotation_physical_type,
     assess_pair,
     canonical_aliases,
     infer_entity_kind,
@@ -211,6 +212,7 @@ def load(raw: Path):
                     "max_radius_arcsec": prof.max_radius_arcsec,
                     "source_density_arcsec2": density,
                     "association_aliases": canonical_aliases(cat, r, cid),
+                    "annotation_type": annotation_physical_type(cat, r),
                     "source_row": int(i),
                 }
             )
@@ -301,6 +303,11 @@ def run(raw_dir: Path, out: Path):
                 group = groups[gi]
                 if group["entity_kind"] == "transient_event":
                     continue
+                if det.get("annotation_type") and det["catalog"] in group["typed_annotations"]:
+                    # Two entries of one annotation catalogue that both carry a
+                    # physical type are two objects for that catalogue (a
+                    # supernova and its host galaxy; association_model).
+                    continue
                 if det["catalog"] in group["catalogs"] and det["catalog"] not in ANNOTATION_CATALOGS:
                     # A second spectrum of a target already holding one is a
                     # duplicate, not evidence for a neighbour (field RA 20).
@@ -362,6 +369,8 @@ def run(raw_dir: Path, out: Path):
             group = groups[gi]
             oid = group["id"]
             group["catalogs"].add(det["catalog"])
+            if det.get("annotation_type"):
+                group["typed_annotations"].add(det["catalog"])
             group["members"] += 1
             if det["catalog"] == TARGET_IMAGING:
                 group["targets"].append((det["ra"], det["dec"]))
@@ -379,6 +388,7 @@ def run(raw_dir: Path, out: Path):
                     "id": oid,
                     "anchor": det,
                     "catalogs": {det["catalog"]},
+                    "typed_annotations": {det["catalog"]} if det.get("annotation_type") else set(),
                     "members": 1,
                     "entity_kind": det["entity_kind"],
                     "aliases": set(det.get("association_aliases") or ()),
