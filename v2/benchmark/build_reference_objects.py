@@ -88,6 +88,12 @@ def take(df: pd.DataFrame, key: str, typ: str, coarse: str, paper: str, name, ra
             "dec": pd.to_numeric(df[dec], errors="coerce") if isinstance(dec, str) else dec,
         }
     )
+    # catalogue prefixes where the source gives a bare designation
+    pre = {"dr16q": "SDSS J", "nair": "SDSS J", "asassn": "ASASSN-V J"}.get(key)
+    if pre:
+        bare = out.name.str.replace(r"^(SDSS ?J|ASASSN-V ?J|J)", "", regex=True)
+        out["name"] = pre + bare
+    out["name"] = out.name.str.replace("JJ", "J", regex=False)
     out = out[out.name.ne("") & out.name.ne("nan")].drop_duplicates("name")
     n = len(out)
     out = out.sample(min(n, PER_TYPE), random_state=SEED) if n else out
