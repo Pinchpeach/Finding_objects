@@ -1,6 +1,6 @@
 # Reference objects of confirmed nature
 
-12269 objects, 47 types (`build_reference_objects.py`).
+13614 objects, 50 types (`build_reference_objects.py`).
 
 | coarse | type | n | source |
 |---|---|---|---|
@@ -9,8 +9,6 @@
 | QSO | QSO | 300 | Almeida et al. 2023, ApJS 267, 44 (SDSS DR18); classes by Bolton et al. 2012, AJ 144, 144 |
 | GALAXY | GALAXY_STAR_FORMING | 300 | Bolton et al. 2012, AJ 144, 144 (SDSS spectral sub-class from BPT, Brinchmann et al. 2004) |
 | GALAXY | GALAXY_STARBURST | 215 | Bolton et al. 2012, AJ 144, 144 (SDSS spectral sub-class from BPT, Brinchmann et al. 2004) |
-| GALAXY | GALAXY_AGN_NARROW_LINE | 72 | Bolton et al. 2012, AJ 144, 144 (SDSS spectral sub-class from BPT, Brinchmann et al. 2004) |
-| GALAXY | GALAXY_AGN_BROADLINE | 51 | Bolton et al. 2012, AJ 144, 144 (SDSS spectral sub-class from BPT, Brinchmann et al. 2004) |
 | STAR | WHITE_DWARF_DA | 150 | Guo et al. 2022, MNRAS 509, 2674 (LAMOST DR5 white dwarfs, visual spectral types) |
 | STAR | WHITE_DWARF_DB | 150 | Guo et al. 2022, MNRAS 509, 2674 (LAMOST DR5 white dwarfs, visual spectral types) |
 | STAR | AGB_CARBON_RICH | 300 | Suh 2021, ApJS 256, 43 (catalogue of AGB stars, C-rich / O-rich from IR spectra and photometry) |
@@ -29,6 +27,9 @@
 | GALAXY | LINER | 300 | Véron-Cetty & Véron 2010, A&A 518, A10 (quasars and active nuclei, 13th ed.) |
 | QSO | BLAZAR_BL_LAC | 300 | Massaro et al. 2015, Ap&SS 357, 75 (Roma-BZCAT 5th edition) |
 | QSO | BLAZAR_FSRQ | 300 | Massaro et al. 2015, Ap&SS 357, 75 (Roma-BZCAT 5th edition) |
+| GALAXY | GALAXY_ELLIPTICAL | 300 | Nair & Abraham 2010, ApJS 186, 427 (visual morphologies of 14,034 SDSS galaxies) |
+| GALAXY | GALAXY_LENTICULAR | 300 | Nair & Abraham 2010, ApJS 186, 427 (visual morphologies of 14,034 SDSS galaxies) |
+| GALAXY | GALAXY_SPIRAL | 300 | Nair & Abraham 2010, ApJS 186, 427 (visual morphologies of 14,034 SDSS galaxies) |
 | GALAXY | GALAXY_INTERACTING_PECULIAR | 300 | Arp 1966, ApJS 14, 1 (Atlas of Peculiar Galaxies) |
 | STAR | HOT_SUBDWARF_SDB | 300 | Geier et al. 2017, A&A 600, A50 (catalogue of known hot subdwarf stars) |
 | STAR | HOT_SUBDWARF_SDO | 300 | Geier et al. 2017, A&A 600, A50 (catalogue of known hot subdwarf stars) |
@@ -48,6 +49,8 @@
 | OTHER | SUPERNOVA_IB_IC | 300 | Barbon et al. 1999, A&AS 139, 531 (Asiago Supernova Catalogue, updated; VizieR B/sn) |
 | STAR | CATACLYSMIC_DWARF_NOVA | 300 | Ritter & Kolb 2003, A&A 404, 301 (catalogue of CVs, LMXBs and related objects, final ed. 7.24) |
 | STAR | CATACLYSMIC_NOVA | 21 | Ritter & Kolb 2003, A&A 404, 301 (catalogue of CVs, LMXBs and related objects, final ed. 7.24) |
+| STAR | CATACLYSMIC_POLAR | 268 | Ritter & Kolb 2003, A&A 404, 301 (catalogue of CVs, LMXBs and related objects, final ed. 7.24) |
 | STAR | X_RAY_BINARY_LOW_MASS | 108 | Ritter & Kolb 2003, A&A 404, 301 (catalogue of CVs, LMXBs and related objects, final ed. 7.24) |
+| STAR | NOVA_CLASSICAL | 300 | Samus et al. 2017, Astron. Rep. 61, 80 (General Catalogue of Variable Stars, GCVS 5.1) |
 | STAR | X_RAY_BINARY_HIGH_MASS | 114 | Liu, van Paradijs & van den Heuvel 2006, A&A 455, 1165 (catalogue of high-mass X-ray binaries) |
 | OTHER | GALAXY_CLUSTER | 300 | Abell, Corwin & Olowin 1989, ApJS 70, 1 (rich clusters of galaxies) |
