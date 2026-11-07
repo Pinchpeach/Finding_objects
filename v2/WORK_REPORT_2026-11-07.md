@@ -100,7 +100,7 @@
 사용자 요청: 관측 논문과 해석 논문을 바탕으로 정체가 확실한 천체 목록을 만든다. 큰 범주와 세부 항목을 모두 포함하고, 종류마다 100–1000개, 이름 / 종류 / 출처 순으로 정리한다.
 
 **결과:** `v2/reference_objects/`
-- `REFERENCE_OBJECTS.md`: 종류별 전체 목록(이름 / 종류 / 출처).
+- `REFERENCE_OBJECTS.md`: 종류별 전체 목록(천체 코드 / 정체 / 카탈로그 / 논문 출처, 사용자 요청 형식). 이름은 카탈로그(명명 체계)와 번호로 나눴다(예: Abell / 426, PSR / J1745-3040, ASASSN-V / J1946…, GCVS 이름은 GCVS / HO Del).
 - `SUMMARY.md`: 종류별 개수와 논문.
 - `reference_objects.csv.gz`: 위치·bibcode 포함.
 - 52종류, 14,108개.

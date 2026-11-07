@@ -278,7 +278,7 @@ def remote_sources(only=None):
                 add("kirk21", d, typ, "STAR", "kirk21", ("Name",), "J/ApJS/253/7", lambda d, lo=lo, hi=hi: spec & (ad >= lo) & (ad < hi))
     if want("esplin19"):
         d = fetch("J/AJ/158/54/table1", limit=2000, need=("2MASS",))
-        add("esplin19", d, "YSO_TAURUS_MEMBER", "STAR", "esplin19", lambda d: ("2MASS J" + d["2MASS"].astype(str).str.strip()).where(d["2MASS"].astype(str).str.strip().ne(""), d["Gaia"].astype(str)), "J/AJ/158/54")
+        add("esplin19", d, "YSO_TAURUS_MEMBER", "STAR", "esplin19", lambda d: ("2MASS J" + d["2MASS"].astype(str).str.strip()).where(d["2MASS"].astype(str).str.strip().ne(""), "Gaia DR2 " + d["Gaia"].astype(str)), "J/AJ/158/54")
     for t, typ in (("DCEP", "CEPHEID_CLASSICAL"), ("CWA", "CEPHEID_TYPE_II_CWA"), ("CWB", "CEPHEID_TYPE_II_CWB"), ("HADS", "DELTA_SCUTI_HADS"), ("DSCT", "DELTA_SCUTI"), ("EB", "ECLIPSING_BETA_LYR"), ("ROT", "ROTATIONAL_VARIABLE"), ("YSO", "YSO_VARIABLE")):
         if want("asassn"):
             d = fetch("II/366/catv2021", {"Type": f"={t}", "Prob": ">0.95"}, limit=3000)
@@ -329,23 +329,103 @@ def remote_sources(only=None):
     return parts
 
 
+KO = {
+    "STAR": "별", "GALAXY": "은하", "QSO": "퀘이사", "QSO_SPECTROSCOPIC": "퀘이사(분광 확인)",
+    "GALAXY_STAR_FORMING": "별 생성 은하", "GALAXY_STARBURST": "폭발적 별 생성 은하",
+    "GALAXY_ELLIPTICAL": "타원 은하", "GALAXY_LENTICULAR": "렌즈형(S0) 은하", "GALAXY_SPIRAL": "나선 은하",
+    "GALAXY_INTERACTING_PECULIAR": "상호작용·특이 은하", "SEYFERT_1": "1형 세이퍼트 은하", "SEYFERT_2": "2형 세이퍼트 은하",
+    "LINER": "라이너(LINER) 은하", "BLAZAR_BL_LAC": "블레이자(BL Lac형)", "BLAZAR_FSRQ": "블레이자(평탄 스펙트럼 전파 퀘이사)",
+    "WHITE_DWARF_DA": "백색왜성 DA형(수소)", "WHITE_DWARF_DB": "백색왜성 DB형(헬륨)",
+    "HOT_SUBDWARF_SDB": "고온 준왜성 sdB", "HOT_SUBDWARF_SDO": "고온 준왜성 sdO", "HOT_SUBDWARF_SDOB": "고온 준왜성 sdOB",
+    "ULTRACOOL_L_DWARF": "초저온 왜성 L형", "ULTRACOOL_T_DWARF": "초저온 왜성 T형", "ULTRACOOL_Y_DWARF": "초저온 왜성 Y형",
+    "RED_GIANT": "적색거성", "AGB_CARBON_RICH": "점근거성가지(AGB) 탄소별", "AGB_OXYGEN_RICH": "점근거성가지(AGB) 산소 과잉별",
+    "YSO_TAURUS_MEMBER": "젊은 별(황소자리 별 생성 영역 구성원)", "YSO_VARIABLE": "젊은 별 변광성",
+    "RR_LYRAE_AB": "거문고자리 RR형 변광성(RRab)", "RR_LYRAE_C": "거문고자리 RR형 변광성(RRc)",
+    "CEPHEID_CLASSICAL": "고전 세페이드", "CEPHEID_TYPE_II_CWA": "2형 세페이드(CWA)", "CEPHEID_TYPE_II_CWB": "2형 세페이드(CWB)",
+    "DELTA_SCUTI": "방패자리 델타형 변광성", "DELTA_SCUTI_HADS": "고진폭 방패자리 델타형 변광성",
+    "MIRA": "미라형 변광성", "SEMIREGULAR_VARIABLE": "반규칙 변광성", "ROTATIONAL_VARIABLE": "자전 변광성",
+    "ECLIPSING_ALGOL": "식쌍성(알골형)", "ECLIPSING_BETA_LYR": "식쌍성(거문고자리 베타형)", "ECLIPSING_W_UMA": "식쌍성(큰곰자리 W형)",
+    "CATACLYSMIC_DWARF_NOVA": "왜소신성", "CATACLYSMIC_POLAR": "자기 격변변광성(폴라·중간 폴라)", "NOVA_CLASSICAL": "고전 신성",
+    "X_RAY_BINARY_LOW_MASS": "저질량 X선 쌍성", "X_RAY_BINARY_HIGH_MASS": "고질량 X선 쌍성", "PULSAR": "펄서",
+    "PLANETARY_NEBULA": "행성상 성운", "SUPERNOVA_IA": "Ia형 초신성", "SUPERNOVA_II": "II형 초신성", "SUPERNOVA_IB_IC": "Ib/c형 초신성",
+    "GALAXY_CLUSTER": "은하단",
+}
+# designation systems written without a space before the number
+_GLUED = re.compile(r"^(NPM1G|[A-Z][A-Za-z]*?)(J?[\d+\-].*)$")
+# readable names where the source gives a bare designation (no survey prefix)
+SOURCE_CATALOG_NAME = {
+    "B/cb": "RKcat (Ritter & Kolb)",
+    "B/cb/lmxbdata": "RKcat LMXB (Ritter & Kolb)",
+    "J/A+A/600/A50": "Geier+2017 hot subdwarfs",
+    "VII/258": "Veron-Cetty & Veron 2010",
+    "J/ApJS/253/7": "Kirkpatrick+2021",
+    "J/AJ/158/54": "Esplin & Luhman 2019",
+    "J/A+A/455/1165": "Liu+2006 HMXB",
+}
+_GCVS = re.compile(r"^(V?\d*|[A-Z]{1,2}|[a-z]+) [A-Z][a-z]{2}$")  # GCVS names such as "HO Del", "V1309 Ori"
+
+
+def split_name(name: str, source_catalog: str):
+    """(catalogue / designation system, code) from a designation such as "Abell 426" or "SDSSJ1732+0839"."""
+    n = str(name).strip()
+    m = re.match(r"^(\[[^\]]+\])\s*(.+)$", n)
+    if m:
+        return m.group(1), m.group(2)
+    if _GCVS.match(n):
+        return "GCVS", n
+    m = re.match(r"^(.+?)\s+(\S*\d\S*)$", n)
+    if m:
+        return m.group(1), m.group(2)
+    m = _GLUED.match(n) if " " not in n else None
+    if m and m.group(1) not in ("J", "B", "G"):  # a bare "J0558+0006" is a coordinate name, not a catalogue
+        return m.group(1), m.group(2)
+    return SOURCE_CATALOG_NAME.get(source_catalog, source_catalog), n
+
+
 def write_list(ref: pd.DataFrame) -> None:
-    """Full list, per type: name (catalogue designation) / type / paper."""
-    out = ["# Reference objects by type", "", "Name (catalogue designation) / type / source paper. Positions are in `reference_objects.csv.gz`.", ""]
+    """Full list per type: object code / identity / catalogue / source paper."""
+    out = [
+        "# 정체가 확정된 천체 목록 (Reference objects by type)",
+        "",
+        "천체 코드 / 정체 / 카탈로그 / 논문 출처. 위치와 bibcode는 `reference_objects.csv.gz`.",
+        "",
+    ]
     for coarse in ("STAR", "GALAXY", "QSO", "OTHER"):
         for typ, g in ref[ref.coarse_class == coarse].groupby("type", sort=False):
-            out += [f"## {typ} ({coarse}, {len(g)})", "", f"Source: {g.source.iloc[0]} [{g.bibcode.iloc[0]}]", "", "| name | type | source |", "|---|---|---|"]
-            short = g.source.iloc[0].split(" (")[0]
-            out += [f"| {n} | {typ} | {short} |" for n in g.name.sort_values()]
+            ko = KO.get(typ, typ)
+            src = g.source.iloc[0].split(" (")[0]
+            out += [f"## {ko} — {typ} ({len(g)}개)", "", f"출처: {g.source.iloc[0]} [{g.bibcode.iloc[0]}]", ""]
+            out += ["| 천체 코드 | 정체 | 카탈로그 | 논문 출처 |", "|---|---|---|---|"]
+            out += [f"| {r.code} | {ko} ({typ}) | {r.catalog_name} | {src} |" for r in g.sort_values(["catalog_name", "code"]).itertuples()]
             out.append("")
     (OUT / "REFERENCE_OBJECTS.md").write_text("\n".join(out) + "\n")
+
+
+def finish(ref: pd.DataFrame) -> pd.DataFrame:
+    parts = [split_name(n, c) for n, c in zip(ref.name, ref.catalog)]
+    ref = ref.assign(catalog_name=[p[0] for p in parts], code=[p[1] for p in parts], identity=ref.type.map(KO))
+    return ref.rename(columns={"catalog": "source_catalog"})[
+        ["code", "identity", "type", "catalog_name", "source", "bibcode", "name", "coarse_class", "source_catalog", "ra", "dec"]
+    ]
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--only", nargs="*", help="remote source keys to fetch (default all)")
     ap.add_argument("--local-only", action="store_true")
+    ap.add_argument("--relabel", action="store_true", help="re-split names of the committed table (no fetching)")
     a = ap.parse_args()
+    if a.relabel:
+        old = pd.read_csv(OUT / "reference_objects.csv.gz")
+        old = old.rename(columns={"source_catalog": "catalog"})[["name", "type", "coarse_class", "source", "bibcode", "catalog", "ra", "dec"]]
+        ref = finish(old)
+        ref.to_csv(OUT / "reference_objects.csv.gz", index=False)
+        s = ref.groupby(["coarse_class", "type", "identity", "source"], sort=False).size().reset_index(name="n")
+        lines = ["# Reference objects of confirmed nature", "", f"{len(ref)} objects, {s.type.nunique()} types (`build_reference_objects.py`).", "", "| coarse | 정체 | type | n | source |", "|---|---|---|---|---|"]
+        lines += [f"| {r.coarse_class} | {r.identity} | {r.type} | {r.n} | {r.source} |" for r in s.itertuples()]
+        (OUT / "SUMMARY.md").write_text("\n".join(lines) + "\n")
+        write_list(ref)
+        return
     sys.path.insert(0, str(V2 / "Get_data"))
     print("local truth files:", flush=True)
     parts = local_sources()
@@ -359,13 +439,14 @@ def main():
         print("VizieR:", flush=True)
         parts += remote_sources(a.only)
     ref = pd.concat(parts, ignore_index=True)
-    ref = ref[["name", "type", "coarse_class", "source", "bibcode", "catalog", "ra", "dec"]]
+    ref = finish(ref[["name", "type", "coarse_class", "source", "bibcode", "catalog", "ra", "dec"]])
     OUT.mkdir(parents=True, exist_ok=True)
     ref.to_csv(OUT / "reference_objects.csv.gz", index=False)
-    s = ref.groupby(["coarse_class", "type", "source"], sort=False).size().reset_index(name="n")
-    lines = ["# Reference objects of confirmed nature", "", f"{len(ref)} objects, {s.type.nunique()} types (`build_reference_objects.py`).", "", "| coarse | type | n | source |", "|---|---|---|---|"]
-    lines += [f"| {r.coarse_class} | {r.type} | {r.n} | {r.source} |" for r in s.itertuples()]
+    s = ref.groupby(["coarse_class", "type", "identity", "source"], sort=False).size().reset_index(name="n")
+    lines = ["# Reference objects of confirmed nature", "", f"{len(ref)} objects, {s.type.nunique()} types (`build_reference_objects.py`).", "", "| coarse | 정체 | type | n | source |", "|---|---|---|---|---|"]
+    lines += [f"| {r.coarse_class} | {r.identity} | {r.type} | {r.n} | {r.source} |" for r in s.itertuples()]
     (OUT / "SUMMARY.md").write_text("\n".join(lines) + "\n")
+    print("\n".join(lines))
     write_list(ref)
     print("\n".join(lines))
 
