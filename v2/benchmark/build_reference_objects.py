@@ -65,6 +65,7 @@ P = {
     "asiago": ("Barbon et al. 1999, A&AS 139, 531 (Asiago Supernova Catalogue, updated; VizieR B/sn)", "1999A&AS..139..531B"),
     "rk03": ("Ritter & Kolb 2003, A&A 404, 301 (catalogue of CVs, LMXBs and related objects, final ed. 7.24)", "2003A&A...404..301R"),
     "liu06": ("Liu, van Paradijs & van den Heuvel 2006, A&A 455, 1165 (catalogue of high-mass X-ray binaries)", "2006A&A...455.1165L"),
+    "gcvs": ("Samus et al. 2017, Astron. Rep. 61, 80 (General Catalogue of Variable Stars, GCVS 5.1)", "2017ARep...61...80S"),
     "abell89": ("Abell, Corwin & Olowin 1989, ApJS 70, 1 (rich clusters of galaxies)", "1989ApJS...70....1A"),
 }
 
@@ -108,7 +109,8 @@ def local_sources():
     sl = pd.read_csv(BENCH / "spectro_truth" / "sdss_galaxy_lines.csv.gz", low_memory=False)
     pos = gt.set_index("specobjid")[["ra", "dec"]]
     sl = sl.join(pos, on="specobjid")
-    for sub, typ in (("STARFORMING", "GALAXY_STAR_FORMING"), ("STARBURST", "GALAXY_STARBURST"), ("AGN", "GALAXY_AGN_NARROW_LINE"), ("BROADLINE", "GALAXY_AGN_BROADLINE")):
+    # (the SDSS AGN / BROADLINE sub-classes have < 100 objects here; Seyferts come from Veron-Cetty & Veron)
+    for sub, typ in (("STARFORMING", "GALAXY_STAR_FORMING"), ("STARBURST", "GALAXY_STARBURST")):
         d = sl[sl.subclass.astype(str).str.strip().eq(sub)]
         parts.append(take(d, "bpt", typ, "GALAXY", "bpt", sdss, "ra", "dec", "SDSS DR18 specObj subclass"))
     wd = pd.read_csv(V2 / "Classifier" / "wd_subtype_truth.csv")
@@ -237,9 +239,11 @@ def remote_sources(only=None):
             add("bzcat", d, "BLAZAR_BL_LAC", "QSO", "bzcat", ("Name", "BZCAT5", "5BZCAT"), "VII/274", lambda d: col_has(d, ("Class", "Type"), r"^BL Lac$|^BZB", re.I) | col_has(d, ("Name", "BZCAT5"), r"^5BZB"))
             add("bzcat", d, "BLAZAR_FSRQ", "QSO", "bzcat", ("Name", "BZCAT5", "5BZCAT"), "VII/274", lambda d: col_has(d, ("Class", "Type"), r"^QSO RLoud flat|^BZQ", re.I) | col_has(d, ("Name", "BZCAT5"), r"^5BZQ"))
     if want("nair"):
-        d = fetch("J/ApJS/186/427", limit=15000, need=("TType",))
+        d = fetch("J/ApJS/186/427", limit=15000, need=("SDSS",))
         if d is not None:
-            tt = lambda d: pd.to_numeric(d[first_col(d, "TType", "T", "ttype")], errors="coerce")  # noqa: E731
+            print("    Nair columns:", list(d.columns), flush=True)
+        if d is not None:
+            tt = lambda d: pd.to_numeric(d[first_col(d, "TType", "TT", "T", "ttype", "Ttype")], errors="coerce")  # noqa: E731
             nm = ("SDSS", "Name", "JID", "ID")
             add("nair", d, "GALAXY_ELLIPTICAL", "GALAXY", "nair", nm, "J/ApJS/186/427", lambda d: tt(d) <= -5)
             add("nair", d, "GALAXY_LENTICULAR", "GALAXY", "nair", nm, "J/ApJS/186/427", lambda d: tt(d).between(-3, 0))
@@ -258,9 +262,10 @@ def remote_sources(only=None):
     if want("kirk21"):
         d = fetch("J/ApJS/253/7", limit=3000, need=("SpTO", "SpTIR"))
         if d is not None:
-            sp = lambda d: d["SpTO"].astype(str).str.strip().where(d["SpTO"].astype(str).str.strip().ne(""), d["SpTIR"].astype(str).str.strip())  # noqa: E731
-            add("kirk21", d, "ULTRACOOL_L_DWARF", "STAR", "kirk21", ("Name",), "J/ApJS/253/7", lambda d: sp(d).str.match(r"^L\d"))
-            add("kirk21", d, "ULTRACOOL_T_DWARF", "STAR", "kirk21", ("Name",), "J/ApJS/253/7", lambda d: sp(d).str.match(r"^T\d"))
+            sp = lambda d: d["SpTO"].astype(str) + " " + d["SpTIR"].astype(str)  # noqa: E731
+            print("    spectral types e.g.", sp(d).head(8).tolist(), flush=True)
+            add("kirk21", d, "ULTRACOOL_L_DWARF", "STAR", "kirk21", ("Name",), "J/ApJS/253/7", lambda d: sp(d).str.contains(r"(?:^|[^A-Za-z])L\s?\d") & ~sp(d).str.contains(r"(?:^|[^A-Za-z])[TY]\s?\d"))
+            add("kirk21", d, "ULTRACOOL_T_DWARF", "STAR", "kirk21", ("Name",), "J/ApJS/253/7", lambda d: sp(d).str.contains(r"(?:^|[^A-Za-z])T\s?\d"))
     if want("esplin19"):
         d = fetch("J/AJ/158/54/table1", limit=2000, need=("2MASS",))
         add("esplin19", d, "YSO_TAURUS_MEMBER", "STAR", "esplin19", lambda d: ("2MASS J" + d["2MASS"].astype(str).str.strip()).where(d["2MASS"].astype(str).str.strip().ne(""), d["Gaia"].astype(str)), "J/AJ/158/54")
@@ -286,9 +291,15 @@ def remote_sources(only=None):
             ty = ("Type1", "Type", "Typ1")
             add("rk03", d, "CATACLYSMIC_DWARF_NOVA", "STAR", "rk03", ("Name",), "B/cb", lambda d: col_has(d, ty, r"^(DN|UG|SU|UGSU|UGSS|UGZ|ZC|SS|WZ)"))
             add("rk03", d, "CATACLYSMIC_NOVA", "STAR", "rk03", ("Name",), "B/cb", lambda d: col_has(d, ty, r"^N[ABCR]?$"))
-            add("rk03", d, "CATACLYSMIC_POLAR", "STAR", "rk03", ("Name",), "B/cb", lambda d: col_has(d, ty, r"^(AM|IP|DQ)$"))
+            anyt = lambda d: d[[c for c in ("Type1", "Type2", "Type3", "Type4") if c in d]].astype(str).agg(" ".join, axis=1)  # noqa: E731
+            print("    CV types e.g.", anyt(d).value_counts().head(15).to_dict(), flush=True)
+            add("rk03", d, "CATACLYSMIC_POLAR", "STAR", "rk03", ("Name",), "B/cb", lambda d: anyt(d).str.contains(r"\b(AM|IP|DQ)\b"))
         d = fetch("B/cb/lmxbdata", limit=1000)
         add("rk03", d, "X_RAY_BINARY_LOW_MASS", "STAR", "rk03", ("Name",), "B/cb/lmxbdata")
+    if want("gcvs"):
+        # classical novae of the General Catalogue of Variable Stars (Samus et al. 2017)
+        d = fetch("B/gcvs/gcvs_cat", {"VarType": "N*"}, limit=3000, need=("VarType",))
+        add("gcvs", d, "NOVA_CLASSICAL", "STAR", "gcvs", lambda d: d[first_col(d, "GCVS", "Name")].astype(str), "B/gcvs", lambda d: col_has(d, ("VarType",), r"^N[ABC]?:?$|^NR$") & ~col_has(d, ("VarType",), r".*:$"))
     if want("liu06"):
         d = fetch("J/A+A/455/1165", limit=1000, need=("Name",))
         add("liu06", d, "X_RAY_BINARY_HIGH_MASS", "STAR", "liu06", ("Name", "ID"), "J/A+A/455/1165")
