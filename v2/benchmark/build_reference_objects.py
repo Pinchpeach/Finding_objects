@@ -167,7 +167,7 @@ def radec(df):
     return pd.to_numeric(r, errors="coerce"), pd.to_numeric(d, errors="coerce")
 
 
-def fetch(catalog, filters=None, limit=20000):
+def fetch(catalog, filters=None, limit=20000, need=()):
     from astroquery.vizier import Vizier
 
     v = Vizier(columns=["**", "_RAJ2000", "_DEJ2000"], column_filters=filters or {}, row_limit=limit)
@@ -183,7 +183,12 @@ def fetch(catalog, filters=None, limit=20000):
     if not len(t):
         print(f"    {catalog}: no table", flush=True)
         return None
-    df = t[0].to_pandas()
+    tabs = list(t)
+    pick = next((x for x in tabs if not need or any(c in x.colnames for c in need)), None)
+    if pick is None:
+        print(f"    {catalog}: no table with {need}; tables {[x.colnames[:8] for x in tabs]}", flush=True)
+        return None
+    df = pick.to_pandas()
     for c in df.columns:
         if df[c].dtype == object:
             df[c] = df[c].map(lambda x: x.decode() if isinstance(x, bytes) else x)
@@ -222,19 +227,17 @@ def remote_sources(only=None):
         d = fetch("VII/289/dr16q", limit=6000)
         add("dr16q", d, "QSO_SPECTROSCOPIC", "QSO", "dr16q", ("SDSS", "SDSSJ", "Name"), "VII/289", lambda d: pd.to_numeric(d[first_col(d, "z", "Z")], errors="coerce") > 0)
     if want("vv10"):
-        d = fetch("VII/258/vv10", limit=40000)
-        if d is not None:
-            sp = ("Sp", "SpType", "Class")
-            add("vv10", d, "SEYFERT_1", "GALAXY", "vv10", ("Name",), "VII/258", lambda d: col_has(d, sp, r"^S1(\.[0-9])?$"))
-            add("vv10", d, "SEYFERT_2", "GALAXY", "vv10", ("Name",), "VII/258", lambda d: col_has(d, sp, r"^S2$"))
-            add("vv10", d, "LINER", "GALAXY", "vv10", ("Name",), "VII/258", lambda d: col_has(d, sp, r"^S3$"))
+        # Veron-Cetty & Veron class A (AGN) with spectral type: S1.x = Seyfert 1, S2 = Seyfert 2, S3 = LINER
+        for sp, typ in (("S1*", "SEYFERT_1"), ("=S2", "SEYFERT_2"), ("S3*", "LINER")):
+            d = fetch("VII/258/vv10", {"Cl": "=A", "Sp": sp}, limit=20000, need=("Sp",))
+            add("vv10", d, typ, "GALAXY", "vv10", ("Name",), "VII/258")
     if want("bzcat"):
         d = fetch("VII/274/bzcat5", limit=5000)
         if d is not None:
             add("bzcat", d, "BLAZAR_BL_LAC", "QSO", "bzcat", ("Name", "BZCAT5", "5BZCAT"), "VII/274", lambda d: col_has(d, ("Class", "Type"), r"^BL Lac$|^BZB", re.I) | col_has(d, ("Name", "BZCAT5"), r"^5BZB"))
             add("bzcat", d, "BLAZAR_FSRQ", "QSO", "bzcat", ("Name", "BZCAT5", "5BZCAT"), "VII/274", lambda d: col_has(d, ("Class", "Type"), r"^QSO RLoud flat|^BZQ", re.I) | col_has(d, ("Name", "BZCAT5"), r"^5BZQ"))
     if want("nair"):
-        d = fetch("J/ApJS/186/427/table1", limit=15000)
+        d = fetch("J/ApJS/186/427", limit=15000, need=("TType",))
         if d is not None:
             tt = lambda d: pd.to_numeric(d[first_col(d, "TType", "T", "ttype")], errors="coerce")  # noqa: E731
             nm = ("SDSS", "Name", "JID", "ID")
@@ -245,7 +248,7 @@ def remote_sources(only=None):
         d = fetch("VII/192/arplist", limit=1000)
         add("arp", d, "GALAXY_INTERACTING_PECULIAR", "GALAXY", "arp", lambda d: "Arp " + d[first_col(d, "Arp", "Seq", "No")].astype(str), "VII/192")
     if want("geier17"):
-        d = fetch("J/A+A/600/A50/catalog", limit=6000)
+        d = fetch("J/A+A/600/A50", limit=6000, need=("SpClass",))
         if d is not None:
             sp = ("SpClass", "SpType", "Class")
             nm = ("Name", "ID", "Simbad")
@@ -253,18 +256,14 @@ def remote_sources(only=None):
             add("geier17", d, "HOT_SUBDWARF_SDO", "STAR", "geier17", nm, "J/A+A/600/A50", lambda d: col_has(d, sp, r"^(sdO|He-sdO)$"))
             add("geier17", d, "HOT_SUBDWARF_SDOB", "STAR", "geier17", nm, "J/A+A/600/A50", lambda d: col_has(d, sp, r"^(sdOB|He-sdOB)$"))
     if want("kirk21"):
-        for tab in ("J/ApJS/253/7/table4", "J/ApJS/253/7/table5", "J/ApJS/253/7"):
-            d = fetch(tab, limit=3000)
-            if d is not None and first_col(d, "SpT", "SpType", "OSpT", "NSpT") is not None:
-                break
+        d = fetch("J/ApJS/253/7", limit=3000, need=("SpTO", "SpTIR"))
         if d is not None:
-            sp = ("SpT", "SpType", "NSpT", "OSpT")
-            nm = ("Name", "Object", "Simbad")
-            add("kirk21", d, "ULTRACOOL_L_DWARF", "STAR", "kirk21", nm, "J/ApJS/253/7", lambda d: col_has(d, sp, r"^L\d"))
-            add("kirk21", d, "ULTRACOOL_T_DWARF", "STAR", "kirk21", nm, "J/ApJS/253/7", lambda d: col_has(d, sp, r"^T\d"))
+            sp = lambda d: d["SpTO"].astype(str).str.strip().where(d["SpTO"].astype(str).str.strip().ne(""), d["SpTIR"].astype(str).str.strip())  # noqa: E731
+            add("kirk21", d, "ULTRACOOL_L_DWARF", "STAR", "kirk21", ("Name",), "J/ApJS/253/7", lambda d: sp(d).str.match(r"^L\d"))
+            add("kirk21", d, "ULTRACOOL_T_DWARF", "STAR", "kirk21", ("Name",), "J/ApJS/253/7", lambda d: sp(d).str.match(r"^T\d"))
     if want("esplin19"):
-        d = fetch("J/AJ/158/54/table1", limit=2000) or fetch("J/AJ/158/54", limit=2000)
-        add("esplin19", d, "YSO_TAURUS_MEMBER", "STAR", "esplin19", ("Name", "2MASS", "ID"), "J/AJ/158/54")
+        d = fetch("J/AJ/158/54/table1", limit=2000, need=("2MASS",))
+        add("esplin19", d, "YSO_TAURUS_MEMBER", "STAR", "esplin19", lambda d: ("2MASS J" + d["2MASS"].astype(str).str.strip()).where(d["2MASS"].astype(str).str.strip().ne(""), d["Gaia"].astype(str)), "J/AJ/158/54")
     for t, typ in (("DCEP", "CEPHEID_CLASSICAL"), ("CWA", "CEPHEID_TYPE_II_CWA"), ("CWB", "CEPHEID_TYPE_II_CWB"), ("HADS", "DELTA_SCUTI_HADS"), ("DSCT", "DELTA_SCUTI"), ("EB", "ECLIPSING_BETA_LYR"), ("ROT", "ROTATIONAL_VARIABLE"), ("YSO", "YSO_VARIABLE")):
         if want("asassn"):
             d = fetch("II/366/catv2021", {"Type": f"={t}", "Prob": ">0.95"}, limit=3000)
@@ -291,7 +290,7 @@ def remote_sources(only=None):
         d = fetch("B/cb/lmxbdata", limit=1000)
         add("rk03", d, "X_RAY_BINARY_LOW_MASS", "STAR", "rk03", ("Name",), "B/cb/lmxbdata")
     if want("liu06"):
-        d = fetch("J/A+A/455/1165/table1", limit=1000) or fetch("J/A+A/455/1165", limit=1000)
+        d = fetch("J/A+A/455/1165", limit=1000, need=("Name",))
         add("liu06", d, "X_RAY_BINARY_HIGH_MASS", "STAR", "liu06", ("Name", "ID"), "J/A+A/455/1165")
     if want("abell89"):
         d = fetch("VII/110A/table3", limit=5000)
