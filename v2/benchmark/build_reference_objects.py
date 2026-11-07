@@ -262,11 +262,9 @@ def remote_sources(only=None):
     if want("kirk21"):
         d = fetch("J/ApJS/253/7", limit=3000, need=("SpTO", "SpTIR"))
         if d is not None:
-            # spectral class letter in column "T", numeric subtype in SpTO (optical) / SpTIR (near-IR)
-            letter = lambda d: d["T"].astype(str).str.strip().str.upper()  # noqa: E731
-            print("    spectral classes:", letter(d).value_counts().to_dict(), flush=True)
-            for cl, typ in (("L", "ULTRACOOL_L_DWARF"), ("T", "ULTRACOOL_T_DWARF"), ("Y", "ULTRACOOL_Y_DWARF")):
-                add("kirk21", d, typ, "STAR", "kirk21", ("Name",), "J/ApJS/253/7", lambda d, cl=cl: letter(d).eq(cl))
+            # encoding of the spectral types checked against known objects before use
+            with pd.option_context("display.width", 200):
+                print(d[[c for c in ("Name", "T", "SpTO", "SpTIR", "SpAd", "r_SpTO") if c in d]].head(40).to_string(), flush=True)
     if want("esplin19"):
         d = fetch("J/AJ/158/54/table1", limit=2000, need=("2MASS",))
         add("esplin19", d, "YSO_TAURUS_MEMBER", "STAR", "esplin19", lambda d: ("2MASS J" + d["2MASS"].astype(str).str.strip()).where(d["2MASS"].astype(str).str.strip().ne(""), d["Gaia"].astype(str)), "J/AJ/158/54")
