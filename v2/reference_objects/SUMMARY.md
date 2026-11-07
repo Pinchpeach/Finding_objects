@@ -1,6 +1,6 @@
 # Reference objects of confirmed nature
 
-13893 objects, 50 types (`build_reference_objects.py`).
+13593 objects, 49 types (`build_reference_objects.py`).
 
 | coarse | type | n | source |
 |---|---|---|---|
@@ -34,7 +34,6 @@
 | STAR | HOT_SUBDWARF_SDB | 300 | Geier et al. 2017, A&A 600, A50 (catalogue of known hot subdwarf stars) |
 | STAR | HOT_SUBDWARF_SDO | 300 | Geier et al. 2017, A&A 600, A50 (catalogue of known hot subdwarf stars) |
 | STAR | HOT_SUBDWARF_SDOB | 300 | Geier et al. 2017, A&A 600, A50 (catalogue of known hot subdwarf stars) |
-| STAR | ULTRACOOL_T_DWARF | 300 | Kirkpatrick et al. 2021, ApJS 253, 7 (20 pc census of L, T, Y dwarfs) |
 | STAR | YSO_TAURUS_MEMBER | 300 | Esplin & Luhman 2019, AJ 158, 54 (spectroscopic members of Taurus) |
 | STAR | CEPHEID_CLASSICAL | 300 | Jayasinghe et al. 2019-2021 (ASAS-SN variable stars; VizieR II/366, Christy et al. 2023) |
 | STAR | CEPHEID_TYPE_II_CWA | 300 | Jayasinghe et al. 2019-2021 (ASAS-SN variable stars; VizieR II/366, Christy et al. 2023) |
