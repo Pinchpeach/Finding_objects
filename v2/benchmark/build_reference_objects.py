@@ -262,10 +262,11 @@ def remote_sources(only=None):
     if want("kirk21"):
         d = fetch("J/ApJS/253/7", limit=3000, need=("SpTO", "SpTIR"))
         if d is not None:
-            sp = lambda d: d["SpTO"].astype(str) + " " + d["SpTIR"].astype(str)  # noqa: E731
-            print("    spectral types e.g.", sp(d).head(8).tolist(), flush=True)
-            add("kirk21", d, "ULTRACOOL_L_DWARF", "STAR", "kirk21", ("Name",), "J/ApJS/253/7", lambda d: sp(d).str.contains(r"(?:^|[^A-Za-z])L\s?\d") & ~sp(d).str.contains(r"(?:^|[^A-Za-z])[TY]\s?\d"))
-            add("kirk21", d, "ULTRACOOL_T_DWARF", "STAR", "kirk21", ("Name",), "J/ApJS/253/7", lambda d: sp(d).str.contains(r"(?:^|[^A-Za-z])T\s?\d"))
+            # spectral class letter in column "T", numeric subtype in SpTO (optical) / SpTIR (near-IR)
+            letter = lambda d: d["T"].astype(str).str.strip().str.upper()  # noqa: E731
+            print("    spectral classes:", letter(d).value_counts().to_dict(), flush=True)
+            for cl, typ in (("L", "ULTRACOOL_L_DWARF"), ("T", "ULTRACOOL_T_DWARF"), ("Y", "ULTRACOOL_Y_DWARF")):
+                add("kirk21", d, typ, "STAR", "kirk21", ("Name",), "J/ApJS/253/7", lambda d, cl=cl: letter(d).eq(cl))
     if want("esplin19"):
         d = fetch("J/AJ/158/54/table1", limit=2000, need=("2MASS",))
         add("esplin19", d, "YSO_TAURUS_MEMBER", "STAR", "esplin19", lambda d: ("2MASS J" + d["2MASS"].astype(str).str.strip()).where(d["2MASS"].astype(str).str.strip().ne(""), d["Gaia"].astype(str)), "J/AJ/158/54")
@@ -290,10 +291,10 @@ def remote_sources(only=None):
         if d is not None:
             ty = ("Type1", "Type", "Typ1")
             add("rk03", d, "CATACLYSMIC_DWARF_NOVA", "STAR", "rk03", ("Name",), "B/cb", lambda d: col_has(d, ty, r"^(DN|UG|SU|UGSU|UGSS|UGZ|ZC|SS|WZ)"))
-            add("rk03", d, "CATACLYSMIC_NOVA", "STAR", "rk03", ("Name",), "B/cb", lambda d: col_has(d, ty, r"^N[ABCR]?$"))
+            # (classical novae come from the GCVS below: only 21 here)
             anyt = lambda d: d[[c for c in ("Type1", "Type2", "Type3", "Type4") if c in d]].astype(str).agg(" ".join, axis=1)  # noqa: E731
             print("    CV types e.g.", anyt(d).value_counts().head(15).to_dict(), flush=True)
-            add("rk03", d, "CATACLYSMIC_POLAR", "STAR", "rk03", ("Name",), "B/cb", lambda d: anyt(d).str.contains(r"\b(AM|IP|DQ)\b"))
+            add("rk03", d, "CATACLYSMIC_POLAR", "STAR", "rk03", ("Name",), "B/cb", lambda d: anyt(d).str.contains(r"\b(?:AM|IP|DQ)\b"))
         d = fetch("B/cb/lmxbdata", limit=1000)
         add("rk03", d, "X_RAY_BINARY_LOW_MASS", "STAR", "rk03", ("Name",), "B/cb/lmxbdata")
     if want("gcvs"):
