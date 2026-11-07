@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   push:
     branches-ignore: [main, validation-data]
-    paths: ["v2/reference_objects/validation/plan.csv", "v2/benchmark/validate_reference_objects.py"]
+    paths: ["v2/reference_objects/validation/plan.csv"]
 concurrency:
   group: reference-validation-${{ github.ref }}
   cancel-in-progress: true
