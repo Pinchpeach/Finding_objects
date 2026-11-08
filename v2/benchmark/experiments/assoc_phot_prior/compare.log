@@ -1,0 +1,7 @@
+variant   n    acc  unknown  fixed  broken  truth_with_fragments  recall_STAR  recall_GALAXY  recall_QSO
+   base 973 99.589        1      0       0                   270        99.66          98.81       100.0
+   phot 973 99.589        1      0       0                   262        99.66          98.81       100.0
+         groups  allwise_rows  allwise_matched  allwise_downweighted  2mass_rows  2mass_matched  2mass_downweighted  shifted_groups  shifted_allwise_rows  shifted_allwise_matched  shifted_allwise_downweighted  shifted_2mass_rows  shifted_2mass_matched  shifted_2mass_downweighted
+variant                                                                                                                                                                                                                                                                                
+base     397235         51059            38896                     0       22238          21576                   0          431589                 51059                    27094                             0               22238                   2708                           0
+phot     396358         51059            39545                  2148       22238          21685                3814          431762                 51059                    27072                           814               22238                   2563                        1431
