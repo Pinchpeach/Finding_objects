@@ -11,6 +11,11 @@ on:
   workflow_dispatch:
     inputs:
       experiment: {description: "results folder under v2/benchmark/experiments", default: "assoc_phot_prior"}
+  # A new workflow cannot be dispatched before it is on main: pushing the
+  # trigger file (one line, the experiment name) starts it on a work branch.
+  push:
+    branches-ignore: [main, validation-data]
+    paths: ["v2/benchmark/experiments/RUN_AB"]
 concurrency:
   group: experiment-ab-${{ github.ref }}
   cancel-in-progress: true
@@ -128,7 +133,7 @@ jobs:
           merge-multiple: true
       - name: Compare
         run: |
-          out=v2/benchmark/experiments/${{ github.event.inputs.experiment }}
+          out=v2/benchmark/experiments/${{ github.event.inputs.experiment || 'assoc_phot_prior' }}
           mkdir -p $out
           (cd v2/benchmark && python -u compare_ab_fields.py /tmp/ab --out ../../$out) | tee $out/compare.log
           python - <<'PY'
@@ -145,12 +150,12 @@ jobs:
               print(t.drop(columns="field").groupby("variant").median(numeric_only=True).to_string())
           PY
         env:
-          EXP: ${{ github.event.inputs.experiment }}
+          EXP: ${{ github.event.inputs.experiment || 'assoc_phot_prior' }}
       - name: Commit
         if: github.ref_name != 'main'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add v2/benchmark/experiments
-          git commit -m "A/B experiment results: ${{ github.event.inputs.experiment }}" || exit 0
+          git commit -m "A/B experiment results: ${{ github.event.inputs.experiment || 'assoc_phot_prior' }}" || exit 0
           bash .github/scripts/push_with_retry.sh "${{ github.ref_name }}"
