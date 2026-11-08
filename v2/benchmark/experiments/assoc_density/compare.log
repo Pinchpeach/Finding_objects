@@ -1,11 +1,11 @@
 variant   n    acc  unknown  fixed  broken  truth_with_fragments  recall_STAR  recall_GALAXY  recall_QSO
-   base 973 99.589        1      0       0                   272        99.66          98.81       100.0
-   both 973 99.589        1      0       0                   267        99.66          98.81       100.0
-   cand 973 99.589        1      0       0                   275        99.66          98.81       100.0
-   phot 973 99.589        1      0       0                   264        99.66          98.81       100.0
+   base 973 99.589        1      0       0                   268        99.66          98.81       100.0
+   both 973 99.589        1      0       0                   263        99.66          98.81       100.0
+   cand 973 99.589        1      0       0                   271        99.66          98.81       100.0
+   phot 973 99.589        1      0       0                   260        99.66          98.81       100.0
          groups  allwise_rows  allwise_matched  allwise_downweighted  2mass_rows  2mass_matched  2mass_downweighted  shifted_groups  shifted_allwise_rows  shifted_allwise_matched  shifted_allwise_downweighted  shifted_2mass_rows  shifted_2mass_matched  shifted_2mass_downweighted
 variant                                                                                                                                                                                                                                                                                
-base     396897         51059            38896                     0       22238          21576                   0          431320                 51059                    27094                             0               22238                   2708                           0
-both     396946         51059            37138                  2138       22238          21686                3813          435819                 51059                    23251                           658               22238                   2049                        1043
-cand     397741         51059            36547                     0       22238          21580                   0          435730                 51059                    23266                             0               22238                   2119                           0
-phot     396035         51059            39545                  2148       22238          21685                3814          431492                 51059                    27072                           814               22238                   2563                        1431
+base     396370         51059            38896                     0       22238          21576                   0          430869                 51059                    27094                             0               22238                   2708                           0
+both     396433         51059            37138                  2138       22238          21686                3813          435362                 51059                    23251                           658               22238                   2049                        1043
+cand     397207         51059            36547                     0       22238          21580                   0          435273                 51059                    23266                             0               22238                   2119                           0
+phot     395529         51059            39545                  2148       22238          21685                3814          431041                 51059                    27072                           814               22238                   2563                        1431
