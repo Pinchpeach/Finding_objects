@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import math
+import os
 from pathlib import Path
 import pandas as pd
 
@@ -223,6 +224,27 @@ def load(raw: Path):
     return rows, skipped
 
 
+# Chance coincidence (experiment, opt-in V2_ASSOC_CANDIDATE_DENSITY=1).  The
+# probability that an unrelated source lies within the separation is set by
+# the density of the sources the detection could be confused with, i.e. the
+# candidate counterparts (the anchor's catalogue), not the detection's own
+# catalogue: Budavari & Szalay 2008 (ApJ 679, 301) and NWAY (Salvato et al.
+# 2018) put the counterpart catalogue's density in the prior.  With the
+# detection's density a 6"-PSF AllWISE row is judged against the sparse WISE
+# sky; shifted by 2' (NWAY's false-match test) 29-35 % of AllWISE rows still
+# joined an unrelated object at high latitude, ~90 % in crowded fields
+# (benchmark/experiments/assoc_phot_prior).
+_CANDIDATE_DENSITY = os.environ.get("V2_ASSOC_CANDIDATE_DENSITY", "0") == "1"
+
+
+def _pair_density(det, anchor):
+    own = det.get("source_density_arcsec2")
+    if not _CANDIDATE_DENSITY:
+        return own
+    other = anchor.get("source_density_arcsec2")
+    return max(d for d in (own, other) if d is not None) if (own is not None or other is not None) else None
+
+
 def _target_sep(group, det):
     """Distance to the group's Legacy Surveys member(s), the imaging target of
     a DESI spectrum; the group anchor is often another survey's detection
@@ -332,7 +354,7 @@ def run(raw_dir: Path, out: Path):
                     )
                     candidates.append((1.0, 0.0, gi, result))
                     continue
-                density = det.get("source_density_arcsec2")
+                density = _pair_density(det, group["anchor"])
                 result = assess_pair(group["anchor"], det, density)
                 if use_phot and det["catalog"] in det.get("phot", {}):
                     w = phot_weight(det["catalog"], group.get("G"), det["phot"][det["catalog"]])
@@ -480,7 +502,7 @@ def run(raw_dir: Path, out: Path):
         # whatever anchor the group had then (e.g. an offset NED position),
         # which left faint Legacy Surveys/DESI members with ~0 confidence.
         if rec["association_method"] == "position_epoch_likelihood" and anchor is not det and rec["phot_weight"] >= 1.0:
-            final = assess_pair(anchor, det, det.get("source_density_arcsec2"))
+            final = assess_pair(anchor, det, _pair_density(det, anchor))
             rec["association_confidence"] = max(rec["association_confidence"] or 0.0, final["association_posterior"])
             rec["final_anchor_separation_arcsec"] = final["separation_arcsec"]
         rec["object_ra"] = anchor["ra"]
