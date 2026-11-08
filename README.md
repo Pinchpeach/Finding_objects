@@ -140,6 +140,8 @@ classified_objects.csv
 
 문헌으로 정체가 확정된 천체 520개(52종류, [`v2/reference_objects/`](v2/reference_objects/))로 한 검증(2.47.0): blind 큰 범주 89.5 %, 세부 종류 45.8 %; full 큰 범주 87.9 %, 세부 종류 55.0 %([`REFERENCE_VALIDATION_2026-11-07.md`](v2/reference_objects/validation/REFERENCE_VALIDATION_2026-11-07.md)).
 
+비슷한 역할의 파이프라인(NWAY, MUWCLASS, Clarke+2020, Hughes+2022, Gaia DSC 등)과 비교하고 NWAY의 연관 설계를 적용했다(2.48.0, [`v2/LITERATURE_SIMILAR_PIPELINES_2026-11-08.md`](v2/LITERATURE_SIMILAR_PIPELINES_2026-11-08.md)): 위치를 옮긴 목록으로 잰 거짓 연관이 AllWISE −14 %, 2MASS −24 %이고 정답 정확도는 같다.
+
 2.40.0의 밝기별 QSO 사전확률은 같은 영역 재생에서 1차 분류 정확도 96.21 → 96.31 %, QSO 정밀도 79.5 → 86.9 %, QSO 재현율 94.4 → 90.9 %였다([`v2/benchmark/qso_options/`](v2/benchmark/qso_options/)).
 
 ### 실제 하늘 비율 기준 순도 (blind, 18개 영역, 2.36.0 측정)

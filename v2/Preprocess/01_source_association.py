@@ -5,12 +5,16 @@ from __future__ import annotations
 
 import argparse
 import math
+import os
 from pathlib import Path
 import pandas as pd
 
 from association_model import (
     annotation_physical_type,
     assess_pair,
+    phot_magnitudes,
+    phot_prior_enabled,
+    phot_weight,
     canonical_aliases,
     infer_entity_kind,
     infer_epoch,
@@ -213,10 +217,35 @@ def load(raw: Path):
                     "source_density_arcsec2": density,
                     "association_aliases": canonical_aliases(cat, r, cid),
                     "annotation_type": annotation_physical_type(cat, r),
+                    "phot": phot_magnitudes(cat, r),
                     "source_row": int(i),
                 }
             )
     return rows, skipped
+
+
+# Chance coincidence (2.48.0; V2_ASSOC_CANDIDATE_DENSITY=0 restores the old rule).  The
+# probability that an unrelated source lies within the separation is set by
+# the density of the sources the detection could be confused with, i.e. the
+# candidate counterparts (the anchor's catalogue), not the detection's own
+# catalogue: Budavari & Szalay 2008 (ApJ 679, 301) and NWAY (Salvato et al.
+# 2018) put the counterpart catalogue's density in the prior.  With the
+# detection's density a 6"-PSF AllWISE row is judged against the sparse WISE
+# sky; shifted by 2' (NWAY's false-match test) 29-35 % of AllWISE rows still
+# joined an unrelated object at high latitude, ~90 % in crowded fields
+# (benchmark/experiments/assoc_phot_prior).  The larger of the two densities
+# is used; on the same 26 fields this removed 14 % of the false AllWISE and
+# 22 % of the false 2MASS associations with the truth accuracy unchanged
+# (benchmark/experiments/assoc_density).
+_CANDIDATE_DENSITY = os.environ.get("V2_ASSOC_CANDIDATE_DENSITY", "1") == "1"
+
+
+def _pair_density(det, anchor):
+    own = det.get("source_density_arcsec2")
+    if not _CANDIDATE_DENSITY:
+        return own
+    other = anchor.get("source_density_arcsec2")
+    return max(d for d in (own, other) if d is not None) if (own is not None or other is not None) else None
 
 
 def _target_sep(group, det):
@@ -263,6 +292,7 @@ def run(raw_dir: Path, out: Path):
         )
     )
     groups, records = [], []
+    use_phot = phot_prior_enabled()
     epochs = [float(d["ref_epoch"]) for d in detections if d.get("ref_epoch") is not None]
     # Epoch span from the data (a 1950 catalogue vs Gaia is 66 yr), at least
     # the historical 45 yr.
@@ -327,8 +357,17 @@ def run(raw_dir: Path, out: Path):
                     )
                     candidates.append((1.0, 0.0, gi, result))
                     continue
-                density = det.get("source_density_arcsec2")
+                density = _pair_density(det, group["anchor"])
                 result = assess_pair(group["anchor"], det, density)
+                if use_phot and det["catalog"] in det.get("phot", {}):
+                    w = phot_weight(det["catalog"], group.get("G"), det["phot"][det["catalog"]])
+                    if w != 1.0:
+                        # NWAY: the prior weight multiplies the positional Bayes factor.
+                        result["association_score"] *= w
+                        lik = result["positional_likelihood"] * w / (2.0 * math.pi * result["combined_sigma_arcsec"] ** 2)
+                        result["association_posterior"] = lik / (lik + density) if density else min(1.0, result["positional_likelihood"] * w)
+                        result["accepted"] = result["accepted"] and result["association_score"] >= 1e-5
+                        result["phot_weight"] = w
                 result["association_method"] = "position_epoch_likelihood"
                 result["shared_aliases"] = ""
                 if det["catalog"] in TARGET_SPECTRA and _target_sep(group, det) <= TARGET_MATCH_ARCSEC:
@@ -369,6 +408,8 @@ def run(raw_dir: Path, out: Path):
             group = groups[gi]
             oid = group["id"]
             group["catalogs"].add(det["catalog"])
+            if group.get("G") is None and "G" in (det.get("phot") or {}):
+                group["G"] = det["phot"]["G"]
             if det.get("annotation_type"):
                 group["typed_annotations"].add(det["catalog"])
             group["members"] += 1
@@ -389,6 +430,7 @@ def run(raw_dir: Path, out: Path):
                     "anchor": det,
                     "catalogs": {det["catalog"]},
                     "typed_annotations": {det["catalog"]} if det.get("annotation_type") else set(),
+                    "G": (det.get("phot") or {}).get("G"),
                     "members": 1,
                     "entity_kind": det["entity_kind"],
                     "aliases": set(det.get("association_aliases") or ()),
@@ -433,7 +475,8 @@ def run(raw_dir: Path, out: Path):
         confidence = match.get("association_posterior", match.get("association_score"))
         records.append(
             {
-                **{**det, "association_aliases": "|".join(sorted(det.get("association_aliases") or ()))},
+                **{k: v for k, v in det.items() if k != "phot"},
+                "association_aliases": "|".join(sorted(det.get("association_aliases") or ())),
                 "object_id": oid,
                 "association_status": status,
                 "match_separation_arcsec": match.get("separation_arcsec"),
@@ -450,6 +493,7 @@ def run(raw_dir: Path, out: Path):
                 "association_method": match.get("association_method", "position_epoch_likelihood"),
                 "shared_aliases": match.get("shared_aliases", ""),
                 "candidate_count": len(candidates),
+                "phot_weight": match.get("phot_weight", 1.0),
             }
         )
 
@@ -460,8 +504,8 @@ def run(raw_dir: Path, out: Path):
         # (its most precise position).  The score computed at match time used
         # whatever anchor the group had then (e.g. an offset NED position),
         # which left faint Legacy Surveys/DESI members with ~0 confidence.
-        if rec["association_method"] == "position_epoch_likelihood" and anchor is not det:
-            final = assess_pair(anchor, det, det.get("source_density_arcsec2"))
+        if rec["association_method"] == "position_epoch_likelihood" and anchor is not det and rec["phot_weight"] >= 1.0:
+            final = assess_pair(anchor, det, _pair_density(det, anchor))
             rec["association_confidence"] = max(rec["association_confidence"] or 0.0, final["association_posterior"])
             rec["final_anchor_separation_arcsec"] = final["separation_arcsec"]
         rec["object_ra"] = anchor["ra"]

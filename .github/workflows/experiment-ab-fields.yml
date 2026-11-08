@@ -1,0 +1,164 @@
+name: Experiment A/B on independent fields
+
+# Paired comparison of pipeline variants on identical collected data
+# (v2/benchmark/compare_ab_fields.py).  Each field (set B, truth from the
+# validation-data branch) is collected once; the blind evidence is then run
+# once per variant.  Variants are environment switches:
+#   base: defaults      phot: V2_ASSOC_PHOT_PRIOR=1 (NWAY photometric prior)
+#   cand: V2_ASSOC_CANDIDATE_DENSITY=1 (chance coincidence from the counterparts' density)
+#   both: phot + cand
+# A shifted copy (AllWISE and 2MASS moved by 2') measures false associations
+# as NWAY's shifted-catalogue calibration does.  Manual.
+on:
+  workflow_dispatch:
+    inputs:
+      experiment: {description: "results folder under v2/benchmark/experiments", default: "assoc_phot_prior"}
+  # A new workflow cannot be dispatched before it is on main: pushing the
+  # trigger file (one line, the experiment name) starts it on a work branch.
+  push:
+    branches-ignore: [main, validation-data]
+    paths: ["v2/benchmark/experiments/RUN_AB"]
+concurrency:
+  group: experiment-ab-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  field:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      max-parallel: 13
+      matrix:
+        f:
+          - {name: blam_082p06, ra: 81.44083, dec: 5.89889, r: 12.0}
+          - {name: blam_090p56, ra: 88.93583, dec: 55.93583, r: 12.0}
+          - {name: blam_253p13, ra: 252.81639, dec: 13.04056, r: 12.0}
+          - {name: blam_263p09, ra: 262.84194, dec: 8.74972, r: 12.0}
+          - {name: blam_266p15, ra: 265.78611, dec: 15.2725, r: 12.0}
+          - {name: blam_277p53, ra: 276.37417, dec: 52.83806, r: 12.0}
+          - {name: blam_323p08, ra: 323.84306, dec: 8.40389, r: 12.0}
+          - {name: blam_335p37, ra: 334.96583, dec: 36.87028, r: 12.0}
+          - {name: blam_340p24, ra: 340.38917, dec: 24.06611, r: 12.0}
+          - {name: blam_354p11, ra: 354.10056, dec: 11.31333, r: 12.0}
+          - {name: bngp_207m05, ra: 207.77806, dec: -4.90333, r: 12.0}
+          - {name: bngp_217m05, ra: 216.80639, dec: -4.96889, r: 12.0}
+          - {name: bs82_034p00, ra: 33.38167, dec: 0.11472, r: 12.0}
+          - {name: bsgp_012m36, ra: 11.52389, dec: -35.80361, r: 12.0}
+          - {name: bsgp_024m31, ra: 23.57139, dec: -30.49722, r: 12.0}
+          - {name: bsgp_037m25, ra: 37.37917, dec: -25.44694, r: 12.0}
+          - {name: bsgp_046m35, ra: 46.67278, dec: -35.17889, r: 12.0}
+          - {name: bsth_039m43, ra: 39.195, dec: -43.94917, r: 12.0}
+          - {name: bsth_198m27, ra: 198.08194, dec: -26.56444, r: 12.0}
+          - {name: gc_ngc6541, ra: 272.01, dec: -43.715, r: 6.0}
+          - {name: lmc_outer_ne, ra: 98.0, dec: -65.5, r: 6.0}
+          - {name: mag_bridge_w, ra: 46.0, dec: -71.5, r: 6.0}
+          - {name: oc_ngc2477, ra: 118.0, dec: -38.5, r: 12.0}
+          - {name: sb_ngc4945, ra: 196.364, dec: -49.468, r: 12.0}
+          - {name: sfr_cra, ra: 285.4, dec: -36.95, r: 12.0}
+          - {name: sfr_rosette, ra: 98.0, dec: 4.95, r: 6.0}
+    env:
+      NAME: ${{ matrix.f.name }}
+      RA: ${{ matrix.f.ra }}
+      DEC: ${{ matrix.f.dec }}
+      R: ${{ matrix.f.r }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas numpy scipy requests astropy astroquery pyvo
+      - name: Truth and field record from validation-data
+        run: |
+          git fetch -q --depth=1 origin validation-data
+          git checkout origin/validation-data -- "v2/benchmark/independent_fields_b/$NAME"
+          mkdir -p /tmp/ref && cp -r "v2/benchmark/independent_fields_b/$NAME/truth" "v2/benchmark/independent_fields_b/$NAME/field.json" /tmp/ref/
+          git rm -rq --cached "v2/benchmark/independent_fields_b/$NAME" && rm -rf "v2/benchmark/independent_fields_b/$NAME"
+      - name: Collect (once)
+        run: python -u v2/pipeline.py --ra $RA --dec $DEC --radius $R --work /tmp/field
+      - name: Blind raw and shifted copy
+        run: |
+          raw=$(ls -d /tmp/field/raw/*/ | head -1)
+          mkdir -p /tmp/blindraw
+          for f in "$raw"*.csv; do
+            case "$(basename "$f")" in
+              lamost_spectroscopy_*|sdss_spectroscopy_*|desi_spectroscopy_*|desi_fastspec_*|simbad_*|ned_*|bzcat_*|pn_spectroscopy_*|hash_pn_*|asas_sn_supernova_*|asiago_supernova_*|agb_suh2021_*|atnf_pulsar_*|galaxy_clusters_*) ;;
+              *) cp "$f" /tmp/blindraw/;;
+            esac
+          done
+          ls /tmp/blindraw
+          python - <<'PY'
+          import pandas as pd, shutil
+          from pathlib import Path
+          src, dst = Path("/tmp/blindraw"), Path("/tmp/shiftraw")
+          shutil.copytree(src, dst)
+          for f in dst.glob("*.csv"):
+              d = pd.read_csv(f, low_memory=False)
+              if "catalog" in d and d.catalog.astype(str).isin(["AllWISE", "2MASS PSC"]).any():
+                  d["dec"] = pd.to_numeric(d.dec, errors="coerce") + 2.0 / 60.0
+                  d.to_csv(f, index=False)
+                  print("shifted", f.name, len(d))
+          PY
+      - name: Variants
+        run: |
+          for v in base phot cand both; do
+            case $v in phot|both) export V2_ASSOC_PHOT_PRIOR=1;; *) export V2_ASSOC_PHOT_PRIOR=0;; esac
+            case $v in cand|both) export V2_ASSOC_CANDIDATE_DENSITY=1;; *) export V2_ASSOC_CANDIDATE_DENSITY=0;; esac
+            python -u v2/pipeline.py --raw-dir /tmp/blindraw --ra $RA --dec $DEC --radius $R --work /tmp/run_$v
+            python -u v2/Preprocess/01_source_association.py --raw-dir /tmp/shiftraw --out /tmp/shift_$v.csv
+            out=/tmp/ab/$v/$NAME; mkdir -p $out
+            cp -r /tmp/ref/truth /tmp/ref/field.json $out/
+            python -u .github/scripts/independent_truth_field.py compact /tmp/run_$v $RA $DEC $R $out objects_blind
+            python -u .github/scripts/assoc_stats.py /tmp/run_$v/source_association.csv /tmp/shift_$v.csv > $out/assoc_stats.json
+            cp /tmp/run_$v/pipeline_summary.csv $out/ || true
+            cat $out/assoc_stats.json
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ab-${{ matrix.f.name }}
+          path: /tmp/ab/
+          if-no-files-found: ignore
+  score:
+    needs: field
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas numpy scipy astropy
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: ab-*
+          path: /tmp/ab
+          merge-multiple: true
+      - name: Compare
+        run: |
+          out=v2/benchmark/experiments/${{ github.event.inputs.experiment || 'assoc_density' }}
+          mkdir -p $out
+          (cd v2/benchmark && python -u compare_ab_fields.py /tmp/ab --out ../../$out) | tee $out/compare.log
+          python - <<'PY'
+          import pandas as pd, glob, os
+          rows = []
+          for f in glob.glob("/tmp/ab/*/*/pipeline_summary.csv"):
+              v, field = f.split("/")[3:5]
+              s = pd.read_csv(f).set_index("stage").seconds
+              rows.append({"variant": v, "field": field, **s.to_dict()})
+          if rows:
+              t = pd.DataFrame(rows)
+              out = "v2/benchmark/experiments/" + os.environ["EXP"]
+              t.to_csv(out + "/stage_seconds.csv", index=False)
+              print(t.drop(columns="field").groupby("variant").median(numeric_only=True).to_string())
+          PY
+        env:
+          EXP: ${{ github.event.inputs.experiment || 'assoc_density' }}
+      - name: Commit
+        if: github.ref_name != 'main'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add v2/benchmark/experiments
+          git commit -m "A/B experiment results: ${{ github.event.inputs.experiment || 'assoc_density' }}" || exit 0
+          bash .github/scripts/push_with_retry.sh "${{ github.ref_name }}"

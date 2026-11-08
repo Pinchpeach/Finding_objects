@@ -1,0 +1,7 @@
+design,train,test,acc_design,acc_ours,design_right_ours_wrong,ours_right_design_wrong,STAR_design,STAR_ours,GALAXY_design,GALAXY_ours,QSO_design,QSO_ours
+Clarke+2020 RF (SDSS ugriz + WISE + psf-model),5655,3788,99.31,99.21,20,16,99.6,99.5,98.8,97.9,88.1,94.9
+"Clarke+2020 design, PS1 grizy + WISE + psf-Kron",12096,7827,99.46,99.57,19,27,99.8,99.9,98.5,97.5,76.5,92.6
+Hughes+2022 boosted trees (Gaia + WISE),12947,9280,99.61,99.7,10,18,99.8,99.9,98.0,97.4,89.0,96.7
+Gaia DR3 DSC-Combmod,0,9268,98.3,99.71,12,143,,,,,,
+LS-GBM (LS photometry only),0,4920,98.72,99.23,11,36,,,,,,
+LS morphology + WISE W1-W2>=0.8,0,5372,99.03,99.29,20,34,,,,,,
