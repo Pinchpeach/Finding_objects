@@ -224,7 +224,7 @@ def load(raw: Path):
     return rows, skipped
 
 
-# Chance coincidence (experiment, opt-in V2_ASSOC_CANDIDATE_DENSITY=1).  The
+# Chance coincidence (2.48.0; V2_ASSOC_CANDIDATE_DENSITY=0 restores the old rule).  The
 # probability that an unrelated source lies within the separation is set by
 # the density of the sources the detection could be confused with, i.e. the
 # candidate counterparts (the anchor's catalogue), not the detection's own
@@ -233,8 +233,11 @@ def load(raw: Path):
 # detection's density a 6"-PSF AllWISE row is judged against the sparse WISE
 # sky; shifted by 2' (NWAY's false-match test) 29-35 % of AllWISE rows still
 # joined an unrelated object at high latitude, ~90 % in crowded fields
-# (benchmark/experiments/assoc_phot_prior).
-_CANDIDATE_DENSITY = os.environ.get("V2_ASSOC_CANDIDATE_DENSITY", "0") == "1"
+# (benchmark/experiments/assoc_phot_prior).  The larger of the two densities
+# is used; on the same 26 fields this removed 14 % of the false AllWISE and
+# 22 % of the false 2MASS associations with the truth accuracy unchanged
+# (benchmark/experiments/assoc_density).
+_CANDIDATE_DENSITY = os.environ.get("V2_ASSOC_CANDIDATE_DENSITY", "1") == "1"
 
 
 def _pair_density(det, anchor):

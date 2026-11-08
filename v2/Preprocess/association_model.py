@@ -427,15 +427,18 @@ def assess_pair(a: Mapping[str, Any], b: Mapping[str, Any], density_arcsec2: flo
 # property is the colour between the candidate's band and the optical anchor
 # (Gaia G - W1 for AllWISE, G - Ks for 2MASS): a WISE source blended with, or
 # offset from, an unrelated optical star has a colour no real counterpart
-# shows.  The table is built from our own fields (benchmark/build_phot_prior.py);
-# opt-in (V2_ASSOC_PHOT_PRIOR=1) until it is validated.
+# shows.  The table is built from our own fields (benchmark/build_phot_prior.py).
+# On by default since 2.48.0 (A/B on 26 set-B fields, together with the
+# counterpart density of 01_source_association._pair_density: false AllWISE /
+# 2MASS associations -14 % / -24 %, truth accuracy unchanged); V2_ASSOC_PHOT_PRIOR=0
+# switches it off.
 PHOT_PRIOR_BANDS = {"AllWISE": "W1mag", "2MASS PSC": "Kmag"}
 _PHOT_PRIOR_FILE = Path(__file__).with_name("phot_prior.csv")
 _PHOT_PRIOR: dict[str, list[tuple[float, float, float]]] | None = None
 
 
 def phot_prior_enabled() -> bool:
-    return os.environ.get("V2_ASSOC_PHOT_PRIOR", "0") == "1" and _PHOT_PRIOR_FILE.exists()
+    return os.environ.get("V2_ASSOC_PHOT_PRIOR", "1") == "1" and _PHOT_PRIOR_FILE.exists()
 
 
 def _phot_table():
