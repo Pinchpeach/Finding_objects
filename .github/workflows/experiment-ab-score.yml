@@ -1,0 +1,45 @@
+name: Experiment A/B score only
+
+# Re-score the artifacts of an earlier experiment-ab-fields run without
+# collecting again.  Push v2/benchmark/experiments/SCORE_AB with two words:
+# "<run id> <experiment name>".
+on:
+  push:
+    branches-ignore: [main, validation-data]
+    paths: ["v2/benchmark/experiments/SCORE_AB"]
+
+jobs:
+  score:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas numpy scipy astropy
+      - id: arg
+        run: |
+          read RUN EXP < v2/benchmark/experiments/SCORE_AB
+          echo "run=$RUN" >> "$GITHUB_OUTPUT"; echo "exp=$EXP" >> "$GITHUB_OUTPUT"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: ab-*
+          path: /tmp/ab
+          merge-multiple: true
+          run-id: ${{ steps.arg.outputs.run }}
+          github-token: ${{ github.token }}
+      - name: Compare
+        run: |
+          out=v2/benchmark/experiments/${{ steps.arg.outputs.exp }}
+          mkdir -p $out
+          set -o pipefail
+          (cd v2/benchmark && python -u compare_ab_fields.py /tmp/ab --out ../../$out) | tee $out/compare.log
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add v2/benchmark/experiments
+          git commit -m "A/B experiment scores: ${{ steps.arg.outputs.exp }}" || exit 0
+          bash .github/scripts/push_with_retry.sh "${{ github.ref_name }}"
