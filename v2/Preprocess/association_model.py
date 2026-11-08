@@ -15,7 +15,10 @@ can replace it without changing the Stage-1 interface.
 from __future__ import annotations
 
 from dataclasses import dataclass
+import csv
 import math
+import os
+from pathlib import Path
 from typing import Mapping, Any
 
 
@@ -414,3 +417,56 @@ def assess_pair(a: Mapping[str, Any], b: Mapping[str, Any], density_arcsec2: flo
         "chance_probability": pchance,
         "association_score": score,
     }
+
+
+# Photometric prior for low-resolution counterparts (NWAY, Salvato et al. 2018,
+# MNRAS 473, 4937; code nwaylib/magnitudeweights.py).  NWAY multiplies the
+# positional Bayes factor of a candidate by h_sel(m) / h_all(m): the
+# distribution of a property among secure counterparts over that among all
+# field sources, normalised so the mean weight over the field is 1.  Here the
+# property is the colour between the candidate's band and the optical anchor
+# (Gaia G - W1 for AllWISE, G - Ks for 2MASS): a WISE source blended with, or
+# offset from, an unrelated optical star has a colour no real counterpart
+# shows.  The table is built from our own fields (benchmark/build_phot_prior.py);
+# opt-in (V2_ASSOC_PHOT_PRIOR=1) until it is validated.
+PHOT_PRIOR_BANDS = {"AllWISE": "W1mag", "2MASS PSC": "Kmag"}
+_PHOT_PRIOR_FILE = Path(__file__).with_name("phot_prior.csv")
+_PHOT_PRIOR: dict[str, list[tuple[float, float, float]]] | None = None
+
+
+def phot_prior_enabled() -> bool:
+    return os.environ.get("V2_ASSOC_PHOT_PRIOR", "0") == "1" and _PHOT_PRIOR_FILE.exists()
+
+
+def _phot_table():
+    global _PHOT_PRIOR
+    if _PHOT_PRIOR is None:
+        _PHOT_PRIOR = {}
+        with open(_PHOT_PRIOR_FILE) as f:
+            for r in csv.DictReader(f):
+                _PHOT_PRIOR.setdefault(r["catalog"], []).append((float(r["lo"]), float(r["hi"]), float(r["weight"])))
+    return _PHOT_PRIOR
+
+
+def phot_magnitudes(catalog: str, row: Mapping[str, Any]) -> dict[str, float]:
+    out = {}
+    col = PHOT_PRIOR_BANDS.get(catalog) or ("phot_g_mean_mag" if catalog == "Gaia DR3" else None)
+    if col:
+        v = num(row.get(col))
+        if v is not None:
+            out["G" if catalog == "Gaia DR3" else catalog] = v
+    return out
+
+
+def phot_weight(catalog: str, g_anchor: float | None, mag: float | None) -> float:
+    """NWAY-style weight h_sel / h_all of the colour G - mag (1 when unknown)."""
+    if g_anchor is None or mag is None:
+        return 1.0
+    rows = _phot_table().get(catalog)
+    if not rows:
+        return 1.0
+    c = g_anchor - mag
+    for lo, hi, w in rows:
+        if lo <= c < hi:
+            return w
+    return rows[0][2] if c < rows[0][0] else rows[-1][2]

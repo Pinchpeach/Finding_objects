@@ -210,3 +210,29 @@ def test_physical_ned_type_is_read_before_band_detection(tmp_path):
 
     o = pd.read_csv(out)
     assert len(o) == 1 and o["ned__Type"].iloc[0] == "C*"
+
+
+def test_photometric_prior_rejects_a_red_wise_source_offset_from_a_star(tmp_path, monkeypatch):
+    # Reference object J042925 (2.47.0): an AllWISE carbon star 4.8" from an
+    # unrelated Gaia star (G - W1 ~ 11) was merged with it at 4.7 sigma.  With
+    # the NWAY-style colour prior (opt-in) the pair is no longer accepted;
+    # a normal-colour WISE counterpart is unaffected.
+    import pandas as pd
+
+    dec = 55.6
+    cosd = math.cos(math.radians(dec))
+
+    def field(w1, dx):
+        pd.DataFrame([{"catalog": "Gaia DR3", "catalog_object_id": "g1", "ra": 67.0, "dec": dec, "phot_g_mean_mag": 17.5,
+                       "ra_error": 0.1, "dec_error": 0.1}]).to_csv(tmp_path / "gaia.csv", index=False)
+        pd.DataFrame([{"catalog": "AllWISE", "catalog_object_id": "w1", "ra": 67.0 + dx / 3600 / cosd, "dec": dec, "W1mag": w1}]).to_csv(
+            tmp_path / "allwise.csv", index=False)
+        out = tmp_path.parent / f"{tmp_path.name}_assoc.csv"  # outside the raw folder
+        _stage1().run(tmp_path, out)
+        return pd.read_csv(out).object_id.nunique()
+
+    monkeypatch.setenv("V2_ASSOC_PHOT_PRIOR", "0")
+    assert field(6.5, 4.6) == 1  # merged on position alone
+    monkeypatch.setenv("V2_ASSOC_PHOT_PRIOR", "1")
+    assert field(6.5, 4.6) == 2  # G - W1 = 11: not a counterpart
+    assert field(14.5, 1.0) == 1  # G - W1 = 3, 1": still merged
