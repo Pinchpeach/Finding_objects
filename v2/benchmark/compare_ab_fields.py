@@ -60,6 +60,11 @@ def main():
             t = m.t_truth == c
             r[f"recall_{c}"] = round(100 * ok[t].mean(), 2) if t.any() else None
         out.append(r)
+        if v != a.base and "allwise__W1mag" in m and "allwise__W1mag" in b:
+            w, wb = pd.to_numeric(m.allwise__W1mag, errors="coerce"), pd.to_numeric(b.allwise__W1mag, errors="coerce")
+            d = (w - wb).abs()
+            r["w1_changed"] = int((d > 0.01).sum())
+            r["w1_median_abs_diff"] = round(float(d[d > 0.01].median()), 3) if (d > 0.01).any() else 0.0
         if v != a.base and a.out:
             diff = m[ok != okb][["field", "t_ra", "t_dec", "t_truth", "t_survey", "ours"]].assign(base=b.ours[ok != okb])
             a.out.mkdir(parents=True, exist_ok=True)
