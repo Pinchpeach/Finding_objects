@@ -1,12 +1,12 @@
 name: Experiment A/B score only
 
 # Re-score the artifacts of an earlier experiment-ab-fields run without
-# collecting again.  Push v2/benchmark/experiments/SCORE_AB with two words:
-# "<run id> <experiment name>".
+# collecting again.  Dispatch with the run id and the experiment name.
 on:
-  push:
-    branches-ignore: [main, validation-data]
-    paths: ["v2/benchmark/experiments/SCORE_AB"]
+  workflow_dispatch:
+    inputs:
+      run: {description: "experiment-ab-fields run id", required: true}
+      experiment: {description: "results folder under v2/benchmark/experiments", required: true}
 
 jobs:
   score:
@@ -21,8 +21,7 @@ jobs:
       - run: pip install pandas numpy scipy astropy
       - id: arg
         run: |
-          read RUN EXP < v2/benchmark/experiments/SCORE_AB
-          echo "run=$RUN" >> "$GITHUB_OUTPUT"; echo "exp=$EXP" >> "$GITHUB_OUTPUT"
+          echo "run=${{ github.event.inputs.run }}" >> "$GITHUB_OUTPUT"; echo "exp=${{ github.event.inputs.experiment }}" >> "$GITHUB_OUTPUT"
       - uses: actions/download-artifact@v4
         with:
           pattern: ab-*

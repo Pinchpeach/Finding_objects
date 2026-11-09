@@ -13,11 +13,8 @@ on:
   workflow_dispatch:
     inputs:
       experiment: {description: "results folder under v2/benchmark/experiments", default: "assoc_phot_prior"}
-  # A new workflow cannot be dispatched before it is on main: pushing the
-  # trigger file (one line, the experiment name) starts it on a work branch.
-  push:
-    branches-ignore: [main, validation-data]
-    paths: ["v2/benchmark/experiments/RUN_AB"]
+  # Dispatch only (since 2.48.1): the former push trigger on a trigger file
+  # re-ran the whole experiment whenever the work branch was reset to main.
 concurrency:
   group: experiment-ab-${{ github.ref }}
   cancel-in-progress: true
