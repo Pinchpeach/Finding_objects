@@ -170,8 +170,12 @@ jobs:
           shutil.copytree(src, dst)
           for f in dst.glob("*.csv"):
               d = pd.read_csv(f, low_memory=False)
-              if "catalog" in d and d.catalog.astype(str).isin(["AllWISE", "2MASS PSC"]).any():
-                  d["dec"] = pd.to_numeric(d.dec, errors="coerce") + 2.0 / 60.0
+              cats = set(d.catalog.astype(str)) if "catalog" in d else set()
+              # opposite directions, so a shifted WISE row cannot find its own
+              # shifted 2MASS row (2.49.0; the 2.48.0 test moved both together)
+              step = 2.0 / 60.0 if "AllWISE" in cats else (-2.0 / 60.0 if "2MASS PSC" in cats else None)
+              if step is not None:
+                  d["dec"] = pd.to_numeric(d.dec, errors="coerce") + step
                   d.to_csv(f, index=False)
                   print("shifted", f.name, len(d))
           PY

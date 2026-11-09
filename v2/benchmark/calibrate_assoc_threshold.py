@@ -14,6 +14,13 @@ moved by 2' (assoc_pairs.csv.gz).  For each catalogue this script reports
 
 and the smallest t with false(t) <= TARGET.  Output: Preprocess/assoc_min_posterior.csv.
 
+2.49.0: AllWISE and 2MASS are moved together, so a shifted WISE row still
+finds its own shifted 2MASS row; only matches to an unshifted anchor
+(object_anchor_catalog not AllWISE / 2MASS) count as false.  The membership
+posterior saturates near 1 for AllWISE (its 6" PSF makes the positional
+density small against the sky density), so the cut is on the normalised
+separation instead: the largest k with false(sep/sigma <= k) <= TARGET.
+
     calibrate_assoc_threshold.py PAIRS_CSV [--variant base] [--target 0.05]
 """
 
@@ -23,7 +30,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-OUT = Path(__file__).resolve().parents[1] / "Preprocess" / "assoc_min_posterior.csv"
+OUT = Path(__file__).resolve().parents[1] / "Preprocess" / "assoc_max_nsep.csv"
+SHIFTED = ("AllWISE", "2MASS PSC")
 
 
 def main():
@@ -35,24 +43,24 @@ def main():
     a = ap.parse_args()
     d = pd.read_csv(a.pairs, low_memory=False)
     d = d[d.variant == a.variant]
-    grid = np.r_[0.0, np.logspace(-4, 0, 81)]
+    grid = np.round(np.arange(0.25, 6.01, 0.25), 2)
     rows = []
     for cat, g in d.groupby("catalog"):
         real, sh = g[g.run == "real"], g[g.run == "shifted"]
-        rm = real[real.association_status == "matched"].association_confidence.astype(float)
-        sm = sh[sh.association_status == "matched"].association_confidence.astype(float)
+        rm = pd.to_numeric(real[real.association_status == "matched"].normalized_separation, errors="coerce")
+        m = sh[(sh.association_status == "matched") & ~sh.object_anchor_catalog.isin(SHIFTED)]
+        sm = pd.to_numeric(m.normalized_separation, errors="coerce")
         best = None
-        print(f"\n{cat}: real rows {len(real)} (matched {len(rm)}), shifted rows {len(sh)} (matched {len(sm)})")
-        for t in grid:
-            false = (sm >= t).sum() / max(len(sh), 1)
-            kept = (rm >= t).sum() / max(len(rm), 1)
-            if t in (0.0,) or abs(np.log10(t) % 0.5) < 1e-9:
-                print(f"  t={t:.4g}  false={100 * false:.1f} %  kept real matches={100 * kept:.1f} %")
-            if best is None and false <= a.target:
-                best = (t, false, kept)
+        print(f"\n{cat}: real rows {len(real)} (matched {len(rm)}), shifted rows {len(sh)} (false matches {len(sm)})")
+        for k in grid:
+            false = (sm <= k).sum() / max(len(sh), 1)
+            kept = (rm <= k).sum() / max(len(rm), 1)
+            print(f"  sep/sigma <= {k:4.2f}  false {100 * false:5.1f} %  kept real matches {100 * kept:5.1f} %")
+            if false <= a.target:
+                best = (k, false, kept)
         if best:
-            print(f"  -> threshold {best[0]:.4g}: false {100 * best[1]:.1f} %, kept {100 * best[2]:.1f} %")
-            rows.append(dict(catalog=cat, min_posterior=round(float(best[0]), 6), false_rate=round(float(best[1]), 4),
+            print(f"  -> largest cut with false <= {100 * a.target:.0f} %: {best[0]}  (false {100 * best[1]:.1f} %, kept {100 * best[2]:.1f} %)")
+            rows.append(dict(catalog=cat, max_nsep=float(best[0]), false_rate=round(float(best[1]), 4),
                              kept_real=round(float(best[2]), 4), target=a.target))
     t = pd.DataFrame(rows)
     print(t.to_string(index=False))
