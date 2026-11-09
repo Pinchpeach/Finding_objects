@@ -12,7 +12,8 @@ name: Experiment A/B on independent fields
 on:
   workflow_dispatch:
     inputs:
-      experiment: {description: "results folder under v2/benchmark/experiments", default: "assoc_phot_prior"}
+      experiment: {description: "results folder under v2/benchmark/experiments", default: "wise_from_ls"}
+      variants: {description: "space-separated variants (base phot cand both lsw)", default: "base lsw"}
   # Dispatch only (since 2.48.1): the former push trigger on a trigger file
   # re-ran the whole experiment whenever the work branch was reset to main.
 concurrency:
@@ -25,7 +26,7 @@ jobs:
     timeout-minutes: 300
     strategy:
       fail-fast: false
-      max-parallel: 13
+      max-parallel: 20
       matrix:
         f:
           - {name: blam_082p06, ra: 81.44083, dec: 5.89889, r: 12.0}
@@ -54,6 +55,60 @@ jobs:
           - {name: sb_ngc4945, ra: 196.364, dec: -49.468, r: 12.0}
           - {name: sfr_cra, ra: 285.4, dec: -36.95, r: 12.0}
           - {name: sfr_rosette, ra: 98.0, dec: 4.95, r: 6.0}
+          - {name: blam_006p41, ra: 5.04389, dec: 41.24333, r: 12.0}
+          - {name: blam_008p05, ra: 8.40556, dec: 5.05444, r: 12.0}
+          - {name: blam_008p46, ra: 7.62056, dec: 46.02083, r: 12.0}
+          - {name: blam_010p16, ra: 10.19167, dec: 15.9925, r: 12.0}
+          - {name: blam_022p35, ra: 21.40694, dec: 34.26667, r: 12.0}
+          - {name: blam_024p13, ra: 23.04972, dec: 12.97722, r: 12.0}
+          - {name: blam_028p21, ra: 28.15639, dec: 20.88444, r: 12.0}
+          - {name: blam_037p43, ra: 36.36417, dec: 42.75222, r: 12.0}
+          - {name: blam_074m02, ra: 73.71194, dec: -1.74611, r: 12.0}
+          - {name: blam_132m03, ra: 131.47917, dec: -3.28194, r: 12.0}
+          - {name: blam_138p50, ra: 138.71333, dec: 50.24917, r: 12.0}
+          - {name: blam_165p42, ra: 165.62083, dec: 42.68194, r: 12.0}
+          - {name: blam_170p51, ra: 169.50472, dec: 51.56833, r: 12.0}
+          - {name: blam_208p49, ra: 208.9625, dec: 49.18889, r: 12.0}
+          - {name: blam_221p23, ra: 220.585, dec: 22.72944, r: 12.0}
+          - {name: blam_221p40, ra: 221.14861, dec: 39.73528, r: 12.0}
+          - {name: blam_224p33, ra: 223.87389, dec: 32.90111, r: 12.0}
+          - {name: blam_241p22, ra: 240.31222, dec: 21.92194, r: 12.0}
+          - {name: blam_246p39, ra: 245.51, dec: 38.79444, r: 12.0}
+          - {name: blam_252p19, ra: 251.76611, dec: 19.37472, r: 12.0}
+          - {name: blam_253p06, ra: 252.83306, dec: 6.51222, r: 12.0}
+          - {name: blam_258p56, ra: 258.51833, dec: 56.45583, r: 12.0}
+          - {name: blam_268p58, ra: 267.18333, dec: 57.96889, r: 12.0}
+          - {name: blam_344p06, ra: 344.23528, dec: 5.50889, r: 12.0}
+          - {name: bngp_155p01, ra: 154.95389, dec: 1.43889, r: 12.0}
+          - {name: bngp_162p01, ra: 161.71667, dec: 1.35889, r: 12.0}
+          - {name: bngp_191p03, ra: 191.275, dec: 3.08167, r: 12.0}
+          - {name: bngp_218p03, ra: 217.96833, dec: 2.19806, r: 12.0}
+          - {name: bngp_224m02, ra: 224.10833, dec: -1.26278, r: 12.0}
+          - {name: bs82_345p01, ra: 345.48472, dec: 0.58889, r: 12.0}
+          - {name: bsgp_003m33, ra: 3.37139, dec: -33.00028, r: 12.0}
+          - {name: bsgp_009m31, ra: 9.19083, dec: -30.80583, r: 12.0}
+          - {name: bsgp_033m31, ra: 33.60361, dec: -30.56639, r: 12.0}
+          - {name: bsgp_333m24, ra: 333.13889, dec: -23.7175, r: 12.0}
+          - {name: bsgp_333m36, ra: 332.22167, dec: -35.73833, r: 12.0}
+          - {name: bsgp_337m36, ra: 337.33389, dec: -36.33556, r: 12.0}
+          - {name: bsgp_345m29, ra: 345.68333, dec: -29.15222, r: 12.0}
+          - {name: bsgp_350m34, ra: 349.87472, dec: -34.18194, r: 12.0}
+          - {name: bsgp_355m36, ra: 354.12611, dec: -35.94972, r: 12.0}
+          - {name: bsth_078m57, ra: 77.05944, dec: -57.06972, r: 12.0}
+          - {name: bsth_095m80, ra: 95.38, dec: -80.36, r: 12.0}
+          - {name: bsth_184m22, ra: 184.0425, dec: -21.53056, r: 12.0}
+          - {name: bsth_302m32, ra: 301.81972, dec: -31.67222, r: 12.0}
+          - {name: gc_m10, ra: 254.288, dec: -4.1, r: 6.0}
+          - {name: gc_m56, ra: 289.148, dec: 30.184, r: 6.0}
+          - {name: gc_ngc1851, ra: 78.528, dec: -40.047, r: 6.0}
+          - {name: lmc_outer_se, ra: 95.0, dec: -73.5, r: 6.0}
+          - {name: oc_m48, ra: 123.4, dec: -5.75, r: 12.0}
+          - {name: oc_ngc2547, ra: 122.6, dec: -49.2, r: 12.0}
+          - {name: sb_m51, ra: 202.47, dec: 47.195, r: 12.0}
+          - {name: sfr_ic5146, ra: 328.4, dec: 47.3, r: 12.0}
+          - {name: sfr_lupus1, ra: 235.6, dec: -34.6, r: 12.0}
+          - {name: sfr_serpens, ra: 277.45, dec: 1.25, r: 12.0}
+          - {name: sfr_w51, ra: 290.9, dec: 14.1, r: 6.0}
     env:
       NAME: ${{ matrix.f.name }}
       RA: ${{ matrix.f.ra }}
@@ -97,15 +152,23 @@ jobs:
           PY
       - name: Variants
         run: |
-          for v in base phot cand both; do
-            case $v in phot|both) export V2_ASSOC_PHOT_PRIOR=1;; *) export V2_ASSOC_PHOT_PRIOR=0;; esac
-            case $v in cand|both) export V2_ASSOC_CANDIDATE_DENSITY=1;; *) export V2_ASSOC_CANDIDATE_DENSITY=0;; esac
+          # base = current defaults; phot/cand/both = the 2.48.0 association
+          # switches against a no-prior baseline; lsw = WISE from LS forced photometry.
+          for v in ${{ github.event.inputs.variants || 'base lsw' }}; do
+            unset V2_ASSOC_PHOT_PRIOR V2_ASSOC_CANDIDATE_DENSITY V2_WISE_FROM_LS
+            case $v in
+              phot) export V2_ASSOC_PHOT_PRIOR=1 V2_ASSOC_CANDIDATE_DENSITY=0;;
+              cand) export V2_ASSOC_PHOT_PRIOR=0 V2_ASSOC_CANDIDATE_DENSITY=1;;
+              both) export V2_ASSOC_PHOT_PRIOR=1 V2_ASSOC_CANDIDATE_DENSITY=1;;
+              old) export V2_ASSOC_PHOT_PRIOR=0 V2_ASSOC_CANDIDATE_DENSITY=0;;
+              lsw) export V2_WISE_FROM_LS=1;;
+            esac
             python -u v2/pipeline.py --raw-dir /tmp/blindraw --ra $RA --dec $DEC --radius $R --work /tmp/run_$v
             python -u v2/Preprocess/01_source_association.py --raw-dir /tmp/shiftraw --out /tmp/shift_$v.csv
             out=/tmp/ab/$v/$NAME; mkdir -p $out
             cp -r /tmp/ref/truth /tmp/ref/field.json $out/
             python -u .github/scripts/independent_truth_field.py compact /tmp/run_$v $RA $DEC $R $out objects_blind
-            python -u .github/scripts/assoc_stats.py /tmp/run_$v/source_association.csv /tmp/shift_$v.csv > $out/assoc_stats.json
+            python -u .github/scripts/assoc_stats.py /tmp/run_$v/source_association.csv /tmp/shift_$v.csv $out/assoc_pairs.csv.gz > $out/assoc_stats.json
             cp /tmp/run_$v/pipeline_summary.csv $out/ || true
             cat $out/assoc_stats.json
           done
@@ -133,7 +196,7 @@ jobs:
           merge-multiple: true
       - name: Compare
         run: |
-          out=v2/benchmark/experiments/${{ github.event.inputs.experiment || 'assoc_density' }}
+          out=v2/benchmark/experiments/${{ github.event.inputs.experiment || 'wise_from_ls' }}
           mkdir -p $out
           (cd v2/benchmark && python -u compare_ab_fields.py /tmp/ab --out ../../$out) | tee $out/compare.log
           python - <<'PY'
@@ -143,6 +206,12 @@ jobs:
               v, field = f.split("/")[3:5]
               s = pd.read_csv(f).set_index("stage").seconds
               rows.append({"variant": v, "field": field, **s.to_dict()})
+          pairs = []
+          for f in glob.glob("/tmp/ab/*/*/assoc_pairs.csv.gz"):
+              v, field = f.split("/")[3:5]
+              pairs.append(pd.read_csv(f, low_memory=False).assign(variant=v, field=field))
+          if pairs:
+              pd.concat(pairs).to_csv("v2/benchmark/experiments/" + os.environ["EXP"] + "/assoc_pairs.csv.gz", index=False)
           if rows:
               t = pd.DataFrame(rows)
               out = "v2/benchmark/experiments/" + os.environ["EXP"]
@@ -150,12 +219,12 @@ jobs:
               print(t.drop(columns="field").groupby("variant").median(numeric_only=True).to_string())
           PY
         env:
-          EXP: ${{ github.event.inputs.experiment || 'assoc_density' }}
+          EXP: ${{ github.event.inputs.experiment || 'wise_from_ls' }}
       - name: Commit
         if: github.ref_name != 'main'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add v2/benchmark/experiments
-          git commit -m "A/B experiment results: ${{ github.event.inputs.experiment || 'assoc_density' }}" || exit 0
+          git commit -m "A/B experiment results: ${{ github.event.inputs.experiment || 'wise_from_ls' }}" || exit 0
           bash .github/scripts/push_with_retry.sh "${{ github.ref_name }}"

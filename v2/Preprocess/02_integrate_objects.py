@@ -2,7 +2,7 @@
 """Stage 2: build one-row-per-object records from Stage-1 associations."""
 
 from __future__ import annotations
-import argparse, math, re
+import argparse, math, os, re
 from pathlib import Path
 import numpy as np
 import pandas as pd
@@ -54,6 +54,40 @@ def _units():
     m = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(m)
     return m
+
+
+# WISE at the optical position (experiment, opt-in V2_WISE_FROM_LS=1).
+# AllWISE profile-fit photometry blends sources within its 6" PSF, and the
+# AllWISE row can be associated with the wrong optical neighbour (2.48.0:
+# 46 % of AllWISE rows moved by 2' still found a partner).  Legacy Surveys
+# DR10 measures unWISE W1/W2 by forced photometry at the optical position
+# with the optical model as the profile, which deblends neighbours (Lang,
+# Hogg & Schlegel 2016, AJ 151, 36; Dey et al. 2019, AJ 157, 168).  Where an
+# object holds both rows, its W1/W2 (Vega: AB - 2.699 / 3.339, Jarrett et
+# al. 2011) and S/N come from the forced photometry; the AllWISE values stay
+# under *_catalog.
+_WISE_FROM_LS = os.environ.get("V2_WISE_FROM_LS", "0") == "1"
+_LS = "desi_legacy_surveys_dr10__"
+_WISE_AB_VEGA = {"1": 2.699, "2": 3.339}
+
+
+def ls_forced_wise(rec):
+    if "allwise__W1mag" not in rec or f"{_LS}flux_w1" not in rec:
+        return
+    done = False
+    for b in ("1", "2"):
+        f, iv = _float(rec.get(f"{_LS}flux_w{b}")), _float(rec.get(f"{_LS}flux_ivar_w{b}"))
+        if not (f == f and iv == iv) or f <= 0 or iv <= 0:
+            continue
+        for k in (f"W{b}mag", f"e_W{b}mag", f"snr{b}"):
+            rec[f"allwise__{k}_catalog"] = rec.get(f"allwise__{k}")
+        snr = f * math.sqrt(iv)
+        rec[f"allwise__W{b}mag"] = 22.5 - 2.5 * math.log10(f) - _WISE_AB_VEGA[b]
+        rec[f"allwise__e_W{b}mag"] = 1.0857 / snr
+        rec[f"allwise__snr{b}"] = snr
+        done = True
+    if done:
+        rec["wise_photometry_source"] = "LS_FORCED_UNWISE"
 
 
 def flag_large_galaxy_hosts(rows):
@@ -195,6 +229,8 @@ def run(associations, raw_dir, out):
                 if col not in object_keys and (col not in rec or pd.isna(rec[col])):
                     rec[col] = val
         rec["catalogs"] = "|".join(sorted(set(catalogs)))
+        if _WISE_FROM_LS:
+            ls_forced_wise(rec)
         rows.append(rec)
     flag_large_galaxy_hosts(rows)
     df = pd.DataFrame(rows)

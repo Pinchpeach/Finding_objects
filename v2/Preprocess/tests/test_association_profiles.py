@@ -236,3 +236,22 @@ def test_photometric_prior_rejects_a_red_wise_source_offset_from_a_star(tmp_path
     monkeypatch.setenv("V2_ASSOC_PHOT_PRIOR", "1")
     assert field(6.5, 4.6) == 2  # G - W1 = 11: not a counterpart
     assert field(14.5, 1.0) == 1  # G - W1 = 3, 1": still merged
+
+
+def test_ls_forced_wise_replaces_allwise_photometry():
+    s = importlib.util.spec_from_file_location("s2w", PRE / "02_integrate_objects.py")
+    m = importlib.util.module_from_spec(s)
+    s.loader.exec_module(m)
+    rec = {"allwise__W1mag": 12.0, "allwise__W2mag": 11.0, "allwise__snr1": 50.0, "allwise__snr2": 40.0,
+           "desi_legacy_surveys_dr10__flux_w1": 100.0, "desi_legacy_surveys_dr10__flux_ivar_w1": 1.0,
+           "desi_legacy_surveys_dr10__flux_w2": 100.0, "desi_legacy_surveys_dr10__flux_ivar_w2": 0.25}
+    m.ls_forced_wise(rec)
+    # 100 nanomaggies = AB 17.5; Vega W1 = 14.801, W2 = 14.161
+    assert math.isclose(rec["allwise__W1mag"], 17.5 - 2.699, abs_tol=1e-6)
+    assert math.isclose(rec["allwise__W2mag"], 17.5 - 3.339, abs_tol=1e-6)
+    assert math.isclose(rec["allwise__snr2"], 50.0) and rec["allwise__W1mag_catalog"] == 12.0
+    assert rec["wise_photometry_source"] == "LS_FORCED_UNWISE"
+    # no AllWISE row: nothing is added
+    only_ls = {"desi_legacy_surveys_dr10__flux_w1": 100.0, "desi_legacy_surveys_dr10__flux_ivar_w1": 1.0}
+    m.ls_forced_wise(only_ls)
+    assert "allwise__W1mag" not in only_ls
