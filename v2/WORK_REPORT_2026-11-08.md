@@ -41,8 +41,8 @@
 **실험 설계**
 - 26개 세트 B 영역을 한 번만 수집하고, 같은 blind 원자료로 네 변형(base, phot, cand, both)을 돌렸다(`.github/workflows/experiment-ab-fields.yml`).
 - 수집 차이가 결과에 섞이지 않는다.
-- 새 워크플로는 main에 오기 전에는 dispatch할 수 없어서, 작업 브랜치에서는 `v2/benchmark/experiments/RUN_AB`를 push해 시작한다.
-- 점수만 다시 낼 때는 `SCORE_AB`(실행 번호 + 이름)를 push한다(`experiment-ab-score.yml`).
+- 2.48.1부터 두 워크플로 모두 workflow_dispatch로만 시작한다(이전의 트리거 파일 push 방식은 브랜치를 main으로 되돌릴 때 실험 전체가 다시 돌았다).
+- 점수만 다시 낼 때는 `experiment-ab-score.yml`을 실행 번호와 이름으로 dispatch한다.
 
 **"both"를 고른 이유**
 - 짝 후보 밀도만 쓰면 거짓 연관은 줄지만, 실제 AllWISE 짝도 2,349개 줄고 정답 옆 조각이 272 → 275로 는다.
