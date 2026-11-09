@@ -52,6 +52,8 @@ CATALOGUES = {
 DEEP_CATALOGUES = {
     "COSMOS ACS (Leauthaud+2007)": "J/ApJS/172/219",
     "COSMOS2020 (Weaver+2022)": "J/ApJS/258/11",
+    # morphology annotation candidate (roadmap C5)
+    "Galaxy Zoo DESI (Walmsley+2023)": "J/MNRAS/526/4768",
 }
 SEARCH_WORDS = ["APOGEE DR17", "Magellanic Quasars", "quasars behind Magellanic", "Gaia-ESO survey DR5",
                 "SMC 2dF spectroscopy", "LMC spectroscopic survey", "open clusters spectroscopic members"]
