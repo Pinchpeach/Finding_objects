@@ -4,76 +4,76 @@ SIMBAD supplies only validation coordinates/reference type; no SIMBAD row enters
 Transient event rows are associated in a separate entity layer from persistent hosts.
 
 - requested samples: **9**
-- successfully executed: **0/9**
-- blind exact-axis matches: **0/0 (0.0%)**
+- successfully executed: **9/9**
+- blind exact-axis matches: **9/9 (100.0%)**
 
 | sample | axis | expected | blind | status | sep_arcsec |
 |---|---|---|---|---|---:|
-| GD 71 | physical | WD | ERROR | NameResolveError('All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: \n https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?GD%2071: timed out\nhttp://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?GD%2071: Request took longer than the allowed 10.0 seconds') |  |
-| RR Lyr | variability | RR_LYRAE | ERROR | NameResolveError('All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: \n https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?RR%20Lyr: timed out\nhttp://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?RR%20Lyr: Request took longer than the allowed 10.0 seconds') |  |
-| delta Cep | variability | CEPHEID | ERROR | NameResolveError('All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: \n https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?delta%20Cep: timed out\nhttp://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?delta%20Cep: Request took longer than the allowed 10.0 seconds') |  |
-| Mira | physical | AGB | ERROR | NameResolveError('All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: \n https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?Mira: timed out\nhttp://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?Mira: Request took longer than the allowed 10.0 seconds') |  |
-| PSR B0531+21 | compact | PULSAR | ERROR | NameResolveError('All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: \n https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?PSR%20B0531%2B21: timed out\nhttp://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?PSR%20B0531%2B21: Request took longer than the allowed 10.0 seconds') |  |
-| M 57 | phenomenon | PN | ERROR | NameResolveError('All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: \n https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?M%2057: timed out\nhttp://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?M%2057: Request took longer than the allowed 10.0 seconds') |  |
-| SN 2018fhw | phenomenon | SN | ERROR | NameResolveError('All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: \n https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?SN%202018fhw: timed out\nhttp://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?SN%202018fhw: Request took longer than the allowed 10.0 seconds') |  |
-| SN 2011fe | phenomenon | SN | ERROR | NameResolveError('All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: \n https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?SN%202011fe: timed out\nhttp://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?SN%202011fe: Request took longer than the allowed 10.0 seconds') |  |
-| 3C 273 | extragalactic | AGN | ERROR | NameResolveError('All Sesame queries failed. Unable to retrieve coordinates. See errors per URL below: \n https://cds.unistra.fr/cgi-bin/nph-sesame/SNV?3C%20273: timed out\nhttp://vizier.cfa.harvard.edu/viz-bin/nph-sesame/SNV?3C%20273: Request took longer than the allowed 10.0 seconds') |  |
+| GD 71 | physical | WD | WD | CLASSIFIED_WD | 3.027 |
+| RR Lyr | variability | RR_LYRAE | RR_LYRAE | GAIA_DR3_VARIABLE_CANDIDATE | 3.591 |
+| delta Cep | variability | CEPHEID | CEPHEID | GAIA_DR3_VARIABLE_CANDIDATE | 0.239 |
+| Mira | physical | AGB | AGB | SUH2021_AGB_CATALOG_MATCH | 0.367 |
+| PSR B0531+21 | compact | PULSAR | PULSAR | ATNF_CATALOG_MATCH | 0.197 |
+| M 57 | phenomenon | PN | PN | HASH_PN_CATALOG_MATCH | 0.291 |
+| SN 2018fhw | phenomenon | SN | SN | ASASSN_SUPERNOVA_EVENT_MATCH | 2.531 |
+| SN 2011fe | phenomenon | SN | SN | ASIAGO_SUPERNOVA_EVENT_MATCH | 0.886 |
+| 3C 273 | extragalactic | AGN | AGN | GAIA_DR3_AGN_CANDIDATE | 0.002 |
 
 ## Scientific measurements and association diagnostics
 
 ### GD 71
 
-- measured fields: {}
-- collectors: []
-- candidates: []
+- measured fields: {"ra": 88.11543730306488, "dec": 15.886239315232913, "ref_epoch": 2016.0, "anchor_catalog": "Gaia DR3", "entity_kind": "persistent_source", "parallax": 19.5638180302216, "parallax_error": 0.055117156, "pmra": 76.72806594267264, "pmdec": -172.95960304595332, "ruwe": 0.9704604, "phot_g_mean_mag": 12.999769, "phot_bp_mean_mag": 12.853095, "phot_rp_mean_mag": 13.305408, "bp_rp": -0.45231247}
+- collectors: [{"collector": "gaia_dr3", "status": "ok", "rows": 1, "error": ""}, {"collector": "allwise", "status": "empty", "rows": 0, "error": ""}, {"collector": "twomass", "status": "empty", "rows": 0, "error": ""}]
+- candidates: [{"object_id": "OBJ000001", "sep_arcsec": 3.027416087455188, "catalogs": "Gaia DR3", "entity_kind": "persistent_source", "anchor_catalog": "Gaia DR3", "association_members": 1.0, "association_confidence_mean": 1.0, "proper_motion_propagated_any": false, "primary_class": "STAR", "physical_class": "WD", "variability_class": "UNKNOWN", "compact_class": "UNKNOWN", "phenomenon_class": "UNKNOWN"}]
 
 ### RR Lyr
 
-- measured fields: {}
-- collectors: []
-- candidates: []
+- measured fields: {"ra": 291.36564029422567, "dec": 42.783488792618705, "ref_epoch": 2016.0, "anchor_catalog": "Gaia DR3", "entity_kind": "persistent_source", "parallax": 3.984858178256173, "parallax_error": 0.026521722, "pmra": -109.59872730873641, "pmdec": -195.85073064533083, "ruwe": 1.0359073, "phot_g_mean_mag": 7.6188045, "phot_bp_mean_mag": 7.831135, "phot_rp_mean_mag": 7.257368, "bp_rp": 0.5737667, "teff_gspphot": 6163.496, "logg_gspphot": 3.2207, "mh_gspphot": -0.6117, "mass_flame": 2.3781524, "age_flame": 0.696964, "evolstage_flame": 407.0, "best_class_name": "RR", "best_class_score": 0.5515927, "gaia_dr3__in_vari_long_period_variable": false, "in_vari_long_period_variable": false}
+- collectors: [{"collector": "gaia_dr3", "status": "ok", "rows": 4, "error": ""}]
+- candidates: [{"object_id": "OBJ000001", "sep_arcsec": 3.5908963037852386, "catalogs": "Gaia DR3", "entity_kind": "persistent_source", "anchor_catalog": "Gaia DR3", "association_members": 1.0, "association_confidence_mean": 1.0, "proper_motion_propagated_any": false, "primary_class": "STAR", "physical_class": "UNKNOWN", "variability_class": "RR_LYRAE", "compact_class": "UNKNOWN", "phenomenon_class": "UNKNOWN"}, {"object_id": "OBJ000004", "sep_arcsec": 8.54723956955087, "catalogs": "Gaia DR3", "entity_kind": "persistent_source", "anchor_catalog": "Gaia DR3", "association_members": 1.0, "association_confidence_mean": 1.0, "proper_motion_propagated_any": false, "primary_class": "STAR", "physical_class": "UNKNOWN", "variability_class": "UNKNOWN", "compact_class": "UNKNOWN", "phenomenon_class": "UNKNOWN"}, {"object_id": "OBJ000002", "sep_arcsec": 9.464543525434559, "catalogs": "Gaia DR3", "entity_kind": "persistent_source", "anchor_catalog": "Gaia DR3", "association_members": 1.0, "association_confidence_mean": 1.0, "proper_motion_propagated_any": false, "primary_class": "STAR", "physical_class": "UNKNOWN", "variability_class": "UNKNOWN", "compact_class": "UNKNOWN", "phenomenon_class": "UNKNOWN"}, {"object_id": "OBJ000003", "sep_arcsec": 11.586044366151025, "catalogs": "Gaia DR3", "entity_kind": "persistent_source", "anchor_catalog": "Gaia DR3", "association_members": 1.0, "association_confidence_mean": 1.0, "proper_motion_propagated_any": false, "primary_class": "STAR", "physical_class": "UNKNOWN", "variability_class": "UNKNOWN", "compact_class": "UNKNOWN", "phenomenon_class": "UNKNOWN"}]
 
 ### delta Cep
 
-- measured fields: {}
-- collectors: []
-- candidates: []
+- measured fields: {"ra": 337.2928846512036, "dec": 58.41520817273959, "ref_epoch": 2016.0, "anchor_catalog": "Gaia DR3", "entity_kind": "persistent_source", "parallax": 3.5550642334569473, "parallax_error": 0.14753917, "pmra": 14.559642753326361, "pmdec": 3.2375195232330003, "ruwe": 2.7130983, "phot_g_mean_mag": 3.8505998, "phot_bp_mean_mag": 4.2316995, "phot_rp_mean_mag": 3.2610846, "bp_rp": 0.9706149, "teff_gspphot": 6355.6323, "logg_gspphot": 1.7987, "mh_gspphot": -0.129, "mass_flame": 5.560175, "evolstage_flame": 763.0, "best_class_name": "CEP", "best_class_score": 0.16061565, "gaia_dr3__in_vari_long_period_variable": false, "in_vari_long_period_variable": false}
+- collectors: [{"collector": "gaia_dr3", "status": "ok", "rows": 2, "error": ""}]
+- candidates: [{"object_id": "OBJ000001", "sep_arcsec": 0.23865279397449343, "catalogs": "Gaia DR3", "entity_kind": "persistent_source", "anchor_catalog": "Gaia DR3", "association_members": 1.0, "association_confidence_mean": 1.0, "proper_motion_propagated_any": false, "primary_class": "STAR", "physical_class": "UNKNOWN", "variability_class": "CEPHEID", "compact_class": "UNKNOWN", "phenomenon_class": "UNKNOWN"}, {"object_id": "OBJ000002", "sep_arcsec": 14.450248652708467, "catalogs": "Gaia DR3", "entity_kind": "persistent_source", "anchor_catalog": "Gaia DR3", "association_members": 1.0, "association_confidence_mean": 1.0, "proper_motion_propagated_any": false, "primary_class": "STAR", "physical_class": "UNKNOWN", "variability_class": "UNKNOWN", "compact_class": "UNKNOWN", "phenomenon_class": "UNKNOWN"}]
 
 ### Mira
 
-- measured fields: {}
-- collectors: []
-- candidates: []
+- measured fields: {"ra": 34.836726, "dec": -2.977594, "ref_epoch": 2000.0, "anchor_catalog": "2MASS PSC", "entity_kind": "persistent_source", "agb_subclass": "OAGB_IRAS", "position_basis": "IRAS"}
+- collectors: [{"collector": "gaia_dr3", "status": "ok", "rows": 1, "error": ""}, {"collector": "allwise", "status": "empty", "rows": 0, "error": ""}, {"collector": "twomass", "status": "ok", "rows": 1, "error": ""}, {"collector": "agb_suh2021", "status": "ok", "rows": 1, "error": ""}]
+- candidates: [{"object_id": "OBJ000002", "sep_arcsec": 0.36699396344921675, "catalogs": "2MASS PSC|Suh 2021 AGB Catalog", "entity_kind": "persistent_source", "anchor_catalog": "2MASS PSC", "association_members": 2.0, "association_confidence_mean": 0.7661727682238832, "proper_motion_propagated_any": false, "primary_class": "UNKNOWN", "physical_class": "AGB", "variability_class": "UNKNOWN", "compact_class": "UNKNOWN", "phenomenon_class": "UNKNOWN"}, {"object_id": "OBJ000001", "sep_arcsec": 3.8378723944331474, "catalogs": "Gaia DR3", "entity_kind": "persistent_source", "anchor_catalog": "Gaia DR3", "association_members": 1.0, "association_confidence_mean": 1.0, "proper_motion_propagated_any": false, "primary_class": "STAR", "physical_class": "UNKNOWN", "variability_class": "LPV", "compact_class": "UNKNOWN", "phenomenon_class": "UNKNOWN"}]
 
 ### PSR B0531+21
 
-- measured fields: {}
-- collectors: []
-- candidates: []
+- measured fields: {"ra": 83.63305654, "dec": 22.01449797, "anchor_catalog": "ATNF Pulsar Catalog", "entity_kind": "persistent_source", "parallax": 0.53, "parallax_error": 0.06, "atnf_pulsar_catalog__period": 0.0333924123, "period": 0.0333924123, "atnf_pulsar_catalog__period_error": 1.2e-09, "period_error": 1.2e-09, "atnf_pulsar_catalog__ref_period": "ljg+15", "ref_period": "ljg+15", "atnf_pulsar_catalog__period_dot": 4.20972e-13, "period_dot": 4.20972e-13, "atnf_pulsar_catalog__period_dot_error": 3e-18, "period_dot_error": 3e-18, "atnf_pulsar_catalog__ref_period_dot": "ljg+15", "ref_period_dot": "ljg+15", "atnf_pulsar_catalog__period_epoch": 48442.5, "period_epoch": 48442.5, "atnf_pulsar_catalog__dm": 56.7712, "atnf_pulsar_catalog__dm_error": 0.0003, "atnf_pulsar_catalog__dm_distance": 1.311, "atnf_pulsar_catalog__dm_sin_bii": -5.72, "atnf_pulsar_catalog__corr_period_dot": 4.21e-13, "corr_period_dot": 4.21e-13}
+- collectors: [{"collector": "atnf_pulsar", "status": "ok", "rows": 1, "error": ""}]
+- candidates: [{"object_id": "OBJ000001", "sep_arcsec": 0.1972017048961296, "catalogs": "ATNF Pulsar Catalog", "entity_kind": "persistent_source", "anchor_catalog": "ATNF Pulsar Catalog", "association_members": 1.0, "association_confidence_mean": 1.0, "proper_motion_propagated_any": false, "primary_class": "UNKNOWN", "physical_class": "UNKNOWN", "variability_class": "UNKNOWN", "compact_class": "PULSAR", "phenomenon_class": "UNKNOWN"}]
 
 ### M 57
 
-- measured fields: {}
-- collectors: []
-- candidates: []
+- measured fields: {"ra": 283.39615, "dec": 33.02917, "ref_epoch": 2000.0, "anchor_catalog": "HASH PN Catalog", "entity_kind": "persistent_source"}
+- collectors: [{"collector": "hash_pn", "status": "ok", "rows": 1, "error": ""}, {"collector": "pn_spectroscopy", "status": "ok", "rows": 1, "error": ""}]
+- candidates: [{"object_id": "OBJ000001", "sep_arcsec": 0.2911284177445165, "catalogs": "HASH PN Catalog", "entity_kind": "persistent_source", "anchor_catalog": "HASH PN Catalog", "association_members": 1.0, "association_confidence_mean": 1.0, "proper_motion_propagated_any": false, "primary_class": "UNKNOWN", "physical_class": "UNKNOWN", "variability_class": "UNKNOWN", "compact_class": "UNKNOWN", "phenomenon_class": "PN"}, {"object_id": "OBJ000002", "sep_arcsec": 9.297463093749375, "catalogs": "Acker PN Spectroscopy", "entity_kind": "persistent_source", "anchor_catalog": "Acker PN Spectroscopy", "association_members": 1.0, "association_confidence_mean": 1.0, "proper_motion_propagated_any": false, "primary_class": "UNKNOWN", "physical_class": "UNKNOWN", "variability_class": "UNKNOWN", "compact_class": "UNKNOWN", "phenomenon_class": "PN"}]
 
 ### SN 2018fhw
 
-- measured fields: {}
-- collectors: []
-- candidates: []
+- measured fields: {"ra": 64.52562499999999, "dec": -63.61573888888889, "ref_epoch": 2000.0, "anchor_catalog": "ASAS-SN Supernova Catalog", "entity_kind": "transient_event", "event_time_raw": "2018-08-21.31", "sn_subtype": "Ia"}
+- collectors: [{"collector": "asas_sn_supernova", "status": "ok", "rows": 1, "error": ""}, {"collector": "asiago_supernova", "status": "empty", "rows": 0, "error": ""}]
+- candidates: [{"object_id": "OBJ000001", "sep_arcsec": 2.5310259952053196, "catalogs": "ASAS-SN Supernova Catalog", "entity_kind": "transient_event", "anchor_catalog": "ASAS-SN Supernova Catalog", "association_members": 1.0, "association_confidence_mean": 1.0, "proper_motion_propagated_any": false, "primary_class": "UNKNOWN", "physical_class": "UNKNOWN", "variability_class": "UNKNOWN", "compact_class": "UNKNOWN", "phenomenon_class": "SN"}]
 
 ### SN 2011fe
 
-- measured fields: {}
-- collectors: []
-- candidates: []
+- measured fields: {"ra": 210.77420833333332, "dec": 54.27372222222222, "ref_epoch": 2000.0, "anchor_catalog": "Asiago Supernova Catalog", "entity_kind": "transient_event", "sn_subtype": "Ia"}
+- collectors: [{"collector": "asiago_supernova", "status": "ok", "rows": 1, "error": ""}]
+- candidates: [{"object_id": "OBJ000001", "sep_arcsec": 0.885606880440357, "catalogs": "Asiago Supernova Catalog", "entity_kind": "transient_event", "anchor_catalog": "Asiago Supernova Catalog", "association_members": 1.0, "association_confidence_mean": 1.0, "proper_motion_propagated_any": false, "primary_class": "UNKNOWN", "physical_class": "UNKNOWN", "variability_class": "UNKNOWN", "compact_class": "UNKNOWN", "phenomenon_class": "SN"}]
 
 ### 3C 273
 
-- measured fields: {}
-- collectors: []
-- candidates: []
+- measured fields: {"ra": 187.2779158387138, "dec": 2.052388668185861, "ref_epoch": 2016.0, "anchor_catalog": "Gaia DR3", "entity_kind": "persistent_source", "parallax": -0.015950290834234743, "parallax_error": 0.020795885, "pmra": -0.022885672495060565, "pmdec": 0.09846797908921764, "ruwe": 1.1057829, "phot_g_mean_mag": 12.8440895, "phot_bp_mean_mag": 12.989387, "phot_rp_mean_mag": 12.495527, "bp_rp": 0.4938593, "teff_gspphot": 9879.593, "logg_gspphot": 2.7659, "mh_gspphot": -2.3554, "best_class_name": "AGN", "best_class_score": 0.18568185, "gaia_dr3__in_vari_long_period_variable": false, "in_vari_long_period_variable": false}
+- collectors: [{"collector": "gaia_dr3", "status": "ok", "rows": 1, "error": ""}, {"collector": "allwise", "status": "ok", "rows": 1, "error": ""}, {"collector": "sdss_dr18", "status": "ok", "rows": 2, "error": ""}, {"collector": "sdss_spectroscopy", "status": "empty", "rows": 0, "error": ""}]
+- candidates: [{"object_id": "OBJ000001", "sep_arcsec": 0.001619010052797566, "catalogs": "AllWISE|Gaia DR3|SDSS DR18 PhotoObj", "entity_kind": "persistent_source", "anchor_catalog": "Gaia DR3", "association_members": 3.0, "association_confidence_mean": 0.8039952163947017, "proper_motion_propagated_any": true, "primary_class": "UNKNOWN", "physical_class": "UNKNOWN", "variability_class": "UNKNOWN", "compact_class": "UNKNOWN", "phenomenon_class": "UNKNOWN"}, {"object_id": "OBJ000002", "sep_arcsec": 12.468091269210007, "catalogs": "SDSS DR18 PhotoObj", "entity_kind": "persistent_source", "anchor_catalog": "SDSS DR18 PhotoObj", "association_members": 1.0, "association_confidence_mean": 1.0, "proper_motion_propagated_any": false, "primary_class": "GALAXY", "physical_class": "UNKNOWN", "variability_class": "UNKNOWN", "compact_class": "UNKNOWN", "phenomenon_class": "UNKNOWN"}]
 
 ## Interpretation
 
