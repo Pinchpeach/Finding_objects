@@ -243,14 +243,17 @@ def load(raw: Path):
 _CANDIDATE_DENSITY = os.environ.get("V2_ASSOC_CANDIDATE_DENSITY", "1") == "1"
 
 
-# Acceptance at a target false-association rate (experiment, opt-in
-# V2_ASSOC_MIN_POSTERIOR=1): per catalogue, the largest normalised separation
-# whose false-match rate in a shifted catalogue is <= 5 % (NWAY p_any
-# calibration, Salvato et al. 2018; benchmark/calibrate_assoc_threshold.py on
-# 80 set-B fields writes assoc_max_nsep.csv: AllWISE 1.75 sigma, 2MASS 2.5).
-# The membership posterior is not used: it saturates near 1 for AllWISE.
+# Acceptance at a target false-association rate (2.49.0; V2_ASSOC_MAX_NSEP=0
+# switches it off): per catalogue, the largest normalised separation whose
+# false-match rate in a shifted catalogue is <= 5 % (NWAY p_any calibration,
+# Salvato et al. 2018; benchmark/calibrate_assoc_threshold.py on 80 set-B
+# fields -> assoc_max_nsep.csv: AllWISE 1.75 sigma, 2MASS 2.5).  The membership
+# posterior is not used: it saturates near 1 for AllWISE.  A/B on 89 fields
+# (31,610 truth objects, 9 of them COSMOS deep fields): false AllWISE matches
+# 20.9 -> 5.6 % (set B) and 22.4 -> 7.8 % (COSMOS, not used to calibrate),
+# 2MASS 10.6 -> 4.9 %, truth +8 / -6 (benchmark/experiments/assoc_minp).
 _MAX_NSEP = {}
-if os.environ.get("V2_ASSOC_MIN_POSTERIOR", "0") == "1":
+if os.environ.get("V2_ASSOC_MAX_NSEP", "1") == "1":
     _f = Path(__file__).with_name("assoc_max_nsep.csv")
     if _f.exists():
         _MAX_NSEP = pd.read_csv(_f).set_index("catalog").max_nsep.astype(float).to_dict()

@@ -231,6 +231,7 @@ def test_photometric_prior_rejects_a_red_wise_source_offset_from_a_star(tmp_path
         _stage1().run(tmp_path, out)
         return pd.read_csv(out).object_id.nunique()
 
+    monkeypatch.setenv("V2_ASSOC_MAX_NSEP", "0")  # the 2.49.0 separation cut alone rejects this pair
     monkeypatch.setenv("V2_ASSOC_PHOT_PRIOR", "0")
     assert field(6.5, 4.6) == 1  # merged on position alone
     monkeypatch.setenv("V2_ASSOC_PHOT_PRIOR", "1")
@@ -255,3 +256,27 @@ def test_ls_forced_wise_replaces_allwise_photometry():
     only_ls = {"desi_legacy_surveys_dr10__flux_w1": 100.0, "desi_legacy_surveys_dr10__flux_ivar_w1": 1.0}
     m.ls_forced_wise(only_ls)
     assert "allwise__W1mag" not in only_ls
+
+
+def test_calibrated_separation_cut_rejects_distant_wise_rows(tmp_path, monkeypatch):
+    # 2.49.0: AllWISE rows beyond 1.75 sigma are no longer accepted (5 % false
+    # matches in a shifted catalogue); a 1" counterpart still is.
+    import pandas as pd
+
+    dec = 10.0
+    cosd = math.cos(math.radians(dec))
+
+    def field(dx):
+        pd.DataFrame([{"catalog": "Gaia DR3", "catalog_object_id": "g1", "ra": 20.0, "dec": dec, "phot_g_mean_mag": 17.5}]).to_csv(
+            tmp_path / "gaia.csv", index=False)
+        pd.DataFrame([{"catalog": "AllWISE", "catalog_object_id": "w1", "ra": 20.0 + dx / 3600 / cosd, "dec": dec, "W1mag": 14.5}]).to_csv(
+            tmp_path / "allwise.csv", index=False)
+        out = tmp_path.parent / f"{tmp_path.name}_cut.csv"
+        _stage1().run(tmp_path, out)
+        return pd.read_csv(out).object_id.nunique()
+
+    monkeypatch.setenv("V2_ASSOC_MAX_NSEP", "1")
+    assert field(1.0) == 1
+    assert field(3.0) == 2
+    monkeypatch.setenv("V2_ASSOC_MAX_NSEP", "0")
+    assert field(3.0) == 1
