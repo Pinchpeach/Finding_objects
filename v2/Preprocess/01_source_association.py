@@ -72,6 +72,9 @@ ANNOTATION_CATALOGS = frozenset(
         "HASH PN Catalog",
         "Acker PN Spectroscopy",
         "ATNF Pulsar Catalog",
+        # Galaxy Zoo DESI: vote-fraction predictions for galaxies the Legacy
+        # Surveys already detected (Walmsley et al. 2023), positions from LS DR8.
+        "Galaxy Zoo DESI",
     }
 )
 TARGET_MATCH_ARCSEC = 0.3

@@ -53,6 +53,7 @@ IMPACT = {
     "bzcat": ("Roma-BZCAT", "blazar labels", False),
     "agb_suh2021": ("AGB catalogue (Suh 2021)", "AGB labels", False),
     "sga2020": ("Siena Galaxy Atlas", "large-galaxy grouping", False),
+    "galaxy_zoo_desi": ("Galaxy Zoo DESI", "galaxy morphology sub-class", False),
     "galaxy_clusters": ("galaxy cluster catalogues", "cluster membership", False),
     "simbad": ("SIMBAD", "literature labels", False),
     "ned": ("NED", "literature labels", False),
