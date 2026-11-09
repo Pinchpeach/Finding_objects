@@ -240,6 +240,18 @@ def load(raw: Path):
 _CANDIDATE_DENSITY = os.environ.get("V2_ASSOC_CANDIDATE_DENSITY", "1") == "1"
 
 
+# Acceptance at a target false-association rate (experiment, opt-in
+# V2_ASSOC_MIN_POSTERIOR=1): per catalogue, the smallest membership posterior
+# whose false-match rate in a shifted catalogue is <= 5 % (NWAY p_any
+# calibration, Salvato et al. 2018; benchmark/calibrate_assoc_threshold.py
+# writes assoc_min_posterior.csv).
+_MIN_POSTERIOR = {}
+if os.environ.get("V2_ASSOC_MIN_POSTERIOR", "0") == "1":
+    _f = Path(__file__).with_name("assoc_min_posterior.csv")
+    if _f.exists():
+        _MIN_POSTERIOR = pd.read_csv(_f).set_index("catalog").min_posterior.astype(float).to_dict()
+
+
 def _pair_density(det, anchor):
     own = det.get("source_density_arcsec2")
     if not _CANDIDATE_DENSITY:
@@ -370,6 +382,8 @@ def run(raw_dir: Path, out: Path):
                         result["phot_weight"] = w
                 result["association_method"] = "position_epoch_likelihood"
                 result["shared_aliases"] = ""
+                if det["catalog"] in _MIN_POSTERIOR and result["association_posterior"] < _MIN_POSTERIOR[det["catalog"]]:
+                    result["accepted"] = False
                 if det["catalog"] in TARGET_SPECTRA and _target_sep(group, det) <= TARGET_MATCH_ARCSEC:
                     result.update({"accepted": True, "association_method": "spectroscopic_target"})
                 if result["accepted"]:

@@ -155,13 +155,15 @@ jobs:
           # base = current defaults; phot/cand/both = the 2.48.0 association
           # switches against a no-prior baseline; lsw = WISE from LS forced photometry.
           for v in ${{ github.event.inputs.variants || 'base lsw' }}; do
-            unset V2_ASSOC_PHOT_PRIOR V2_ASSOC_CANDIDATE_DENSITY V2_WISE_FROM_LS
+            unset V2_ASSOC_PHOT_PRIOR V2_ASSOC_CANDIDATE_DENSITY V2_WISE_FROM_LS V2_ASSOC_MIN_POSTERIOR
             case $v in
               phot) export V2_ASSOC_PHOT_PRIOR=1 V2_ASSOC_CANDIDATE_DENSITY=0;;
               cand) export V2_ASSOC_PHOT_PRIOR=0 V2_ASSOC_CANDIDATE_DENSITY=1;;
               both) export V2_ASSOC_PHOT_PRIOR=1 V2_ASSOC_CANDIDATE_DENSITY=1;;
               old) export V2_ASSOC_PHOT_PRIOR=0 V2_ASSOC_CANDIDATE_DENSITY=0;;
               lsw) export V2_WISE_FROM_LS=1;;
+              minp) export V2_ASSOC_MIN_POSTERIOR=1;;
+              minp_lsw) export V2_ASSOC_MIN_POSTERIOR=1 V2_WISE_FROM_LS=1;;
             esac
             python -u v2/pipeline.py --raw-dir /tmp/blindraw --ra $RA --dec $DEC --radius $R --work /tmp/run_$v
             python -u v2/Preprocess/01_source_association.py --raw-dir /tmp/shiftraw --out /tmp/shift_$v.csv
