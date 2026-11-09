@@ -1,0 +1,4 @@
+variant,n,acc,unknown,fixed,broken,truth_with_fragments,recall_STAR,recall_GALAXY,recall_QSO
+base,28210,94.725,28,0,0,1640,85.34,95.64,
+lsw,28210,94.729,25,4,3,1640,85.42,95.64,
+old,28210,94.732,27,10,8,1634,85.23,95.66,
