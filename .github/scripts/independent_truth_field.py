@@ -46,6 +46,13 @@ CATALOGUES = {
     "Gaia-ESO DR5 (Randich+2022)": "J/A+A/666/A121",
     "2dF SMC OBA stars (Evans+2004)": "J/MNRAS/353/601",
 }
+# Deep morphological truth (2.49 plan, IMPROVEMENT_ROADMAP D2): HST/ACS
+# point-source classification in COSMOS, for faint stars and galaxies that
+# spectroscopic surveys rarely target.
+DEEP_CATALOGUES = {
+    "COSMOS ACS (Leauthaud+2007)": "J/ApJS/172/219",
+    "COSMOS2020 (Weaver+2022)": "J/ApJS/258/11",
+}
 SEARCH_WORDS = ["APOGEE DR17", "Magellanic Quasars", "quasars behind Magellanic", "Gaia-ESO survey DR5",
                 "SMC 2dF spectroscopy", "LMC spectroscopic survey", "open clusters spectroscopic members"]
 
@@ -69,7 +76,7 @@ def probe():
                 print(f"   {k}: {c.description}")
         except Exception as exc:
             print(f"== find '{w}' failed: {exc!r}")
-    for name, cat in CATALOGUES.items():
+    for name, cat in {**CATALOGUES, **DEEP_CATALOGUES}.items():
         try:
             meta = _vizier(3).get_catalogs(cat)
             for t in meta:
