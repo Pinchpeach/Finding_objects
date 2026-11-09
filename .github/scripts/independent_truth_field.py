@@ -117,6 +117,23 @@ def truth(ra, dec, radius, out):
     (out / "truth_log.json").write_text(json.dumps(log, indent=1))
 
 
+def truth_deep(ra, dec, radius, out):
+    """COSMOS2020 Classic rows in the cone, only the columns the deep truth uses."""
+    import astropy.units as u
+    from astropy.coordinates import SkyCoord
+    from astroquery.vizier import Vizier
+
+    out = Path(out)
+    out.mkdir(parents=True, exist_ok=True)
+    v = Vizier(columns=["_RAJ2000", "_DEJ2000", "ACSF814Wmag", "ACSmuClass", "lptype", "HSCimagAuto"], row_limit=-1)
+    v.TIMEOUT = 300
+    res = v.query_region(SkyCoord(ra * u.deg, dec * u.deg), radius=radius * u.arcmin, catalog="J/ApJS/258/11/classic")
+    for t in res:
+        df = t.to_pandas()
+        df.to_csv(out / "J_ApJS_258_11_classic.csv.gz", index=False)
+        print("COSMOS2020 rows", len(df))
+
+
 def _positions(truth_dir):
     pos = []
     for f in Path(truth_dir).glob("*.csv.gz"):
@@ -283,6 +300,8 @@ if __name__ == "__main__":
     mode, args = sys.argv[1], sys.argv[2:]
     if mode == "probe":
         probe()
+    elif mode == "truth_deep":
+        truth_deep(float(args[0]), float(args[1]), float(args[2]), args[3])
     elif mode == "truth":
         truth(float(args[0]), float(args[1]), float(args[2]), args[3])
     elif mode == "centre":

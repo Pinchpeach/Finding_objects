@@ -13,11 +13,12 @@ on:
   workflow_dispatch:
     inputs:
       experiment: {description: "results folder under v2/benchmark/experiments", default: "wise_from_ls"}
-      variants: {description: "space-separated variants (base phot cand both lsw)", default: "base lsw"}
+      variants: {description: "space-separated variants (base phot cand both old lsw minp minp_lsw)", default: "base lsw"}
+      fieldset: {description: "b = independent set B (truth from validation-data), deep = COSMOS deep fields (COSMOS2020 truth), all", default: "b"}
   # Dispatch only (since 2.48.1): the former push trigger on a trigger file
   # re-ran the whole experiment whenever the work branch was reset to main.
 concurrency:
-  group: experiment-ab-${{ github.ref }}
+  group: experiment-ab-${{ github.ref }}-${{ github.event.inputs.experiment }}-${{ github.event.inputs.fieldset }}
   cancel-in-progress: true
 
 jobs:
@@ -109,25 +110,49 @@ jobs:
           - {name: sfr_lupus1, ra: 235.6, dec: -34.6, r: 12.0}
           - {name: sfr_serpens, ra: 277.45, dec: 1.25, r: 12.0}
           - {name: sfr_w51, ra: 290.9, dec: 14.1, r: 6.0}
+          - {name: deep_cosmos_1, ra: 149.85, dec: 1.95, r: 6.0, deep: true}  # COSMOS2020 / HST-ACS truth
+          - {name: deep_cosmos_2, ra: 149.85, dec: 2.21, r: 6.0, deep: true}  # COSMOS2020 / HST-ACS truth
+          - {name: deep_cosmos_3, ra: 149.85, dec: 2.47, r: 6.0, deep: true}  # COSMOS2020 / HST-ACS truth
+          - {name: deep_cosmos_4, ra: 150.12, dec: 1.95, r: 6.0, deep: true}  # COSMOS2020 / HST-ACS truth
+          - {name: deep_cosmos_5, ra: 150.12, dec: 2.21, r: 6.0, deep: true}  # COSMOS2020 / HST-ACS truth
+          - {name: deep_cosmos_6, ra: 150.12, dec: 2.47, r: 6.0, deep: true}  # COSMOS2020 / HST-ACS truth
+          - {name: deep_cosmos_7, ra: 150.39, dec: 1.95, r: 6.0, deep: true}  # COSMOS2020 / HST-ACS truth
+          - {name: deep_cosmos_8, ra: 150.39, dec: 2.21, r: 6.0, deep: true}  # COSMOS2020 / HST-ACS truth
+          - {name: deep_cosmos_9, ra: 150.39, dec: 2.47, r: 6.0, deep: true}  # COSMOS2020 / HST-ACS truth
     env:
       NAME: ${{ matrix.f.name }}
       RA: ${{ matrix.f.ra }}
       DEC: ${{ matrix.f.dec }}
       R: ${{ matrix.f.r }}
     steps:
+      - id: pick
+        run: |
+          set="${{ github.event.inputs.fieldset || 'b' }}"; deep="${{ matrix.f.deep || false }}"
+          if [ "$set" = all ] || { [ "$set" = deep ] && [ "$deep" = true ]; } || { [ "$set" = b ] && [ "$deep" != true ]; }; then echo "run=1" >> "$GITHUB_OUTPUT"; fi
       - uses: actions/checkout@v4
+        if: steps.pick.outputs.run
       - uses: actions/setup-python@v5
+        if: steps.pick.outputs.run
         with: {python-version: "3.11"}
       - run: pip install pandas numpy scipy requests astropy astroquery pyvo
+        if: steps.pick.outputs.run
+      - name: Deep truth (COSMOS2020) and field record
+        if: steps.pick.outputs.run && matrix.f.deep
+        run: |
+          python -u .github/scripts/independent_truth_field.py truth_deep $RA $DEC $R /tmp/ref/truth
+          echo "{\"ra\": $RA, \"dec\": $DEC, \"radius_arcmin\": $R}" > /tmp/ref/field.json
       - name: Truth and field record from validation-data
+        if: steps.pick.outputs.run && !matrix.f.deep
         run: |
           git fetch -q --depth=1 origin validation-data
           git checkout origin/validation-data -- "v2/benchmark/independent_fields_b/$NAME"
           mkdir -p /tmp/ref && cp -r "v2/benchmark/independent_fields_b/$NAME/truth" "v2/benchmark/independent_fields_b/$NAME/field.json" /tmp/ref/
           git rm -rq --cached "v2/benchmark/independent_fields_b/$NAME" && rm -rf "v2/benchmark/independent_fields_b/$NAME"
       - name: Collect (once)
+        if: steps.pick.outputs.run
         run: python -u v2/pipeline.py --ra $RA --dec $DEC --radius $R --work /tmp/field
       - name: Blind raw and shifted copy
+        if: steps.pick.outputs.run
         run: |
           raw=$(ls -d /tmp/field/raw/*/ | head -1)
           mkdir -p /tmp/blindraw
@@ -151,6 +176,7 @@ jobs:
                   print("shifted", f.name, len(d))
           PY
       - name: Variants
+        if: steps.pick.outputs.run
         run: |
           # base = current defaults; phot/cand/both = the 2.48.0 association
           # switches against a no-prior baseline; lsw = WISE from LS forced photometry.
@@ -175,7 +201,7 @@ jobs:
             cat $out/assoc_stats.json
           done
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: always() && steps.pick.outputs.run
         with:
           name: ab-${{ matrix.f.name }}
           path: /tmp/ab/
