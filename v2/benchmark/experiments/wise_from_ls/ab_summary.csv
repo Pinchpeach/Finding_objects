@@ -1,0 +1,4 @@
+variant,n,acc,unknown,fixed,broken,truth_with_fragments,recall_STAR,recall_GALAXY,recall_QSO
+base,3425,97.547,48,0,0,891,99.64,89.66,78.0
+lsw,3425,97.547,48,0,0,891,99.64,89.66,78.0
+old,3425,97.489,52,0,2,911,99.64,89.33,78.0

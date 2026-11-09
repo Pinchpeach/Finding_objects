@@ -1,0 +1,9 @@
+variant    n    acc  unknown  fixed  broken  truth_with_fragments  recall_STAR  recall_GALAXY  recall_QSO
+   base 3425 97.547       48      0       0                   891        99.64          89.66        78.0
+    lsw 3425 97.547       48      0       0                   891        99.64          89.66        78.0
+    old 3425 97.489       52      0       2                   911        99.64          89.33        78.0
+         groups  allwise_rows  allwise_matched  allwise_downweighted  2mass_rows  2mass_matched  2mass_downweighted  shifted_groups  shifted_allwise_rows  shifted_allwise_matched  shifted_allwise_downweighted  shifted_2mass_rows  shifted_2mass_matched  shifted_2mass_downweighted
+variant                                                                                                                                                                                                                                                                                
+base     975407        155532           107425                  7575       58002          56344               13510         1084104                155532                    62022                          1700               58002                   5881                        2917
+lsw      975407        155532           107425                  7575       58002          56344               13510         1084104                155532                    62022                          1700               58002                   5881                        2917
+old      975399        155532           110556                     0       58002          56092                   0         1075199                155532                    68990                             0               58002                   7670                           0
