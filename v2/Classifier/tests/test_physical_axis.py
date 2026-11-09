@@ -119,3 +119,21 @@ def test_hot_subdwarf_gaia_cmd_culpan2022():
     )
     assert m.hot_subdwarf_evidence(dict(sdo, gaia_dr3__parallax_error=1.0)) is None
     assert m.hot_subdwarf_evidence(dict(sdo, gaia_dr3__phot_bp_rp_excess_factor=1.9)) is None
+
+
+def test_galaxy_zoo_desi_morphology():
+    import importlib.util
+    from pathlib import Path
+
+    p = Path(__file__).resolve().parents[1] / "subclass.py"
+    s = importlib.util.spec_from_file_location("sc_gz", p)
+    m = importlib.util.module_from_spec(s)
+    s.loader.exec_module(m)
+    g = "galaxy_zoo_desi__gz_"
+    assert m.galaxy_profile({g + "SFSM": 0.8, g + "SFFDF": 0.2})[0] == "EARLY_TYPE"
+    assert m.galaxy_profile({g + "SFSM": 0.1, g + "SFFDF": 0.85, g + "SAYes": 0.9})[0] == "SPIRAL"
+    assert m.galaxy_profile({g + "SFSM": 0.1, g + "SFFDF": 0.85, g + "SAYes": 0.2})[0] == "DISK"
+    # no majority: falls back to the Legacy Surveys profile
+    assert m.galaxy_profile({g + "SFSM": 0.45, g + "SFFDF": 0.45, "desi_legacy_surveys_dr10__type": "DEV"})[1] == "LS_DEV"
+    assert m.galaxy_merger({g + "MMaD": 0.3, g + "MM": 0.3}) is not None
+    assert m.galaxy_merger({g + "MMaD": 0.1, g + "MM": 0.1}) is None

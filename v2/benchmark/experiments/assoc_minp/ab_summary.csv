@@ -1,0 +1,4 @@
+variant,n,acc,unknown,fixed,broken,truth_with_fragments,recall_STAR,recall_GALAXY,recall_QSO,w1_changed,w1_median_abs_diff
+base,31610,95.204,38,0,0,2563,92.89,95.67,96.0,,
+minp,31610,95.21,37,8,6,2556,92.91,95.67,96.0,8.0,1.426
+minp_lsw,31610,95.214,34,11,8,2556,92.95,95.67,96.0,3818.0,0.121

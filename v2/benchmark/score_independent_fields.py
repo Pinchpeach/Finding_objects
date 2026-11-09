@@ -110,6 +110,20 @@ def truth_table(truth_dir):
     if d is not None:
         q = d.get("Qs", pd.Series("", index=d.index)).astype(str).str.strip()
         t.append(_rows(d[q.eq("Q1") & _num(d, "z").ge(0.5)], "QSO", "MQS"))
+    d = _read(truth_dir, "J_ApJS_258_11_classic")
+    if d is not None:
+        # COSMOS2020 (Weaver et al. 2022) deep morphological truth: HST/ACS
+        # F814W point-source class (ACSmuClass, Leauthaud et al. 2007:
+        # 1 galaxy, 2 star, 3 spurious) agreeing with the LePhare SED type
+        # (lptype 0 galaxy, 1 star; 2 = X-ray AGN, left out because a quasar is
+        # point-like but not a star).  F814W < 24.5, where the ACS
+        # size-magnitude separation is clean.
+        mu, lp, f814 = _num(d, "ACSmuClass"), _num(d, "lptype"), _num(d, "ACSF814Wmag")
+        ok = f814.lt(24.5)
+        cls = np.where(mu.eq(2) & lp.eq(1), "STAR", np.where(mu.eq(1) & lp.eq(0), "GALAXY", None))
+        print("COSMOS2020 truth check (ACSmuClass x lptype, F814W < 24.5):",
+              pd.crosstab(mu[ok], lp[ok]).to_dict())
+        t.append(_rows(d[ok], pd.Series(cls, index=d.index)[ok], "COSMOS2020 ACS+SED"))
     t = pd.concat(t, ignore_index=True) if t else pd.DataFrame(columns=["ra", "dec", "truth", "survey"])
     # One object per 1" group; disagreeing surveys drop it.
     key = list(zip((t.ra * 3600).round().astype("int64"), (t.dec * 3600).round().astype("int64")))

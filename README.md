@@ -142,6 +142,8 @@ classified_objects.csv
 
 비슷한 역할의 파이프라인(NWAY, MUWCLASS, Clarke+2020, Hughes+2022, Gaia DSC 등)과 비교하고 NWAY의 연관 설계를 적용했다(2.48.0, [`v2/LITERATURE_SIMILAR_PIPELINES_2026-11-08.md`](v2/LITERATURE_SIMILAR_PIPELINES_2026-11-08.md)): 위치를 옮긴 목록으로 잰 거짓 연관이 AllWISE −14 %, 2MASS −24 %이고 정답 정확도는 같다.
 
+개선 로드맵 1–4단계(2.49.0, [`v2/WORK_REPORT_2026-11-09.md`](v2/WORK_REPORT_2026-11-09.md)): 연관 받는 반경을 거짓 연관률 5 %로 보정(AllWISE 20.9 → 5.6 %), COSMOS 깊은 정답 영역(HST/ACS, 어두운 천체 28,210개), Galaxy Zoo DESI 형태(은하 세부 17 → 26/50). 2.48.0의 거짓 연관 비율은 2.49.0에서 정정했다.
+
 2.40.0의 밝기별 QSO 사전확률은 같은 영역 재생에서 1차 분류 정확도 96.21 → 96.31 %, QSO 정밀도 79.5 → 86.9 %, QSO 재현율 94.4 → 90.9 %였다([`v2/benchmark/qso_options/`](v2/benchmark/qso_options/)).
 
 ### 실제 하늘 비율 기준 순도 (blind, 18개 영역, 2.36.0 측정)

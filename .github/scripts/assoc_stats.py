@@ -32,3 +32,15 @@ res = counts(sys.argv[1], "")
 if len(sys.argv) > 2:
     res |= counts(sys.argv[2], "shifted_")
 print(json.dumps(res))
+if len(sys.argv) > 3:
+    # Per-row match diagnostics of the low-resolution catalogues, real and
+    # shifted, for calibrating an acceptance threshold at a target false-match
+    # rate (NWAY p_any calibration; benchmark/calibrate_assoc_threshold.py).
+    keep = ["catalog", "association_status", "association_method", "association_confidence", "normalized_separation",
+            "match_separation_arcsec", "source_density_arcsec2", "candidate_count", "object_anchor_catalog", "phot_weight"]
+    parts = []
+    for run, f in (("real", sys.argv[1]), ("shifted", sys.argv[2])):
+        a = pd.read_csv(f, low_memory=False)
+        a = a[a.catalog.isin(CATS)]
+        parts.append(a[[c for c in keep if c in a]].assign(run=run))
+    pd.concat(parts).to_csv(sys.argv[3], index=False)

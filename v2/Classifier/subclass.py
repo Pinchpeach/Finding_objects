@@ -1442,6 +1442,9 @@ def galaxy_tags(row, activity, activity_rule=None):
     if ot in SIMBAD_ENVIRONMENT:
         t, lab = SIMBAD_ENVIRONMENT[ot]
         tags.append(_tag(t, lab, "SIMBAD_OTYPE", f"SIMBAD type {ot}"))
+    merger = galaxy_merger(row)
+    if merger and ot not in ("IG",):
+        tags.append(_tag("INTERACTING", "interacting / merging galaxy", "GZ_DESI_MERGER", merger))
     # Luminosity: M_B from the spectroscopic redshift.  B = g + 0.313(g-r) + 0.227
     # (Lupton 2005 SDSS->Johnson); dwarf when M_B > -16 (Tammann 1994).  No
     # K-correction, so only 0.003 < z < 0.1 (peculiar velocities / K-term).
@@ -1517,7 +1520,42 @@ def galaxy_tags(row, activity, activity_rule=None):
     return tags
 
 
+# Galaxy Zoo DESI (Walmsley et al. 2023, MNRAS 526, 4768): predicted volunteer
+# vote fractions for r < 19 Legacy Surveys galaxies.  A class is the answer a
+# majority of volunteers would give (fraction >= 0.5), the Galaxy Zoo
+# consensus convention (Willett et al. 2013, MNRAS 435, 2835); not tuned on
+# our reference objects (Nair & Abraham 2010, Arp 1966), which stay the test.
+GZ = "galaxy_zoo_desi__gz_"
+GZ_MAJORITY = 0.5
+
+
+def galaxy_zoo(row):
+    smooth, featured, arms = (_num(row, GZ + c) for c in ("SFSM", "SFFDF", "SAYes"))
+    if smooth is None and featured is None:
+        return None, None, None
+    if smooth is not None and smooth >= GZ_MAJORITY:
+        return "EARLY_TYPE", "GZ_DESI_SMOOTH", f"Galaxy Zoo DESI smooth {smooth:.2f}"
+    if featured is not None and featured >= GZ_MAJORITY:
+        if arms is not None and arms >= GZ_MAJORITY:
+            return "SPIRAL", "GZ_DESI_SPIRAL", f"Galaxy Zoo DESI featured {featured:.2f}, spiral arms {arms:.2f}"
+        return "DISK", "GZ_DESI_FEATURED", f"Galaxy Zoo DESI featured {featured:.2f}"
+    return None, None, None
+
+
+def galaxy_merger(row):
+    major, merger = _num(row, GZ + "MMaD"), _num(row, GZ + "MM")
+    if major is None and merger is None:
+        return None
+    f = (major or 0.0) + (merger or 0.0)
+    if f >= GZ_MAJORITY:
+        return f"Galaxy Zoo DESI major disturbance + merger {f:.2f}"
+    return None
+
+
 def galaxy_profile(row):
+    prof = galaxy_zoo(row)
+    if prof[0] is not None:
+        return prof
     t = (_text(row, "desi_legacy_surveys_dr10__type") or "").upper()
     if t == "DEV":
         return "EARLY_TYPE", "LS_DEV", "Legacy Surveys de Vaucouleurs profile"
@@ -1552,7 +1590,7 @@ ACT_NAME = {
     "GREEN_VALLEY": "green-valley",
     "COMPOSITE": "composite (star-forming + AGN)",
 }
-PROF_NAME = {"EARLY_TYPE": "early-type", "DISK": "disc", "LATE_TYPE": "late-type"}
+PROF_NAME = {"EARLY_TYPE": "early-type", "DISK": "disc", "LATE_TYPE": "late-type", "SPIRAL": "spiral"}
 
 
 def classify_galaxy(row):
