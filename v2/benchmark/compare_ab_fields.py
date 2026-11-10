@@ -65,6 +65,13 @@ def main():
             d = (w - wb).abs()
             r["w1_changed"] = int((d > 0.01).sum())
             r["w1_median_abs_diff"] = round(float(d[d > 0.01].median()), 3) if (d > 0.01).any() else 0.0
+        if a.out:
+            # every wrong or UNKNOWN truth object of this variant, for error analysis
+            keep = [c for c in ("field", "t_ra", "t_dec", "t_truth", "t_survey", "t_n_fragments", "ours", "catalogs", "unknown_reason",
+                                "primary_confidence", "classification_basis", "gaia_dr3__phot_g_mean_mag", "std_mag__ls_r",
+                                "std_mag__ps1_r", "std_mag__sdss_r", "desi_legacy_surveys_dr10__type", "subclass") if c in m]
+            a.out.mkdir(parents=True, exist_ok=True)
+            m[~ok][keep].to_csv(a.out / f"errors_{v}.csv.gz", index=False)
         if v != a.base and a.out:
             diff = m[ok != okb][["field", "t_ra", "t_dec", "t_truth", "t_survey", "ours"]].assign(base=b.ours[ok != okb])
             a.out.mkdir(parents=True, exist_ok=True)
