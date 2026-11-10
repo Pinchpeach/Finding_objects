@@ -622,8 +622,11 @@ def evaluate(rule, row, namespaced=frozenset()):
                 feature("ps1_var_log_r", max(-2.0, min(3.0, math.log(max(rmed, 1e-3)))), "log epoch scatter / predicted")
                 feature("ps1_var_present", 1.0, "PS1 multi-epoch statistics (point source)")
     elif rid == "RADIO-001":
-        # Radio loudness R = 0.4 (r - t), t = -2.5 log10(S_1.4GHz / 3631 Jy)
-        # (Ivezic et al. 2002, AJ 124, 2364; radio-loud R > 1).  Radio-loud
+        # Radio loudness R_m = 0.4 (m - t), t = -2.5 log10(S_1.4GHz / 3631 Jy)
+        # (Ivezic et al. 2002, AJ 124, 2364, define R_m for any SDSS band m and
+        # use i in their examples; here m = r, the band every survey we read
+        # provides.  No R threshold is applied, so the band only shifts the
+        # feature, which the fitted Stage-5 weights absorb; 2.50.0 audit).  Radio-loud
         # quasars and AGN in galaxies are detected at the survey limits
         # (FIRST ~1 mJy) while stars almost never are; star-forming galaxies
         # are radio-detected at low R.  Continuous features; weights come
@@ -639,7 +642,9 @@ def evaluate(rule, row, namespaced=frozenset()):
                 feature(name, v, "radio counterpart")
     elif rid == "XRAY-001":
         # X-ray-to-optical flux ratio log(fX/fopt) = log fX + r/2.5 + 5.37
-        # (Maccacaro et al. 1988, Eq. 1; r used for V): AGN and quasars lie
+        # (Maccacaro et al. 1988, Eq. 1, defined with V; r used for V, so the
+        # boundaries below are shifted by V - r ~ 0.2-0.4 mag / 2.5; no
+        # threshold is applied here, only the fitted feature): AGN and quasars lie
         # at -1 to +1.2, coronal stars below -1 and normal galaxies below
         # ~ -2 (Stocke et al. 1991, ApJS 76, 813).  Continuous features;
         # weights come only from the fitted Stage-5 model.
