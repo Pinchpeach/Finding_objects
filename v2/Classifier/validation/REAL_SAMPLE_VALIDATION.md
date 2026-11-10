@@ -12,7 +12,7 @@ Transient event rows are associated in a separate entity layer from persistent h
 | GD 71 | physical | WD | WD | CLASSIFIED_WD | 3.027 |
 | RR Lyr | variability | RR_LYRAE | RR_LYRAE | GAIA_DR3_VARIABLE_CANDIDATE | 3.591 |
 | delta Cep | variability | CEPHEID | CEPHEID | GAIA_DR3_VARIABLE_CANDIDATE | 0.239 |
-| Mira | physical | AGB | AGB | SUH2021_AGB_CATALOG_MATCH | 0.367 |
+| Mira | physical | AGB | AGB | SUH2021_AGB_CATALOG_MATCH | 1.885 |
 | PSR B0531+21 | compact | PULSAR | PULSAR | ATNF_CATALOG_MATCH | 0.197 |
 | M 57 | phenomenon | PN | PN | HASH_PN_CATALOG_MATCH | 0.291 |
 | SN 2018fhw | phenomenon | SN | SN | ASASSN_SUPERNOVA_EVENT_MATCH | 2.531 |
@@ -24,8 +24,8 @@ Transient event rows are associated in a separate entity layer from persistent h
 ### GD 71
 
 - measured fields: {"ra": 88.11543730306488, "dec": 15.886239315232913, "ref_epoch": 2016.0, "anchor_catalog": "Gaia DR3", "entity_kind": "persistent_source", "parallax": 19.5638180302216, "parallax_error": 0.055117156, "pmra": 76.72806594267264, "pmdec": -172.95960304595332, "ruwe": 0.9704604, "phot_g_mean_mag": 12.999769, "phot_bp_mean_mag": 12.853095, "phot_rp_mean_mag": 13.305408, "bp_rp": -0.45231247}
-- collectors: [{"collector": "gaia_dr3", "status": "ok", "rows": 1, "error": ""}, {"collector": "allwise", "status": "empty", "rows": 0, "error": ""}, {"collector": "twomass", "status": "empty", "rows": 0, "error": ""}]
-- candidates: [{"object_id": "OBJ000001", "sep_arcsec": 3.027416087455188, "catalogs": "Gaia DR3", "entity_kind": "persistent_source", "anchor_catalog": "Gaia DR3", "association_members": 1.0, "association_confidence_mean": 1.0, "proper_motion_propagated_any": false, "primary_class": "STAR", "physical_class": "WD", "variability_class": "UNKNOWN", "compact_class": "UNKNOWN", "phenomenon_class": "UNKNOWN"}]
+- collectors: [{"collector": "gaia_dr3", "status": "ok", "rows": 1, "error": ""}, {"collector": "allwise", "status": "ok", "rows": 1, "error": ""}, {"collector": "twomass", "status": "ok", "rows": 1, "error": ""}]
+- candidates: [{"object_id": "OBJ000001", "sep_arcsec": 3.027416087455188, "catalogs": "2MASS PSC|AllWISE|Gaia DR3", "entity_kind": "persistent_source", "anchor_catalog": "Gaia DR3", "association_members": 3.0, "association_confidence_mean": 0.9029533301958698, "proper_motion_propagated_any": true, "primary_class": "STAR", "physical_class": "WD", "variability_class": "UNKNOWN", "compact_class": "UNKNOWN", "phenomenon_class": "UNKNOWN"}]
 
 ### RR Lyr
 
@@ -41,9 +41,9 @@ Transient event rows are associated in a separate entity layer from persistent h
 
 ### Mira
 
-- measured fields: {"ra": 34.836726, "dec": -2.977594, "ref_epoch": 2000.0, "anchor_catalog": "2MASS PSC", "entity_kind": "persistent_source", "agb_subclass": "OAGB_IRAS", "position_basis": "IRAS"}
-- collectors: [{"collector": "gaia_dr3", "status": "ok", "rows": 1, "error": ""}, {"collector": "allwise", "status": "empty", "rows": 0, "error": ""}, {"collector": "twomass", "status": "ok", "rows": 1, "error": ""}, {"collector": "agb_suh2021", "status": "ok", "rows": 1, "error": ""}]
-- candidates: [{"object_id": "OBJ000002", "sep_arcsec": 0.36699396344921675, "catalogs": "2MASS PSC|Suh 2021 AGB Catalog", "entity_kind": "persistent_source", "anchor_catalog": "2MASS PSC", "association_members": 2.0, "association_confidence_mean": 0.7661727682238832, "proper_motion_propagated_any": false, "primary_class": "UNKNOWN", "physical_class": "AGB", "variability_class": "UNKNOWN", "compact_class": "UNKNOWN", "phenomenon_class": "UNKNOWN"}, {"object_id": "OBJ000001", "sep_arcsec": 3.8378723944331474, "catalogs": "Gaia DR3", "entity_kind": "persistent_source", "anchor_catalog": "Gaia DR3", "association_members": 1.0, "association_confidence_mean": 1.0, "proper_motion_propagated_any": false, "primary_class": "STAR", "physical_class": "UNKNOWN", "variability_class": "LPV", "compact_class": "UNKNOWN", "phenomenon_class": "UNKNOWN"}]
+- measured fields: {"ra": 34.836525, "dec": -2.9781499, "ref_epoch": 2010.5, "anchor_catalog": "AllWISE", "entity_kind": "persistent_source", "agb_subclass": "OAGB_IRAS", "position_basis": "IRAS"}
+- collectors: [{"collector": "gaia_dr3", "status": "ok", "rows": 1, "error": ""}, {"collector": "allwise", "status": "ok", "rows": 2, "error": ""}, {"collector": "twomass", "status": "ok", "rows": 1, "error": ""}, {"collector": "agb_suh2021", "status": "ok", "rows": 1, "error": ""}]
+- candidates: [{"object_id": "OBJ000002", "sep_arcsec": 0.36699396344921675, "catalogs": "2MASS PSC", "entity_kind": "persistent_source", "anchor_catalog": "2MASS PSC", "association_members": 1.0, "association_confidence_mean": 1.0, "proper_motion_propagated_any": false, "primary_class": "UNKNOWN", "physical_class": "UNKNOWN", "variability_class": "UNKNOWN", "compact_class": "UNKNOWN", "phenomenon_class": "UNKNOWN"}, {"object_id": "OBJ000004", "sep_arcsec": 1.8850268001039285, "catalogs": "AllWISE|Suh 2021 AGB Catalog", "entity_kind": "persistent_source", "anchor_catalog": "AllWISE", "association_members": 2.0, "association_confidence_mean": 1.0, "proper_motion_propagated_any": false, "primary_class": "UNKNOWN", "physical_class": "AGB", "variability_class": "UNKNOWN", "compact_class": "UNKNOWN", "phenomenon_class": "UNKNOWN"}, {"object_id": "OBJ000001", "sep_arcsec": 3.8378723944331474, "catalogs": "Gaia DR3", "entity_kind": "persistent_source", "anchor_catalog": "Gaia DR3", "association_members": 1.0, "association_confidence_mean": 1.0, "proper_motion_propagated_any": false, "primary_class": "STAR", "physical_class": "UNKNOWN", "variability_class": "LPV", "compact_class": "UNKNOWN", "phenomenon_class": "UNKNOWN"}, {"object_id": "OBJ000003", "sep_arcsec": 6.268178319145986, "catalogs": "AllWISE", "entity_kind": "persistent_source", "anchor_catalog": "AllWISE", "association_members": 1.0, "association_confidence_mean": 1.0, "proper_motion_propagated_any": false, "primary_class": "UNKNOWN", "physical_class": "UNKNOWN", "variability_class": "UNKNOWN", "compact_class": "UNKNOWN", "phenomenon_class": "UNKNOWN"}]
 
 ### PSR B0531+21
 
@@ -67,7 +67,7 @@ Transient event rows are associated in a separate entity layer from persistent h
 
 - measured fields: {"ra": 210.77420833333332, "dec": 54.27372222222222, "ref_epoch": 2000.0, "anchor_catalog": "Asiago Supernova Catalog", "entity_kind": "transient_event", "sn_subtype": "Ia"}
 - collectors: [{"collector": "asiago_supernova", "status": "ok", "rows": 1, "error": ""}]
-- candidates: [{"object_id": "OBJ000001", "sep_arcsec": 0.885606880440357, "catalogs": "Asiago Supernova Catalog", "entity_kind": "transient_event", "anchor_catalog": "Asiago Supernova Catalog", "association_members": 1.0, "association_confidence_mean": 1.0, "proper_motion_propagated_any": false, "primary_class": "UNKNOWN", "physical_class": "UNKNOWN", "variability_class": "UNKNOWN", "compact_class": "UNKNOWN", "phenomenon_class": "SN"}]
+- candidates: [{"object_id": "OBJ000001", "sep_arcsec": 0.8856832637682267, "catalogs": "Asiago Supernova Catalog", "entity_kind": "transient_event", "anchor_catalog": "Asiago Supernova Catalog", "association_members": 1.0, "association_confidence_mean": 1.0, "proper_motion_propagated_any": false, "primary_class": "UNKNOWN", "physical_class": "UNKNOWN", "variability_class": "UNKNOWN", "compact_class": "UNKNOWN", "phenomenon_class": "SN"}]
 
 ### 3C 273
 
