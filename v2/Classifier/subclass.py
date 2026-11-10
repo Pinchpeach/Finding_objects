@@ -1292,8 +1292,8 @@ def galaxy_activity(row):
     # Stage-4 rule WISE-AGN-001; 2.18.0).
     s1, s2 = _num(row, "allwise__snr1"), _num(row, "allwise__snr2")
     snr_ok = s1 is None or s2 is None or min(s1, s2) >= 10
-    if w1 is not None and w2 is not None and w1 - w2 >= 0.8 and w2 < 15.05 and snr_ok:
-        return "AGN", "WISE_STERN12", f"W1-W2 = {w1 - w2:.2f} >= 0.8 with W2 = {w2:.2f} < 15.05"
+    if w1 is not None and w2 is not None and w1 - w2 >= 0.8 and w2 <= 15.05 and snr_ok:
+        return "AGN", "WISE_STERN12", f"W1-W2 = {w1 - w2:.2f} >= 0.8 with W2 = {w2:.2f} <= 15.05"
     if w2 is not None and w3 is not None:
         c = w2 - w3
         if ew3 is not None and ew3 < 0.2:

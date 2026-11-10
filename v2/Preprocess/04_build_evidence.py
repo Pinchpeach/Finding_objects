@@ -529,7 +529,14 @@ def evaluate(rule, row, namespaced=frozenset()):
         gr, ri, iz = (num(row, f"ps1_{c}_color") for c in ("g_r", "r_i", "i_z"))
         er, ei = num(row, "ps1_r_psf_mag_err"), num(row, "ps1_i_psf_mag_err")
         pk = num(row, "ps1_i_psf_minus_kron")
-        if None not in (gr, ri, iz, er, ei, pk) and er < 0.2 and ei < 0.2 and pk < 0.05:
+        # Richards et al. (2002) restrict this branch to 15.0 < i* <= 20.2
+        # ("we use i* = 20.2 as the magnitude limit for high-redshift quasar
+        # candidates"; checked in the original, 2.50.0 audit).  Without it the
+        # rule fired on 29 independent-field objects, all stars.  PS1 i is used
+        # for SDSS i* (< 0.1 mag apart, Tonry et al. 2012), not dereddened.
+        imag = num(src, "iMeanPSFMag")
+        bright_enough = imag is not None and 15.0 < imag <= 20.2
+        if None not in (gr, ri, iz, er, ei, pk) and bright_enough and er < 0.2 and ei < 0.2 and pk < 0.05:
             if gr > 1.0 and (ri < 0.08 + 0.42 * (gr - 0.96) or gr > 2.26) and iz < 0.25:
                 hit(
                     "QSO",

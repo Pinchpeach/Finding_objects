@@ -144,6 +144,8 @@ classified_objects.csv
 
 개선 로드맵 1–4단계(2.49.0, [`v2/WORK_REPORT_2026-11-09.md`](v2/WORK_REPORT_2026-11-09.md)): 연관 받는 반경을 거짓 연관률 5 %로 보정(AllWISE 20.9 → 5.6 %), COSMOS 깊은 정답 영역(HST/ACS, 어두운 천체 28,210개), Galaxy Zoo DESI 형태(은하 세부 17 → 26/50). 2.48.0의 거짓 연관 비율은 2.49.0에서 정정했다.
 
+분류 기준 126개를 문헌 원문과 독립 영역 정밀도로 점검했다(2.50.0, [`v2/LITERATURE_CRITERIA_AUDIT_2026-11-10.md`](v2/LITERATURE_CRITERIA_AUDIT_2026-11-10.md)). 문헌과 다른 고적색이동 QSO 색 규칙 둘을 고치거나 뺐고, 인용 오류를 바로잡았다.
+
 2.40.0의 밝기별 QSO 사전확률은 같은 영역 재생에서 1차 분류 정확도 96.21 → 96.31 %, QSO 정밀도 79.5 → 86.9 %, QSO 재현율 94.4 → 90.9 %였다([`v2/benchmark/qso_options/`](v2/benchmark/qso_options/)).
 
 ### 실제 하늘 비율 기준 순도 (blind, 18개 영역, 2.36.0 측정)
