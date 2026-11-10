@@ -34,6 +34,11 @@ def main():
         rows = []
         for fdir in sorted(p for p in (a.root / v).iterdir() if (p / "field.json").exists() and (p / "objects_blind.csv.gz").exists()):
             m, _ = S.field_matches(fdir, "blind", bench)
+            ev = fdir / "objects_blind_evidence.csv.gz"
+            if not m.empty and ev.exists() and "object_id" in m:
+                # fused class probabilities of the matched objects (risk-coverage / abstention calibration)
+                p = pd.read_csv(ev, usecols=lambda c: c in ("object_id", "p_star", "p_galaxy", "p_qso"))
+                m = m.merge(p.drop_duplicates("object_id"), on="object_id", how="left")
             if not m.empty:
                 m.insert(0, "field", fdir.name)
                 rows.append(m)
@@ -66,10 +71,13 @@ def main():
             r["w1_changed"] = int((d > 0.01).sum())
             r["w1_median_abs_diff"] = round(float(d[d > 0.01].median()), 3) if (d > 0.01).any() else 0.0
         if a.out:
+            pcols = [c for c in ("p_star", "p_galaxy", "p_qso") if c in m]
+            m[["field", "t_truth", "ours"] + pcols].to_csv(a.out / f"truth_probs_{v}.csv.gz", index=False)
             # every wrong or UNKNOWN truth object of this variant, for error analysis
             keep = [c for c in ("field", "t_ra", "t_dec", "t_truth", "t_survey", "t_n_fragments", "ours", "catalogs", "unknown_reason",
                                 "primary_confidence", "classification_basis", "gaia_dr3__phot_g_mean_mag", "std_mag__ls_r",
-                                "std_mag__ps1_r", "std_mag__sdss_r", "desi_legacy_surveys_dr10__type", "subclass") if c in m]
+                                "std_mag__ps1_r", "std_mag__sdss_r", "desi_legacy_surveys_dr10__type", "subclass",
+                                "p_star", "p_galaxy", "p_qso") if c in m]
             a.out.mkdir(parents=True, exist_ok=True)
             m[~ok][keep].to_csv(a.out / f"errors_{v}.csv.gz", index=False)
         if v != a.base and a.out:
