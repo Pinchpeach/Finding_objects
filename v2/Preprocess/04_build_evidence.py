@@ -6,7 +6,7 @@ its required feature columns are present and usable. Missing values are neutral.
 """
 
 from __future__ import annotations
-import argparse, importlib, importlib.util, json, math, sys
+import argparse, importlib, importlib.util, json, math, os, sys
 from pathlib import Path
 import pandas as pd
 
@@ -772,6 +772,11 @@ def _ls_gbm_evidence(df, rule_list):
 SOFT_SUFFIXES = ("-CKNN-001", "-GBM-001")
 
 
+# Rule ablation for experiments (comma-separated rule ids): the A/B workflow
+# measures what each rule adds on the independent fields (2.50.0 audit).
+DISABLED_RULES = frozenset(r.strip() for r in os.environ.get("V2_DISABLE_RULES", "").split(",") if r.strip())
+
+
 def run(features: Path, rules_path: Path, out: Path) -> Path:
     global PM_MAHALANOBIS
     PM_MAHALANOBIS = "c2" in _import_local("qso_options").parse()
@@ -794,6 +799,8 @@ def run(features: Path, rules_path: Path, out: Path) -> Path:
             ev.extend(evaluate(rule, row, namespaced))
         ev.extend(knn[i])
         ev.extend(gbm[i])
+        if DISABLED_RULES:
+            ev = [e for e in ev if e.get("rule_id") not in DISABLED_RULES]
         payload.append(json.dumps(ev, separators=(",", ":")))
         counts.append(len(ev))
         # kNN class fractions are soft statistical evidence, weighed by the
