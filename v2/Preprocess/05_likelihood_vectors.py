@@ -616,7 +616,7 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     nir_p = NIR.star_probability(df)
     # DESI BGS Gaia star-galaxy test (2.42.0, bgs_galaxy.py): a resolved LS
     # source with G - r_raw > 0.6 or without a Gaia source at r < 20 is a
-    # galaxy (Ruiz-Macias et al. 2021); used where the evidence does not
+    # galaxy (Ruiz-Macias et al. 2021; Hahn et al. 2023, AJ 165, 253, sec. 3: G_Gaia - r_raw > 0.6, checked in the original); used where the evidence does not
     # already give a class at >= BGS_KEEP_P.  Independent regions A+B
     # (replay): 31 fixed, 1 broken, mostly the 2dFGRS SGP strip.
     bgs = BGS.galaxy_test(df)

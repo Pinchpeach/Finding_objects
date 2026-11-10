@@ -20,7 +20,7 @@ from pathlib import Path
 
 from pypdf import PdfReader
 
-MAX_HITS = 3
+MAX_HITS = int(__import__("os").environ.get("MAX_HITS", "3"))
 UA = {"User-Agent": "Finding_objects literature check (GitHub Actions)"}
 
 

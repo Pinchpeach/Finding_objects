@@ -54,7 +54,7 @@ def classify(row):
             ],
         }
     flags_ok = flags is None or (len(flags) >= 2 and flags[1] == "0")
-    if 490 <= stage <= 1300 and logg < 3.5 and 1.0 <= mass < 2.0 and age > 1.5 and flags_ok:
+    if 490 < stage <= 1300 and logg < 3.5 and 1.0 < mass < 2.0 and age > 1.5 and flags_ok:
         return {
             "label": "RED_GIANT",
             "confidence": None,

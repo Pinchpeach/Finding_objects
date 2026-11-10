@@ -16,7 +16,7 @@ Gaia G / BP / RP         kept in the Gaia (Vega) system,               not conve
                                                                        references (Pecaut & Mamajek BP-RP,
                                                                        Gentile Fusillo+2021 WD locus)
 Galactic reddening       ``std_ebv`` = SFD E(B-V)                      Legacy Surveys mw_transmission_g with
-                                                                       R_g = 3.214 (Schlafly & Finkbeiner 2011),
+                                                                       R_g = 3.214 (Legacy Surveys DR9/DR10 DECam coefficient),
                                                                        else GALEX E(B-V)
 radio flux density       mJy at the native frequency, and              FIRST/NVSS 1.4 GHz as published; LoTSS
                          ``std_radio_1p4ghz_mjy``                      144 MHz and VLASS 3 GHz scaled with

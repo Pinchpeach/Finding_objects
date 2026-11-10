@@ -1,0 +1,6 @@
+variant,n,acc,unknown,fixed,broken,truth_with_fragments,recall_STAR,recall_GALAXY,recall_QSO,w1_changed,w1_median_abs_diff
+base,31622,95.209,38,0,0,2557,92.95,95.66,96.0,,
+off-AST-EXT-001,31622,95.209,38,0,0,2557,92.95,95.66,96.0,0.0,0.0
+off-PS1-MORPH-001,31622,95.209,38,0,0,2557,92.95,95.66,96.0,0.0,0.0
+off-PS1-QSO-HIZ-001+PS1-QSO-Z6-001,31622,95.209,38,0,0,2557,92.95,95.66,96.0,0.0,0.0
+off-WISE-AGN-001,31622,95.212,37,1,0,2557,92.95,95.66,96.0,0.0,0.0

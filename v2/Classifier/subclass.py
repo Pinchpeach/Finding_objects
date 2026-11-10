@@ -75,8 +75,12 @@ RULE_PRECISION.setdefault("DESI_BLUE", 0.857)  # DESI galaxies vs BPT (see _blue
 # coefficients per E(B-V); E(BP-RP) = (3.374 - 2.035) E(B-V), A_G ~ 2.740 E(B-V).
 E_BPRP_PER_EBV = 1.339
 A_G_PER_EBV = 2.740
-# Schlafly & Finkbeiner (2011, Table 6, R_V = 3.1) A_band / E(B-V): DECam g
-# also recovers E(B-V) from the Legacy Surveys mw_transmission_g column.
+# A_band / E(B-V).  DECam g, r: the Legacy Surveys DR9/DR10 coefficients
+# (legacysurvey.org/dr9/catalogs; SF11 recalibration for the DECam passbands),
+# the values LS used to compute mw_transmission_g, so inverting that column
+# returns E(B-V) exactly.  (SF11 Table 6 lists DES g, r = 3.237, 2.176, a
+# different passband set; corrected citation, 2.50.0 audit.)  SDSS u, g, r:
+# Schlafly & Finkbeiner 2011, Table 6, R_V = 3.1.
 R_DECAM_G, R_DECAM_R = 3.214, 2.165
 R_SDSS_U, R_SDSS_G, R_SDSS_R = 4.239, 3.303, 2.285
 
@@ -1288,8 +1292,8 @@ def galaxy_activity(row):
     # Stage-4 rule WISE-AGN-001; 2.18.0).
     s1, s2 = _num(row, "allwise__snr1"), _num(row, "allwise__snr2")
     snr_ok = s1 is None or s2 is None or min(s1, s2) >= 10
-    if w1 is not None and w2 is not None and w1 - w2 >= 0.8 and w2 < 15.05 and snr_ok:
-        return "AGN", "WISE_STERN12", f"W1-W2 = {w1 - w2:.2f} >= 0.8 with W2 = {w2:.2f} < 15.05"
+    if w1 is not None and w2 is not None and w1 - w2 >= 0.8 and w2 <= 15.05 and snr_ok:
+        return "AGN", "WISE_STERN12", f"W1-W2 = {w1 - w2:.2f} >= 0.8 with W2 = {w2:.2f} <= 15.05"
     if w2 is not None and w3 is not None:
         c = w2 - w3
         if ew3 is not None and ew3 < 0.2:
@@ -1522,9 +1526,13 @@ def galaxy_tags(row, activity, activity_rule=None):
 
 # Galaxy Zoo DESI (Walmsley et al. 2023, MNRAS 526, 4768): predicted volunteer
 # vote fractions for r < 19 Legacy Surveys galaxies.  A class is the answer a
-# majority of volunteers would give (fraction >= 0.5), the Galaxy Zoo
-# consensus convention (Willett et al. 2013, MNRAS 435, 2835); not tuned on
-# our reference objects (Nair & Abraham 2010, Arp 1966), which stay the test.
+# majority of volunteers would give (fraction >= 0.5).  This is our choice,
+# not a published convention: Galaxy Zoo 2 sets per-task thresholds with
+# minimum vote counts on debiased fractions (Willett et al. 2013, MNRAS 435,
+# 2835, Table 3), and Walmsley et al. (2023) give no merger threshold; the
+# merger tag sums "major disturbance" and "merger" (also our choice).  Not
+# tuned on our reference objects (Nair & Abraham 2010, Arp 1966), which stay
+# the test (2.50.0 audit, LITERATURE_CRITERIA_AUDIT_2026-11-10.md).
 GZ = "galaxy_zoo_desi__gz_"
 GZ_MAJORITY = 0.5
 

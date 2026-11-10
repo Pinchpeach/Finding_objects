@@ -6,7 +6,7 @@ its required feature columns are present and usable. Missing values are neutral.
 """
 
 from __future__ import annotations
-import argparse, importlib, importlib.util, json, math, sys
+import argparse, importlib, importlib.util, json, math, os, sys
 from pathlib import Path
 import pandas as pd
 
@@ -529,7 +529,14 @@ def evaluate(rule, row, namespaced=frozenset()):
         gr, ri, iz = (num(row, f"ps1_{c}_color") for c in ("g_r", "r_i", "i_z"))
         er, ei = num(row, "ps1_r_psf_mag_err"), num(row, "ps1_i_psf_mag_err")
         pk = num(row, "ps1_i_psf_minus_kron")
-        if None not in (gr, ri, iz, er, ei, pk) and er < 0.2 and ei < 0.2 and pk < 0.05:
+        # Richards et al. (2002) restrict this branch to 15.0 < i* <= 20.2
+        # ("we use i* = 20.2 as the magnitude limit for high-redshift quasar
+        # candidates"; checked in the original, 2.50.0 audit).  Without it the
+        # rule fired on 29 independent-field objects, all stars.  PS1 i is used
+        # for SDSS i* (< 0.1 mag apart, Tonry et al. 2012), not dereddened.
+        imag = num(src, "iMeanPSFMag")
+        bright_enough = imag is not None and 15.0 < imag <= 20.2
+        if None not in (gr, ri, iz, er, ei, pk) and bright_enough and er < 0.2 and ei < 0.2 and pk < 0.05:
             if gr > 1.0 and (ri < 0.08 + 0.42 * (gr - 0.96) or gr > 2.26) and iz < 0.25:
                 hit(
                     "QSO",
@@ -622,8 +629,11 @@ def evaluate(rule, row, namespaced=frozenset()):
                 feature("ps1_var_log_r", max(-2.0, min(3.0, math.log(max(rmed, 1e-3)))), "log epoch scatter / predicted")
                 feature("ps1_var_present", 1.0, "PS1 multi-epoch statistics (point source)")
     elif rid == "RADIO-001":
-        # Radio loudness R = 0.4 (r - t), t = -2.5 log10(S_1.4GHz / 3631 Jy)
-        # (Ivezic et al. 2002, AJ 124, 2364; radio-loud R > 1).  Radio-loud
+        # Radio loudness R_m = 0.4 (m - t), t = -2.5 log10(S_1.4GHz / 3631 Jy)
+        # (Ivezic et al. 2002, AJ 124, 2364, define R_m for any SDSS band m and
+        # use i in their examples; here m = r, the band every survey we read
+        # provides.  No R threshold is applied, so the band only shifts the
+        # feature, which the fitted Stage-5 weights absorb; 2.50.0 audit).  Radio-loud
         # quasars and AGN in galaxies are detected at the survey limits
         # (FIRST ~1 mJy) while stars almost never are; star-forming galaxies
         # are radio-detected at low R.  Continuous features; weights come
@@ -639,7 +649,9 @@ def evaluate(rule, row, namespaced=frozenset()):
                 feature(name, v, "radio counterpart")
     elif rid == "XRAY-001":
         # X-ray-to-optical flux ratio log(fX/fopt) = log fX + r/2.5 + 5.37
-        # (Maccacaro et al. 1988, Eq. 1; r used for V): AGN and quasars lie
+        # (Maccacaro et al. 1988, Eq. 1, defined with V; r used for V, so the
+        # boundaries below are shifted by V - r ~ 0.2-0.4 mag / 2.5; no
+        # threshold is applied here, only the fitted feature): AGN and quasars lie
         # at -1 to +1.2, coronal stars below -1 and normal galaxies below
         # ~ -2 (Stocke et al. 1991, ApJS 76, 813).  Continuous features;
         # weights come only from the fitted Stage-5 model.
@@ -772,6 +784,11 @@ def _ls_gbm_evidence(df, rule_list):
 SOFT_SUFFIXES = ("-CKNN-001", "-GBM-001")
 
 
+# Rule ablation for experiments (comma-separated rule ids): the A/B workflow
+# measures what each rule adds on the independent fields (2.50.0 audit).
+DISABLED_RULES = frozenset(r.strip() for r in os.environ.get("V2_DISABLE_RULES", "").split(",") if r.strip())
+
+
 def run(features: Path, rules_path: Path, out: Path) -> Path:
     global PM_MAHALANOBIS
     PM_MAHALANOBIS = "c2" in _import_local("qso_options").parse()
@@ -794,6 +811,8 @@ def run(features: Path, rules_path: Path, out: Path) -> Path:
             ev.extend(evaluate(rule, row, namespaced))
         ev.extend(knn[i])
         ev.extend(gbm[i])
+        if DISABLED_RULES:
+            ev = [e for e in ev if e.get("rule_id") not in DISABLED_RULES]
         payload.append(json.dumps(ev, separators=(",", ":")))
         counts.append(len(ev))
         # kNN class fractions are soft statistical evidence, weighed by the
