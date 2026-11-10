@@ -1,0 +1,97 @@
+{
+ "1205.0811": [
+  "W1 ?[−-] ?W2 ?(?:≥|>=|>) ?0\\.8",
+  "15\\.05",
+  "W2 ?(?:<|≤) ?15"
+ ],
+ "1706.09901": [
+  "0\\.65",
+  "0\\.153",
+  "13\\.86",
+  "R90|90 ?per ?cent reliab"
+ ],
+ "2204.12574": [
+  "parallax.{0,40}5",
+  "proper motion.{0,60}5",
+  "\\|\\s*ϖ|normalised parallax|varpi"
+ ],
+ "2012.01742": [
+  "−0\\.017|-0\\.017|0\\.017 mas",
+  "zero[- ]point"
+ ],
+ "2206.06710": [
+  "prior",
+  "0\\.0009|0\\.0002|0\\.9988|1000|class prior"
+ ],
+ "2208.08511": [
+  "22\\.3",
+  "W1.{0,30}W2.{0,30}(?:22|veto)",
+  "point[- ]like|PSF"
+ ],
+ "astro-ph/0202251": [
+  "20\\.2",
+  "i\\* ?(?:<|≤)",
+  "high-redshift|z ?> ?3"
+ ],
+ "1608.03279": [
+  "brown dwarf|cool dwarf|contamin",
+  "i ?[−-] ?z ?> ?2",
+  "z ?[−-] ?y"
+ ],
+ "1012.4804": [
+  "3\\.237|3\\.214",
+  "2\\.176|2\\.165",
+  "DES"
+ ],
+ "1804.08657": [
+  "S/N|signal-to-noise|SNR",
+  "PSF.{0,40}(?:REX|EXP|DEV)",
+  "ellipticity|chi2|χ"
+ ],
+ "2007.14950": [
+  "20\\.175",
+  "0\\.6",
+  "G ?[−-] ?r"
+ ],
+ "1308.3496": [
+  "0\\.5|majority|plurality",
+  "debiased",
+  "threshold"
+ ],
+ "2309.11425": [
+  "merg",
+  "major disturbance",
+  "threshold|cut|>"
+ ],
+ "astro-ph/0106324": [
+  "0\\.61",
+  "0\\.47",
+  "1\\.19"
+ ],
+ "astro-ph/0304239": [
+  "0\\.61",
+  "0\\.05",
+  "1\\.3"
+ ],
+ "astro-ph/0202408": [
+  "i ?band|i-band|\\bi\\b ?mag",
+  "radio-to-optical|R ?= ?|log\\(F"
+ ],
+ "q:Tachibana Miller morphological classification model unresolved PanSTARRS1 sources": [
+  "0\\.05",
+  "PSF.{0,20}Kron|Kron.{0,20}PSF",
+  "i ?(?:<|≤|>) ?2[01]"
+ ],
+ "q:Farrow Pan-STARRS1 medium deep star galaxy separation PSF Kron": [
+  "0\\.05",
+  "PSF.{0,20}Kron"
+ ],
+ "q:Zhang Sanders Mira variables Gaia ASAS-SN period amplitude": [
+  "0\\.5 ?mag|amplitude",
+  "80 ?(?:d|days)"
+ ],
+ "q:Jarrett 2011 Spitzer WISE survey of the ecliptic poles colour classification spheroid W2-W3": [
+  "W2 ?[−-] ?W3",
+  "spheroid|elliptical"
+ ]
+}
