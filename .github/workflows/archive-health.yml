@@ -1,0 +1,17 @@
+name: Archive health
+
+# Core collectors (Gaia, Legacy Surveys, PS1, AllWISE, 2MASS) on one small
+# cone; fails when any is down (2.51.1).  Run before long validation runs.
+on:
+  workflow_dispatch:
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas numpy scipy requests astropy astroquery pyvo
+      - run: python -u .github/scripts/archive_health.py

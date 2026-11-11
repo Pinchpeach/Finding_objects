@@ -29,8 +29,19 @@ jobs:
           v=$(tr -d ' \n' < v2/VERSION)
           if [ -e "v2/benchmark/locked_c/$v" ]; then echo "VERSION $v was already scored on set C; bump VERSION first"; exit 1; fi
           echo "version=$v" >> "$GITHUB_OUTPUT"
-  field:
+  health:
+    # stop before 60 region jobs when a core archive is down (2.51.1)
     needs: lock
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas numpy scipy requests astropy astroquery pyvo
+      - run: python -u .github/scripts/archive_health.py
+  field:
+    needs: [lock, health]
     runs-on: ubuntu-latest
     timeout-minutes: 300
     strategy:
@@ -141,8 +152,8 @@ jobs:
           retention-days: 7
           if-no-files-found: ignore
   score:
-    needs: [lock, field]
-    if: ${{ !cancelled() && needs.lock.result == 'success' }}
+    needs: [lock, health, field]
+    if: ${{ !cancelled() && needs.lock.result == 'success' && needs.health.result == 'success' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write

@@ -22,7 +22,19 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  health:
+    # stop before 89 region jobs when a core archive is down (2.51.1;
+    # on 2026-11-11 every run lost AllWISE / 2MASS or Legacy Surveys)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas numpy scipy requests astropy astroquery pyvo
+      - run: python -u .github/scripts/archive_health.py
   field:
+    needs: health
     runs-on: ubuntu-latest
     timeout-minutes: 300
     strategy:
