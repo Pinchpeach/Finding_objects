@@ -22,7 +22,7 @@ evaluated with numpy only (``ls_gbm.raw_scores``), as for LS-GBM-001.
 """
 
 from __future__ import annotations
-import argparse, json, math
+import argparse, json, math, os
 from pathlib import Path
 import numpy as np
 import pandas as pd
@@ -54,6 +54,15 @@ _fp_s.loader.exec_module(FAINT)
 _ah_s = _tio_u.spec_from_file_location("v2_agn_host", Path(__file__).resolve().parent / "agn_host.py")
 AGN_HOST = _tio_u.module_from_spec(_ah_s)
 _ah_s.loader.exec_module(AGN_HOST)
+_cg_s = _tio_u.spec_from_file_location("v2_coarse_gbm", Path(__file__).resolve().parent / "coarse_gbm.py")
+COARSE_GBM = _tio_u.module_from_spec(_cg_s)
+_cg_s.loader.exec_module(COARSE_GBM)
+# Coarse model (2.51.0, coarse_gbm.py): "fusion" = rule fusion (linear + trees
+# over evidence scores); "gbm" = one gradient-boosted model on the measured
+# quantities for every object without a catalogue label, the rule fusion where
+# a spectroscopic / literature label exists (lookup vs inference, review 7.2).
+COARSE_MODEL = os.environ.get("V2_COARSE_MODEL", "fusion").strip().lower()
+CATALOG_LABEL_RULES = ("SPC-", "SIMBAD-TYPE", "NED-TYPE", "SGA-")
 CLASSES = ("STAR", "GALAXY", "QSO")
 WEIGHT = {"direct_probability": 1.0, "catalog_label": 1.5, "continuous_score": 0.35, "binary_evidence": 0.35}
 MIN_CONFIDENCE = 0.50
@@ -87,7 +96,8 @@ MEMBER_BASIS = "young-star membership (MYStIX)"
 # is classified STAR even when other (photometric) evidence conflicts.
 DECISIVE_MOTION_SIGMA = 10.0
 DECISIVE_MIN_RELIABILITY = 0.8  # Gaia astrometry quality (RUWE <= ~1.75) and association
-MODEL_PATH = Path(__file__).resolve().parent / "fusion_weights.json"
+# V2_FUSION_WEIGHTS: alternative fitted model for experiments (2.51.0 A/B)
+MODEL_PATH = Path(os.environ.get("V2_FUSION_WEIGHTS") or Path(__file__).resolve().parent / "fusion_weights.json")
 # Stage-4 rules measuring a significant Gaia parallax / proper motion.
 GAIA_MOTION_RULES = frozenset({"AST-GAL-001", "AST-GAL-002"})
 
@@ -534,6 +544,13 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     for i in np.flatnonzero(magellanic_region(df)):
         item_lists[i] = [e for e in item_lists[i] if e.get("rule_id") != "DSC-001"]
     fused = fuse_many(item_lists, model, Path(model_path).parent)
+    if COARSE_MODEL == "gbm":
+        g = COARSE_GBM.predict_proba(df, os.environ.get("V2_COARSE_GBM") or str(COARSE_GBM.MODEL_PATH))
+        if g is not None:
+            G, has = g
+            for i, items in enumerate(item_lists):
+                if has[i] and not any(str(e.get("rule_id", "")).startswith(CATALOG_LABEL_RULES) for e in items):
+                    fused[i] = (dict(zip(CLASSES, G[i])), fused[i][1])
     rows = []
     for items, hr, (p, used) in zip(item_lists, host_r, fused):
         strong = set()
@@ -734,7 +751,12 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
         result_columns[f"field_prior_{c.lower()}"] = [float(prior[i])] * len(df)
     result_columns.update(
         {
-            "coarse_probability_calibrated": [bool(model)] * len(df),
+            # Not calibrated (2.51.0, scientific review): the fusion is fitted
+            # on class-balanced benchmarks and several priors (local density,
+            # magnitude, faint star:galaxy, vetoes) are multiplied in after it;
+            # the product was never checked against outcome frequencies (COSMOS:
+            # p >= 0.9 is wrong 2.75 % of the time).  Use the values for ranking.
+            "coarse_probability_calibrated": [False] * len(df),
             "coarse_prior_adjusted": [adjust] * len(df),
             "coarse_score_semantics": [
                 (model or {}).get("semantics", "normalized evidence likelihood; not a calibrated posterior probability")

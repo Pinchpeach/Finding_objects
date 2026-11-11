@@ -125,9 +125,22 @@ def truth_deep(ra, dec, radius, out):
 
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
-    v = Vizier(columns=["_RAJ2000", "_DEJ2000", "ACSF814Wmag", "ACSmuClass", "lptype", "HSCimagAuto"], row_limit=-1)
-    v.TIMEOUT = 300
-    res = v.query_region(SkyCoord(ra * u.deg, dec * u.deg), radius=radius * u.arcmin, catalog="J/ApJS/258/11/classic")
+    res, err = None, None
+    # VizieR mirrors (as v2/Get_data/throttle.py): the Strasbourg server
+    # answered 404 for every COSMOS query on 2026-11-11.
+    for host in ("vizier.cds.unistra.fr", "vizier.cfa.harvard.edu", "vizier.iucaa.in", "vizier.nao.ac.jp"):
+        v = Vizier(columns=["_RAJ2000", "_DEJ2000", "ACSF814Wmag", "ACSmuClass", "lptype", "HSCimagAuto"], row_limit=-1)
+        v.VIZIER_SERVER = host
+        v.TIMEOUT = 300
+        try:
+            res = v.query_region(SkyCoord(ra * u.deg, dec * u.deg), radius=radius * u.arcmin, catalog="J/ApJS/258/11/classic")
+            print("COSMOS2020 from", host)
+            break
+        except Exception as e:  # noqa: BLE001 - try the next mirror
+            err = e
+            print("mirror failed", host, e)
+    if res is None:
+        raise RuntimeError(f"COSMOS2020 query failed on every VizieR mirror: {err}")
     for t in res:
         df = t.to_pandas()
         df.to_csv(out / "J_ApJS_258_11_classic.csv.gz", index=False)

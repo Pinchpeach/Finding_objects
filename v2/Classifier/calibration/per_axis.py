@@ -1,8 +1,20 @@
-"""Per-axis calibration utilities.
+"""Per-axis reliability utilities.
 
-Calibration is intentionally separated from raw evidence.  A model is only
-considered usable when it was fit on an independent truth set meeting minimum
-sample/positive/negative counts.  Otherwise probability columns remain NaN.
+Kept apart from raw evidence.  A model is only usable when it was fit on an
+independent truth set meeting minimum sample/positive/negative counts;
+otherwise the reliability columns stay NaN.
+
+What the number means (2.51.0, scientific review 2026-11-11): most truth sets
+behind these models hold only the target classes (e.g. Cepheid / LPV / Mira /
+RR Lyrae, or HASH PNe), so the value is the agreement of the rule with
+those labels, not its precision against contaminants on the sky; it was
+previously reported as "calibrated_probability" with status CALIBRATED.
+Columns are now ``{axis}_reliability`` with ``{axis}_reliability_status``:
+
+  PRECISION_SKY_SAMPLE   precision on a sky-random sample passing the rule
+                         (contaminants included; build_truth.py samples)
+  AGREEMENT_TARGET_SET   agreement within a target-class-only truth set
+  NO_MODEL / INSUFFICIENT_TRUTH
 """
 
 from __future__ import annotations
@@ -69,21 +81,22 @@ def annotate(
         for label, score, st in zip(labels.astype(str), scores, stat):
             rm = rule_models.get(f"{st}|{label}")
             if rm and rm.get("method") == "rule_precision":
-                # Measured precision of the rule that produced this label (2.15.0).
+                # Measured agreement / precision of the rule that produced this label (2.15.0).
                 probs.append(float(rm["precision"]))
-                statuses.append("CALIBRATED")
+                statuses.append("PRECISION_SKY_SAMPLE" if rm.get("external_source") else "AGREEMENT_TARGET_SET")
                 methods.append("rule_precision")
                 continue
             model = axis_models.get(label)
             p = calibrate_score(score, model)
             probs.append(p)
             if p is None:
-                statuses.append("UNCALIBRATED_INSUFFICIENT_TRUTH" if model else "UNCALIBRATED_NO_MODEL")
+                statuses.append("INSUFFICIENT_TRUTH" if model else "NO_MODEL")
                 methods.append(None)
             else:
-                statuses.append("CALIBRATED")
+                # Platt fits use the same target-class-only variability set.
+                statuses.append("AGREEMENT_TARGET_SET")
                 methods.append(model.get("method"))
-        out[f"{axis}_calibrated_probability"] = probs
-        out[f"{axis}_calibration_status"] = statuses
-        out[f"{axis}_calibration_method"] = methods
+        out[f"{axis}_reliability"] = probs
+        out[f"{axis}_reliability_status"] = statuses
+        out[f"{axis}_reliability_method"] = methods
     return out

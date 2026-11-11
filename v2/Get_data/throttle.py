@@ -10,7 +10,7 @@ scripted clients (CDS blocks a host that sends SIMBAD more than a few queries
 per second); the random jitter keeps parallel collectors out of lock-step.
 
 VizieR mirrors (2.36.4): a VizieR request whose connection is refused,
-that times out (connecting or reading), or that answers 500/502/503/504, is sent
+that times out (connecting or reading), or that answers 404/500/502/503/504, is sent
 again to the next official
 mirror (CDS list of VizieR sites: Strasbourg, CfA, NAOJ, IUCAA, China-VO,
 IDIA; same catalogues).  On 2026-10-24 the Strasbourg server refused every
@@ -49,7 +49,12 @@ CONNECT_TIMEOUT_S = 10.0
 # 500 added in 2.44.0: on 2026-10-31 the IDIA mirror, preferred after
 # Strasbourg failed, answered 500 to every query for hours (48 fields lost
 # every VizieR catalogue).
-RETRY_STATUS = {500, 502, 503, 504}
+# 404 (2.51.0): on 2026-11-11 Strasbourg answered 404 Not Found to every
+# viz-bin/votable query all day, while the mirrors served the catalogues; an
+# existing catalogue with no rows in the cone answers 200 with an empty
+# table, so a 404 is never a valid VizieR answer.  Every validation run of
+# that day lost AllWISE and 2MASS (allwise_rows = 0 in assoc_stats.csv).
+RETRY_STATUS = {404, 500, 502, 503, 504}
 _preferred = {"host": None, "until": 0.0}
 
 _local = threading.local()

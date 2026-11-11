@@ -1,0 +1,200 @@
+name: Locked test set C (once per release)
+
+# Locked test set C (2.51.0, benchmark/LOCKED_TEST_SET_C.md): 60 regions never
+# used for development, selected by benchmark/select_fields_c.py and locked by
+# the SHA-256 of benchmark/fields_c.csv.  Scored once per release, blind
+# (spectroscopic and literature catalogues dropped), aggregate metrics only:
+# no per-object outputs are committed, so the set cannot be tuned on.
+# Manual; refuses to run when the list changed or this VERSION was scored.
+on:
+  workflow_dispatch:
+    inputs:
+      note: {description: "why this run (release scoring)", default: "release scoring"}
+concurrency:
+  group: locked-set-c-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  LOCK_SHA256: 21c42406ce3700ce7c271f2773a81297484e4f7543a821aaa05cf521f378b7e4
+
+jobs:
+  lock:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: v
+        run: |
+          echo "$LOCK_SHA256  v2/benchmark/fields_c.csv" | sha256sum -c - || { echo "fields_c.csv differs from the locked list"; exit 1; }
+          v=$(tr -d ' \n' < v2/VERSION)
+          if [ -e "v2/benchmark/locked_c/$v" ]; then echo "VERSION $v was already scored on set C; bump VERSION first"; exit 1; fi
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+  field:
+    needs: lock
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        f:
+          - {name: csth_304m58, ra: 303.73, dec: -58.39}
+          - {name: csth_024m41, ra: 23.51, dec: -41.29}
+          - {name: csth_167m22, ra: 167.42, dec: -22.15}
+          - {name: csth_025m61, ra: 25.36, dec: -60.85}
+          - {name: csth_212m34, ra: 212.06, dec: -33.81}
+          - {name: csth_322m50, ra: 321.88, dec: -50.08}
+          - {name: csth_082m30, ra: 82.38, dec: -30.41}
+          - {name: csth_223m26, ra: 223.4, dec: -25.79}
+          - {name: csth_324m62, ra: 324.05, dec: -61.85}
+          - {name: csth_091m52, ra: 91.3, dec: -51.89}
+          - {name: csth_055m53, ra: 54.79, dec: -52.79}
+          - {name: csth_030m54, ra: 29.57, dec: -54.49}
+          - {name: csth_073m34, ra: 72.74, dec: -33.51}
+          - {name: csth_324m83, ra: 324.42, dec: -82.78}
+          - {name: csth_317m47, ra: 316.88, dec: -47.28}
+          - {name: csth_057m66, ra: 56.97, dec: -65.68}
+          - {name: csth_332m56, ra: 331.88, dec: -56.24}
+          - {name: csth_057m38, ra: 56.83, dec: -38.49}
+          - {name: cpln_345p48, ra: 344.76, dec: 48.5}
+          - {name: cpln_069p37, ra: 69.26, dec: 36.93}
+          - {name: cpln_320p31, ra: 320.27, dec: 30.71}
+          - {name: cpln_054p39, ra: 53.67, dec: 38.99}
+          - {name: cpln_307p26, ra: 307.28, dec: 26.3}
+          - {name: cpln_089p47, ra: 89.38, dec: 46.92}
+          - {name: cpln_071p26, ra: 71.27, dec: 25.89}
+          - {name: cpln_102p35, ra: 101.98, dec: 34.75}
+          - {name: cpln_113p02, ra: 112.59, dec: 1.52}
+          - {name: cpln_077p21, ra: 77.22, dec: 21.24}
+          - {name: cpln_110m02, ra: 110.19, dec: -2.13}
+          - {name: cpln_310p53, ra: 309.54, dec: 52.73}
+          - {name: clam_075p14, ra: 74.66, dec: 14.43}
+          - {name: clam_170p30, ra: 169.93, dec: 29.5}
+          - {name: clam_127p10, ra: 126.59, dec: 10.44}
+          - {name: clam_110p25, ra: 110.27, dec: 25.48}
+          - {name: clam_226p24, ra: 226.18, dec: 23.82}
+          - {name: clam_011p39, ra: 10.62, dec: 38.73}
+          - {name: clam_228p11, ra: 228.02, dec: 10.97}
+          - {name: clam_358p22, ra: 358.09, dec: 21.58}
+          - {name: clam_148p32, ra: 147.8, dec: 31.8}
+          - {name: clam_209p37, ra: 208.57, dec: 36.61}
+          - {name: clam_037p06, ra: 36.97, dec: 5.92}
+          - {name: clam_209p15, ra: 208.55, dec: 14.96}
+          - {name: clam_155p56, ra: 154.63, dec: 55.95}
+          - {name: clam_014p32, ra: 14.34, dec: 32.47}
+          - {name: clam_230m05, ra: 230.4, dec: -4.83}
+          - {name: clam_131p06, ra: 131.43, dec: 5.71}
+          - {name: clam_317p12, ra: 317.05, dec: 11.55}
+          - {name: clam_020p09, ra: 20.0, dec: 8.9}
+          - {name: clam_030p12, ra: 29.64, dec: 11.58}
+          - {name: clam_120p26, ra: 120.17, dec: 26.47}
+          - {name: clam_154p28, ra: 154.18, dec: 28.13}
+          - {name: clam_283p35, ra: 282.54, dec: 35.0}
+          - {name: clam_215p27, ra: 215.06, dec: 27.45}
+          - {name: clam_185p49, ra: 185.38, dec: 48.84}
+          - {name: clam_027p29, ra: 26.57, dec: 29.14}
+          - {name: clam_219p57, ra: 218.86, dec: 57.11}
+          - {name: clam_219p31, ra: 219.27, dec: 31.35}
+          - {name: clam_356p05, ra: 356.42, dec: 4.79}
+          - {name: clam_353p27, ra: 353.26, dec: 26.71}
+          - {name: clam_139p35, ra: 139.18, dec: 34.62}
+    env:
+      NAME: ${{ matrix.f.name }}
+      RA0: ${{ matrix.f.ra }}
+      DEC0: ${{ matrix.f.dec }}
+      R: "12"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas numpy scipy requests astropy astroquery pyvo
+      - name: Independent truth within 40' and the densest truth cone (as set B)
+        run: |
+          python -u .github/scripts/independent_truth_field.py truth $RA0 $DEC0 40 /tmp/truth
+          read RA DEC N < <(python -u .github/scripts/independent_truth_field.py centre /tmp/truth $RA0 $DEC0 40 $R | tail -1)
+          echo "centre $RA $DEC ($N truth positions)"
+          echo "RA=$RA" >> "$GITHUB_ENV"; echo "DEC=$DEC" >> "$GITHUB_ENV"
+      - name: Collect
+        run: python -u v2/pipeline.py --ra $RA --dec $DEC --radius $R --work /tmp/field
+      - name: Blind run and compact record
+        run: |
+          raw=$(ls -d /tmp/field/raw/*/ | head -1)
+          mkdir -p /tmp/blindraw
+          for f in "$raw"*.csv; do
+            case "$(basename "$f")" in
+              lamost_spectroscopy_*|sdss_spectroscopy_*|desi_spectroscopy_*|desi_fastspec_*|simbad_*|ned_*|bzcat_*|pn_spectroscopy_*|hash_pn_*|asas_sn_supernova_*|asiago_supernova_*|agb_suh2021_*|atnf_pulsar_*|galaxy_clusters_*) ;;
+              *) cp "$f" /tmp/blindraw/;;
+            esac
+          done
+          python -u v2/pipeline.py --raw-dir /tmp/blindraw --ra $RA --dec $DEC --radius $R --work /tmp/blind
+          out=/tmp/c/base/$NAME; mkdir -p $out/truth
+          cp /tmp/truth/* $out/truth/
+          echo "{\"ra\": $RA, \"dec\": $DEC, \"radius_arcmin\": $R}" > $out/field.json
+          python -u .github/scripts/independent_truth_field.py compact /tmp/blind $RA $DEC $R $out objects_blind
+          cp /tmp/blind/pipeline_summary.csv $out/ || true
+          cp /tmp/field/raw/*/collection_summary_*.csv $out/collection_summary.csv || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: c-${{ matrix.f.name }}
+          path: /tmp/c/
+          retention-days: 7
+          if-no-files-found: ignore
+  score:
+    needs: [lock, field]
+    if: ${{ !cancelled() && needs.lock.result == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas numpy scipy astropy
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: c-*
+          path: /tmp/c
+          merge-multiple: true
+      - name: Score (aggregate only)
+        env:
+          V: ${{ needs.lock.outputs.version }}
+          NOTE: ${{ github.event.inputs.note }}
+        run: |
+          # Archive health gate (2.51.0): on 2026-11-11 VizieR (404) and NOIRLab
+          # (502) were down for hours and every field run of the day lost
+          # AllWISE / 2MASS or Legacy Surveys.  A set-C score taken during such an
+          # outage would spend the release's single look on degraded data, so
+          # the run stops before writing locked_c/<VERSION> when a core survey
+          # failed in more than 10 % of the regions; it can be re-run later.
+          python - <<'PY'
+          import glob, sys
+          import pandas as pd
+          core = ["gaia_dr3", "desi_legacy", "panstarrs1", "allwise", "twomass"]
+          rows = []
+          for f in glob.glob("/tmp/c/base/*/collection_summary.csv"):
+              d = pd.read_csv(f).set_index("collector")
+              rows.append({c: (d.status.get(c, "missing") in ("error", "timeout", "missing")) for c in core})
+          bad = pd.DataFrame(rows).mean() if rows else pd.Series(1.0, index=core)
+          print("core collector failure fraction:", bad.round(3).to_dict(), "regions", len(rows))
+          if len(rows) < 54 or (bad > 0.10).any():
+              sys.exit("archives unhealthy (or < 90 % of regions finished): not scored; re-run when the archives recover")
+          PY
+          out=v2/benchmark/locked_c/$V; mkdir -p $out
+          (cd v2/benchmark && python -u compare_ab_fields.py /tmp/c --aggregate-only --out /tmp/score) | tee $out/score.log
+          cp /tmp/score/ab_summary.csv $out/summary.csv
+          n=$(ls -d /tmp/c/base/*/ 2>/dev/null | wc -l)
+          python - <<PY
+          import json, os, datetime
+          json.dump({"version": os.environ["V"], "commit": "${{ github.sha }}", "fields_scored": $n, "fields_locked": 60,
+                     "list_sha256": os.environ["LOCK_SHA256"], "date": datetime.date.today().isoformat(), "note": os.environ["NOTE"]},
+                    open("$out/run.json", "w"), indent=1)
+          PY
+      - name: Commit
+        if: github.ref_name != 'main'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add v2/benchmark/locked_c
+          git commit -m "Locked set C score: ${{ needs.lock.outputs.version }}" || exit 0
+          bash .github/scripts/push_with_retry.sh "${{ github.ref_name }}"
