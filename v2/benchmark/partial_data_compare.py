@@ -19,7 +19,12 @@ Train = SDSS + DESI + DESI-fusion train splits (as fit_fusion_weights.py);
 reported on the SDSS and DESI test splits, with balanced accuracy and the
 exact McNemar test against the pipeline (benchmark/field_stats.py).
 
-    python v2/benchmark/partial_data_compare.py --manifests READY READY_DESI READY_DFUS --out DIR
+    python v2/benchmark/partial_data_compare.py --manifests READY READY_DESI READY_DFUS --out DIR \
+        --export v2/Preprocess/coarse_gbm_model.npz
+
+With --export the whole pipeline is also run with the exported model
+(V2_COARSE_MODEL=gbm: priors, overrides and abstention unchanged), column
+pipeline_gbm.
 """
 
 from __future__ import annotations
@@ -27,6 +32,7 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
+import os
 import sys
 import tempfile
 from pathlib import Path
@@ -38,6 +44,10 @@ B = Path(__file__).resolve().parent
 sys.path.insert(0, str(B))
 import field_stats as FS  # noqa: E402
 
+_c = importlib.util.spec_from_file_location("v2_coarse_gbm_fit", B.parent / "Preprocess" / "coarse_gbm.py")
+CG = importlib.util.module_from_spec(_c)
+_c.loader.exec_module(CG)
+gbm_features = CG.features
 spec = importlib.util.spec_from_file_location("erb", B / "evaluate_rule_baseline.py")
 E = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(E)
@@ -59,51 +69,30 @@ SCENARIOS = {
 CLS = ["STAR", "GALAXY", "QSO"]
 
 
-def stage(truth, cats, drop, with_fusion):
+def stage(truth, cats, drop, keep_dir):
+    """Stage 2-4 on the remaining surveys; returns the Stage-3 features and the
+    Stage-4 evidence path (kept in keep_dir for the Stage-5 runs)."""
     cats = {k: v for k, v in cats.items() if k not in drop}
     raw = E.wide(truth, cats)
-    s3, s4, s5 = (E.load_script(n) for n in ("03_extract_features.py", "04_build_evidence.py", "05_likelihood_vectors.py"))
+    s3, s4 = (E.load_script(n) for n in ("03_extract_features.py", "04_build_evidence.py"))
     rules = E.PRE / "classification_rules.csv"
+    keep_dir.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory() as td:
         td = Path(td)
         raw.to_csv(td / "o.csv", index=False)
         s3.run(td / "o.csv", rules, td / "f.csv")
         f = pd.read_csv(td / "f.csv", low_memory=False)
-        pred = None
-        if with_fusion:
-            s4.run(td / "f.csv", rules, td / "e.csv")
-            s5.run(td / "e.csv", td / "l.csv")
-            pred = pd.read_csv(td / "l.csv", usecols=["benchmark_id", "primary_class"])
-    return f, pred
+        s4.run(td / "f.csv", rules, keep_dir / "e.csv")
+    return f, keep_dir / "e.csv"
 
 
-def num(f, *names):
-    for n in names:
-        if n in f:
-            return pd.to_numeric(f[n], errors="coerce")
-    return pd.Series(np.nan, index=f.index)
-
-
-def gbm_features(f):
-    """Measured quantities only: no catalogue labels, no X-ray / radio, no positions."""
-    x = pd.DataFrame(index=f.index)
-    x["plx_snr"] = num(f, "gaia_dr3__parallax", "parallax") / num(f, "gaia_dr3__parallax_error", "parallax_error")
-    x["pm_snr"] = np.hypot(num(f, "gaia_dr3__pmra", "pmra") / num(f, "gaia_dr3__pmra_error", "pmra_error"),
-                           num(f, "gaia_dr3__pmdec", "pmdec") / num(f, "gaia_dr3__pmdec_error", "pmdec_error"))
-    for k in ("quasar", "galaxy", "star", "whitedwarf", "binarystar"):
-        x[f"dsc_{k}"] = num(f, f"gaia_dr3__classprob_dsc_combmod_{k}", f"classprob_dsc_combmod_{k}")
-    x["gaia_g"] = num(f, "gaia_dr3__phot_g_mean_mag", "phot_g_mean_mag")
-    for c in ("ps1_g_r_color", "ps1_r_i_color", "ps1_i_z_color", "ps1_z_y_color", "ps1_i_psf_minus_kron",
-              "ls_g_r_color", "ls_r_z_color", "ls_z_w1_color", "ls_w1_w2_color", "ls_zw1_excess",
-              "ls_dchisq_rex_rel_log", "ls_size_sig_log", "ls_r_mag", "wise_w1_w2_color", "wise_w2_w3_color"):
-        x[c] = num(f, c)
-    x["ps1_i"] = num(f, "pan_starrs1_dr2_meanobject__iMeanPSFMag", "iMeanPSFMag")
-    for b in "gri":
-        x[f"ps1_{b}_std"] = num(f, f"pan_starrs1_dr2_meanobject__{b}MeanPSFMagStd", f"{b}MeanPSFMagStd")
-    x["w2"] = num(f, "allwise__W2mag", "W2mag")
-    t = f.get("desi_legacy_surveys_dr10__type", f.get("type", pd.Series("", index=f.index))).astype(str).str.strip().str.upper()
-    x["ls_psf"] = np.where(t.isin(["", "NAN"]), np.nan, (t == "PSF").astype(float))
-    return x.replace([np.inf, -np.inf], np.nan)
+def stage5(evidence, coarse_model):
+    """Stage 5 with V2_COARSE_MODEL=coarse_model (read at module load)."""
+    os.environ["V2_COARSE_MODEL"] = coarse_model
+    s5 = E.load_script("05_likelihood_vectors.py")
+    with tempfile.TemporaryDirectory() as td:
+        s5.run(evidence, Path(td) / "l.csv")
+        return pd.read_csv(Path(td) / "l.csv", usecols=["benchmark_id", "primary_class"])
 
 
 def main():
@@ -112,6 +101,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--manifests", type=Path, nargs=3, required=True, help="benchmark_manifest.csv of sdss, desi, dfus")
     ap.add_argument("--out", type=Path, required=True)
+    ap.add_argument("--export", type=Path, help="write the augmented model here (Preprocess/coarse_gbm_model.npz)")
     a = ap.parse_args()
     a.out.mkdir(parents=True, exist_ok=True)
     data = {}
@@ -119,16 +109,18 @@ def main():
         t = pd.read_csv(tp).merge(pd.read_csv(mp)[["benchmark_id", "split"]], on="benchmark_id")
         E.pre = E.load_script("02_integrate_objects.py")
         data[name] = (t, E.read_catalogs(root))
-    feats, preds = {}, {}
+    feats, evid = {}, {}
     for sc, drop in SCENARIOS.items():
         for name, (t, cats) in data.items():
             print("stage", sc, name, flush=True)
-            f, p = stage(t, cats, drop, with_fusion=name != "dfus")
+            f, e = stage(t, cats, drop, a.out / "evidence" / f"{sc}_{name}")
             x = gbm_features(f)
             x["benchmark_id"] = f.benchmark_id.to_numpy()
             feats[sc, name] = x.merge(t[["benchmark_id", "truth_class", "split"]], on="benchmark_id")
-            if p is not None:
-                preds[sc, name] = p
+            if name == "dfus":  # train only; no Stage-5 run
+                e.unlink()
+            else:
+                evid[sc, name] = e
     cols = [c for c in feats["full", "sdss"].columns if c not in ("benchmark_id", "truth_class", "split")]
 
     def train(aug):
@@ -146,6 +138,20 @@ def main():
         return m
 
     models = {"gbm_full": train(False), "gbm_aug": train(True)}
+    if a.export:
+        spec2 = importlib.util.spec_from_file_location("ffw", B / "fit_fusion_weights.py")
+        F = importlib.util.module_from_spec(spec2)
+        spec2.loader.exec_module(F)
+        F.export_trees(models["gbm_aug"], a.export, cols)
+        print("exported", a.export, flush=True)
+        os.environ["V2_COARSE_GBM"] = str(a.export.resolve())
+    preds = {}
+    for sc in SCENARIOS:
+        for name in ("sdss", "desi"):
+            preds[sc, name] = stage5(evid[sc, name], "fusion")
+            if a.export:
+                preds[sc, name] = preds[sc, name].merge(
+                    stage5(evid[sc, name], "gbm").rename(columns={"primary_class": "pipeline_gbm_class"}), on="benchmark_id")
     rows = []
     for sc in SCENARIOS:
         for name in ("sdss", "desi"):
@@ -164,6 +170,13 @@ def main():
                 p, n01, n10 = FS.mcnemar(ok, ok_p)
                 r[k + "_vs_pipeline_p"] = round(p, 4)
                 r[k + "_only_right"], r[k + "_pipeline_only_right"] = n01, n10
+            if "pipeline_gbm_class" in te:
+                ok_g = (te.pipeline_gbm_class == te.truth_class).to_numpy()
+                r["pipeline_gbm"] = round(100 * ok_g.mean(), 2)
+                r["pipeline_gbm_bal"] = round(100 * FS._bal(te.pipeline_gbm_class, te.truth_class), 2)
+                r["pipeline_gbm_unknown"] = int((te.pipeline_gbm_class == "UNKNOWN").sum())
+                p, n01, n10 = FS.mcnemar(ok_g, ok_p)
+                r["pipeline_gbm_vs_pipeline_p"], r["pipeline_gbm_fixed"], r["pipeline_gbm_broken"] = round(p, 4), n01, n10
             rows.append(r)
             print(r, flush=True)
     res = pd.DataFrame(rows)

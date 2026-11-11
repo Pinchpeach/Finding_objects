@@ -54,6 +54,15 @@ _fp_s.loader.exec_module(FAINT)
 _ah_s = _tio_u.spec_from_file_location("v2_agn_host", Path(__file__).resolve().parent / "agn_host.py")
 AGN_HOST = _tio_u.module_from_spec(_ah_s)
 _ah_s.loader.exec_module(AGN_HOST)
+_cg_s = _tio_u.spec_from_file_location("v2_coarse_gbm", Path(__file__).resolve().parent / "coarse_gbm.py")
+COARSE_GBM = _tio_u.module_from_spec(_cg_s)
+_cg_s.loader.exec_module(COARSE_GBM)
+# Coarse model (2.51.0, coarse_gbm.py): "fusion" = rule fusion (linear + trees
+# over evidence scores); "gbm" = one gradient-boosted model on the measured
+# quantities for every object without a catalogue label, the rule fusion where
+# a spectroscopic / literature label exists (lookup vs inference, review 7.2).
+COARSE_MODEL = os.environ.get("V2_COARSE_MODEL", "fusion").strip().lower()
+CATALOG_LABEL_RULES = ("SPC-", "SIMBAD-TYPE", "NED-TYPE", "SGA-")
 CLASSES = ("STAR", "GALAXY", "QSO")
 WEIGHT = {"direct_probability": 1.0, "catalog_label": 1.5, "continuous_score": 0.35, "binary_evidence": 0.35}
 MIN_CONFIDENCE = 0.50
@@ -535,6 +544,13 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     for i in np.flatnonzero(magellanic_region(df)):
         item_lists[i] = [e for e in item_lists[i] if e.get("rule_id") != "DSC-001"]
     fused = fuse_many(item_lists, model, Path(model_path).parent)
+    if COARSE_MODEL == "gbm":
+        g = COARSE_GBM.predict_proba(df, os.environ.get("V2_COARSE_GBM") or str(COARSE_GBM.MODEL_PATH))
+        if g is not None:
+            G, has = g
+            for i, items in enumerate(item_lists):
+                if has[i] and not any(str(e.get("rule_id", "")).startswith(CATALOG_LABEL_RULES) for e in items):
+                    fused[i] = (dict(zip(CLASSES, G[i])), fused[i][1])
     rows = []
     for items, hr, (p, used) in zip(item_lists, host_r, fused):
         strong = set()
