@@ -1,4 +1,0 @@
-variant,n,acc,unknown,fixed,broken,truth_with_fragments,recall_STAR,recall_GALAXY,recall_QSO,n_fields,bal_acc,acc_lo,acc_hi,bal_lo,bal_hi,precision_STAR,precision_GALAXY,precision_QSO,baseline_majority,baseline_dsc,ours_on_dsc,dsc_coverage,unmatched_truth_pct,mcnemar_p,only_variant_right,only_base_right
-base,7449,50.383,2913,0,0,657,69.44,45.85,,9,57.65,48.25,52.65,55.74,60.0,61.75,94.26,,GALAXY 80.80,93.73,98.89,7.3,74.0,,,
-cgbm,7449,51.846,2932,528,419,657,65.45,48.61,,9,57.03,49.92,53.97,55.22,59.24,69.59,93.27,0.0,GALAXY 80.80,93.73,99.08,7.3,74.0,0.0004430110775294547,528.0,419.0
-fw-fusion_weights_nopresence,7449,49.658,2953,168,222,657,71.12,44.56,,9,57.84,47.39,52.15,55.76,60.18,60.5,95.31,0.0,GALAXY 80.80,93.73,98.71,7.3,74.0,0.007202377825743227,168.0,222.0
