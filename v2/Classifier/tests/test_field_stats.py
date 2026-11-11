@@ -37,3 +37,20 @@ def test_mcnemar_paired():
     b[:20] = False  # base wrong on 20 objects the variant gets right
     p, only_a, only_b = FS.mcnemar(a, b)
     assert (only_a, only_b) == (20, 0) and p < 1e-4
+
+
+def test_sky_cells_are_equal_area_and_split_whole():
+    import build_sdss_sky_truth as B
+    import validate_catalog_truth as V
+
+    rng = np.random.default_rng(1)
+    ra = rng.uniform(0, 360, 50000)
+    dec = np.degrees(np.arcsin(rng.uniform(-1, 1, 50000)))
+    c = B.sky_cell(ra, dec)
+    counts = np.bincount(c, minlength=768)
+    assert c.min() == 0 and c.max() == 767
+    assert counts.std() / counts.mean() < 0.25  # uniform sky -> similar counts per cell
+    split = pd.Series(c).astype(str).map(lambda v: V.split_for(f"cell:{v}"))
+    assert pd.DataFrame({"c": c, "s": split}).groupby("c").s.nunique().max() == 1
+    d = pd.DataFrame({"ra": ra[:2000], "dec": dec[:2000], "sky_cell": c[:2000]})
+    assert B.spread(d, 700, 0).sky_cell.value_counts().max() == 1  # one per cell before any repeats
