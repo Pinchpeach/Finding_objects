@@ -11,8 +11,10 @@ CLASS_COLORS = {"STAR": "#d9822b", "GALAXY": "#2b6cb0", "QSO": "#7b3fb5", "UNKNO
 TABLE_COLUMNS = [
     "designation",
     "primary_class",
+    "primary_provenance",
     "secondary_class",
     "subclass",
+    "subclass_provenance",
     "subclass_tags",
     "primary_confidence",
     "classification_status",
@@ -35,7 +37,11 @@ HEADERS = {
     "separation_arcmin": "Dist (′)",
     "primary_class": "Class",
     "secondary_class": "Also",
-    "primary_confidence": "Confidence",
+    # 2.51.0: CATALOG (copied from a catalogue), EXTERNAL_CLASSIFIER (another
+    # survey's classifier) or INFERRED (our inference from measurements)
+    "primary_provenance": "Class from",
+    "subclass_provenance": "Sub-class from",
+    "primary_confidence": "Score (uncalibrated)",
     "classification_status": "Status",
     "p_star": "P(star)",
     "p_galaxy": "P(galaxy)",

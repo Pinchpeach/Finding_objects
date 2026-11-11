@@ -58,6 +58,17 @@ def annotate(df: pd.DataFrame, rows=None) -> pd.DataFrame:
             "reliability_method",
         )
     ]
+    # Provenance of every axis decision and of the coarse class (2.51.0, provenance.py)
+    prov = load_module(ROOT / "provenance.py", "classifier_provenance")
+    for name in AXES:
+        additions[f"{name}_provenance"] = [
+            "NONE" if str(lab).upper() == "UNKNOWN" else prov.of_rule(st)
+            for lab, st in zip(additions[f"{name}_class"], additions[f"{name}_status"])
+        ]
+    if "primary_class" in df.columns:
+        ev = df["evidence_json"] if "evidence_json" in df.columns else pd.Series(None, index=df.index)
+        additions["primary_provenance"] = [prov.of_primary(l, e) for l, e in zip(df["primary_class"], ev)]
+    stale += [c for c in ("primary_provenance",) + tuple(f"{a}_provenance" for a in AXES) if c in df.columns]
     result = pd.concat([df.drop(columns=stale).reset_index(drop=True), pd.DataFrame(additions)], axis=1)
     cal = load_module(ROOT / "calibration" / "per_axis.py", "classifier_per_axis_calibration")
     return cal.annotate(result, ROOT / "calibration" / "models.json", AXES)

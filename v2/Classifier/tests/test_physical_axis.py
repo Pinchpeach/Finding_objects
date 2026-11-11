@@ -137,3 +137,41 @@ def test_galaxy_zoo_desi_morphology():
     assert m.galaxy_profile({g + "SFSM": 0.45, g + "SFFDF": 0.45, "desi_legacy_surveys_dr10__type": "DEV"})[1] == "LS_DEV"
     assert m.galaxy_merger({g + "MMaD": 0.3, g + "MM": 0.3}) is not None
     assert m.galaxy_merger({g + "MMaD": 0.1, g + "MM": 0.1}) is None
+
+
+def test_provenance_separates_lookup_from_inference():
+    import importlib.util
+    import json
+    from pathlib import Path
+
+    p = Path(__file__).resolve().parents[1] / "provenance.py"
+    s = importlib.util.spec_from_file_location("prov_t", p)
+    m = importlib.util.module_from_spec(s)
+    s.loader.exec_module(m)
+    assert m.of_rule("SIMBAD_CURATED_WD") == "CATALOG"
+    assert m.of_rule("LAMOST_SUBCLASS") == "CATALOG"
+    assert m.of_rule("GAIA_DR3_SOS_RRLYRAE") == "EXTERNAL_CLASSIFIER"
+    assert m.of_rule("GZ_DESI_SPIRAL") == "EXTERNAL_CLASSIFIER"
+    assert m.of_rule("GAIA_CMD_HOT_SUBLUMINOUS") == "INFERRED"
+    assert m.of_rule("RADIO_STEEP_COMPACT") == "INFERRED"
+    assert m.of_rule("NO_VARIABILITY_EVIDENCE") == "NONE"
+    spec = json.dumps([{"rule_id": "SPC-SDSS-003", "class": "QSO", "score": 0.9}])
+    assert m.of_primary("QSO", spec) == "CATALOG"
+    assert m.of_primary("STAR", json.dumps([{"rule_id": "DSC-001", "class": "STAR", "score": 0.99}])) == "INFERRED"
+
+
+def test_lamost_double_star_is_not_a_white_dwarf():
+    import importlib.util
+    from pathlib import Path
+
+    p = Path(__file__).resolve().parents[1] / "subclass.py"
+    s = importlib.util.spec_from_file_location("sc_ds", p)
+    m = importlib.util.module_from_spec(s)
+    s.loader.exec_module(m)
+    r = m.classify_star({"lamost_dr_catalog__SubClass": "DoubleStar"})
+    assert not (r and r.get("code") == "STAR:WD")
+    assert m.classify_star({"lamost_dr_catalog__SubClass": "DA"})["code"] == "STAR:WD"
+    # dust in front of a star: continuous through the plane, unchanged at high latitude
+    f = m.dust_fraction_in_front
+    assert abs(f(1000, 30, 0.0) - f(1000, 30, 0.001)) < 1e-3 and 0 < f(1000, 30, 0.0) < 0.2
+    assert abs(f(100, 30, 60) - 0.476) < 1e-3

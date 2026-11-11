@@ -1944,6 +1944,8 @@ def annotate(df: pd.DataFrame, rows=None) -> pd.DataFrame:
     out["subclass_code"] = [r.get("code") for r in res]
     out["subclass_confidence"] = [r.get("confidence") for r in res]
     out["subclass_rule"] = [r.get("rule") for r in res]
+    prov = _load("provenance")
+    out["subclass_provenance"] = [prov.of_rule(r.get("rule")) if r.get("code") else "NONE" for r in res]
     out["subclass_status"] = [r.get("status") for r in res]
     out["subclass_basis"] = [r.get("basis") for r in res]
     for col in ("paper_class", "paper_source", "paper_refs", "paper_ads"):
