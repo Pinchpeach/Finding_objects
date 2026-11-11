@@ -1,0 +1,119 @@
+name: Build sky-spread SDSS benchmark
+
+# 2.52.0 (SCIENTIFIC_REVIEW_2026-11-11 items 6.7-6.8): a second SDSS
+# spectroscopic benchmark drawn over the whole footprint (768 equal-area
+# cells, low latitude included, nothing the models were trained or tuned on)
+# with a spatial train / calibration / test split.  Truth and features go to
+# v2/benchmark/sdss_sky/; the 2.x benchmark (truth_data/, catalog_features/)
+# is left untouched.  Manual: it re-queries six archives for 9,999 objects.
+on:
+  workflow_dispatch:
+    inputs:
+      per_class: {description: "objects per class", default: "3333"}
+concurrency:
+  group: build-sdss-sky-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas numpy scipy requests astropy astroquery pyvo
+      - run: python -u .github/scripts/archive_health.py
+  truth:
+    needs: health
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas numpy scipy requests astropy
+      - run: python -u v2/benchmark/build_sdss_sky_truth.py --per-class ${{ github.event.inputs.per_class || '3333' }} --out /tmp/sky/truth.csv
+      - uses: actions/upload-artifact@v4
+        with: {name: sky-truth, path: /tmp/sky/truth.csv, retention-days: 7}
+  collect:
+    needs: truth
+    strategy:
+      fail-fast: false
+      matrix:
+        catalog: [gaia_dr3, panstarrs1, allwise, twomass, galex, desi_legacy]
+        shard: ["0/2", "1/2"]
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas numpy requests astropy astroquery pyvo
+      - uses: actions/download-artifact@v4
+        with: {name: sky-truth, path: /tmp/sky}
+      - id: s
+        run: echo "tag=$(echo '${{ matrix.shard }}' | tr / _)" >> "$GITHUB_OUTPUT"
+      - run: |
+          if [ "${{ matrix.catalog }}" = gaia_dr3 ] && [ "${{ matrix.shard }}" != "0/2" ]; then echo "gaia is one bulk XMatch"; exit 0; fi
+          shard="${{ matrix.shard }}"; [ "${{ matrix.catalog }}" = gaia_dr3 ] && shard="0/1"
+          python -u v2/benchmark/collect_catalog_truth.py --truth /tmp/sky/truth.csv --out-dir /tmp/out --catalog ${{ matrix.catalog }} --workers 8 --shard $shard
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sky-features-${{ matrix.catalog }}-${{ steps.s.outputs.tag }}
+          path: /tmp/out/${{ matrix.catalog }}_trd.csv
+          if-no-files-found: ignore
+          retention-days: 7
+  evaluate:
+    needs: collect
+    if: always() && needs.collect.result != 'cancelled'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas numpy scipy
+      - uses: actions/download-artifact@v4
+        with: {path: /tmp/art}
+      - name: Assemble
+        run: |
+          set -euo pipefail
+          d=v2/benchmark/sdss_sky; mkdir -p $d/catalog_features
+          cp /tmp/art/sky-truth/truth.csv $d/truth.csv
+          python - <<'PY'
+          import glob, gzip, pandas as pd
+          from pathlib import Path
+          d = Path("v2/benchmark/sdss_sky/catalog_features")
+          for cat in ("gaia_dr3", "panstarrs1", "allwise", "twomass", "galex", "desi_legacy"):
+              parts = [pd.read_csv(f, low_memory=False) for f in glob.glob(f"/tmp/art/sky-features-{cat}-*/{cat}_trd.csv")]
+              parts = [p for p in parts if len(p)]
+              if not parts:
+                  print(cat, "no rows"); continue
+              x = pd.concat(parts, ignore_index=True).drop_duplicates("benchmark_id")
+              with gzip.open(d / f"{cat}_trd.csv.gz", "wt") as fh:
+                  x.to_csv(fh, index=False)
+              print(cat, len(x))
+          PY
+      - name: Evaluate (whole set is new to the models; test = held-out sky cells)
+        run: |
+          set -euo pipefail
+          d=v2/benchmark/sdss_sky
+          python v2/benchmark/validate_catalog_truth.py --truth $d/truth.csv --catalog-root $d/catalog_features --out /tmp/ready --split-column sky_cell
+          cp /tmp/ready/benchmark_manifest.csv $d/manifest.csv
+          cp /tmp/ready/catalog_validation.csv $d/catalog_validation.csv
+          for v in fusion gbm; do
+            V2_COARSE_MODEL=$v python v2/benchmark/evaluate_rule_baseline.py --truth $d/truth.csv --catalog-root $d/catalog_features --manifest /tmp/ready/benchmark_manifest.csv --out /tmp/eval_$v --split all
+            cp /tmp/eval_$v/rule_baseline_metrics.json $d/coarse_metrics_$v.json
+          done
+          python v2/benchmark/sky_benchmark_report.py --dir $d --pred-fusion /tmp/eval_fusion/rule_baseline_test_predictions.csv --pred-gbm /tmp/eval_gbm/rule_baseline_test_predictions.csv | tee $d/report.txt
+      - name: Commit
+        if: github.ref_name != 'main'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add v2/benchmark/sdss_sky
+          git commit -m "Sky-spread SDSS benchmark: truth, features, evaluation" || exit 0
+          bash .github/scripts/push_with_retry.sh "${{ github.ref_name }}"
