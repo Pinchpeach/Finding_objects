@@ -132,6 +132,7 @@ jobs:
           echo "{\"ra\": $RA, \"dec\": $DEC, \"radius_arcmin\": $R}" > $out/field.json
           python -u .github/scripts/independent_truth_field.py compact /tmp/blind $RA $DEC $R $out objects_blind
           cp /tmp/blind/pipeline_summary.csv $out/ || true
+          cp /tmp/field/raw/*/collection_summary_*.csv $out/collection_summary.csv || true
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -160,6 +161,25 @@ jobs:
           V: ${{ needs.lock.outputs.version }}
           NOTE: ${{ github.event.inputs.note }}
         run: |
+          # Archive health gate (2.51.0): on 2026-11-11 VizieR (404) and NOIRLab
+          # (502) were down for hours and every field run of the day lost
+          # AllWISE / 2MASS or Legacy Surveys.  A set-C score taken during such an
+          # outage would spend the release's single look on degraded data, so
+          # the run stops before writing locked_c/<VERSION> when a core survey
+          # failed in more than 10 % of the regions; it can be re-run later.
+          python - <<'PY'
+          import glob, sys
+          import pandas as pd
+          core = ["gaia_dr3", "desi_legacy", "panstarrs1", "allwise", "twomass"]
+          rows = []
+          for f in glob.glob("/tmp/c/base/*/collection_summary.csv"):
+              d = pd.read_csv(f).set_index("collector")
+              rows.append({c: (d.status.get(c, "missing") in ("error", "timeout", "missing")) for c in core})
+          bad = pd.DataFrame(rows).mean() if rows else pd.Series(1.0, index=core)
+          print("core collector failure fraction:", bad.round(3).to_dict(), "regions", len(rows))
+          if len(rows) < 54 or (bad > 0.10).any():
+              sys.exit("archives unhealthy (or < 90 % of regions finished): not scored; re-run when the archives recover")
+          PY
           out=v2/benchmark/locked_c/$V; mkdir -p $out
           (cd v2/benchmark && python -u compare_ab_fields.py /tmp/c --aggregate-only --out /tmp/score) | tee $out/score.log
           cp /tmp/score/ab_summary.csv $out/summary.csv

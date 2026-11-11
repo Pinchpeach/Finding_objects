@@ -43,7 +43,12 @@
 3. **No tuning.**
    - Do not change a rule, threshold or weight because of a set-C number.
    - A drop on C is reported in the CHANGELOG with the release. Investigate it on sets A / B / COSMOS, never on C.
-4. **Retirement.**
+4. **Healthy archives only.**
+   - The score job checks each region's collection summary.
+   - If gaia_dr3, desi_legacy, panstarrs1, allwise or twomass failed (error / timeout) in more than 10 % of the regions, or fewer than 54 regions finished, it stops before writing `locked_c/<VERSION>/`. The release's single look is not spent.
+   - Re-run when the archives recover.
+   - Reason: on 2026-11-11 VizieR answered 404 and NOIRLab 502 for hours, and every field run of that day lost AllWISE / 2MASS or Legacy Surveys.
+5. **Retirement.**
    - If C is ever examined object by object, it becomes a development set.
    - A new set D is then selected the same way, excluding A, B, C and COSMOS.
    - Record the retirement here.
@@ -51,3 +56,4 @@
 ## Scores
 | VERSION | regions scored | objects | accuracy (95 % CI) | balanced accuracy (95 % CI) | note |
 |---|---|---|---|---|---|
+| 2.51.0 | – | – | – | – | not yet scored: archives unhealthy on the release day (rule 4) |
