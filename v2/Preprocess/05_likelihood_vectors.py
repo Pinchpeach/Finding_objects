@@ -22,7 +22,7 @@ evaluated with numpy only (``ls_gbm.raw_scores``), as for LS-GBM-001.
 """
 
 from __future__ import annotations
-import argparse, json, math
+import argparse, json, math, os
 from pathlib import Path
 import numpy as np
 import pandas as pd
@@ -87,7 +87,8 @@ MEMBER_BASIS = "young-star membership (MYStIX)"
 # is classified STAR even when other (photometric) evidence conflicts.
 DECISIVE_MOTION_SIGMA = 10.0
 DECISIVE_MIN_RELIABILITY = 0.8  # Gaia astrometry quality (RUWE <= ~1.75) and association
-MODEL_PATH = Path(__file__).resolve().parent / "fusion_weights.json"
+# V2_FUSION_WEIGHTS: alternative fitted model for experiments (2.51.0 A/B)
+MODEL_PATH = Path(os.environ.get("V2_FUSION_WEIGHTS") or Path(__file__).resolve().parent / "fusion_weights.json")
 # Stage-4 rules measuring a significant Gaia parallax / proper motion.
 GAIA_MOTION_RULES = frozenset({"AST-GAL-001", "AST-GAL-002"})
 
