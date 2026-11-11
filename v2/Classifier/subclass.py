@@ -754,15 +754,19 @@ def star_tags(row):
 #     "little dust" meant "carbon" in the Suh set.
 # Cascade (first model whose inputs exist; saturated WISE bands masked):
 #   1. W_RP - W_KJ (Lebzelter et al. 2018), Ks - W3, Gaia LPV C-star flag
-#      (Lebzelter et al. 2023): 96.0 % on 3656 stars;
-#   2. W_RP - W_KJ, J - Ks, C-star flag: 96.9 % on 1987;
+#      (Lebzelter et al. 2023): 97.1 % on 3760 test stars;
+#   2. W_RP - W_KJ, J - Ks, C-star flag: 98.5 % on 2027;
 #   3. W_RP - W_KJ, J - Ks: 79.0 % on 614;
 #   4. J - Ks, Ks - W3, W1 - W2, W3 - W4: 88.5 % on 26.
 #   A Ks - W3 model without the flag was dropped (73.8 %: dusty O-rich and
 #   dust-free stars overlap).  Within 0.15 of p = 0.5: "chemistry uncertain".
-#   All together: 94.6 % at 83 % coverage (Suh 91.2 %, GCVS 98.3 %; C
-#   precision 0.87, O 0.97).  On 23 969 field LPVs in random cones the
-#   predicted C fraction is 25.7 % (Gaia C-star flag: 24.4 %).
+#   All together (agb_chemistry_model.json "test", 50/50 split of the same
+#   lists, no external set): 95.8 % at 84.9 % coverage (Suh 93.1 %, GCVS
+#   98.7 %; C precision 0.919, O 0.968).  On 23 969 field LPVs in random
+#   cones it predicts C for only 3.3 %, while the Gaia C-star flag marks
+#   24.4 %: on the field population the model and the flag disagree strongly,
+#   which the in-list test cannot show (numbers corrected 2.51.0; the old
+#   comment said 94.6 % and 25.7 %, values of an earlier model).
 # The published single cuts did worse on these mostly dust-obscured Galactic
 # AGB stars: W_RP - W_KJ >= 0.9 (Mowlavi+2019) 68.5 %, the AllWISE line of
 # Lian et al. (2014) 75.4 %; WISE colours alone (46.6 % on stars without
