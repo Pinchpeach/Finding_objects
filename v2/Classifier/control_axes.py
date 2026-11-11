@@ -53,9 +53,9 @@ def annotate(df: pd.DataFrame, rows=None) -> pd.DataFrame:
             "confidence",
             "status",
             "evidence_json",
-            "calibrated_probability",
-            "calibration_status",
-            "calibration_method",
+            "reliability",
+            "reliability_status",
+            "reliability_method",
         )
     ]
     result = pd.concat([df.drop(columns=stale).reset_index(drop=True), pd.DataFrame(additions)], axis=1)

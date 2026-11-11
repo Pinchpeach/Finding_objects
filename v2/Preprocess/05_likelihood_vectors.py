@@ -734,7 +734,12 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
         result_columns[f"field_prior_{c.lower()}"] = [float(prior[i])] * len(df)
     result_columns.update(
         {
-            "coarse_probability_calibrated": [bool(model)] * len(df),
+            # Not calibrated (2.51.0, scientific review): the fusion is fitted
+            # on class-balanced benchmarks and several priors (local density,
+            # magnitude, faint star:galaxy, vetoes) are multiplied in after it;
+            # the product was never checked against outcome frequencies (COSMOS:
+            # p >= 0.9 is wrong 2.75 % of the time).  Use the values for ranking.
+            "coarse_probability_calibrated": [False] * len(df),
             "coarse_prior_adjusted": [adjust] * len(df),
             "coarse_score_semantics": [
                 (model or {}).get("semantics", "normalized evidence likelihood; not a calibrated posterior probability")

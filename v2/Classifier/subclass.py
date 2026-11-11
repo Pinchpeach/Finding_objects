@@ -252,7 +252,18 @@ def _ebv(row):
 # at distance d and latitude b = 1 - exp(-d |sin b| / h).  Applied only with a
 # parallax (2.23.0: a 20 pc star was dereddened by the full column, 0.4 mag in
 # BP-RP); without one the full column is kept, as before.
+# 2.51.0 (scientific review 2026-11-11): the infinite slab makes the total
+# column diverge as b -> 0, so a 1 kpc star near the plane kept ~0.3 % of the
+# column, and b = 0 exactly jumped to 1.0.  The dust layer now ends where the
+# sight line leaves the dust disc (Galactocentric radius DUST_DISC_EDGE_PC,
+# Sun at R0): fraction = (1 - e^{-d/L_b}) / (1 - e^{-L/L_b}), L_b = h / |sin b|,
+# which is continuous and tends to d / L in the plane.  The edge radius is our
+# approximation of the dust disc's extent, not a fitted value; a 3-D dust map
+# (e.g. Edenhofer et al. 2024) is the proper replacement (follow-up).  Gaia
+# GSP-Phot extinctions are used instead of this model whenever they exist.
 DUST_SCALE_HEIGHT_PC = 134.0
+R0_PC = 8178.0  # GRAVITY Collaboration 2019, A&A 625, L10
+DUST_DISC_EDGE_PC = 15000.0
 
 
 def _galactic_lb(row):
@@ -274,9 +285,26 @@ def _dust_fraction(row):
     p, lb = _parallax(row), _galactic_lb(row)
     if p is None or lb is None:
         return 1.0
-    b = lb[1]
+    lon, b = lb
     d_pc = 1000.0 / p[0]
-    return 1.0 - math.exp(-d_pc * abs(math.sin(math.radians(b))) / DUST_SCALE_HEIGHT_PC) if abs(b) > 0 else 1.0
+    return dust_fraction_in_front(d_pc, lon, b)
+
+
+def dust_fraction_in_front(d_pc, lon_deg, b_deg):
+    """Fraction of the sight-line dust column in front of distance ``d_pc``:
+    exponential layer (scale height DUST_SCALE_HEIGHT_PC) truncated at the dust
+    disc edge."""
+    cl, cb = math.cos(math.radians(lon_deg)), math.cos(math.radians(b_deg))
+    # in-plane distance from the Sun to the disc edge along longitude l
+    s_plane = R0_PC * cl + math.sqrt(max(0.0, R0_PC * R0_PC * cl * cl - (R0_PC * R0_PC - DUST_DISC_EDGE_PC * DUST_DISC_EDGE_PC)))
+    path = s_plane / max(cb, 1e-6)
+    sb = abs(math.sin(math.radians(b_deg)))
+    if d_pc >= path:
+        return 1.0
+    if sb < 1e-9:
+        return d_pc / path
+    lam = DUST_SCALE_HEIGHT_PC / sb
+    return (1.0 - math.exp(-d_pc / lam)) / (1.0 - math.exp(-path / lam))
 
 
 def _sfd_ebv_in_front(row):
@@ -1007,7 +1035,9 @@ def classify_star(row):
         u = label.upper()
         # SDSS WD templates: WD, WDhotter, WDcooler, WDmagnetic, CarbonWD (DQ)
         # and CalciumWD (DZ, missed before 2.27.0); LAMOST DA/DB/... types.
-        if "WD" in u or u.startswith(("DA", "DB", "DC", "DQ", "DZ", "DO")):
+        # MK white-dwarf types on the original case (2.51.0): "DoubleStar"
+        # (LAMOST) started with "DO" once upper-cased and became a white dwarf.
+        if "WD" in u or re.match(r"^D[ABCOQZ][ABCOQZHPEV0-9.:+]*$", label.strip()):
             return _result(
                 f"White dwarf ({label})", "STAR:WD", None, f"{src}_SUBCLASS", f"{src} spectrum subclass {label}"
             )
