@@ -65,8 +65,8 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
   evaluate:
-    needs: collect
-    if: always() && needs.collect.result != 'cancelled'
+    needs: [truth, collect]
+    if: always() && needs.truth.result == 'success' && needs.collect.result != 'cancelled'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
