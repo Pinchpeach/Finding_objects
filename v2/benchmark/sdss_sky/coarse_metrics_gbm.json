@@ -1,0 +1,38 @@
+{
+  "test_rows": 9999,
+  "classified_rows": 9920,
+  "abstention_rate": 0.007900790079007902,
+  "accuracy_all_unknown_wrong": 0.9360936093609361,
+  "accuracy_when_classified": 0.9435483870967742,
+  "macro_f1_when_classified": 0.9426835977998643,
+  "confusion": {
+    "STAR": {
+      "STAR": 3259,
+      "GALAXY": 22,
+      "QSO": 3,
+      "UNKNOWN": 49
+    },
+    "GALAXY": {
+      "STAR": 26,
+      "GALAXY": 3282,
+      "QSO": 16,
+      "UNKNOWN": 9
+    },
+    "QSO": {
+      "STAR": 321,
+      "GALAXY": 172,
+      "QSO": 2819,
+      "UNKNOWN": 21
+    }
+  },
+  "per_class_recall_all": {
+    "STAR": 0.9777977797779778,
+    "GALAXY": 0.9846984698469847,
+    "QSO": 0.8457845784578458
+  },
+  "per_class_precision": {
+    "STAR": 0.903771491957848,
+    "GALAXY": 0.9441887226697353,
+    "QSO": 0.9933051444679352
+  }
+}

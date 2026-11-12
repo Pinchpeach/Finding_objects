@@ -1,0 +1,4 @@
+catalog,matched,coverage_fraction,use_for_model_validation,exclusion_reason,duplicates,bad_truth_class,bad_coordinates,separation_violations,max_sep_arcsec,STAR,GALAXY,QSO
+allwise,8019,0.801980198019802,True,,0,0,0,0,2.9977269080493807,2276,3102,2641
+desi_legacy,9392,0.9392939293929393,True,,0,0,0,0,1.9751543239235376,2816,3289,3287
+panstarrs1,9908,0.9908990899089909,True,,0,0,0,0,1.9856799632601114,3298,3295,3315
