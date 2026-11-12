@@ -56,4 +56,11 @@
 ## Scores
 | VERSION | regions scored | objects | accuracy (95 % CI) | balanced accuracy (95 % CI) | note |
 |---|---|---|---|---|---|
-| 2.51.0 | – | – | – | – | not yet scored: archives unhealthy on the release day (rule 4) |
+| 2.51.0 | 60 (58 with truth) | 3,150 | 99.62 % (99.34–99.86) | 93.95 % (79.33–99.47) | first look, 2026-11-12, archive health check passed. See the reading notes below the table. |
+
+**Reading the 2.51.0 score**
+- **Composition:** the truth mix is about 95.5 % stars. The majority-class baseline is 95.46 %.
+- **Small classes:** going by the recall and precision values there are only ~136 galaxies and ~7 QSOs. The QSO numbers (recall 85.7 %, precision 75.0 %) and the balanced-accuracy interval carry little weight.
+- **Gaia DSC comparison:** on the 91.5 % of objects that have DSC, DSC scores 99.31 % and the pipeline 99.83 %.
+- **Unmatched truth:** 1.65 %. Truth objects with single-catalogue fragments nearby: 743.
+- **Not reported:** per-pool scores (the low-latitude pool `cpln` included) are not part of the aggregate. From the next release the aggregate should be split by pool, still aggregate only.

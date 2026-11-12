@@ -9,9 +9,11 @@ benchmark drawn over the whole spectroscopic footprint, low latitude
 included, with a spatial train / calibration / test split.
 
 Sampling
-  1. Pseudo-random subset of SpecObj per class: specObjID % m = r.  The id
-     packs plate, fibre and MJD bits, so the residue class is spread over all
-     plates (no ORDER BY, no plate clustering).  ZWARNING = 0, sciencePrimary.
+  1. Pseudo-random subset of SpecObj per class:
+     (plate * 7919 + fiberID * 104729) % m = r, i.e. about 1/m of the fibres
+     of every plate (no ORDER BY, no plate clustering).  ZWARNING = 0,
+     sciencePrimary.  (specObjID % m cannot be used: its low 10 bits are
+     always 0 -- every residue but 0 is empty, seen 2026-11-12.)
   2. Equal-area sky cells: 24 bands uniform in sin(Dec) x 32 in RA = 768
      cells of 53.7 deg^2 (HEALPix nside = 8 has the same count and area;
      a plain grid needs no healpy).
@@ -78,7 +80,7 @@ def candidates(cls, residue):
  s.zWarning, s.plate, s.mjd, s.fiberID, s.survey, p.psfMag_r, p.type AS photo_type
  FROM SpecObj AS s LEFT JOIN PhotoObj AS p ON p.objID = s.bestObjID
  WHERE s.class = '{cls}' AND s.zWarning = 0 AND s.sciencePrimary = 1
-   AND (s.specObjID % {m}) = {residue}"""
+   AND ((s.plate * 7919 + s.fiberID * 104729) % {m}) = {residue}"""
     d = fetch(sql)
     print(f"[{cls}] residue {residue}/{m}: {len(d)} spectra", flush=True)
     return d
