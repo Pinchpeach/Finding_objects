@@ -21,24 +21,24 @@
     "phenomenon": {
       "OTHER_PHENOMENON": {
         "method": "withheld",
-        "n": 208,
-        "negative": 208,
+        "n": 122,
+        "negative": 122,
         "positive": 0,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "PN": {
         "method": "withheld",
-        "n": 208,
+        "n": 122,
         "negative": 2,
-        "positive": 206,
+        "positive": 120,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "SN": {
         "method": "withheld",
-        "n": 208,
-        "negative": 206,
+        "n": 122,
+        "negative": 120,
         "positive": 2,
         "reason": "insufficient independent truth support",
         "truth_independent": true
@@ -47,68 +47,68 @@
     "variability": {
       "CEPHEID": {
         "method": "withheld",
-        "n": 217,
-        "negative": 201,
+        "n": 222,
+        "negative": 206,
         "positive": 16,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "ECLIPSING": {
         "method": "withheld",
-        "n": 217,
-        "negative": 217,
+        "n": 222,
+        "negative": 222,
         "positive": 0,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "LPV": {
-        "coef": 2.951698828135307,
-        "intercept": -0.8442770994617609,
+        "coef": 3.0576844724465033,
+        "intercept": -0.976010966864803,
         "method": "platt",
-        "n": 217,
-        "negative": 68,
-        "positive": 149,
+        "n": 222,
+        "negative": 66,
+        "positive": 156,
         "truth_independent": true
       },
       "MIRA": {
         "method": "withheld",
-        "n": 217,
-        "negative": 200,
-        "positive": 17,
+        "n": 222,
+        "negative": 203,
+        "positive": 19,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "OTHER_VARIABLE": {
         "method": "withheld",
-        "n": 217,
-        "negative": 217,
+        "n": 222,
+        "negative": 222,
         "positive": 0,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "PULSATING": {
         "method": "withheld",
-        "n": 217,
-        "negative": 217,
+        "n": 222,
+        "negative": 222,
         "positive": 0,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "ROTATIONAL": {
         "method": "withheld",
-        "n": 217,
-        "negative": 217,
+        "n": 222,
+        "negative": 222,
         "positive": 0,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "RR_LYRAE": {
-        "coef": 1.7123966657712064,
-        "intercept": -1.6972024917480828,
+        "coef": 1.3907892120076295,
+        "intercept": -1.8567370718077238,
         "method": "platt",
-        "n": 217,
-        "negative": 182,
-        "positive": 35,
+        "n": 222,
+        "negative": 191,
+        "positive": 31,
         "truth_independent": true
       }
     }
@@ -124,15 +124,15 @@
     "compact": {},
     "phenomenon": {
       "HASH_PN_CATALOG_MATCH|PN": {
-        "correct": 195,
+        "correct": 115,
         "method": "rule_precision",
-        "n": 195,
+        "n": 115,
         "precision": 1.0,
         "truth_classes": [
           "PN",
           "SN"
         ],
-        "wilson_lower_95": 0.9807
+        "wilson_lower_95": 0.9677
       }
     },
     "physical": {
@@ -174,22 +174,22 @@
         "wilson_lower_95": 0.9828
       },
       "GAIA_DR3_SOS_LPV_LARGE_AMPLITUDE|MIRA": {
-        "correct": 162,
+        "correct": 161,
         "method": "rule_precision",
-        "n": 180,
-        "precision": 0.9,
+        "n": 175,
+        "precision": 0.92,
         "truth_classes": [
           "CEPHEID",
           "LPV",
           "MIRA",
           "RR_LYRAE"
         ],
-        "wilson_lower_95": 0.8475
+        "wilson_lower_95": 0.8702
       },
       "GAIA_DR3_SOS_RRLYRAE|RR_LYRAE": {
-        "correct": 192,
+        "correct": 196,
         "method": "rule_precision",
-        "n": 192,
+        "n": 196,
         "precision": 1.0,
         "truth_classes": [
           "CEPHEID",
@@ -197,33 +197,33 @@
           "MIRA",
           "RR_LYRAE"
         ],
-        "wilson_lower_95": 0.9804
+        "wilson_lower_95": 0.9808
       },
       "GAIA_DR3_VARIABLE_CANDIDATE|LPV": {
-        "correct": 154,
+        "correct": 167,
         "method": "rule_precision",
-        "n": 156,
-        "precision": 0.9872,
+        "n": 169,
+        "precision": 0.9882,
         "truth_classes": [
           "CEPHEID",
           "LPV",
           "MIRA",
           "RR_LYRAE"
         ],
-        "wilson_lower_95": 0.9545
+        "wilson_lower_95": 0.9579
       },
       "ZTF_PERIODIC_VARIABLE|MIRA": {
-        "correct": 71,
+        "correct": 70,
         "method": "rule_precision",
-        "n": 73,
-        "precision": 0.9726,
+        "n": 71,
+        "precision": 0.9859,
         "truth_classes": [
           "CEPHEID",
           "LPV",
           "MIRA",
           "RR_LYRAE"
         ],
-        "wilson_lower_95": 0.9055
+        "wilson_lower_95": 0.9244
       }
     }
   },
