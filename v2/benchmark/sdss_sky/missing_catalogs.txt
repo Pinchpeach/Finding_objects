@@ -1,2 +1,0 @@
-twomass 0_2
-galex 0_2
