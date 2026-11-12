@@ -114,16 +114,23 @@ jobs:
           import glob, gzip, pandas as pd
           from pathlib import Path
           d = Path("v2/benchmark/sdss_sky/catalog_features")
+          bulk = {"gaia_dr3", "twomass", "galex"}  # one XMatch, uploaded by shard 0/2
           for cat in ("gaia_dr3", "panstarrs1", "allwise", "twomass", "galex", "desi_legacy"):
-              files = glob.glob(f"/tmp/art/sky-features-{cat}-*/{cat}_trd.csv")
-              if not files:  # not collected in this run: the earlier run's shards
-                  files = glob.glob(f"/tmp/art_reuse/sky-features-{cat}-*/{cat}_trd.csv")
+              # per shard: this run's file, else the earlier run's (reuse_run),
+              # else the shard is recorded as missing -- a catalogue is never
+              # silently evaluated with one shard's objects only
+              files, missing = [], []
+              for tag in (["0_2"] if cat in bulk else ["0_2", "1_2"]):
+                  f = (glob.glob(f"/tmp/art/sky-features-{cat}-{tag}/{cat}_trd.csv")
+                       or glob.glob(f"/tmp/art_reuse/sky-features-{cat}-{tag}/{cat}_trd.csv"))
+                  (files.extend(f) if f else missing.append(tag))
+              if missing:
+                  print(cat, "MISSING shards", missing)
+                  with open("v2/benchmark/sdss_sky/missing_catalogs.txt", "a") as fh:
+                      fh.write(f"{cat} {' '.join(missing)}\n")
               parts = [pd.read_csv(f, low_memory=False) for f in files]
               parts = [p for p in parts if len(p)]
               if not parts:
-                  print(cat, "MISSING")
-                  with open("v2/benchmark/sdss_sky/missing_catalogs.txt", "a") as fh:
-                      fh.write(cat + "\n")
                   continue
               x = pd.concat(parts, ignore_index=True).drop_duplicates("benchmark_id")
               with gzip.open(d / f"{cat}_trd.csv.gz", "wt") as fh:
