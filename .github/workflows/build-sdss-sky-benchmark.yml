@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       per_class: {description: "objects per class", default: "3333"}
-      reuse_run: {description: "earlier run id whose truth and finished catalogue artifacts are reused (blank = build new)", default: ""}
+      reuse_run: {description: "earlier run id(s), space-separated: truth from the first, finished catalogue shards from any (blank = build new)", default: ""}
       catalogs: {description: "JSON list of catalogues to collect", default: '["gaia_dr3","panstarrs1","allwise","twomass","galex","desi_legacy"]'}
 concurrency:
   group: build-sdss-sky-${{ github.ref }}
@@ -38,14 +38,14 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: "3.11"}
       - run: pip install pandas numpy scipy requests astropy
-      - name: Truth of an earlier run (reuse_run)
+      - name: Truth of the first earlier run (reuse_run)
         if: github.event.inputs.reuse_run != ''
-        uses: actions/download-artifact@v4
-        with:
-          name: sky-truth
-          path: /tmp/sky
-          run-id: ${{ github.event.inputs.reuse_run }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          first=$(echo "${{ github.event.inputs.reuse_run }}" | awk '{print $1}')
+          gh run download "$first" --repo "${{ github.repository }}" --name sky-truth --dir /tmp/sky
+          test -s /tmp/sky/truth.csv
       - if: github.event.inputs.reuse_run == ''
         run: python -u v2/benchmark/build_sdss_sky_truth.py --per-class ${{ github.event.inputs.per_class || '3333' }} --out /tmp/sky/truth.csv
       - uses: actions/upload-artifact@v4
@@ -84,7 +84,10 @@ jobs:
     needs: [truth, collect]
     # also after a timed-out shard (2026-11-12 the job was skipped because a
     # timeout counts as cancelled); missing catalogues are listed in the report
-    if: ${{ always() && needs.truth.result == 'success' }}
+    # !cancelled(): a cancelled run must not commit a partial benchmark (a
+    # cancelled 2026-11-12 run did, with always()); timed-out shards are
+    # still evaluated and listed as missing
+    if: ${{ !cancelled() && needs.truth.result == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
@@ -97,18 +100,22 @@ jobs:
       - run: pip install pandas numpy scipy
       - uses: actions/download-artifact@v4
         with: {path: /tmp/art}
-      - name: Catalogues finished in an earlier run (reuse_run)
+      - name: Catalogues finished in earlier runs (reuse_run, several ids allowed)
         if: github.event.inputs.reuse_run != ''
-        uses: actions/download-artifact@v4
-        with:
-          pattern: sky-features-*
-          path: /tmp/art_reuse
-          run-id: ${{ github.event.inputs.reuse_run }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # one folder per earlier run, in the order given (first = preferred)
+          i=0
+          for id in ${{ github.event.inputs.reuse_run }}; do
+            mkdir -p /tmp/art_reuse/$i
+            gh run download "$id" --repo "${{ github.repository }}" --pattern 'sky-features-*' --dir /tmp/art_reuse/$i || echo "run $id: no catalogue artifacts"
+            i=$((i+1))
+          done
       - name: Assemble
         run: |
           set -euo pipefail
-          d=v2/benchmark/sdss_sky; mkdir -p $d/catalog_features
+          d=v2/benchmark/sdss_sky; rm -rf $d; mkdir -p $d/catalog_features  # no stale files from an earlier commit
           cp /tmp/art/sky-truth/truth.csv $d/truth.csv
           python - <<'PY'
           import glob, gzip, pandas as pd
@@ -119,17 +126,23 @@ jobs:
               # per shard: this run's file, else the earlier run's (reuse_run),
               # else the shard is recorded as missing -- a catalogue is never
               # silently evaluated with one shard's objects only
-              files, missing = [], []
+              parts, missing = [], []
               for tag in (["0_2"] if cat in bulk else ["0_2", "1_2"]):
-                  f = (glob.glob(f"/tmp/art/sky-features-{cat}-{tag}/{cat}_trd.csv")
-                       or glob.glob(f"/tmp/art_reuse/sky-features-{cat}-{tag}/{cat}_trd.csv"))
-                  (files.extend(f) if f else missing.append(tag))
+                  # this run first, then the earlier runs in the order given;
+                  # an empty table (a failed bulk query writes one) is no data
+                  cands = glob.glob(f"/tmp/art/sky-features-{cat}-{tag}/{cat}_trd.csv") + sorted(
+                      glob.glob(f"/tmp/art_reuse/*/sky-features-{cat}-{tag}/{cat}_trd.csv"))
+                  found = None
+                  for f in cands:
+                      x = pd.read_csv(f, low_memory=False)
+                      if len(x):
+                          found = x
+                          break
+                  (parts.append(found) if found is not None else missing.append(tag))
               if missing:
                   print(cat, "MISSING shards", missing)
                   with open("v2/benchmark/sdss_sky/missing_catalogs.txt", "a") as fh:
                       fh.write(f"{cat} {' '.join(missing)}\n")
-              parts = [pd.read_csv(f, low_memory=False) for f in files]
-              parts = [p for p in parts if len(p)]
               if not parts:
                   continue
               x = pd.concat(parts, ignore_index=True).drop_duplicates("benchmark_id")

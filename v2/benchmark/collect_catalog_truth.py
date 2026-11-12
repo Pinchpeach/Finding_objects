@@ -161,8 +161,14 @@ def run_gaia(truth, out_dir):
             colDec1="truth_dec",
         ).to_pandas()
     except Exception as e:
-        print(f"[gaia_dr3] CDS XMatch ERROR {e!r}", flush=True)
-        return _finish("gaia_dr3", out_dir, len(truth), errors=1)
+        # cdsxmatch.u-strasbg.fr down (2026-11-12): the same table through
+        # the mirrored VizieR multi-target query (2.51.3)
+        print(f"[gaia_dr3] CDS XMatch ERROR {e!r}; trying VizieR multi-target batches", flush=True)
+        try:
+            xm = vizier_multi(truth, "I/355/gaiadr3", PM_SEARCH_ARCSEC)
+        except Exception as e2:  # noqa: BLE001
+            print(f"[gaia_dr3] VizieR batches ERROR {e2!r}", flush=True)
+            return _finish("gaia_dr3", out_dir, len(truth), errors=1)
     if xm.empty:
         return _finish("gaia_dr3", out_dir, len(truth))
 
@@ -345,6 +351,7 @@ def from_vizier_batch(d, chunk):
     q = pd.to_numeric(d["_q"], errors="coerce").astype(int) - 1  # 1-based target index
     t = chunk.reset_index(drop=True)
     d["benchmark_id"] = t.benchmark_id.to_numpy()[q]
+    d["truth_ra"], d["truth_dec"] = t.ra.to_numpy(float)[q], t.dec.to_numpy(float)[q]
     ra = next(c for c in ("RAJ2000", "RA_ICRS") if c in d.columns)
     de = next(c for c in ("DEJ2000", "DE_ICRS") if c in d.columns)
     d["angDist"] = sep_arcsec(t.ra.to_numpy(float)[q], t.dec.to_numpy(float)[q],
@@ -353,23 +360,30 @@ def from_vizier_batch(d, chunk):
     return d.drop(columns=["_q"])
 
 
-def run_vizier_batch(name, truth, out_dir):
+def vizier_multi(truth, table, radius_arcsec):
+    """All rows of a VizieR table within radius of each truth position, in
+    VIZIER_BATCH-position requests, in the CDS XMatch layout (benchmark_id,
+    truth_ra, truth_dec, angDist + the table's VizieR columns)."""
     from astroquery.vizier import Vizier
     from astropy.coordinates import SkyCoord
     import astropy.units as u
 
-    mod = load(name)
     v = Vizier(columns=["**"], row_limit=-1)
     v.TIMEOUT = 300
     parts = []
     for i in range(0, len(truth), VIZIER_BATCH):
         chunk = truth.iloc[i : i + VIZIER_BATCH]
         coords = SkyCoord(chunk.ra.to_numpy(float) * u.deg, chunk.dec.to_numpy(float) * u.deg)
-        res = v.query_region(coords, radius=MATCH_ARCSEC[name] * u.arcsec, catalog=XMATCH[name]["table"])
+        res = v.query_region(coords, radius=radius_arcsec * u.arcsec, catalog=table)
         if len(res):
             parts.append(from_vizier_batch(res[0].to_pandas(), chunk))
-        print(f"[{name}] VizieR batch {i + len(chunk)}/{len(truth)}", flush=True)
-    xm = pd.concat(parts, ignore_index=True) if parts else pd.DataFrame(columns=["benchmark_id", "angDist"])
+        print(f"[{table}] VizieR batch {i + len(chunk)}/{len(truth)}", flush=True)
+    return pd.concat(parts, ignore_index=True) if parts else pd.DataFrame(columns=["benchmark_id", "angDist"])
+
+
+def run_vizier_batch(name, truth, out_dir):
+    mod = load(name)
+    xm = vizier_multi(truth, XMATCH[name]["table"], MATCH_ARCSEC[name])
     out = from_xmatch(xm, truth, name, mod.CATALOG) if len(xm) else pd.DataFrame()
     print(f"[{name}] VizieR multi-target targets={len(truth)} matched={len(out)}", flush=True)
     return _finish(name, out_dir, len(truth), out if len(out) else None, matched=len(out))
