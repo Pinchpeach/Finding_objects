@@ -264,9 +264,77 @@ def run_gaia(truth, out_dir):
     return _finish("gaia_dr3", out_dir, len(truth), out, matched=ok)
 
 
+# One CDS XMatch per catalogue instead of one VizieR cone per object
+# (2.51.2).  The per-object cones (3-5 s throttle each) took more than the
+# 300-min job limit for 5,000 objects in 2MASS and GALEX when the sky-spread
+# benchmark was collected (2026-11-12); XMatch matches all positions in one
+# request against the same VizieR table, so the rows (VizieR column names)
+# are those of the cone search.  Falls back to the cones on any failure.
+XMATCH = {
+    "twomass": {"table": "II/246/out", "id": ["2MASS", "_2MASS"]},
+    "galex": {"table": "II/335/galex_ais", "id": ["objid"]},
+}
+
+
+def from_xmatch(xm, truth, name, catalog_label):
+    """Nearest XMatch row per truth object within MATCH_ARCSEC, in the
+    schema of the per-object path (truth metadata + collector base columns)."""
+    spec = XMATCH[name]
+    idc = next((c for c in spec["id"] if c in xm.columns), None)
+    rac = next((c for c in ("RAJ2000", "RA_ICRS", "ra") if c in xm.columns), None)
+    dcc = next((c for c in ("DEJ2000", "DE_ICRS", "dec") if c in xm.columns), None)
+    if not (idc and rac and dcc and "angDist" in xm.columns):
+        raise KeyError(f"{name} XMatch columns missing; got {list(xm.columns)[:20]}")
+    xm = xm.copy()
+    xm["_sep_arcsec"] = pd.to_numeric(xm["angDist"], errors="coerce")
+    xm = xm[xm["_sep_arcsec"] <= MATCH_ARCSEC[name]]
+    xm = xm.sort_values(["benchmark_id", "_sep_arcsec"]).drop_duplicates("benchmark_id", keep="first")
+    ident = xm[idc].astype("string")
+    base = pd.DataFrame(
+        {
+            "catalog": catalog_label,
+            "catalog_object_id": ident,
+            "object_name": catalog_label + " " + ident,
+            "ra": pd.to_numeric(xm[rac], errors="coerce"),
+            "dec": pd.to_numeric(xm[dcc], errors="coerce"),
+        },
+        index=xm.index,
+    )
+    rest = xm.drop(columns=[c for c in ("truth_ra", "truth_dec", "angDist") if c in xm.columns])
+    xm = pd.concat([base, rest.drop(columns=[c for c in base.columns if c in rest.columns])], axis=1)
+    meta = truth[["benchmark_id", "truth_class", "truth_source", "ra", "dec"]].rename(columns={"ra": "truth_ra", "dec": "truth_dec"})
+    out = meta.merge(xm, on="benchmark_id", how="inner")
+    out.insert(5, "match_threshold_arcsec", MATCH_ARCSEC[name])
+    return out.sort_values("benchmark_id")
+
+
+def run_xmatch(name, truth, out_dir):
+    from astroquery.xmatch import XMatch
+    from astropy.table import Table
+    import astropy.units as u
+
+    mod = load(name)
+    upload = truth[["benchmark_id", "ra", "dec"]].rename(columns={"ra": "truth_ra", "dec": "truth_dec"})
+    xm = XMatch.query(
+        cat1=Table.from_pandas(upload),
+        cat2=f"vizier:{XMATCH[name]['table']}",
+        max_distance=MATCH_ARCSEC[name] * u.arcsec,
+        colRA1="truth_ra",
+        colDec1="truth_dec",
+    ).to_pandas()
+    out = from_xmatch(xm, truth, name, mod.CATALOG)
+    print(f"[{name}] CDS XMatch targets={len(truth)} matched={len(out)}", flush=True)
+    return _finish(name, out_dir, len(truth), out if len(out) else None, matched=len(out))
+
+
 def run_catalog(name, truth, out_dir, workers):
     if name == "gaia_dr3":
         return run_gaia(truth, out_dir)
+    if name in XMATCH:
+        try:
+            return run_xmatch(name, truth, out_dir)
+        except Exception as e:  # noqa: BLE001 - CDS XMatch down: per-object cones
+            print(f"[{name}] CDS XMatch failed ({e!r}); falling back to per-object cones", flush=True)
     mod = load(name)
     radius = RADII[name]
     rows = []

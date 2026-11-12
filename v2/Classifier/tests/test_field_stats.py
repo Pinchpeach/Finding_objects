@@ -54,3 +54,19 @@ def test_sky_cells_are_equal_area_and_split_whole():
     assert pd.DataFrame({"c": c, "s": split}).groupby("c").s.nunique().max() == 1
     d = pd.DataFrame({"ra": ra[:2000], "dec": dec[:2000], "sky_cell": c[:2000]})
     assert B.spread(d, 700, 0).sky_cell.value_counts().max() == 1  # one per cell before any repeats
+
+
+def test_xmatch_rows_follow_the_cone_schema():
+    import collect_catalog_truth as C
+
+    truth = pd.DataFrame({"benchmark_id": ["A", "B"], "ra": [10.0, 20.0], "dec": [1.0, 2.0],
+                          "truth_class": ["STAR", "QSO"], "truth_source": "SDSS"})
+    xm = pd.DataFrame({"benchmark_id": ["A", "A", "B"], "truth_ra": [10, 10, 20], "truth_dec": [1, 1, 2],
+                       "angDist": [0.5, 1.2, 9.0], "objid": [1, 2, 3], "RAJ2000": [10, 10, 20],
+                       "DEJ2000": [1, 1, 2], "NUVmag": [20.1, 21.0, 19.0]})
+    o = C.from_xmatch(xm, truth, "galex", "GALEX AIS")
+    # nearest row kept; B is beyond the 5" GALEX match radius
+    assert o.benchmark_id.tolist() == ["A"] and o.catalog_object_id.iloc[0] == "1"
+    assert list(o.columns[:11]) == ["benchmark_id", "truth_class", "truth_source", "truth_ra", "truth_dec",
+                                    "match_threshold_arcsec", "catalog", "catalog_object_id", "object_name", "ra", "dec"]
+    assert o._sep_arcsec.iloc[0] == 0.5

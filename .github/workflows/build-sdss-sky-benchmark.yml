@@ -10,9 +10,14 @@ on:
   workflow_dispatch:
     inputs:
       per_class: {description: "objects per class", default: "3333"}
+      reuse_run: {description: "earlier run id whose truth and finished catalogue artifacts are reused (blank = build new)", default: ""}
+      catalogs: {description: "JSON list of catalogues to collect", default: '["gaia_dr3","panstarrs1","allwise","twomass","galex","desi_legacy"]'}
 concurrency:
   group: build-sdss-sky-${{ github.ref }}
   cancel-in-progress: true
+permissions:
+  contents: write
+  actions: read  # artifacts of an earlier run (reuse_run)
 
 jobs:
   health:
@@ -33,7 +38,16 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: "3.11"}
       - run: pip install pandas numpy scipy requests astropy
-      - run: python -u v2/benchmark/build_sdss_sky_truth.py --per-class ${{ github.event.inputs.per_class || '3333' }} --out /tmp/sky/truth.csv
+      - name: Truth of an earlier run (reuse_run)
+        if: github.event.inputs.reuse_run != ''
+        uses: actions/download-artifact@v4
+        with:
+          name: sky-truth
+          path: /tmp/sky
+          run-id: ${{ github.event.inputs.reuse_run }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - if: github.event.inputs.reuse_run == ''
+        run: python -u v2/benchmark/build_sdss_sky_truth.py --per-class ${{ github.event.inputs.per_class || '3333' }} --out /tmp/sky/truth.csv
       - uses: actions/upload-artifact@v4
         with: {name: sky-truth, path: /tmp/sky/truth.csv, retention-days: 7}
   collect:
@@ -41,7 +55,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        catalog: [gaia_dr3, panstarrs1, allwise, twomass, galex, desi_legacy]
+        catalog: ${{ fromJSON(github.event.inputs.catalogs || '["gaia_dr3","panstarrs1","allwise","twomass","galex","desi_legacy"]') }}
         shard: ["0/2", "1/2"]
     runs-on: ubuntu-latest
     timeout-minutes: 300
@@ -55,8 +69,10 @@ jobs:
       - id: s
         run: echo "tag=$(echo '${{ matrix.shard }}' | tr / _)" >> "$GITHUB_OUTPUT"
       - run: |
-          if [ "${{ matrix.catalog }}" = gaia_dr3 ] && [ "${{ matrix.shard }}" != "0/2" ]; then echo "gaia is one bulk XMatch"; exit 0; fi
-          shard="${{ matrix.shard }}"; [ "${{ matrix.catalog }}" = gaia_dr3 ] && shard="0/1"
+          # gaia_dr3, twomass, galex: one CDS XMatch for all objects (2.51.2)
+          case "${{ matrix.catalog }}" in gaia_dr3|twomass|galex) bulk=1;; *) bulk=0;; esac
+          if [ $bulk = 1 ] && [ "${{ matrix.shard }}" != "0/2" ]; then echo "one bulk XMatch in shard 0/2"; exit 0; fi
+          shard="${{ matrix.shard }}"; [ $bulk = 1 ] && shard="0/1"
           python -u v2/benchmark/collect_catalog_truth.py --truth /tmp/sky/truth.csv --out-dir /tmp/out --catalog ${{ matrix.catalog }} --workers 8 --shard $shard
       - uses: actions/upload-artifact@v4
         with:
@@ -66,11 +82,14 @@ jobs:
           retention-days: 7
   evaluate:
     needs: [truth, collect]
-    if: always() && needs.truth.result == 'success' && needs.collect.result != 'cancelled'
+    # also after a timed-out shard (2026-11-12 the job was skipped because a
+    # timeout counts as cancelled); missing catalogues are listed in the report
+    if: ${{ always() && needs.truth.result == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
       contents: write
+      actions: read  # artifacts of an earlier run (reuse_run)
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -78,6 +97,14 @@ jobs:
       - run: pip install pandas numpy scipy
       - uses: actions/download-artifact@v4
         with: {path: /tmp/art}
+      - name: Catalogues finished in an earlier run (reuse_run)
+        if: github.event.inputs.reuse_run != ''
+        uses: actions/download-artifact@v4
+        with:
+          pattern: sky-features-*
+          path: /tmp/art_reuse
+          run-id: ${{ github.event.inputs.reuse_run }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Assemble
         run: |
           set -euo pipefail
@@ -88,10 +115,16 @@ jobs:
           from pathlib import Path
           d = Path("v2/benchmark/sdss_sky/catalog_features")
           for cat in ("gaia_dr3", "panstarrs1", "allwise", "twomass", "galex", "desi_legacy"):
-              parts = [pd.read_csv(f, low_memory=False) for f in glob.glob(f"/tmp/art/sky-features-{cat}-*/{cat}_trd.csv")]
+              files = glob.glob(f"/tmp/art/sky-features-{cat}-*/{cat}_trd.csv")
+              if not files:  # not collected in this run: the earlier run's shards
+                  files = glob.glob(f"/tmp/art_reuse/sky-features-{cat}-*/{cat}_trd.csv")
+              parts = [pd.read_csv(f, low_memory=False) for f in files]
               parts = [p for p in parts if len(p)]
               if not parts:
-                  print(cat, "no rows"); continue
+                  print(cat, "MISSING")
+                  with open("v2/benchmark/sdss_sky/missing_catalogs.txt", "a") as fh:
+                      fh.write(cat + "\n")
+                  continue
               x = pd.concat(parts, ignore_index=True).drop_duplicates("benchmark_id")
               with gzip.open(d / f"{cat}_trd.csv.gz", "wt") as fh:
                   x.to_csv(fh, index=False)
