@@ -3,16 +3,16 @@
     "compact": {
       "PULSAR": {
         "method": "withheld",
-        "n": 4,
+        "n": 2,
         "negative": 0,
-        "positive": 4,
+        "positive": 2,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "PULSAR_CANDIDATE": {
         "method": "withheld",
-        "n": 4,
-        "negative": 4,
+        "n": 2,
+        "negative": 2,
         "positive": 0,
         "reason": "insufficient independent truth support",
         "truth_independent": true
@@ -21,24 +21,24 @@
     "phenomenon": {
       "OTHER_PHENOMENON": {
         "method": "withheld",
-        "n": 208,
-        "negative": 208,
+        "n": 227,
+        "negative": 227,
         "positive": 0,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "PN": {
         "method": "withheld",
-        "n": 208,
+        "n": 227,
         "negative": 2,
-        "positive": 206,
+        "positive": 225,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "SN": {
         "method": "withheld",
-        "n": 208,
-        "negative": 206,
+        "n": 227,
+        "negative": 225,
         "positive": 2,
         "reason": "insufficient independent truth support",
         "truth_independent": true
@@ -47,67 +47,67 @@
     "variability": {
       "CEPHEID": {
         "method": "withheld",
-        "n": 219,
+        "n": 217,
         "negative": 203,
-        "positive": 16,
+        "positive": 14,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "ECLIPSING": {
         "method": "withheld",
-        "n": 219,
-        "negative": 219,
+        "n": 217,
+        "negative": 217,
         "positive": 0,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "LPV": {
-        "coef": 3.23754609890048,
-        "intercept": -1.0583854944659228,
+        "coef": 2.9537295455733283,
+        "intercept": -0.5119288360960615,
         "method": "platt",
-        "n": 219,
-        "negative": 65,
-        "positive": 154,
+        "n": 217,
+        "negative": 57,
+        "positive": 160,
         "truth_independent": true
       },
       "MIRA": {
         "method": "withheld",
-        "n": 219,
-        "negative": 202,
-        "positive": 17,
+        "n": 217,
+        "negative": 206,
+        "positive": 11,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "OTHER_VARIABLE": {
         "method": "withheld",
-        "n": 219,
-        "negative": 219,
+        "n": 217,
+        "negative": 217,
         "positive": 0,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "PULSATING": {
         "method": "withheld",
-        "n": 219,
-        "negative": 219,
+        "n": 217,
+        "negative": 217,
         "positive": 0,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "ROTATIONAL": {
         "method": "withheld",
-        "n": 219,
-        "negative": 219,
+        "n": 217,
+        "negative": 217,
         "positive": 0,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "RR_LYRAE": {
-        "coef": 1.3596037044599663,
-        "intercept": -1.8028729001953223,
+        "coef": 1.3751736270622539,
+        "intercept": -1.791856287412974,
         "method": "platt",
-        "n": 219,
-        "negative": 187,
+        "n": 217,
+        "negative": 185,
         "positive": 32,
         "truth_independent": true
       }
@@ -124,15 +124,15 @@
     "compact": {},
     "phenomenon": {
       "HASH_PN_CATALOG_MATCH|PN": {
-        "correct": 196,
+        "correct": 213,
         "method": "rule_precision",
-        "n": 196,
+        "n": 213,
         "precision": 1.0,
         "truth_classes": [
           "PN",
           "SN"
         ],
-        "wilson_lower_95": 0.9808
+        "wilson_lower_95": 0.9823
       }
     },
     "physical": {
@@ -161,9 +161,9 @@
     },
     "variability": {
       "GAIA_DR3_SOS_CEPHEID|CEPHEID": {
-        "correct": 220,
+        "correct": 223,
         "method": "rule_precision",
-        "n": 220,
+        "n": 223,
         "precision": 1.0,
         "truth_classes": [
           "CEPHEID",
@@ -171,20 +171,20 @@
           "MIRA",
           "RR_LYRAE"
         ],
-        "wilson_lower_95": 0.9828
+        "wilson_lower_95": 0.9831
       },
       "GAIA_DR3_SOS_LPV_LARGE_AMPLITUDE|MIRA": {
-        "correct": 162,
+        "correct": 173,
         "method": "rule_precision",
-        "n": 176,
-        "precision": 0.9205,
+        "n": 185,
+        "precision": 0.9351,
         "truth_classes": [
           "CEPHEID",
           "LPV",
           "MIRA",
           "RR_LYRAE"
         ],
-        "wilson_lower_95": 0.8709
+        "wilson_lower_95": 0.8901
       },
       "GAIA_DR3_SOS_RRLYRAE|RR_LYRAE": {
         "correct": 196,
@@ -200,30 +200,30 @@
         "wilson_lower_95": 0.9808
       },
       "GAIA_DR3_VARIABLE_CANDIDATE|LPV": {
-        "correct": 164,
+        "correct": 155,
         "method": "rule_precision",
-        "n": 166,
-        "precision": 0.988,
+        "n": 157,
+        "precision": 0.9873,
         "truth_classes": [
           "CEPHEID",
           "LPV",
           "MIRA",
           "RR_LYRAE"
         ],
-        "wilson_lower_95": 0.9571
+        "wilson_lower_95": 0.9547
       },
       "ZTF_PERIODIC_VARIABLE|MIRA": {
-        "correct": 71,
+        "correct": 64,
         "method": "rule_precision",
-        "n": 72,
-        "precision": 0.9861,
+        "n": 69,
+        "precision": 0.9275,
         "truth_classes": [
           "CEPHEID",
           "LPV",
           "MIRA",
           "RR_LYRAE"
         ],
-        "wilson_lower_95": 0.9254
+        "wilson_lower_95": 0.8413
       }
     }
   },
