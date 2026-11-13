@@ -54,3 +54,15 @@ def test_reported_probabilities_agree_with_rule_labels():
     assert np.isclose(out[1, 1], 0.9) and out[1].argmax() == 1 and np.isclose(out[1].sum(), 1)
     assert np.isclose(out[1, 0] / out[1, 2], 7.0)  # rest shared in proportion
     assert np.allclose(out[2], Pc[2])  # UNKNOWN: unchanged
+
+
+def test_cosmos_faint_counts_lean_to_galaxy_at_the_faint_end():
+    _f = importlib.util.spec_from_file_location("v2_faint_t", P / "faint_class_prior.py")
+    F = importlib.util.module_from_spec(_f)
+    _f.loader.exec_module(F)
+    df = pd.DataFrame({"std_mag__ls_r": [19.0, 20.1, 24.2, 30.0, np.nan], "ra": 150.1, "dec": 2.2})
+    f = F.star_galaxy_factors(df, which="cosmos")
+    assert np.isnan(f[0]).all() and np.isnan(f[4]).all()  # r < 20, no r: not applied
+    assert np.allclose(f[1:4].sum(1), 3.0)  # STAR + GALAXY fractions x 3
+    assert f[2, 0] / f[2, 1] < 0.1  # r = 24: < 10 % stars in COSMOS2020
+    assert f[1, 0] > f[2, 0]  # stars thin out to r = 24

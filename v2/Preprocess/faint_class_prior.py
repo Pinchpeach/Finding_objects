@@ -28,6 +28,7 @@ and vice versa): see v2/LITERATURE_REMAINING_ERRORS_2026-11-06.md.
 
 from __future__ import annotations
 
+import os
 from functools import lru_cache
 from pathlib import Path
 
@@ -35,6 +36,22 @@ import numpy as np
 import pandas as pd
 
 TABLE = Path(__file__).resolve().parent / "faint_class_prior.csv"
+# 2.52.0: star and galaxy counts of COSMOS2020 truth objects we detect, per
+# 0.5 mag of LS r (benchmark/build_faint_prior_cosmos.py, calibration fields
+# only).  The 2.46.0 table above counts our own labels in regions centred on
+# stellar targets and leans to STAR at the faint end (r = 25: 58 % stars at
+# |b| = 40-60 deg against 9 % in COSMOS2020).  Position enters through the
+# local Gaia density prior of Stage 5 (galaxy counts are isotropic, star
+# counts follow the local stellar density), so this table has no |b| axis.
+TABLE_COSMOS = Path(__file__).resolve().parent / "faint_class_prior_cosmos.csv"
+SOURCES = ("labels", "cosmos")
+
+
+def source() -> str:
+    v = os.environ.get("V2_FAINT_PRIOR", "labels").strip().lower() or "labels"
+    if v not in SOURCES:
+        raise ValueError(f"V2_FAINT_PRIOR={v!r}; known: {SOURCES}")
+    return v
 R_COLUMN = "std_mag__ls_r"
 R_MIN = 20.0
 R_EDGES = np.arange(16, 25.5, 0.5)
@@ -60,8 +77,32 @@ def abs_b(df: pd.DataFrame) -> np.ndarray:
     return np.degrees(np.abs(np.arcsin(np.clip(sinb, -1, 1))))
 
 
-def star_galaxy_factors(df: pd.DataFrame, table: pd.DataFrame | None = None) -> np.ndarray:
+@lru_cache(maxsize=4)
+def load_cosmos(path: str | Path = TABLE_COSMOS) -> pd.DataFrame:
+    """Smoothed (+1) STAR / GALAXY fractions per r bin of the COSMOS2020 counts."""
+    t = pd.read_csv(path)
+    ns, ng = t.n_star + 1.0, t.n_galaxy + 1.0
+    return t.assign(STAR=ns / (ns + ng), GALAXY=ng / (ns + ng))
+
+
+def cosmos_factors(df: pd.DataFrame, table: pd.DataFrame | None = None) -> np.ndarray:
+    table = load_cosmos() if table is None else table
+    r = pd.to_numeric(df[R_COLUMN], errors="coerce").to_numpy(float) if R_COLUMN in df else np.full(len(df), np.nan)
+    out = np.full((len(df), 2), np.nan)
+    lo = table.r_lo.to_numpy(float)
+    use = np.flatnonzero(np.isfinite(r) & (r >= max(R_MIN, lo[0])))
+    if len(use):
+        k = np.clip(np.searchsorted(lo, r[use], side="right") - 1, 0, len(lo) - 1)
+        out[use] = table[["STAR", "GALAXY"]].to_numpy(float)[k] * N_TRAIN_CLASSES
+    return out
+
+
+def star_galaxy_factors(df: pd.DataFrame, table: pd.DataFrame | None = None, which: str | None = None) -> np.ndarray:
     """(n, 2) multipliers for the STAR and GALAXY probabilities; NaN where the prior does not apply."""
+    if which is None:  # an explicit table decides by its format, else V2_FAINT_PRIOR
+        which = source() if table is None else ("cosmos" if "r_lo" in table.columns else "labels")
+    if which == "cosmos":
+        return cosmos_factors(df, table)
     table = load_table() if table is None else table
     r = pd.to_numeric(df[R_COLUMN], errors="coerce").to_numpy(float) if R_COLUMN in df else np.full(len(df), np.nan)
     rb = np.digitize(r, R_EDGES)

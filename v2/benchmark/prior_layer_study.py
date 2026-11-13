@@ -116,7 +116,7 @@ def rebuild_factors(t: pd.DataFrame):
     L = np.where(np.isfinite(L) & (L > 0), np.clip(L, 1e-4, 1), 1.0)
     M = np.where(np.isfinite(M) & (M > 0), np.clip(M, 1e-4, 1), 1.0)
     pos = pd.DataFrame({"ra": t.t_ra, "dec": t.t_dec, FAINT.R_COLUMN: t.get(FAINT.R_COLUMN)})
-    F = FAINT.star_galaxy_factors(pos)
+    F = FAINT.star_galaxy_factors(pos, which="labels")  # the 2.51 run's table
     return P, L, M, F
 
 
@@ -137,10 +137,10 @@ def faint_split(Q, F):
     return Q
 
 
-def legacy_faint(Q, F, label):
+def legacy_faint(Q, F, label, inherited):
     """2.46.0 post-decision rule on S/G-labelled evidence objects."""
     out = label.copy()
-    for i in np.flatnonzero(np.isfinite(F).all(1) & np.isin(label, ["STAR", "GALAXY"])):
+    for i in np.flatnonzero(np.isfinite(F).all(1) & np.isin(label, ["STAR", "GALAXY"]) & ~inherited):
         w = Q[i].copy()
         w[0] *= F[i, 0]
         w[1] *= F[i, 1]
@@ -151,12 +151,13 @@ def legacy_faint(Q, F, label):
     return out
 
 
-def decide(Q, base_label, basis, status):
-    """Evidence decisions from Q; overrides and abstentions for other reasons kept."""
+def decide(Q, base_label, basis, status, inherited):
+    """Evidence decisions from Q; overrides, abstentions for other reasons and
+    fragments (label inherited from the parent galaxy after Stage 5) kept."""
     lab = np.array(base_label, dtype=object).copy()
     ev = (basis.fillna("evidence").isin(["evidence", "", "nan"]).to_numpy()) & np.isin(
         status, ["CLASSIFIED", "LOW_CONFIDENCE"]
-    )
+    ) & ~inherited
     conf = Q.max(1)
     top = np.array(C)[Q.argmax(1)]
     lab[ev] = np.where(conf[ev] >= MIN_CONF, top[ev], "UNKNOWN")
@@ -208,19 +209,24 @@ def main():
     Q_legacy = prior_layer(P, L, M)
     stored = np.clip(t[["p_star", "p_galaxy", "p_qso"]].to_numpy(float), EPS, 1)
     rebuild_err = float(np.abs(Q_legacy - stored).max())
-    lab_legacy_q = decide(Q_legacy, t.ours.to_numpy(), basis, status)
-    lab_legacy = legacy_faint(Q_legacy, F, lab_legacy_q)
+    inherited = t.get("parent_object_id", pd.Series(np.nan, index=t.index)).notna().to_numpy()
+    lab_legacy_q = decide(Q_legacy, t.ours.to_numpy(), basis, status, inherited)
+    lab_legacy = legacy_faint(Q_legacy, F, lab_legacy_q, inherited)
     Q_uni = faint_split(Q_legacy, F)
-    lab_uni = decide(Q_uni, t.ours.to_numpy(), basis, status)
+    lab_uni = decide(Q_uni, t.ours.to_numpy(), basis, status, inherited)
     cal = (t.split == "cal").to_numpy()
-    T = fit_temperatures(np.log(np.clip(Q_uni, EPS, 1))[cal], y[cal], rb[cal], nb)
-    Q_cal = apply_temperatures(np.log(np.clip(Q_uni, EPS, 1)), rb, T)
+    logQ = np.log(np.clip(Q_uni, EPS, 1))
+    T = fit_temperatures(logQ[cal], y[cal], rb[cal], nb)
+    Q_cal = apply_temperatures(logQ, rb, T)
+    T1 = fit_temperatures(logQ[cal], y[cal], np.zeros(cal.sum(), int), 1)
+    Q_cal1 = apply_temperatures(logQ, np.zeros(len(t), int), T1)
     rows = []
     variants = {
         "stored (2.51 p_*, label)": (stored, t.ours.to_numpy()),
         "replayed legacy": (Q_legacy, lab_legacy),
         "unified prior layer": (Q_uni, lab_uni),
-        "unified + temperature": (Q_cal, lab_uni),
+        "unified + T per r bin": (Q_cal, lab_uni),
+        "unified + one T": (Q_cal1, lab_uni),
         "balanced training P": (P, None),
     }
     for sp in ("cal", "test"):
@@ -234,23 +240,43 @@ def main():
         k = (t.split == "test").to_numpy() & (rb == b)
         if not k.any():
             continue
-        for name in ("stored (2.51 p_*, label)", "unified prior layer", "unified + temperature"):
+        for name in ("stored (2.51 p_*, label)", "unified prior layer", "unified + T per r bin", "unified + one T"):
             Qv, lab = variants[name]
             by_r.append({"r_bin": b, "variant": name, **metrics(Qv[k], y[k], lab[k])})
     by_r = pd.DataFrame(by_r)
     pd.set_option("display.width", 220)
     print(f"rebuild check: max |legacy layer - stored p_*| = {rebuild_err:.2e}")
-    print(f"label agreement replayed legacy vs stored: {100 * (lab_legacy == t.ours.to_numpy()).mean():.3f} %")
     print(res.to_string(index=False))
     print("\ntest fields by LS r bin", list(R_EDGES))
     print(by_r.to_string(index=False))
-    print("temperatures per r bin:", [round(float(x), 3) for x in T])
+    print("temperatures per r bin:", [round(float(x), 3) for x in T], "| one temperature:", round(float(T1[0]), 3))
     k = (t.split == "test").to_numpy()
-    ok_s, ok_u = t.ours.to_numpy()[k] == t.t_truth.to_numpy()[k], lab_uni[k] == t.t_truth.to_numpy()[k]
+    truth = t.t_truth.to_numpy()
     from field_stats import mcnemar
 
-    p, n01, n10 = mcnemar(ok_u, ok_s)
-    print(f"test fields, unified vs stored labels: unified only right {n01}, stored only right {n10}, exact McNemar p = {p:.3g}")
+    print(f"label agreement replayed legacy vs stored: {100 * (lab_legacy == t.ours.to_numpy()).mean():.3f} %")
+    for name, lab in (("stored", t.ours.to_numpy()), ("replayed legacy", lab_legacy)):
+        p, n01, n10 = mcnemar(lab_uni[k] == truth[k], lab[k] == truth[k])
+        print(f"test fields, unified vs {name} labels: unified only right {n01}, {name} only right {n10}, exact McNemar p = {p:.3g}")
+    # field bootstrap of the metric differences on the test fields
+    rng = np.random.default_rng(2052)
+    fk = t.field.to_numpy()[k]
+    uf = np.unique(fk)
+    idx = {f: np.flatnonzero(fk == f) for f in uf}
+    yk = y[k]
+    pairs = {"unified - stored": (Q_uni[k], stored[k]), "unified+T(r) - stored": (Q_cal[k], stored[k]),
+             "unified+T(r) - unified": (Q_cal[k], Q_uni[k]), "unified+T - unified": (Q_cal1[k], Q_uni[k])}
+    boot = {n: {"ece": [], "nll": []} for n in pairs}
+    for _ in range(300):
+        j = np.concatenate([idx[f] for f in rng.choice(uf, len(uf))])
+        for n, (A, B) in pairs.items():
+            boot[n]["ece"].append(100 * (ece(A[j], yk[j]) - ece(B[j], yk[j])))
+            pa = np.clip(A[j][np.arange(len(j)), yk[j]], EPS, 1)
+            pb = np.clip(B[j][np.arange(len(j)), yk[j]], EPS, 1)
+            boot[n]["nll"].append(float(-np.log(pa).mean() + np.log(pb).mean()))
+    for n, d in boot.items():
+        e, l = np.percentile(d["ece"], [2.5, 97.5]), np.percentile(d["nll"], [2.5, 97.5])
+        print(f"{n:24s} dECE (pts) 95% [{e[0]:+.3f}, {e[1]:+.3f}]  dNLL 95% [{l[0]:+.4f}, {l[1]:+.4f}]  (field bootstrap, test)")
     res.to_csv(a.out / "prior_layer_metrics.csv", index=False)
     by_r.to_csv(a.out / "prior_layer_by_r.csv", index=False)
     (a.out / "temperatures.json").write_text(json.dumps({"r_edges": [None if not np.isfinite(e) else e for e in R_EDGES],
