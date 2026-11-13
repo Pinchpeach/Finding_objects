@@ -37,11 +37,11 @@ COSMOS deep fields and half of set B; the faint counts come from the odd
 COSMOS fields only), 13,857 truth objects:
 
     2.51 legacy layer   label accuracy 94.99 %, ECE 1.33 %, NLL 0.242
-    unified + COSMOS    label accuracy 96.65 %, ECE 0.32 %, NLL 0.095
+    unified + COSMOS    label accuracy 96.65 %, ECE 0.37 %, NLL 0.098
 
 325 objects fixed, 95 broken (exact McNemar p = 1.6e-30); 95 % field-
-bootstrap interval of dECE -1.44 to -0.45 points.  Bright fields: labels
-identical, ECE 0.84 -> 0.77 % (interval -0.38 to +0.13).  The cost is STAR
+bootstrap interval of dECE -1.38 to -0.52 points.  Bright fields: labels
+identical, ECE 0.84 -> 0.85 % (interval -0.20 to +0.16).  The cost is STAR
 recall at r > 23 in COSMOS (81 -> 65 %; precision 47 -> 64 %): stars are 5 %
 of the objects there, and the Bayes decision under the real mix maximises
 accuracy, not balanced accuracy (STAR F1 0.75 -> 0.81, GALAXY 0.97 -> 0.98).
@@ -91,18 +91,23 @@ def consistent(Pc: np.ndarray, labels, confidence, classes) -> np.ndarray:
     """Make the reported probabilities agree with the label.
 
     Where a rule other than the fused evidence set the label (2MASS counts,
-    BGS test, MYStIX membership, sparse priors, motion) and it is not the
-    most probable class, the label gets its rule confidence and the other
-    classes share the rest in proportion."""
+    BGS test, MYStIX membership, sparse priors, motion), the label gets its
+    rule confidence and the other classes share the rest in proportion:
+    both when the label is not the most probable class and when the rule
+    raised the confidence of the class that already led (BGS GALAXY 0.98
+    over p_galaxy 0.79), so primary_confidence = p_<label> always.
+    Evidence decisions (confidence = the largest p) are unchanged."""
     out = np.array(Pc, dtype=float, copy=True)
     if not len(out):
         return out
     k = np.array([classes.index(x) if x in classes else -1 for x in labels])
-    fix = (k >= 0) & (out.argmax(1) != k)
+    conf = np.asarray(confidence, dtype=float)
+    p_lab = out[np.arange(len(out)), np.maximum(k, 0)]
+    fix = (k >= 0) & ((out.argmax(1) != k) | (np.isfinite(conf) & (np.abs(p_lab - conf) > 1e-9)))
     if not fix.any():
         return out
     rows = np.flatnonzero(fix)
-    c = np.asarray(confidence, dtype=float)[rows]
+    c = conf[rows]
     c = np.where(np.isfinite(c), c, 0.5)
     sub = out[rows]
     lab = np.zeros_like(sub, dtype=bool)

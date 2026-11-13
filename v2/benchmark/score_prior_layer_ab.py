@@ -57,7 +57,13 @@ def probs(t: pd.DataFrame, consistent: bool) -> np.ndarray:
     P = np.clip(t[[f"p_{c.lower()}" for c in C]].to_numpy(float), EPS, 1)
     P = P / P.sum(1, keepdims=True)
     if consistent and t.get("prior_layer", pd.Series("legacy")).eq("unified").all():
-        P = CP.consistent(P, t.ours.tolist(), pd.to_numeric(t.primary_confidence, errors="coerce").to_numpy(), C)
+        # Stage 5 applies it with each object's own label, before host grouping;
+        # matched fragments carry their parent's class in `ours`
+        # (score_independent_fields.field_matches) but their own p_* and
+        # confidence, so they keep the probabilities Stage 5 wrote.
+        own = t.get("parent_object_id", pd.Series(np.nan, index=t.index)).isna().to_numpy()
+        P[own] = CP.consistent(P[own], t.ours[own].tolist(),
+                               pd.to_numeric(t.primary_confidence, errors="coerce").to_numpy()[own], C)
     return P
 
 
@@ -124,6 +130,8 @@ def main():
     Pb, lb = V[a.base]
     for grp in ("all", "cosmos", "bright"):
         k = (split == "test") & ((group == grp) if grp != "all" else True)
+        if not k.any():  # e.g. a run of set B only or deep fields only
+            continue
         fk = base.field.to_numpy()[k]
         uf = np.unique(fk)
         idx = {f: np.flatnonzero(fk == f) for f in uf}

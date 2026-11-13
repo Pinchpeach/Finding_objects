@@ -43,6 +43,14 @@ def test_reported_probabilities_agree_with_rule_labels():
     assert np.isclose(out[1, 1], 0.9) and out[1].argmax() == 1 and np.isclose(out[1].sum(), 1)
     assert np.isclose(out[1, 0] / out[1, 2], 7.0)  # rest shared in proportion
     assert np.allclose(out[2], Pc[2])  # UNKNOWN: unchanged
+    # a rule that raised the confidence of the class that already led (BGS GALAXY 0.98)
+    Pg = np.array([[0.15, 0.79, 0.06]])
+    out = CP.consistent(Pg, ["GALAXY"], [0.98], C)
+    assert np.isclose(out[0, 1], 0.98) and np.isclose(out.sum(), 1)
+    assert np.isclose(out[0, 0] / out[0, 2], 2.5)
+    # evidence decision: confidence = largest p, unchanged; NaN confidence on the leader: unchanged
+    assert np.allclose(CP.consistent(Pg, ["GALAXY"], [0.79], C), Pg)
+    assert np.allclose(CP.consistent(Pg, ["GALAXY"], [np.nan], C), Pg)
 
 
 def test_cosmos_faint_counts_lean_to_galaxy_at_the_faint_end():

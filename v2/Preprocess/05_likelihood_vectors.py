@@ -770,7 +770,8 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
             "prior_position": lat,  # on GALAXY and QSO
             "prior_qso_magnitude": qmag,
             "prior_qso_veto": qveto,
-            # after the decision, STAR / GALAXY only (faint_class_prior.py; NaN = not applied)
+            # STAR / GALAXY only (faint_class_prior.py; NaN = not applied): inside p_* in the
+            # unified layer, after the decision on the label in the legacy one
             "prior_faint_star": faint_prior[:, 0] if len(df) else [],
             "prior_faint_galaxy": faint_prior[:, 1] if len(df) else [],
             "prior_layer": ["unified" if unified else "legacy"] * len(df),
