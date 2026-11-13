@@ -227,6 +227,9 @@ SDSS·DESI 세부 분류 벤치마크(`evaluate_subclass.py`)의 별 분광형 �
 
 - 백색왜성 관문이 이름공간 없는 Gaia 열(`parallax`)을 읽어, 파이프라인에서 쓰이지 않는 것처럼 보였다. 확인해 보니 통합 단계(`02_integrate_objects.py`)가 "첫 유효값" 이름 없는 열도 함께 써서 실제로 작동한다. 벤치마크(`evaluate_subclass.py`)도 같은 별칭을 붙인다. 문제 없음.
 - 새 시험의 두꺼운 원반 예가 고유운동 150 mas/yr를 넘어 HIGH_PM 표시도 붙었다. 고유운동이 작고 V_T가 60–150 km/s인 예로 바꿨다.
+- PR #66의 CI 두 개가 이 변경과 무관하게 실패했다.
+  - `Build WD Subtype Gaia XP Model`: `star.py`가 바뀌면 자동 실행되는데, 입력 아티팩트(실행 36300795761)가 만료돼 내려받기 단계에서 멈춘다. 모델은 `star.py`를 쓰지 않는다. 워크플로 실행 조건을 바꾸는 것은 사용자 결정으로 남겼다(PR 댓글).
+  - `Evaluate WD HR-locus gates`: CDS XMatch(`cdsxmatch.u-strasbg.fr`) 접속 시간 초과. 2.51.3에서 벤치마크 수집기에 넣은 VizieR 다중 위치 질의 물러남을 `collect_star_gaia.py`에도 옮겼다.
 
 ## 4. 남은 것
 

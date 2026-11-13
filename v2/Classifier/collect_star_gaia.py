@@ -8,6 +8,21 @@ import numpy as np
 import pandas as pd
 
 
+def _vizier_fallback(truth: pd.DataFrame, radius_arcsec: float) -> pd.DataFrame:
+    import importlib.util
+    import sys
+
+    v2 = Path(__file__).resolve().parents[1]
+    sys.path.insert(0, str(v2 / "Get_data"))
+    import throttle  # VizieR mirror failover (CfA / NAOJ / IUCAA ...)
+
+    throttle.install()
+    spec = importlib.util.spec_from_file_location("v2_collect_catalog_truth", v2 / "benchmark" / "collect_catalog_truth.py")
+    cct = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(cct)
+    return cct.vizier_multi(truth[["benchmark_id", "ra", "dec"]], "I/355/gaiadr3", radius_arcsec)
+
+
 def run(truth_path: Path, out: Path, max_sep_arcsec: float = 2.0, min_matches: int = 500):
     from astroquery.xmatch import XMatch
     from astropy.table import Table
@@ -18,13 +33,21 @@ def run(truth_path: Path, out: Path, max_sep_arcsec: float = 2.0, min_matches: i
     if not req.issubset(truth.columns):
         raise KeyError(f"truth missing {sorted(req-set(truth.columns))}")
     upload = truth[["benchmark_id", "ra", "dec"]].rename(columns={"ra": "truth_ra", "dec": "truth_dec"})
-    xm = XMatch.query(
-        cat1=Table.from_pandas(upload),
-        cat2="vizier:I/355/gaiadr3",
-        max_distance=max_sep_arcsec * u.arcsec,
-        colRA1="truth_ra",
-        colDec1="truth_dec",
-    ).to_pandas()
+    try:
+        xm = XMatch.query(
+            cat1=Table.from_pandas(upload),
+            cat2="vizier:I/355/gaiadr3",
+            max_distance=max_sep_arcsec * u.arcsec,
+            colRA1="truth_ra",
+            colDec1="truth_dec",
+        ).to_pandas()
+    except Exception as e:  # noqa: BLE001
+        # cdsxmatch.u-strasbg.fr refuses connections at times (2026-11-12,
+        # 2026-11-13): the same Gaia table through VizieR multi-target
+        # queries with mirror failover, as benchmark/collect_catalog_truth.py
+        # does since 2.51.3 (angDist / truth_ra / truth_dec in the XMatch layout).
+        print(f"[collect_star_gaia] CDS XMatch ERROR {e!r}; trying VizieR multi-target batches", flush=True)
+        xm = _vizier_fallback(truth, max_sep_arcsec)
     mp = {
         "Source": "source_id",
         "RA_ICRS": "ra",
