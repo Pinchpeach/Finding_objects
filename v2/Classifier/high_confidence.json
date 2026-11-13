@@ -1,5 +1,5 @@
 {
- "description": "Confidence threshold per magnitude bin and class above which the estimated real-sky purity is >= 0.98 (bootstrap 84 % one-sided); null = no photometric high-confidence objects. Built by v2/benchmark/natural_purity.py (2.36.0).",
+ "description": "Confidence threshold per magnitude bin and class above which the estimated real-sky purity is >= 0.98 (bootstrap 84 % one-sided); null = no photometric high-confidence objects. Built by v2/benchmark/natural_purity.py (2.36.0). 2.52.0: r>22 GALAXY raised 0.5 -> 0.6 for the unified prior layer (more faint objects are called GALAXY): COSMOS2020 truth, calibration fields 98.17 % purity (one-sided 84 % bound 98.05 %), test fields 98.23 % (98.09 %); 0.5 gave 97.85 % (benchmark/natural_purity.py COSMOS_FLOOR).",
  "target_purity": 0.98,
  "magnitude_columns": [
   "std_mag__ls_r",
@@ -45,7 +45,7 @@
   },
   "r>22": {
    "STAR": null,
-   "GALAXY": 0.5,
+   "GALAXY": 0.6,
    "QSO": null
   }
  },
@@ -65,7 +65,7 @@
    "GALAXY": 0.996
   },
   "r>22": {
-   "GALAXY": 0.9831
+   "GALAXY": 0.9805
   }
  }
 }

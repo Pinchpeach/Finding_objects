@@ -41,7 +41,9 @@ HEADERS = {
     # survey's classifier) or INFERRED (our inference from measurements)
     "primary_provenance": "Class from",
     "subclass_provenance": "Sub-class from",
-    "primary_confidence": "Score (uncalibrated)",
+    # 2.52.0: the label's probability under the sky prior (= its p_*; calibrated on
+    # held-out COSMOS and set-B fields, ALGORITHM.md section 5)
+    "primary_confidence": "P(class)",
     "classification_status": "Status",
     "p_star": "P(star)",
     "p_galaxy": "P(galaxy)",

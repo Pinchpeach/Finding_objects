@@ -57,6 +57,9 @@ _ah_s.loader.exec_module(AGN_HOST)
 _cg_s = _tio_u.spec_from_file_location("v2_coarse_gbm", Path(__file__).resolve().parent / "coarse_gbm.py")
 COARSE_GBM = _tio_u.module_from_spec(_cg_s)
 _cg_s.loader.exec_module(COARSE_GBM)
+_cp_s = _tio_u.spec_from_file_location("v2_class_prior", Path(__file__).resolve().parent / "class_prior.py")
+CLASS_PRIOR = _tio_u.module_from_spec(_cp_s)
+_cp_s.loader.exec_module(CLASS_PRIOR)
 # Coarse model (2.51.0, coarse_gbm.py): "fusion" = rule fusion (linear + trees
 # over evidence scores); "gbm" = one gradient-boosted model on the measured
 # quantities for every object without a catalogue label, the rule fusion where
@@ -595,7 +598,8 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     # QSO predictions -16 % outside and -59 % inside the Clouds.  Where it
     # cannot be measured (small searches, < 11 Gaia sources) the latitude and
     # Magellanic priors above are used.
-    dens = QSO_OPT.density_prior(df)
+    rho = QSO_OPT.local_density(df)
+    dens = QSO_OPT.density_prior(df, rho)
     lat = np.where(np.isfinite(dens), dens, latitude_factor(df) * magellanic_factor(df))
     Q[:, [CLASSES.index("GALAXY"), CLASSES.index("QSO")]] *= lat[:, None]
     qf = np.ones(len(df))
@@ -608,7 +612,8 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     # 96.21 -> 96.31 %, QSO precision 79.5 -> 86.9 %, recall 94.4 -> 90.9 %;
     # QSO-rich benchmarks lose (SDSS -0.75, DESI -3.4 %p).  Option c1a
     # applies the full prior.
-    qf *= QSO_OPT.magnitude_prior(df, half="c1a" not in opts)
+    qmag = QSO_OPT.magnitude_prior(df, half="c1a" not in opts)
+    qf *= qmag
     # DESI QSO preselection W1 < 22.3 and W2 < 22.3 AB (Chaussidon et al.
     # 2023, Sect. 3; removes stars faint in WISE, e.g. the Sagittarius
     # stream): QSO odds x VETO otherwise (2.39.0; fields +0.09 %p, SDSS
@@ -622,6 +627,7 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     # 98.74 % with the Mahalanobis motion test, DESI unchanged).
     qf *= np.where(QSO_OPT.xray_star_side(df), QSO_OPT.VETO, 1.0)
     Q[:, CLASSES.index("QSO")] *= qf
+    qveto = qf / qmag  # literature cuts failed (VETO each), evidence rather than a prior
     qso_min = QSO_OPT.desi_threshold(df) if "c3b" in opts else np.zeros(len(df))
     faint = QSO_OPT.r_mag(df) > 22 if "c8" in opts else np.zeros(len(df), bool)
     # Bright clean 2MASS point sources (2.41.0, nir_star.py): where the
@@ -650,6 +656,13 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
         [_spectroscopic(items) for items in item_lists], dtype=bool
     )
     Q = Q / Q.sum(axis=1, keepdims=True) if len(Q) else Q
+    faint_prior = FAINT.star_galaxy_factors(df)
+    # One prior layer (2.52.0, class_prior.py): the faint star:galaxy prior
+    # enters the probabilities before the decision instead of re-deciding the
+    # label after it, so p_* and the label agree.
+    unified = CLASS_PRIOR.layer() == "unified"
+    if unified:
+        Q = CLASS_PRIOR.faint_split(Q, faint_prior)
     labels = []
     confidence = []
     margins = []
@@ -657,7 +670,6 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     basis = []
     best_candidates = []
     best_candidate_scores = []
-    faint_prior = FAINT.star_galaxy_factors(df)
     for q, (_, used, star_conflict, conflict, in_host, moving), qmin, qfaint, nir_i, nir_pi, bgs_i, member_i, gstar_i, wgal_i, faint_i in zip(
         Q, rows, qso_min, faint, nir, nir_p, bgs, member, gaia_star, wise_gal, faint_prior
     ):
@@ -727,7 +739,7 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
             status = "CLASSIFIED"
             # Faint star:galaxy number-count prior (2.46.0, faint_class_prior.py;
             # Henrion et al. 2011): STAR/GALAXY only, never QSO or moving stars.
-            if label in ("STAR", "GALAXY"):
+            if label in ("STAR", "GALAXY") and not unified:
                 redo = FAINT.apply(q, faint_i, CLASSES)
                 if redo is not None and redo[0] != "QSO":
                     label, conf, margin = redo
@@ -749,18 +761,41 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
         result_columns[f"p_{c.lower()}"] = Q[:, i] if len(Q) else []  # legacy alias
         result_columns[f"p_{c.lower()}_training_prior"] = P[:, i] if len(P) else []
         result_columns[f"field_prior_{c.lower()}"] = [float(prior[i])] * len(df)
+    # Every factor between the balanced-training probabilities and p_* (2.52.0),
+    # so a replay or a calibration study can rebuild the layer exactly:
+    # p_* ~ p_*_training_prior x (1, position, position x qso_magnitude x qso_veto)
     result_columns.update(
         {
-            # Not calibrated (2.51.0, scientific review): the fusion is fitted
-            # on class-balanced benchmarks and several priors (local density,
-            # magnitude, faint star:galaxy, vetoes) are multiplied in after it;
-            # the product was never checked against outcome frequencies (COSMOS:
-            # p >= 0.9 is wrong 2.75 % of the time).  Use the values for ranking.
-            "coarse_probability_calibrated": [False] * len(df),
+            "prior_gaia_density": rho,  # Gaia DR3 sources / deg^2 (10th neighbour)
+            "prior_position": lat,  # on GALAXY and QSO
+            "prior_qso_magnitude": qmag,
+            "prior_qso_veto": qveto,
+            # STAR / GALAXY only (faint_class_prior.py; NaN = not applied): inside p_* in the
+            # unified layer, after the decision on the label in the legacy one
+            "prior_faint_star": faint_prior[:, 0] if len(df) else [],
+            "prior_faint_galaxy": faint_prior[:, 1] if len(df) else [],
+            "prior_layer": ["unified" if unified else "legacy"] * len(df),
+        }
+    )
+    # Unified layer: p_* agree with the label where a rule set it (2.52.0,
+    # class_prior.consistent); likelihood_* keep the evidence-and-prior values.
+    if unified and len(Q):
+        Pf = CLASS_PRIOR.consistent(Q, labels, confidence, CLASSES)
+        for i, c in enumerate(CLASSES):
+            result_columns[f"p_{c.lower()}"] = Pf[:, i]
+    result_columns.update(
+        {
+            # 2.51: not calibrated -- priors multiplied in at two places, the
+            # faint one on the label only (COSMOS: p >= 0.9 wrong 2.75 % of the
+            # time).  2.52.0 unified layer: one prior, checked against outcome
+            # frequencies on held-out validation fields (class_prior.py; QSO
+            # not measured on the real-sky mix: too few QSO truth objects).
+            "coarse_probability_calibrated": [bool(unified)] * len(df),
             "coarse_prior_adjusted": [adjust] * len(df),
             "coarse_score_semantics": [
                 (model or {}).get("semantics", "normalized evidence likelihood; not a calibrated posterior probability")
                 + ("; class priors re-estimated for this field (Saerens+2002 EM)" if adjust else "")
+                + ("; p_* = posterior under one sky prior (position, QSO magnitude, faint star:galaxy counts), agreeing with the label (2.52.0)" if unified else "")
             ]
             * len(df),
             "primary_class": labels,

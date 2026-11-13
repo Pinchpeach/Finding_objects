@@ -1,0 +1,14 @@
+r_lo,r_hi,n_star,n_galaxy,fields
+20.0,20.5,51,104,deep_cosmos_1 deep_cosmos_3 deep_cosmos_5 deep_cosmos_7 deep_cosmos_9
+20.5,21.0,77,210,deep_cosmos_1 deep_cosmos_3 deep_cosmos_5 deep_cosmos_7 deep_cosmos_9
+21.0,21.5,85,297,deep_cosmos_1 deep_cosmos_3 deep_cosmos_5 deep_cosmos_7 deep_cosmos_9
+21.5,22.0,102,516,deep_cosmos_1 deep_cosmos_3 deep_cosmos_5 deep_cosmos_7 deep_cosmos_9
+22.0,22.5,113,813,deep_cosmos_1 deep_cosmos_3 deep_cosmos_5 deep_cosmos_7 deep_cosmos_9
+22.5,23.0,138,1397,deep_cosmos_1 deep_cosmos_3 deep_cosmos_5 deep_cosmos_7 deep_cosmos_9
+23.0,23.5,164,2129,deep_cosmos_1 deep_cosmos_3 deep_cosmos_5 deep_cosmos_7 deep_cosmos_9
+23.5,24.0,141,2987,deep_cosmos_1 deep_cosmos_3 deep_cosmos_5 deep_cosmos_7 deep_cosmos_9
+24.0,24.5,134,3125,deep_cosmos_1 deep_cosmos_3 deep_cosmos_5 deep_cosmos_7 deep_cosmos_9
+24.5,25.0,115,1930,deep_cosmos_1 deep_cosmos_3 deep_cosmos_5 deep_cosmos_7 deep_cosmos_9
+25.0,25.5,61,614,deep_cosmos_1 deep_cosmos_3 deep_cosmos_5 deep_cosmos_7 deep_cosmos_9
+25.5,26.0,36,190,deep_cosmos_1 deep_cosmos_3 deep_cosmos_5 deep_cosmos_7 deep_cosmos_9
+26.0,inf,28,55,deep_cosmos_1 deep_cosmos_3 deep_cosmos_5 deep_cosmos_7 deep_cosmos_9
