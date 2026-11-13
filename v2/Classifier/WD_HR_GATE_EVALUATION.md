@@ -62,3 +62,38 @@ not create a spurious conflict with Gaia DSC.
 About 31 non-WD SDSS STAR spectra still fall on the locus under the default
 gate (likely hot subdwarfs, CVs and WD+M composites, which share the region).
 Separating these needs spectroscopy or Gaia XP, not a tighter HR cut.
+
+## 2.53.0: error-aware locus (literature review 2026-11-13)
+
+GF21 do not stop at the Eq. 1 line: they give each source a probability
+P_WD that carries its measurement errors and recommend P_WD > 0.75.  Their
+map (built from SDSS spectra) is not available offline, so the gate now uses
+the probability that the source lies on the WD side of the Eq. 1 line given
+its errors:
+
+- M_G > 6 + 5(BP−RP) exactly when ϖ > ϖ_line = 10^((16 + 5(BP−RP) − G)/5);
+- P = Φ((ϖ − ϖ_line) / √(σ_ϖ² + (ϖ_line ln10 σ_c)²)), σ_c from the BP and RP
+  flux errors (first order; the G error is negligible);
+- on the locus at P ≥ 0.75, off it at P ≤ 0.25, abstain in between, after the
+  same parallax / proper-motion significance gate (`plx4_or_pm10_p75`).
+
+Local mixed benchmarks (Gaia features preserved with the benchmarks; SDSS
+split by the benchmark manifest):
+
+| set | gate | flagged | true WD | false WD | P | R | F1 |
+|---|---|---:|---:|---:|---:|---:|---:|
+| SDSS train (82 WD) | plx4_or_pm10 | 108 | 74 | 34 (28 STAR, 6 QSO) | 0.685 | 0.902 | 0.779 |
+| | **plx4_or_pm10_p75** | 103 | 74 | 29 (23 STAR, 6 QSO) | 0.718 | 0.902 | **0.800** |
+| | plx4_or_pm10_p90 | 100 | 73 | 27 | 0.730 | 0.890 | 0.802 |
+| SDSS test (68 WD) | plx4_or_pm10 | 66 | 59 | 7 | 0.894 | 0.868 | 0.881 |
+| | **plx4_or_pm10_p75** | 63 | 59 | 4 | 0.937 | 0.868 | **0.901** |
+| | plx4_or_pm10_p90 | 60 | 57 | 3 | 0.950 | 0.838 | 0.891 |
+| DESI DR1 (42 WD) | plx4_or_pm10 | 42 | 31 | 11 | 0.738 | 0.738 | 0.738 |
+| | **plx4_or_pm10_p75** | 39 | 31 | 8 | 0.795 | 0.738 | **0.765** |
+| | plx4_or_pm10_p90 | 36 | 28 | 8 | 0.778 | 0.667 | 0.718 |
+
+t = 0.75 (GF21's recommended cut on their own probability) removes false WDs
+without losing true ones on every set; t = 0.9 is level on the train split
+and loses WDs on the others.  The remaining false WDs are stars (hot
+subdwarfs, WD+MS pairs, CVs), as before.  The SDSS STAR / LAMOST sets need a
+Gaia crossmatch (`evaluate-wd-hr-gates.yml`).

@@ -174,4 +174,28 @@ def test_lamost_double_star_is_not_a_white_dwarf():
     # dust in front of a star: continuous through the plane, unchanged at high latitude
     f = m.dust_fraction_in_front
     assert abs(f(1000, 30, 0.0) - f(1000, 30, 0.001)) < 1e-3 and 0 < f(1000, 30, 0.0) < 0.2
-    assert abs(f(100, 30, 60) - 0.476) < 1e-3
+    # sech^2 layer, h = 188 pc at the solar circle (Drimmel & Spergel 2001; 2.53.0): tanh(100 sin 60 / 188)
+    assert abs(f(100, 30, 60) - 0.4307) < 1e-3
+
+
+def test_2_53_error_aware_wd_locus():
+    """GF21 decide with an error-aware probability; the gate uses P(on the WD
+    side of M_G = 6 + 5(BP-RP)) >= 0.75, off it at <= 0.25, else abstains."""
+    import importlib.util
+    from pathlib import Path
+
+    p = Path(__file__).resolve().parents[1] / "branches" / "star.py"
+    s = importlib.util.spec_from_file_location("star_wd_p", p)
+    m = importlib.util.module_from_spec(s)
+    s.loader.exec_module(m)
+    assert m.DEFAULT_HR_GATE == "plx4_or_pm10_p75"
+    wd = {"parallax": 20.0, "parallax_error": 0.2, "phot_g_mean_mag": 15.0, "bp_rp": 0.0}  # M_G = 11.5
+    assert m._wd_hr_signal(wd) is True
+    ms = dict(wd, phot_g_mean_mag=8.0)  # M_G = 4.5: main sequence side
+    assert m._wd_hr_signal(ms) is False
+    # 0.1 mag below the line with a 20 % parallax error: P = 0.59, abstain
+    near = {"parallax": 5.0, "parallax_error": 1.0, "phot_g_mean_mag": 12.6, "bp_rp": 0.0}  # M_G = 6.1
+    prob = m.wd_locus_probability(5.0, 1.0, 12.6, 0.0)
+    assert 0.25 < prob < 0.75 and m._wd_hr_signal(near) is None
+    # a colour error widens the probability towards 0.5
+    assert abs(m.wd_locus_probability(5.0, 1.0, 12.6, 0.0, 0.3) - 0.5) < abs(prob - 0.5)
