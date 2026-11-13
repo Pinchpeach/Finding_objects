@@ -21,33 +21,29 @@ probability only between STAR and GALAXY (the QSO share is unchanged: the
 hierarchical form of the 2.46.0 rule that the faint prior must not create
 QSOs or push faint QSOs to STAR, LITERATURE_REMAINING_ERRORS_2026-11-06).
 
-Calibration.  The prior-adjusted probabilities are not calibrated by
-construction: the fusion is overconfident at faint magnitudes (sky-spread
-SDSS benchmark, class-balanced per r bin: ECE 0.4 % at r < 19, 3.2 % at
-r > 21) and the priors are approximations.  ``p_*_calibrated`` applies one
-temperature per LS r bin to log Q (temperature scaling, Guo et al. 2017,
-ICML, PMLR 70, 1321), fitted on the calibration fields of the independent
-validation (probability_calibration.json, benchmark/prior_layer_study.py).
-Temperature scaling keeps the order of the classes, so labels do not change;
-the decision thresholds and the real-sky purity table of high_confidence.py
-stay on the uncalibrated ``primary_confidence`` scale they were measured on.
-Class-specific bias terms (Alexandari et al. 2020, ICML) were tried on the
-SDSS benchmark and dropped: unstable in sparse bins (r < 18, no LS r).
+Reported probabilities.  In the unified layer ``p_*`` agree with the label:
+where a rule other than the fused evidence set it (2MASS counts, BGS test,
+MYStIX membership, sparse priors, Gaia motion) the label gets the rule's
+confidence and the other classes share the rest (``consistent``);
+``likelihood_*`` keep the evidence-and-prior values.
+
+Calibration (measured, benchmark/prior_layer_study.py, 2.52.0).  On the
+held-out validation fields (half of the COSMOS deep fields, half of set B)
+the unified layer with the COSMOS2020 faint counts has ECE 0.37 % (COSMOS)
+and 0.82 % (bright fields), against 1.52 % and 0.82 % for 2.51.  Temperature
+scaling per LS r bin on top (Guo et al. 2017) was fitted on the other half
+and dropped: ECE +0.04 points (95 % field-bootstrap interval -0.18 to
++0.21), NLL -0.001.  Class-specific bias terms (Alexandari et al. 2020) were
+unstable on the sky-spread SDSS benchmark (sparse r bins).
 """
 
 from __future__ import annotations
 
-import json
 import os
-from functools import lru_cache
-from pathlib import Path
 
 import numpy as np
-import pandas as pd
 
 LAYERS = ("legacy", "unified")
-CALIBRATION = Path(__file__).resolve().parent / "probability_calibration.json"
-R_COLUMN = "std_mag__ls_r"
 EPS = 1e-12
 
 
@@ -75,42 +71,13 @@ def faint_split(Q: np.ndarray, factors: np.ndarray) -> np.ndarray:
     return Q
 
 
-@lru_cache(maxsize=4)
-def load_calibration(path: str | Path = CALIBRATION) -> dict | None:
-    p = Path(path)
-    if not p.exists():
-        return None
-    return json.loads(p.read_text())
-
-
-def r_bins(df: pd.DataFrame, edges) -> np.ndarray:
-    """Bin index per row: magnitude bins, then one bin for rows without an LS r."""
-    r = pd.to_numeric(df[R_COLUMN], errors="coerce").to_numpy(float) if R_COLUMN in df else np.full(len(df), np.nan)
-    inner = [float(e) for e in edges[1:-1]]
-    b = np.digitize(r, inner)
-    return np.where(np.isfinite(r), b, len(inner) + 1)
-
-
-def calibrate(Q: np.ndarray, df: pd.DataFrame, cal: dict | None = None) -> np.ndarray | None:
-    """Temperature-scaled probabilities per LS r bin; None without a calibration file."""
-    cal = load_calibration() if cal is None else cal
-    if not cal or not len(Q):
-        return None
-    T = np.asarray(cal["temperature"], float)
-    rb = np.clip(r_bins(df, cal["r_edges"]), 0, len(T) - 1)
-    a = np.log(np.clip(Q, EPS, 1)) / T[rb][:, None]
-    a -= a.max(1, keepdims=True)
-    e = np.exp(a)
-    return e / e.sum(1, keepdims=True)
-
-
 def consistent(Pc: np.ndarray, labels, confidence, classes) -> np.ndarray:
     """Make the reported probabilities agree with the label.
 
     Where a rule other than the fused evidence set the label (2MASS counts,
-    BGS test, MYStIX membership, sparse priors, motion, faint prior in the
-    legacy layer) and it is not the most probable class, the label gets its
-    rule confidence and the other classes share the rest in proportion."""
+    BGS test, MYStIX membership, sparse priors, motion) and it is not the
+    most probable class, the label gets its rule confidence and the other
+    classes share the rest in proportion."""
     out = np.array(Pc, dtype=float, copy=True)
     for i, (lab, conf) in enumerate(zip(labels, confidence)):
         if lab not in classes:

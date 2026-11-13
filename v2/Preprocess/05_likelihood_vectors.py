@@ -776,28 +776,25 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
             "prior_layer": ["unified" if unified else "legacy"] * len(df),
         }
     )
-    # Calibrated probabilities (2.52.0, class_prior.py): temperature per LS r
-    # bin on log p_*, then agreeing with the label where a rule set it.
-    Qc = CLASS_PRIOR.calibrate(Q, df)
-    if Qc is not None:
-        Pc = CLASS_PRIOR.consistent(Qc, labels, confidence, CLASSES)
+    # Unified layer: p_* agree with the label where a rule set it (2.52.0,
+    # class_prior.consistent); likelihood_* keep the evidence-and-prior values.
+    if unified and len(Q):
+        Pf = CLASS_PRIOR.consistent(Q, labels, confidence, CLASSES)
         for i, c in enumerate(CLASSES):
-            result_columns[f"p_{c.lower()}_calibrated"] = Pc[:, i]
-        result_columns["primary_probability"] = [
-            float(Pc[i, CLASSES.index(lab)]) if lab in CLASSES else float("nan") for i, lab in enumerate(labels)
-        ]
+            result_columns[f"p_{c.lower()}"] = Pf[:, i]
     result_columns.update(
         {
-            # Not calibrated (2.51.0, scientific review): the fusion is fitted
-            # on class-balanced benchmarks and several priors (local density,
-            # magnitude, faint star:galaxy, vetoes) are multiplied in after it;
-            # the product was never checked against outcome frequencies (COSMOS:
-            # p >= 0.9 is wrong 2.75 % of the time).  Use the values for ranking.
-            "coarse_probability_calibrated": [False] * len(df),
+            # 2.51: not calibrated -- priors multiplied in at two places, the
+            # faint one on the label only (COSMOS: p >= 0.9 wrong 2.75 % of the
+            # time).  2.52.0 unified layer: one prior, checked against outcome
+            # frequencies on held-out validation fields (class_prior.py; QSO
+            # not measured on the real-sky mix: too few QSO truth objects).
+            "coarse_probability_calibrated": [bool(unified)] * len(df),
             "coarse_prior_adjusted": [adjust] * len(df),
             "coarse_score_semantics": [
                 (model or {}).get("semantics", "normalized evidence likelihood; not a calibrated posterior probability")
                 + ("; class priors re-estimated for this field (Saerens+2002 EM)" if adjust else "")
+                + ("; p_* = posterior under one sky prior (position, QSO magnitude, faint star:galaxy counts), agreeing with the label (2.52.0)" if unified else "")
             ]
             * len(df),
             "primary_class": labels,
