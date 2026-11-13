@@ -14,7 +14,9 @@ on:
       catalogs: {description: "JSON list of catalogues to collect", default: '["gaia_dr3","panstarrs1","allwise","twomass","galex","desi_legacy"]'}
 concurrency:
   group: build-sdss-sky-${{ github.ref }}
-  cancel-in-progress: true
+  # queue, never cancel: a new run may reuse the artifacts of the one still
+  # running (reuse_run); cancelling it on 2026-11-12 stopped run 2 mid-way
+  cancel-in-progress: false
 permissions:
   contents: write
   actions: read  # artifacts of an earlier run (reuse_run)
