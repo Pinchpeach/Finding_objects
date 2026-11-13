@@ -121,8 +121,8 @@ class ScienceCrossmatchTests(unittest.TestCase):
             p = Path(d) / "models.json"
             p.write_text('{"axes":{}}')
             out = CAL.annotate(frame, p, axes=("physical",))
-            self.assertTrue(pd.isna(out.loc[0, "physical_calibrated_probability"]))
-            self.assertEqual(out.loc[0, "physical_calibration_status"], "UNCALIBRATED_NO_MODEL")
+            self.assertTrue(pd.isna(out.loc[0, "physical_reliability"]))
+            self.assertEqual(out.loc[0, "physical_reliability_status"], "NO_MODEL")
 
     def test_hierarchical_mira_metric_never_overwrites_exact_metric(self):
         rows = pd.DataFrame(

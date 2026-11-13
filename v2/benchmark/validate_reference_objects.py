@@ -54,7 +54,19 @@ LABEL_COLS = (
     "variability_subtype", "compact_class", "compact_subtype", "extragalactic_class", "extragalactic_subtype",
     "phenomenon_class", "phenomenon_subtype", "subclass_code", "subclass_tags", "paper_class",
 )
-KEEP = LABEL_COLS + ("classification_status", "primary_confidence", "object_id", "catalogs")
+# Provenance of each label column (2.51.0, Classifier/provenance.py): a hit
+# counts as the pipeline's own inference only when the column that carries it
+# is INFERRED (not copied from a catalogue or another survey's classifier).
+PROVENANCE_OF = {
+    "primary_class": "primary_provenance",
+    "physical_class": "physical_provenance", "physical_subtype": "physical_provenance",
+    "variability_class": "variability_provenance", "variability_subtype": "variability_provenance",
+    "compact_class": "compact_provenance", "compact_subtype": "compact_provenance",
+    "extragalactic_class": "extragalactic_provenance", "extragalactic_subtype": "extragalactic_provenance",
+    "phenomenon_class": "phenomenon_provenance", "phenomenon_subtype": "phenomenon_provenance",
+    "subclass_code": "subclass_provenance", "subclass_tags": "subclass_provenance",
+}
+KEEP = LABEL_COLS + ("classification_status", "primary_confidence", "object_id", "catalogs") + tuple(sorted(set(PROVENANCE_OF.values())))
 
 # Classifier labels that count as recognising each reference type (any one).
 EXPECT = {
@@ -124,8 +136,11 @@ PARENT = {
 }
 
 
-def tokens(row) -> set[str]:
-    s = " ".join(str(row.get(c, "")) for c in LABEL_COLS if str(row.get(c, "")) not in ("", "nan", "None"))
+def tokens(row, inferred_only=False) -> set[str]:
+    cols = LABEL_COLS
+    if inferred_only:
+        cols = [c for c in LABEL_COLS if c in PROVENANCE_OF and str(row.get(PROVENANCE_OF[c], "")) == "INFERRED"]
+    s = " ".join(str(row.get(c, "")) for c in cols if str(row.get(c, "")) not in ("", "nan", "None"))
     return {t for t in re.split(r"[^A-Z0-9_]+", s.upper()) if t}
 
 
@@ -233,16 +248,21 @@ def score(a):
             coarse = g.coarse_class.iloc[0]
             pc = g[f"{mode}_primary_class"].astype(str)
             sc = g.get(f"{mode}_secondary_class", pd.Series("", index=g.index)).astype(str)
-            tok = [tokens({c: rr.get(f"{mode}_{c}") for c in LABEL_COLS}) for rr in g.to_dict("records")]
+            recs = [{c: rr.get(f"{mode}_{c}") for c in KEEP} for rr in g.to_dict("records")]
+            tok = [tokens(rr) for rr in recs]
+            tok_inf = [tokens(rr, inferred_only=True) for rr in recs]
             exp = set(EXPECT.get(typ, ()))
             hit = pd.Series([bool(t & exp) for t in tok], index=g.index)
             r = dict(mode=mode, type=typ, coarse=coarse, n=len(g), matched=int(m.sum()))
             if coarse in ("STAR", "GALAXY", "QSO"):
                 r["coarse_ok"] = int((m & (pc == coarse)).sum())
+                prov = g.get(f"{mode}_primary_provenance", pd.Series("", index=g.index)).astype(str)
+                r["coarse_ok_inferred"] = int((m & (pc == coarse) & prov.eq("INFERRED")).sum())
                 r["coarse_either"] = int((m & ((pc == coarse) | (sc == coarse))).sum())
                 r["unknown"] = int((m & (pc == "UNKNOWN")).sum())
             if exp:
                 r["type_ok"] = int((m & hit).sum())
+                r["type_ok_inferred"] = int((m & pd.Series([bool(t & exp) for t in tok_inf], index=g.index)).sum())
                 par = exp | set(PARENT.get(typ, ()))
                 r["type_or_parent_ok"] = int((m & pd.Series([bool(t & par) for t in tok], index=g.index)).sum())
             r["labels"] = "; ".join(f"{k}:{v}" for k, v in pc[m].value_counts().head(3).items())

@@ -168,9 +168,9 @@ def test_rule_precision_calibration(tmp_path):
         }
     )
     out = cal.annotate(df, path, axes=("variability",))
-    assert out.variability_calibrated_probability.tolist()[0] == 0.9552
-    assert out.variability_calibration_method.tolist()[0] == "rule_precision"
-    assert out.variability_calibration_method.isna().tolist()[1:] == [True, True]
+    assert out.variability_reliability.tolist()[0] == 0.9552
+    assert out.variability_reliability_method.tolist()[0] == "rule_precision"
+    assert out.variability_reliability_method.isna().tolist()[1:] == [True, True]
 
 
 def test_literature_review_phenomenon_and_gaia_score():

@@ -1,0 +1,2 @@
+variant,n,acc,unknown,fixed,broken,truth_with_fragments,recall_STAR,recall_GALAXY,recall_QSO,n_fields,bal_acc,acc_lo,acc_hi,bal_lo,bal_hi,precision_STAR,precision_GALAXY,precision_QSO,baseline_majority,baseline_dsc,ours_on_dsc,dsc_coverage,unmatched_truth_pct
+base,3150,99.619,3,0,0,743,99.8,96.32,85.71,58,93.95,99.34,99.86,79.33,99.47,99.97,95.62,75.0,STAR 95.46,99.31,99.83,91.5,1.65

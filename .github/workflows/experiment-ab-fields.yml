@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
     inputs:
       experiment: {description: "results folder under v2/benchmark/experiments", default: "wise_from_ls"}
-      variants: {description: "space-separated variants (base phot cand both old lsw nominp minp minp_lsw)", default: "base lsw"}
+      variants: {description: "space-separated variants (base phot cand both old lsw nominp minp minp_lsw cgbm cfusion unified legacy ucosmos fw-<file> off-<rules>)", default: "base lsw"}
       fieldset: {description: "b = independent set B (truth from validation-data), deep = COSMOS deep fields (COSMOS2020 truth), all", default: "b"}
   # Dispatch only (since 2.48.1): the former push trigger on a trigger file
   # re-ran the whole experiment whenever the work branch was reset to main.
@@ -22,7 +22,19 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  health:
+    # stop before 89 region jobs when a core archive is down (2.51.1;
+    # on 2026-11-11 every run lost AllWISE / 2MASS or Legacy Surveys)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas numpy scipy requests astropy astroquery pyvo
+      - run: python -u .github/scripts/archive_health.py
   field:
+    needs: health
     runs-on: ubuntu-latest
     timeout-minutes: 300
     strategy:
@@ -185,13 +197,20 @@ jobs:
           # base = current defaults; phot/cand/both = the 2.48.0 association
           # switches against a no-prior baseline; lsw = WISE from LS forced photometry.
           for v in ${{ github.event.inputs.variants || 'base lsw' }}; do
-            unset V2_ASSOC_PHOT_PRIOR V2_ASSOC_CANDIDATE_DENSITY V2_WISE_FROM_LS V2_ASSOC_MAX_NSEP V2_DISABLE_RULES
+            unset V2_ASSOC_PHOT_PRIOR V2_ASSOC_CANDIDATE_DENSITY V2_WISE_FROM_LS V2_ASSOC_MAX_NSEP V2_DISABLE_RULES V2_COARSE_MODEL V2_FUSION_WEIGHTS V2_PRIOR_LAYER V2_FAINT_PRIOR
             case $v in
               phot) export V2_ASSOC_PHOT_PRIOR=1 V2_ASSOC_CANDIDATE_DENSITY=0 V2_ASSOC_MAX_NSEP=0;;
               cand) export V2_ASSOC_PHOT_PRIOR=0 V2_ASSOC_CANDIDATE_DENSITY=1 V2_ASSOC_MAX_NSEP=0;;
               both) export V2_ASSOC_PHOT_PRIOR=1 V2_ASSOC_CANDIDATE_DENSITY=1 V2_ASSOC_MAX_NSEP=0;;
               old) export V2_ASSOC_PHOT_PRIOR=0 V2_ASSOC_CANDIDATE_DENSITY=0 V2_ASSOC_MAX_NSEP=0;;
               lsw) export V2_WISE_FROM_LS=1;;
+              cgbm) export V2_COARSE_MODEL=gbm;;  # single GBM on measurements (2.51.0, Preprocess/coarse_gbm.py)
+              cfusion) export V2_COARSE_MODEL=fusion;;
+              # prior layer (2.52.0 default: unified + COSMOS2020 faint counts, Preprocess/class_prior.py)
+              legacy) export V2_PRIOR_LAYER=legacy V2_FAINT_PRIOR=labels;;  # 2.51: faint prior after the decision, 2.46.0 table
+              unified) export V2_PRIOR_LAYER=unified V2_FAINT_PRIOR=labels;;  # one layer, 2.46.0 table
+              ucosmos) export V2_PRIOR_LAYER=unified V2_FAINT_PRIOR=cosmos;;  # = base since 2.52.0
+              fw-*) export V2_FUSION_WEIGHTS="$GITHUB_WORKSPACE/v2/Preprocess/${v#fw-}.json";;  # another fusion fit, e.g. fw-fusion_weights_nopresence
               off-*) r="${v#off-}"; export V2_DISABLE_RULES="${r//+/,}";;  # rule ablation, e.g. off-AST-EXT-001+PS1-MORPH-001
               nominp) export V2_ASSOC_MAX_NSEP=0;;
               minp) export V2_ASSOC_MAX_NSEP=1;;

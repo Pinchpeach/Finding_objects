@@ -252,7 +252,18 @@ def _ebv(row):
 # at distance d and latitude b = 1 - exp(-d |sin b| / h).  Applied only with a
 # parallax (2.23.0: a 20 pc star was dereddened by the full column, 0.4 mag in
 # BP-RP); without one the full column is kept, as before.
+# 2.51.0 (scientific review 2026-11-11): the infinite slab makes the total
+# column diverge as b -> 0, so a 1 kpc star near the plane kept ~0.3 % of the
+# column, and b = 0 exactly jumped to 1.0.  The dust layer now ends where the
+# sight line leaves the dust disc (Galactocentric radius DUST_DISC_EDGE_PC,
+# Sun at R0): fraction = (1 - e^{-d/L_b}) / (1 - e^{-L/L_b}), L_b = h / |sin b|,
+# which is continuous and tends to d / L in the plane.  The edge radius is our
+# approximation of the dust disc's extent, not a fitted value; a 3-D dust map
+# (e.g. Edenhofer et al. 2024) is the proper replacement (follow-up).  Gaia
+# GSP-Phot extinctions are used instead of this model whenever they exist.
 DUST_SCALE_HEIGHT_PC = 134.0
+R0_PC = 8178.0  # GRAVITY Collaboration 2019, A&A 625, L10
+DUST_DISC_EDGE_PC = 15000.0
 
 
 def _galactic_lb(row):
@@ -274,9 +285,26 @@ def _dust_fraction(row):
     p, lb = _parallax(row), _galactic_lb(row)
     if p is None or lb is None:
         return 1.0
-    b = lb[1]
+    lon, b = lb
     d_pc = 1000.0 / p[0]
-    return 1.0 - math.exp(-d_pc * abs(math.sin(math.radians(b))) / DUST_SCALE_HEIGHT_PC) if abs(b) > 0 else 1.0
+    return dust_fraction_in_front(d_pc, lon, b)
+
+
+def dust_fraction_in_front(d_pc, lon_deg, b_deg):
+    """Fraction of the sight-line dust column in front of distance ``d_pc``:
+    exponential layer (scale height DUST_SCALE_HEIGHT_PC) truncated at the dust
+    disc edge."""
+    cl, cb = math.cos(math.radians(lon_deg)), math.cos(math.radians(b_deg))
+    # in-plane distance from the Sun to the disc edge along longitude l
+    s_plane = R0_PC * cl + math.sqrt(max(0.0, R0_PC * R0_PC * cl * cl - (R0_PC * R0_PC - DUST_DISC_EDGE_PC * DUST_DISC_EDGE_PC)))
+    path = s_plane / max(cb, 1e-6)
+    sb = abs(math.sin(math.radians(b_deg)))
+    if d_pc >= path:
+        return 1.0
+    if sb < 1e-9:
+        return d_pc / path
+    lam = DUST_SCALE_HEIGHT_PC / sb
+    return (1.0 - math.exp(-d_pc / lam)) / (1.0 - math.exp(-path / lam))
 
 
 def _sfd_ebv_in_front(row):
@@ -726,15 +754,19 @@ def star_tags(row):
 #     "little dust" meant "carbon" in the Suh set.
 # Cascade (first model whose inputs exist; saturated WISE bands masked):
 #   1. W_RP - W_KJ (Lebzelter et al. 2018), Ks - W3, Gaia LPV C-star flag
-#      (Lebzelter et al. 2023): 96.0 % on 3656 stars;
-#   2. W_RP - W_KJ, J - Ks, C-star flag: 96.9 % on 1987;
+#      (Lebzelter et al. 2023): 97.1 % on 3760 test stars;
+#   2. W_RP - W_KJ, J - Ks, C-star flag: 98.5 % on 2027;
 #   3. W_RP - W_KJ, J - Ks: 79.0 % on 614;
 #   4. J - Ks, Ks - W3, W1 - W2, W3 - W4: 88.5 % on 26.
 #   A Ks - W3 model without the flag was dropped (73.8 %: dusty O-rich and
 #   dust-free stars overlap).  Within 0.15 of p = 0.5: "chemistry uncertain".
-#   All together: 94.6 % at 83 % coverage (Suh 91.2 %, GCVS 98.3 %; C
-#   precision 0.87, O 0.97).  On 23 969 field LPVs in random cones the
-#   predicted C fraction is 25.7 % (Gaia C-star flag: 24.4 %).
+#   All together (agb_chemistry_model.json "test", 50/50 split of the same
+#   lists, no external set): 95.8 % at 84.9 % coverage (Suh 93.1 %, GCVS
+#   98.7 %; C precision 0.919, O 0.968).  On 23 969 field LPVs in random
+#   cones it predicts C for only 3.3 %, while the Gaia C-star flag marks
+#   24.4 %: on the field population the model and the flag disagree strongly,
+#   which the in-list test cannot show (numbers corrected 2.51.0; the old
+#   comment said 94.6 % and 25.7 %, values of an earlier model).
 # The published single cuts did worse on these mostly dust-obscured Galactic
 # AGB stars: W_RP - W_KJ >= 0.9 (Mowlavi+2019) 68.5 %, the AllWISE line of
 # Lian et al. (2014) 75.4 %; WISE colours alone (46.6 % on stars without
@@ -1007,7 +1039,9 @@ def classify_star(row):
         u = label.upper()
         # SDSS WD templates: WD, WDhotter, WDcooler, WDmagnetic, CarbonWD (DQ)
         # and CalciumWD (DZ, missed before 2.27.0); LAMOST DA/DB/... types.
-        if "WD" in u or u.startswith(("DA", "DB", "DC", "DQ", "DZ", "DO")):
+        # MK white-dwarf types on the original case (2.51.0): "DoubleStar"
+        # (LAMOST) started with "DO" once upper-cased and became a white dwarf.
+        if "WD" in u or re.match(r"^D[ABCOQZ][ABCOQZHPEV0-9.:+]*$", label.strip()):
             return _result(
                 f"White dwarf ({label})", "STAR:WD", None, f"{src}_SUBCLASS", f"{src} spectrum subclass {label}"
             )
@@ -1910,6 +1944,8 @@ def annotate(df: pd.DataFrame, rows=None) -> pd.DataFrame:
     out["subclass_code"] = [r.get("code") for r in res]
     out["subclass_confidence"] = [r.get("confidence") for r in res]
     out["subclass_rule"] = [r.get("rule") for r in res]
+    prov = _load("provenance")
+    out["subclass_provenance"] = [prov.of_rule(r.get("rule")) if r.get("code") else "NONE" for r in res]
     out["subclass_status"] = [r.get("status") for r in res]
     out["subclass_basis"] = [r.get("basis") for r in res]
     for col in ("paper_class", "paper_source", "paper_refs", "paper_ads"):

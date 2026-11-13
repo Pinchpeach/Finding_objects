@@ -125,9 +125,22 @@ def truth_deep(ra, dec, radius, out):
 
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
-    v = Vizier(columns=["_RAJ2000", "_DEJ2000", "ACSF814Wmag", "ACSmuClass", "lptype", "HSCimagAuto"], row_limit=-1)
-    v.TIMEOUT = 300
-    res = v.query_region(SkyCoord(ra * u.deg, dec * u.deg), radius=radius * u.arcmin, catalog="J/ApJS/258/11/classic")
+    res, err = None, None
+    # VizieR mirrors (as v2/Get_data/throttle.py): the Strasbourg server
+    # answered 404 for every COSMOS query on 2026-11-11.
+    for host in ("vizier.cds.unistra.fr", "vizier.cfa.harvard.edu", "vizier.iucaa.in", "vizier.nao.ac.jp"):
+        v = Vizier(columns=["_RAJ2000", "_DEJ2000", "ACSF814Wmag", "ACSmuClass", "lptype", "HSCimagAuto"], row_limit=-1)
+        v.VIZIER_SERVER = host
+        v.TIMEOUT = 300
+        try:
+            res = v.query_region(SkyCoord(ra * u.deg, dec * u.deg), radius=radius * u.arcmin, catalog="J/ApJS/258/11/classic")
+            print("COSMOS2020 from", host)
+            break
+        except Exception as e:  # noqa: BLE001 - try the next mirror
+            err = e
+            print("mirror failed", host, e)
+    if res is None:
+        raise RuntimeError(f"COSMOS2020 query failed on every VizieR mirror: {err}")
     for t in res:
         df = t.to_pandas()
         df.to_csv(out / "J_ApJS_258_11_classic.csv.gz", index=False)
@@ -172,7 +185,9 @@ KEEP = re.compile(
     # 2.44.0: Tractor fit quality, LS photometry for LS-GBM replays, AllWISE W3, derived features
     r"desi_legacy_surveys_dr10__(ls_id|dchisq_[12]|shape_r_ivar|fracflux_r|flux_(i|w1|w2)|flux_ivar_\w+|mw_transmission_\w+)|"
     r"allwise__(W3mag|snr3)|ls_(zw1_excess|dchisq_rex_rel_log|size_sig_log)|wise_w2_w3_color|"
-    r"sdss_dr18_spectroscopy__class|desi_dr1_spectroscopy__OType|lamost_dr_catalog__Class)$"
+    r"sdss_dr18_spectroscopy__class|desi_dr1_spectroscopy__OType|lamost_dr_catalog__Class|"
+    # 2.52.0: the Stage 5 prior factors (prior-layer calibration study)
+    r"prior_\w+|p_(star|galaxy|qso)(_training_prior)?)$"
 )
 
 
@@ -233,7 +248,7 @@ def compact(work, ra, dec, radius, out, name="objects"):
             _, sep, _ = oc.match_to_catalog_sky(SkyCoord(p[:, 0] * u.deg, p[:, 1] * u.deg))
             near = set(o.object_id[sep.arcsec <= 3.0])
             ev = pd.read_csv(lv, low_memory=False)
-            keep = [c for c in ev.columns if c in ("object_id", "evidence_json", "coarse_probabilities_json") or c.startswith(("p_", "prob", "fused"))]
+            keep = [c for c in ev.columns if c in ("object_id", "evidence_json", "coarse_probabilities_json") or c.startswith(("p_", "prob", "fused", "prior_"))]
             ev[ev.object_id.isin(near)][keep].to_csv(out / f"{name}_evidence.csv.gz", index=False)
     if name != "objects":
         return

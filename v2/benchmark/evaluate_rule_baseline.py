@@ -169,7 +169,10 @@ def main():
         truth[["benchmark_id", "truth_class"]]
         .merge(manifest[["benchmark_id", "split"]], on="benchmark_id")
         .merge(
-            pred[["benchmark_id", "primary_class", "classification_status", "primary_confidence", "primary_margin"]],
+            # class probabilities after and before the position / magnitude
+            # priors and the r magnitude, for the calibration study (2.52.0)
+            pred[["benchmark_id", "primary_class", "classification_status", "primary_confidence", "primary_margin"]
+                 + [c for c in pred.columns if c.startswith(("p_star", "p_galaxy", "p_qso", "prior_")) or c == "std_mag__ls_r"]],
             on="benchmark_id",
         )
     )

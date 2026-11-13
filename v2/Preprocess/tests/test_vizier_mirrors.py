@@ -134,3 +134,11 @@ def test_tableless_everywhere_is_a_real_empty_cone():
 
     r = throttle._with_mirrors(lambda self, m, url, *a, **k: V())(None, "POST", "https://vizier.cds.unistra.fr/viz-bin/votable")
     assert "<TABLE" not in r.text
+
+
+def test_404_from_strasbourg_moves_to_a_mirror():
+    # 2026-11-11: Strasbourg answered 404 to every viz-bin/votable query (2.51.0)
+    seen = []
+    req = throttle._with_mirrors(_send({"vizier.cds.unistra.fr": 404}, seen))
+    r = req(None, "GET", "https://vizier.cds.unistra.fr/viz-bin/votable?-source=II/328/allwise")
+    assert r.status_code == 200 and "vizier.cfa.harvard.edu" in seen[-1]

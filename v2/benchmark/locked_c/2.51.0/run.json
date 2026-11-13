@@ -1,0 +1,9 @@
+{
+ "version": "2.51.0",
+ "commit": "a376dc11fed480606604b4e5507268ea733b006a",
+ "fields_scored": 60,
+ "fields_locked": 60,
+ "list_sha256": "21c42406ce3700ce7c271f2773a81297484e4f7543a821aaa05cf521f378b7e4",
+ "date": "2026-11-12",
+ "note": "2.51.0 release scoring (first look at set C)"
+}

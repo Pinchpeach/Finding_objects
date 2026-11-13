@@ -284,9 +284,9 @@ def classify_assisted(row, truth_otype, axis):
         "confidence",
         "status",
         "evidence_json",
-        "calibrated_probability",
-        "calibration_status",
-        "calibration_method",
+        "reliability",
+        "reliability_status",
+        "reliability_method",
     ):
         payload.pop(f"{axis}_{suffix}", None)
     payload["otype"] = truth_otype

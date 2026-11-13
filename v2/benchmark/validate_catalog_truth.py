@@ -21,6 +21,11 @@ def main():
     # 2.26.0: the DESI fusion-training set (benchmark/desi_fusion) is used for
     # training only; the SDSS / DESI external test splits stay the reference.
     p.add_argument("--split-all", choices=("train", "calibration", "test"), default=None)
+    # 2.52.0: spatial split (SCIENTIFIC_REVIEW_2026-11-11 item 6.8).  Objects
+    # sharing a value of this column (e.g. sky_cell of build_sdss_sky_truth.py)
+    # land in the same split, so neighbouring objects -- same plate, depth and
+    # extinction -- never sit on both sides (Roberts et al. 2017, Ecography 40, 913).
+    p.add_argument("--split-column", default=None)
     a = p.parse_args()
     truth = pd.read_csv(a.truth)
     a.out.mkdir(parents=True, exist_ok=True)
@@ -37,7 +42,12 @@ def main():
     elif any(counts.get(c, 0) < 20 for c in CLASSES):
         raise AssertionError(f"unbalanced benchmark still requires >=20 examples per class; got {counts}")
     manifest = truth[["benchmark_id", "truth_class", "ra", "dec"]].copy()
-    manifest["split"] = a.split_all or manifest.benchmark_id.map(split_for)
+    if a.split_all:
+        manifest["split"] = a.split_all
+    elif a.split_column:
+        manifest["split"] = truth[a.split_column].astype(str).map(lambda v: split_for(f"cell:{v}"))
+    else:
+        manifest["split"] = manifest.benchmark_id.map(split_for)
     reports = []
     files = sorted([*a.catalog_root.rglob("*_trd.csv"), *a.catalog_root.rglob("*_trd.csv.gz")])
     for f in files:

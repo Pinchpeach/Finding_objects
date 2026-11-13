@@ -161,8 +161,14 @@ def run_gaia(truth, out_dir):
             colDec1="truth_dec",
         ).to_pandas()
     except Exception as e:
-        print(f"[gaia_dr3] CDS XMatch ERROR {e!r}", flush=True)
-        return _finish("gaia_dr3", out_dir, len(truth), errors=1)
+        # cdsxmatch.u-strasbg.fr down (2026-11-12): the same table through
+        # the mirrored VizieR multi-target query (2.51.3)
+        print(f"[gaia_dr3] CDS XMatch ERROR {e!r}; trying VizieR multi-target batches", flush=True)
+        try:
+            xm = vizier_multi(truth, "I/355/gaiadr3", PM_SEARCH_ARCSEC)
+        except Exception as e2:  # noqa: BLE001
+            print(f"[gaia_dr3] VizieR batches ERROR {e2!r}", flush=True)
+            return _finish("gaia_dr3", out_dir, len(truth), errors=1)
     if xm.empty:
         return _finish("gaia_dr3", out_dir, len(truth))
 
@@ -264,9 +270,137 @@ def run_gaia(truth, out_dir):
     return _finish("gaia_dr3", out_dir, len(truth), out, matched=ok)
 
 
+# One CDS XMatch per catalogue instead of one VizieR cone per object
+# (2.51.2).  The per-object cones (3-5 s throttle each) took more than the
+# 300-min job limit for 5,000 objects in 2MASS and GALEX when the sky-spread
+# benchmark was collected (2026-11-12); XMatch matches all positions in one
+# request against the same VizieR table, so the rows (VizieR column names)
+# are those of the cone search.  Falls back to the cones on any failure.
+XMATCH = {
+    "twomass": {"table": "II/246/out", "id": ["2MASS", "_2MASS"]},
+    "galex": {"table": "II/335/galex_ais", "id": ["objid"]},
+}
+
+
+def from_xmatch(xm, truth, name, catalog_label):
+    """Nearest XMatch row per truth object within MATCH_ARCSEC, in the
+    schema of the per-object path (truth metadata + collector base columns)."""
+    spec = XMATCH[name]
+    idc = next((c for c in spec["id"] if c in xm.columns), None)
+    rac = next((c for c in ("RAJ2000", "RA_ICRS", "ra") if c in xm.columns), None)
+    dcc = next((c for c in ("DEJ2000", "DE_ICRS", "dec") if c in xm.columns), None)
+    if not (idc and rac and dcc and "angDist" in xm.columns):
+        raise KeyError(f"{name} XMatch columns missing; got {list(xm.columns)[:20]}")
+    xm = xm.copy()
+    xm["_sep_arcsec"] = pd.to_numeric(xm["angDist"], errors="coerce")
+    xm = xm[xm["_sep_arcsec"] <= MATCH_ARCSEC[name]]
+    xm = xm.sort_values(["benchmark_id", "_sep_arcsec"]).drop_duplicates("benchmark_id", keep="first")
+    ident = xm[idc].astype("string")
+    base = pd.DataFrame(
+        {
+            "catalog": catalog_label,
+            "catalog_object_id": ident,
+            "object_name": catalog_label + " " + ident,
+            "ra": pd.to_numeric(xm[rac], errors="coerce"),
+            "dec": pd.to_numeric(xm[dcc], errors="coerce"),
+        },
+        index=xm.index,
+    )
+    rest = xm.drop(columns=[c for c in ("truth_ra", "truth_dec", "angDist") if c in xm.columns])
+    xm = pd.concat([base, rest.drop(columns=[c for c in base.columns if c in rest.columns])], axis=1)
+    meta = truth[["benchmark_id", "truth_class", "truth_source", "ra", "dec"]].rename(columns={"ra": "truth_ra", "dec": "truth_dec"})
+    out = meta.merge(xm, on="benchmark_id", how="inner")
+    out.insert(5, "match_threshold_arcsec", MATCH_ARCSEC[name])
+    return out.sort_values("benchmark_id")
+
+
+def run_xmatch(name, truth, out_dir):
+    from astroquery.xmatch import XMatch
+    from astropy.table import Table
+    import astropy.units as u
+
+    mod = load(name)
+    upload = truth[["benchmark_id", "ra", "dec"]].rename(columns={"ra": "truth_ra", "dec": "truth_dec"})
+    xm = XMatch.query(
+        cat1=Table.from_pandas(upload),
+        cat2=f"vizier:{XMATCH[name]['table']}",
+        max_distance=MATCH_ARCSEC[name] * u.arcsec,
+        colRA1="truth_ra",
+        colDec1="truth_dec",
+    ).to_pandas()
+    out = from_xmatch(xm, truth, name, mod.CATALOG)
+    print(f"[{name}] CDS XMatch targets={len(truth)} matched={len(out)}", flush=True)
+    return _finish(name, out_dir, len(truth), out if len(out) else None, matched=len(out))
+
+
+# VizieR multi-target query (2.51.3): one request with VIZIER_BATCH positions,
+# rows tagged with the target index _q.  Second choice after XMatch: on
+# 2026-11-12 cdsxmatch.u-strasbg.fr refused connections for hours while the
+# VizieR mirrors answered (XMatch has no mirror; Get_data/throttle.py fails
+# VizieR requests over to CfA / NAOJ / IUCAA ...).  10,000 objects = 20 requests.
+VIZIER_BATCH = 500
+
+
+def from_vizier_batch(d, chunk):
+    """VizieR multi-target rows -> the XMatch layout (benchmark_id, angDist)."""
+    if d is None or not len(d):
+        return pd.DataFrame()
+    if "_q" not in d.columns:  # rows cannot be tied to targets: let the caller fall back
+        raise KeyError(f"VizieR multi-target answer without _q; columns {list(d.columns)[:10]}")
+    d = d.copy()
+    q = pd.to_numeric(d["_q"], errors="coerce").astype(int) - 1  # 1-based target index
+    t = chunk.reset_index(drop=True)
+    d["benchmark_id"] = t.benchmark_id.to_numpy()[q]
+    d["truth_ra"], d["truth_dec"] = t.ra.to_numpy(float)[q], t.dec.to_numpy(float)[q]
+    ra = next(c for c in ("RAJ2000", "RA_ICRS") if c in d.columns)
+    de = next(c for c in ("DEJ2000", "DE_ICRS") if c in d.columns)
+    d["angDist"] = sep_arcsec(t.ra.to_numpy(float)[q], t.dec.to_numpy(float)[q],
+                              pd.to_numeric(d[ra], errors="coerce").to_numpy(),
+                              pd.to_numeric(d[de], errors="coerce").to_numpy())
+    return d.drop(columns=["_q"])
+
+
+def vizier_multi(truth, table, radius_arcsec):
+    """All rows of a VizieR table within radius of each truth position, in
+    VIZIER_BATCH-position requests, in the CDS XMatch layout (benchmark_id,
+    truth_ra, truth_dec, angDist + the table's VizieR columns)."""
+    from astroquery.vizier import Vizier
+    from astropy.coordinates import SkyCoord
+    import astropy.units as u
+
+    v = Vizier(columns=["**"], row_limit=-1)
+    v.TIMEOUT = 300
+    parts = []
+    for i in range(0, len(truth), VIZIER_BATCH):
+        chunk = truth.iloc[i : i + VIZIER_BATCH]
+        coords = SkyCoord(chunk.ra.to_numpy(float) * u.deg, chunk.dec.to_numpy(float) * u.deg)
+        res = v.query_region(coords, radius=radius_arcsec * u.arcsec, catalog=table)
+        if len(res):
+            parts.append(from_vizier_batch(res[0].to_pandas(), chunk))
+        print(f"[{table}] VizieR batch {i + len(chunk)}/{len(truth)}", flush=True)
+    return pd.concat(parts, ignore_index=True) if parts else pd.DataFrame(columns=["benchmark_id", "angDist"])
+
+
+def run_vizier_batch(name, truth, out_dir):
+    mod = load(name)
+    xm = vizier_multi(truth, XMATCH[name]["table"], MATCH_ARCSEC[name])
+    out = from_xmatch(xm, truth, name, mod.CATALOG) if len(xm) else pd.DataFrame()
+    print(f"[{name}] VizieR multi-target targets={len(truth)} matched={len(out)}", flush=True)
+    return _finish(name, out_dir, len(truth), out if len(out) else None, matched=len(out))
+
+
 def run_catalog(name, truth, out_dir, workers):
     if name == "gaia_dr3":
         return run_gaia(truth, out_dir)
+    if name in XMATCH:
+        try:
+            return run_xmatch(name, truth, out_dir)
+        except Exception as e:  # noqa: BLE001 - CDS XMatch down: VizieR batches
+            print(f"[{name}] CDS XMatch failed ({e!r}); trying VizieR multi-target batches", flush=True)
+        try:
+            return run_vizier_batch(name, truth, out_dir)
+        except Exception as e:  # noqa: BLE001 - last resort: per-object cones
+            print(f"[{name}] VizieR batches failed ({e!r}); falling back to per-object cones", flush=True)
     mod = load(name)
     radius = RADII[name]
     rows = []
