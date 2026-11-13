@@ -44,7 +44,8 @@ def main():
                 # fused class probabilities of the matched objects (risk-coverage / abstention calibration)
                 # fused probabilities, and the balanced-training ones before the
                 # position / magnitude priors (2.52.0: prior-layer calibration)
-                p = pd.read_csv(ev, usecols=lambda c: c == "object_id" or (c.startswith("p_") and c[2:].split("_")[0] in ("star", "galaxy", "qso")))
+                p = pd.read_csv(ev, usecols=lambda c: c == "object_id" or c.startswith("prior_")
+                                or (c.startswith("p_") and c[2:].split("_")[0] in ("star", "galaxy", "qso")))
                 m = m.merge(p.drop_duplicates("object_id"), on="object_id", how="left")
             if not m.empty:
                 m.insert(0, "field", fdir.name)
@@ -87,9 +88,12 @@ def main():
             r["w1_changed"] = int((d > 0.01).sum())
             r["w1_median_abs_diff"] = round(float(d[d > 0.01].median()), 3) if (d > 0.01).any() else 0.0
         if a.out and not a.aggregate_only:
-            pcols = [c for c in m.columns if c.startswith("p_") and c[2:].split("_")[0] in ("star", "galaxy", "qso")]
+            pcols = [c for c in m.columns if (c.startswith("p_") and c[2:].split("_")[0] in ("star", "galaxy", "qso")) or c.startswith("prior_")]
+            # decision basis and confidence: a replay of the prior layer keeps
+            # the override decisions (BGS, 2MASS, MYStIX, sparse priors, motion)
             mags = [c for c in ("std_mag__ls_r", "std_mag__ps1_r", "std_mag__sdss_r", "gaia_dr3__phot_g_mean_mag", "classification_status",
-                                "t_survey", "t_ra", "t_dec") if c in m]
+                                "classification_basis", "primary_confidence", "desi_legacy_surveys_dr10__type", "t_survey", "t_ra", "t_dec",
+                                "object_id", "parent_object_id") if c in m]
             m[["field", "t_truth", "ours"] + pcols + mags].to_csv(a.out / f"truth_probs_{v}.csv.gz", index=False)
             # every wrong or UNKNOWN truth object of this variant, for error analysis
             keep = [c for c in ("field", "t_ra", "t_dec", "t_truth", "t_survey", "t_n_fragments", "ours", "catalogs", "unknown_reason",

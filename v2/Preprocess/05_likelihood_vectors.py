@@ -595,7 +595,8 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     # QSO predictions -16 % outside and -59 % inside the Clouds.  Where it
     # cannot be measured (small searches, < 11 Gaia sources) the latitude and
     # Magellanic priors above are used.
-    dens = QSO_OPT.density_prior(df)
+    rho = QSO_OPT.local_density(df)
+    dens = QSO_OPT.density_prior(df, rho)
     lat = np.where(np.isfinite(dens), dens, latitude_factor(df) * magellanic_factor(df))
     Q[:, [CLASSES.index("GALAXY"), CLASSES.index("QSO")]] *= lat[:, None]
     qf = np.ones(len(df))
@@ -608,7 +609,8 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     # 96.21 -> 96.31 %, QSO precision 79.5 -> 86.9 %, recall 94.4 -> 90.9 %;
     # QSO-rich benchmarks lose (SDSS -0.75, DESI -3.4 %p).  Option c1a
     # applies the full prior.
-    qf *= QSO_OPT.magnitude_prior(df, half="c1a" not in opts)
+    qmag = QSO_OPT.magnitude_prior(df, half="c1a" not in opts)
+    qf *= qmag
     # DESI QSO preselection W1 < 22.3 and W2 < 22.3 AB (Chaussidon et al.
     # 2023, Sect. 3; removes stars faint in WISE, e.g. the Sagittarius
     # stream): QSO odds x VETO otherwise (2.39.0; fields +0.09 %p, SDSS
@@ -622,6 +624,7 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     # 98.74 % with the Mahalanobis motion test, DESI unchanged).
     qf *= np.where(QSO_OPT.xray_star_side(df), QSO_OPT.VETO, 1.0)
     Q[:, CLASSES.index("QSO")] *= qf
+    qveto = qf / qmag  # literature cuts failed (VETO each), evidence rather than a prior
     qso_min = QSO_OPT.desi_threshold(df) if "c3b" in opts else np.zeros(len(df))
     faint = QSO_OPT.r_mag(df) > 22 if "c8" in opts else np.zeros(len(df), bool)
     # Bright clean 2MASS point sources (2.41.0, nir_star.py): where the
@@ -749,6 +752,20 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
         result_columns[f"p_{c.lower()}"] = Q[:, i] if len(Q) else []  # legacy alias
         result_columns[f"p_{c.lower()}_training_prior"] = P[:, i] if len(P) else []
         result_columns[f"field_prior_{c.lower()}"] = [float(prior[i])] * len(df)
+    # Every factor between the balanced-training probabilities and p_* (2.52.0),
+    # so a replay or a calibration study can rebuild the layer exactly:
+    # p_* ~ p_*_training_prior x (1, position, position x qso_magnitude x qso_veto)
+    result_columns.update(
+        {
+            "prior_gaia_density": rho,  # Gaia DR3 sources / deg^2 (10th neighbour)
+            "prior_position": lat,  # on GALAXY and QSO
+            "prior_qso_magnitude": qmag,
+            "prior_qso_veto": qveto,
+            # after the decision, STAR / GALAXY only (faint_class_prior.py; NaN = not applied)
+            "prior_faint_star": faint_prior[:, 0] if len(df) else [],
+            "prior_faint_galaxy": faint_prior[:, 1] if len(df) else [],
+        }
+    )
     result_columns.update(
         {
             # Not calibrated (2.51.0, scientific review): the fusion is fitted

@@ -122,14 +122,14 @@ def magnitude_prior(df, half=False) -> np.ndarray:
     return np.where(np.isfinite(f), np.minimum(f, 1.0), 1.0)
 
 
-def density_prior(df) -> np.ndarray:
-    """c1b: min(1, RHO_REF / local Gaia density) from the 10th Gaia neighbour;
+def local_density(df) -> np.ndarray:
+    """Gaia DR3 sources per deg^2 at each object from its 10th Gaia neighbour;
     NaN where it cannot be measured (no position, <= KNN Gaia sources in the search)."""
     ra, dec = _col(df, "ra"), _col(df, "dec")
     g = np.isfinite(_col(df, "gaia_dr3__phot_g_mean_mag")) & np.isfinite(ra) & np.isfinite(dec)
-    f = np.full(len(df), np.nan)
+    rho_out = np.full(len(df), np.nan)
     if g.sum() <= KNN:
-        return f
+        return rho_out
     from scipy.spatial import cKDTree
 
     def xyz(a, d):
@@ -140,9 +140,16 @@ def density_prior(df) -> np.ndarray:
     ok = np.isfinite(ra) & np.isfinite(dec)
     dist, _ = tree.query(xyz(ra[ok], dec[ok]), k=KNN + 1)
     theta = 2 * np.degrees(np.arcsin(np.clip(dist[:, -1] / 2, 0, 1)))  # chord -> deg
-    rho = KNN / (np.pi * np.maximum(theta, 1e-6) ** 2)
-    f[ok] = np.maximum(np.minimum(1.0, RHO_REF / rho), 1e-4)
-    return f
+    rho_out[ok] = KNN / (np.pi * np.maximum(theta, 1e-6) ** 2)
+    return rho_out
+
+
+def density_prior(df, rho=None) -> np.ndarray:
+    """c1b: min(1, RHO_REF / local Gaia density) from the 10th Gaia neighbour;
+    NaN where it cannot be measured (no position, <= KNN Gaia sources in the search)."""
+    rho = local_density(df) if rho is None else rho
+    with np.errstate(divide="ignore", invalid="ignore"):
+        return np.where(np.isfinite(rho), np.maximum(np.minimum(1.0, RHO_REF / rho), 1e-4), np.nan)
 
 
 def desi_wise_cut(df) -> np.ndarray:

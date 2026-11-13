@@ -185,7 +185,9 @@ KEEP = re.compile(
     # 2.44.0: Tractor fit quality, LS photometry for LS-GBM replays, AllWISE W3, derived features
     r"desi_legacy_surveys_dr10__(ls_id|dchisq_[12]|shape_r_ivar|fracflux_r|flux_(i|w1|w2)|flux_ivar_\w+|mw_transmission_\w+)|"
     r"allwise__(W3mag|snr3)|ls_(zw1_excess|dchisq_rex_rel_log|size_sig_log)|wise_w2_w3_color|"
-    r"sdss_dr18_spectroscopy__class|desi_dr1_spectroscopy__OType|lamost_dr_catalog__Class)$"
+    r"sdss_dr18_spectroscopy__class|desi_dr1_spectroscopy__OType|lamost_dr_catalog__Class|"
+    # 2.52.0: the Stage 5 prior factors (prior-layer calibration study)
+    r"prior_\w+|p_(star|galaxy|qso)(_training_prior)?)$"
 )
 
 
@@ -246,7 +248,7 @@ def compact(work, ra, dec, radius, out, name="objects"):
             _, sep, _ = oc.match_to_catalog_sky(SkyCoord(p[:, 0] * u.deg, p[:, 1] * u.deg))
             near = set(o.object_id[sep.arcsec <= 3.0])
             ev = pd.read_csv(lv, low_memory=False)
-            keep = [c for c in ev.columns if c in ("object_id", "evidence_json", "coarse_probabilities_json") or c.startswith(("p_", "prob", "fused"))]
+            keep = [c for c in ev.columns if c in ("object_id", "evidence_json", "coarse_probabilities_json") or c.startswith(("p_", "prob", "fused", "prior_"))]
             ev[ev.object_id.isin(near)][keep].to_csv(out / f"{name}_evidence.csv.gz", index=False)
     if name != "objects":
         return
