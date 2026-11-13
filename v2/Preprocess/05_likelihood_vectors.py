@@ -57,6 +57,9 @@ _ah_s.loader.exec_module(AGN_HOST)
 _cg_s = _tio_u.spec_from_file_location("v2_coarse_gbm", Path(__file__).resolve().parent / "coarse_gbm.py")
 COARSE_GBM = _tio_u.module_from_spec(_cg_s)
 _cg_s.loader.exec_module(COARSE_GBM)
+_cp_s = _tio_u.spec_from_file_location("v2_class_prior", Path(__file__).resolve().parent / "class_prior.py")
+CLASS_PRIOR = _tio_u.module_from_spec(_cp_s)
+_cp_s.loader.exec_module(CLASS_PRIOR)
 # Coarse model (2.51.0, coarse_gbm.py): "fusion" = rule fusion (linear + trees
 # over evidence scores); "gbm" = one gradient-boosted model on the measured
 # quantities for every object without a catalogue label, the rule fusion where
@@ -653,6 +656,13 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
         [_spectroscopic(items) for items in item_lists], dtype=bool
     )
     Q = Q / Q.sum(axis=1, keepdims=True) if len(Q) else Q
+    faint_prior = FAINT.star_galaxy_factors(df)
+    # One prior layer (2.52.0, class_prior.py): the faint star:galaxy prior
+    # enters the probabilities before the decision instead of re-deciding the
+    # label after it, so p_* and the label agree.
+    unified = CLASS_PRIOR.layer() == "unified"
+    if unified:
+        Q = CLASS_PRIOR.faint_split(Q, faint_prior)
     labels = []
     confidence = []
     margins = []
@@ -660,7 +670,6 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     basis = []
     best_candidates = []
     best_candidate_scores = []
-    faint_prior = FAINT.star_galaxy_factors(df)
     for q, (_, used, star_conflict, conflict, in_host, moving), qmin, qfaint, nir_i, nir_pi, bgs_i, member_i, gstar_i, wgal_i, faint_i in zip(
         Q, rows, qso_min, faint, nir, nir_p, bgs, member, gaia_star, wise_gal, faint_prior
     ):
@@ -730,7 +739,7 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
             status = "CLASSIFIED"
             # Faint star:galaxy number-count prior (2.46.0, faint_class_prior.py;
             # Henrion et al. 2011): STAR/GALAXY only, never QSO or moving stars.
-            if label in ("STAR", "GALAXY"):
+            if label in ("STAR", "GALAXY") and not unified:
                 redo = FAINT.apply(q, faint_i, CLASSES)
                 if redo is not None and redo[0] != "QSO":
                     label, conf, margin = redo
@@ -764,8 +773,19 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
             # after the decision, STAR / GALAXY only (faint_class_prior.py; NaN = not applied)
             "prior_faint_star": faint_prior[:, 0] if len(df) else [],
             "prior_faint_galaxy": faint_prior[:, 1] if len(df) else [],
+            "prior_layer": ["unified" if unified else "legacy"] * len(df),
         }
     )
+    # Calibrated probabilities (2.52.0, class_prior.py): temperature per LS r
+    # bin on log p_*, then agreeing with the label where a rule set it.
+    Qc = CLASS_PRIOR.calibrate(Q, df)
+    if Qc is not None:
+        Pc = CLASS_PRIOR.consistent(Qc, labels, confidence, CLASSES)
+        for i, c in enumerate(CLASSES):
+            result_columns[f"p_{c.lower()}_calibrated"] = Pc[:, i]
+        result_columns["primary_probability"] = [
+            float(Pc[i, CLASSES.index(lab)]) if lab in CLASSES else float("nan") for i, lab in enumerate(labels)
+        ]
     result_columns.update(
         {
             # Not calibrated (2.51.0, scientific review): the fusion is fitted
