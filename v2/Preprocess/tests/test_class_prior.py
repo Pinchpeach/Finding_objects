@@ -24,9 +24,9 @@ def test_faint_split_moves_mass_only_between_star_and_galaxy():
 
 def test_layer_switch(monkeypatch):
     monkeypatch.delenv("V2_PRIOR_LAYER", raising=False)
+    assert CP.layer() == "unified"  # default since 2.52.0
+    monkeypatch.setenv("V2_PRIOR_LAYER", "legacy")
     assert CP.layer() == "legacy"
-    monkeypatch.setenv("V2_PRIOR_LAYER", "unified")
-    assert CP.layer() == "unified"
     monkeypatch.setenv("V2_PRIOR_LAYER", "other")
     try:
         CP.layer()

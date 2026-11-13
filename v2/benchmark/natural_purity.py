@@ -55,6 +55,12 @@ LABELS = ["r<=18", "18-20", "20-21", "21-22", "r>22"]
 THR = [0.5, 0.7, 0.8, 0.9, 0.95, 0.98, 0.99, 0.995, 0.999]
 TARGET = 0.98
 MIN_TRUTH = 20
+# 2.52.0: lowest thresholds measured directly on COSMOS2020 truth (real sky
+# mix at high latitude, prior_layer_2_52 A/B, calibration fields; test fields
+# confirm) for the unified prior layer, which calls more faint objects
+# GALAXY: r > 22 GALAXY at 0.5 is 97.85 % pure, at 0.6 98.17 % (one-sided
+# 84 % bound 98.05 %; test 98.23 %).  --write keeps the higher of the two.
+COSMOS_FLOOR = {"r>22": {"GALAXY": (0.6, 0.9805)}}
 NBOOT = 200
 # Quasar surface density per magnitude bin (deg^-2), from the cumulative
 # counts N(<r) ~ 2, 20, 50, 120, 230 at r = 18, 20, 21, 22, 23: the
@@ -206,6 +212,9 @@ def main():
                     chosen = t
                     lower.setdefault(b, {})[c] = round(float(lo), 4)
                 rows.append(dict(bin=b, cls=c, thr=t, pi=round(float(e["pi"][C.index(c)]), 4), purity=pur, purity_lo=lo, purity_hi=hi, completeness=comp, field_n=npred, truth_n=ntruth))
+            floor = COSMOS_FLOOR.get(b, {}).get(c)
+            if floor and chosen is not None and chosen < floor[0]:
+                chosen, lower[b][c] = floor
             thresholds.setdefault(b, {})[c] = chosen
     r = pd.DataFrame(rows)
     a.out.mkdir(parents=True, exist_ok=True)

@@ -27,14 +27,30 @@ MYStIX membership, sparse priors, Gaia motion) the label gets the rule's
 confidence and the other classes share the rest (``consistent``);
 ``likelihood_*`` keep the evidence-and-prior values.
 
-Calibration (measured, benchmark/prior_layer_study.py, 2.52.0).  On the
-held-out validation fields (half of the COSMOS deep fields, half of set B)
-the unified layer with the COSMOS2020 faint counts has ECE 0.37 % (COSMOS)
-and 0.82 % (bright fields), against 1.52 % and 0.82 % for 2.51.  Temperature
-scaling per LS r bin on top (Guo et al. 2017) was fitted on the other half
-and dropped: ECE +0.04 points (95 % field-bootstrap interval -0.18 to
-+0.21), NLL -0.001.  Class-specific bias terms (Alexandari et al. 2020) were
-unstable on the sky-spread SDSS benchmark (sparse r bins).
+Default since 2.52.0: ``unified`` with the COSMOS2020 faint counts
+(faint_class_prior.source() = "cosmos"); ``V2_PRIOR_LAYER=legacy`` with
+``V2_FAINT_PRIOR=labels`` reproduces 2.51.
+
+Calibration (measured, A/B prior_layer_2_52: fresh collection of 87 fields,
+benchmark/score_prior_layer_ab.py).  On the held-out test fields (the even
+COSMOS deep fields and half of set B; the faint counts come from the odd
+COSMOS fields only), 13,857 truth objects:
+
+    2.51 legacy layer   label accuracy 94.99 %, ECE 1.33 %, NLL 0.242
+    unified + COSMOS    label accuracy 96.65 %, ECE 0.32 %, NLL 0.095
+
+325 objects fixed, 95 broken (exact McNemar p = 1.6e-30); 95 % field-
+bootstrap interval of dECE -1.44 to -0.45 points.  Bright fields: labels
+identical, ECE 0.84 -> 0.77 % (interval -0.38 to +0.13).  The cost is STAR
+recall at r > 23 in COSMOS (81 -> 65 %; precision 47 -> 64 %): stars are 5 %
+of the objects there, and the Bayes decision under the real mix maximises
+accuracy, not balanced accuracy (STAR F1 0.75 -> 0.81, GALAXY 0.97 -> 0.98).
+
+Temperature scaling per LS r bin on top (Guo et al. 2017), fitted on the
+calibration fields, was dropped: ECE +0.04 points (interval -0.18 to +0.21),
+NLL -0.001 (benchmark/prior_layer_study.py).  Class-specific bias terms
+(Alexandari et al. 2020) were unstable on the sky-spread SDSS benchmark
+(sparse r bins).
 """
 
 from __future__ import annotations
@@ -48,7 +64,7 @@ EPS = 1e-12
 
 
 def layer() -> str:
-    v = os.environ.get("V2_PRIOR_LAYER", "legacy").strip().lower() or "legacy"
+    v = os.environ.get("V2_PRIOR_LAYER", "unified").strip().lower() or "unified"
     if v not in LAYERS:
         raise ValueError(f"V2_PRIOR_LAYER={v!r}; known: {LAYERS}")
     return v

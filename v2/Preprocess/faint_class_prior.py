@@ -44,11 +44,11 @@ TABLE = Path(__file__).resolve().parent / "faint_class_prior.csv"
 # local Gaia density prior of Stage 5 (galaxy counts are isotropic, star
 # counts follow the local stellar density), so this table has no |b| axis.
 TABLE_COSMOS = Path(__file__).resolve().parent / "faint_class_prior_cosmos.csv"
-SOURCES = ("labels", "cosmos")
+SOURCES = ("labels", "cosmos")  # default cosmos since 2.52.0; labels = the 2.46.0 table
 
 
 def source() -> str:
-    v = os.environ.get("V2_FAINT_PRIOR", "labels").strip().lower() or "labels"
+    v = os.environ.get("V2_FAINT_PRIOR", "cosmos").strip().lower() or "cosmos"
     if v not in SOURCES:
         raise ValueError(f"V2_FAINT_PRIOR={v!r}; known: {SOURCES}")
     return v

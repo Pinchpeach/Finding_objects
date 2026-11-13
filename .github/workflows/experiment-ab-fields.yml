@@ -206,9 +206,10 @@ jobs:
               lsw) export V2_WISE_FROM_LS=1;;
               cgbm) export V2_COARSE_MODEL=gbm;;  # single GBM on measurements (2.51.0, Preprocess/coarse_gbm.py)
               cfusion) export V2_COARSE_MODEL=fusion;;
-              unified) export V2_PRIOR_LAYER=unified;;  # one prior layer before the decision (2.52.0, Preprocess/class_prior.py)
-              legacy) export V2_PRIOR_LAYER=legacy;;
-              ucosmos) export V2_PRIOR_LAYER=unified V2_FAINT_PRIOR=cosmos;;  # + faint star:galaxy counts of COSMOS2020 truth
+              # prior layer (2.52.0 default: unified + COSMOS2020 faint counts, Preprocess/class_prior.py)
+              legacy) export V2_PRIOR_LAYER=legacy V2_FAINT_PRIOR=labels;;  # 2.51: faint prior after the decision, 2.46.0 table
+              unified) export V2_PRIOR_LAYER=unified V2_FAINT_PRIOR=labels;;  # one layer, 2.46.0 table
+              ucosmos) export V2_PRIOR_LAYER=unified V2_FAINT_PRIOR=cosmos;;  # = base since 2.52.0
               fw-*) export V2_FUSION_WEIGHTS="$GITHUB_WORKSPACE/v2/Preprocess/${v#fw-}.json";;  # another fusion fit, e.g. fw-fusion_weights_nopresence
               off-*) r="${v#off-}"; export V2_DISABLE_RULES="${r//+/,}";;  # rule ablation, e.g. off-AST-EXT-001+PS1-MORPH-001
               nominp) export V2_ASSOC_MAX_NSEP=0;;

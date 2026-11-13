@@ -46,7 +46,10 @@ def main():
                 # position / magnitude priors (2.52.0: prior-layer calibration)
                 p = pd.read_csv(ev, usecols=lambda c: c == "object_id" or c.startswith("prior_")
                                 or (c.startswith("p_") and c[2:].split("_")[0] in ("star", "galaxy", "qso")))
-                m = m.merge(p.drop_duplicates("object_id"), on="object_id", how="left")
+                # objects_blind already carries them since 2.52.0 (KEEP): add only the missing ones
+                p = p[["object_id"] + [c for c in p.columns if c not in m.columns]]
+                if p.shape[1] > 1:
+                    m = m.merge(p.drop_duplicates("object_id"), on="object_id", how="left")
             if not m.empty:
                 m.insert(0, "field", fdir.name)
                 rows.append(m)
