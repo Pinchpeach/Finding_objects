@@ -79,14 +79,21 @@ def consistent(Pc: np.ndarray, labels, confidence, classes) -> np.ndarray:
     most probable class, the label gets its rule confidence and the other
     classes share the rest in proportion."""
     out = np.array(Pc, dtype=float, copy=True)
-    for i, (lab, conf) in enumerate(zip(labels, confidence)):
-        if lab not in classes:
-            continue
-        k = classes.index(lab)
-        if int(out[i].argmax()) == k:
-            continue
-        c = float(conf) if np.isfinite(conf) else 0.5
-        rest = np.delete(out[i], k)
-        rest = rest / rest.sum() * (1 - c) if rest.sum() > 0 else np.full(len(rest), (1 - c) / len(rest))
-        out[i] = np.insert(rest, k, c)
+    if not len(out):
+        return out
+    k = np.array([classes.index(x) if x in classes else -1 for x in labels])
+    fix = (k >= 0) & (out.argmax(1) != k)
+    if not fix.any():
+        return out
+    rows = np.flatnonzero(fix)
+    c = np.asarray(confidence, dtype=float)[rows]
+    c = np.where(np.isfinite(c), c, 0.5)
+    sub = out[rows]
+    lab = np.zeros_like(sub, dtype=bool)
+    lab[np.arange(len(rows)), k[rows]] = True
+    rest = np.where(lab, 0.0, sub)
+    tot = rest.sum(1, keepdims=True)
+    even = (~lab) / (sub.shape[1] - 1)
+    rest = np.where(tot > 0, rest / np.where(tot > 0, tot, 1), even) * (1 - c)[:, None]
+    out[rows] = np.where(lab, c[:, None], rest)
     return out
