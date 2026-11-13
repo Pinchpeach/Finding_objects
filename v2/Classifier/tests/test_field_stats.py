@@ -70,3 +70,18 @@ def test_xmatch_rows_follow_the_cone_schema():
     assert list(o.columns[:11]) == ["benchmark_id", "truth_class", "truth_source", "truth_ra", "truth_dec",
                                     "match_threshold_arcsec", "catalog", "catalog_object_id", "object_name", "ra", "dec"]
     assert o._sep_arcsec.iloc[0] == 0.5
+
+
+def test_vizier_multitarget_rows_map_back_to_their_targets():
+    import collect_catalog_truth as C
+
+    chunk = pd.DataFrame({"benchmark_id": ["A", "B", "C"], "ra": [10.0, 20.0, 30.0], "dec": [0.0, 0.0, 0.0],
+                          "truth_class": ["STAR", "QSO", "GALAXY"], "truth_source": "SDSS"})
+    # _q is the 1-based index of the target in the request; C has no row
+    d = pd.DataFrame({"_q": [1, 2, 2], "2MASS": ["a", "b1", "b2"],
+                      "RAJ2000": [10.0, 20.0 + 1.0 / 3600, 20.0 + 2.2 / 3600], "DEJ2000": [0.0, 0.0, 0.0]})
+    xm = C.from_vizier_batch(d, chunk)
+    assert xm.benchmark_id.tolist() == ["A", "B", "B"]
+    assert abs(xm.angDist.iloc[1] - 1.0) < 0.01
+    o = C.from_xmatch(xm, chunk, "twomass", "2MASS PSC")
+    assert o.benchmark_id.tolist() == ["A", "B"] and o.catalog_object_id.tolist() == ["a", "b1"]
