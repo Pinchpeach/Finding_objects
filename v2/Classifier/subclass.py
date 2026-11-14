@@ -415,6 +415,58 @@ def star_spectral_type(row):
     return None, None, None, "no spectral type, colour or Teff available"
 
 
+# Giant spectral types (2.53.0, literature review 2026-11-13).  The
+# photometric types above use the Pecaut & Mamajek dwarf sequence.  Colour ->
+# Teff is nearly the same for giants and dwarfs (10-20 K at the boundaries),
+# but the Teff -> spectral-type scale is not: a BP-RP = 1.2 star (~4800 K) is
+# K3 V but G8 III, so a giant was typed about 5 subtypes too late.  For class
+# III stars with a photometric type, the Teff of that dwarf type is converted
+# with the interferometric giant calibration of van Belle et al. (2021, ApJ,
+# doi:10.3847/1538-4357/ac1687, Table 8): piecewise-linear Teff = a ST + b on
+# their index (G0 = 50, K0 = 60, M0 = 66; K giants end at K5), fitted to 191
+# giants G0 III - M7.75 III with median residuals ~50 K.  Outside their linear
+# range (hotter than G1 III, cooler than M5.5 III: 3134 K plateau) the dwarf
+# type is kept.
+GIANT_TEFF_FITS = ((51.0, 61.0, -52.74, 7856.0), (61.0, 64.0, -199.41, 16751.0), (64.0, 71.5, -85.98, 9491.0))
+PHOTOMETRIC_SPT_RULES = {"GAIA_BPRP0_TEFF", "GAIA_BPRP0", "LS_GR0", "GAIA_TEFF"}
+
+
+@lru_cache(maxsize=1)
+def _dwarf_teff_arrays():
+    ref = sequence().dropna(subset=["Teff", "num"]).sort_values("num")
+    return ref.num.to_numpy(float), ref.Teff.to_numpy(float)
+
+
+def dwarf_teff(num: float) -> float:
+    """Teff of a spectral number on the Pecaut & Mamajek dwarf sequence."""
+    x, y = _dwarf_teff_arrays()
+    return float(np.interp(num, x, y))
+
+
+def giant_spectral_number(teff: float):
+    """Our spectral number (G0 = 40, K0 = 50, M0 = 60; half subtypes) of a
+    class III giant at ``teff`` on the van Belle et al. (2021) scale, or None
+    outside G1 III - M5.5 III."""
+    st = None
+    for lo, hi, a, b in GIANT_TEFF_FITS:
+        if a * hi + b <= teff <= a * lo + b:
+            st = (teff - b) / a
+            break
+    if st is None:
+        (lo1, hi1, a1, b1), (lo2, _, a2, b2) = GIANT_TEFF_FITS[:2]
+        if a2 * lo2 + b2 < teff < a1 * hi1 + b1:  # 4587-4640 K: the step between their fits at K1
+            st = 61.0
+        else:
+            return None
+    if st < 60:  # G: their 50-59 -> our 40-49
+        ours = st - 10
+    elif st < 65.5:  # K0-K5: their 60-65 -> our 50-55 (no K6-K9 giants in their scale)
+        ours = min(st, 65.0) - 10
+    else:  # M0 = their 66 -> our 60
+        ours = max(st, 66.0) - 6
+    return round(ours * 2) / 2
+
+
 def cmd_position(row):
     """(M_G, height above the dwarf sequence dM = M_G - M_G,MS, (BP-RP)0) for a
     parallax S/N >= 5, else None.  Negative dM = brighter than the sequence."""
@@ -1128,6 +1180,12 @@ def classify_star(row):
     # photometric giant label; spectroscopy outranks photometry here.
     if phys in {"RGB", "AGB", "RED_GIANT"} and lum not in {"III", "II", "Ib", "Ia"} and lrule != "SIMBAD_SPTYPE":
         lum, lrule, lbasis = "III", "PHYSICAL_AXIS", f"physical axis {phys}"
+    if lum == "III" and rule in PHOTOMETRIC_SPT_RULES:
+        giant = giant_spectral_number(dwarf_teff(num))
+        if giant is not None:
+            basis += f"; class III: {dwarf_teff(num):.0f} K is {spt_label(giant)} III on the giant scale (van Belle+2021)"
+            num = giant
+            letter = LETTERS[int(num // 10)]
     label = spt_label(num) + (f" {lum}" if lum else "")
     name = f"{letter}-type " + (LUM_NAME.get(lum, "star") if lum else "star")
     conf = RULE_PRECISION.get(rule)

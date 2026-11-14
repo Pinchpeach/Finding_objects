@@ -147,6 +147,7 @@
 - **분광형**(O–M), 다음 우선순위로 정합니다.
   1. SIMBAD MK형 / LAMOST·SDSS 분광 템플릿.
   2. Gaia 소광 보정 BP−RP + 온도를 Pecaut & Mamajek 왜성 계열에 대응.
+     - 광도 계급 III이면 그 Teff를 거성 눈금(van Belle+2021 간섭계 표 8)으로 다시 분광형으로 바꿉니다(2.53.0). 거성은 같은 Teff에서 약 5 하위형 이른 형입니다.
      - GSP-Phot 소광이 없으면 SFD E(B−V) 중 별 앞쪽 몫만 씁니다. 먼지층은 sech² 모양, 태양 근처 척도 높이 188 pc입니다(Drimmel & Spergel 2001; 2.53.0, 이전에는 지수형 134 pc).
   3. PS1 i−z.
 - **광도 계급**(V 왜성, IV 준거성, III 거성, VI 준왜성):

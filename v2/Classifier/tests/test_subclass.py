@@ -38,7 +38,8 @@ def test_star_type_and_luminosity_from_gaia():
     assert r["spectral_type"] == "G2" and r["luminosity_class"] == "V" and r["code"] == "STAR:G:V"
     giant = dict(sun, **{"gaia_dr3__bp_rp": 1.25, "gaia_dr3__teff_gspphot": 4700, "gaia_dr3__phot_g_mean_mag": 5.8})
     g = sc.classify(giant)  # M_G = 0.8 at K3 colour: ~5 mag above the MS
-    assert g["spectral_letter"] == "K" and g["luminosity_class"] == "III"
+    # 2.53.0: ~4700 K is K3-K4 on the dwarf scale but ~K0 III on the giant scale (van Belle+2021: K0 III 4692 K)
+    assert g["luminosity_class"] == "III" and 48 <= sc.spt_number(g["spectral_type"]) <= 51
 
 
 def test_spectroscopic_labels_outrank_photometry():
@@ -704,3 +705,25 @@ def test_2_53_whan_with_ew_errors():
     # 8 +- 1 A with log [N II]/Ha = 0.08: an AGN by WHAN
     agn = dict(amb, **{f"{p}line_ha_ew": 8.0})
     assert sc.galaxy_lines(agn)[0] == "AGN"
+
+
+def test_2_53_giant_spectral_type_scale():
+    """Class III stars with a photometric type use the giant Teff scale of van
+    Belle et al. (2021): a BP-RP = 1.2 star is K3 V but about G8 III."""
+    sc = _sc()
+    assert sc.spt_label(sc.giant_spectral_number(4800)) == "G8"
+    assert sc.spt_label(sc.giant_spectral_number(3816)) == "M0"  # their M0 III fit value
+    assert sc.giant_spectral_number(5500) is None and sc.giant_spectral_number(3200) is None  # outside the fits
+    base = {
+        "primary_class": "STAR",
+        "gaia_dr3__bp_rp": 1.2,
+        "gaia_dr3__ebpminrp_gspphot": 0.0,
+        "gaia_dr3__ag_gspphot": 0.0,
+        "gaia_dr3__parallax": 1.0,
+        "gaia_dr3__parallax_error": 0.02,
+    }
+    dwarf = sc.classify(dict(base, **{"gaia_dr3__phot_g_mean_mag": 16.5}))  # M_G 6.5: on the dwarf sequence
+    giant = sc.classify(dict(base, **{"gaia_dr3__phot_g_mean_mag": 10.5}))  # M_G 0.5: giant
+    assert dwarf["luminosity_class"] == "V" and dwarf["spectral_type"].startswith("K")
+    assert giant["luminosity_class"] == "III" and giant["spectral_type"].startswith("G")
+    assert "van Belle" in giant["basis"]
