@@ -2,6 +2,10 @@ name: Validate WD Subtype Gaia XP External
 
 on:
   workflow_dispatch:
+    inputs:
+      refresh:
+        description: "re-collect and replace the committed SDSS tables (true/false)"
+        default: "false"
   push:
     paths:
       - v2/Classifier/build_sdss_wd_subtype_external_truth.py
@@ -42,7 +46,7 @@ jobs:
           PY
       - name: SDSS DR14 DA DB external truth, Gaia crossmatch and XP (only when not committed)
         run: |
-          if [ -f "$DATA/sdss_wd_subtype_xp.csv.gz" ]; then
+          if [ "${{ github.event.inputs.refresh }}" != "true" ] && [ -f "$DATA/sdss_wd_subtype_xp.csv.gz" ]; then
             echo "using the committed $DATA/sdss_wd_subtype_xp.csv.gz"
             exit 0
           fi
@@ -56,7 +60,7 @@ jobs:
           cat v2/Classifier/wd_subtype_xp_external_eval/metrics.json
           echo "--- external confusion ---"
           cat v2/Classifier/wd_subtype_xp_external_eval/external_confusion.csv
-      - name: Commit the SDSS external tables (first collection only)
+      - name: Commit the SDSS external tables (new or refreshed)
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com

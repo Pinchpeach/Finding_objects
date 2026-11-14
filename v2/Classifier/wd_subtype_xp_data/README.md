@@ -16,8 +16,8 @@ spaced ranks (no random draw) and the models use random_state = 42.
 | `sdss_wd_subtype_external_truth.csv.gz` | independent SDSS DR14 DA/DB truth (200 per class requested, S/N ≥ 10, LAMOST objects excluded: the primary external benchmark) | `validate-wd-subtype-xp-external.yml` |
 | `sdss_wd_subtype_gaia.csv.gz`, `sdss_wd_subtype_xp.csv.gz` | its Gaia crossmatch and XP coefficients: the external test table | `validate-wd-subtype-xp-external.yml` |
 
-The workflows collect a table only when it is absent here; `validate-wd-subtype-xp.yml`
-re-collects with `refresh=true`.  Order for a fresh start: `validate-wd-subtype-xp.yml`,
+The workflows collect a table only when it is absent here; both validation workflows
+re-collect with `refresh=true`.  Order for a fresh start: `validate-wd-subtype-xp.yml`,
 then `validate-wd-subtype-xp-external.yml`, then `build-wd-subtype-xp-model.yml`.
 
 ## Re-collected on 2026-11-14 (CDS XMatch down: VizieR batch fallback)

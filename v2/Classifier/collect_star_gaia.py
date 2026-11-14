@@ -9,6 +9,13 @@ import pandas as pd
 
 
 VIZIER_RETRIES = 4
+# VizieR cones are centred on the catalogue's J2000 positions, which for
+# Gaia DR3 are propagated from epoch 2016.0 by the proper motion; CDS XMatch
+# matches the epoch-2016 RA_ICRS / DE_ICRS.  The fallback queries this much
+# wider and measures the separation on RA_ICRS / DE_ICRS, so the 2" cut in
+# run() keeps the XMatch meaning (a white dwarf moving 0.5"/yr is 8" apart
+# between the two epochs; 59 of 290 LAMOST WD matches move > 1").
+EPOCH_MARGIN_ARCSEC = 10.0
 
 
 def _vizier_fallback(truth: pd.DataFrame, radius_arcsec: float) -> pd.DataFrame:
@@ -40,7 +47,7 @@ def _vizier_fallback(truth: pd.DataFrame, radius_arcsec: float) -> pd.DataFrame:
         coords = SkyCoord(chunk.ra.to_numpy(float) * u.deg, chunk.dec.to_numpy(float) * u.deg)
         for attempt in range(VIZIER_RETRIES):
             try:
-                res = v.query_region(coords, radius=radius_arcsec * u.arcsec, catalog="I/355/gaiadr3")
+                res = v.query_region(coords, radius=(radius_arcsec + EPOCH_MARGIN_ARCSEC) * u.arcsec, catalog="I/355/gaiadr3")
                 break
             except Exception as e:  # noqa: BLE001 - transient transfer / server errors
                 if attempt == VIZIER_RETRIES - 1:
@@ -48,7 +55,15 @@ def _vizier_fallback(truth: pd.DataFrame, radius_arcsec: float) -> pd.DataFrame:
                 print(f"[collect_star_gaia] VizieR batch at {i}: {e!r}; retry {attempt + 1}", flush=True)
                 time.sleep(15 * (attempt + 1))
         if len(res):
-            parts.append(cct.from_vizier_batch(res[0].to_pandas(), chunk))
+            part = cct.from_vizier_batch(res[0].to_pandas(), chunk)
+            if {"RA_ICRS", "DE_ICRS"} <= set(part.columns):  # epoch 2016.0, as CDS XMatch
+                part["angDist"] = cct.sep_arcsec(
+                    part.truth_ra.to_numpy(float),
+                    part.truth_dec.to_numpy(float),
+                    pd.to_numeric(part.RA_ICRS, errors="coerce").to_numpy(),
+                    pd.to_numeric(part.DE_ICRS, errors="coerce").to_numpy(),
+                )
+            parts.append(part)
         print(f"[collect_star_gaia] VizieR batch {i + len(chunk)}/{len(t)}", flush=True)
     return pd.concat(parts, ignore_index=True) if parts else pd.DataFrame(columns=["benchmark_id", "angDist"])
 
