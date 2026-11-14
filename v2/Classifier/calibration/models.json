@@ -3,16 +3,16 @@
     "compact": {
       "PULSAR": {
         "method": "withheld",
-        "n": 2,
+        "n": 4,
         "negative": 0,
-        "positive": 2,
+        "positive": 4,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "PULSAR_CANDIDATE": {
         "method": "withheld",
-        "n": 2,
-        "negative": 2,
+        "n": 4,
+        "negative": 4,
         "positive": 0,
         "reason": "insufficient independent truth support",
         "truth_independent": true
@@ -21,24 +21,24 @@
     "phenomenon": {
       "OTHER_PHENOMENON": {
         "method": "withheld",
-        "n": 227,
-        "negative": 227,
+        "n": 220,
+        "negative": 220,
         "positive": 0,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "PN": {
         "method": "withheld",
-        "n": 227,
+        "n": 220,
         "negative": 2,
-        "positive": 225,
+        "positive": 218,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "SN": {
         "method": "withheld",
-        "n": 227,
-        "negative": 225,
+        "n": 220,
+        "negative": 218,
         "positive": 2,
         "reason": "insufficient independent truth support",
         "truth_independent": true
@@ -47,67 +47,67 @@
     "variability": {
       "CEPHEID": {
         "method": "withheld",
-        "n": 217,
-        "negative": 203,
-        "positive": 14,
+        "n": 221,
+        "negative": 205,
+        "positive": 16,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "ECLIPSING": {
         "method": "withheld",
-        "n": 217,
-        "negative": 217,
+        "n": 221,
+        "negative": 221,
         "positive": 0,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "LPV": {
-        "coef": 2.9537295455733283,
-        "intercept": -0.5119288360960615,
+        "coef": 3.180947475290747,
+        "intercept": -0.9985499308574857,
         "method": "platt",
-        "n": 217,
-        "negative": 57,
-        "positive": 160,
+        "n": 221,
+        "negative": 65,
+        "positive": 156,
         "truth_independent": true
       },
       "MIRA": {
         "method": "withheld",
-        "n": 217,
-        "negative": 206,
-        "positive": 11,
+        "n": 221,
+        "negative": 204,
+        "positive": 17,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "OTHER_VARIABLE": {
         "method": "withheld",
-        "n": 217,
-        "negative": 217,
+        "n": 221,
+        "negative": 221,
         "positive": 0,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "PULSATING": {
         "method": "withheld",
-        "n": 217,
-        "negative": 217,
+        "n": 221,
+        "negative": 221,
         "positive": 0,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "ROTATIONAL": {
         "method": "withheld",
-        "n": 217,
-        "negative": 217,
+        "n": 221,
+        "negative": 221,
         "positive": 0,
         "reason": "insufficient independent truth support",
         "truth_independent": true
       },
       "RR_LYRAE": {
-        "coef": 1.3751736270622539,
-        "intercept": -1.791856287412974,
+        "coef": 1.3659284321031515,
+        "intercept": -1.813480161579447,
         "method": "platt",
-        "n": 217,
-        "negative": 185,
+        "n": 221,
+        "negative": 189,
         "positive": 32,
         "truth_independent": true
       }
@@ -124,15 +124,15 @@
     "compact": {},
     "phenomenon": {
       "HASH_PN_CATALOG_MATCH|PN": {
-        "correct": 213,
+        "correct": 207,
         "method": "rule_precision",
-        "n": 213,
+        "n": 207,
         "precision": 1.0,
         "truth_classes": [
           "PN",
           "SN"
         ],
-        "wilson_lower_95": 0.9823
+        "wilson_lower_95": 0.9818
       }
     },
     "physical": {
@@ -161,9 +161,9 @@
     },
     "variability": {
       "GAIA_DR3_SOS_CEPHEID|CEPHEID": {
-        "correct": 223,
+        "correct": 220,
         "method": "rule_precision",
-        "n": 223,
+        "n": 220,
         "precision": 1.0,
         "truth_classes": [
           "CEPHEID",
@@ -171,20 +171,20 @@
           "MIRA",
           "RR_LYRAE"
         ],
-        "wilson_lower_95": 0.9831
+        "wilson_lower_95": 0.9828
       },
       "GAIA_DR3_SOS_LPV_LARGE_AMPLITUDE|MIRA": {
-        "correct": 173,
+        "correct": 162,
         "method": "rule_precision",
-        "n": 185,
-        "precision": 0.9351,
+        "n": 176,
+        "precision": 0.9205,
         "truth_classes": [
           "CEPHEID",
           "LPV",
           "MIRA",
           "RR_LYRAE"
         ],
-        "wilson_lower_95": 0.8901
+        "wilson_lower_95": 0.8709
       },
       "GAIA_DR3_SOS_RRLYRAE|RR_LYRAE": {
         "correct": 196,
@@ -200,30 +200,30 @@
         "wilson_lower_95": 0.9808
       },
       "GAIA_DR3_VARIABLE_CANDIDATE|LPV": {
-        "correct": 155,
+        "correct": 165,
         "method": "rule_precision",
-        "n": 157,
-        "precision": 0.9873,
+        "n": 167,
+        "precision": 0.988,
         "truth_classes": [
           "CEPHEID",
           "LPV",
           "MIRA",
           "RR_LYRAE"
         ],
-        "wilson_lower_95": 0.9547
+        "wilson_lower_95": 0.9574
       },
       "ZTF_PERIODIC_VARIABLE|MIRA": {
-        "correct": 64,
+        "correct": 71,
         "method": "rule_precision",
-        "n": 69,
-        "precision": 0.9275,
+        "n": 72,
+        "precision": 0.9861,
         "truth_classes": [
           "CEPHEID",
           "LPV",
           "MIRA",
           "RR_LYRAE"
         ],
-        "wilson_lower_95": 0.8413
+        "wilson_lower_95": 0.9254
       }
     }
   },
