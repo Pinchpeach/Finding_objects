@@ -19,3 +19,16 @@ spaced ranks (no random draw) and the models use random_state = 42.
 The workflows collect a table only when it is absent here; `validate-wd-subtype-xp.yml`
 re-collects with `refresh=true`.  Order for a fresh start: `validate-wd-subtype-xp.yml`,
 then `validate-wd-subtype-xp-external.yml`, then `build-wd-subtype-xp-model.yml`.
+
+## Re-collected on 2026-11-14 (CDS XMatch down: VizieR batch fallback)
+
+The tables reproduce the original runs (`WD_SUBTYPE_XP_VALIDATION.md`, `WD_SUBTYPE_XP_EXTERNAL_VALIDATION.md`):
+
+| | original | 2026-11-14 |
+|---|---|---|
+| LAMOST truth → Gaia → XP | 300 → 291 → 228 (DA 118, DB 110) | 300 → 290 → 227 (DA 117, DB 110) |
+| LAMOST held-out test, XP random forest | 48 / 50 | 49 / 50 (broadband: 37 / 50 both times) |
+| SDSS external truth → Gaia → XP | 200 → … → 105 (DA 55, DB 50) | 200 → 198 → 105 (DA 55, DB 50) |
+| external accuracy, ungated | 97.14 % | 97.14 % |
+| external p ≥ 0.90 | 65 rows, 98.46 % | 64 rows, 98.44 % |
+| external p ≥ 0.95 | 40 rows, 100 % | 41 rows, 100 % |
