@@ -18,7 +18,9 @@ permissions:
 jobs:
   evaluate:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    # 90 (2.53.0): with CDS XMatch down the VizieR fallback needs ~45 min for
+    # the 9,999-object mixed set alone (run 43422061539 stopped at 9,500)
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

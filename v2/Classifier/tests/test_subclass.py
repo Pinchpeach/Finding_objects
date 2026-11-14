@@ -38,7 +38,8 @@ def test_star_type_and_luminosity_from_gaia():
     assert r["spectral_type"] == "G2" and r["luminosity_class"] == "V" and r["code"] == "STAR:G:V"
     giant = dict(sun, **{"gaia_dr3__bp_rp": 1.25, "gaia_dr3__teff_gspphot": 4700, "gaia_dr3__phot_g_mean_mag": 5.8})
     g = sc.classify(giant)  # M_G = 0.8 at K3 colour: ~5 mag above the MS
-    assert g["spectral_letter"] == "K" and g["luminosity_class"] == "III"
+    # 2.53.0: ~4700 K is K3-K4 on the dwarf scale but ~K0 III on the giant scale (van Belle+2021: K0 III 4692 K)
+    assert g["luminosity_class"] == "III" and 48 <= sc.spt_number(g["spectral_type"]) <= 51
 
 
 def test_spectroscopic_labels_outrank_photometry():
@@ -107,7 +108,9 @@ def test_star_population_binarity_and_subdwarf():
         "gaia_dr3__phot_g_mean_mag": 9.6,
     }
     thin = sc.classify(dict(base, **{"gaia_dr3__pmra": 30.0, "gaia_dr3__pmdec": 40.0}))  # V_T = 23.7 km/s
-    assert [t["tag"] for t in thin["tags"]] == ["THIN_DISC"]
+    assert thin["tags"] == []  # thin disc (V_T < 40 km/s) is the default population: no tag (2.53.0)
+    thick = sc.classify(dict(base, **{"gaia_dr3__pmra": 84.0, "gaia_dr3__pmdec": 112.0}))  # V_T = 66.4 km/s
+    assert [t["tag"] for t in thick["tags"]] == ["THICK_DISC"]
     halo = sc.classify(dict(base, **{"gaia_dr3__pmra": 400.0, "gaia_dr3__pmdec": 300.0, "gaia_dr3__ruwe": 2.1}))
     tags = {t["tag"] for t in halo["tags"]}
     assert tags == {"HALO", "ASTROMETRIC_BINARY", "HIGH_PM"}  # 500 mas/yr is also a high proper motion
@@ -666,3 +669,61 @@ def test_2_29_solar_system_objects():
     ]
     assert out.subclass_rule.tolist()[:2] == ["PS1_SOLSYS", "SDSS_MOVING"]
     assert "Ivezic" in out.unknown_reason[1]
+
+
+def test_2_53_elg_oii_flux_cut():
+    """The third DESI ELG colour cut (Raichoor et al. 2023, Table 2): g - r <
+    -1.2 (r - z) + 1.6 (ELG_LOP + ELG_VLO)."""
+    sc = _sc()
+    # r-z = 1.0, g-r = 0.55 passes 0.5(r-z)+0.1 = 0.6 but not -1.2+1.6 = 0.4
+    red_rz = dict(_ls_row({"g": 23.0, "r": 22.45, "z": 21.45}), primary_class="GALAXY")
+    assert sc.galaxy_activity(red_rz)[0] is None
+    ok = dict(_ls_row({"g": 23.0, "r": 22.7, "z": 22.1}), primary_class="GALAXY")  # r-z 0.6, g-r 0.3 < 0.88
+    assert sc.galaxy_activity(ok)[1] == "LS_ELG"
+
+
+def test_2_53_whan_with_ew_errors():
+    sc = _sc()
+    p = "sdss_dr18_spectroscopy__"
+    base = {f"{p}line_ha_ew": 2.0, f"{p}line_nii6584_ew": 2.0}
+    # no error: the point estimate (EW < 3 A, retired), as before
+    assert sc.galaxy_lines(base)[0] == "QUIESCENT"
+    # 2.0 +- 0.3 A: below 3 A at 2 sigma, retired
+    assert sc.galaxy_lines(dict(base, **{f"{p}line_ha_ew_err": 0.3}))[0] == "QUIESCENT"
+    # 2.0 +- 1.0 A: within 2 sigma of 3 A, undecided -- even with LINER-like line ratios
+    amb = dict(
+        base,
+        **{
+            f"{p}line_ha_ew_err": 1.0,
+            f"{p}line_ha_flux": 10.0,
+            f"{p}line_ha_flux_err": 1.0,
+            f"{p}line_nii6584_flux": 12.0,
+            f"{p}line_nii6584_flux_err": 1.0,
+        },
+    )
+    assert sc.galaxy_lines(amb) is None
+    # 8 +- 1 A with log [N II]/Ha = 0.08: an AGN by WHAN
+    agn = dict(amb, **{f"{p}line_ha_ew": 8.0})
+    assert sc.galaxy_lines(agn)[0] == "AGN"
+
+
+def test_2_53_giant_spectral_type_scale():
+    """Class III stars with a photometric type use the giant Teff scale of van
+    Belle et al. (2021): a BP-RP = 1.2 star is K3 V but about G8 III."""
+    sc = _sc()
+    assert sc.spt_label(sc.giant_spectral_number(4800)) == "G8"
+    assert sc.spt_label(sc.giant_spectral_number(3816)) == "M0"  # their M0 III fit value
+    assert sc.giant_spectral_number(5500) is None and sc.giant_spectral_number(3200) is None  # outside the fits
+    base = {
+        "primary_class": "STAR",
+        "gaia_dr3__bp_rp": 1.2,
+        "gaia_dr3__ebpminrp_gspphot": 0.0,
+        "gaia_dr3__ag_gspphot": 0.0,
+        "gaia_dr3__parallax": 1.0,
+        "gaia_dr3__parallax_error": 0.02,
+    }
+    dwarf = sc.classify(dict(base, **{"gaia_dr3__phot_g_mean_mag": 16.5}))  # M_G 6.5: on the dwarf sequence
+    giant = sc.classify(dict(base, **{"gaia_dr3__phot_g_mean_mag": 10.5}))  # M_G 0.5: giant
+    assert dwarf["luminosity_class"] == "V" and dwarf["spectral_type"].startswith("K")
+    assert giant["luminosity_class"] == "III" and giant["spectral_type"].startswith("G")
+    assert "van Belle" in giant["basis"]

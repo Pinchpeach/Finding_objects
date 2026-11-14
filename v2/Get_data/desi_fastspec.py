@@ -44,6 +44,7 @@ LINE_FIELDS = [f"line_{k}_{s}" for k in LINES for s in ("flux", "flux_err")] + [
     "line_hb_ew",
     "line_hb_ew_err",
     "line_ha_ew",
+    "line_ha_ew_err",
     "line_nii6584_ew",
     "line_source",
 ]
@@ -75,6 +76,7 @@ def standardise(df: pd.DataFrame) -> pd.DataFrame:
     ew = pd.to_numeric(out.get("halpha_ew"), errors="coerce")
     ewiv = pd.to_numeric(out.get("halpha_ew_ivar"), errors="coerce")
     out["line_ha_ew"] = ew.where(ewiv > 0)
+    out["line_ha_ew_err"] = 1.0 / np.sqrt(ewiv.where(ewiv > 0))  # 2.53.0: WHAN with errors
     out["line_nii6584_ew"] = np.nan  # not in this table: the WHAN "passive" test needs it
     out["line_source"] = "FastSpecFit"
     return out

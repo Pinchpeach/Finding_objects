@@ -8,6 +8,66 @@ import numpy as np
 import pandas as pd
 
 
+VIZIER_RETRIES = 4
+# VizieR cones are centred on the catalogue's J2000 positions, which for
+# Gaia DR3 are propagated from epoch 2016.0 by the proper motion; CDS XMatch
+# matches the epoch-2016 RA_ICRS / DE_ICRS.  The fallback queries this much
+# wider and measures the separation on RA_ICRS / DE_ICRS, so the 2" cut in
+# run() keeps the XMatch meaning (a white dwarf moving 0.5"/yr is 8" apart
+# between the two epochs; 59 of 290 LAMOST WD matches move > 1").
+EPOCH_MARGIN_ARCSEC = 10.0
+
+
+def _vizier_fallback(truth: pd.DataFrame, radius_arcsec: float) -> pd.DataFrame:
+    import importlib.util
+    import sys
+
+    v2 = Path(__file__).resolve().parents[1]
+    sys.path.insert(0, str(v2 / "Get_data"))
+    import throttle  # VizieR mirror failover (CfA / NAOJ / IUCAA ...)
+
+    throttle.install()
+    spec = importlib.util.spec_from_file_location("v2_collect_catalog_truth", v2 / "benchmark" / "collect_catalog_truth.py")
+    cct = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(cct)
+    from astroquery.vizier import Vizier
+    from astropy.coordinates import SkyCoord
+    import astropy.units as u
+    import time
+
+    # cct.vizier_multi's batches (500 positions, the XMatch layout through
+    # cct.from_vizier_batch), each retried: one answer cut off in transfer
+    # (ChunkedEncodingError, 2026-11-14) otherwise ended a 30-minute crossmatch.
+    v = Vizier(columns=["**"], row_limit=-1)
+    v.TIMEOUT = 300
+    t = truth[["benchmark_id", "ra", "dec"]]
+    parts = []
+    for i in range(0, len(t), cct.VIZIER_BATCH):
+        chunk = t.iloc[i : i + cct.VIZIER_BATCH]
+        coords = SkyCoord(chunk.ra.to_numpy(float) * u.deg, chunk.dec.to_numpy(float) * u.deg)
+        for attempt in range(VIZIER_RETRIES):
+            try:
+                res = v.query_region(coords, radius=(radius_arcsec + EPOCH_MARGIN_ARCSEC) * u.arcsec, catalog="I/355/gaiadr3")
+                break
+            except Exception as e:  # noqa: BLE001 - transient transfer / server errors
+                if attempt == VIZIER_RETRIES - 1:
+                    raise
+                print(f"[collect_star_gaia] VizieR batch at {i}: {e!r}; retry {attempt + 1}", flush=True)
+                time.sleep(15 * (attempt + 1))
+        if len(res):
+            part = cct.from_vizier_batch(res[0].to_pandas(), chunk)
+            if {"RA_ICRS", "DE_ICRS"} <= set(part.columns):  # epoch 2016.0, as CDS XMatch
+                part["angDist"] = cct.sep_arcsec(
+                    part.truth_ra.to_numpy(float),
+                    part.truth_dec.to_numpy(float),
+                    pd.to_numeric(part.RA_ICRS, errors="coerce").to_numpy(),
+                    pd.to_numeric(part.DE_ICRS, errors="coerce").to_numpy(),
+                )
+            parts.append(part)
+        print(f"[collect_star_gaia] VizieR batch {i + len(chunk)}/{len(t)}", flush=True)
+    return pd.concat(parts, ignore_index=True) if parts else pd.DataFrame(columns=["benchmark_id", "angDist"])
+
+
 def run(truth_path: Path, out: Path, max_sep_arcsec: float = 2.0, min_matches: int = 500):
     from astroquery.xmatch import XMatch
     from astropy.table import Table
@@ -18,13 +78,21 @@ def run(truth_path: Path, out: Path, max_sep_arcsec: float = 2.0, min_matches: i
     if not req.issubset(truth.columns):
         raise KeyError(f"truth missing {sorted(req-set(truth.columns))}")
     upload = truth[["benchmark_id", "ra", "dec"]].rename(columns={"ra": "truth_ra", "dec": "truth_dec"})
-    xm = XMatch.query(
-        cat1=Table.from_pandas(upload),
-        cat2="vizier:I/355/gaiadr3",
-        max_distance=max_sep_arcsec * u.arcsec,
-        colRA1="truth_ra",
-        colDec1="truth_dec",
-    ).to_pandas()
+    try:
+        xm = XMatch.query(
+            cat1=Table.from_pandas(upload),
+            cat2="vizier:I/355/gaiadr3",
+            max_distance=max_sep_arcsec * u.arcsec,
+            colRA1="truth_ra",
+            colDec1="truth_dec",
+        ).to_pandas()
+    except Exception as e:  # noqa: BLE001
+        # cdsxmatch.u-strasbg.fr refuses connections at times (2026-11-12,
+        # 2026-11-13): the same Gaia table through VizieR multi-target
+        # queries with mirror failover, as benchmark/collect_catalog_truth.py
+        # does since 2.51.3 (angDist / truth_ra / truth_dec in the XMatch layout).
+        print(f"[collect_star_gaia] CDS XMatch ERROR {e!r}; trying VizieR multi-target batches", flush=True)
+        xm = _vizier_fallback(truth, max_sep_arcsec)
     mp = {
         "Source": "source_id",
         "RA_ICRS": "ra",

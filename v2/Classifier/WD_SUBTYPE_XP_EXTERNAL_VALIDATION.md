@@ -156,3 +156,14 @@ Implementation:
 - `apply_wd_subtype_xp.py`
 - `branches/star.py`
 - `.github/workflows/build-wd-subtype-xp-model.yml`
+
+## Inputs in the repository (2.53.0, 2026-11-14)
+
+The run artifacts above (36300795761, 36304882268) expired, and every later
+run of `build-wd-subtype-xp-model.yml` failed at the download step.  The
+LAMOST training and SDSS external tables now live in `wd_subtype_xp_data/`,
+re-collected (CDS XMatch was down; the VizieR fallback matches on Gaia's
+epoch-2016 positions like XMatch).  They reproduce every number above
+exactly: 213 external XP rows; ungated 95.31 % (balanced 95.28 %);
+p ≥ 0.90 128 rows 100 %; the deploy model 95.77 % ungated and 124 / 213 at
+p ≥ 0.90, 100 %.  See the data README for the comparison table.
