@@ -156,3 +156,20 @@ Implementation:
 - `apply_wd_subtype_xp.py`
 - `branches/star.py`
 - `.github/workflows/build-wd-subtype-xp-model.yml`
+
+## Inputs in the repository (2.53.0, 2026-11-14)
+
+The run artifacts above (36300795761, 36304882268) expired, and every later
+run of `build-wd-subtype-xp-model.yml` failed at the download step.  The
+LAMOST training and SDSS external tables now live in
+`wd_subtype_xp_data/` (re-collected; see its README for the comparison).
+On them the deploy model reproduces the numbers above:
+
+| | original (run 36306249028) | rebuilt (run 43574307068) |
+|---|---|---|
+| SDSS external XP rows | 213 | 213 |
+| ungated accuracy | 95.77 % | 95.77 % |
+| p ≥ 0.90 | 124 / 213, 100 % | 127 / 213, 100 % |
+
+The external validation itself (calibration split held out): balanced
+accuracy 95.28 % (same), p ≥ 0.90 132 rows 100 % (was 128).
