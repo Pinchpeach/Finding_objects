@@ -1,14 +1,32 @@
 name: Validate frozen STAR model on diverse LAMOST truth
+
+# 2.53.1: the frozen model and the evaluation inputs live in the repository
+# (v2/Classifier/star_diverse_validation/inputs/), not only in artifacts, which
+# expire.  The original model artifact (run 36295747956) expired on 2026-10-27,
+# so every run failed at its download step.  The first run after this change
+# copies the inputs from the full validation artifact of run 36306280498
+# (alive until 2026-12-26; it holds the frozen model as that run downloaded
+# it), checks the model SHA256 recorded in STAR_DIVERSE_PROTOCOL.md, reproduces
+# the published result (star_diverse_validation/metrics.json) and only then
+# commits them.  Later runs evaluate the committed copies and check the same
+# reproduction.  refresh=true evaluates the frozen model on a fresh collection
+# of the truth and Gaia matches and commits nothing: the protocol fixes the
+# truth, and the frozen model is never refitted.
 on:
   workflow_dispatch:
+    inputs:
+      refresh:
+        description: "evaluate on a fresh collection of the truth and Gaia matches (true/false; nothing is committed)"
+        default: "false"
   push:
     paths:
       - v2/Classifier/build_star_diverse_truth.py
       - v2/Classifier/evaluate_star_diverse.py
       - v2/Classifier/test_star_diverse.py
+      - v2/Classifier/star_diverse_validation/inputs/**
       - .github/workflows/validate-star-diverse.yml
 permissions:
-  contents: read
+  contents: write
   actions: read
 jobs:
   validate:
@@ -17,6 +35,9 @@ jobs:
     env:
       OMP_NUM_THREADS: '2'
       OPENBLAS_NUM_THREADS: '2'
+      SNAP: v2/Classifier/star_diverse_validation
+      IN: v2/Classifier/star_diverse_validation/inputs
+      MODEL_SHA256: 22ae268a6525fc9fafbd6cff048c96512f235e75f998bdc63354610f518a9d5c
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -24,36 +45,105 @@ jobs:
           python-version: '3.11'
       - name: Install original model runtime
         run: pip install numpy==2.4.6 scipy==1.17.1 pandas==3.0.6 scikit-learn==1.9.1 joblib==1.6.0 astropy==8.0.1 astroquery==0.4.11 pytest
-      - uses: actions/download-artifact@v4
+      - name: Look for the committed inputs
+        id: have
+        run: |
+          if [ -f "$IN/frozen_star_wd_classifier.joblib" ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Restore the inputs from the last artifact that holds them (one-off)
+        if: steps.have.outputs.found != 'true'
+        uses: actions/download-artifact@v4
         with:
-          name: star-wd-classifier-eval
-          run-id: 36295747956
+          name: star-diverse-frozen-validation
+          run-id: 36306280498
           github-token: ${{ github.token }}
-          path: results/star-diverse/frozen
+          path: results/star-diverse-restore
+      - name: Store the frozen model and inputs in the repository (one-off)
+        if: steps.have.outputs.found != 'true'
+        run: |
+          set -euo pipefail
+          R=results/star-diverse-restore
+          find "$R" -maxdepth 3 -type f -not -path "*/raw/*" | sort
+          echo "$MODEL_SHA256  $R/frozen/star_wd_eval/star_wd_classifier.joblib" | sha256sum -c -
+          mkdir -p "$IN"
+          cp "$R/frozen/star_wd_eval/star_wd_classifier.joblib" "$IN/frozen_star_wd_classifier.joblib"
+          for f in frozen/star_gaia_features.csv external_gaia.csv previous_gaia.csv; do
+            gzip -n -9 -c "$R/$f" > "$IN/$(echo "$f" | sed 's#frozen/#frozen_#').gz"
+          done
+          # hashes of the files as the published run used them (before gzip)
+          (cd "$R" && sha256sum frozen/star_wd_eval/star_wd_classifier.joblib frozen/star_gaia_features.csv \
+            external_gaia.csv previous_gaia.csv data/truth.csv) | tee "$IN/SHA256SUMS"
+          cmp "$R/data/truth.csv" "$SNAP/truth.csv" && echo "truth.csv identical to the committed snapshot"
+          ls -la "$IN"
       - name: Test independence and feature isolation
         run: python -m pytest v2/Classifier/test_star_diverse.py -q
-      - name: Build larger diverse truth without model access
-        run: python v2/Classifier/build_star_diverse_truth.py --out results/star-diverse/data --cache results/star-diverse/raw
-      - name: Match external and previous truth to Gaia
+      - name: Choose the inputs (committed, or a fresh collection with refresh=true)
         run: |
-          python v2/Classifier/collect_star_gaia.py --truth results/star-diverse/data/truth.csv --out results/star-diverse/external_gaia.csv
-          python - <<'PY'
+          set -euo pipefail
+          mkdir -p results/star-diverse
+          if [ "${{ github.event.inputs.refresh }}" = "true" ]; then
+            python v2/Classifier/build_star_diverse_truth.py --out results/star-diverse/data --cache results/star-diverse/raw
+            python v2/Classifier/collect_star_gaia.py --truth results/star-diverse/data/truth.csv --out results/star-diverse/external_gaia.csv
+            python - <<'PY'
           import pandas as pd
           from pathlib import Path
           root = Path('v2/Classifier')
           d = pd.concat([pd.read_csv(root/'lamost_star_external_truth.csv'), pd.read_csv(root/'wd_subtype_truth.csv')], ignore_index=True)
           d.to_csv('results/star-diverse/previous_truth.csv', index=False)
           PY
-          python v2/Classifier/collect_star_gaia.py --truth results/star-diverse/previous_truth.csv --out results/star-diverse/previous_gaia.csv
+            python v2/Classifier/collect_star_gaia.py --truth results/star-diverse/previous_truth.csv --out results/star-diverse/previous_gaia.csv
+            {
+              echo "TRUTH=results/star-diverse/data/truth.csv"
+              echo "EXTERNAL=results/star-diverse/external_gaia.csv"
+              echo "PREVIOUS=results/star-diverse/previous_gaia.csv"
+            } >> "$GITHUB_ENV"
+          else
+            {
+              echo "TRUTH=$SNAP/truth.csv"
+              echo "EXTERNAL=$IN/external_gaia.csv.gz"
+              echo "PREVIOUS=$IN/previous_gaia.csv.gz"
+            } >> "$GITHUB_ENV"
+          fi
       - name: Evaluate original frozen classifier
         run: |
+          set -euo pipefail
+          # the model is a pickle: load only the file whose hash the protocol recorded
+          echo "$MODEL_SHA256  $IN/frozen_star_wd_classifier.joblib" | sha256sum -c -
           python v2/Classifier/evaluate_star_diverse.py \
-            --frozen results/star-diverse/frozen/star_wd_eval/star_wd_classifier.joblib \
-            --sdss results/star-diverse/frozen/star_gaia_features.csv \
-            --truth results/star-diverse/data/truth.csv \
-            --external results/star-diverse/external_gaia.csv \
-            --previous results/star-diverse/previous_gaia.csv \
+            --frozen "$IN/frozen_star_wd_classifier.joblib" \
+            --sdss "$IN/frozen_star_gaia_features.csv.gz" \
+            --truth "$TRUTH" \
+            --external "$EXTERNAL" \
+            --previous "$PREVIOUS" \
             --out results/star-diverse/eval
+      - name: Check that the published result is reproduced (committed inputs)
+        if: github.event.inputs.refresh != 'true'
+        run: |
+          python - <<'PY'
+          import json, os
+          new = json.load(open('results/star-diverse/eval/metrics.json'))
+          old = json.load(open(os.path.join(os.environ['SNAP'], 'metrics.json')))
+          bad = [k for k in ('model_sha256', 'truth_sha256', 'audit', 'truth_rows',
+                             'gaia_matched_rows_before_exclusions', 'gate_passed') if new[k] != old[k]]
+          bad += [k for k in ('internal_reproduction', 'learned', 'baseline', 'non_da')
+                  if new[k]['confusion'] != old[k]['confusion']]
+          bad += [k for k in ('log_loss', 'brier', 'baseline_usable_fraction') if abs(new[k] - old[k]) > 1e-9]
+          if bad:
+              raise SystemExit(f'published result not reproduced: {bad}')
+          print('reproduced:', new['learned']['confusion'], new['baseline']['confusion'], 'log loss', new['log_loss'])
+          PY
+      - name: Commit the restored inputs (one-off, after the reproduction check)
+        if: steps.have.outputs.found != 'true' && github.event.inputs.refresh != 'true'
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add "$IN"
+          git diff --cached --quiet && exit 0
+          git commit -m "STAR diverse validation: frozen model and evaluation inputs from run 36306280498"
+          bash .github/scripts/push_with_retry.sh "${{ github.ref_name }}"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
