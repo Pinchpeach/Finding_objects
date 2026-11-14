@@ -30,6 +30,9 @@ The tables reproduce the original runs (`WD_SUBTYPE_XP_VALIDATION.md`, `WD_SUBTY
 | LAMOST held-out test, XP random forest | 48 / 50 | 49 / 50 (broadband: 37 / 50 both times) |
 | SDSS external (compact, 100 per class) truth → Gaia → XP | 200 → … → 105 (DA 55, DB 50) | 200 → 198 → 105 (DA 55, DB 50) |
 | compact external: accuracy ungated / p ≥ 0.90 / p ≥ 0.95 | 97.14 % / 65 rows 98.46 % / 40 rows 100 % | 97.14 % / 64 rows 98.44 % / 41 rows 100 % |
+| SDSS external (primary, 200 per class) truth → Gaia → XP | 400 → … → 213 (DA 114, DB 99) | 400 → 391 → 213 (DA 114, DB 99) |
+| primary external: balanced accuracy ungated | 95.28 % | 95.28 % |
+| primary external: p ≥ 0.80 / 0.90 / 0.95 | 162 rows 99.38 % / 128 rows 100 % / 74 rows 100 % | 161 rows 99.38 % / 132 rows 100 % / 74 rows 100 % |
 
 The first collection used the workflow's 100-per-class setting, the compact confirmation run; the deploy-model check
 (`build-wd-subtype-xp-model.yml`: ≥ 80 rows at p ≥ 0.90) was set on the primary 200-per-class run (213 XP rows, 124 at
