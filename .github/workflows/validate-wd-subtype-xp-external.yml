@@ -12,7 +12,10 @@ on:
 # instead of expiring artifacts.  The LAMOST training table comes from
 # validate-wd-subtype-xp.yml; the SDSS external truth / Gaia / XP tables are
 # collected and committed only when absent, so a code push validates on the
-# committed data and never replaces it.
+# committed data and never replaces it.  200 per class is the primary external
+# benchmark (run 36304882268: 213 XP rows) that the deploy-model check in
+# build-wd-subtype-xp-model.yml (>= 80 rows at p >= 0.90) was set on; 100 per
+# class was the compact confirmation run (105 rows, 63-65 at p >= 0.90).
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -43,7 +46,7 @@ jobs:
             echo "using the committed $DATA/sdss_wd_subtype_xp.csv.gz"
             exit 0
           fi
-          python v2/Classifier/build_sdss_wd_subtype_external_truth.py --per-class 100 --min-sn 10 --out "$DATA/sdss_wd_subtype_external_truth.csv.gz"
+          python v2/Classifier/build_sdss_wd_subtype_external_truth.py --per-class 200 --min-sn 10 --out "$DATA/sdss_wd_subtype_external_truth.csv.gz"
           python v2/Classifier/collect_star_gaia.py --truth "$DATA/sdss_wd_subtype_external_truth.csv.gz" --out "$DATA/sdss_wd_subtype_gaia.csv.gz" --min-matches 90
           python v2/Classifier/collect_gaia_xp_coefficients.py --features "$DATA/sdss_wd_subtype_gaia.csv.gz" --out "$DATA/sdss_wd_subtype_xp.csv.gz" --batch-size 40
       - name: External DA DB validation

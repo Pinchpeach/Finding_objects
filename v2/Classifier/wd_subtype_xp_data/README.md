@@ -13,7 +13,7 @@ spaced ranks (no random draw) and the models use random_state = 42.
 |---|---|---|
 | `wd_subtype_gaia.csv.gz` | Gaia DR3 crossmatch (2″) of the fixed LAMOST DR5 DA/DB truth (`../wd_subtype_truth.csv`) | `validate-wd-subtype-xp.yml` |
 | `wd_subtype_xp.csv.gz` | the same rows with the 55 BP + 55 RP XP continuous coefficients (ESA Gaia DataLink): the training table | `validate-wd-subtype-xp.yml` |
-| `sdss_wd_subtype_external_truth.csv.gz` | independent SDSS DR14 DA/DB truth (100 per class, S/N ≥ 10, LAMOST objects excluded) | `validate-wd-subtype-xp-external.yml` |
+| `sdss_wd_subtype_external_truth.csv.gz` | independent SDSS DR14 DA/DB truth (200 per class requested, S/N ≥ 10, LAMOST objects excluded: the primary external benchmark) | `validate-wd-subtype-xp-external.yml` |
 | `sdss_wd_subtype_gaia.csv.gz`, `sdss_wd_subtype_xp.csv.gz` | its Gaia crossmatch and XP coefficients: the external test table | `validate-wd-subtype-xp-external.yml` |
 
 The workflows collect a table only when it is absent here; `validate-wd-subtype-xp.yml`
@@ -28,7 +28,9 @@ The tables reproduce the original runs (`WD_SUBTYPE_XP_VALIDATION.md`, `WD_SUBTY
 |---|---|---|
 | LAMOST truth → Gaia → XP | 300 → 291 → 228 (DA 118, DB 110) | 300 → 290 → 227 (DA 117, DB 110) |
 | LAMOST held-out test, XP random forest | 48 / 50 | 49 / 50 (broadband: 37 / 50 both times) |
-| SDSS external truth → Gaia → XP | 200 → … → 105 (DA 55, DB 50) | 200 → 198 → 105 (DA 55, DB 50) |
-| external accuracy, ungated | 97.14 % | 97.14 % |
-| external p ≥ 0.90 | 65 rows, 98.46 % | 64 rows, 98.44 % |
-| external p ≥ 0.95 | 40 rows, 100 % | 41 rows, 100 % |
+| SDSS external (compact, 100 per class) truth → Gaia → XP | 200 → … → 105 (DA 55, DB 50) | 200 → 198 → 105 (DA 55, DB 50) |
+| compact external: accuracy ungated / p ≥ 0.90 / p ≥ 0.95 | 97.14 % / 65 rows 98.46 % / 40 rows 100 % | 97.14 % / 64 rows 98.44 % / 41 rows 100 % |
+
+The first collection used the workflow's 100-per-class setting, the compact confirmation run; the deploy-model check
+(`build-wd-subtype-xp-model.yml`: ≥ 80 rows at p ≥ 0.90) was set on the primary 200-per-class run (213 XP rows, 124 at
+p ≥ 0.90) and fails on the compact set (63 rows).  The SDSS tables are therefore re-collected at 200 per class.
