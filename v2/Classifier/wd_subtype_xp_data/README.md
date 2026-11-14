@@ -22,18 +22,21 @@ then `validate-wd-subtype-xp-external.yml`, then `build-wd-subtype-xp-model.yml`
 
 ## Re-collected on 2026-11-14 (CDS XMatch down: VizieR batch fallback)
 
-The tables reproduce the original runs (`WD_SUBTYPE_XP_VALIDATION.md`, `WD_SUBTYPE_XP_EXTERNAL_VALIDATION.md`):
+The fallback measures the 2″ cut on Gaia's epoch-2016.0 positions, as CDS
+XMatch does (a first collection used the propagated J2000 positions and lost
+one high-proper-motion LAMOST white dwarf: 290 / 227 instead of 291 / 228;
+Codex review on PR #66).  With that fixed the tables reproduce the original
+runs exactly (`WD_SUBTYPE_XP_VALIDATION.md`, `WD_SUBTYPE_XP_EXTERNAL_VALIDATION.md`):
 
 | | original | 2026-11-14 |
 |---|---|---|
-| LAMOST truth → Gaia → XP | 300 → 291 → 228 (DA 118, DB 110) | 300 → 290 → 227 (DA 117, DB 110) |
-| LAMOST held-out test, XP random forest | 48 / 50 | 49 / 50 (broadband: 37 / 50 both times) |
-| SDSS external (compact, 100 per class) truth → Gaia → XP | 200 → … → 105 (DA 55, DB 50) | 200 → 198 → 105 (DA 55, DB 50) |
-| compact external: accuracy ungated / p ≥ 0.90 / p ≥ 0.95 | 97.14 % / 65 rows 98.46 % / 40 rows 100 % | 97.14 % / 64 rows 98.44 % / 41 rows 100 % |
-| SDSS external (primary, 200 per class) truth → Gaia → XP | 400 → … → 213 (DA 114, DB 99) | 400 → 391 → 213 (DA 114, DB 99) |
-| primary external: balanced accuracy ungated | 95.28 % | 95.28 % |
-| primary external: p ≥ 0.80 / 0.90 / 0.95 | 162 rows 99.38 % / 128 rows 100 % / 74 rows 100 % | 161 rows 99.38 % / 132 rows 100 % / 74 rows 100 % |
+| LAMOST truth → Gaia → XP | 300 → 291 → 228 (DA 118, DB 110) | same |
+| LAMOST held-out test: XP random forest / broadband | 48 / 50 / 37 / 50 | same (confusion matrices identical) |
+| SDSS external truth → Gaia → XP (200 per class requested) | 400 → … → 213 (DA 114, DB 99) | 400 → 391 → 213 (same) |
+| external: accuracy / balanced accuracy | 95.31 % / 95.28 % | same |
+| external p ≥ 0.80 / 0.90 / 0.95 | 162 rows 99.38 % / 128 rows 100 % / 74 rows 100 % | same |
+| deploy model on the external set: ungated / p ≥ 0.90 | 95.77 % / 124 of 213, 100 % | same |
 
-The first collection used the workflow's 100-per-class setting, the compact confirmation run; the deploy-model check
-(`build-wd-subtype-xp-model.yml`: ≥ 80 rows at p ≥ 0.90) was set on the primary 200-per-class run (213 XP rows, 124 at
-p ≥ 0.90) and fails on the compact set (63 rows).  The SDSS tables are therefore re-collected at 200 per class.
+The workflow had the 100-per-class setting of the compact confirmation run (105 rows; the
+deploy-model check, ≥ 80 rows at p ≥ 0.90, fails there with 63); it now collects the
+primary 200-per-class benchmark the check was set on.

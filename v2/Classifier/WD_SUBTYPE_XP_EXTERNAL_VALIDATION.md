@@ -161,15 +161,9 @@ Implementation:
 
 The run artifacts above (36300795761, 36304882268) expired, and every later
 run of `build-wd-subtype-xp-model.yml` failed at the download step.  The
-LAMOST training and SDSS external tables now live in
-`wd_subtype_xp_data/` (re-collected; see its README for the comparison).
-On them the deploy model reproduces the numbers above:
-
-| | original (run 36306249028) | rebuilt (run 43574307068) |
-|---|---|---|
-| SDSS external XP rows | 213 | 213 |
-| ungated accuracy | 95.77 % | 95.77 % |
-| p ≥ 0.90 | 124 / 213, 100 % | 127 / 213, 100 % |
-
-The external validation itself (calibration split held out): balanced
-accuracy 95.28 % (same), p ≥ 0.90 132 rows 100 % (was 128).
+LAMOST training and SDSS external tables now live in `wd_subtype_xp_data/`,
+re-collected (CDS XMatch was down; the VizieR fallback matches on Gaia's
+epoch-2016 positions like XMatch).  They reproduce every number above
+exactly: 213 external XP rows; ungated 95.31 % (balanced 95.28 %);
+p ≥ 0.90 128 rows 100 %; the deploy model 95.77 % ungated and 124 / 213 at
+p ≥ 0.90, 100 %.  See the data README for the comparison table.
