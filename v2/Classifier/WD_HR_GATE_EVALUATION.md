@@ -95,5 +95,22 @@ split by the benchmark manifest):
 t = 0.75 (GF21's recommended cut on their own probability) removes false WDs
 without losing true ones on every set; t = 0.9 is level on the train split
 and loses WDs on the others.  The remaining false WDs are stars (hot
-subdwarfs, WD+MS pairs, CVs), as before.  The SDSS STAR / LAMOST sets need a
-Gaia crossmatch (`evaluate-wd-hr-gates.yml`).
+subdwarfs, WD+MS pairs, CVs), as before.
+
+The crossmatched truth sets of the original evaluation
+(`evaluate-wd-hr-gates.yml`, run 43572719091, 2026-11-14; CDS XMatch was
+down, so the Gaia crossmatch used the VizieR batch fallback):
+
+| set | gate | flagged | true WD | false WD | P | R |
+|---|---|---:|---:|---:|---:|---:|
+| SDSS DR18 STAR (489 WD) | plx4_or_pm10 | 411 | 407 | 4 | 0.990 | 0.832 |
+| | **plx4_or_pm10_p75** | 408 | 406 | 2 | 0.995 | 0.830 |
+| | plx4_or_pm10_p90 | 400 | 398 | 2 | 0.995 | 0.814 |
+| LAMOST DR5 external (475 DA) | plx4_or_pm10 / **p75** / p90 | 472 | 472 | 0 | 1.000 | 0.994 |
+| SDSS mixed classes (144 WD) | plx4_or_pm10 | 164 | 127 | 37 (31 STAR, 6 QSO) | 0.774 | 0.882 |
+| | **plx4_or_pm10_p75** | 156 | 127 | 29 (23 STAR, 6 QSO) | 0.814 | 0.882 |
+| | plx4_or_pm10_p90 | 150 | 124 | 26 (21 STAR, 5 QSO) | 0.827 | 0.861 |
+
+LAMOST is unchanged; on both SDSS sets the error-aware gate removes false
+WDs (4 → 2, 37 → 29) for at most one true WD, so `plx4_or_pm10_p75` stays the
+default.  The remaining false WDs are stars, as before.
