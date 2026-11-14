@@ -8,6 +8,9 @@ import numpy as np
 import pandas as pd
 
 
+VIZIER_RETRIES = 4
+
+
 def _vizier_fallback(truth: pd.DataFrame, radius_arcsec: float) -> pd.DataFrame:
     import importlib.util
     import sys
@@ -20,7 +23,34 @@ def _vizier_fallback(truth: pd.DataFrame, radius_arcsec: float) -> pd.DataFrame:
     spec = importlib.util.spec_from_file_location("v2_collect_catalog_truth", v2 / "benchmark" / "collect_catalog_truth.py")
     cct = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(cct)
-    return cct.vizier_multi(truth[["benchmark_id", "ra", "dec"]], "I/355/gaiadr3", radius_arcsec)
+    from astroquery.vizier import Vizier
+    from astropy.coordinates import SkyCoord
+    import astropy.units as u
+    import time
+
+    # cct.vizier_multi's batches (500 positions, the XMatch layout through
+    # cct.from_vizier_batch), each retried: one answer cut off in transfer
+    # (ChunkedEncodingError, 2026-11-14) otherwise ended a 30-minute crossmatch.
+    v = Vizier(columns=["**"], row_limit=-1)
+    v.TIMEOUT = 300
+    t = truth[["benchmark_id", "ra", "dec"]]
+    parts = []
+    for i in range(0, len(t), cct.VIZIER_BATCH):
+        chunk = t.iloc[i : i + cct.VIZIER_BATCH]
+        coords = SkyCoord(chunk.ra.to_numpy(float) * u.deg, chunk.dec.to_numpy(float) * u.deg)
+        for attempt in range(VIZIER_RETRIES):
+            try:
+                res = v.query_region(coords, radius=radius_arcsec * u.arcsec, catalog="I/355/gaiadr3")
+                break
+            except Exception as e:  # noqa: BLE001 - transient transfer / server errors
+                if attempt == VIZIER_RETRIES - 1:
+                    raise
+                print(f"[collect_star_gaia] VizieR batch at {i}: {e!r}; retry {attempt + 1}", flush=True)
+                time.sleep(15 * (attempt + 1))
+        if len(res):
+            parts.append(cct.from_vizier_batch(res[0].to_pandas(), chunk))
+        print(f"[collect_star_gaia] VizieR batch {i + len(chunk)}/{len(t)}", flush=True)
+    return pd.concat(parts, ignore_index=True) if parts else pd.DataFrame(columns=["benchmark_id", "angDist"])
 
 
 def run(truth_path: Path, out: Path, max_sep_arcsec: float = 2.0, min_matches: int = 500):
