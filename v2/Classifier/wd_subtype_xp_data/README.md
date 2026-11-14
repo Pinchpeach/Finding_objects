@@ -1,0 +1,21 @@
+# White-dwarf DA/DB Gaia XP data (2.53.0)
+
+Inputs of the Gaia XP DA/DB sub-type model (`fit_wd_subtype_xp_model.py`,
+`apply_wd_subtype_xp.py`; validation in `WD_SUBTYPE_XP_VALIDATION.md` and
+`WD_SUBTYPE_XP_EXTERNAL_VALIDATION.md`).  They were artifacts of workflow runs
+until 2.53.0; the artifacts expired after 30 days and every run of
+`build-wd-subtype-xp-model.yml` failed at the download step, so the tables are
+kept here.  All of them are reproducible: the truth is fixed, the Gaia DR3 XP
+coefficients are a fixed data release, the SDSS sample is drawn at evenly
+spaced ranks (no random draw) and the models use random_state = 42.
+
+| file | content | written by |
+|---|---|---|
+| `wd_subtype_gaia.csv.gz` | Gaia DR3 crossmatch (2″) of the fixed LAMOST DR5 DA/DB truth (`../wd_subtype_truth.csv`) | `validate-wd-subtype-xp.yml` |
+| `wd_subtype_xp.csv.gz` | the same rows with the 55 BP + 55 RP XP continuous coefficients (ESA Gaia DataLink): the training table | `validate-wd-subtype-xp.yml` |
+| `sdss_wd_subtype_external_truth.csv.gz` | independent SDSS DR14 DA/DB truth (100 per class, S/N ≥ 10, LAMOST objects excluded) | `validate-wd-subtype-xp-external.yml` |
+| `sdss_wd_subtype_gaia.csv.gz`, `sdss_wd_subtype_xp.csv.gz` | its Gaia crossmatch and XP coefficients: the external test table | `validate-wd-subtype-xp-external.yml` |
+
+The workflows collect a table only when it is absent here; `validate-wd-subtype-xp.yml`
+re-collects with `refresh=true`.  Order for a fresh start: `validate-wd-subtype-xp.yml`,
+then `validate-wd-subtype-xp-external.yml`, then `build-wd-subtype-xp-model.yml`.
