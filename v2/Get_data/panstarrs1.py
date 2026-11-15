@@ -107,7 +107,10 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     try:
         return _fetch_mast(ra, dec, radius_arcmin)
     except Exception as exc:  # SSL / connection / 5xx / timeout at MAST
-        print(f"[panstarrs1] MAST failed ({type(exc).__name__}: {str(exc)[:160]}); VizieR {VIZIER_FALLBACK} instead", flush=True)
+        print(
+            f"[panstarrs1] MAST failed ({type(exc).__name__}: {str(exc)[:160]}); VizieR {VIZIER_FALLBACK} instead",
+            flush=True,
+        )
         return _fetch_vizier(ra, dec, radius_arcmin)
 
 

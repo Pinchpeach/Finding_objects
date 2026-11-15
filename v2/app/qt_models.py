@@ -292,7 +292,12 @@ class ResultsFilter(QSortFilterProxyModel):
         if not self._components and self._a_part is not None and self._a_part[row]:
             return False
         # a galaxy part follows "Show galaxy parts" whatever its catalogues
-        if not self._literature and self._a_lit is not None and self._a_lit[row] and not (self._a_part is not None and self._a_part[row]):
+        if (
+            not self._literature
+            and self._a_lit is not None
+            and self._a_lit[row]
+            and not (self._a_part is not None and self._a_part[row])
+        ):
             return False
         if self._high_only and (self._a_high is None or not self._a_high[row]):
             return False

@@ -14,12 +14,29 @@ import simbad  # noqa: E402
 
 def _ii389():
     # columns as VizieR II/389/ps1_dr2 serves them (practical-use probe, 2026-11-15)
-    d = {"objID": [108761501191226839, 108761501191226840], "RAJ2000": [150.1191, 150.1195], "DEJ2000": [2.2058, 2.2061],
-         "e_RAJ2000": [0.01, 0.02], "e_DEJ2000": [0.01, 0.02], "Nd": [12, 3], "Epoch": [56000.1, 56001.0],
-         "f_objID": [1, 2], "Qual": [52, 60]}
+    d = {
+        "objID": [108761501191226839, 108761501191226840],
+        "RAJ2000": [150.1191, 150.1195],
+        "DEJ2000": [2.2058, 2.2061],
+        "e_RAJ2000": [0.01, 0.02],
+        "e_DEJ2000": [0.01, 0.02],
+        "Nd": [12, 3],
+        "Epoch": [56000.1, 56001.0],
+        "f_objID": [1, 2],
+        "Qual": [52, 60],
+    }
     for b in "grizy":
-        d.update({f"N{b}": [3, 1], f"{b}mag": [20.0, 21.0], f"e_{b}mag": [0.02, 0.05], f"{b}magStd": [0.03, 0.1],
-                  f"o_{b}mag": [3, 1], f"{b}Kmag": [19.8, 21.0], f"e_{b}Kmag": [0.03, 0.06]})
+        d.update(
+            {
+                f"N{b}": [3, 1],
+                f"{b}mag": [20.0, 21.0],
+                f"e_{b}mag": [0.02, 0.05],
+                f"{b}magStd": [0.03, 0.1],
+                f"o_{b}mag": [3, 1],
+                f"{b}Kmag": [19.8, 21.0],
+                f"e_{b}Kmag": [0.03, 0.06],
+            }
+        )
     return pd.DataFrame(d)
 
 
@@ -28,7 +45,9 @@ def test_ps1_uses_the_vizier_dr2_copy_when_mast_fails(monkeypatch, tmp_path):
         raise ConnectionError("certificate verify failed")
 
     monkeypatch.setattr(panstarrs1, "_fetch_mast", mast_down)
-    monkeypatch.setattr(_catalog_utils, "vizier_cone", lambda cat, *a, **k: _ii389() if cat == "II/389/ps1_dr2" else None)
+    monkeypatch.setattr(
+        _catalog_utils, "vizier_cone", lambda cat, *a, **k: _ii389() if cat == "II/389/ps1_dr2" else None
+    )
     d = panstarrs1.fetch(150.1191, 2.2058, 1.0)
     assert len(d) == 2 and set(d.ps1_query_status) == {"vizier_fallback"}
     assert d.catalog.iloc[0] == panstarrs1.CATALOG  # the same catalogue for Stage 1

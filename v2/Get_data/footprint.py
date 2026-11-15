@@ -54,8 +54,13 @@ def outside(fp: dict | None, ra: float, dec: float, radius_arcmin: float, margin
         l, b = galactic(ra, dec)
         if not _in_range(l, lo, hi):
             # distance to the nearer boundary meridian (a great half-circle
-            # through the Galactic poles): asin(|sin(l - l0)| cos b)
-            dist = min(math.degrees(math.asin(min(1.0, abs(math.sin(math.radians(l - l0))) * math.cos(math.radians(b))))) for l0 in (lo, hi))
+            # through the Galactic poles): asin(|sin(l - l0)| cos b); exact for
+            # a range whose ends are 180 deg apart (eRASS1-DE), where the two
+            # meridians form one great circle
+            dist = min(
+                math.degrees(math.asin(min(1.0, abs(math.sin(math.radians(l - l0))) * math.cos(math.radians(b)))))
+                for l0 in (lo, hi)
+            )
             if dist > reach:
                 return True
     return False

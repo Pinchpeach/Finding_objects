@@ -214,7 +214,9 @@ def test_detections_inside_large_galaxy_abstain(tmp_path):
     assert out.loc["out", "classification_status"] != "WITHIN_LARGE_GALAXY"
     # A lone SIMBAD label is a literature class without a probability (2.54.0);
     # its evidence still points to STAR.
-    assert out.loc["out", "likelihood_star"] > max(out.loc["out", "likelihood_galaxy"], out.loc["out", "likelihood_qso"])
+    assert out.loc["out", "likelihood_star"] > max(
+        out.loc["out", "likelihood_galaxy"], out.loc["out", "likelihood_qso"]
+    )
     assert math.isnan(out.loc["out", "p_star"])
     host = pd.read_csv(l)
     host = host[host.catalogs.str.contains("SGA-2020", regex=False)].iloc[0]

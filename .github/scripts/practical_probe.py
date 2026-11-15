@@ -32,14 +32,20 @@ def vizier():
 
     cases = {
         "rows (AllWISE 0.5')": ("II/328/allwise", 30.0),
-        "empty cone (NVSS 2\")": ("VIII/65/nvss", 2.0),
-        "empty cone (Suh AGB t9 2\")": ("J/ApJS/256/43/table9", 2.0),
+        'empty cone (NVSS 2")': ("VIII/65/nvss", 2.0),
+        'empty cone (Suh AGB t9 2")': ("J/ApJS/256/43/table9", 2.0),
         "unknown catalogue": ("J/XXX/999/nosuch", 30.0),
     }
     for host in VIZIER_HOSTS:
         for label, (cat, rs) in cases.items():
             url = f"https://{host}/viz-bin/votable"
-            params = {"-source": cat, "-c": f"{COSMOS[0]} {COSMOS[1]}", "-c.rs": rs, "-out": "_RAJ2000,_DEJ2000", "-out.max": 50}
+            params = {
+                "-source": cat,
+                "-c": f"{COSMOS[0]} {COSMOS[1]}",
+                "-c.rs": rs,
+                "-out": "_RAJ2000,_DEJ2000",
+                "-out.max": 50,
+            }
             t0 = time.monotonic()
             try:
                 r = requests.get(url, params=params, timeout=(10, 40))
@@ -53,7 +59,10 @@ def vizier():
                     flush=True,
                 )
             except Exception as exc:
-                print(f"{host:24s} {label:28s} {type(exc).__name__} {time.monotonic() - t0:5.1f}s {str(exc)[:120]}", flush=True)
+                print(
+                    f"{host:24s} {label:28s} {type(exc).__name__} {time.monotonic() - t0:5.1f}s {str(exc)[:120]}",
+                    flush=True,
+                )
 
 
 def vizier_mini():
@@ -65,13 +74,24 @@ def vizier_mini():
     body = "-source={cat}\n-out.max=unlimited\n-out.all\n-c=150.11910623+2.20579505\n-c.rs=2.0\n-out.meta=huUD\n-out.form=mini\n-oc.form=d"
     for host in ("vizier.cds.unistra.fr", "vizier.cfa.harvard.edu", "vizier.idia.ac.za"):
         for cat in ("VIII/65/nvss", "J/ApJS/256/43/table9", "J/XXX/999/nosuch", "II/328/allwise"):
-            for label, data in (("mini", body.format(cat=cat)),
-                                ("confirm", "\n".join([l for l in body.format(cat=cat).splitlines() if not l.startswith(("-out.form=", "-out.max="))] + ["-out.max=1"]))):
+            for label, data in (
+                ("mini", body.format(cat=cat)),
+                (
+                    "confirm",
+                    "\n".join(
+                        [l for l in body.format(cat=cat).splitlines() if not l.startswith(("-out.form=", "-out.max="))]
+                        + ["-out.max=1"]
+                    ),
+                ),
+            ):
                 t0 = time.monotonic()
                 try:
                     r = requests.post(f"https://{host}/viz-bin/votable", data=data, timeout=(10, 40))
                     t = r.text
-                    print(f"{host:24s} {cat:22s} {label:8s} {r.status_code} {time.monotonic() - t0:4.1f}s table={'<TABLE' in t.upper()} tr={t.count('<TR>')} len={len(t)}", flush=True)
+                    print(
+                        f"{host:24s} {cat:22s} {label:8s} {r.status_code} {time.monotonic() - t0:4.1f}s table={'<TABLE' in t.upper()} tr={t.count('<TR>')} len={len(t)}",
+                        flush=True,
+                    )
                 except Exception as exc:
                     print(f"{host:24s} {cat:22s} {label:8s} {type(exc).__name__}", flush=True)
 
@@ -120,15 +140,25 @@ def ps1():
         ]
         m = requests.get(
             "https://catalogs.mast.stsci.edu/api/v0.1/panstarrs/dr2/mean.csv",
-            params={"ra": ra, "dec": dec, "radius": r / 60, "nDetections.gte": 2, "columns": "[" + ",".join(cols) + "]"},
+            params={
+                "ra": ra,
+                "dec": dec,
+                "radius": r / 60,
+                "nDetections.gte": 2,
+                "columns": "[" + ",".join(cols) + "]",
+            },
             timeout=120,
         )
         mast = pd.read_csv(StringIO(m.text), dtype={"objID": "string"}) if m.text.strip() else pd.DataFrame()
-        print(f"\n== cone {ra} {dec} r={r}': MAST {len(mast)} rows; nDetections {mast.nDetections.value_counts().sort_index().head(6).to_dict() if len(mast) else {}}")
+        print(
+            f"\n== cone {ra} {dec} r={r}': MAST {len(mast)} rows; nDetections {mast.nDetections.value_counts().sort_index().head(6).to_dict() if len(mast) else {}}"
+        )
         for cat in ("II/389", "II/349"):
             t0 = time.monotonic()
             try:
-                v = Vizier(columns=["**"], row_limit=-1).query_region(SkyCoord(ra * u.deg, dec * u.deg), radius=r * u.arcmin, catalog=cat)
+                v = Vizier(columns=["**"], row_limit=-1).query_region(
+                    SkyCoord(ra * u.deg, dec * u.deg), radius=r * u.arcmin, catalog=cat
+                )
             except Exception as exc:
                 print(f"{cat}: {type(exc).__name__} {str(exc)[:150]}")
                 continue
@@ -142,14 +172,26 @@ def ps1():
             viz["objID"] = pd.to_numeric(viz["objID"], errors="coerce").astype("Int64").astype("string")
             j = mast.merge(viz, on="objID", how="inner")
             miss = mast[~mast.objID.isin(viz.objID)]
-            print(f"  matched {len(j)} of MAST {len(mast)}; MAST rows missing from {cat}: nDetections {miss.nDetections.value_counts().sort_index().to_dict()}")
-            for mk, vk in (("gMeanPSFMag", "gmag"), ("rMeanPSFMag", "rmag"), ("rMeanKronMag", "rKmag"), ("rMeanApMag", "rAmag"),
-                           ("nDetections", "Nd"), ("qualityFlag", "Qual"), ("objInfoFlag", "f_objID"), ("epochMean", "Epoch")):
+            print(
+                f"  matched {len(j)} of MAST {len(mast)}; MAST rows missing from {cat}: nDetections {miss.nDetections.value_counts().sort_index().to_dict()}"
+            )
+            for mk, vk in (
+                ("gMeanPSFMag", "gmag"),
+                ("rMeanPSFMag", "rmag"),
+                ("rMeanKronMag", "rKmag"),
+                ("rMeanApMag", "rAmag"),
+                ("nDetections", "Nd"),
+                ("qualityFlag", "Qual"),
+                ("objInfoFlag", "f_objID"),
+                ("epochMean", "Epoch"),
+            ):
                 if mk in j and vk in j:
                     x = pd.to_numeric(j[mk], errors="coerce").where(lambda s: s > -900)
                     y = pd.to_numeric(j[vk], errors="coerce")
                     d = (x - y).dropna()
-                    print(f"    {mk:14s} - {vk:8s}: n={len(d)} median={d.median() if len(d) else None} max|d|={d.abs().max() if len(d) else None}")
+                    print(
+                        f"    {mk:14s} - {vk:8s}: n={len(d)} median={d.median() if len(d) else None} max|d|={d.abs().max() if len(d) else None}"
+                    )
 
 
 def httplog(log_path, summary_path):
@@ -165,9 +207,12 @@ def httplog(log_path, summary_path):
         return
     h = pd.DataFrame(rows)
     s = pd.read_csv(summary_path)
-    agg = h.groupby("collector").agg(requests=("host", "size"), request_s=("seconds", "sum"),
-                                       hosts=("host", lambda x: ",".join(sorted(set(x)))),
-                                       outcomes=("outcome", lambda x: ",".join(f"{k}x{v}" for k, v in x.value_counts().items())))
+    agg = h.groupby("collector").agg(
+        requests=("host", "size"),
+        request_s=("seconds", "sum"),
+        hosts=("host", lambda x: ",".join(sorted(set(x)))),
+        outcomes=("outcome", lambda x: ",".join(f"{k}x{v}" for k, v in x.value_counts().items())),
+    )
     out = s.set_index("collector")[["status", "rows", "elapsed_seconds", "cache"]].join(agg, how="left")
     out["pause_estimate_s"] = out.requests.fillna(0) * 4.0
     with pd.option_context("display.width", 250, "display.max_colwidth", 80, "display.max_rows", 100):
@@ -175,4 +220,6 @@ def httplog(log_path, summary_path):
 
 
 if __name__ == "__main__":
-    {"vizier": vizier, "vizier_mini": vizier_mini, "simbad": simbad, "ps1": ps1}.get(sys.argv[1], lambda: httplog(*sys.argv[2:4]))()
+    {"vizier": vizier, "vizier_mini": vizier_mini, "simbad": simbad, "ps1": ps1}.get(
+        sys.argv[1], lambda: httplog(*sys.argv[2:4])
+    )()

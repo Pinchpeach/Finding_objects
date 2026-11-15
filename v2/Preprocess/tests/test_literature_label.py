@@ -20,8 +20,15 @@ def _stage5():
 def test_ned_only_qso_is_a_literature_label_without_probability(tmp_path):
     s5 = _stage5()
     # as Stage 4 writes them (score = 0.85 x reliability 0.8 x association)
-    label = {"score": 0.68, "raw_score": 0.85, "reliability": 0.8, "association_reliability": 1.0,
-             "kind": "catalog_label", "origin": "CATALOG", "feature_group": "catalog_reference"}
+    label = {
+        "score": 0.68,
+        "raw_score": 0.85,
+        "reliability": 0.8,
+        "association_reliability": 1.0,
+        "kind": "catalog_label",
+        "origin": "CATALOG",
+        "feature_group": "catalog_reference",
+    }
     ned = label | {"rule_id": "NED-TYPE-001", "class": "QSO", "value": "QSO"}
     simbad = label | {"rule_id": "SIMBAD-TYPE-001", "class": "GALAXY", "value": "G"}
     ls = {"rule_id": "LS-MORPH-001", "class": "GALAXY", "score": 0.9, "raw_score": 0.9, "kind": "morphology"}
