@@ -3,15 +3,26 @@ name: Validate WD Subtype Gaia XP
 # Manual only (2.24.0): it rewrites preserved benchmark / truth data, which
 # must change only on purpose (an automatic run on a code push replaced the
 # DESI benchmark with a partial re-collection on 2026-10-14).
+# 2.53.0: the inputs live in the repository (v2/Classifier/wd_subtype_xp_data/),
+# not only in artifacts, which expire (30 days): the Gaia crossmatch and the XP
+# coefficients of the fixed DA/DB truth are committed when absent and replaced
+# only with refresh=true.  The truth table itself has been in the repository
+# since the first run (the old artifact restore step pointed at an expired run).
 on:
   workflow_dispatch:
+    inputs:
+      refresh:
+        description: "re-collect and replace the committed Gaia / XP tables (true/false)"
+        default: "false"
 jobs:
   validate:
     runs-on: ubuntu-latest
     permissions:
       actions: read
       contents: write
-    timeout-minutes: 45
+    timeout-minutes: 90
+    env:
+      DATA: v2/Classifier/wd_subtype_xp_data
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -19,21 +30,17 @@ jobs:
           python-version: "3.11"
       - name: Install dependencies
         run: pip install pandas numpy scipy scikit-learn astropy astroquery
-      - name: Restore fixed DA DB truth from successful benchmark
-        uses: actions/download-artifact@v4
-        with:
-          name: wd-subtype-da-db-eval
-          path: /tmp/wdsub_seed
-          run-id: 36298470467
-          github-token: ${{ github.token }}
-      - name: Install fixed DA DB truth
-        run: cp /tmp/wdsub_seed/wd_subtype_truth.csv v2/Classifier/wd_subtype_truth.csv
-      - name: Crossmatch DA DB truth to Gaia
-        run: python v2/Classifier/collect_star_gaia.py --truth v2/Classifier/wd_subtype_truth.csv --out v2/Classifier/wd_subtype_gaia.csv --min-matches 180
-      - name: Download Gaia XP continuous coefficients
-        run: python v2/Classifier/collect_gaia_xp_coefficients.py --features v2/Classifier/wd_subtype_gaia.csv --out v2/Classifier/wd_subtype_xp.csv --batch-size 30
+      - name: Crossmatch DA DB truth to Gaia and download XP coefficients (committed copy unless refresh)
+        run: |
+          mkdir -p "$DATA"
+          if [ "${{ github.event.inputs.refresh }}" != "true" ] && [ -f "$DATA/wd_subtype_xp.csv.gz" ]; then
+            echo "using the committed $DATA/wd_subtype_xp.csv.gz"
+            exit 0
+          fi
+          python v2/Classifier/collect_star_gaia.py --truth v2/Classifier/wd_subtype_truth.csv --out "$DATA/wd_subtype_gaia.csv.gz" --min-matches 180
+          python v2/Classifier/collect_gaia_xp_coefficients.py --features "$DATA/wd_subtype_gaia.csv.gz" --out "$DATA/wd_subtype_xp.csv.gz" --batch-size 30
       - name: Train and validate XP subtype model
-        run: python v2/Classifier/train_validate_wd_subtype_xp.py --features v2/Classifier/wd_subtype_xp.csv --out v2/Classifier/wd_subtype_xp_eval
+        run: python v2/Classifier/train_validate_wd_subtype_xp.py --features "$DATA/wd_subtype_xp.csv.gz" --out v2/Classifier/wd_subtype_xp_eval
       - name: Show XP metrics
         run: |
           cat v2/Classifier/wd_subtype_xp_eval/metrics.json
@@ -43,20 +50,20 @@ jobs:
           cat v2/Classifier/wd_subtype_xp_eval/xp_rf_confusion.csv
           echo "--- top XP coefficients ---"
           head -21 v2/Classifier/wd_subtype_xp_eval/xp_feature_importance.csv
-      - name: Commit fixed subtype truth if absent
+      - name: Commit the Gaia / XP tables (new or refreshed)
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add v2/Classifier/wd_subtype_truth.csv
+          git add "$DATA"
           git diff --cached --quiet && exit 0
-          git commit -m "Add fixed DA DB subtype truth"
-          bash .github/scripts/push_with_retry.sh
+          git commit -m "WD subtype XP data: Gaia crossmatch and XP coefficients of the DA/DB truth"
+          bash .github/scripts/push_with_retry.sh "${{ github.ref_name }}"
       - uses: actions/upload-artifact@v4
         with:
           name: wd-subtype-gaia-xp-eval
           path: |
             v2/Classifier/wd_subtype_truth.csv
-            v2/Classifier/wd_subtype_gaia.csv
-            v2/Classifier/wd_subtype_xp.csv
+            ${{ env.DATA }}/wd_subtype_gaia.csv.gz
+            ${{ env.DATA }}/wd_subtype_xp.csv.gz
             v2/Classifier/wd_subtype_xp_eval/
           retention-days: 30

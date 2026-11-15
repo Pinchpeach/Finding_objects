@@ -21,8 +21,9 @@ STAR
 GALAXY
   * activity: SDSS broad lines > emission-line WHAN / BPT > SDSS spectral
     subclass (Bolton+2012) > SIMBAD type > WISE mid-IR AGN (W1-W2 >= 0.8,
-    W2 < 15.05, S/N >= 10; Stern+2012) > WISE W2-W3 (> 3.5 star-forming,
-    < 1.5 quiescent; Jarrett+2017/2019) > GALEX NUV-r (> 5 red sequence;
+    W2 < 15.05, S/N >= 10; Stern+2012) > WISE W2-W3 (< 1.5 quiescent,
+    Jarrett+2017/2019; > 3.5 star-forming, our stricter cut of their 3.0)
+    > GALEX NUV-r (> 5 red sequence;
     Salim 2014, Wyder+2007).
   * light profile: Legacy Surveys DEV (de Vaucouleurs, early-type-like) /
     EXP (exponential disc); SDSS u-r >= 2.22 early type (Strateva+2001).
@@ -247,21 +248,25 @@ def _ebv(row):
 
 
 # SFD-type E(B-V) is the whole line of sight; a star inside the dust layer
-# sees only the part in front of it.  Exponential dust disc with scale height
-# 134 pc (Drimmel & Spergel 2001, ApJ 556, 181): fraction in front of a star
-# at distance d and latitude b = 1 - exp(-d |sin b| / h).  Applied only with a
-# parallax (2.23.0: a 20 pc star was dereddened by the full column, 0.4 mag in
-# BP-RP); without one the full column is kept, as before.
-# 2.51.0 (scientific review 2026-11-11): the infinite slab makes the total
-# column diverge as b -> 0, so a 1 kpc star near the plane kept ~0.3 % of the
-# column, and b = 0 exactly jumped to 1.0.  The dust layer now ends where the
-# sight line leaves the dust disc (Galactocentric radius DUST_DISC_EDGE_PC,
-# Sun at R0): fraction = (1 - e^{-d/L_b}) / (1 - e^{-L/L_b}), L_b = h / |sin b|,
-# which is continuous and tends to d / L in the plane.  The edge radius is our
-# approximation of the dust disc's extent, not a fitted value; a 3-D dust map
-# (e.g. Edenhofer et al. 2024) is the proper replacement (follow-up).  Gaia
-# GSP-Phot extinctions are used instead of this model whenever they exist.
-DUST_SCALE_HEIGHT_PC = 134.0
+# sees only the part in front of it.  Applied only with a parallax (2.23.0: a
+# 20 pc star was dereddened by the full column, 0.4 mag in BP-RP); without one
+# the full column is kept, as before.
+# Vertical profile (2.53.0): the Drimmel & Spergel (2001, ApJ 556, 181) dust
+# disc is sech^2(z / h), with a scale height that flares outward: 134 pc is
+# their inner-disc value, 188 pc the value at the solar circle (literature
+# review 2026-11-13; 2.23.0-2.52 used an exponential with 134 pc).  The
+# column from the plane to height z is h tanh(z / h), so along a sight line
+# at latitude b the fraction in front of distance d is
+# tanh(d |sin b| / h) / tanh(L |sin b| / h).  Only the local value is used:
+# stars with a parallax good enough for this are within a few kpc.
+# 2.51.0 (scientific review 2026-11-11): the sight line ends where it leaves
+# the dust disc (Galactocentric radius DUST_DISC_EDGE_PC, Sun at R0) at path
+# length L, so the column stays finite as b -> 0 and the fraction tends to
+# d / L in the plane.  The edge radius is our approximation of the dust disc's
+# extent, not a fitted value; a 3-D dust map (e.g. Edenhofer et al. 2024) is
+# the proper replacement (follow-up).  Gaia GSP-Phot extinctions are used
+# instead of this model whenever they exist.
+DUST_SCALE_HEIGHT_PC = 188.0
 R0_PC = 8178.0  # GRAVITY Collaboration 2019, A&A 625, L10
 DUST_DISC_EDGE_PC = 15000.0
 
@@ -292,7 +297,7 @@ def _dust_fraction(row):
 
 def dust_fraction_in_front(d_pc, lon_deg, b_deg):
     """Fraction of the sight-line dust column in front of distance ``d_pc``:
-    exponential layer (scale height DUST_SCALE_HEIGHT_PC) truncated at the dust
+    sech^2 layer (scale height DUST_SCALE_HEIGHT_PC) truncated at the dust
     disc edge."""
     cl, cb = math.cos(math.radians(lon_deg)), math.cos(math.radians(b_deg))
     # in-plane distance from the Sun to the disc edge along longitude l
@@ -304,7 +309,7 @@ def dust_fraction_in_front(d_pc, lon_deg, b_deg):
     if sb < 1e-9:
         return d_pc / path
     lam = DUST_SCALE_HEIGHT_PC / sb
-    return (1.0 - math.exp(-d_pc / lam)) / (1.0 - math.exp(-path / lam))
+    return math.tanh(d_pc / lam) / math.tanh(path / lam)
 
 
 def _sfd_ebv_in_front(row):
@@ -408,6 +413,58 @@ def star_spectral_type(row):
     if n_te is not None:
         return n_te, None, "GAIA_TEFF", f"Gaia GSP-Phot Teff = {teff:.0f} K on the Pecaut & Mamajek scale"
     return None, None, None, "no spectral type, colour or Teff available"
+
+
+# Giant spectral types (2.53.0, literature review 2026-11-13).  The
+# photometric types above use the Pecaut & Mamajek dwarf sequence.  Colour ->
+# Teff is nearly the same for giants and dwarfs (10-20 K at the boundaries),
+# but the Teff -> spectral-type scale is not: a BP-RP = 1.2 star (~4800 K) is
+# K3 V but G8 III, so a giant was typed about 5 subtypes too late.  For class
+# III stars with a photometric type, the Teff of that dwarf type is converted
+# with the interferometric giant calibration of van Belle et al. (2021, ApJ,
+# doi:10.3847/1538-4357/ac1687, Table 8): piecewise-linear Teff = a ST + b on
+# their index (G0 = 50, K0 = 60, M0 = 66; K giants end at K5), fitted to 191
+# giants G0 III - M7.75 III with median residuals ~50 K.  Outside their linear
+# range (hotter than G1 III, cooler than M5.5 III: 3134 K plateau) the dwarf
+# type is kept.
+GIANT_TEFF_FITS = ((51.0, 61.0, -52.74, 7856.0), (61.0, 64.0, -199.41, 16751.0), (64.0, 71.5, -85.98, 9491.0))
+PHOTOMETRIC_SPT_RULES = {"GAIA_BPRP0_TEFF", "GAIA_BPRP0", "LS_GR0", "GAIA_TEFF"}
+
+
+@lru_cache(maxsize=1)
+def _dwarf_teff_arrays():
+    ref = sequence().dropna(subset=["Teff", "num"]).sort_values("num")
+    return ref.num.to_numpy(float), ref.Teff.to_numpy(float)
+
+
+def dwarf_teff(num: float) -> float:
+    """Teff of a spectral number on the Pecaut & Mamajek dwarf sequence."""
+    x, y = _dwarf_teff_arrays()
+    return float(np.interp(num, x, y))
+
+
+def giant_spectral_number(teff: float):
+    """Our spectral number (G0 = 40, K0 = 50, M0 = 60; half subtypes) of a
+    class III giant at ``teff`` on the van Belle et al. (2021) scale, or None
+    outside G1 III - M5.5 III."""
+    st = None
+    for lo, hi, a, b in GIANT_TEFF_FITS:
+        if a * hi + b <= teff <= a * lo + b:
+            st = (teff - b) / a
+            break
+    if st is None:
+        (lo1, hi1, a1, b1), (lo2, _, a2, b2) = GIANT_TEFF_FITS[:2]
+        if a2 * lo2 + b2 < teff < a1 * hi1 + b1:  # 4587-4640 K: the step between their fits at K1
+            st = 61.0
+        else:
+            return None
+    if st < 60:  # G: their 50-59 -> our 40-49
+        ours = st - 10
+    elif st < 65.5:  # K0-K5: their 60-65 -> our 50-55 (no K6-K9 giants in their scale)
+        ours = min(st, 65.0) - 10
+    else:  # M0 = their 66 -> our 60
+        ours = max(st, 66.0) - 6
+    return round(ours * 2) / 2
 
 
 def cmd_position(row):
@@ -596,9 +653,13 @@ def star_luminosity_class(row):
 
 # Tangential-velocity selections of Babusiaux et al. (2018, A&A 616, A10,
 # Gaia DR2 HRDs): thin disc V_T < 40, thick disc 60-150, halo > 200 km/s.
-# Between the windows the population is left open.
-POPULATION_VT = (("THIN_DISC", 0.0, 40.0), ("THICK_DISC", 60.0, 150.0), ("HALO", 200.0, float("inf")))
-POP_LABEL = {"THIN_DISC": "thin-disc star", "THICK_DISC": "thick-disc star", "HALO": "halo star"}
+# Between the windows the population is left open.  2.53.0 (literature
+# review 2026-11-13): Babusiaux et al. do call the V_T < 40 km/s sample thin
+# disc, but about 95 % of the stars within 100 pc are thin-disc stars, so a
+# thin-disc tag tells the user almost nothing; only the minority populations
+# (thick disc, halo) are tagged.
+POPULATION_VT = (("THICK_DISC", 60.0, 150.0), ("HALO", 200.0, float("inf")))
+POP_LABEL = {"THICK_DISC": "thick-disc star", "HALO": "halo star"}
 RUWE_BINARY = 1.4  # Lindegren et al. (2018); Belokurov et al. (2020)
 
 
@@ -615,7 +676,7 @@ def star_tags(row):
                         pop,
                         POP_LABEL[pop],
                         "GAIA_VTAN",
-                        f"V_T = {vt:.0f} km/s (Babusiaux+2018 windows 40 / 60-150 / 200)",
+                        f"V_T = {vt:.0f} km/s (Babusiaux+2018 windows 60-150 / 200)",
                     )
                 )
     ruwe = _num(row, "gaia_dr3__ruwe", "ruwe")
@@ -1119,6 +1180,12 @@ def classify_star(row):
     # photometric giant label; spectroscopy outranks photometry here.
     if phys in {"RGB", "AGB", "RED_GIANT"} and lum not in {"III", "II", "Ib", "Ia"} and lrule != "SIMBAD_SPTYPE":
         lum, lrule, lbasis = "III", "PHYSICAL_AXIS", f"physical axis {phys}"
+    if lum == "III" and rule in PHOTOMETRIC_SPT_RULES:
+        giant = giant_spectral_number(dwarf_teff(num))
+        if giant is not None:
+            basis += f"; class III: {dwarf_teff(num):.0f} K is {spt_label(giant)} III on the giant scale (van Belle+2021)"
+            num = giant
+            letter = LETTERS[int(num // 10)]
     label = spt_label(num) + (f" {lum}" if lum else "")
     name = f"{letter}-type " + (LUM_NAME.get(lum, "star") if lum else "star")
     conf = RULE_PRECISION.get(rule)
@@ -1160,6 +1227,15 @@ def classify_star(row):
 #    et al. 1999).
 LINE_SNR = 3.0
 D4000_OLD = 1.6
+# WHAN with the EW error (2.53.0, literature review 2026-11-13): Cid Fernandes
+# et al. (2011) set no S/N floor, but they note that about a third of the
+# galaxies near the 3 A boundary move across it within the errors.  A galaxy
+# is retired (or passive) only when EW + 2 sigma is below the boundary; when
+# EW - 2 sigma < 3 A <= EW + 2 sigma the H-alpha strength is undecided, and
+# the line ratios are not used either (LINER-like ratios with EW ~ 3 A may be
+# a retired galaxy, not an AGN).  Without an EW error the point estimate is
+# used, as before.
+WHAN_NSIGMA = 2.0
 
 
 # Line sources in order of precedence: SDSS (Portsmouth / MPA-JHU), then DESI
@@ -1194,12 +1270,18 @@ def _galaxy_lines(row, prefix, tag):
     good = lambda f, sn: f is not None and f > 0 and sn is not None and sn >= LINE_SNR
     w = _num(row, f"{prefix}line_ha_ew")
     wn = _num(row, f"{prefix}line_nii6584_ew")
+    we, wne = _num(row, f"{prefix}line_ha_ew_err"), _num(row, f"{prefix}line_nii6584_ew_err")
+    hi = lambda v, e: v + WHAN_NSIGMA * e if e is not None and e >= 0 else v  # noqa: E731
+    lo = lambda v, e: v - WHAN_NSIGMA * e if e is not None and e >= 0 else v  # noqa: E731
+    err = f" +- {we:.1f}" if we is not None else ""
     # Weak H-alpha first: LINER-like ratios with EW(Ha) < 3 A come from old
     # stars, not an AGN (retired galaxies; Cid Fernandes et al. 2010, 2011).
-    if w is not None and w < 0.5 and wn is not None and wn < 0.5:
-        return "QUIESCENT", f"{tag}_WHAN", f"EW(Ha) = {w:.1f} A, EW([N II]) = {wn:.1f} A < 0.5 A (passive; WHAN)"
-    if w is not None and w < 3.0:
-        return "QUIESCENT", f"{tag}_WHAN", f"EW(Ha) = {w:.1f} A < 3 A (retired; WHAN)"
+    if w is not None and hi(w, we) < 0.5 and wn is not None and hi(wn, wne) < 0.5:
+        return "QUIESCENT", f"{tag}_WHAN", f"EW(Ha) = {w:.1f}{err} A, EW([N II]) = {wn:.1f} A < 0.5 A (passive; WHAN)"
+    if w is not None and hi(w, we) < 3.0:
+        return "QUIESCENT", f"{tag}_WHAN", f"EW(Ha) = {w:.1f}{err} A < 3 A at 2 sigma (retired; WHAN)"
+    if w is not None and lo(w, we) < 3.0:
+        return None  # EW(Ha) within 2 sigma of the 3 A boundary: undecided (WHAN_NSIGMA)
     if all(good(f, sn) for f, sn in ((ha, ha_sn), (hb, hb_sn), (o3, o3_sn), (n2, n2_sn))):
         x, y = math.log10(n2 / ha), math.log10(o3 / hb)
         pos = f"log [N II]/Ha = {x:.2f}, log [O III]/Hb = {y:.2f}"
@@ -1266,11 +1348,14 @@ def _blue_diagram(row, prefix, tag, hb, hb_sn, o3, o3_sn):
 
 
 # WISE W2-W3 sequence (Jarrett et al. 2017, ApJ 836, 182; 2019, ApJS 245,
-# 25): spheroids < ~2, intermediate discs 2-3.5, star-forming discs > 3.5.
-# 2.18.0: SF cut 3.0 -> 3.5 (the published boundary); on the SDSS test split
-# its precision rises 0.754 -> 0.871 and activity accuracy 79.5 -> 87.9 %,
-# while coverage falls 42.3 -> 31.8 % (galaxies at 3-3.5 stay unlabelled).
-# Quiescent < 1.5 (Jarrett et al. 2011 spheroid colour; measured 0.70/0.83).
+# 25): spheroids < 1.5, intermediate (semi-quiescent) discs 1.5-3.0,
+# star-forming discs > 3.0 (2.53.0, literature review 2026-11-13: the "< 2,
+# 2-3.5" quoted here before is not in the paper).  Quiescent < 1.5 is that
+# boundary (measured 0.70 / 0.83).  The SF cut 3.5 is our choice, stricter
+# than Jarrett's 3.0: on the SDSS benchmark only 149 of the 240 train
+# galaxies at 3.0-3.5 are star-forming (0.62; test 40 / 75), against 0.85 /
+# 0.87 above 3.5 (2.18.0 had moved it to 3.5 calling it the published value;
+# activity accuracy on the test split 79.5 -> 87.9 %, coverage 42.3 -> 31.8 %).
 # No K-correction: WISE colours change at z > ~0.1.
 W23_SF = 3.5
 W23_Q = 1.5
@@ -1291,7 +1376,16 @@ W23_Q = 1.5
 # 0.63 of its galaxies have EW([O II]) < 5 A.  Last in the chain, so any
 # spectrum, SIMBAD type, WISE or GALEX indicator decides first (those reach
 # only 3.6 % of the DESI benchmark galaxies; this adds 18 %).
+# 2.53.0 (literature review 2026-11-13): the box lacked the third colour cut
+# of Raichoor et al. (2023, Table 2), the [O II]-flux cut with negative slope:
+# g - r < -1.2 (r - z) + 1.3 for ELG_LOP and up to + 1.6 for ELG_VLO (the
+# extension to redder, lower-z galaxies).  The union of the two main samples
+# (+ 1.6) is used.  On the same DESI galaxies (passive: EW([O II]) < 5 A,
+# emitter: >= 5 A at 3 sigma) precision 601/632 = 0.951 -> 571/596 = 0.958
+# (0.944 -> 0.953 and 0.955 -> 0.961 on the two sets); 41 galaxies fewer, 30
+# of them emitters.  ELG_LOP alone (+ 1.3) is 0.960 at 205 fewer.
 ELG_G_MIN, ELG_G_MAX = 20.0, 24.1
+ELG_OII_SLOPE, ELG_OII_ICPT = -1.2, 1.6
 
 
 def galaxy_activity(row):
@@ -1362,12 +1456,17 @@ def galaxy_activity(row):
     m = ls_dered_mags(row, ("g", "r", "z"))
     if m is not None:
         gr, rz = m["g"] - m["r"], m["r"] - m["z"]
-        if ELG_G_MIN < m["g"] <= ELG_G_MAX and rz > 0.15 and gr < 0.5 * rz + 0.1:
+        if (
+            ELG_G_MIN < m["g"] <= ELG_G_MAX
+            and rz > 0.15
+            and gr < 0.5 * rz + 0.1
+            and gr < ELG_OII_SLOPE * rz + ELG_OII_ICPT
+        ):
             return (
                 "STAR_FORMING",
                 "LS_ELG",
                 f"DESI ELG colours (Raichoor+2023): 20 < g = {m['g']:.2f} <= 24.1, r-z = {rz:.2f} > 0.15, "
-                f"g-r = {gr:.2f} < 0.5(r-z) + 0.1 ([O II] emitter at z > 0.6)",
+                f"g-r = {gr:.2f} < 0.5(r-z) + 0.1 and < -1.2(r-z) + 1.6 ([O II] emitter at z > 0.6)",
             )
     return None, None, "no spectrum, mid-IR, UV or optical-colour activity indicator"
 

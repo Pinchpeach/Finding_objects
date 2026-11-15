@@ -71,16 +71,59 @@ HR_GATES = {
         "max_cstar_sigma": 5.0,
     },
 }
+# Error-aware locus (2.53.0, literature review 2026-11-13): GF21 decide with a
+# probability P_WD that carries the measurement errors, not with the line on
+# a 1/parallax point estimate.  Their P_WD map (built from SDSS spectra) is
+# not available offline, so the gate uses the probability that the source is
+# on the WD side of their Eq. 1 line given its errors (wd_locus_probability):
+# on the locus when P >= t, off it when P <= 1 - t, abstain in between.
+for _t in (0.75, 0.9):
+    HR_GATES[f"plx4_or_pm10_p{int(_t * 100)}"] = dict(HR_GATES["plx4_or_pm10"], min_locus_probability=_t)
 # Chosen on independent truth (WD_HR_GATE_EVALUATION.md): best F1 on a mixed
 # SDSS STAR/GALAXY/QSO sample, QSO false WDs 52 -> 6, LAMOST unchanged.
-DEFAULT_HR_GATE = "plx4_or_pm10"
+# 2.53.0: with the error-aware locus at t = 0.75 (the P_WD > 0.75 cut GF21
+# recommend for their own probability), on the local mixed benchmarks
+# (SDSS train / test, DESI DR1): false WDs 34 / 7 / 11 -> 29 / 4 / 8 with the
+# same true WDs (74 / 59 / 31); F1 0.779 / 0.881 / 0.738 -> 0.800 / 0.901 /
+# 0.765.  t = 0.9 is level on the train split (0.802) and loses WDs on the
+# others.  What still passes are hot subdwarfs, WD+MS pairs and CVs.
+DEFAULT_HR_GATE = "plx4_or_pm10_p75"
+MAG_PER_FLUX_FRACTION = 2.5 / math.log(10)  # 1.0857
+
+
+def _phi(x):
+    return 0.5 * (1.0 + math.erf(x / math.sqrt(2.0)))
+
+
+def _colour_error(row):
+    """1-sigma BP-RP error from the BP and RP flux errors (0 when unknown)."""
+    var = 0.0
+    for b in ("bp", "rp"):
+        f, e = _num(row, f"phot_{b}_mean_flux"), _num(row, f"phot_{b}_mean_flux_error")
+        if f is None or e is None or f <= 0 or e < 0:
+            return 0.0
+        var += (MAG_PER_FLUX_FRACTION * e / f) ** 2
+    return math.sqrt(var)
+
+
+def wd_locus_probability(p, pe, g, color, color_err=0.0):
+    """P(M_G > 6 + 5 (BP-RP)) for a Gaussian parallax error (and colour error).
+
+    M_G = G + 5 log10(parallax / mas) - 10 lies below the GF21 Eq. 1 line
+    exactly when parallax > p_line = 10^((16 + 5 (BP-RP) - G) / 5); the colour
+    error moves p_line by p_line ln(10) sigma_c (first order).  The G error
+    (< 0.01 mag) is neglected."""
+    p_line = 10.0 ** ((16.0 + 5.0 * color - g) / 5.0)
+    s = math.hypot(pe, p_line * math.log(10.0) * color_err)
+    return _phi((p - p_line) / s) if s > 0 else float(p > p_line)
 
 
 def _wd_hr_signal(row, gate=None):
     """Gaia HR WD-locus signal: M_G > 6 + 5(BP-RP) (Gentile Fusillo+2021).
 
-    Returns True/False only when the cut is usable under the quality gate;
-    otherwise None (abstain).  This is candidate evidence, not a subtype.
+    Returns True/False only when the cut is usable under the quality gate and,
+    for the error-aware gates, decided at the gate's probability; otherwise
+    None (abstain).  This is candidate evidence, not a subtype.
     """
     cfg = HR_GATES[gate or DEFAULT_HR_GATE]
     p = _num(row, "parallax")
@@ -110,6 +153,10 @@ def _wd_hr_signal(row, gate=None):
         ruwe = _num(row, "ruwe")
         if ruwe is None or ruwe > cfg["max_ruwe"]:
             return None
+    if "min_locus_probability" in cfg:
+        t = cfg["min_locus_probability"]
+        prob = wd_locus_probability(p, pe, g, color, _colour_error(row))
+        return True if prob >= t else (False if prob <= 1.0 - t else None)
     abs_g = g + 5 * math.log10(p) - 10
     return bool(abs_g > 6 + 5 * color)
 
@@ -145,7 +192,7 @@ def classify(row):
         if dsc_wd:
             family_basis = "Gaia DSC and literature Gaia HR-locus both support WD candidate"
         else:
-            family_basis = "Gentile Fusillo+2021 broad Gaia HR-locus WD candidate evidence"
+            family_basis = "Gentile Fusillo+2021 Gaia HR locus (P >= 0.75 with errors; parallax or proper-motion significant)"
     elif dsc_star:
         family = "STAR_LIKE"
         family_score = stellar

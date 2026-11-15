@@ -117,7 +117,11 @@ coarse class given:
    changed in 2.18.0):
    * BROADLINE → AGN first: a narrow-line fit misses broad Hα, so 29 SDSS
      BROADLINE objects would look WHAN-retired.
-   * Then WHAN → BPT from the line fluxes (`galaxy_lines`, below).
+   * Then WHAN → BPT from the line fluxes (`galaxy_lines`, below). WHAN
+     uses the EW error since 2.53.0: retired only when EW(Hα) + 2σ < 3 Å;
+     within 2σ of 3 Å neither WHAN nor the line ratios decide (Cid Fernandes
+     et al. 2011 set no S/N floor but note that about a third of the galaxies
+     near the boundary cross it within the errors).
    * Then the SDSS subclass (Bolton et al. 2012, AJ 144, 144) as a fallback.
      Its SF/AGN line, log([O III]/Hβ) = 0.7 − 1.2(log([N II]/Hα) + 0.4), is
      neither Kewley et al. 2001 nor Kauffmann et al. 2003, so composites
@@ -136,10 +140,15 @@ coarse class given:
    753, 30), with S/N ≥ 10 in W1 and W2 (the photometry Stern et al.
    calibrated on, as in Stage-4 WISE-AGN-001; 2.18.0).
 4. WISE W2−W3 (Jarrett et al. 2017, ApJ 836, 182; 2019, ApJS 245, 25):
-   * star-forming discs > 3.5 (Jarrett et al. 2017; 3.0 before 2.18.0),
-     spheroids < 1.5, intermediate discs in between (no label);
-   * SDSS test split: SF precision 0.754 → 0.871, activity accuracy
-     79.5 → 87.9 %, coverage 42.3 → 31.8 %;
+   * their boundaries are 1.5 (spheroids / intermediate discs) and 3.0
+     (intermediate / star-forming discs); the "< 2, 2–3.5" quoted here and in
+     the code before 2.53.0 is not in the paper (literature review 2026-11-13);
+   * quiescent < 1.5 is their boundary; star-forming > 3.5 is our stricter
+     choice (2.18.0 had moved 3.0 → 3.5 calling it the published value): on
+     the SDSS benchmark only 149 of 240 train galaxies at 3.0–3.5 are
+     star-forming (0.62; test 40 / 75 = 0.53), against 0.85 / 0.87 above 3.5;
+   * SDSS test split, 3.0 → 3.5: SF precision 0.754 → 0.871, activity
+     accuracy 79.5 → 87.9 %, coverage 42.3 → 31.8 %;
    * applied when W3 S/N ≥ 5 (σ < 0.2 mag);
    * when AllWISE gives only a W3 upper limit, the true colour is bluer than
      W2 − W3_lim, so W2 − W3_lim < 1.5 also implies a spheroid.
@@ -198,7 +207,7 @@ stored with their measurement in `subclass_json["tags"]`, listed in
 ### STAR
 | attribute | rule | basis |
 |---|---|---|
-| thin disc / thick disc / halo | Gaia V_T = 4.74 μ/ϖ (ϖ/σ ≥ 5): < 40, 60–150, > 200 km/s (gaps left open) | Babusiaux et al. 2018, A&A 616, A10 (Gaia DR2 HRDs) |
+| thick disc / halo | Gaia V_T = 4.74 μ/ϖ (ϖ/σ ≥ 5): 60–150, > 200 km/s (gaps left open). The V_T < 40 km/s thin-disc window is not tagged since 2.53.0: Babusiaux et al. do call it thin disc, but about 95 % of the stars within 100 pc are thin-disc stars, so the tag carried almost no information | Babusiaux et al. 2018, A&A 616, A10 (Gaia DR2 HRDs) |
 | subdwarf (luminosity class VI) | 1 < ΔM_G ≤ 3 below the dwarf sequence | metal-poor subdwarfs lie 1–2 mag below the MS (Kuiper 1939; Gizis 1997) |
 | astrometric binary candidate | RUWE > 1.4 | Lindegren et al. 2018; Belokurov et al. 2020 |
 | binary candidate | Gaia DSC binary probability ≥ 0.8 | Creevey et al. 2023 |
@@ -449,7 +458,7 @@ Candidates came from the gaps of the sub-class benchmark (`evaluate_subclass.py`
 |---|---|---|---|
 | QSO z < 2.1 without a spectrum (`PHOT_Z_KNN`) | kNN (k = 31) in dereddened LS g−r, r−z, z−W1, W1−W2 (errors ≤ 0.2) + r/4; reference = DESI DR1 quasars of the fusion training set (`benchmark/build_qso_photoz_reference.py`). Quasar colours vs z: Richards et al. 2001 (AJ 121, 2308); grzW photo-z 72 % within 0.1(1+z): Yang et al. 2017 (AJ 154, 269); kNN photo-z: Ball et al. 2008 (ApJ 683, 12). Claimed when P(z ≥ 2.1) ≤ 0.2 | purity 0.958 (DESI external, 834 QSOs, 70 % of its z < 2.1 QSOs) and 0.994 (SDSS test, 81 %); |Δz|/(1+z) < 0.1 for 70 % (cf. Yang+2017 72 %) | **adopted** (low-z only) |
 | QSO z ≥ 2.1 without a spectrum | same kNN, P ≥ 0.7–0.8; no published grzW cut with a z > 2.1 purity (Chaussidon et al. 2023, ApJ 944, 107: one random forest for all z; Yèche et al. 2020 colour cuts) | purity 0.88–0.91 on DESI but 0.40–0.65 on SDSS (prior dependent); z ~ 2.8 quasars sit on the stellar locus (Yang+2017) | not adopted |
-| Faint star-forming galaxies (`LS_ELG`) | DESI ELG box, dereddened LS: g > 20, r−z > 0.15, g−r < 0.5(r−z) + 0.1 (Raichoor et al. 2023, AJ 165, 126, Table 2; [O II] emitters at 0.6 < z < 1.6); g-fibre < 24.1 not applied (no fibre fluxes) | truth: FastSpecFit EW([O II] 3726+3729) of 4,361 DESI benchmark galaxies (`benchmark/desi_galaxy_activity`, passive below 5 Å: Balogh et al. 1999, ApJ 527, 54; Dressler et al. 1999, ApJS 122, 51). 601/637 decided cases are emitters (0.943; 0.932 / 0.950 on the two sets); 152 more have EW ≥ 5 Å below 3σ (median 10.4 Å). Activity coverage of the DESI benchmark galaxies 3.6 → 21.6 % | **adopted**, last in the activity chain, precision 0.943 |
+| Faint star-forming galaxies (`LS_ELG`) | DESI ELG box, dereddened LS: g > 20, r−z > 0.15, g−r < 0.5(r−z) + 0.1, and since 2.53.0 the [O II]-flux cut g−r < −1.2(r−z) + 1.6 (ELG_LOP + ELG_VLO; Raichoor et al. 2023, AJ 165, 126, Table 2; [O II] emitters at 0.6 < z < 1.6); g-fibre < 24.1 applied to the total g (no fibre fluxes) | truth: FastSpecFit EW([O II] 3726+3729) of 4,361 DESI benchmark galaxies (`benchmark/desi_galaxy_activity`, passive below 5 Å: Balogh et al. 1999, ApJ 527, 54; Dressler et al. 1999, ApJS 122, 51). 601/637 decided cases are emitters (0.943; 0.932 / 0.950 on the two sets); 152 more have EW ≥ 5 Å below 3σ (median 10.4 Å). Activity coverage of the DESI benchmark galaxies 3.6 → 21.6 % | **adopted**, last in the activity chain, precision 0.943 |
 | Faint quiescent galaxies via the DESI LRG box | Zhou et al. 2023 (AJ 165, 58) Eqs. 1–2 | only 0.63 of LRG-box galaxies have EW([O II]) < 5 Å; the box is a stellar-mass selection (complete for log M* > 11.5), not a quiescence selection | not adopted |
 | WD without a usable parallax, reduced proper motion | H_G = G + 5 log μ + 5 > 10 + 7(BP−RP), pm/σ > 10 (Gentile Fusillo et al. 2021, MNRAS 508, 3877, Sect. 2.3 — a pre-cut before their P_WD map); inclusive H_g line of Kilic et al. 2006 (AJ 131, 582) | where the parallax gate abstains: DESI 4 WD / 4 non-WD, SDSS 5 WD / 30 non-WD (halo A/BHB stars just above the line); Kilic line with offsets ≤ 50 % purity | not adopted |
 | Hot WD from GALEX UV | FUV−NUV < −0.13 and NUV−r < 0.1, both errors ≤ 0.3 (Bianchi et al. 2011, MNRAS 411, 2770) | hot stars 96 % (as published) but WDs only ~50 % (B/A/BHB/sdB stars share the colours) | not adopted as WD |
@@ -459,3 +468,20 @@ Candidates came from the gaps of the sub-class benchmark (`evaluate_subclass.py`
 | Gaia DSC vs HR-locus conflict | the veto of a WD-locus star with DSC star ≥ 0.8 (2.17.0) | conflicting cases are 22 WD / 20 non-WD (SDSS), 9 / 10 (DESI) | kept |
 
 The faint DESI white dwarfs without a WD label (47 of 89) have no Gaia counterpart at all; no published grz white-dwarf cut with a measured purity exists (hot WDs overlap z ≈ 2–3 quasars and BHB / sdB stars in grz), so they stay unclassified.
+
+## Literature review of 2026-11-13 (third branch: remaining sub-class items) — changes in 2.53.0
+
+The review checked the sub-class criteria against the original papers and corrected two points of its own earlier review. What was changed, what was confirmed as is, and what is still open:
+
+| item | review finding | change | measurement |
+|---|---|---|---|
+| WD HR gate (`branches/star.py`) | Parallax S/N 1–4 with pm/σ > 10 is literally GF21's preselection (earlier review was wrong to doubt it). The problem is after the gate: GF21 decide with an error-aware probability (P_WD, recommended > 0.75) plus quality cuts; we took one line on the 1/ϖ point estimate. Original checked (arXiv:2106.07669, Sect. 2.1–2.2): Eq. 1–2 are G_abs > 6 + 5(BP−RP) with parallax_over_error > 1; the quality cuts (Eq. 3–8 at \|b\| > 25°) add astrometric_sigma5d_max < 1.5, phot_bp/rp_n_obs > 2, (ϖ/σ ≥ 4 or pm/σ > 10), \|C*\| < 0.6 and an astrometric-excess-noise cut; P_WD treats every object as a 2D Gaussian whose width reflects its BP−RP and G_abs errors, integrated over the SDSS WD / contaminant density-ratio map; P_WD > 0.75 is ~91 % confirmed WDs | `wd_locus_probability`: the same Gaussian (parallax error and the BP−RP error from the flux errors) integrated over the Eq. 1 boundary instead of their map; on the locus at P ≥ 0.75, off it at ≤ 0.25, abstain between (`plx4_or_pm10_p75`, default). Their map is not available offline; their extra quality columns (sigma5d_max, n_obs, excess noise) are not collected, and C* was measured before to add nothing once ϖ/σ ≥ 4 or pm/σ > 10 is required | local mixed benchmarks (SDSS train / test, DESI DR1): false WDs 34 / 7 / 11 → 29 / 4 / 8, same true WDs (74 / 59 / 31); F1 0.779 / 0.881 / 0.738 → 0.800 / 0.901 / 0.765. t = 0.9: 0.802 on train, fewer WDs elsewhere |
+| thin disc, V_T < 40 km/s | Babusiaux et al. 2018 do call it thin disc (earlier review half right), but ~95 % of stars within 100 pc are thin disc: almost no information | the THIN_DISC tag is no longer emitted; thick disc and halo stay | SDSS / DESI benchmark: 4 stars lose a "Thin-disc star" sub-class that was their only attribute |
+| giant spectral type | colour → Teff is nearly the same for giants and dwarfs (10–20 K at the boundary); the error is the Teff → spectral-type scale: a BP−RP = 1.2 giant is G8 III, we gave K3 (~5 subtypes late) | class III stars with a photometric type: the Teff of the dwarf type is converted with the interferometric giant scale of van Belle et al. 2021 (ApJ, doi:10.3847/1538-4357/ac1687, arXiv:2107.09205, Table 8; read in the original): Teff = a·ST + b, ST G0 = 50, K0 = 60, M0 = 66; a, b = −52.74, 7856 (ST 51–61), −199.41, 16751 (61–64), −85.98, 9491 (64–71.5); 191 giants G0 III–M7.75 III, median residual ~50 K. Outside G1–M5.5 III the dwarf type is kept. (Alonso et al. 1999, A&AS 140, 261 is not on arXiv and the A&A site refuses automated access) | BP−RP = 1.2 (K3 V, 4830 K) → G7.5 III; a 4700 K giant → G9.5 III (their K0 III: 4692 K). Benchmarks: 1 star changes (SDSS truth F9: K2 → G2.5); the SDSS / DESI targets hold few giants |
+| dust layer for the SFD fraction in front of a star | Drimmel & Spergel 2001: 134 pc is the inner-disc scale height, 188 pc at the solar circle, and the profile is sech², not exponential | sech²(z/h), h = 188 pc: fraction = tanh(d sin b / h) / tanh(L sin b / h), same disc-edge truncation | used only without GSP-Phot extinction: 2 spectral types changed on the benchmarks (e.g. M5 V → M5.5 V, truth M6) |
+| WHAN | boundaries match the original; no S/N floor there, but ~1/3 of galaxies near the 3 Å boundary cross it within the errors → EW + 2σ < 3 Å is justified | retired / passive need EW + 2σ below the boundary; within 2σ of 3 Å neither WHAN nor the line ratios decide; SDSS (Portsmouth / MPA-JHU) and DESI collectors now store the Hα / [N II] EW errors | DESI benchmark galaxies with Hα EW: 102 of 1,738 become undecided (58 retired, 24 weak AGN, 12 SF, 7 composite, 1 BPT SF); of those with EW 1–5 Å, 49 % lie within 2σ of 3 Å |
+| W2−W3 (Jarrett 2019) | boundaries are 1.5 / 3.0; "< 2, 2–3.5" in our comment is not in the paper | citation corrected; 3.5 kept as our measured choice (see Activity, item 4) | train galaxies at 3.0–3.5: 149 / 240 SF (0.62) |
+| DESI ELG box | the third colour cut of Raichoor et al. 2023 Table 2 was missing | g − r < −1.2(r − z) + 1.6 (ELG_LOP + ELG_VLO) | DESI galaxies: precision 0.951 → 0.958 (0.944 → 0.953, 0.955 → 0.961), 41 fewer (30 emitters) |
+| zero parallax → extragalactic (AST-EXT-001, Stage 4) | at the north Galactic pole, complete spectroscopy of zero-parallax, zero-motion sources gives 63 quasars and 41 stars, ~60 % (Heintz et al. 2020) — the most favourable case | none: consistent with our measured precision of 6.6 % (2.50.0 audit); the rule stays a weak, sky-dependent hint | — |
+
+Not verified in the review: the SIMBAD object-type documentation and Chen et al. 1999 (no access).

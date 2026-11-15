@@ -8,45 +8,41 @@ on:
       - v2/Classifier/apply_wd_subtype_xp.py
       - v2/Classifier/branches/star.py
       - .github/workflows/build-wd-subtype-xp-model.yml
+      - v2/Classifier/wd_subtype_xp_data/**
 
+# 2.53.0: the training (LAMOST) and external (SDSS) tables are read from the
+# repository (v2/Classifier/wd_subtype_xp_data/, written by the two
+# validate-wd-subtype-xp workflows).  Until then they were artifacts of runs
+# 36300795761 / 36304882268, which expired, and every run failed at the
+# download step (first seen on PR #66).
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      actions: read
       contents: read
+    env:
+      DATA: v2/Classifier/wd_subtype_xp_data
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
       - run: pip install pandas numpy scipy scikit-learn joblib
-      - name: Download validated LAMOST Gaia XP training data
-        uses: actions/download-artifact@v4
-        with:
-          name: wd-subtype-gaia-xp-eval
-          path: /tmp/lamost_xp
-          run-id: 36300795761
-          github-token: ${{ github.token }}
-      - name: Download independent SDSS XP external data
-        uses: actions/download-artifact@v4
-        with:
-          name: wd-subtype-xp-external-eval
-          path: /tmp/sdss_external
-          run-id: 36304882268
-          github-token: ${{ github.token }}
+      - name: Committed training and external tables
+        run: |
+          for f in wd_subtype_xp.csv.gz sdss_wd_subtype_xp.csv.gz; do
+            test -f "$DATA/$f" || { echo "missing $DATA/$f: run validate-wd-subtype-xp.yml, then validate-wd-subtype-xp-external.yml"; exit 1; }
+          done
       - name: Fit deploy model
         run: |
-          TRAIN="$(find /tmp/lamost_xp -name wd_subtype_xp.csv -print -quit)"
-          test -n "$TRAIN"
+          TRAIN="$DATA/wd_subtype_xp.csv.gz"
           python v2/Classifier/fit_wd_subtype_xp_model.py \
             --features "$TRAIN" \
             --model-out /tmp/model/wd_subtype_xp_model.joblib \
             --metadata-out /tmp/model/wd_subtype_xp_model.json
       - name: Validate deploy model on untouched SDSS external data
         run: |
-          EXT="$(find /tmp/sdss_external -name sdss_wd_subtype_xp.csv -print -quit)"
-          test -n "$EXT"
+          EXT="$DATA/sdss_wd_subtype_xp.csv.gz"
           python v2/Classifier/apply_wd_subtype_xp.py \
             --input "$EXT" \
             --model /tmp/model/wd_subtype_xp_model.joblib \

@@ -109,6 +109,8 @@ DB/DO의 100%는 표본이 작아 안정성을 증명하지 못한다. non-DA는
 
 전체 raw 조회 응답·Gaia 입력·기존 frozen 모델·예측은 위 성공 실행의 `star-diverse-frozen-validation` artifact에 있다. 다운로드한 ZIP의 SHA256도 GitHub artifact digest와 일치함을 확인했다. 원본 전체 ZIP은 작업 폴더 `results/star-diverse-validation.zip`에도 보존했다. 원본 모델 artifact는 2026-10-27, 이번 전체 artifact는 2026-12-26에 만료 예정이므로 이후 재현에는 보관한 ZIP을 사용해야 한다.
 
+**2.53.1 추가: 입력을 저장소에 보존.** 원본 모델 artifact가 2026-10-27에 만료되어 `validate-star-diverse.yml`은 그 뒤 모든 실행이 내려받기 단계에서 실패했다. 그래서 고정 모델과 평가 입력(원래 SDSS 특징표, 외부·이전 Gaia 매칭)을 [`star_diverse_validation/inputs/`](star_diverse_validation/inputs/README.md)에 두었다. 위 성공 실행의 전체 artifact(2026-12-26 만료)에 그 실행이 내려받은 모델이 그대로 들어 있어, 워크플로가 한 번 그것을 복사했다. 모델 SHA256 `22ae268a…`가 위 표와 일치했고, 이 보고서의 `metrics.json`(내부 183/194, 혼동행렬 `[[2209,127],[36,1935]]`, HR 기준 `[[2301,35],[38,1933]]`, non-DA 105개, log loss 0.10478)을 그대로 재현했다. 행별 예측도 같았다. 커밋은 그 확인이 끝난 뒤에만 했다(run 43583255342). 이후 실행은 저장소의 입력으로 같은 재현을 매번 확인한다. `refresh=true`는 새로 모은 정답·매칭으로 평가하되 아무것도 바꾸지 않는다.
+
 | 대상 | SHA256 |
 |---|---|
 | 원래 frozen 모델 | `22ae268a6525fc9fafbd6cff048c96512f235e75f998bdc63354610f518a9d5c` |

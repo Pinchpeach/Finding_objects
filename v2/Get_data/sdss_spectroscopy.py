@@ -43,17 +43,27 @@ LINES = {
     "line_nii6584_flux_err": ("Flux_NII_6583_Err", "nii_6584_flux_err"),
     "line_ha_ew": ("EW_Ha_6562", "h_alpha_eqw"),
     "line_nii6584_ew": ("EW_NII_6583", "nii_6584_eqw"),
+    # 1-sigma EW errors (2.53.0: WHAN with errors, Classifier/subclass.py)
+    "line_ha_ew_err": ("EW_Ha_6562_Err", "h_alpha_eqw_err"),
+    "line_nii6584_ew_err": ("EW_NII_6583_Err", "nii_6584_eqw_err"),
 }
+# Queried without the EW errors if a release lacks them (the line fluxes and
+# EWs must not be lost for two optional columns).
+EW_ERR = ("line_ha_ew_err", "line_nii6584_ew_err")
 LINE_FIELDS = [*LINES, "line_source", "port_bpt", "d4000_n"]
-PORT_SQL = (
-    "SELECT specObjID,BPT,"
-    + ",".join(p for p, _ in LINES.values())
-    + " FROM emissionLinesPort WHERE specObjID IN ({ids})"
-)
-MPA_SQL = (
-    "SELECT l.specObjID," + ",".join("l." + m for _, m in LINES.values()) + ",i.d4000_n FROM galSpecLine AS l "
-    "LEFT JOIN galSpecIndx AS i ON i.specObjID=l.specObjID WHERE l.specObjID IN ({ids})"
-)
+def _port_sql(lines):
+    return "SELECT specObjID,BPT," + ",".join(p for p, _ in lines.values()) + " FROM emissionLinesPort WHERE specObjID IN ({ids})"
+
+
+def _mpa_sql(lines):
+    return (
+        "SELECT l.specObjID," + ",".join("l." + m for _, m in lines.values()) + ",i.d4000_n FROM galSpecLine AS l "
+        "LEFT JOIN galSpecIndx AS i ON i.specObjID=l.specObjID WHERE l.specObjID IN ({ids})"
+    )
+
+
+LINES_NO_ERR = {k: v for k, v in LINES.items() if k not in EW_ERR}
+PORT_SQL, MPA_SQL = _port_sql(LINES), _mpa_sql(LINES)
 
 
 def _sql(template: str, ids: list[str]) -> pd.DataFrame:
@@ -72,6 +82,15 @@ def _sql(template: str, ids: list[str]) -> pd.DataFrame:
     return out.drop_duplicates("specobjid")
 
 
+def _sql_with_fallback(template: str, fallback: str, ids: list[str]) -> pd.DataFrame:
+    """The query with the EW-error columns; without them if that one fails."""
+    try:
+        return _sql(template, ids)
+    except Exception as exc:
+        print(f"[sdss_spectroscopy] retry without EW errors ({type(exc).__name__}: {str(exc)[:80]})")
+        return _sql(fallback, ids)
+
+
 def _clean(v: pd.Series) -> pd.Series:
     v = pd.to_numeric(v, errors="coerce")
     return v.where((v.abs() < 1e6) & (v > -999))  # -9999 / -999 and 1e38 fill values
@@ -81,13 +100,13 @@ def _lines(ids: list[str]) -> pd.DataFrame:
     out = pd.DataFrame({"specobjid": ids})
     status = "ok"  # recorded so the archive cache skips partial results
     try:
-        port = _sql(PORT_SQL, ids)
+        port = _sql_with_fallback(PORT_SQL, _port_sql(LINES_NO_ERR), ids)
     except Exception as exc:
         print(f"[sdss_spectroscopy] Portsmouth line query failed: {type(exc).__name__}: {str(exc)[:120]}")
         port = pd.DataFrame(columns=["specobjid"])
         status = "error:portsmouth"
     try:
-        mpa = _sql(MPA_SQL, ids)
+        mpa = _sql_with_fallback(MPA_SQL, _mpa_sql(LINES_NO_ERR), ids)
     except Exception as exc:
         print(f"[sdss_spectroscopy] MPA-JHU line query failed: {type(exc).__name__}: {str(exc)[:120]}")
         mpa = pd.DataFrame(columns=["specobjid"])

@@ -147,6 +147,8 @@
 - **분광형**(O–M), 다음 우선순위로 정합니다.
   1. SIMBAD MK형 / LAMOST·SDSS 분광 템플릿.
   2. Gaia 소광 보정 BP−RP + 온도를 Pecaut & Mamajek 왜성 계열에 대응.
+     - 광도 계급 III이면 그 Teff를 거성 눈금(van Belle+2021 간섭계 표 8)으로 다시 분광형으로 바꿉니다(2.53.0). 거성은 같은 Teff에서 약 5 하위형 이른 형입니다.
+     - GSP-Phot 소광이 없으면 SFD E(B−V) 중 별 앞쪽 몫만 씁니다. 먼지층은 sech² 모양, 태양 근처 척도 높이 188 pc입니다(Drimmel & Spergel 2001; 2.53.0, 이전에는 지수형 134 pc).
   3. PS1 i−z.
 - **광도 계급**(V 왜성, IV 준거성, III 거성, VI 준왜성):
   - Gaia 시차로 구한 주계열 위 높이 ΔM.
@@ -155,7 +157,8 @@
   - 시차가 없으면 분광 log g(Ciardi+2011 경계, log g < 3.5).
   - GSP-Spec log g·[M/H]는 생산자 보정식(Recio-Blanco+2023)을 적용합니다.
 - **속성 표지**:
-  - 고유운동 속도로 얇은 원반·두꺼운 원반·헤일로.
+  - 고유운동 속도로 두꺼운 원반·헤일로(Babusiaux+2018).
+    - 얇은 원반(V_T < 40 km/s)은 2.53.0부터 표시하지 않습니다. 100 pc 안 별의 약 95 %가 얇은 원반이라 정보가 거의 없습니다.
   - RUWE 쌍성. AGB 별에는 쓰지 않습니다.
   - 근처 별, 고유운동 큰 별, 적색 거성단(red clump).
   - 적외선 초과, X선, 금속 결핍(분광 [Fe/H] < −1), 방출선.
@@ -170,11 +173,14 @@
 - **활동성**, 다음 우선순위로 정합니다.
   1. SDSS 넓은 선.
   2. 방출선 WHAN(은퇴·수동) → BPT(Kewley/Kauffmann; Seyfert/LINER).
+     - 2.53.0부터 Hα EW 오차를 씁니다. EW + 2σ < 3 Å일 때만 은퇴이고, 3 Å에서 2σ 안이면 판정하지 않습니다.
   3. SDSS 분류.
   4. SIMBAD 유형.
   5. WISE W1−W2 AGN.
-  6. W2−W3 > 3.5 별 생성 / < 1.5 회전타원체(Jarrett+2017).
+  6. W2−W3 < 1.5 회전타원체(Jarrett+2017·2019 경계) / > 3.5 별 생성.
+     - Jarrett의 별 생성 원반 경계는 3.0입니다. 3.0–3.5 사이는 SDSS train에서 62 %만 별 생성이라 우리가 3.5로 엄격하게 둡니다.
   7. GALEX NUV−r(> 5 적색 계열, 4–5 녹색 계곡).
+  8. 어두운 은하: DESI ELG 색 상자(Raichoor+2023). 2.53.0부터 세 번째 색 조건 g−r < −1.2(r−z) + 1.6을 넣었습니다(DESI 은하 정밀도 0.951 → 0.958).
 - **빛 분포**: Tractor DEV/EXP/Sérsic n ≥ 2.5, SDSS u−r ≥ 2.22.
 - **속성 표지**:
   - 1형·2형 AGN, 왜소·밝은 은하(M_B).
@@ -198,7 +204,7 @@ SIMBAD 유형은 SIMBAD `otypedef` 계층(`Classifier/reference/simbad_otypedef.
 
 | 축 | 클래스 | 주요 근거 |
 |---|---|---|
-| 물리 상태 | WD, HOT_SUBDWARF, ULTRACOOL_DWARF, RGB, AGB, RED_GIANT | Gaia HR 위치(GF21) + DSC. **뜨거운 준왜성**: Culpan+2022 Gaia 색–절대등급 선택(−0.7 ≤ BP−RP ≤ 0.7, 시차 S/N > 5, \|C*\| < 0.6, 주계열 제거 다항식). **초저온 왜성**: Gaia ESP-UCD Teff < 2700 K, 품질 0·1(Sarro+2023). Suh 2021 AGB(광도 확인). SIMBAD(HS*, BD*, AB*). 광도 계급 III + Teff < 5500 K → RED_GIANT. FLAME 거성(1 ≤ M < 2 M☉, 나이 > 1.5 Gyr) |
+| 물리 상태 | WD, HOT_SUBDWARF, ULTRACOOL_DWARF, RGB, AGB, RED_GIANT | Gaia HR 위치(GF21) + DSC. **백색왜성 위치**: 시차·색 오차를 반영해 GF21 식 1 선 아래일 확률이 0.75 이상일 때만 판정(2.53.0, 0.25 이하는 아님, 그 사이는 보류). **뜨거운 준왜성**: Culpan+2022 Gaia 색–절대등급 선택(−0.7 ≤ BP−RP ≤ 0.7, 시차 S/N > 5, \|C*\| < 0.6, 주계열 제거 다항식). **초저온 왜성**: Gaia ESP-UCD Teff < 2700 K, 품질 0·1(Sarro+2023). Suh 2021 AGB(광도 확인). SIMBAD(HS*, BD*, AB*). 광도 계급 III + Teff < 5500 K → RED_GIANT. FLAME 거성(1 ≤ M < 2 M☉, 나이 > 1.5 Gyr) |
 | 변광 | RR_LYRAE, CEPHEID, MIRA, LPV, ECLIPSING, ROTATIONAL, ERUPTIVE, PULSATING, YSO, OTHER_VARIABLE | SIMBAD 유형(계층: cC*·WV* → 세페이드, TT*·Or* → YSO) → Gaia SOS(RR, 세페이드). ZTF 주기 변광성(g/r 진폭비 표시). Gaia LPV 반진폭 ≥ 0.6 mag이고 80 ≤ P < 1000 d → 미라. Gaia 변광 분류기 |
 | 밀집성 | NS, PULSAR, PULSAR_CANDIDATE, XRB, COMPACT_COMPANION_CANDIDATE | ATNF, SIMBAD. 전파: TGSS–NVSS 스펙트럼 지수 ≤ −1.5이고 점광원(+유의한 편광) → 펄서 후보. 하늘 전체 사후확률(은하면·편광 우도비)이 확신도. Gaia 밀집 동반성 후보 |
 | 외부은하 | GALAXY, AGN, QSO, BLAZAR | **블레이자**: Roma-BZCAT 5판 일치(수집기 `bzcat.py`, 유형 BL Lac/FSRQ/모은하 우세/불확실), SIMBAD Bla·BLL. Gaia 변광 AGN, 1차 분류 |
