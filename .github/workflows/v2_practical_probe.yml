@@ -1,0 +1,103 @@
+name: v2 practical-use probe
+
+# Diagnostics behind the 2.54.0 practical-use fixes (WORK_REPORT_2026-11-15.md):
+# how the VizieR mirrors answer an empty cone, the SIMBAD mirror, PS1 at MAST
+# against its VizieR copy, and three real fields run end to end with a
+# per-request log (V2_HTTP_LOG=1), then re-run to check the archive cache.
+# The raw catalogues are stored on the validation-data branch
+# (practical_probe/<run id>/), never on main.
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/code-review-7ox8zn]
+    paths:
+      - .github/workflows/v2_practical_probe.yml
+      - .github/scripts/practical_probe.py
+
+permissions:
+  contents: read
+
+jobs:
+  services:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas numpy requests astropy astroquery pyvo
+      - name: VizieR mirrors
+        run: python -u .github/scripts/practical_probe.py vizier
+      - name: SIMBAD mirrors
+        run: python -u .github/scripts/practical_probe.py simbad
+      - name: PS1 at MAST and VizieR
+        run: python -u .github/scripts/practical_probe.py ps1
+
+  field:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        f:
+          - {name: ngc4522, ra: 188.4155, dec: 9.1751, r: 2}
+          - {name: cosmos, ra: 150.1191, dec: 2.2058, r: 2}
+          - {name: plane_l30_bm2, ra: 283.3044, dec: -3.5206, r: 1}
+    env:
+      V2_HTTP_LOG: "1"
+      V2_CACHE_DIR: /tmp/v2cache
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas numpy scipy requests astropy astroquery pyvo
+      - name: Run (cold cache)
+        run: |
+          set -o pipefail
+          python -u v2/pipeline.py --ra ${{ matrix.f.ra }} --dec ${{ matrix.f.dec }} --radius ${{ matrix.f.r }} --work /tmp/w 2>&1 | tee /tmp/run1.log | grep -v "^\[http\]" | tail -40
+      - name: Requests per collector (cold)
+        run: python -u .github/scripts/practical_probe.py httplog /tmp/run1.log $(ls /tmp/w/raw/*/collection_summary_*.csv | head -1)
+      - name: Errors
+        run: |
+          python - <<'PY'
+          import glob, pandas as pd
+          s = pd.read_csv(glob.glob("/tmp/w/raw/*/collection_summary_*.csv")[0])
+          print(s[s.status.isin(["error", "timeout"])][["collector", "status", "elapsed_seconds", "error"]].to_string(index=False))
+          PY
+      - name: Run again (warm cache)
+        run: |
+          set -o pipefail
+          python -u v2/pipeline.py --ra ${{ matrix.f.ra }} --dec ${{ matrix.f.dec }} --radius ${{ matrix.f.r }} --work /tmp/w2 2>&1 | tee /tmp/run2.log | grep -E "^\[pipeline\]|cache (hit|miss|off)" | tail -45
+      - name: Pack raw catalogues
+        run: |
+          mkdir -p out && tar -C /tmp/w/raw -czf out/${{ matrix.f.name }}_raw.tar.gz . && cp /tmp/w/pipeline_summary.csv out/${{ matrix.f.name }}_pipeline_summary.csv
+          gzip -c /tmp/run1.log > out/${{ matrix.f.name }}_run1.log.gz
+          ls -la out
+      - uses: actions/upload-artifact@v4
+        with:
+          name: probe-${{ matrix.f.name }}
+          path: out/
+          retention-days: 7
+
+  store:
+    needs: field
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with: {path: code}
+      - uses: actions/checkout@v4
+        with: {ref: validation-data, fetch-depth: 1, path: data}
+      - uses: actions/download-artifact@v4
+        with: {pattern: probe-*, path: /tmp/probe, merge-multiple: true}
+      - name: Commit to validation-data
+        working-directory: data
+        run: |
+          d=practical_probe/${{ github.run_id }}
+          mkdir -p $d && cp /tmp/probe/* $d/ && ls -la $d
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add $d && git commit -qm "practical probe ${{ github.run_id }}: raw catalogues of 3 fields"
+          bash ../code/.github/scripts/push_with_retry.sh validation-data

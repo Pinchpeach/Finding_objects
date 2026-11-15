@@ -31,6 +31,7 @@ validation field.  A healthy server connects in well under a second.
 from __future__ import annotations
 
 import http.client
+import os
 import random
 import threading
 import time
@@ -67,6 +68,18 @@ def pause() -> float:
     s = random.uniform(MIN_PAUSE_S, MAX_PAUSE_S)
     time.sleep(s)
     return s
+
+
+def _log(host, outcome, started) -> None:
+    """One line per archive request when V2_HTTP_LOG=1 (2.54.0): the thread
+    name is the collector (controller._run_bounded), so a slow collector's
+    time can be split into requests, mirrors and their answers."""
+    if os.environ.get("V2_HTTP_LOG", "").strip() not in {"1", "true", "yes", "on"}:
+        return
+    print(
+        f"[http] {threading.current_thread().name} {host} {outcome} {time.monotonic() - started:.2f}s",
+        flush=True,
+    )
 
 
 def _paced(send):
@@ -117,7 +130,14 @@ def _with_mirrors(send):
     def request(self, method, url, *args, **kwargs):
         parts = urlsplit(str(url))
         if parts.hostname not in VIZIER_HOSTS:
-            return send(self, method, url, *args, **kwargs)
+            t0 = time.monotonic()
+            try:
+                resp = send(self, method, url, *args, **kwargs)
+            except Exception as exc:
+                _log(parts.hostname, type(exc).__name__, t0)
+                raise
+            _log(parts.hostname, resp.status_code, t0)
+            return resp
         hosts = _vizier_order(parts.hostname)
         read = kwargs.get("timeout")
         read = read[1] if isinstance(read, tuple) else read
@@ -128,11 +148,14 @@ def _with_mirrors(send):
             if i:
                 pause()  # every retry is an archive request too
             target = urlunsplit(parts._replace(netloc=parts.netloc.replace(parts.hostname, host)))
+            t0 = time.monotonic()
             try:
                 resp = send(self, method, target, *args, **kwargs)
             except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as exc:  # refused, DNS, connect/read timeout
+                _log(host, type(exc).__name__, t0)
                 last = exc
                 continue
+            _log(host, f"{resp.status_code}{' tableless' if _tableless_votable(resp) else ''}", t0)
             if resp.status_code in RETRY_STATUS and i < len(hosts) - 1:
                 last = resp
                 continue

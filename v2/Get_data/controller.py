@@ -229,7 +229,8 @@ def _run_bounded(job, names, workers: int, budget_s: float) -> list[dict]:
         while pending and len(running) < max(1, workers):
             name = pending.pop(0)
             event = threading.Event()
-            thread = threading.Thread(target=target, args=(name, event), daemon=True)
+            # named after the collector: throttle's V2_HTTP_LOG lines carry it (2.54.0)
+            thread = threading.Thread(target=target, args=(name, event), name=name, daemon=True)
             running[name] = (thread, time.monotonic(), event)
             thread.start()
         now = time.monotonic()
