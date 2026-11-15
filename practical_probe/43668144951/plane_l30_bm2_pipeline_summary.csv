@@ -1,0 +1,9 @@
+stage,seconds
+collect,131.238
+1_associate,0.644
+2_integrate,0.303
+3_features,0.348
+4_evidence,0.523
+5_coarse,0.84
+6_prepare,0.305
+7_classify,0.606
