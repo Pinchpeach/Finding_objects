@@ -67,7 +67,12 @@ def test_ps1_vizier_copy_keeps_the_detection_cut(monkeypatch):
 
 
 def test_simbad_falls_back_to_the_harvard_mirror(monkeypatch):
-    from astropy.table import Table
+    class Table:  # what fetch() uses of astroquery's result (no astropy in the Preprocess CI job)
+        def __init__(self, cols):
+            self.cols = cols
+
+        def to_pandas(self):
+            return pd.DataFrame(self.cols)
 
     tried = []
 
