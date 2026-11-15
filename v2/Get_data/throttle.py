@@ -26,11 +26,30 @@ waited astroquery's full 60 s before failing over, a collector made several,
 and VizieR-backed collectors took ~270 s, pushing Gaia (whose VizieR copy is
 the fallback for a slow ESA TAP) past the 300 s collector budget in every
 validation field.  A healthy server connects in well under a second.
+
+Empty answers of a mirror (2.54.0): astroquery asks for ``-out.form=mini``,
+whose answer to a cone without rows has no <TABLE>, like the answer of a
+mirror that lacks the catalogue.  A table-less mirror answer was therefore
+sent on to every other mirror (2.47.0 rule below).  On 2026-11-14/15, with
+Strasbourg answering 404, each empty cone went Strasbourg -> CfA -> NAOJ and
+IUCAA (10 s connect timeouts each) -> China-VO -> IDIA, ~50 s per query:
+the 0-row AGB (4 tables, 201 s), Gaia SOS (3 tables, 154 s) and radio
+collectors (53 s each) set a field's ~340 s collection.  The same mirror is
+now asked once more without the mini form (one row): a known catalogue then
+answers with an empty <TABLE>, an unknown one without (practical-use probe,
+CfA and IDIA, 2026-11-15), so a confirmed empty cone is accepted at once.
+A confirmation with a row means the table-less answer was wrong (CfA did
+this for a Gaia DR3 cone of 349 sources): the next mirror is asked.
+A mirror that refused the connection, did not connect within
+CONNECT_TIMEOUT_S or answered a RETRY_STATUS is tried last for
+MIRROR_STICKY_S (Strasbourg's 404 and the NAOJ / IUCAA connect timeouts were
+paid again by every query).
 """
 
 from __future__ import annotations
 
 import http.client
+import os
 import random
 import threading
 import time
@@ -56,6 +75,7 @@ CONNECT_TIMEOUT_S = 10.0
 # that day lost AllWISE and 2MASS (allwise_rows = 0 in assoc_stats.csv).
 RETRY_STATUS = {404, 500, 502, 503, 504}
 _preferred = {"host": None, "until": 0.0}
+_unreachable: dict[str, float] = {}  # host -> monotonic time until which it is tried last
 
 _local = threading.local()
 _lock = threading.Lock()
@@ -67,6 +87,18 @@ def pause() -> float:
     s = random.uniform(MIN_PAUSE_S, MAX_PAUSE_S)
     time.sleep(s)
     return s
+
+
+def _log(host, outcome, started) -> None:
+    """One line per archive request when V2_HTTP_LOG=1 (2.54.0): the thread
+    name is the collector (controller._run_bounded), so a slow collector's
+    time can be split into requests, mirrors and their answers."""
+    if os.environ.get("V2_HTTP_LOG", "").strip() not in {"1", "true", "yes", "on"}:
+        return
+    print(
+        f"[http] {threading.current_thread().name} {host} {outcome} {time.monotonic() - started:.2f}s",
+        flush=True,
+    )
 
 
 def _paced(send):
@@ -87,11 +119,55 @@ def _paced(send):
 def _vizier_order(host: str) -> list[str]:
     """Hosts to try for a VizieR request to ``host``: the recently working mirror first."""
     hosts = [host] + [h for h in VIZIER_HOSTS if h != host]
+    now = time.monotonic()
     pref = _preferred["host"]
-    if pref and time.monotonic() < _preferred["until"] and pref in hosts:
+    if pref and now < _preferred["until"] and pref in hosts:
         hosts.remove(pref)
         hosts.insert(0, pref)
-    return hosts
+    # stable: reachable hosts keep their order, unreachable ones go last
+    return sorted(hosts, key=lambda h: now < _unreachable.get(h, 0.0))
+
+
+def _without_mini_form(data):
+    """The request body asking for one row in the standard VOTable form."""
+    if isinstance(data, bytes):
+        return _without_mini_form(data.decode()).encode()
+    if isinstance(data, str):
+        lines = [l for l in data.splitlines() if not l.startswith(("-out.form=", "-out.max="))]
+        return "\n".join(lines + ["-out.max=1"])
+    if isinstance(data, dict):
+        d = {k: v for k, v in data.items() if k not in ("-out.form",)}
+        d["-out.max"] = 1
+        return d
+    return None
+
+
+def _confirmed_empty(send, session, method, target, args, kwargs) -> bool:
+    """Ask the mirror again without the mini form: an empty <TABLE> means the
+    catalogue is there and the cone has no rows."""
+    data = _without_mini_form(kwargs.get("data"))
+    if data is None:
+        return False
+    pause()
+    t0 = time.monotonic()
+    try:
+        resp = send(session, method, target, *args, **dict(kwargs, data=data))
+    except Exception as exc:
+        _log(target.split("/")[2], f"confirm {type(exc).__name__}", t0)
+        return False
+    text = (resp.text or "").upper()
+    # An empty <TABLE> only: rows here mean the first answer was wrong, not
+    # empty (CfA answered table-less for a Gaia DR3 cone with 349 sources,
+    # practical-use probe 2026-11-15), so the next mirror is asked.
+    ok = resp.status_code == 200 and "<TABLE" in text and "<TR" not in text
+    what = "empty table" if ok else ("rows" if "<TR" in text else "no table")
+    if what == "no table":  # the server's reason, for the log
+        import re
+
+        info = re.findall(r'<INFO[^>]*name="(?:QUERY_STATUS|Error|Warning)"[^>]*>([^<]{0,160})', resp.text or "", re.I)
+        what += f" {info[:2]}"
+    _log(target.split("/")[2], f"confirm {resp.status_code} {what}", t0)
+    return ok
 
 
 def _tableless_votable(resp) -> bool:
@@ -117,7 +193,14 @@ def _with_mirrors(send):
     def request(self, method, url, *args, **kwargs):
         parts = urlsplit(str(url))
         if parts.hostname not in VIZIER_HOSTS:
-            return send(self, method, url, *args, **kwargs)
+            t0 = time.monotonic()
+            try:
+                resp = send(self, method, url, *args, **kwargs)
+            except Exception as exc:
+                _log(parts.hostname, type(exc).__name__, t0)
+                raise
+            _log(parts.hostname, resp.status_code, t0)
+            return resp
         hosts = _vizier_order(parts.hostname)
         read = kwargs.get("timeout")
         read = read[1] if isinstance(read, tuple) else read
@@ -128,12 +211,18 @@ def _with_mirrors(send):
             if i:
                 pause()  # every retry is an archive request too
             target = urlunsplit(parts._replace(netloc=parts.netloc.replace(parts.hostname, host)))
+            t0 = time.monotonic()
             try:
                 resp = send(self, method, target, *args, **kwargs)
             except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as exc:  # refused, DNS, connect/read timeout
+                _log(host, type(exc).__name__, t0)
+                if isinstance(exc, requests.exceptions.ConnectionError):  # not connected (a read timeout is a slow answer)
+                    _unreachable[host] = time.monotonic() + MIRROR_STICKY_S
                 last = exc
                 continue
+            _log(host, f"{resp.status_code}{' tableless' if _tableless_votable(resp) else ''}", t0)
             if resp.status_code in RETRY_STATUS and i < len(hosts) - 1:
+                _unreachable[host] = time.monotonic() + MIRROR_STICKY_S  # failing: tried last for a while
                 last = resp
                 continue
             # A mirror's table-less answer is not trusted on its own (2.47.0):
@@ -145,8 +234,9 @@ def _with_mirrors(send):
             # reference-object runs came back empty.  Such an answer is kept
             # only if no other mirror returns a table.
             if host != VIZIER_HOSTS[0] and _tableless_votable(resp):
-                empty = empty or resp
-                continue
+                if not _confirmed_empty(send, self, method, target, args, kwargs):
+                    empty = empty or resp
+                    continue
             if host != VIZIER_HOSTS[0]:
                 _preferred.update(host=host, until=time.monotonic() + MIRROR_STICKY_S)
             elif _preferred["host"]:

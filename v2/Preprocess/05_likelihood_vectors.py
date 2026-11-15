@@ -66,6 +66,17 @@ _cp_s.loader.exec_module(CLASS_PRIOR)
 # a spectroscopic / literature label exists (lookup vs inference, review 7.2).
 COARSE_MODEL = os.environ.get("V2_COARSE_MODEL", "fusion").strip().lower()
 CATALOG_LABEL_RULES = ("SPC-", "SIMBAD-TYPE", "NED-TYPE", "SGA-")
+# Literature compilations (2.54.0).  An object whose only evidence is a NED or
+# SIMBAD type has no measurement behind its class: the fused value was the
+# fixed prior weight of a catalogue label (e.g. 0.80 for every NED-only QSO,
+# 241 objects of a 2' COSMOS search, mostly JWST high-z candidates without
+# any measurement in the collected surveys).  NED and SIMBAD types are
+# heterogeneous literature assignments, not a calibrated classifier (NED:
+# Mazzarella et al. 2007; SIMBAD: Wenger et al. 2000), so such a class is
+# reported as a literature label without a probability.
+LITERATURE_LABEL_RULES = ("NED-TYPE", "SIMBAD-TYPE")
+LITERATURE_STATUS = "LITERATURE_LABEL"
+LITERATURE_BASIS = "literature type only (NED / SIMBAD), no measurement"
 CLASSES = ("STAR", "GALAXY", "QSO")
 WEIGHT = {"direct_probability": 1.0, "catalog_label": 1.5, "continuous_score": 0.35, "binary_evidence": 0.35}
 MIN_CONFIDENCE = 0.50
@@ -187,6 +198,21 @@ def fuse(items, model=None):
 # 2.44.0 field run), so these features add to the class odds but do not
 # make an object "with evidence"; the sparse priors handle it instead.
 SUPPORT_ONLY_RULES = ("WISE-COLOR-001:",)
+
+
+def literature_only(item_lists, basis) -> np.ndarray:
+    """Objects whose evidence is only NED / SIMBAD types and whose label came
+    from the fused evidence (not from a measurement rule such as the 2MASS
+    counts, the BGS Gaia test or MYStIX membership)."""
+    return np.array(
+        [
+            bool(items)
+            and b == "evidence"
+            and all(str(e.get("rule_id", "")).startswith(LITERATURE_LABEL_RULES) for e in items)
+            for items, b in zip(item_lists, basis)
+        ],
+        dtype=bool,
+    )
 
 
 def _counts(key, kind, fitted):
@@ -755,6 +781,12 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
         else:
             best_candidates.append(top)
             best_candidate_scores.append(conf)
+    literature = literature_only(item_lists, basis)
+    for i in np.flatnonzero(literature):
+        if labels[i] in CLASSES:
+            statuses[i] = LITERATURE_STATUS
+            basis[i] = LITERATURE_BASIS
+        confidence[i] = margins[i] = best_candidate_scores[i] = float("nan")
     result_columns = {}
     for i, c in enumerate(CLASSES):
         result_columns[f"likelihood_{c.lower()}"] = Q[:, i] if len(Q) else []
@@ -783,6 +815,12 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
         Pf = CLASS_PRIOR.consistent(Q, labels, confidence, CLASSES)
         for i, c in enumerate(CLASSES):
             result_columns[f"p_{c.lower()}"] = Pf[:, i]
+    if literature.any():
+        for c in CLASSES:
+            for col in (f"p_{c.lower()}", f"p_{c.lower()}_training_prior"):
+                v = np.array(result_columns[col], dtype=float, copy=True)
+                v[literature] = np.nan
+                result_columns[col] = v
     result_columns.update(
         {
             # 2.51: not calibrated -- priors multiplied in at two places, the

@@ -21,6 +21,7 @@ DEFAULT_OUT = ROOT / "rawdata"
 if str(GET_DATA) not in sys.path:
     sys.path.insert(0, str(GET_DATA))
 import archive_cache  # noqa: E402  (local cache / mirror of collector results, 2.9.1)
+import footprint  # noqa: E402  (documented survey edges, 2.54.0)
 import throttle  # noqa: E402
 
 throttle.install()  # 3-5 s before every archive request (2.33.0)
@@ -109,6 +110,20 @@ def _collect_one(
     cache = "off"
     try:
         module = _load_collector(name)
+        if footprint.outside(getattr(module, "FOOTPRINT", None), ra, dec, radius_arcmin):
+            # The whole cone is outside the survey's documented sky: no request
+            # (2.54.0).  Not a failure (catalog_coverage counts error / timeout).
+            result = {
+                "collector": name,
+                "status": "outside_footprint",
+                "rows": 0,
+                "elapsed_seconds": round(time.monotonic() - started, 3),
+                "output_file": "",
+                "error": "",
+                "cache": "off",
+            }
+            print(f"[{name}] outside_footprint: not queried", flush=True)
+            return result
         source = GET_DATA / f"{name}.py"
         df = archive_cache.get(
             name, source, ra, dec, radius_arcmin, float(getattr(module, "CACHE_FILTER_MARGIN_ARCMIN", 0.0))
@@ -229,7 +244,8 @@ def _run_bounded(job, names, workers: int, budget_s: float) -> list[dict]:
         while pending and len(running) < max(1, workers):
             name = pending.pop(0)
             event = threading.Event()
-            thread = threading.Thread(target=target, args=(name, event), daemon=True)
+            # named after the collector: throttle's V2_HTTP_LOG lines carry it (2.54.0)
+            thread = threading.Thread(target=target, args=(name, event), name=name, daemon=True)
             running[name] = (thread, time.monotonic(), event)
             thread.start()
         now = time.monotonic()

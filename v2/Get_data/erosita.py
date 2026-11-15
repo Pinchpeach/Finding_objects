@@ -12,6 +12,9 @@ save = save_csv  # collector API: save(df, path)
 
 CATALOG = "eROSITA eRASS1"
 VIZIER_CATALOG = "J/A+A/682/A34"
+# eROSITA-DE half of the sky, 179.9442 < l < 359.9442 (Merloni et al. 2024,
+# A&A 682, A34); footprint.py (2.54.0)
+FOOTPRINT = {"gal_l_range": (179.9442, 359.9442)}
 ID_COLUMNS = ["IAUName", "IAUNAME", "DetUId"]
 RA_COLUMNS = ["RA_ICRS", "RAJ2000", "_RAJ2000"]
 DEC_COLUMNS = ["DE_ICRS", "DEJ2000", "_DEJ2000"]

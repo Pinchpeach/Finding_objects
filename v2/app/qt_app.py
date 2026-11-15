@@ -100,7 +100,7 @@ from PySide6.QtWidgets import (
 )
 
 from progress import ProgressTracker  # noqa: E402
-from qt_models import DataFrameModel, ResultsFilter  # noqa: E402
+from qt_models import DataFrameModel, ResultsFilter, literature_only  # noqa: E402
 from qt_widgets import DetailPanel, LogWindow, SkyView  # noqa: E402
 from app_log import AppLog  # noqa: E402
 from bookmarks import BookmarkStore  # noqa: E402
@@ -265,6 +265,7 @@ class MainWindow(QMainWindow):
                 "SOLAR_SYSTEM",
                 "UNCONFIRMED",
                 "RADIO_COMPONENT",
+                "LITERATURE_LABEL",
             ]
         )
         self.txt_search = QLineEdit()
@@ -274,6 +275,11 @@ class MainWindow(QMainWindow):
         self.chk_parts.setToolTip(
             "Catalogue entries that are pieces of a large galaxy (HII regions, nucleus, shreds)\n"
             "are grouped under the galaxy and hidden unless this is on."
+        )
+        self.chk_lit = QCheckBox("Show literature-only")
+        self.chk_lit.setToolTip(
+            "Entries known only from the NED / SIMBAD literature compilations, with no detection\n"
+            "in the collected surveys (most UNKNOWN rows of deep fields), are hidden unless this is on."
         )
         self.chk_high = QCheckBox("High confidence only")
         self.chk_high.setToolTip(
@@ -288,6 +294,7 @@ class MainWindow(QMainWindow):
             self.cmb_status,
             self.txt_search,
             self.chk_parts,
+            self.chk_lit,
             self.chk_high,
         ):
             bar.addWidget(w)
@@ -333,6 +340,7 @@ class MainWindow(QMainWindow):
         self._filter_timer.timeout.connect(self._filters_changed)
         self.txt_search.textChanged.connect(self._filter_timer.start)
         self.chk_parts.toggled.connect(self._filters_changed)
+        self.chk_lit.toggled.connect(self._filters_changed)
         self.chk_high.toggled.connect(self._filters_changed)
         self.table.selectionModel().currentRowChanged.connect(self._row_changed)
         self.sky.objectClicked.connect(self._select_source_row)
@@ -710,17 +718,22 @@ class MainWindow(QMainWindow):
         self.proxy.set_status(self.cmb_status.currentText())
         self.proxy.set_text(self.txt_search.text())
         self.proxy.set_show_components(self.chk_parts.isChecked())
+        self.proxy.set_show_literature(self.chk_lit.isChecked())
         self.proxy.set_high_only(self.chk_high.isChecked())
         self.sky.set_visible_rows(self._visible_source_rows())
         df = self.model.frame()
         if not df.empty and "primary_class" in df:
             top = df[df.parent_object_id.isna()] if "parent_object_id" in df else df
+            lit = literature_only(top)
+            n_lit = int(lit.sum())
+            top = top[~lit]
             counts = top.primary_class.value_counts()
-            parts = len(df) - len(top)
+            parts = len(df) - len(top) - n_lit
             n_high = int(top.high_confidence.fillna(False).astype(bool).sum()) if "high_confidence" in top else 0
             self.lbl_counts.setText(
                 f"{self.proxy.rowCount()} shown / {len(top)} objects"
                 + (f" (+{parts} galaxy parts)" if parts else "")
+                + (f" (+{n_lit} literature-only)" if n_lit else "")
                 + (f" · {n_high} high confidence" if n_high else "")
                 + " · "
                 + " · ".join(f"{k} {v}" for k, v in counts.items())
@@ -811,6 +824,8 @@ class MainWindow(QMainWindow):
             and pd.notna(df.iloc[hit].get("parent_object_id"))
         ):
             self.chk_parts.setChecked(True)  # a bookmarked galaxy part is hidden by default
+        if not self.chk_lit.isChecked() and bool(literature_only(df.iloc[[hit]]).iloc[0]):
+            self.chk_lit.setChecked(True)  # so is a literature-only entry (2.54.0)
         self.cmb_class.setCurrentText("ALL")
         self.cmb_status.setCurrentText("ALL")
         self.txt_search.clear()

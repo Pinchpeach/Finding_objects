@@ -257,6 +257,43 @@ def test_filter_proxy_follows_a_larger_new_frame():
     assert proxy.rowCount() == 0
 
 
+def test_literature_only_entries_hidden_and_labelled():
+    """2.54.0: NED / SIMBAD-only entries are hidden until "Show literature-only"
+    is on (galaxy parts follow the parts switch); a literature label shows
+    "literature" instead of a probability."""
+    pytest.importorskip("PySide6")
+    import math
+
+    import pandas as pd
+    from PySide6.QtCore import Qt
+    from PySide6.QtWidgets import QApplication
+    from qt_models import TABLE_COLUMNS, DataFrameModel, ResultsFilter, literature_only
+
+    app = QApplication.instance() or QApplication([])
+    df = pd.DataFrame(
+        {
+            "object_id": ["A", "B", "C", "D"],
+            "designation": ["A", "B", "C", "D"],
+            "primary_class": ["GALAXY", "QSO", "UNKNOWN", "UNKNOWN"],
+            "primary_confidence": [0.9, math.nan, 1 / 3, 0.4],
+            "classification_status": ["CLASSIFIED", "LITERATURE_LABEL", "NO_EVIDENCE", "WITHIN_LARGE_GALAXY"],
+            "catalogs": ["DESI Legacy Surveys DR10|NED", "NED", "NED|SIMBAD", "NED"],
+            "parent_object_id": [None, None, None, "A"],
+        }
+    )
+    assert literature_only(df).tolist() == [False, True, True, True]
+    model, proxy = DataFrameModel(df), ResultsFilter()
+    proxy.setSourceModel(model)
+    assert proxy.rowCount() == 1  # B, C literature-only; D a galaxy part
+    proxy.set_show_components(True)
+    assert proxy.rowCount() == 2  # the part follows the parts switch
+    proxy.set_show_literature(True)
+    assert proxy.rowCount() == 4
+    col = [c for c in TABLE_COLUMNS if c in df].index("primary_confidence")
+    assert model.data(model.index(1, col), Qt.DisplayRole) == "literature"
+    assert model.data(model.index(0, col), Qt.DisplayRole) == "0.900"
+
+
 def test_pipeline_on_an_empty_field_returns_no_objects(tmp_path):
     import importlib.util, sys
 
