@@ -212,7 +212,10 @@ def test_detections_inside_large_galaxy_abstain(tmp_path):
     # Outside the ellipse the object is classified normally (a lone SIMBAD
     # label may still fall below the abstention threshold).
     assert out.loc["out", "classification_status"] != "WITHIN_LARGE_GALAXY"
-    assert out.loc["out", "p_star"] > max(out.loc["out", "p_galaxy"], out.loc["out", "p_qso"])
+    # A lone SIMBAD label is a literature class without a probability (2.54.0);
+    # its evidence still points to STAR.
+    assert out.loc["out", "likelihood_star"] > max(out.loc["out", "likelihood_galaxy"], out.loc["out", "likelihood_qso"])
+    assert math.isnan(out.loc["out", "p_star"])
     host = pd.read_csv(l)
     host = host[host.catalogs.str.contains("SGA-2020", regex=False)].iloc[0]
     assert host.primary_class == "GALAXY"

@@ -56,17 +56,37 @@ def vizier():
                 print(f"{host:24s} {label:28s} {type(exc).__name__} {time.monotonic() - t0:5.1f}s {str(exc)[:120]}", flush=True)
 
 
+def vizier_mini():
+    """astroquery's own request body (-out.form=mini) for an empty cone and an
+    unknown catalogue at the working mirrors, then the same without the mini
+    form and one row: the confirmation throttle.py makes (2.54.0)."""
+    import requests
+
+    body = "-source={cat}\n-out.max=unlimited\n-out.all\n-c=150.11910623+2.20579505\n-c.rs=2.0\n-out.meta=huUD\n-out.form=mini\n-oc.form=d"
+    for host in ("vizier.cds.unistra.fr", "vizier.cfa.harvard.edu", "vizier.idia.ac.za"):
+        for cat in ("VIII/65/nvss", "J/ApJS/256/43/table9", "J/XXX/999/nosuch", "II/328/allwise"):
+            for label, data in (("mini", body.format(cat=cat)),
+                                ("confirm", "\n".join([l for l in body.format(cat=cat).splitlines() if not l.startswith(("-out.form=", "-out.max="))] + ["-out.max=1"]))):
+                t0 = time.monotonic()
+                try:
+                    r = requests.post(f"https://{host}/viz-bin/votable", data=data, timeout=(10, 40))
+                    t = r.text
+                    print(f"{host:24s} {cat:22s} {label:8s} {r.status_code} {time.monotonic() - t0:4.1f}s table={'<TABLE' in t.upper()} tr={t.count('<TR>')} len={len(t)}", flush=True)
+                except Exception as exc:
+                    print(f"{host:24s} {cat:22s} {label:8s} {type(exc).__name__}", flush=True)
+
+
 def simbad():
     from astroquery.simbad import Simbad
     from astropy.coordinates import SkyCoord
     import astropy.units as u
 
     for server in ("simbad.cds.unistra.fr", "simbad.harvard.edu"):
-        s = Simbad()
-        s.server = server
-        s.add_votable_fields("otype", "sp", "plx", "pmra", "pmdec", "rvz_redshift")
         t0 = time.monotonic()
         try:
+            s = Simbad()
+            s.server = server
+            s.add_votable_fields("otype", "sp", "plx", "pmra", "pmdec", "rvz_redshift")
             t = s.query_region(SkyCoord(COSMOS[0] * u.deg, COSMOS[1] * u.deg), radius=1 * u.arcmin)
             n = 0 if t is None else len(t)
             cols = [] if t is None else list(t.colnames)
@@ -160,4 +180,4 @@ def httplog(log_path, summary_path):
 
 
 if __name__ == "__main__":
-    {"vizier": vizier, "simbad": simbad, "ps1": ps1}.get(sys.argv[1], lambda: httplog(*sys.argv[2:4]))()
+    {"vizier": vizier, "vizier_mini": vizier_mini, "simbad": simbad, "ps1": ps1}.get(sys.argv[1], lambda: httplog(*sys.argv[2:4]))()

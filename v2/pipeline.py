@@ -15,6 +15,8 @@ Examples::
 
 Every stage writes its CSV into ``--work`` so intermediate products stay
 inspectable; per-stage wall time is written to ``pipeline_summary.csv``.
+``objects_summary.csv`` holds the columns to read first, one row per
+independent detected object (``classified_objects.csv`` is the full record).
 """
 
 from __future__ import annotations
@@ -129,6 +131,7 @@ def run(
         # down): an empty result, not a failure of the later stages.
         out = pd.DataFrame(columns=EMPTY_RESULT_COLUMNS)
         out.to_csv(work / "classified_objects.csv", index=False)
+        _load(V2 / "summary.py", "v2_summary").write(out, work)
         pd.DataFrame(timings).to_csv(work / "pipeline_summary.csv", index=False)
         _coverage(work, raw_dir)
         print("[pipeline] 0 objects: no detections in the search area", flush=True)
@@ -181,6 +184,9 @@ def run(
     coverage = _coverage(work, raw_dir)
     out = _load(V2 / "high_confidence.py", "v2_high_confidence").apply(out, coverage)
     out.to_csv(work / "classified_objects.csv", index=False)
+    # The columns a user reads first, one row per independent detected object;
+    # galaxy parts and NED/SIMBAD-only entries apart (2.54.0, summary.py).
+    counts = _load(V2 / "summary.py", "v2_summary").write(out, work)
 
     summary = pd.DataFrame(timings)
     summary.to_csv(work / "pipeline_summary.csv", index=False)
@@ -188,6 +194,12 @@ def run(
         f"[pipeline] {len(out)} objects; primary classes {out.primary_class.value_counts().to_dict()}; "
         f"high confidence {int(out.high_confidence.sum())}; "
         f"total {summary.seconds.sum():.1f} s -> {work / 'classified_objects.csv'}",
+        flush=True,
+    )
+    print(
+        f"[pipeline] summary: {counts['objects']} objects -> {work / 'objects_summary.csv'} "
+        f"(+{counts['galaxy_parts']} galaxy parts in classified_objects.csv, "
+        f"+{counts['literature_only']} literature-only entries -> literature_only_entries.csv)",
         flush=True,
     )
     return out

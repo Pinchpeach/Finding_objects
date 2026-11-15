@@ -28,10 +28,36 @@ jobs:
       - run: pip install pandas numpy requests astropy astroquery pyvo
       - name: VizieR mirrors
         run: python -u .github/scripts/practical_probe.py vizier
+      - name: VizieR mini form and its confirmation
+        if: always()
+        run: python -u .github/scripts/practical_probe.py vizier_mini
       - name: SIMBAD mirrors
+        if: always()
         run: python -u .github/scripts/practical_probe.py simbad
       - name: PS1 at MAST and VizieR
+        if: always()
         run: python -u .github/scripts/practical_probe.py ps1
+      - name: Collectors with the 2.54.0 fallbacks (SIMBAD mirror, PS1 VizieR copy forced)
+        if: always()
+        run: |
+          python - <<'PY'
+          import sys, time
+          sys.path.insert(0, "v2/Get_data")
+          import simbad, panstarrs1
+          t = time.monotonic(); d = simbad.fetch(150.1191, 2.2058, 1.0)
+          print("simbad", len(d), "rows", round(time.monotonic() - t, 1), "s; server", d.get("simbad_server", [None])[0] if len(d) else None,
+                "ref status", d["simbad_reference_query_status"].value_counts().to_dict() if len(d) else None)
+          t = time.monotonic(); v = panstarrs1._fetch_vizier(150.1191, 2.2058, 2.0)
+          m = panstarrs1._fetch_mast(150.1191, 2.2058, 2.0)
+          print("ps1 vizier", len(v), "rows", round(time.monotonic() - t, 1), "s; mast", len(m), "rows")
+          j = m.merge(v, on="catalog_object_id", suffixes=("_m", "_v"))
+          print("matched", len(j), "of", len(m), "/", len(v))
+          for c in ("gMeanPSFMag", "rMeanPSFMag", "iMeanPSFMag", "rMeanKronMag", "nDetections", "epochMean", "qualityFlag", "objInfoFlag"):
+              import pandas as pd
+              a = pd.to_numeric(j[c + "_m"], errors="coerce").where(lambda x: x > -900); b = pd.to_numeric(j[c + "_v"], errors="coerce")
+              d = (a - b).dropna()
+              print(f"  {c:14s} n={len(d)} median={d.median() if len(d) else None} max|d|={d.abs().max() if len(d) else None}")
+          PY
 
   field:
     runs-on: ubuntu-latest

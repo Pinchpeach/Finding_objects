@@ -73,7 +73,69 @@ OPTIONAL_COLUMNS = ["epochMean", "objInfoFlag", "qualityFlag"] + [
 ]
 
 
+# VizieR copy of the PS1 mean-object catalogue (II/349/ps1: Chambers et al.
+# 2016, arXiv:1612.05560; DR1, the same PV3 mean photometry the MAST DR2
+# MeanObject table serves, DR2 adding the epoch-level tables).  Used when the
+# MAST API fails (2.54.0): mean PSF and Kron magnitudes, flags, epoch and the
+# detection count; no aperture magnitudes, per-band counts or single-epoch
+# scatter (variability evidence is then absent).  Its rows carry
+# ps1_query_status = vizier_fallback (cached one day, archive_cache.py).
+VIZIER_FALLBACK = "II/349/ps1"
+VIZIER_MAP = {
+    "objID": ("objID",),
+    "raMean": ("RAJ2000", "RAdeg"),
+    "decMean": ("DEJ2000", "DEdeg"),
+    "raMeanErr": ("e_RAJ2000",),
+    "decMeanErr": ("e_DEJ2000",),
+    "nDetections": ("Nd",),
+    "epochMean": ("Epoch",),
+    "objInfoFlag": ("f_objID",),
+    "qualityFlag": ("Qual",),
+    **{f"{b}MeanPSFMag": (f"{b}mag",) for b in "grizy"},
+    **{f"{b}MeanPSFMagErr": (f"e_{b}mag",) for b in "grizy"},
+    **{f"{b}MeanKronMag": (f"{b}Kmag",) for b in "grizy"},
+    **{f"{b}MeanKronMagErr": (f"e_{b}Kmag",) for b in "grizy"},
+}
+
+
 def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
+    try:
+        return _fetch_mast(ra, dec, radius_arcmin)
+    except Exception as exc:  # SSL / connection / 5xx / timeout at MAST
+        print(f"[panstarrs1] MAST failed ({type(exc).__name__}: {str(exc)[:160]}); VizieR {VIZIER_FALLBACK} instead", flush=True)
+        return _fetch_vizier(ra, dec, radius_arcmin)
+
+
+def _fetch_vizier(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
+    from _catalog_utils import vizier_cone
+
+    v = vizier_cone(VIZIER_FALLBACK, ra, dec, radius_arcmin)
+    cols = ["catalog", "catalog_object_id", "object_name", "ra", "dec", *COLUMNS, "ps1_query_status"]
+    if v is None or v.empty:
+        return pd.DataFrame(columns=cols)
+    df = pd.DataFrame(index=v.index)
+    for out, cands in VIZIER_MAP.items():
+        src = next((c for c in cands if c in v.columns), None)
+        df[out] = v[src] if src is not None else pd.NA
+    df["objID"] = pd.to_numeric(df["objID"], errors="coerce").astype("Int64").astype("string")
+    df = df[pd.to_numeric(df["nDetections"], errors="coerce").ge(MIN_DETECTIONS)]
+    if df.empty:
+        return pd.DataFrame(columns=cols)
+    for c in COLUMNS:
+        if c not in df:
+            df[c] = pd.NA
+    df["objName"] = df["objName"].astype("string")
+    df.insert(0, "catalog", CATALOG)
+    df.insert(1, "catalog_object_id", df["objID"])
+    df.insert(2, "object_name", "PS1 " + df["objID"])
+    df.insert(3, "ra", pd.to_numeric(df["raMean"], errors="coerce"))
+    df.insert(4, "dec", pd.to_numeric(df["decMean"], errors="coerce"))
+    df["ps1_query_status"] = "vizier_fallback"
+    df = df.drop_duplicates("catalog_object_id", keep="last")
+    return dedupe_positions(df).reset_index(drop=True)
+
+
+def _fetch_mast(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     # nDetections >= 2 (STScI PS1 guidance): single-detection MeanObject rows are
     # mostly spurious/moving; they duplicated real sources and made Stage-1
     # association ambiguous in real fields.

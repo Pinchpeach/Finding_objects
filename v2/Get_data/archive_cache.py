@@ -14,8 +14,9 @@ Correctness rules:
   as ``_catalog_utils.py`` and ``gaia_release.py`` included) and the Gaia
   release, so changing collection code never reuses old rows;
 * only complete successful fetches are stored: errors, timeouts and partial
-  results (any ``*_query_status`` that is not ok, e.g. the Gaia VizieR
-  fallback or a failed optional query) are not;
+  results (any ``*_query_status`` that is not ok, e.g. a failed optional
+  query) are not; the complete answer of an alternative source (the Gaia
+  VizieR fallback) is kept for FALLBACK_TTL_DAYS only (2.54.0);
 * empty results expire after ``EMPTY_TTL_DAYS`` (an archive outage can look
   like an empty answer), non-empty ones after ``TTL_DAYS`` (the archives
   here are fixed releases except SIMBAD / NED, which get ``LIVE_TTL_DAYS``);
@@ -44,6 +45,14 @@ LIVE_TTL_DAYS = 7.0
 EMPTY_TTL_DAYS = 1.0
 LIVE = {"simbad", "ned"}
 OK_STATUS = {"", "ok", "tap", "missing_source_id", "nan", "<NA>", "None"}
+# A complete answer from a collector's documented alternative source (Gaia DR3
+# from its VizieR copy when the ESA TAP misses its budget) lacks a few
+# columns only that source has (gaia_dr3.py).  2.54.0: kept FALLBACK_TTL_DAYS,
+# so a re-run of the search does not repeat the ~60 s fallback, while the
+# next day tries the primary source again (it was not cached at all: in the
+# practical-use probe every warm re-run spent 56-60 s on Gaia).
+FALLBACK_STATUS = {"vizier_fallback", "fallback_partial", "fallback_unavailable"}
+FALLBACK_TTL_DAYS = 1.0
 SAME_TOL_ARCMIN = 1e-6
 LOCK_STALE_S = 30.0
 _LOCK = threading.Lock()
@@ -90,19 +99,31 @@ def _index(d: Path) -> list[dict]:
         return []
 
 
-def _ttl(name: str, rows: int) -> float:
+def _ttl(name: str, rows: int, fallback: bool = False) -> float:
     if rows == 0:
         return EMPTY_TTL_DAYS
+    if fallback:
+        return FALLBACK_TTL_DAYS
     return LIVE_TTL_DAYS if name in LIVE else TTL_DAYS
 
 
-def cacheable(df: pd.DataFrame) -> bool:
-    """False for partial results (a ``*_query_status`` column reporting a failure)."""
+def _statuses(df: pd.DataFrame) -> set:
+    out = set()
     for c in df.columns:
         if str(c).endswith("_query_status"):
-            if set(df[c].astype(str).str.strip()) - OK_STATUS:
-                return False
-    return True
+            out |= set(df[c].astype(str).str.strip())
+    return out
+
+
+def fallback(df: pd.DataFrame) -> bool:
+    """True when the rows came from a collector's alternative source."""
+    return bool(_statuses(df) & FALLBACK_STATUS)
+
+
+def cacheable(df: pd.DataFrame) -> bool:
+    """False for partial results (a ``*_query_status`` column reporting a
+    failure); an alternative source's complete answer is cacheable (briefly)."""
+    return not (_statuses(df) - OK_STATUS - FALLBACK_STATUS)
 
 
 def get(
@@ -116,7 +137,7 @@ def get(
     candidates = [
         e
         for e in _index(d)
-        if now - e["t"] <= _ttl(name, e["rows"]) * 86400
+        if now - e["t"] <= _ttl(name, e["rows"], e.get("fallback", False)) * 86400
         and _sep_arcmin(ra, dec, e["ra"], e["dec"]) + radius_arcmin <= e["r"] + SAME_TOL_ARCMIN
     ]
     # Smallest containing cone first; one whose file was pruned or is
@@ -200,7 +221,7 @@ def put(name: str, source: Path, ra: float, dec: float, radius_arcmin: float, df
             for e in _index(d):
                 if e["file"] == fname:
                     continue
-                (drop if now - e["t"] > _ttl(name, e["rows"]) * 86400 else keep).append(e)
+                (drop if now - e["t"] > _ttl(name, e["rows"], e.get("fallback", False)) * 86400 else keep).append(e)
             keep.append(
                 {
                     "ra": float(ra),
@@ -209,6 +230,7 @@ def put(name: str, source: Path, ra: float, dec: float, radius_arcmin: float, df
                     "rows": int(len(df)),
                     "t": now,
                     "file": fname,
+                    "fallback": fallback(df),
                 }
             )
             fd, itmp = tempfile.mkstemp(dir=d, suffix=".json.tmp")
