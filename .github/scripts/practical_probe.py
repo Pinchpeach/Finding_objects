@@ -99,62 +99,57 @@ def simbad():
 
 
 def ps1():
-    """Same cone from MAST (DR2 MeanObject) and VizieR II/349/ps1 (DR1, Chambers
-    et al. 2016): columns, rows, and the magnitude differences of objects
-    matched by objID."""
+    """MAST DR2 MeanObject against the VizieR copies II/389 (PS1 DR2, built with
+    nDetections > 2) and II/349 (DR1): tables, columns, rows, matched values,
+    and the detection counts of MAST rows missing from each copy."""
     from io import StringIO
 
-    import numpy as np
     import pandas as pd
     import requests
     from astroquery.vizier import Vizier
     from astropy.coordinates import SkyCoord
     import astropy.units as u
 
-    for ra, dec, r in ((COSMOS[0], COSMOS[1], 2.0), (188.4155, 9.1751, 2.0), (283.3044, -3.5206, 1.0)):
-        cols = ["objID", "raMean", "decMean", "nDetections", "qualityFlag", "objInfoFlag"] + [
-            f"{b}Mean{k}Mag" for b in "grizy" for k in ("PSF", "Kron")
+    sys.path.insert(0, "v2/Get_data")
+    import throttle
+
+    throttle.install()  # VizieR mirror failover, as in the collectors
+    for ra, dec, r in ((COSMOS[0], COSMOS[1], 2.0), (283.3044, -3.5206, 1.0)):
+        cols = ["objID", "raMean", "decMean", "nDetections", "qualityFlag", "objInfoFlag", "epochMean"] + [
+            f"{b}Mean{k}Mag" for b in "grizy" for k in ("PSF", "Kron", "Ap")
         ]
-        t0 = time.monotonic()
         m = requests.get(
             "https://catalogs.mast.stsci.edu/api/v0.1/panstarrs/dr2/mean.csv",
             params={"ra": ra, "dec": dec, "radius": r / 60, "nDetections.gte": 2, "columns": "[" + ",".join(cols) + "]"},
             timeout=120,
         )
         mast = pd.read_csv(StringIO(m.text), dtype={"objID": "string"}) if m.text.strip() else pd.DataFrame()
-        tm = time.monotonic() - t0
-        t0 = time.monotonic()
-        v = Vizier(columns=["**"], row_limit=-1).query_region(SkyCoord(ra * u.deg, dec * u.deg), radius=r * u.arcmin, catalog="II/349/ps1")
-        tv = time.monotonic() - t0
-        viz = v[0].to_pandas() if v else pd.DataFrame()
-        print(f"\n== cone {ra} {dec} r={r}': MAST {m.status_code} {len(mast)} rows {tm:.1f}s; VizieR {len(viz)} rows {tv:.1f}s")
-        print("VizieR II/349/ps1 columns:", list(viz.columns))
-        if mast.empty or viz.empty:
-            continue
-        viz["objID"] = viz["objID"].astype("Int64").astype("string")
-        nd = next((c for c in ("Nd", "nDetections") if c in viz), None)
-        if nd:
-            print("VizieR rows with Nd >= 2:", int(pd.to_numeric(viz[nd], errors="coerce").ge(2).sum()))
-        j = mast.merge(viz, on="objID", how="inner")
-        print(f"matched by objID: {len(j)} of MAST {len(mast)} / VizieR {len(viz)}")
-        for b in "grizy":
-            for mk, vk in ((f"{b}MeanPSFMag", f"{b}mag"), (f"{b}MeanKronMag", f"{b}Kmag")):
+        print(f"\n== cone {ra} {dec} r={r}': MAST {len(mast)} rows; nDetections {mast.nDetections.value_counts().sort_index().head(6).to_dict() if len(mast) else {}}")
+        for cat in ("II/389", "II/349"):
+            t0 = time.monotonic()
+            try:
+                v = Vizier(columns=["**"], row_limit=-1).query_region(SkyCoord(ra * u.deg, dec * u.deg), radius=r * u.arcmin, catalog=cat)
+            except Exception as exc:
+                print(f"{cat}: {type(exc).__name__} {str(exc)[:150]}")
+                continue
+            print(f"{cat}: {len(v)} tables {list(v.keys())} {time.monotonic() - t0:.1f}s")
+            if not len(v):
+                continue
+            viz = v[0].to_pandas()
+            print(f"  {list(v.keys())[0]}: {len(viz)} rows; columns {list(viz.columns)}")
+            if mast.empty or "objID" not in viz:
+                continue
+            viz["objID"] = pd.to_numeric(viz["objID"], errors="coerce").astype("Int64").astype("string")
+            j = mast.merge(viz, on="objID", how="inner")
+            miss = mast[~mast.objID.isin(viz.objID)]
+            print(f"  matched {len(j)} of MAST {len(mast)}; MAST rows missing from {cat}: nDetections {miss.nDetections.value_counts().sort_index().to_dict()}")
+            for mk, vk in (("gMeanPSFMag", "gmag"), ("rMeanPSFMag", "rmag"), ("rMeanKronMag", "rKmag"), ("rMeanApMag", "rAmag"),
+                           ("nDetections", "Nd"), ("qualityFlag", "Qual"), ("objInfoFlag", "f_objID"), ("epochMean", "Epoch")):
                 if mk in j and vk in j:
                     x = pd.to_numeric(j[mk], errors="coerce").where(lambda s: s > -900)
                     y = pd.to_numeric(j[vk], errors="coerce")
                     d = (x - y).dropna()
-                    if len(d):
-                        print(
-                            f"  {mk:16s} - {vk:6s}: n={len(d):4d} median={d.median():+.4f} "
-                            f"p95|d|={d.abs().quantile(0.95):.4f} max|d|={d.abs().max():.4f}"
-                        )
-        if nd:
-            dn = pd.to_numeric(j["nDetections"], errors="coerce") - pd.to_numeric(j[nd], errors="coerce")
-            print("  nDetections - Nd:", dn.describe().round(2).to_dict())
-        for mk, vk in (("qualityFlag", "Qual"), ("objInfoFlag", "f_objID")):
-            if mk in j and vk in j:
-                same = (pd.to_numeric(j[mk], errors="coerce") == pd.to_numeric(j[vk], errors="coerce")).mean()
-                print(f"  {mk} == {vk}: {100 * same:.1f} %")
+                    print(f"    {mk:14s} - {vk:8s}: n={len(d)} median={d.median() if len(d) else None} max|d|={d.abs().max() if len(d) else None}")
 
 
 def httplog(log_path, summary_path):

@@ -66,12 +66,12 @@ def literature_only(df: pd.DataFrame) -> pd.Series:
     if "catalogs" not in df:
         return pd.Series(False, index=df.index)
     cats = df["catalogs"].fillna("").astype(str).map(lambda s: frozenset(c for c in s.split("|") if c))
-    return cats.map(lambda c: bool(c) and c <= LITERATURE)
+    return cats.map(lambda c: bool(c) and c <= LITERATURE).astype(bool)
 
 
 def part(df: pd.DataFrame) -> pd.Series:
     """Rows grouped under a host galaxy (host_groups.py)."""
-    return df["parent_object_id"].notna() if "parent_object_id" in df else pd.Series(False, index=df.index)
+    return df["parent_object_id"].notna().astype(bool) if "parent_object_id" in df else pd.Series(False, index=df.index)
 
 
 def compact(df: pd.DataFrame) -> pd.DataFrame:

@@ -38,8 +38,12 @@ collectors (53 s each) set a field's ~340 s collection.  The same mirror is
 now asked once more without the mini form (one row): a known catalogue then
 answers with an empty <TABLE>, an unknown one without (practical-use probe,
 CfA and IDIA, 2026-11-15), so a confirmed empty cone is accepted at once.
-A mirror that refused the connection or did not connect within
-CONNECT_TIMEOUT_S is tried last for MIRROR_STICKY_S.
+A confirmation with a row means the table-less answer was wrong (CfA did
+this for a Gaia DR3 cone of 349 sources): the next mirror is asked.
+A mirror that refused the connection, did not connect within
+CONNECT_TIMEOUT_S or answered a RETRY_STATUS is tried last for
+MIRROR_STICKY_S (Strasbourg's 404 and the NAOJ / IUCAA connect timeouts were
+paid again by every query).
 """
 
 from __future__ import annotations
@@ -151,8 +155,18 @@ def _confirmed_empty(send, session, method, target, args, kwargs) -> bool:
     except Exception as exc:
         _log(target.split("/")[2], f"confirm {type(exc).__name__}", t0)
         return False
-    ok = resp.status_code == 200 and "<TABLE" in (resp.text or "").upper()
-    _log(target.split("/")[2], f"confirm {resp.status_code} {'empty table' if ok else 'no table'}", t0)
+    text = (resp.text or "").upper()
+    # An empty <TABLE> only: rows here mean the first answer was wrong, not
+    # empty (CfA answered table-less for a Gaia DR3 cone with 349 sources,
+    # practical-use probe 2026-11-15), so the next mirror is asked.
+    ok = resp.status_code == 200 and "<TABLE" in text and "<TR" not in text
+    what = "empty table" if ok else ("rows" if "<TR" in text else "no table")
+    if what == "no table":  # the server's reason, for the log
+        import re
+
+        info = re.findall(r'<INFO[^>]*name="(?:QUERY_STATUS|Error|Warning)"[^>]*>([^<]{0,160})', resp.text or "", re.I)
+        what += f" {info[:2]}"
+    _log(target.split("/")[2], f"confirm {resp.status_code} {what}", t0)
     return ok
 
 
@@ -208,6 +222,7 @@ def _with_mirrors(send):
                 continue
             _log(host, f"{resp.status_code}{' tableless' if _tableless_votable(resp) else ''}", t0)
             if resp.status_code in RETRY_STATUS and i < len(hosts) - 1:
+                _unreachable[host] = time.monotonic() + MIRROR_STICKY_S  # failing: tried last for a while
                 last = resp
                 continue
             # A mirror's table-less answer is not trusted on its own (2.47.0):

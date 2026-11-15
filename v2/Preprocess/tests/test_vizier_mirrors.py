@@ -220,3 +220,24 @@ def test_mini_form_removed_from_the_body():
     assert throttle._without_mini_form(MINI).splitlines()[-1] == "-out.max=1"
     assert "-out.form" not in throttle._without_mini_form(MINI)
     assert throttle._without_mini_form(None) is None
+
+
+def test_confirmation_with_rows_is_not_an_empty_cone():
+    """A table-less mini answer whose confirmation has a row was wrong (CfA,
+    Gaia DR3 cone with 349 sources, 2026-11-15): the next mirror is asked."""
+    seen = []
+
+    def send(self, method, url, *a, data=None, **k):
+        host = url.split("/")[2]
+        seen.append(host)
+        if host == "vizier.cds.unistra.fr":
+            return Resp(404)
+        if host == "vizier.cfa.harvard.edu":
+            if "-out.form=mini" in data:
+                return _V("<VOTABLE><RESOURCE></RESOURCE></VOTABLE>")
+            return _V("<VOTABLE><RESOURCE><TABLE><DATA><TABLEDATA><TR><TD>1</TD></TR></TABLEDATA></DATA></TABLE></RESOURCE></VOTABLE>")
+        return _V("<VOTABLE><RESOURCE><TABLE><DATA><TABLEDATA><TR><TD>1</TD></TR><TR><TD>2</TD></TR></TABLEDATA></DATA></TABLE></RESOURCE></VOTABLE>")
+
+    r = throttle._with_mirrors(send)(None, "POST", "https://vizier.cds.unistra.fr/viz-bin/votable", data=MINI)
+    assert r.text.count("<TR>") == 2
+    assert seen[:4] == ["vizier.cds.unistra.fr", "vizier.cfa.harvard.edu", "vizier.cfa.harvard.edu", "vizier.nao.ac.jp"]
