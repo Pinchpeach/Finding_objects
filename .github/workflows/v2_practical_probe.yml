@@ -52,7 +52,8 @@ jobs:
           print("ps1 vizier", len(v), "rows", round(time.monotonic() - t, 1), "s; mast", len(m), "rows")
           j = m.merge(v, on="catalog_object_id", suffixes=("_m", "_v"))
           print("matched", len(j), "of", len(m), "/", len(v))
-          for c in ("gMeanPSFMag", "rMeanPSFMag", "iMeanPSFMag", "rMeanKronMag", "nDetections", "epochMean", "qualityFlag", "objInfoFlag"):
+          for c in ("gMeanPSFMag", "rMeanPSFMag", "iMeanPSFMag", "rMeanKronMag", "nDetections", "epochMean", "qualityFlag", "objInfoFlag",
+                    "ng", "nr", "rMeanPSFMagStd", "rMeanPSFMagNpt", "iMeanPSFMagStd", "iMeanPSFMagNpt", "raMeanErr"):
               import pandas as pd
               a = pd.to_numeric(j[c + "_m"], errors="coerce").where(lambda x: x > -900); b = pd.to_numeric(j[c + "_v"], errors="coerce")
               d = (a - b).dropna()

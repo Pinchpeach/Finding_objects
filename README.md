@@ -6,9 +6,9 @@
 
 # Finding Objects — 프로그램 개요
 
-버전 2.36.2 · 전 파장대 관측 자료로 하늘 영역의 천체를 찾고 분류하는 프로그램
+버전 2.54.0 · 전 파장대 관측 자료로 하늘 영역의 천체를 찾고 분류하는 프로그램
 
-같은 내용의 PDF: [`v2/document/OVERVIEW_v2.36.1.pdf`](v2/document/OVERVIEW_v2.36.1.pdf) · 알고리즘 상세: [`v2/ALGORITHM.md`](v2/ALGORITHM.md) · 버전별 변경: [`v2/CHANGELOG.md`](v2/CHANGELOG.md)
+이전 판(2.36.1) 개요 PDF: [`v2/document/OVERVIEW_v2.36.1.pdf`](v2/document/OVERVIEW_v2.36.1.pdf) · 알고리즘 상세: [`v2/ALGORITHM.md`](v2/ALGORITHM.md) · 버전별 변경: [`v2/CHANGELOG.md`](v2/CHANGELOG.md)
 
 ## 1. 한눈에 보기
 
@@ -17,9 +17,9 @@
 | 목적 | 하늘의 한 영역(중심 좌표 + 반경)에 있는 모든 천체를 찾고, 전파부터 X선까지의 공개 목록을 종합해 종류를 판정한다. |
 | 입력 | 천체 이름 또는 좌표(RA, Dec)와 반경. 또는 이미 모아 둔 목록 파일 폴더. |
 | 1차 분류 | `STAR` · `GALAXY` · `QSO` · `UNKNOWN`. 증거가 부족하면 이유와 함께 `UNKNOWN`으로 기권한다. 실제로 판정을 정하는 것은 광학 색·형태, Gaia 천체측정·DSC, WISE 중적외선이다. X선·전파는 세부 분류와 표지에 쓴다(2.51.0 파장대 끄기 시험). |
-| 판정 출처 | 판정마다 `CATALOG`(목록에서 옮김) / `EXTERNAL_CLASSIFIER`(다른 탐사의 분류기) / `INFERRED`(측정에서 추론)를 표시한다(2.51.0). |
+| 판정 출처 | 판정마다 `CATALOG`(목록에서 옮김) / `EXTERNAL_CLASSIFIER`(다른 탐사의 분류기) / `INFERRED`(측정에서 추론)를 표시한다(2.51.0). NED·SIMBAD 문헌 종류만 있고 측정이 없는 천체는 확률 없이 `LITERATURE_LABEL`로 둔다(2.54.0). |
 | 세부 분류 | 분광형, 백색왜성, 뜨거운 준왜성, 초저온 왜성, 적색거성·AGB(탄소/산소), 변광성(미라·세페이드·RR Lyrae·YSO), 펄서, AGN, 블레이자, 행성상성운, 은하 활동성 등. 여기에 5개 독립 축이 더해진다. |
-| 출력 | `classified_objects.csv`: 천체당 한 행에 종류, 확신도, 세부 분류, 고신뢰 여부·근거, 근거 증거를 담는다. 단계별 CSV와 아카이브 상태 파일(`catalog_coverage.json`)도 함께 나온다. |
+| 출력 | `objects_summary.csv`(2.54.0): 먼저 읽을 열 26개만, 탐사에 검출된 독립 천체당 한 행. 큰 은하의 조각과 NED·SIMBAD에만 있는 항목(`literature_only_entries.csv`)은 따로 둔다. `classified_objects.csv`: 모든 단계의 열을 담은 전체 기록(천체당 한 행, 1,500–2,400열). 단계별 CSV와 아카이브 상태 파일(`catalog_coverage.json`)도 함께 나온다. |
 | 사용 방법 | 데스크톱 앱(Windows·macOS·Linux, 파이썬 설치 불필요) 또는 명령줄 `v2/pipeline.py` |
 | 원칙 | 모든 임계값·규칙은 문헌 근거를 코드 주석과 `LITERATURE*.md`에 남긴다. 정확도와 속도를 함께 측정한다. |
 
@@ -28,7 +28,8 @@
 ```
 (RA, Dec, 반경)
   │
-  ├─ 수집         28개 아카이브 병렬 조회 (요청마다 3–5초 간격, 수집기별 시간 제한, 로컬 캐시)
+  ├─ 수집         30개 수집기 병렬 조회 (요청마다 3–5초 간격, 수집기별 시간 제한, 로컬 캐시,
+  │               VizieR·SIMBAD 미러, PS1 VizieR 사본, 관측 범위 밖 탐사 건너뛰기)
   │               실패한 수집기는 기록된다
   ├─ 1 연관       같은 천체의 검출을 묶음 — 위치·관측 시기·오차·고유운동을 고려한 우도비
   ├─ 2 통합       천체당 한 행, 단위 통일 (AB 등급, mJy, 적색이동)
@@ -39,10 +40,10 @@
   └─ 후처리       큰 은하 조각, PS1 중복, 밝은 별 헤일로, 미확인 검출, 전파 성분, 은하단,
                   아카이브 경고, 고신뢰 판정
   ↓
-classified_objects.csv
+objects_summary.csv (요약) · literature_only_entries.csv · classified_objects.csv (전체)
 ```
 
-## 3. 사용하는 관측 자료 (28개 수집기)
+## 3. 사용하는 관측 자료 (30개 수집기)
 
 | 파장·종류 | 목록 | 주로 주는 정보 |
 |---|---|---|
@@ -57,6 +58,12 @@ classified_objects.csv
 | 문헌 데이터베이스 | SIMBAD, NED | 문헌 표지(낮은 가중치의 증거) |
 
 핵심 아카이브(Gaia, PS1, Legacy Surveys, AllWISE)가 조회에 실패하면 결과 표 위에 경고가 뜬다. 이때 측광만으로 판정하는 고신뢰 경로는 쓰지 않는다.
+
+아카이브 장애에 대한 대비(2.54.0):
+- **VizieR:** 공식 미러로 넘어간다. 미러가 빈 원뿔에 표 없이 답하면 같은 미러에 한 번 더 물어 확인한다. 응답하지 않는 미러는 뒤로 미룬다.
+- **SIMBAD:** Harvard 미러로 넘어간다.
+- **Pan-STARRS1:** MAST가 실패하면 VizieR의 DR2 사본을 쓴다.
+- **관측 범위 밖:** NVSS·VLASS(δ < −40°), TGSS(δ < −53°), eROSITA-DE(동쪽 은하 반구)는 조회하지 않는다.
 
 ## 4. 1차 분류 (STAR / GALAXY / QSO)
 
@@ -103,6 +110,23 @@ classified_objects.csv
 - **문헌 표지:** 분류되지 않은 천체도 SIMBAD/NED의 문헌 종류를 'from paper'로 보여 준다.
 
 ## 7. 성능
+
+### 현재 핵심 수치 (1차 분류 STAR / GALAXY / QSO)
+
+| 시험 | 판 | 결과 | 비교 기준 |
+|---|---|---|---|
+| **잠근 시험 세트 C** (60개 영역, 판마다 한 번·집계만, [`LOCKED_TEST_SET_C.md`](v2/benchmark/LOCKED_TEST_SET_C.md)) | 2.52.0 | **99.65 %** (99.40–99.86), 3,170개 | 전부 별 95.24 %; 같은 천체의 Gaia DSC 99.52 % (우리 99.81 %) |
+| 같은 세트 C, 첫 채점 | 2.51.0 | 99.62 % (99.34–99.86), 3,150개 | |
+| 사전확률 보정 시험 영역 (87개 영역 중 결과 보기 전에 정한 시험 영역, 13,857개) | 2.52.0 | **96.65 %** (2.51: 94.99 %), ECE 0.37 % | |
+| COSMOS 깊은 영역 (HST/ACS 정답, 28,194개) | 2.51.0 | 94.31 % | 전부 은하 91.09 % |
+| 하늘 전체 SDSS 분광 (처음 보는 9,999개, [`sdss_sky/`](v2/benchmark/sdss_sky/)) | 2.51.3 | 93.79 % (93.24–94.30); r > 21 88.0 %, QSO 재현율 84.1 % | |
+| SDSS / DESI 분광 벤치마크 시험 분할 | 2.52.0 | 97.99 % / 90.33 % | |
+
+- **밝은 하늘에서는 안정적이다.** 다만 세트 C는 별이 약 95 %인 표본이라 은하·QSO 성능은 이 값으로 알 수 없다.
+- **어두운 끝(r > 21)과 QSO가 약하다.**
+- 세부 분류는 대부분 목록 조회다(판정 출처 `CATALOG`). 측정에서 추론한 세부 종류는 일부뿐이다(아래 세부 분류 정확도).
+
+아래는 판마다의 측정 이력이다.
 
 ### 벤치마크 (시험 분할, 학습에 쓰지 않음)
 
@@ -183,7 +207,7 @@ classified_objects.csv
 | 기능 | 설명 |
 |---|---|
 | 검색 영역 | 천체 이름(Sesame) 또는 좌표 + 반경. 지도에서 더블클릭하면 그 위치를 중심으로 지정한다. |
-| 결과 표 | 정렬·필터(종류, 상태, 텍스트), 은하 부속 보기, **High confidence only** 필터 |
+| 결과 표 | 정렬·필터(종류, 상태, 텍스트), 은하 부속 보기, **Show literature-only**(NED·SIMBAD에만 있는 항목, 기본으로 숨김, 2.54.0), **High confidence only** 필터. 문헌 종류만 있는 천체는 P(class) 칸에 확률 대신 `literature`로 표시 |
 | 천체 상세 | 1차 확률 막대, 근거 증거, 세부 분류와 근거, 문헌 링크(ADS), Legacy Viewer·SIMBAD 열기, 고신뢰 근거(★) |
 | 하늘 지도 | 종류·세부 종류별 아이콘, 큰 은하 실제 타원, 확대·이동, 이름 표시, 고신뢰 천체 **금색 테두리** |
 | 경고 | 조회에 실패한 아카이브와 그 영향을 결과 표 위 노란 띠로 계속 표시 |
@@ -208,16 +232,16 @@ python v2/pipeline.py --ra 188.4155 --dec 9.1751 --radius 0.5 --work runs/ngc452
 python v2/pipeline.py --raw-dir v2/rawdata --work runs/ngc4522
 ```
 
-단계마다 `--work`에 CSV를 쓰고, `pipeline_summary.csv`에 단계별 시간을 기록한다.
+단계마다 `--work`에 CSV를 쓰고, `pipeline_summary.csv`에 단계별 시간을 기록한다. 결과는 `objects_summary.csv`(먼저 읽을 열만, 독립 천체당 한 행)부터 보면 된다. `classified_objects.csv`는 모든 단계의 열을 담은 전체 기록이다.
 
 ## 9. 코드 구성
 
 | 위치 | 역할 |
 |---|---|
-| `v2/Get_data/` | 28개 수집기, 병렬 실행·시간 제한(`controller.py`), 캐시, 요청 간격 |
+| `v2/Get_data/` | 30개 수집기, 병렬 실행·시간 제한(`controller.py`), 캐시, 요청 간격·미러(`throttle.py`), 관측 범위(`footprint.py`) |
 | `v2/Preprocess/` | 1–5단계(연관·통합·특징·증거·1차 분류), 규칙 표, 융합 가중치, `LITERATURE.md` |
 | `v2/Classifier/` | 세부 분류(`subclass.py`), 5개 축, 축별 보정, 고신뢰 기준표 |
-| `v2/*.py` | `pipeline.py`와 후처리 모듈(`host_groups`, `detection_quality`, `radio_sources`, `clusters`, `catalog_coverage`, `high_confidence`, `designations`) |
+| `v2/*.py` | `pipeline.py`와 후처리 모듈(`host_groups`, `detection_quality`, `radio_sources`, `clusters`, `catalog_coverage`, `high_confidence`, `designations`, `summary`) |
 | `v2/app/` | PySide6 앱, PyInstaller 패키징 |
 | `v2/benchmark/` | 정답 세트, 보존된 목록 특징, 평가·학습·독립 검증·실제 하늘 순도 스크립트 |
 | `.github/workflows/` | 자료 수집·검증(수동 실행), 앱 빌드·배포 |
@@ -225,7 +249,7 @@ python v2/pipeline.py --raw-dir v2/rawdata --work runs/ngc4522
 ## 10. 개발·검증 체계
 
 - **문헌 우선:** 규칙·임계값을 바꾸기 전에 근거를 조사하고 기록한다. 분류된 논문 목록은 [`v2/document/PAPERS.md`](v2/document/PAPERS.md)에 있다.
-- **시험:** pytest 112개(전처리·분류기·앱 통합). 벤치마크는 보존된 특징으로 네트워크 없이 재현한다.
+- **시험:** pytest 189개(전처리·분류기·앱 통합; 앱 시험에는 PySide6가 필요하다). 벤치마크는 보존된 특징으로 네트워크 없이 재현한다.
 - **자료가 필요한 검증:** GitHub Actions 워크플로로 실행하고 결과를 커밋으로 받는다.
 - **버전:** main에 병합할 때마다 `v2/VERSION`과 `v2/CHANGELOG.md`(변경·이유·측정치)를 올린다. 작업 보고서(`v2/WORK_REPORT_*.md`)에는 설계 이유와 버린 대안을 적는다.
 - **채택 기준:** 벤치마크·독립 정답에서 유의한 개선이 없으면 채택하지 않는다. 예: GALEX UV, u 대역, PS1 변광은 측정 후 기각했다.

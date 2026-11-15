@@ -73,14 +73,16 @@ OPTIONAL_COLUMNS = ["epochMean", "objInfoFlag", "qualityFlag"] + [
 ]
 
 
-# VizieR copy of the PS1 mean-object catalogue (II/349/ps1: Chambers et al.
-# 2016, arXiv:1612.05560; DR1, the same PV3 mean photometry the MAST DR2
-# MeanObject table serves, DR2 adding the epoch-level tables).  Used when the
-# MAST API fails (2.54.0): mean PSF and Kron magnitudes, flags, epoch and the
-# detection count; no aperture magnitudes, per-band counts or single-epoch
-# scatter (variability evidence is then absent).  Its rows carry
+# VizieR copy of the same PS1 DR2 MeanObject + ObjectThin tables (II/389/ps1_dr2,
+# built by CDS from MAST with nDetections > 2), used when the MAST API fails
+# (2.54.0).  Practical-use probe 2026-11-15 (COSMOS 2', a b = -2 field 1'):
+# every object it holds matches MAST by objID with the same PSF / Kron
+# magnitudes (|diff| < 1e-6 mag), nDetections, qualityFlag, objInfoFlag and
+# epochMean; the objects it lacks are those with nDetections = 2 (83 of 210
+# and 54 of 698 rows).  No aperture magnitudes.  The DR1 copy II/349 has the
+# same rows but DR1 flags and epochs, so it is not used.  Rows carry
 # ps1_query_status = vizier_fallback (cached one day, archive_cache.py).
-VIZIER_FALLBACK = "II/349/ps1"
+VIZIER_FALLBACK = "II/389/ps1_dr2"
 VIZIER_MAP = {
     "objID": ("objID",),
     "raMean": ("RAJ2000", "RAdeg"),
@@ -91,8 +93,11 @@ VIZIER_MAP = {
     "epochMean": ("Epoch",),
     "objInfoFlag": ("f_objID",),
     "qualityFlag": ("Qual",),
+    **{f"n{b}": (f"N{b}",) for b in "grizy"},
     **{f"{b}MeanPSFMag": (f"{b}mag",) for b in "grizy"},
     **{f"{b}MeanPSFMagErr": (f"e_{b}mag",) for b in "grizy"},
+    **{f"{b}MeanPSFMagStd": (f"{b}magStd",) for b in "grizy"},
+    **{f"{b}MeanPSFMagNpt": (f"o_{b}mag",) for b in "grizy"},
     **{f"{b}MeanKronMag": (f"{b}Kmag",) for b in "grizy"},
     **{f"{b}MeanKronMagErr": (f"e_{b}Kmag",) for b in "grizy"},
 }
