@@ -1,0 +1,43 @@
+name: v2 r-undetected sources vs COSMOS2020
+
+# 2.55.0 check (WORK_REPORT_2026-11-17.md): the faint z-only Legacy Surveys
+# sources are almost absent from the deep-field A/B truth, so they are matched
+# to COSMOS2020 SED types directly.  One COSMOS cone is collected once and
+# classified with the 2.54 behaviour and with the 2.55 defaults.
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/code-review-7ox8zn]
+    paths:
+      - .github/workflows/v2_r_undetected_cosmos.yml
+      - .github/scripts/r_undetected_cosmos.py
+
+permissions:
+  contents: read
+
+jobs:
+  cosmos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      RA: "150.1191"
+      DEC: "2.2058"
+      R: "6"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas numpy scipy requests astropy astroquery pyvo
+      - name: Collect
+        run: python -u v2/Get_data/controller.py --ra $RA --dec $DEC --radius $R --out-dir /tmp/raw --workers 6 2>&1 | grep -E "^\[[a-z_0-9]+\] (ok|empty|error|timeout)|Completed"
+      - name: Classify (2.54 behaviour, 2.55 defaults)
+        run: |
+          V2_LS_GBM_DOMAIN=observed V2_FAINT_PRIOR_UNDETECTED=off python -u v2/pipeline.py --raw-dir /tmp/raw --ra $RA --dec $DEC --radius $R --work /tmp/old | tail -2
+          python -u v2/pipeline.py --raw-dir /tmp/raw --ra $RA --dec $DEC --radius $R --work /tmp/new | tail -2
+      - name: Match the r-undetected sources to COSMOS2020
+        run: python -u .github/scripts/r_undetected_cosmos.py $RA $DEC $R /tmp/raw /tmp/old /tmp/new
+      - uses: actions/upload-artifact@v4
+        with:
+          name: r-undetected-cosmos
+          path: r_undetected_cosmos.csv
+          retention-days: 30
