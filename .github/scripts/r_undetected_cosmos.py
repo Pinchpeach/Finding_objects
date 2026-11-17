@@ -81,6 +81,22 @@ def main():
         acs = s.ACSmuClass.map({1: "ACS galaxy", 2: "ACS point", 3: "ACS spurious"}).fillna("no ACS")
         print("ACS class x SED type:")
         print(pd.crosstab(acs, sed[s.index]))
+    # Real sources or noise / shreds?  Nearest COSMOS2020 separation of the
+    # z-only sources against r-detected LS sources of the same z magnitude,
+    # and the chance rate from the COSMOS2020 density.
+    dens = len(c) / (np.pi * (radius * 60.0) ** 2)  # per arcsec^2
+    top = a[a.parent_object_id.isna()] if "parent_object_id" in a else a
+    num = lambda col: pd.to_numeric(top[col], errors="coerce")
+    zt = 22.5 - 2.5 * np.log10(num(LS + "flux_z").where(num(LS + "flux_z") > 0))
+    ctrl = top[(num(LS + "flux_r") > 0) & zt.between(22.25, 23.62)]
+    _, csep, _ = SkyCoord(ctrl.ra.to_numpy() * u.deg, ctrl.dec.to_numpy() * u.deg).match_to_catalog_sky(cc)
+    zonly = x[x.group == "faint z-only"]
+    print("\nNearest COSMOS2020 source (arcsec)    within 0.5\"  within 1\"   median sep")
+    for name, sp in (("faint z-only, r undetected", zonly.sep.to_numpy()), ("r-detected, same z range", csep.arcsec)):
+        print(f"  {name:28s} n={len(sp):5d}  {np.mean(sp <= 0.5):6.1%}      {np.mean(sp <= 1.0):6.1%}   {np.median(sp):5.2f}")
+    print(f"  chance (COSMOS2020 density {dens:.4f}/arcsec^2)        {1 - np.exp(-dens * np.pi * 0.25):6.1%}      {1 - np.exp(-dens * np.pi):6.1%}   {np.sqrt(np.log(2) / (np.pi * dens)):5.2f}")
+    for lab, s2 in zonly.groupby(LS + "type"):
+        print(f"  z-only {lab:4s} n={len(s2):4d} within 0.5\": {np.mean(s2.sep <= 0.5):6.1%}")
     x.reset_index()[["object_id", "ra", "dec", "group", LS + "type", "zmag", "primary_class", "new", "new_status", "lptype", "ACSmuClass", "ACSF814Wmag", "sep"]].to_csv(
         "r_undetected_cosmos.csv", index=False
     )
