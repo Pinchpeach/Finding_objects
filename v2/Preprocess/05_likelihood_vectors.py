@@ -200,6 +200,22 @@ def fuse(items, model=None):
 SUPPORT_ONLY_RULES = ("WISE-COLOR-001:",)
 
 
+def _strong_classes(items) -> set:
+    """Classes claimed by strong (score >= 0.8) non-soft evidence, as the conflict test of run()."""
+    strong = set()
+    for e in items:
+        c = e.get("class")
+        if c in {"WD", "BINARY"}:
+            c = "STAR"
+        try:
+            s = float(e.get("score", 0))
+        except (TypeError, ValueError):
+            s = 0
+        if c in CLASSES and s >= 0.8 and not str(e.get("rule_id", "")).endswith(("-CKNN-001", "-GBM-001")):
+            strong.add(c)
+    return strong
+
+
 def literature_only(item_lists, basis) -> np.ndarray:
     """Objects whose evidence is only NED / SIMBAD types and whose label came
     from the fused evidence (not from a measurement rule such as the 2MASS
@@ -807,7 +823,17 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
         for j, i in enumerate(cat_rows):
             o = np.argsort(-Qm[j])
             c, m = float(Qm[j][o[0]]), float(Qm[j][o[0]] - Qm[j][o[1]])
-            without_catalog[i] = CLASSES[o[0]] if fm[j][1] > 0 and c >= min_conf and m >= min_margin else "UNKNOWN"
+            top_m = CLASSES[o[0]]
+            # the evidence-decision gates of the loop above, on the measurements alone
+            strong = _strong_classes(meas[j])
+            gated = (
+                fm[j][1] == 0
+                or (len(strong) > 1 and (not model or c < CONFLICT_RESOLVED_P))
+                or c < min_conf
+                or m < min_margin
+                or (top_m == "QSO" and (c < qso_min[i] or faint[i]))
+            )
+            without_catalog[i] = "UNKNOWN" if gated else top_m
     literature = literature_only(item_lists, basis)
     for i in np.flatnonzero(literature):
         if labels[i] in CLASSES:

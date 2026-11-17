@@ -53,7 +53,7 @@
   - **SIMBAD:** Harvard 미러로 넘어갑니다.
   - **Pan-STARRS1:** VizieR의 DR2 사본(II/389, 검출 3회 이상)으로 넘어갑니다. 값은 MAST와 같습니다.
   - **ATNF 펄서 (2.55.0):** HEASARC에 30초만 기다리고, 그 뒤에는 VizieR 사본(B/psr)을 씁니다. 하류는 이름과 위치만 씁니다.
-  - **최근 실패 기억 (2.55.0):** 핵심이 아닌 수집기가 실패하면 10분간 기억합니다(`V2_FAILURE_MEMORY_S`). 그 사이 새 검색은 그 수집기를 기다리지 않고 실패로 기록하며, 경고는 그대로 뜹니다. 핵심 수집기(Gaia, LS, PS1, AllWISE, 2MASS)는 늘 다시 묻습니다.
+  - **최근 실패 기억 (2.55.0):** 핵심이 아닌 수집기가 실패하면 10분간 기억합니다(`V2_FAILURE_MEMORY_S`). 그 사이 새 검색은 그 수집기를 기다리지 않고 실패로 기록하며, 경고는 그대로 뜹니다. 핵심 수집기(Gaia, LS, PS1, AllWISE, 2MASS)는 늘 다시 묻습니다. 최근 실패한 Legacy Surveys만 시도 1회(90초)로 줄입니다. 내부 대체 경로가 있는 Gaia·PS1은 줄이지 않습니다.
   - **관측 범위 밖:** 문헌에 경계가 명시된 탐사는 범위에서 1° 넘게 벗어난 영역을 조회하지 않습니다(NVSS·VLASS δ ≥ −40°, TGSS δ ≥ −53°, eRASS1-DE 179.94° < l < 359.94°).
 
 ## 2. 위치 연관 (`Preprocess/01_source_association.py`, `association_model.py`)
@@ -253,7 +253,7 @@ SIMBAD 유형은 SIMBAD `otypedef` 계층(`Classifier/reference/simbad_otypedef.
   - 예외는 독립 천체로 남깁니다: 유의한 운동(전경 별), 다른 적색편이(배경), 초신성.
 - **이름**: SIMBAD → NED → 주요 카탈로그 순서로 사람이 읽는 이름을 붙입니다. 같은 이름이면 구분 표시를 답니다.
 
-- **LS z 전용 검출 (2.55.0, `detection_quality.flag_ls_z_only`):** LS에만 있고 r을 측정했는데 검출되지 않은(flux_r ≤ 0, flux_ivar_r > 0) z ≥ 20 최상위 천체는 `UNKNOWN`/`UNCONFIRMED`로 둡니다.
+- **LS z 전용 검출 (2.55.0, `detection_quality.flag_ls_z_only`):** LS에만 있고 r을 측정했는데 검출되지 않았으며(flux_r ≤ 0, flux_ivar_r > 0) g·i에서도 S/N 3 미만인 z ≥ 20 최상위 천체는 `UNKNOWN`/`UNCONFIRMED`로 둡니다.
   - COSMOS 중심 6′에서 이런 천체 244개 중 9.0 %만 0.5″ 안에 COSMOS2020 천체가 있습니다. 우연 일치는 3.5 %이고, 같은 z의 r 검출 천체는 83.8 %입니다.
   - 그래서 대부분 잡음이나 다른 천체의 조각으로 봅니다. 2.54까지는 이들을 STAR로 냈습니다.
 

@@ -70,17 +70,20 @@ def test_ls_z_only_detection_is_unconfirmed():
     P = DQ.LS_P
     out = pd.DataFrame(
         {
-            "object_id": ["A", "B", "C", "D"],
-            "catalogs": [DQ.LS, "AllWISE|" + DQ.LS, DQ.LS + "|NED", DQ.LS],
-            "primary_class": ["STAR"] * 4,
-            "classification_status": ["CLASSIFIED"] * 4,
-            P + "flux_r": [-0.02, -0.02, -0.01, 0.5],
-            P + "flux_ivar_r": [300.0] * 4,
-            P + "flux_z": [0.8, 0.8, 0.5, 0.8],  # z = 22.7, 22.7, 23.3, 22.7
-            "parent_object_id": [None] * 4,
+            "object_id": ["A", "B", "C", "D", "E"],
+            "catalogs": [DQ.LS, "AllWISE|" + DQ.LS, DQ.LS + "|NED", DQ.LS, DQ.LS],
+            "primary_class": ["STAR"] * 5,
+            "classification_status": ["CLASSIFIED"] * 5,
+            P + "flux_r": [-0.02, -0.02, -0.01, 0.5, -0.02],
+            P + "flux_ivar_r": [300.0] * 5,
+            P + "flux_z": [0.8, 0.8, 0.5, 0.8, 0.8],  # z = 22.7, 22.7, 23.3, 22.7, 22.7
+            P + "flux_g": [0.01, 0.01, 0.0, 0.3, 0.5],  # E: g S/N = 0.5 x 20 = 10
+            P + "flux_ivar_g": [400.0] * 5,
+            "parent_object_id": [None] * 5,
         }
     )
     r = DQ.apply(out).set_index("object_id")
     assert r.loc["A", "primary_class"] == "UNKNOWN" and r.loc["A", "classification_status"] == "UNCONFIRMED"
     assert r.loc["C", "classification_status"] == "UNCONFIRMED"  # a literature entry is no detection
     assert r.loc["B", "primary_class"] == "STAR" and r.loc["D", "primary_class"] == "STAR"
+    assert r.loc["E", "primary_class"] == "STAR"  # detected in g: not z only (PR #71 review)

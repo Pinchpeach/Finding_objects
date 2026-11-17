@@ -90,11 +90,23 @@ def test_collector_budget_is_per_collector(monkeypatch):
     assert out[0]["status"] == "timeout" and time.monotonic() - t0 < 5
 
 
-def test_core_collector_after_a_failure_gets_a_short_budget(tmp_path, monkeypatch):
+def test_core_collector_after_a_failure_gets_its_retry_budget(tmp_path, monkeypatch):
     monkeypatch.setenv("V2_CACHE_DIR", str(tmp_path / "cache"))
-    monkeypatch.setattr(controller, "_load_collector", lambda name: _fake([]))
+    ls = _fake([])
+    ls.RETRY_BUDGET_S = 90.0
+    mods = {"desi_legacy": ls, "panstarrs1": _fake([])}
+    monkeypatch.setattr(controller, "_load_collector", lambda name: mods[name])
     assert controller._budget("desi_legacy", 300.0) == 300.0
-    archive_cache.note_outcome("desi_legacy", "timeout", "Data Lab TAP exceeded 80 s")
-    assert controller._budget("desi_legacy", 300.0) == controller.CORE_RETRY_BUDGET_S
+    for n in mods:
+        archive_cache.note_outcome(n, "timeout", "x")
+    assert controller._budget("desi_legacy", 300.0) == 90.0
+    # no RETRY_BUDGET_S (an internal fallback needs the full budget): unchanged
+    assert controller._budget("panstarrs1", 300.0) == 300.0
     archive_cache.note_outcome("desi_legacy", "ok")
     assert controller._budget("desi_legacy", 300.0) == 300.0
+
+
+def test_only_ls_declares_a_retry_budget():
+    assert controller._load_collector("desi_legacy").RETRY_BUDGET_S == 90.0
+    for n in ("gaia_dr3", "panstarrs1"):
+        assert not hasattr(controller._load_collector(n), "RETRY_BUDGET_S")

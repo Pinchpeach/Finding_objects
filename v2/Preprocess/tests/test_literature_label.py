@@ -118,3 +118,35 @@ def test_ls_gbm_domain():
     assert G.in_domain(d, which="observed").tolist() == [True, True, True]
     assert G.in_domain(d, which="detected").tolist() == [True, False, True]
     assert G.in_domain(d, which="snr3").tolist() == [True, False, False]  # r S/N = 0.5
+
+
+def test_class_without_catalogue_applies_the_conflict_gate(tmp_path):
+    """PR #71 review: strong measurements for two classes, resolved only with the
+    catalogue label, are UNKNOWN without it (so the class is a CATALOG lookup)."""
+    s5 = _stage5()
+    spec = {
+        "rule_id": "SPC-SDSS-001",
+        "class": "GALAXY",
+        "score": 0.99,
+        "raw_score": 0.99,
+        "kind": "catalog_label",
+        "reliability": 1.0,
+        "association_reliability": 1.0,
+        "origin": "CATALOG",
+    }
+    st = {"rule_id": "LS-MORPH-001", "class": "STAR", "score": 0.9, "raw_score": 0.9, "kind": "morphology"}
+    ga = {"rule_id": "PS1-MORPH-001", "class": "GALAXY", "score": 0.9, "raw_score": 0.9, "kind": "morphology"}
+    d = pd.DataFrame(
+        {
+            "object_id": ["X"],
+            "ra": [150.1],
+            "dec": [2.2],
+            "catalogs": ["SDSS DR18 spectroscopy|DESI Legacy Surveys DR10"],
+            "evidence_json": [json.dumps([spec, st, ga])],
+        }
+    )
+    d.to_csv(tmp_path / "e.csv", index=False)
+    s5.run(tmp_path / "e.csv", tmp_path / "o.csv")
+    o = pd.read_csv(tmp_path / "o.csv").iloc[0]
+    assert o.primary_without_catalog == "UNKNOWN"
+    assert s5._strong_classes([st, ga]) == {"STAR", "GALAXY"}

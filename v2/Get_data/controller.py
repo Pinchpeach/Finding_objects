@@ -105,11 +105,13 @@ COLLECTOR_BUDGET_S = 300.0
 # gate): never skipped for a recent failure, since a re-run right after an
 # outage is how a user recovers them (archive_cache.recent_failure).
 CORE = ("gaia_dr3", "desi_legacy", "panstarrs1", "allwise", "twomass")
-# A core collector that failed a moment ago is asked again, but waited for
-# only CORE_RETRY_BUDGET_S: with the Legacy Surveys TAP down (2026-11-17) its
-# three 80 s attempts made every re-run wait 246-300 s, while a healthy LS
-# cone takes 11-16 s (practical-use probes), so a recovery is still caught.
-CORE_RETRY_BUDGET_S = 90.0
+# A core collector that failed a moment ago is asked again; one that declares
+# RETRY_BUDGET_S is then waited for only that long.  Only collectors without an
+# internal fallback declare it: Gaia (ESA TAP, then VizieR) and Pan-STARRS1
+# (MAST, then VizieR) need their full budget to reach the fallback (PR #71
+# review).  Legacy Surveys: with the Data Lab TAP down (2026-11-17) its three
+# 80 s attempts made every re-run wait 246-300 s, while a healthy LS cone
+# takes 5-16 s, so one attempt (90 s) still catches a recovery.
 
 
 def _budget(name: str, default: float) -> float:
@@ -118,7 +120,12 @@ def _budget(name: str, default: float) -> float:
     except Exception:
         b = default
     if name in CORE and archive_cache.recent_failure(name):
-        b = min(b, CORE_RETRY_BUDGET_S)
+        try:
+            retry = getattr(_load_collector(name), "RETRY_BUDGET_S", None)
+        except Exception:
+            retry = None
+        if retry is not None:
+            b = min(b, float(retry))
     return b
 
 

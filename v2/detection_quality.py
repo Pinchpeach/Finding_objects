@@ -91,6 +91,9 @@ def flag(out: pd.DataFrame) -> pd.Series:
 # STAR.  Such a row is UNKNOWN / UNCONFIRMED.
 LS_P = "desi_legacy_surveys_dr10__"
 Z_ONLY_MIN_MAG = 20.0
+# Detected in another LS band = S/N >= OTHER_BAND_SNR there (g, and i where
+# DR10 has it): such a source is not "z only" and keeps its class.
+OTHER_BAND_SNR = 3.0
 
 
 def flag_ls_z_only(out: pd.DataFrame) -> pd.Series:
@@ -103,11 +106,16 @@ def flag_ls_z_only(out: pd.DataFrame) -> pd.Series:
     fz = num(LS_P + "flux_z")
     with np.errstate(divide="ignore", invalid="ignore"):
         zmag = 22.5 - 2.5 * np.log10(fz.where(fz > 0))
+    other = pd.Series(False, index=out.index)
+    for b in ("g", "i"):
+        f, iv = num(LS_P + f"flux_{b}"), num(LS_P + f"flux_ivar_{b}")
+        other |= (f * np.sqrt(iv.where(iv > 0))).ge(OTHER_BAND_SNR)
     res = (
         cats.map(lambda c: c == frozenset({LS}))
         & num(LS_P + "flux_r").le(0)
         & num(LS_P + "flux_ivar_r").gt(0)
         & zmag.ge(Z_ONLY_MIN_MAG)
+        & ~other
     )
     if "parent_object_id" in out:  # a part of a galaxy is already grouped under it
         res &= out.parent_object_id.isna()
