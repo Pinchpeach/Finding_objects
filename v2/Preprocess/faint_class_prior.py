@@ -65,8 +65,16 @@ R_MIN = 20.0
 # r_3sigma = 22.5 - 2.5 log10(3 / sqrt(flux_ivar_r)) (observed AB, the same
 # system as std_mag__ls_r and the COSMOS table).  V2_FAINT_PRIOR_UNDETECTED:
 # limit (default) or off (2.54 and earlier).
+# Only faint z-only sources: an r flux <= 0 on a source seen by Gaia or in
+# another survey's r band, or bright in z, is a failed r measurement
+# (saturation, masking, blending), not faintness.  In the 400 stored set A/B
+# products 1,010 of the 17,827 observed-but-undetected r sources have a Gaia G
+# (median 18.6) and 883 have z < 18; 6 of the 8 with spectroscopic truth are
+# such stars (APOGEE / LAMOST).  15,104 are fainter than z = 22.
 LS = "desi_legacy_surveys_dr10__"
 UNDETECTED_SIGMA = 3.0
+UNDETECTED_Z_MIN = 20.0
+OTHER_BRIGHT = ("gaia_dr3__phot_g_mean_mag", "std_mag__ps1_r", "std_mag__sdss_r")
 
 
 def undetected_mode() -> str:
@@ -84,10 +92,16 @@ def r_magnitude(df: pd.DataFrame) -> np.ndarray:
     r = num(R_COLUMN)
     if undetected_mode() == "off":
         return r
-    f, iv = num(LS + "flux_r"), num(LS + "flux_ivar_r")
+    f, iv, fz = num(LS + "flux_r"), num(LS + "flux_ivar_r"), num(LS + "flux_z")
     with np.errstate(divide="ignore", invalid="ignore"):
         lim = 22.5 - 2.5 * np.log10(UNDETECTED_SIGMA / np.sqrt(np.where(iv > 0, iv, np.nan)))
-    undetected = ~np.isfinite(r) & np.isfinite(f) & (f <= 0) & np.isfinite(lim)
+        zmag = np.where(fz > 0, 22.5 - 2.5 * np.log10(fz), np.nan)
+    seen_elsewhere = np.zeros(n, dtype=bool)
+    for c in OTHER_BRIGHT:
+        seen_elsewhere |= np.isfinite(num(c))
+    undetected = (
+        ~np.isfinite(r) & np.isfinite(f) & (f <= 0) & np.isfinite(lim) & (zmag >= UNDETECTED_Z_MIN) & ~seen_elsewhere
+    )
     return np.where(undetected, lim, r)
 
 

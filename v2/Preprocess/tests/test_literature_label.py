@@ -102,3 +102,19 @@ def test_class_without_catalogue_labels(tmp_path):
     assert provenance.of_primary("GALAXY", o.loc["BOTH", "evidence_json"], "GALAXY") == "INFERRED"
     assert provenance.of_primary("GALAXY", o.loc["ONLYCAT", "evidence_json"], "UNKNOWN") == "CATALOG"
     assert provenance.of_primary("GALAXY", o.loc["BOTH", "evidence_json"]) == "CATALOG"  # older results
+
+
+def test_ls_gbm_domain():
+    """2.55.0: LS-GBM gives evidence only where r and z are detected."""
+    import importlib.util as iu
+
+    spec = iu.spec_from_file_location("lsgbm_dom", P / "ls_gbm.py")
+    G = iu.module_from_spec(spec)
+    spec.loader.exec_module(G)
+    L = G.P
+    d = pd.DataFrame({L + f"flux_ivar_{b}": [100.0] * 3 for b in "grz"})
+    d[L + "flux_r"] = [1.0, -0.1, 0.05]
+    d[L + "flux_z"] = [2.0, 0.8, 1.0]
+    assert G.in_domain(d, which="observed").tolist() == [True, True, True]
+    assert G.in_domain(d, which="detected").tolist() == [True, False, True]
+    assert G.in_domain(d, which="snr3").tolist() == [True, False, False]  # r S/N = 0.5
