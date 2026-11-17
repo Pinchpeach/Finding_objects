@@ -88,3 +88,13 @@ def test_collector_budget_is_per_collector(monkeypatch):
     t0 = time.monotonic()
     out = controller._run_bounded(job, ["slow"], 1, {"slow": 0.3})
     assert out[0]["status"] == "timeout" and time.monotonic() - t0 < 5
+
+
+def test_core_collector_after_a_failure_gets_a_short_budget(tmp_path, monkeypatch):
+    monkeypatch.setenv("V2_CACHE_DIR", str(tmp_path / "cache"))
+    monkeypatch.setattr(controller, "_load_collector", lambda name: _fake([]))
+    assert controller._budget("desi_legacy", 300.0) == 300.0
+    archive_cache.note_outcome("desi_legacy", "timeout", "Data Lab TAP exceeded 80 s")
+    assert controller._budget("desi_legacy", 300.0) == controller.CORE_RETRY_BUDGET_S
+    archive_cache.note_outcome("desi_legacy", "ok")
+    assert controller._budget("desi_legacy", 300.0) == 300.0

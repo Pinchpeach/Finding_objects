@@ -105,13 +105,21 @@ COLLECTOR_BUDGET_S = 300.0
 # gate): never skipped for a recent failure, since a re-run right after an
 # outage is how a user recovers them (archive_cache.recent_failure).
 CORE = ("gaia_dr3", "desi_legacy", "panstarrs1", "allwise", "twomass")
+# A core collector that failed a moment ago is asked again, but waited for
+# only CORE_RETRY_BUDGET_S: with the Legacy Surveys TAP down (2026-11-17) its
+# three 80 s attempts made every re-run wait 246-300 s, while a healthy LS
+# cone takes 11-16 s (practical-use probes), so a recovery is still caught.
+CORE_RETRY_BUDGET_S = 90.0
 
 
 def _budget(name: str, default: float) -> float:
     try:
-        return min(default, float(getattr(_load_collector(name), "BUDGET_S", default)))
+        b = min(default, float(getattr(_load_collector(name), "BUDGET_S", default)))
     except Exception:
-        return default
+        b = default
+    if name in CORE and archive_cache.recent_failure(name):
+        b = min(b, CORE_RETRY_BUDGET_S)
+    return b
 
 
 def _collect_one(

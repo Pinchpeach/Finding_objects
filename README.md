@@ -17,7 +17,7 @@
 | 목적 | 하늘의 한 영역(중심 좌표 + 반경)에 있는 모든 천체를 찾고, 전파부터 X선까지의 공개 목록을 종합해 종류를 판정한다. |
 | 입력 | 천체 이름 또는 좌표(RA, Dec)와 반경. 또는 이미 모아 둔 목록 파일 폴더. |
 | 1차 분류 | `STAR` · `GALAXY` · `QSO` · `UNKNOWN`. 증거가 부족하면 이유와 함께 `UNKNOWN`으로 기권한다. 실제로 판정을 정하는 것은 광학 색·형태, Gaia 천체측정·DSC, WISE 중적외선이다. X선·전파는 세부 분류와 표지에 쓴다(2.51.0 파장대 끄기 시험). |
-| 판정 출처 | 판정마다 `CATALOG`(목록에서 옮김) / `EXTERNAL_CLASSIFIER`(다른 탐사의 분류기) / `INFERRED`(측정에서 추론)를 표시한다(2.51.0). NED·SIMBAD 문헌 종류만 있고 측정이 없는 천체는 확률 없이 `LITERATURE_LABEL`로 둔다(2.54.0). |
+| 판정 출처 | 판정마다 `CATALOG`(목록에서 옮김) / `EXTERNAL_CLASSIFIER`(다른 탐사의 분류기) / `INFERRED`(측정에서 추론)를 표시한다(2.51.0). 1차 클래스는 목록 표지를 빼도 측정만으로 같은 클래스가 나오면 `INFERRED`다(2.55.0). NED·SIMBAD 문헌 종류만 있고 측정이 없는 천체는 확률 없이 `LITERATURE_LABEL`로 둔다(2.54.0). |
 | 세부 분류 | 분광형, 백색왜성, 뜨거운 준왜성, 초저온 왜성, 적색거성·AGB(탄소/산소), 변광성(미라·세페이드·RR Lyrae·YSO), 펄서, AGN, 블레이자, 행성상성운, 은하 활동성 등. 여기에 5개 독립 축이 더해진다. |
 | 출력 | `objects_summary.csv`(2.54.0): 먼저 읽을 열 26개만, 탐사에 검출된 독립 천체당 한 행. 큰 은하의 조각과 NED·SIMBAD에만 있는 항목(`literature_only_entries.csv`)은 따로 둔다. `classified_objects.csv`: 모든 단계의 열을 담은 전체 기록(천체당 한 행, 1,500–2,400열). 단계별 CSV와 아카이브 상태 파일(`catalog_coverage.json`)도 함께 나온다. |
 | 사용 방법 | 데스크톱 앱(Windows·macOS·Linux, 파이썬 설치 불필요) 또는 명령줄 `v2/pipeline.py` |
@@ -63,6 +63,8 @@ objects_summary.csv (요약) · literature_only_entries.csv · classified_object
 - **VizieR:** 공식 미러로 넘어간다. 미러가 빈 원뿔에 표 없이 답하면 같은 미러에 한 번 더 물어 확인한다. 응답하지 않는 미러는 뒤로 미룬다.
 - **SIMBAD:** Harvard 미러로 넘어간다.
 - **Pan-STARRS1:** MAST가 실패하면 VizieR의 DR2 사본을 쓴다.
+- **ATNF 펄서 (2.55.0):** HEASARC가 30초 안에 답하지 않으면 VizieR 사본(B/psr)을 쓴다.
+- **최근 실패 기억 (2.55.0):** 핵심이 아닌 수집기가 실패하면 10분 동안은 다시 기다리지 않는다(경고는 그대로 표시).
 - **관측 범위 밖:** NVSS·VLASS(δ < −40°), TGSS(δ < −53°), eROSITA-DE(동쪽 은하 반구)는 조회하지 않는다.
 
 ## 4. 1차 분류 (STAR / GALAXY / QSO)
