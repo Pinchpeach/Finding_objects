@@ -54,6 +54,39 @@ def source() -> str:
     return v
 R_COLUMN = "std_mag__ls_r"
 R_MIN = 20.0
+# r non-detections (2.55.0).  A Legacy Surveys source detected in another band
+# whose r flux was measured (flux_ivar_r > 0) but is not positive has no
+# std_mag__ls_r, so the prior skipped it, and the faint z-only sources were
+# left to the evidence alone (labelled STAR; ls_gbm.py).  Its true r is
+# fainter than the 3-sigma limit with probability > 99.8 % for Gaussian flux
+# errors around a non-positive measurement, so the prior is read at
+# r_3sigma = 22.5 - 2.5 log10(3 / sqrt(flux_ivar_r)) (observed AB, the same
+# system as std_mag__ls_r and the COSMOS table).  V2_FAINT_PRIOR_UNDETECTED:
+# limit (default) or off (2.54 and earlier).
+LS = "desi_legacy_surveys_dr10__"
+UNDETECTED_SIGMA = 3.0
+
+
+def undetected_mode() -> str:
+    v = os.environ.get("V2_FAINT_PRIOR_UNDETECTED", "limit").strip().lower() or "limit"
+    if v not in ("limit", "off"):
+        raise ValueError(f"V2_FAINT_PRIOR_UNDETECTED={v!r}; known: limit, off")
+    return v
+
+
+def r_magnitude(df: pd.DataFrame) -> np.ndarray:
+    """LS r for the prior: the measured magnitude, or for an r non-detection
+    the 3-sigma upper-limit magnitude (NaN where r was not observed)."""
+    n = len(df)
+    num = lambda c: pd.to_numeric(df[c], errors="coerce").to_numpy(float) if c in df else np.full(n, np.nan)
+    r = num(R_COLUMN)
+    if undetected_mode() == "off":
+        return r
+    f, iv = num(LS + "flux_r"), num(LS + "flux_ivar_r")
+    with np.errstate(divide="ignore", invalid="ignore"):
+        lim = 22.5 - 2.5 * np.log10(UNDETECTED_SIGMA / np.sqrt(np.where(iv > 0, iv, np.nan)))
+    undetected = ~np.isfinite(r) & np.isfinite(f) & (f <= 0) & np.isfinite(lim)
+    return np.where(undetected, lim, r)
 R_EDGES = np.arange(16, 25.5, 0.5)
 B_EDGES = np.array([0, 20, 40, 60, 91])
 MIN_P = 0.5
@@ -87,7 +120,7 @@ def load_cosmos(path: str | Path = TABLE_COSMOS) -> pd.DataFrame:
 
 def cosmos_factors(df: pd.DataFrame, table: pd.DataFrame | None = None) -> np.ndarray:
     table = load_cosmos() if table is None else table
-    r = pd.to_numeric(df[R_COLUMN], errors="coerce").to_numpy(float) if R_COLUMN in df else np.full(len(df), np.nan)
+    r = r_magnitude(df)
     out = np.full((len(df), 2), np.nan)
     lo = table.r_lo.to_numpy(float)
     use = np.flatnonzero(np.isfinite(r) & (r >= max(R_MIN, lo[0])))
@@ -104,7 +137,7 @@ def star_galaxy_factors(df: pd.DataFrame, table: pd.DataFrame | None = None, whi
     if which == "cosmos":
         return cosmos_factors(df, table)
     table = load_table() if table is None else table
-    r = pd.to_numeric(df[R_COLUMN], errors="coerce").to_numpy(float) if R_COLUMN in df else np.full(len(df), np.nan)
+    r = r_magnitude(df)
     rb = np.digitize(r, R_EDGES)
     bb = np.digitize(abs_b(df), B_EDGES)
     out = np.full((len(df), 2), np.nan)
