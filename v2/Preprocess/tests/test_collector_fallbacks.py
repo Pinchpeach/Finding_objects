@@ -8,6 +8,7 @@ import pandas as pd
 GET = Path(__file__).resolve().parents[2] / "Get_data"
 sys.path.insert(0, str(GET))
 import _catalog_utils  # noqa: E402
+import atnf_pulsar  # noqa: E402
 import panstarrs1  # noqa: E402
 import simbad  # noqa: E402
 
@@ -91,3 +92,29 @@ def test_simbad_falls_back_to_the_harvard_mirror(monkeypatch):
     assert tried == ["simbad.cds.unistra.fr", "simbad.harvard.edu"]
     assert d.object_name.tolist() == ["NGC 4522"] and d.simbad_server.iloc[0] == "simbad.harvard.edu"
     assert d.simbad_reference_query_status.iloc[0].startswith("error")  # references failed: not cached
+
+
+def test_atnf_uses_the_vizier_copy_when_heasarc_fails(monkeypatch):
+    def overloaded(*a, **k):
+        raise RuntimeError("DALQueryError: System overloaded. Please try again later.")
+
+    v = pd.DataFrame(
+        {"PSRJ": ["J1234+0901", "J1235+0902"], "_RAJ2000": [188.5, 188.75], "_DEJ2000": [9.02, 9.03], "P0": [0.5, 1.2]}
+    )
+    monkeypatch.setattr(atnf_pulsar, "_fetch_heasarc", overloaded)
+    monkeypatch.setattr(_catalog_utils, "vizier_cone", lambda cat, *a, **k: v if cat == "B/psr/psr" else None)
+    d = atnf_pulsar.fetch(188.5, 9.0, 2.0)
+    assert d.catalog.unique().tolist() == [atnf_pulsar.CATALOG]  # the same catalogue for Stage 1 and the compact axis
+    assert d.catalog_object_id.tolist() == ["J1234+0901", "J1235+0902"] and d.ra.tolist() == [188.5, 188.75]
+    assert set(d.atnf_query_status) == {"vizier_fallback"}
+
+
+def test_atnf_slow_heasarc_is_abandoned(monkeypatch):
+    import time as _t
+
+    monkeypatch.setattr(atnf_pulsar, "HEASARC_BUDGET_S", 0.2)
+    monkeypatch.setattr(atnf_pulsar, "_fetch_heasarc", lambda *a: _t.sleep(5))
+    monkeypatch.setattr(_catalog_utils, "vizier_cone", lambda *a, **k: None)
+    t0 = _t.monotonic()
+    d = atnf_pulsar.fetch(188.5, 9.0, 2.0)
+    assert d.empty and _t.monotonic() - t0 < 2

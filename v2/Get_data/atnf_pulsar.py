@@ -28,7 +28,61 @@ def _pick(df: pd.DataFrame, names):
     return None
 
 
+# HEASARC first, then the VizieR copy of the same catalogue (2.55.0).  In the
+# 2.54.0 re-evaluation the HEASARC TAP failed every search after 66-146 s, and
+# on 2026-11-17 it answered "System overloaded" after 66 s (archive health);
+# a re-run waited for it again.  Healthy HEASARC answers a cone in 5-7 s, so it gets
+# HEASARC_BUDGET_S; then VizieR B/psr (ATNF Pulsar Catalogue, Manchester et
+# al. 2005, AJ 129, 1993, kept current by CDS) gives the same pulsar names and
+# positions, which is all the pipeline uses (axes/compact.py: catalogue match).
+HEASARC_BUDGET_S = 30.0
+VIZIER_FALLBACK = "B/psr/psr"
+
+
 def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
+    import threading
+
+    box = {}
+
+    def heasarc():
+        try:
+            box["df"] = _fetch_heasarc(ra, dec, radius_arcmin)
+        except BaseException as exc:
+            box["error"] = exc
+
+    t = threading.Thread(target=heasarc, daemon=True)
+    t.start()
+    t.join(HEASARC_BUDGET_S)
+    if "df" in box:
+        return box["df"]
+    why = repr(box["error"])[:160] if "error" in box else f"no answer in {HEASARC_BUDGET_S:.0f} s"
+    print(f"[atnf_pulsar] HEASARC failed ({why}); VizieR {VIZIER_FALLBACK} instead", flush=True)
+    return _fetch_vizier(ra, dec, radius_arcmin)
+
+
+def _fetch_vizier(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
+    from _catalog_utils import coordinates, vizier_cone
+
+    v = vizier_cone(VIZIER_FALLBACK, ra, dec, radius_arcmin, ["**", "_RAJ2000", "_DEJ2000"])
+    if v is None or v.empty:
+        return pd.DataFrame(columns=["catalog", "catalog_object_id", "object_name", "ra", "dec", "atnf_query_status"])
+    name_col = _pick(v, ["PSRJ", "JName", "PSRB", "Name"])
+    if name_col is None:
+        raise KeyError(f"ATNF (VizieR) name column missing; got {list(v.columns)[:20]}")
+    r, d = coordinates(v, ["_RAJ2000", "RAJ2000", "RAdeg"], ["_DEJ2000", "DEJ2000", "DEdeg"])
+    out = v.copy()
+    out.insert(0, "catalog", CATALOG)
+    names = out[name_col].astype("string").str.strip()
+    out.insert(1, "catalog_object_id", names)
+    out.insert(2, "object_name", names)
+    out.insert(3, "ra", pd.to_numeric(pd.Series(r, index=out.index), errors="coerce"))
+    out.insert(4, "dec", pd.to_numeric(pd.Series(d, index=out.index), errors="coerce"))
+    out["atnf_query_status"] = "vizier_fallback"  # cached one day (archive_cache.FALLBACK_STATUS)
+    out = out.dropna(subset=["ra", "dec"])
+    return out.drop_duplicates("catalog_object_id", keep="last").reset_index(drop=True)
+
+
+def _fetch_heasarc(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     from astroquery.heasarc import Heasarc
     from astropy.coordinates import SkyCoord
     import astropy.units as u

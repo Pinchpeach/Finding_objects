@@ -93,3 +93,30 @@ def test_stage5_unified_layer_puts_the_faint_prior_into_p(tmp_path, monkeypatch)
     assert u.prior_layer == "unified" and out["legacy"].prior_layer == "legacy"
     assert u.p_galaxy > out["legacy"].p_galaxy  # the faint counts entered p_*
     assert np.isclose(u.p_qso, out["legacy"].p_qso)  # QSO share unchanged
+
+
+def test_faint_prior_at_the_r_limit_only_for_faint_z_only_sources(monkeypatch):
+    """2.55.0: r observed but not detected -> the prior is read at the r
+    3-sigma limit, but not for a source seen by Gaia / another r, or bright in z."""
+    spec = importlib.util.spec_from_file_location("fcp_limit", P / "faint_class_prior.py")
+    F = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(F)
+    L = F.LS
+    d = pd.DataFrame(
+        {
+            L + "flux_r": [-0.05, -0.05, -0.05, 5.0],
+            L + "flux_ivar_r": [400.0, 400.0, 400.0, 400.0],
+            L + "flux_z": [0.6, 0.6, 200.0, 2.0],  # z = 23.1, 23.1, 16.7, 21.7
+            "gaia_dr3__phot_g_mean_mag": [np.nan, 18.5, np.nan, np.nan],
+            F.R_COLUMN: [np.nan, np.nan, np.nan, 22.5 - 2.5 * np.log10(5.0)],
+        }
+    )
+    r = F.r_magnitude(d)
+    lim = 22.5 - 2.5 * np.log10(3 / np.sqrt(400.0))
+    assert np.isclose(r[0], lim)  # faint z-only source: the 3-sigma limit (r = 24.56)
+    assert np.isnan(r[1]) and np.isnan(r[2])  # Gaia star / bright in z: a failed r measurement
+    assert np.isclose(r[3], 22.5 - 2.5 * np.log10(5.0))
+    f = F.cosmos_factors(d)
+    assert np.isfinite(f[0]).all() and f[0][1] > f[0][0]  # galaxies outnumber stars there
+    monkeypatch.setenv("V2_FAINT_PRIOR_UNDETECTED", "off")
+    assert np.isnan(F.r_magnitude(d)[0])
