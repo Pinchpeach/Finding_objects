@@ -120,6 +120,71 @@ def fallback(df: pd.DataFrame) -> bool:
     return bool(_statuses(df) & FALLBACK_STATUS)
 
 
+# Recent failures (2.55.0).  A collector whose service failed is retried by
+# every new search; with NED and the HEASARC ATNF table failing (2.54.0 re-evaluation) a
+# re-run of a cached 2' COSMOS search still took 111 s, all of it waiting on
+# the two failing services.  controller.py skips a non-core collector that
+# failed less than FAILURE_MEMORY_S ago (V2_FAILURE_MEMORY_S, 0 = off) and
+# reports it as an error, so the missing-archive warning still shows it.
+FAILURE_MEMORY_S = 600.0
+
+
+def failure_memory_s() -> float:
+    try:
+        return max(0.0, float(os.environ.get("V2_FAILURE_MEMORY_S", FAILURE_MEMORY_S)))
+    except ValueError:
+        return FAILURE_MEMORY_S
+
+
+def _failures_path() -> Path:
+    return root() / "failures.json"
+
+
+def _read_failures() -> dict:
+    try:
+        return json.loads(_failures_path().read_text())
+    except Exception:
+        return {}
+
+
+def _write_failures(d: dict) -> None:
+    path = _failures_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=path.parent, suffix=".json.tmp")
+    with os.fdopen(fd, "w") as fh:
+        json.dump(d, fh)
+    os.replace(tmp, path)
+
+
+def recent_failure(name: str) -> dict | None:
+    """The last failure of ``name`` if it is younger than the memory, else None."""
+    if not enabled() or failure_memory_s() <= 0:
+        return None
+    e = _read_failures().get(name)
+    if not e or time.time() - float(e.get("t", 0)) > failure_memory_s():
+        return None
+    return e
+
+
+def note_outcome(name: str, status: str, error: str = "") -> None:
+    """Remember a failure (error / timeout) or forget one after a success."""
+    if not enabled() or failure_memory_s() <= 0:
+        return
+    try:
+        root().mkdir(parents=True, exist_ok=True)
+        with _LOCK, _FileLock(root() / "failures.lock"):
+            d = _read_failures()
+            now = time.time()
+            d = {k: v for k, v in d.items() if now - float(v.get("t", 0)) <= failure_memory_s()}
+            if status in ("error", "timeout"):
+                d[name] = {"t": now, "status": status, "error": str(error)[:300]}
+            else:
+                d.pop(name, None)
+            _write_failures(d)
+    except Exception as exc:  # never fail a collection over this
+        print(f"[cache] failure memory not updated ({exc!r})", flush=True)
+
+
 def cacheable(df: pd.DataFrame) -> bool:
     """False for partial results (a ``*_query_status`` column reporting a
     failure); an alternative source's complete answer is cacheable (briefly)."""

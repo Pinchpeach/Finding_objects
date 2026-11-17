@@ -52,6 +52,8 @@ def source() -> str:
     if v not in SOURCES:
         raise ValueError(f"V2_FAINT_PRIOR={v!r}; known: {SOURCES}")
     return v
+
+
 R_COLUMN = "std_mag__ls_r"
 R_MIN = 20.0
 # r non-detections (2.55.0).  A Legacy Surveys source detected in another band
@@ -87,6 +89,8 @@ def r_magnitude(df: pd.DataFrame) -> np.ndarray:
         lim = 22.5 - 2.5 * np.log10(UNDETECTED_SIGMA / np.sqrt(np.where(iv > 0, iv, np.nan)))
     undetected = ~np.isfinite(r) & np.isfinite(f) & (f <= 0) & np.isfinite(lim)
     return np.where(undetected, lim, r)
+
+
 R_EDGES = np.arange(16, 25.5, 0.5)
 B_EDGES = np.array([0, 20, 40, 60, 91])
 MIN_P = 0.5

@@ -781,6 +781,33 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
         else:
             best_candidates.append(top)
             best_candidate_scores.append(conf)
+    # The class without the catalogue labels (2.55.0): where a spectroscopic
+    # class, a NED / SIMBAD type or the SGA decided nothing the measurements
+    # did not already decide, the coarse class is an inference that the
+    # catalogue agrees with, not a lookup (Classifier/provenance.of_primary).
+    # Re-fused for the evidence-decided rows that carry a catalogue label,
+    # under the same sky priors; rule-decided rows keep their label.
+    without_catalog = np.array(labels, dtype=object)
+    cat_rows = np.flatnonzero(
+        [
+            b == "evidence" and any(str(e.get("rule_id", "")).startswith(CATALOG_LABEL_RULES) for e in items)
+            for items, b in zip(item_lists, basis)
+        ]
+    )
+    if len(cat_rows):
+        meas = [[e for e in item_lists[i] if not str(e.get("rule_id", "")).startswith(CATALOG_LABEL_RULES)] for i in cat_rows]
+        fm = fuse_many(meas, model, Path(model_path).parent)
+        Pm = np.array([[p[c] for c in CLASSES] for p, _ in fm], dtype=float)
+        Qm = Pm * (prior if adjust else np.array(train_prior)) / np.array(train_prior)
+        Qm[:, [CLASSES.index("GALAXY"), CLASSES.index("QSO")]] *= lat[cat_rows][:, None]
+        Qm[:, CLASSES.index("QSO")] *= qf[cat_rows]
+        Qm = Qm / Qm.sum(axis=1, keepdims=True)
+        if unified:
+            Qm = CLASS_PRIOR.faint_split(Qm, faint_prior[cat_rows])
+        for j, i in enumerate(cat_rows):
+            o = np.argsort(-Qm[j])
+            c, m = float(Qm[j][o[0]]), float(Qm[j][o[0]] - Qm[j][o[1]])
+            without_catalog[i] = CLASSES[o[0]] if fm[j][1] > 0 and c >= min_conf and m >= min_margin else "UNKNOWN"
     literature = literature_only(item_lists, basis)
     for i in np.flatnonzero(literature):
         if labels[i] in CLASSES:
@@ -843,6 +870,7 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
             "classification_basis": basis,
             "best_candidate_class": best_candidates,
             "best_candidate_probability": best_candidate_scores,
+            "primary_without_catalog": without_catalog,
         }
     )
     # Dual GALAXY/QSO reading of active galaxies (2.46.0, agn_host.py).

@@ -96,6 +96,33 @@ def vizier_mini():
                     print(f"{host:24s} {cat:22s} {label:8s} {type(exc).__name__}", flush=True)
 
 
+def atnf():
+    """ATNF pulsars from HEASARC and from the VizieR copy B/psr at the Crab and
+    a millisecond-pulsar field: names and positions must agree (2.55.0)."""
+    sys.path.insert(0, "v2/Get_data")
+    import atnf_pulsar
+
+    for ra, dec, r in ((83.6331, 22.0145, 3.0), (284.1515, 4.6886, 30.0)):
+        t0 = time.monotonic()
+        try:
+            h = atnf_pulsar._fetch_heasarc(ra, dec, r)
+            print(
+                f"HEASARC {ra} {dec} r={r}': {len(h)} rows {time.monotonic() - t0:.1f}s",
+                h[["catalog_object_id", "ra", "dec"]].head(5).to_dict("records"),
+            )
+        except Exception as exc:
+            h = None
+            print(f"HEASARC {ra} {dec}: {type(exc).__name__} {str(exc)[:120]} {time.monotonic() - t0:.1f}s")
+        t0 = time.monotonic()
+        v = atnf_pulsar._fetch_vizier(ra, dec, r)
+        print(f"VizieR B/psr: {len(v)} rows {time.monotonic() - t0:.1f}s columns {list(v.columns)[:30]}")
+        print("   ", v[["catalog_object_id", "ra", "dec"]].head(5).to_dict("records"))
+        if h is not None and len(h) and len(v):
+            j = h.merge(v, on="catalog_object_id", suffixes=("_h", "_v"))
+            sep = ((j.ra_h - j.ra_v) ** 2 + (j.dec_h - j.dec_v) ** 2) ** 0.5 * 3600
+            print(f"    same names {len(j)} of {len(h)} / {len(v)}; position difference max {sep.max():.2f} arcsec")
+
+
 def simbad():
     from astroquery.simbad import Simbad
     from astropy.coordinates import SkyCoord
@@ -220,6 +247,6 @@ def httplog(log_path, summary_path):
 
 
 if __name__ == "__main__":
-    {"vizier": vizier, "vizier_mini": vizier_mini, "simbad": simbad, "ps1": ps1}.get(
+    {"vizier": vizier, "vizier_mini": vizier_mini, "simbad": simbad, "ps1": ps1, "atnf": atnf}.get(
         sys.argv[1], lambda: httplog(*sys.argv[2:4])
     )()
