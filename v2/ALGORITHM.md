@@ -253,6 +253,10 @@ SIMBAD 유형은 SIMBAD `otypedef` 계층(`Classifier/reference/simbad_otypedef.
   - 예외는 독립 천체로 남깁니다: 유의한 운동(전경 별), 다른 적색편이(배경), 초신성.
 - **이름**: SIMBAD → NED → 주요 카탈로그 순서로 사람이 읽는 이름을 붙입니다. 같은 이름이면 구분 표시를 답니다.
 
+- **LS z 전용 검출 (2.55.0, `detection_quality.flag_ls_z_only`):** LS에만 있고 r을 측정했는데 검출되지 않은(flux_r ≤ 0, flux_ivar_r > 0) z ≥ 20 최상위 천체는 `UNKNOWN`/`UNCONFIRMED`로 둡니다.
+  - COSMOS 중심 6′에서 이런 천체 244개 중 9.0 %만 0.5″ 안에 COSMOS2020 천체가 있습니다. 우연 일치는 3.5 %이고, 같은 z의 r 검출 천체는 83.8 %입니다.
+  - 그래서 대부분 잡음이나 다른 천체의 조각으로 봅니다. 2.54까지는 이들을 STAR로 냈습니다.
+
 ## 9. 앱 (`app/`)
 
 - PySide6 GUI 구성:

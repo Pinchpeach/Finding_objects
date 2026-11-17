@@ -31,7 +31,9 @@ def cosmos2020(ra, dec, radius):
         v.VIZIER_SERVER = host
         v.TIMEOUT = 300
         try:
-            res = v.query_region(SkyCoord(ra * u.deg, dec * u.deg), radius=radius * u.arcmin, catalog="J/ApJS/258/11/classic")
+            res = v.query_region(
+                SkyCoord(ra * u.deg, dec * u.deg), radius=radius * u.arcmin, catalog="J/ApJS/258/11/classic"
+            )
             if len(res):
                 print("COSMOS2020 from", host, len(res[0]), "rows")
                 return res[0].to_pandas()
@@ -67,13 +69,23 @@ def main():
     for col in ("lptype", "ACSmuClass", "ACSF814Wmag", "HSCimagAuto"):
         x[col] = np.where(m, c[col].to_numpy()[i], np.nan)
     x["zmag"] = 22.5 - 2.5 * np.log10(pd.to_numeric(x[LS + "flux_z"], errors="coerce"))
-    seen = x[[k for k in ("gaia_dr3__phot_g_mean_mag", "std_mag__ps1_r", "std_mag__sdss_r") if k in x]].apply(pd.to_numeric, errors="coerce").notna().any(axis=1)
+    seen = (
+        x[[k for k in ("gaia_dr3__phot_g_mean_mag", "std_mag__ps1_r", "std_mag__sdss_r") if k in x]]
+        .apply(pd.to_numeric, errors="coerce")
+        .notna()
+        .any(axis=1)
+    )
     x["group"] = np.where(seen | (x.zmag < 20), "seen elsewhere / bright z", "faint z-only")
     sed = x.lptype.map({0: "SED galaxy", 1: "SED star", 2: "SED X-ray AGN"}).fillna("no COSMOS2020 match")
-    print(f"\nr-undetected top-level sources: {len(x)}; matched to COSMOS2020 within 1\": {int(m.sum())}")
+    print(f'\nr-undetected top-level sources: {len(x)}; matched to COSMOS2020 within 1": {int(m.sum())}')
     for g, s in x.groupby("group"):
         print(f"\n== {g}: {len(s)}")
-        print("LS type:", s[LS + "type"].value_counts().to_dict(), "| z mag quartiles:", s.zmag.quantile([0.25, 0.5, 0.75]).round(2).to_dict())
+        print(
+            "LS type:",
+            s[LS + "type"].value_counts().to_dict(),
+            "| z mag quartiles:",
+            s.zmag.quantile([0.25, 0.5, 0.75]).round(2).to_dict(),
+        )
         print("2.54 (old) label x COSMOS2020 SED type:")
         print(pd.crosstab(s.primary_class, sed[s.index]))
         print("2.55 (new) label x COSMOS2020 SED type:")
@@ -91,15 +103,33 @@ def main():
     ctrl = top[(num(LS + "flux_r") > 0) & zt.between(22.25, 23.62)]
     _, csep, _ = SkyCoord(ctrl.ra.to_numpy() * u.deg, ctrl.dec.to_numpy() * u.deg).match_to_catalog_sky(cc)
     zonly = x[x.group == "faint z-only"]
-    print("\nNearest COSMOS2020 source (arcsec)    within 0.5\"  within 1\"   median sep")
+    print('\nNearest COSMOS2020 source (arcsec)    within 0.5"  within 1"   median sep')
     for name, sp in (("faint z-only, r undetected", zonly.sep.to_numpy()), ("r-detected, same z range", csep.arcsec)):
-        print(f"  {name:28s} n={len(sp):5d}  {np.mean(sp <= 0.5):6.1%}      {np.mean(sp <= 1.0):6.1%}   {np.median(sp):5.2f}")
-    print(f"  chance (COSMOS2020 density {dens:.4f}/arcsec^2)        {1 - np.exp(-dens * np.pi * 0.25):6.1%}      {1 - np.exp(-dens * np.pi):6.1%}   {np.sqrt(np.log(2) / (np.pi * dens)):5.2f}")
-    for lab, s2 in zonly.groupby(LS + "type"):
-        print(f"  z-only {lab:4s} n={len(s2):4d} within 0.5\": {np.mean(s2.sep <= 0.5):6.1%}")
-    x.reset_index()[["object_id", "ra", "dec", "group", LS + "type", "zmag", "primary_class", "new", "new_status", "lptype", "ACSmuClass", "ACSF814Wmag", "sep"]].to_csv(
-        "r_undetected_cosmos.csv", index=False
+        print(
+            f"  {name:28s} n={len(sp):5d}  {np.mean(sp <= 0.5):6.1%}      {np.mean(sp <= 1.0):6.1%}   {np.median(sp):5.2f}"
+        )
+    print(
+        f"  chance (COSMOS2020 density {dens:.4f}/arcsec^2)        {1 - np.exp(-dens * np.pi * 0.25):6.1%}      {1 - np.exp(-dens * np.pi):6.1%}   {np.sqrt(np.log(2) / (np.pi * dens)):5.2f}"
     )
+    for lab, s2 in zonly.groupby(LS + "type"):
+        print(f'  z-only {lab:4s} n={len(s2):4d} within 0.5": {np.mean(s2.sep <= 0.5):6.1%}')
+    x.reset_index()[
+        [
+            "object_id",
+            "ra",
+            "dec",
+            "group",
+            LS + "type",
+            "zmag",
+            "primary_class",
+            "new",
+            "new_status",
+            "lptype",
+            "ACSmuClass",
+            "ACSF814Wmag",
+            "sep",
+        ]
+    ].to_csv("r_undetected_cosmos.csv", index=False)
 
 
 if __name__ == "__main__":

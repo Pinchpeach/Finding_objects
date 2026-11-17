@@ -78,8 +78,55 @@ def flag(out: pd.DataFrame) -> pd.Series:
     return res
 
 
+# Legacy Surveys sources seen only in z (2.55.0).  A Tractor source whose r
+# flux was measured (flux_ivar_r > 0) but is not positive, detected in z at
+# z >= Z_ONLY_MIN_MAG and in no other survey: in the central 6' of COSMOS
+# 9.0 % of such sources (n = 244) have a COSMOS2020 counterpart within 0.5"
+# (Weaver et al. 2022, complete to i ~ 26-27), against 3.5 % by chance at the
+# COSMOS2020 density and 83.8 % for r-detected LS sources of the same z
+# (n = 2,394); median nearest separation 2.49" against 2.20" for random
+# positions (WORK_REPORT_2026-11-17.md).  They are mostly noise peaks or
+# pieces of other objects, not stars or galaxies; before 2.55 the faint-object
+# classifier called 99.9 % of the 14,775 in the 400 stored set A/B products
+# STAR.  Such a row is UNKNOWN / UNCONFIRMED.
+LS_P = "desi_legacy_surveys_dr10__"
+Z_ONLY_MIN_MAG = 20.0
+
+
+def flag_ls_z_only(out: pd.DataFrame) -> pd.Series:
+    """Rows that are Legacy Surveys z-only detections seen by no other survey."""
+    res = pd.Series(False, index=out.index)
+    if out.empty or "catalogs" not in out or LS_P + "flux_r" not in out:
+        return res
+    cats = out.catalogs.astype(str).map(lambda s: frozenset(c for c in s.split("|") if c) - LITERATURE)
+    num = lambda c: pd.to_numeric(out.get(c, pd.Series(np.nan, index=out.index)), errors="coerce")
+    fz = num(LS_P + "flux_z")
+    with np.errstate(divide="ignore", invalid="ignore"):
+        zmag = 22.5 - 2.5 * np.log10(fz.where(fz > 0))
+    res = (
+        cats.map(lambda c: c == frozenset({LS}))
+        & num(LS_P + "flux_r").le(0)
+        & num(LS_P + "flux_ivar_r").gt(0)
+        & zmag.ge(Z_ONLY_MIN_MAG)
+    )
+    if "parent_object_id" in out:  # a part of a galaxy is already grouped under it
+        res &= out.parent_object_id.isna()
+    return res.fillna(False).astype(bool)
+
+
 def apply(out: pd.DataFrame) -> pd.DataFrame:
     """Mark unconfirmed detections: classification_status UNCONFIRMED and the reason."""
+    z = flag_ls_z_only(out)
+    if z.any():
+        out = out.copy()
+        out.loc[z, "primary_class"] = "UNKNOWN"
+        out.loc[z, "classification_status"] = "UNCONFIRMED"
+        if "primary_provenance" in out:
+            out.loc[z, "primary_provenance"] = "NONE"
+        out.loc[z, "unknown_reason"] = (
+            "Legacy Surveys z only (r measured but not detected), no other survey: in COSMOS most such "
+            "sources have no COSMOS2020 counterpart, likely noise or a piece of another object"
+        )
     f = flag(out)
     if not f.any():
         return out
