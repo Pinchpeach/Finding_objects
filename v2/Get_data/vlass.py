@@ -12,6 +12,8 @@ save = save_csv  # collector API: save(df, path)
 
 CATALOG = "VLASS"
 VIZIER_CATALOG = "J/ApJS/255/30"
+# North of dec -40 (Lacy et al. 2020, PASP 132, 035001; Gordon et al. 2021); footprint.py (2.54.0)
+FOOTPRINT = {"dec_min": -40.0}
 ID_COLUMNS = ["CompName", "Component_name", "Name", "VLASS", "CompId", "Component_id"]
 RA_COLUMNS = ["RAJ2000", "RA_ICRS", "_RAJ2000", "RAdeg"]
 DEC_COLUMNS = ["DEJ2000", "DE_ICRS", "_DEJ2000", "DEdeg"]

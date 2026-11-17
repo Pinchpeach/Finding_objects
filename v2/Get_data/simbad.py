@@ -14,16 +14,36 @@ from pathlib import Path
 import pandas as pd
 
 CATALOG = "SIMBAD"
+# CDS Strasbourg, then its official mirror at Harvard-CfA (the two servers of
+# astroquery's simbad.conf.servers_list; same database, synchronised by CDS).
+# 2.54.0: on 2026-11-14/15 Strasbourg answered 404 to every SIMBAD request
+# (TAP capabilities included) and every search lost SIMBAD.
+SERVERS = ("simbad.cds.unistra.fr", "simbad.harvard.edu")
+FIELDS = ("otype", "sp", "plx", "pmra", "pmdec", "rvz_redshift")
 
 
-def fetch(ra, dec, radius_arcmin):
+def _query(server, ra, dec, radius_arcmin):
     from astroquery.simbad import Simbad
     from astropy.coordinates import SkyCoord
     import astropy.units as u
 
     s = Simbad()
-    s.add_votable_fields("otype", "sp", "plx", "pmra", "pmdec", "rvz_redshift")
-    t = s.query_region(SkyCoord(ra * u.deg, dec * u.deg), radius=radius_arcmin * u.arcmin)
+    s.server = server  # before add_votable_fields, which already asks the TAP service
+    s.add_votable_fields(*FIELDS)
+    return s, s.query_region(SkyCoord(ra * u.deg, dec * u.deg), radius=radius_arcmin * u.arcmin)
+
+
+def fetch(ra, dec, radius_arcmin):
+    last = None
+    for server in SERVERS:
+        try:
+            s, t = _query(server, ra, dec, radius_arcmin)
+            break
+        except Exception as exc:  # 404 / 5xx / refused / timeout: the mirror
+            print(f"[simbad] {server}: {type(exc).__name__}: {str(exc)[:160]}", flush=True)
+            last = exc
+    else:
+        raise last
     if t is None:
         return pd.DataFrame(columns=["catalog", "catalog_object_id", "object_name", "ra", "dec"])
     df = t.to_pandas()
@@ -59,6 +79,7 @@ def fetch(ra, dec, radius_arcmin):
     if dcc != "dec":
         df.insert(4 if "ra" in df else 3, "dec", dv)
     df = df.drop_duplicates("catalog_object_id", keep="last").reset_index(drop=True)
+    df["simbad_server"] = server
     try:
         df = _attach_references(s, df)
     except Exception as exc:  # reference metadata is optional

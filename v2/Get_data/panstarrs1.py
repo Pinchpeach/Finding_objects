@@ -73,7 +73,77 @@ OPTIONAL_COLUMNS = ["epochMean", "objInfoFlag", "qualityFlag"] + [
 ]
 
 
+# VizieR copy of the same PS1 DR2 MeanObject + ObjectThin tables (II/389/ps1_dr2,
+# built by CDS from MAST with nDetections > 2), used when the MAST API fails
+# (2.54.0).  Practical-use probe 2026-11-15 (COSMOS 2', a b = -2 field 1'):
+# every object it holds matches MAST by objID with the same PSF / Kron
+# magnitudes (|diff| < 1e-6 mag), nDetections, qualityFlag, objInfoFlag and
+# epochMean; the objects it lacks are those with nDetections = 2 (83 of 210
+# and 54 of 698 rows).  No aperture magnitudes.  The DR1 copy II/349 has the
+# same rows but DR1 flags and epochs, so it is not used.  Rows carry
+# ps1_query_status = vizier_fallback (cached one day, archive_cache.py).
+VIZIER_FALLBACK = "II/389/ps1_dr2"
+VIZIER_MAP = {
+    "objID": ("objID",),
+    "raMean": ("RAJ2000", "RAdeg"),
+    "decMean": ("DEJ2000", "DEdeg"),
+    "raMeanErr": ("e_RAJ2000",),
+    "decMeanErr": ("e_DEJ2000",),
+    "nDetections": ("Nd",),
+    "epochMean": ("Epoch",),
+    "objInfoFlag": ("f_objID",),
+    "qualityFlag": ("Qual",),
+    **{f"n{b}": (f"N{b}",) for b in "grizy"},
+    **{f"{b}MeanPSFMag": (f"{b}mag",) for b in "grizy"},
+    **{f"{b}MeanPSFMagErr": (f"e_{b}mag",) for b in "grizy"},
+    **{f"{b}MeanPSFMagStd": (f"{b}magStd",) for b in "grizy"},
+    **{f"{b}MeanPSFMagNpt": (f"o_{b}mag",) for b in "grizy"},
+    **{f"{b}MeanKronMag": (f"{b}Kmag",) for b in "grizy"},
+    **{f"{b}MeanKronMagErr": (f"e_{b}Kmag",) for b in "grizy"},
+}
+
+
 def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
+    try:
+        return _fetch_mast(ra, dec, radius_arcmin)
+    except Exception as exc:  # SSL / connection / 5xx / timeout at MAST
+        print(
+            f"[panstarrs1] MAST failed ({type(exc).__name__}: {str(exc)[:160]}); VizieR {VIZIER_FALLBACK} instead",
+            flush=True,
+        )
+        return _fetch_vizier(ra, dec, radius_arcmin)
+
+
+def _fetch_vizier(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
+    from _catalog_utils import vizier_cone
+
+    v = vizier_cone(VIZIER_FALLBACK, ra, dec, radius_arcmin)
+    cols = ["catalog", "catalog_object_id", "object_name", "ra", "dec", *COLUMNS, "ps1_query_status"]
+    if v is None or v.empty:
+        return pd.DataFrame(columns=cols)
+    df = pd.DataFrame(index=v.index)
+    for out, cands in VIZIER_MAP.items():
+        src = next((c for c in cands if c in v.columns), None)
+        df[out] = v[src] if src is not None else pd.NA
+    df["objID"] = pd.to_numeric(df["objID"], errors="coerce").astype("Int64").astype("string")
+    df = df[pd.to_numeric(df["nDetections"], errors="coerce").ge(MIN_DETECTIONS)]
+    if df.empty:
+        return pd.DataFrame(columns=cols)
+    for c in COLUMNS:
+        if c not in df:
+            df[c] = pd.NA
+    df["objName"] = df["objName"].astype("string")
+    df.insert(0, "catalog", CATALOG)
+    df.insert(1, "catalog_object_id", df["objID"])
+    df.insert(2, "object_name", "PS1 " + df["objID"])
+    df.insert(3, "ra", pd.to_numeric(df["raMean"], errors="coerce"))
+    df.insert(4, "dec", pd.to_numeric(df["decMean"], errors="coerce"))
+    df["ps1_query_status"] = "vizier_fallback"
+    df = df.drop_duplicates("catalog_object_id", keep="last")
+    return dedupe_positions(df).reset_index(drop=True)
+
+
+def _fetch_mast(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     # nDetections >= 2 (STScI PS1 guidance): single-detection MeanObject rows are
     # mostly spurious/moving; they duplicated real sources and made Stage-1
     # association ambiguous in real fields.

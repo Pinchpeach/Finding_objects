@@ -105,3 +105,23 @@ def test_review_fixes(tmp_path, monkeypatch):
     assert ac.get("coll", src, 50.0, 0.0, 1.0) is None
     ac.put("coll", src, 50.0, 0.0, 1.0, _frame().assign(gaia_ap_query_status="ok"))
     assert ac.get("coll", src, 50.0, 0.0, 1.0) is not None
+
+
+def test_fallback_answer_is_kept_one_day_errors_not(tmp_path, monkeypatch):
+    """2.54.0: the Gaia VizieR fallback is a complete answer from another
+    source: cached for FALLBACK_TTL_DAYS; a failed query is still not cached."""
+    monkeypatch.setenv("V2_CACHE_DIR", str(tmp_path / "c"))
+    src = tmp_path / "gaia.py"
+    src.write_text("x = 1\n")
+    fb = _frame().assign(gaia_base_query_status="vizier_fallback", gaia_ap_query_status="fallback_partial")
+    assert ac.cacheable(fb) and ac.fallback(fb)
+    ac.put("gaia", src, 10.0, 0.0, 5.0, fb)
+    assert ac.get("gaia", src, 10.0, 0.0, 5.0) is not None
+    t0 = ac.time.time()
+    monkeypatch.setattr(ac.time, "time", lambda: t0 + 1.5 * 86400)  # past one day: asked again
+    assert ac.get("gaia", src, 10.0, 0.0, 5.0) is None
+    bad = _frame().assign(agb_query_status="error:table9:ConnectTimeout")
+    assert not ac.cacheable(bad)
+    ok = _frame().assign(gaia_base_query_status="tap")
+    assert ac.cacheable(ok) and not ac.fallback(ok)
+    assert ac._ttl("gaia", 2, False) == ac.TTL_DAYS and ac._ttl("gaia", 2, True) == ac.FALLBACK_TTL_DAYS

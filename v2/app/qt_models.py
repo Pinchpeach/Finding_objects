@@ -54,6 +54,19 @@ HEADERS = {
 }
 
 
+# NED and SIMBAD compile the literature; an entry seen only there has no
+# detection in the collected surveys (v2/summary.py, 2.54.0).
+LITERATURE = frozenset({"NED", "SIMBAD"})
+
+
+def literature_only(df: pd.DataFrame) -> pd.Series:
+    """Rows whose catalogues are all literature compilations (NED / SIMBAD)."""
+    if "catalogs" not in df:
+        return pd.Series(False, index=df.index)
+    cats = df["catalogs"].fillna("").astype(str).map(lambda s: frozenset(c for c in s.split("|") if c))
+    return cats.map(lambda c: bool(c) and c <= LITERATURE).astype(bool)
+
+
 def class_color(name: str) -> QColor:
     return QColor(CLASS_COLORS.get(str(name), CLASS_COLORS["UNKNOWN"]))
 
@@ -135,6 +148,11 @@ class DataFrameModel(QAbstractTableModel):
             self._icons = icons
         return self._icons[row] if row < len(self._icons) else None
 
+    def _status_at(self, row: int) -> str:
+        if "classification_status" not in self._df:
+            return ""
+        return str(self._df.iat[row, self._df.columns.get_loc("classification_status")])
+
     def column_name(self, col: int) -> str:
         return self._cols[col]
 
@@ -161,6 +179,9 @@ class DataFrameModel(QAbstractTableModel):
         if role == Qt.DisplayRole:
             if isinstance(value, float):
                 if math.isnan(value):
+                    # a NED / SIMBAD type without a measurement has no probability (2.54.0)
+                    if col == "primary_confidence" and self._status_at(index.row()) == "LITERATURE_LABEL":
+                        return "literature"
                     return ""
                 return f"{value:.5f}" if col in ("ra", "dec") else f"{value:.3f}"
             return "" if value is None else str(value)
@@ -190,9 +211,10 @@ class ResultsFilter(QSortFilterProxyModel):
         self._status = "ALL"
         self._text = ""
         self._components = False
+        self._literature = False
         self._high_only = False
         self._a_high = None
-        self._a_cls = self._a_status = self._a_text = self._a_part = None
+        self._a_cls = self._a_status = self._a_text = self._a_part = self._a_lit = None
         self._n_cached = -1
 
     def _refilter(self, apply):
@@ -224,6 +246,10 @@ class ResultsFilter(QSortFilterProxyModel):
         """Show the parts of large galaxies (hidden by default: they are listed under their host)."""
         self._set("_components", bool(on))
 
+    def set_show_literature(self, on: bool):
+        """Show entries known only from NED / SIMBAD (hidden by default, 2.54.0)."""
+        self._set("_literature", bool(on))
+
     def set_high_only(self, on: bool):
         """Only high-confidence objects (2.36.0)."""
         self._set("_high_only", bool(on))
@@ -244,6 +270,7 @@ class ResultsFilter(QSortFilterProxyModel):
         col = lambda c: df[c].fillna("").astype(str).to_numpy(dtype=object) if c in df else None
         self._a_cls, self._a_status = col("primary_class"), col("classification_status")
         self._a_part = df["parent_object_id"].notna().to_numpy() if "parent_object_id" in df else None
+        self._a_lit = literature_only(df).to_numpy() if "catalogs" in df else None
         self._a_high = df["high_confidence"].fillna(False).astype(bool).to_numpy() if "high_confidence" in df else None
         parts = [
             a
@@ -263,6 +290,14 @@ class ResultsFilter(QSortFilterProxyModel):
         if self._n_cached != self.sourceModel().rowCount():  # never index arrays of an older frame
             self._cache()
         if not self._components and self._a_part is not None and self._a_part[row]:
+            return False
+        # a galaxy part follows "Show galaxy parts" whatever its catalogues
+        if (
+            not self._literature
+            and self._a_lit is not None
+            and self._a_lit[row]
+            and not (self._a_part is not None and self._a_part[row])
+        ):
             return False
         if self._high_only and (self._a_high is None or not self._a_high[row]):
             return False

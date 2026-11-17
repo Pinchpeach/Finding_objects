@@ -18,6 +18,7 @@ class Resp:
 def no_pause(monkeypatch):
     monkeypatch.setattr(throttle, "pause", lambda: 0.0)
     throttle._preferred.update(host=None, until=0.0)
+    throttle._unreachable.clear()
 
 
 def _send(behaviour, seen):
@@ -142,3 +143,101 @@ def test_404_from_strasbourg_moves_to_a_mirror():
     req = throttle._with_mirrors(_send({"vizier.cds.unistra.fr": 404}, seen))
     r = req(None, "GET", "https://vizier.cds.unistra.fr/viz-bin/votable?-source=II/328/allwise")
     assert r.status_code == 200 and "vizier.cfa.harvard.edu" in seen[-1]
+
+
+MINI = "-source=VIII/65/nvss\n-out.max=unlimited\n-out.all\n-c=150.1+2.2\n-c.rs=2.0\n-out.form=mini\n-oc.form=d"
+
+
+class _V:
+    def __init__(self, text):
+        self.status_code, self.text, self.headers = 200, text, {"Content-Type": "text/xml;content=x-votable"}
+
+
+def test_empty_cone_on_a_mirror_is_confirmed_not_cascaded():
+    """2.54.0: with Strasbourg at 404, astroquery's mini-form answer to an
+    empty cone has no <TABLE>; asked again without the mini form the mirror
+    returns an empty table, so the answer is accepted there instead of being
+    sent to every other mirror (~50 s per query on 2026-11-15)."""
+    seen = []
+
+    def send(self, method, url, *a, data=None, **k):
+        host = url.split("/")[2]
+        seen.append((host, "-out.form=mini" in (data or "")))
+        if host == "vizier.cds.unistra.fr":
+            return Resp(404)
+        if "-out.form=mini" in data:
+            return _V("<VOTABLE><RESOURCE><INFO name='x'/></RESOURCE></VOTABLE>")
+        return _V("<VOTABLE><RESOURCE><TABLE><FIELD name='_RAJ2000'/><DATA><TABLEDATA></TABLEDATA></DATA></TABLE></RESOURCE></VOTABLE>")
+
+    r = throttle._with_mirrors(send)(None, "POST", "https://vizier.cds.unistra.fr/viz-bin/votable", data=MINI)
+    assert "<TABLE" not in r.text  # the original (empty) answer is returned
+    assert seen == [("vizier.cds.unistra.fr", True), ("vizier.cfa.harvard.edu", True), ("vizier.cfa.harvard.edu", False)]
+    assert throttle._preferred["host"] == "vizier.cfa.harvard.edu"
+
+
+def test_mirror_without_the_catalogue_is_still_passed_over():
+    """The confirmation of a mirror that lacks the catalogue has no table
+    either (unknown catalogue: plain <RESOURCE>): the next mirror is asked."""
+    seen = []
+
+    def send(self, method, url, *a, data=None, **k):
+        host = url.split("/")[2]
+        seen.append(host)
+        if host == "vizier.cds.unistra.fr":
+            return Resp(404)
+        if host == "vizier.cfa.harvard.edu":
+            return _V("<VOTABLE><RESOURCE></RESOURCE></VOTABLE>")
+        return _V("<VOTABLE><RESOURCE><TABLE><TR><TD>1</TD></TR></TABLE></RESOURCE></VOTABLE>")
+
+    r = throttle._with_mirrors(send)(None, "POST", "https://vizier.cds.unistra.fr/viz-bin/votable", data=MINI)
+    assert "<TR>" in r.text
+    assert seen[:4] == ["vizier.cds.unistra.fr", "vizier.cfa.harvard.edu", "vizier.cfa.harvard.edu", "vizier.nao.ac.jp"]
+
+
+def test_unreachable_mirror_is_tried_last():
+    import requests
+
+    seen = []
+
+    def send(self, method, url, *a, **k):
+        host = url.split("/")[2]
+        seen.append(host)
+        if host in ("vizier.cds.unistra.fr", "vizier.cfa.harvard.edu"):
+            raise requests.exceptions.ConnectTimeout("no connection")
+        return Resp(200)
+
+    req = throttle._with_mirrors(send)
+    req(None, "GET", "https://vizier.cds.unistra.fr/viz-bin/votable")
+    assert seen == ["vizier.cds.unistra.fr", "vizier.cfa.harvard.edu", "vizier.nao.ac.jp"]
+    seen.clear()
+    throttle._preferred.update(host=None, until=0.0)
+    req(None, "GET", "https://vizier.cds.unistra.fr/viz-bin/votable")
+    assert seen[0] == "vizier.nao.ac.jp"  # both hosts that did not connect come last
+    assert throttle._vizier_order("vizier.cds.unistra.fr")[-2:] == ["vizier.cds.unistra.fr", "vizier.cfa.harvard.edu"]
+
+
+def test_mini_form_removed_from_the_body():
+    assert throttle._without_mini_form(MINI).splitlines()[-1] == "-out.max=1"
+    assert "-out.form" not in throttle._without_mini_form(MINI)
+    assert throttle._without_mini_form(None) is None
+
+
+def test_confirmation_with_rows_is_not_an_empty_cone():
+    """A table-less mini answer whose confirmation has a row was wrong (CfA,
+    Gaia DR3 cone with 349 sources, 2026-11-15): the next mirror is asked."""
+    seen = []
+
+    def send(self, method, url, *a, data=None, **k):
+        host = url.split("/")[2]
+        seen.append(host)
+        if host == "vizier.cds.unistra.fr":
+            return Resp(404)
+        if host == "vizier.cfa.harvard.edu":
+            if "-out.form=mini" in data:
+                return _V("<VOTABLE><RESOURCE></RESOURCE></VOTABLE>")
+            return _V("<VOTABLE><RESOURCE><TABLE><DATA><TABLEDATA><TR><TD>1</TD></TR></TABLEDATA></DATA></TABLE></RESOURCE></VOTABLE>")
+        return _V("<VOTABLE><RESOURCE><TABLE><DATA><TABLEDATA><TR><TD>1</TD></TR><TR><TD>2</TD></TR></TABLEDATA></DATA></TABLE></RESOURCE></VOTABLE>")
+
+    r = throttle._with_mirrors(send)(None, "POST", "https://vizier.cds.unistra.fr/viz-bin/votable", data=MINI)
+    assert r.text.count("<TR>") == 2
+    assert seen[:4] == ["vizier.cds.unistra.fr", "vizier.cfa.harvard.edu", "vizier.cfa.harvard.edu", "vizier.nao.ac.jp"]

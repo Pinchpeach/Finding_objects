@@ -12,6 +12,8 @@ save = save_csv  # collector API: save(df, path)
 
 CATALOG = "NVSS"
 VIZIER_CATALOG = "VIII/65/nvss"
+# North of dec -40 (Condon et al. 1998, AJ 115, 1693); footprint.py (2.54.0)
+FOOTPRINT = {"dec_min": -40.0}
 
 
 def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
