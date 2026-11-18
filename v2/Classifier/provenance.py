@@ -75,12 +75,20 @@ def of_rule(rule) -> str:
     return "INFERRED"
 
 
-def of_primary(label, evidence_json) -> str:
+def of_primary(label, evidence_json, without_catalog=None) -> str:
     """CATALOG when a spectroscopic / literature label supports the final
-    coarse class, else INFERRED (fusion of measurements); NONE for UNKNOWN."""
+    coarse class, else INFERRED (fusion of measurements); NONE for UNKNOWN.
+
+    2.55.0: with ``without_catalog`` (Stage 5's class without the catalogue
+    labels), CATALOG only when the label decided it, i.e. the measurements
+    alone give another class or none.  In a 2' COSMOS search 615 galaxies
+    marked high-confidence from photometry were CATALOG only because SIMBAD
+    lists them as galaxies too (practical-use re-evaluation of 2.54.0)."""
     lab = str(label or "").upper()
     if lab not in {"STAR", "GALAXY", "QSO"}:
         return "NONE"
+    if without_catalog is not None and str(without_catalog).upper() == lab:
+        return "INFERRED"
     try:
         ev = json.loads(evidence_json) if isinstance(evidence_json, str) else []
     except (TypeError, ValueError):

@@ -24,6 +24,9 @@ TABLE = "ls_dr10.tractor"
 # errors; short bounded attempts recover far more often than one long wait.
 ATTEMPT_BUDGET_S = 80.0
 ATTEMPTS = 3
+# After a recent failure (controller._budget, 2.55.0): one attempt, so a
+# re-run during a Data Lab outage waits ~90 s, not 3 x 80 s.
+RETRY_BUDGET_S = 90.0
 
 
 # pyvo sends requests without a socket timeout, so a stalled Data Lab call

@@ -17,6 +17,7 @@ missing-value direction of each split, as in scikit-learn.
 """
 
 from __future__ import annotations
+import os
 from functools import lru_cache
 from pathlib import Path
 
@@ -135,6 +136,51 @@ def raw_scores(X: np.ndarray, model: dict) -> np.ndarray:
     return out
 
 
+# Training domain (2.55.0).  The model's training objects (DESI DR1 targets,
+# desi_gbm_truth/train.csv.gz, 149,769) with r observed (flux_ivar_r > 0) are
+# detected in r: only 4 have flux_r <= 0 with g and z detected (z: also 4),
+# and 99.9 % of the detected ones have r S/N >= 3.  The 209 training objects
+# with flux_r <= 0 and z > 0 are 206 stars with no r measurement (ivar = 0),
+# so the trees' missing-r branch says "bright star without r".  A faint
+# source seen only in z (r observed, not detected) went down that branch:
+# in a 2' COSMOS search 30 of 92 STAR labels were such sources (26 of them
+# extended, REX), and 7 of the 9 r-undetected objects matched to COSMOS2020
+# truth in the 2.52.0 A/B are galaxies, all labelled STAR.  The model now
+# gives evidence only inside its domain (V2_LS_GBM_DOMAIN):
+#   detected  g, r, z observed and r, z detected (flux > 0)   default
+#   snr3      as detected, and r S/N >= 3 (the training 0.1 % quantile)
+#   observed  g, r, z observed (flux_ivar > 0) only           2.54 and earlier
+DOMAINS = ("detected", "snr3", "observed")
+R_SNR_MIN = 3.0
+
+
+def domain() -> str:
+    v = os.environ.get("V2_LS_GBM_DOMAIN", "detected").strip().lower() or "detected"
+    if v not in DOMAINS:
+        raise ValueError(f"V2_LS_GBM_DOMAIN={v!r}; known: {DOMAINS}")
+    return v
+
+
+def in_domain(df: pd.DataFrame, prefix: str = P, which: str | None = None) -> np.ndarray:
+    """Rows inside the model's training domain (see DOMAINS)."""
+    which = which or domain()
+    ok = np.ones(len(df), dtype=bool)
+    for b in ("g", "r", "z"):
+        if f"{prefix}flux_ivar_{b}" in df:
+            iv = _col(df, f"{prefix}flux_ivar_{b}")
+            ok &= np.isfinite(iv) & (iv > 0)
+    if which == "observed":
+        return ok
+    for b in ("r", "z"):
+        if f"{prefix}flux_{b}" in df:
+            ok &= _col(df, f"{prefix}flux_{b}") > 0
+    if which == "snr3":
+        f, iv = _col(df, f"{prefix}flux_r"), _col(df, f"{prefix}flux_ivar_r")
+        with np.errstate(invalid="ignore"):
+            ok &= f * np.sqrt(np.where(iv > 0, iv, np.nan)) >= R_SNR_MIN
+    return ok
+
+
 def predict_proba(df: pd.DataFrame, prefix: str = P) -> np.ndarray:
     """(n, 3) STAR/GALAXY/QSO probabilities; NaN rows where there is no LS photometry or no model."""
     model = load_model()
@@ -149,10 +195,8 @@ def predict_proba(df: pd.DataFrame, prefix: str = P) -> np.ndarray:
     # that footprint, e.g. DR10 DECam areas without r (field 340/-30,
     # 2026-10-21), sends every r feature down an untrained missing branch:
     # extended Sersic galaxies scored STAR 1.00.  No evidence there.
-    for b in ("g", "r", "z"):
-        iv = _col(df, f"{prefix}flux_ivar_{b}")
-        if f"{prefix}flux_ivar_{b}" in df:
-            has &= np.isfinite(iv) & (iv > 0)
+    # 2.55.0: also detected in r and z (in_domain above).
+    has &= in_domain(df, prefix)
     if model is None or not has.any():
         return probs
     z = raw_scores(X[has], model)

@@ -31,6 +31,12 @@ jobs:
       - name: VizieR mini form and its confirmation
         if: always()
         run: python -u .github/scripts/practical_probe.py vizier_mini
+      - name: Legacy Surveys routes
+        if: always()
+        run: python -u .github/scripts/practical_probe.py ls
+      - name: ATNF at HEASARC and VizieR
+        if: always()
+        run: python -u .github/scripts/practical_probe.py atnf
       - name: SIMBAD mirrors
         if: always()
         run: python -u .github/scripts/practical_probe.py simbad

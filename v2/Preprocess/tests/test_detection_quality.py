@@ -55,3 +55,35 @@ def test_field_without_pan_starrs1():
     dq = _dq()
     out = pd.DataFrame([_row(303.1, -56.8, "DESI Legacy Surveys DR10", primary_class="GALAXY")])
     assert dq.apply(out).classification_status.tolist() == ["NO_EVIDENCE"]
+
+
+def test_ls_z_only_detection_is_unconfirmed():
+    """2.55.0: a Legacy Surveys source seen only in z (r measured, not
+    detected) and in no other survey is UNKNOWN / UNCONFIRMED; seen by another
+    survey, bright in z, or r detected, it keeps its class."""
+    import importlib.util as iu
+    from pathlib import Path
+
+    spec = iu.spec_from_file_location("dq_zonly", Path(__file__).resolve().parents[2] / "detection_quality.py")
+    DQ = iu.module_from_spec(spec)
+    spec.loader.exec_module(DQ)
+    P = DQ.LS_P
+    out = pd.DataFrame(
+        {
+            "object_id": ["A", "B", "C", "D", "E"],
+            "catalogs": [DQ.LS, "AllWISE|" + DQ.LS, DQ.LS + "|NED", DQ.LS, DQ.LS],
+            "primary_class": ["STAR"] * 5,
+            "classification_status": ["CLASSIFIED"] * 5,
+            P + "flux_r": [-0.02, -0.02, -0.01, 0.5, -0.02],
+            P + "flux_ivar_r": [300.0] * 5,
+            P + "flux_z": [0.8, 0.8, 0.5, 0.8, 0.8],  # z = 22.7, 22.7, 23.3, 22.7, 22.7
+            P + "flux_g": [0.01, 0.01, 0.0, 0.3, 0.5],  # E: g S/N = 0.5 x 20 = 10
+            P + "flux_ivar_g": [400.0] * 5,
+            "parent_object_id": [None] * 5,
+        }
+    )
+    r = DQ.apply(out).set_index("object_id")
+    assert r.loc["A", "primary_class"] == "UNKNOWN" and r.loc["A", "classification_status"] == "UNCONFIRMED"
+    assert r.loc["C", "classification_status"] == "UNCONFIRMED"  # a literature entry is no detection
+    assert r.loc["B", "primary_class"] == "STAR" and r.loc["D", "primary_class"] == "STAR"
+    assert r.loc["E", "primary_class"] == "STAR"  # detected in g: not z only (PR #71 review)

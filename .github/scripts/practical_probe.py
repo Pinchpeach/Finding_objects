@@ -96,6 +96,59 @@ def vizier_mini():
                     print(f"{host:24s} {cat:22s} {label:8s} {type(exc).__name__}", flush=True)
 
 
+def atnf():
+    """ATNF pulsars from HEASARC and from the VizieR copy B/psr at the Crab and
+    a millisecond-pulsar field: names and positions must agree (2.55.0)."""
+    sys.path.insert(0, "v2/Get_data")
+    import atnf_pulsar
+
+    for ra, dec, r in ((83.6331, 22.0145, 3.0), (284.1515, 4.6886, 30.0)):
+        t0 = time.monotonic()
+        try:
+            h = atnf_pulsar._fetch_heasarc(ra, dec, r)
+            print(
+                f"HEASARC {ra} {dec} r={r}': {len(h)} rows {time.monotonic() - t0:.1f}s",
+                h[["catalog_object_id", "ra", "dec"]].head(5).to_dict("records"),
+            )
+        except Exception as exc:
+            h = None
+            print(f"HEASARC {ra} {dec}: {type(exc).__name__} {str(exc)[:120]} {time.monotonic() - t0:.1f}s")
+        t0 = time.monotonic()
+        v = atnf_pulsar._fetch_vizier(ra, dec, r)
+        print(f"VizieR B/psr: {len(v)} rows {time.monotonic() - t0:.1f}s columns {list(v.columns)[:30]}")
+        print("   ", v[["catalog_object_id", "ra", "dec"]].head(5).to_dict("records"))
+        if h is not None and len(h) and len(v):
+            j = h.merge(v, on="catalog_object_id", suffixes=("_h", "_v"))
+            sep = ((j.ra_h - j.ra_v) ** 2 + (j.dec_h - j.dec_v) ** 2) ** 0.5 * 3600
+            print(f"    same names {len(j)} of {len(h)} / {len(v)}; position difference max {sep.max():.2f} arcsec")
+
+
+def ls():
+    """Legacy Surveys DR10 when the Data Lab TAP stalls: Data Lab's sync TAP
+    with a tiny query, the TAP availability endpoint, and the Legacy Surveys
+    viewer catalogue API (a possible independent route)."""
+    import requests
+
+    tests = {
+        "datalab availability": ("GET", "https://datalab.noirlab.edu/tap/availability", None),
+        "datalab sync TOP 1": ("GET", "https://datalab.noirlab.edu/tap/sync",
+                                {"REQUEST": "doQuery", "LANG": "ADQL", "FORMAT": "csv",
+                                 "QUERY": "SELECT TOP 1 ls_id, ra, dec FROM ls_dr10.tractor WHERE ra BETWEEN 150.1 AND 150.101 AND dec BETWEEN 2.2 AND 2.201"}),
+        "viewer cat ls-dr10": ("GET", "https://www.legacysurvey.org/viewer/ls-dr10/cat.json",
+                               {"ralo": 150.115, "rahi": 150.123, "declo": 2.202, "dechi": 2.210}),
+        "viewer cat ls-dr9": ("GET", "https://www.legacysurvey.org/viewer/ls-dr9/cat.json",
+                              {"ralo": 150.115, "rahi": 150.123, "declo": 2.202, "dechi": 2.210}),
+    }
+    for label, (method, url, params) in tests.items():
+        t0 = time.monotonic()
+        try:
+            r = requests.request(method, url, params=params, timeout=(10, 90))
+            body = r.text
+            print(f"{label:22s} {r.status_code} {time.monotonic() - t0:5.1f}s len={len(body)} head={body[:300]!r}", flush=True)
+        except Exception as exc:
+            print(f"{label:22s} {type(exc).__name__} {time.monotonic() - t0:5.1f}s {str(exc)[:150]}", flush=True)
+
+
 def simbad():
     from astroquery.simbad import Simbad
     from astropy.coordinates import SkyCoord
@@ -220,6 +273,6 @@ def httplog(log_path, summary_path):
 
 
 if __name__ == "__main__":
-    {"vizier": vizier, "vizier_mini": vizier_mini, "simbad": simbad, "ps1": ps1}.get(
+    {"vizier": vizier, "vizier_mini": vizier_mini, "simbad": simbad, "ps1": ps1, "atnf": atnf, "ls": ls}.get(
         sys.argv[1], lambda: httplog(*sys.argv[2:4])
     )()

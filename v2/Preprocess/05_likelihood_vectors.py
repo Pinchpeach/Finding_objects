@@ -200,6 +200,22 @@ def fuse(items, model=None):
 SUPPORT_ONLY_RULES = ("WISE-COLOR-001:",)
 
 
+def _strong_classes(items) -> set:
+    """Classes claimed by strong (score >= 0.8) non-soft evidence, as the conflict test of run()."""
+    strong = set()
+    for e in items:
+        c = e.get("class")
+        if c in {"WD", "BINARY"}:
+            c = "STAR"
+        try:
+            s = float(e.get("score", 0))
+        except (TypeError, ValueError):
+            s = 0
+        if c in CLASSES and s >= 0.8 and not str(e.get("rule_id", "")).endswith(("-CKNN-001", "-GBM-001")):
+            strong.add(c)
+    return strong
+
+
 def literature_only(item_lists, basis) -> np.ndarray:
     """Objects whose evidence is only NED / SIMBAD types and whose label came
     from the fused evidence (not from a measurement rule such as the 2MASS
@@ -781,6 +797,43 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
         else:
             best_candidates.append(top)
             best_candidate_scores.append(conf)
+    # The class without the catalogue labels (2.55.0): where a spectroscopic
+    # class, a NED / SIMBAD type or the SGA decided nothing the measurements
+    # did not already decide, the coarse class is an inference that the
+    # catalogue agrees with, not a lookup (Classifier/provenance.of_primary).
+    # Re-fused for the evidence-decided rows that carry a catalogue label,
+    # under the same sky priors; rule-decided rows keep their label.
+    without_catalog = np.array(labels, dtype=object)
+    cat_rows = np.flatnonzero(
+        [
+            b == "evidence" and any(str(e.get("rule_id", "")).startswith(CATALOG_LABEL_RULES) for e in items)
+            for items, b in zip(item_lists, basis)
+        ]
+    )
+    if len(cat_rows):
+        meas = [[e for e in item_lists[i] if not str(e.get("rule_id", "")).startswith(CATALOG_LABEL_RULES)] for i in cat_rows]
+        fm = fuse_many(meas, model, Path(model_path).parent)
+        Pm = np.array([[p[c] for c in CLASSES] for p, _ in fm], dtype=float)
+        Qm = Pm * (prior if adjust else np.array(train_prior)) / np.array(train_prior)
+        Qm[:, [CLASSES.index("GALAXY"), CLASSES.index("QSO")]] *= lat[cat_rows][:, None]
+        Qm[:, CLASSES.index("QSO")] *= qf[cat_rows]
+        Qm = Qm / Qm.sum(axis=1, keepdims=True)
+        if unified:
+            Qm = CLASS_PRIOR.faint_split(Qm, faint_prior[cat_rows])
+        for j, i in enumerate(cat_rows):
+            o = np.argsort(-Qm[j])
+            c, m = float(Qm[j][o[0]]), float(Qm[j][o[0]] - Qm[j][o[1]])
+            top_m = CLASSES[o[0]]
+            # the evidence-decision gates of the loop above, on the measurements alone
+            strong = _strong_classes(meas[j])
+            gated = (
+                fm[j][1] == 0
+                or (len(strong) > 1 and (not model or c < CONFLICT_RESOLVED_P))
+                or c < min_conf
+                or m < min_margin
+                or (top_m == "QSO" and (c < qso_min[i] or faint[i]))
+            )
+            without_catalog[i] = "UNKNOWN" if gated else top_m
     literature = literature_only(item_lists, basis)
     for i in np.flatnonzero(literature):
         if labels[i] in CLASSES:
@@ -843,6 +896,7 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
             "classification_basis": basis,
             "best_candidate_class": best_candidates,
             "best_candidate_probability": best_candidate_scores,
+            "primary_without_catalog": without_catalog,
         }
     )
     # Dual GALAXY/QSO reading of active galaxies (2.46.0, agn_host.py).

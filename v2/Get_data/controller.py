@@ -99,7 +99,34 @@ def _tag(ra: float, dec: float, radius_arcmin: float) -> str:
 
 # Wall-time budget per archive.  Several services (TAP in particular) can
 # hang without a socket timeout; one stuck archive must not stall the run.
+# A collector may set a shorter ``BUDGET_S`` (2.55.0).
 COLLECTOR_BUDGET_S = 300.0
+# The archives the classification rests on (archive_health.py, the locked-set
+# gate): never skipped for a recent failure, since a re-run right after an
+# outage is how a user recovers them (archive_cache.recent_failure).
+CORE = ("gaia_dr3", "desi_legacy", "panstarrs1", "allwise", "twomass")
+# A core collector that failed a moment ago is asked again; one that declares
+# RETRY_BUDGET_S is then waited for only that long.  Only collectors without an
+# internal fallback declare it: Gaia (ESA TAP, then VizieR) and Pan-STARRS1
+# (MAST, then VizieR) need their full budget to reach the fallback (PR #71
+# review).  Legacy Surveys: with the Data Lab TAP down (2026-11-17) its three
+# 80 s attempts made every re-run wait 246-300 s, while a healthy LS cone
+# takes 5-16 s, so one attempt (90 s) still catches a recovery.
+
+
+def _budget(name: str, default: float) -> float:
+    try:
+        b = min(default, float(getattr(_load_collector(name), "BUDGET_S", default)))
+    except Exception:
+        b = default
+    if name in CORE and archive_cache.recent_failure(name):
+        try:
+            retry = getattr(_load_collector(name), "RETRY_BUDGET_S", None)
+        except Exception:
+            retry = None
+        if retry is not None:
+            b = min(b, float(retry))
+    return b
 
 
 def _collect_one(
@@ -128,6 +155,22 @@ def _collect_one(
         df = archive_cache.get(
             name, source, ra, dec, radius_arcmin, float(getattr(module, "CACHE_FILTER_MARGIN_ARCMIN", 0.0))
         )
+        prev = None if (df is not None or name in CORE) else archive_cache.recent_failure(name)
+        if prev:
+            # Failed a moment ago: not asked again until the memory expires (2.55.0).
+            age = time.time() - float(prev.get("t", 0))
+            result = {
+                "collector": name,
+                "status": "error",
+                "rows": 0,
+                "elapsed_seconds": round(time.monotonic() - started, 3),
+                "output_file": "",
+                "error": f"skipped: {prev.get('status')} {age:.0f} s ago, asked again after "
+                f"{archive_cache.failure_memory_s():.0f} s ({str(prev.get('error', ''))[:160]})",
+                "cache": "recent_failure",
+            }
+            print(f"[{name}] error: skipped, failed {age:.0f} s ago", flush=True)
+            return result
         if df is not None:
             cache = "hit"
         else:
@@ -140,7 +183,7 @@ def _collect_one(
             if not (cancelled is not None and cancelled.is_set()):
                 archive_cache.put(name, source, ra, dec, radius_arcmin, df)
         if cancelled is not None and cancelled.is_set():
-            raise TimeoutError(f"{name} finished after the {COLLECTOR_BUDGET_S:.0f} s budget; result discarded")
+            raise TimeoutError(f"{name} finished after its collector budget; result discarded")
 
         # Written under a temporary name and renamed only if the budget has not
         # run out meanwhile: Stage 1 reads every *.csv in the folder, so a file
@@ -152,7 +195,7 @@ def _collect_one(
             raise RuntimeError(f"{name}.save() returned without writing {part}")
         if cancelled is not None and cancelled.is_set():
             part.unlink(missing_ok=True)
-            raise TimeoutError(f"{name} finished after the {COLLECTOR_BUDGET_S:.0f} s budget; result discarded")
+            raise TimeoutError(f"{name} finished after its collector budget; result discarded")
         os.replace(part, output)
         status = "ok" if len(df) else "empty"
         error = ""
@@ -223,12 +266,13 @@ def _disable_astroquery_cache() -> None:
         pass
 
 
-def _run_bounded(job, names, workers: int, budget_s: float) -> list[dict]:
+def _run_bounded(job, names, workers: int, budget_s: float | dict) -> list[dict]:
     """Run ``job(name, cancelled_event)`` for each name on at most ``workers``
-    daemon threads; a job over ``budget_s`` is reported as a timeout and its
+    daemon threads; a job over ``budget_s`` (seconds, or per name) is reported as a timeout and its
     slot reused (the thread cannot be killed, but its late result is dropped)."""
     import threading
 
+    limit = (lambda n: budget_s.get(n, COLLECTOR_BUDGET_S)) if isinstance(budget_s, dict) else (lambda n: budget_s)
     results: dict[str, dict] = {}
     lock = threading.Lock()  # the job's result and the timeout record never both win
     pending = list(names)
@@ -252,7 +296,7 @@ def _run_bounded(job, names, workers: int, budget_s: float) -> list[dict]:
         for name, (thread, t0, event) in list(running.items()):
             with lock:
                 done = name in results
-                if not done and thread.is_alive() and now - t0 > budget_s:
+                if not done and thread.is_alive() and now - t0 > limit(name):
                     event.set()
             if done or not thread.is_alive():
                 del running[name]
@@ -264,10 +308,10 @@ def _run_bounded(job, names, workers: int, budget_s: float) -> list[dict]:
                     "rows": 0,
                     "elapsed_seconds": round(now - t0, 3),
                     "output_file": "",
-                    "error": f"exceeded {budget_s:.0f} s collector budget",
+                    "error": f"exceeded {limit(name):.0f} s collector budget",
                     "cache": "off",
                 }
-                print(f"[{name}] timeout: abandoned after {budget_s:.0f} s", flush=True)
+                print(f"[{name}] timeout: abandoned after {limit(name):.0f} s", flush=True)
         if running:
             time.sleep(0.2)
     return [results[n] for n in names]
@@ -297,9 +341,13 @@ def collect_all(
         print(f"[cache] pruned {pruned}", flush=True)
     if workers > 1:
         _preload()
+    budgets = {n: _budget(n, budget_s) for n in COLLECTORS}
     results = _run_bounded(
-        lambda n, c: _collect_one(n, ra, dec, radius_arcmin, out_dir, tag, c), COLLECTORS, workers, budget_s
+        lambda n, c: _collect_one(n, ra, dec, radius_arcmin, out_dir, tag, c), COLLECTORS, workers, budgets
     )
+    for r in results:  # remember failures of this search, forget recovered services (2.55.0)
+        if r.get("cache") != "recent_failure" and r["status"] != "outside_footprint":
+            archive_cache.note_outcome(r["collector"], r["status"], r.get("error", ""))
 
     summary = pd.DataFrame(results)
     summary_path = out_dir / f"collection_summary_{tag}.csv"
