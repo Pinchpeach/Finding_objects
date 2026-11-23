@@ -41,3 +41,42 @@ def test_collectors_declare_their_edges_and_controller_skips(tmp_path):
     r = controller._collect_one("vlass", 0.0, -70.0, 2.0, tmp_path, "t")
     assert r["status"] == "outside_footprint" and r["rows"] == 0 and r["error"] == ""
     assert not list(tmp_path.glob("*.csv"))
+
+
+# ---------------------------------------------------- DESI DR1 tiles (2.59.0)
+def test_desi_collectors_declare_the_tile_footprint():
+    for name in ("desi_spectroscopy", "desi_fastspec"):
+        fp = controller._load_collector(name).FOOTPRINT
+        assert fp == {"tiles": "desi_dr1_tiles.csv.gz", "tile_radius_deg": 1.7}
+
+
+def test_tile_footprint_skips_the_galactic_plane_but_keeps_desi_fields_and_edges():
+    fp = {"tiles": "desi_dr1_tiles.csv.gz", "tile_radius_deg": 1.7}
+    assert not footprint.outside(fp, 150.10, 2.25, 2.0)  # COSMOS: a DR1 tile is on it
+    assert not footprint.outside(fp, 188.4155, 9.1751, 2.0)  # NGC 4522: 1.1 deg from a tile centre
+    assert footprint.outside(fp, 283.80, -2.10, 1.0)  # 11 deg from every tile
+    assert footprint.outside(fp, 283.3044, -3.5206, 1.0)
+    assert footprint.tile_gap_deg("desi_dr1_tiles.csv.gz", 150.12, 2.206) < 0.1
+    # a cone whose edge is within tile radius + margin of a tile is asked: a 3 deg cone 5 deg from the tiles is not skipped
+    gap = footprint.tile_gap_deg("desi_dr1_tiles.csv.gz", 283.80, -2.10)
+    assert footprint.outside(fp, 283.80, -2.10, 60.0 * (gap - 1.7 - footprint.MARGIN_DEG - 1.0))
+    assert not footprint.outside(fp, 283.80, -2.10, 60.0 * (gap - 1.7 - footprint.MARGIN_DEG + 1.0))
+
+
+def test_every_stored_desi_object_lies_inside_the_tile_radius():
+    """The 1.7 deg radius: 162,821 DESI objects stored in benchmark/ lie within 1.622 deg of a tile centre (2026-11-23).
+    This keeps the assumption checked on the 4,795 external-benchmark objects, so a different tile file cannot
+    silently cut the footprint."""
+    import numpy as np
+    import pandas as pd
+
+    d = pd.read_csv(GET.parent / "benchmark" / "desi_external" / "truth.csv", usecols=["ra", "dec"]).dropna()
+    gaps = [footprint.tile_gap_deg("desi_dr1_tiles.csv.gz", r, x) for r, x in zip(d.ra[::10], d.dec[::10])]
+    assert max(gaps) < 1.7 and np.isfinite(gaps).all()
+
+
+def test_controller_asks_no_desi_archive_outside_the_footprint(tmp_path):
+    for name in ("desi_spectroscopy", "desi_fastspec"):
+        r = controller._collect_one(name, 283.80, -2.10, 1.0, tmp_path, "t")
+        assert r["status"] == "outside_footprint" and r["rows"] == 0 and r["error"] == ""
+    assert not list(tmp_path.glob("*.csv"))

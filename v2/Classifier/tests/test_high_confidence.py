@@ -61,3 +61,22 @@ def test_failed_key_archive_withholds_photometric_route_only():
 def test_committed_table_loads():
     t = hc.load_table()
     assert t and t["target_purity"] >= 0.98 and all(v.get("QSO") is None for v in t["thresholds"].values())
+
+
+def test_a_faint_quasar_candidate_is_not_photometric_high_confidence_but_a_spectrum_still_confirms():
+    """2.59.0: "high confidence GALAXY" and "QSO candidate" on one object contradict each other."""
+    faint = _df(primary_class="GALAXY", primary_confidence=0.87, std_mag__ls_r=22.7)
+    assert hc.apply(faint, table=TABLE).high_confidence.iloc[0]  # an ordinary faint galaxy
+    flagged = faint.assign(secondary_class="QSO", secondary_class_reason="FAINT_QSO_CANDIDATE")
+    assert not hc.apply(flagged, table=TABLE).high_confidence.iloc[0]
+    other = faint.assign(secondary_class="QSO", secondary_class_reason="GALAXY_WISE_AGN")  # another reading: unchanged
+    assert hc.apply(other, table=TABLE).high_confidence.iloc[0]
+    spec = flagged.assign(
+        desi_dr1_spectroscopy__OType="GALAXY",
+        catalog_confidence_desi_spectroscopy=1.0,
+        association_confidence__desi_dr1_spectroscopy=0.95,
+    )
+    r = hc.apply(spec, table=TABLE)
+    assert r.high_confidence.iloc[0] and r.high_confidence_basis.iloc[0] == "spectrum (DESI DR1)"
+    # a missing column (results of an older version) is the old behaviour
+    assert hc.apply(faint.drop(columns=[c for c in faint.columns if c.startswith("secondary")], errors="ignore"), table=TABLE).high_confidence.iloc[0]

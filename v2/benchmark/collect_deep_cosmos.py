@@ -65,6 +65,18 @@ def _load(path: Path, name: str):
     return mod
 
 
+def gaia_source(raw: Path) -> str:
+    """ "tap" when the collected Gaia rows come from the ESA archive, "vizier_fallback" for the VizieR copy,
+    "empty" without rows, "none" without a file."""
+    import pandas as pd
+
+    files = sorted(raw.glob("gaia_dr3_ra*.csv"))
+    if not files:
+        return "none"
+    st = pd.read_csv(files[0], usecols=lambda c: c == "gaia_base_query_status", dtype=str, keep_default_na=False)
+    return str(st.iloc[0, 0]) if len(st) and st.shape[1] else "empty"
+
+
 def collect_field(name: str, out: Path, workers: int, retries: int) -> dict:
     ra, dec = FIELDS[name]
     ctl = _load(V2 / "Get_data" / "controller.py", "deep_controller")
@@ -91,6 +103,7 @@ def collect_field(name: str, out: Path, workers: int, retries: int) -> dict:
     state = cov.summarize(raw)
     return {
         "field": name,
+        "gaia_source": gaia_source(raw),
         "failed": [f["collector"] for f in state.get("failed", [])],
         "alternative": [a["collector"] for a in state.get("alternative", [])],
         "key_failed": state.get("key_failed", False),
@@ -100,15 +113,35 @@ def collect_field(name: str, out: Path, workers: int, retries: int) -> dict:
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--out", type=Path, required=True)
-    p.add_argument("--fields", default=",".join(FIELDS))
+    p.add_argument("--fields", default="", help="comma list; default: every field of the list")
+    p.add_argument(
+        "--fields-file", type=Path, help="fields csv (name, ra, dec, r), e.g. deep_cosmos_fields_2.csv (2.59.0)"
+    )
     p.add_argument("--workers", type=int, default=6)
     p.add_argument("--retries", type=int, default=2)
+    p.add_argument(
+        "--require-gaia-tap",
+        action="store_true",
+        help="fail unless every field's Gaia rows are the ESA archive's, not the VizieR copy",
+    )
     a = p.parse_args()
+    if a.fields_file:
+        import pandas as pd
+
+        t = pd.read_csv(a.fields_file)
+        if "r" in t and not (t.r.astype(float) == RADIUS_ARCMIN).all():
+            p.error(f"every field of {a.fields_file} must have radius {RADIUS_ARCMIN}'")
+        FIELDS.clear()
+        FIELDS.update({r.name: (float(r.ra), float(r.dec)) for r in t.itertuples()})
     results = []
-    for name in a.fields.split(","):
+    for name in (a.fields.split(",") if a.fields else list(FIELDS)):
         results.append(collect_field(name.strip(), a.out, a.workers, a.retries))
         print(json.dumps(results[-1]), flush=True)
     (a.out / "collection_state.json").write_text(json.dumps(results, indent=1))
+    copy = [r["field"] for r in results if r["gaia_source"] == "vizier_fallback"]
+    if a.require_gaia_tap and copy:
+        print(f"Gaia came from the VizieR copy in {copy}: not a baseline collection (ESA archive down?)", flush=True)
+        return 2
     return 1 if any(r["key_failed"] for r in results) else 0
 
 

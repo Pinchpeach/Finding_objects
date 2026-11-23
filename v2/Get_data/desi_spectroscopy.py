@@ -15,6 +15,9 @@ save = save_csv  # collector API: save(df, path)
 
 CATALOG = "DESI DR1 spectroscopy"
 VIZIER_CATALOG = "V/161/zcatdr1"
+# DESI DR1 covers the tiles of its public tile list only (footprint.py, 2.59.0): outside them the cone
+# is not asked (the Galactic plane field is 11 deg from the nearest tile).
+FOOTPRINT = {"tiles": "desi_dr1_tiles.csv.gz", "tile_radius_deg": 1.7}
 
 
 def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:

@@ -102,7 +102,7 @@ class TapTimeout(RuntimeError):
     """Every attempt ran out of time (as opposed to a rejected query)."""
 
 
-def _query_with_retries(run, hedge=None):
+def _query_with_retries(run, hedge=None, attempts=None, attempt_budget_s=None):
     """Result of ``run()`` (the Data Lab TAP), in up to ATTEMPTS attempts of
     ATTEMPT_BUDGET_S each.  ``hedge`` (2.57.0): a second path to the same rows,
     started once, in its own thread, when an attempt fails or the first one has
@@ -110,6 +110,8 @@ def _query_with_retries(run, hedge=None):
     (the TAP's when both are there)."""
     import threading, time
 
+    attempts = ATTEMPTS if attempts is None else attempts  # a caller may wait less (desi_fastspec.py, 2.59.0)
+    budget = ATTEMPT_BUDGET_S if attempt_budget_s is None else attempt_budget_s
     hedged = {}  # {"thread", "value", "error"} once started
 
     def start_hedge(why):
@@ -123,12 +125,12 @@ def _query_with_retries(run, hedge=None):
         return hedged.get("value")
 
     last = None
-    for attempt in range(ATTEMPTS):
+    for attempt in range(attempts):
         box = {}
         t0 = time.monotonic()
         t = threading.Thread(target=_box_target(run, box), daemon=True)
         t.start()
-        while t.is_alive() and time.monotonic() - t0 < ATTEMPT_BUDGET_S:
+        while t.is_alive() and time.monotonic() - t0 < budget:
             t.join(0.25)
             if hedge_value() is not None and "value" not in box:
                 return hedge_value()
@@ -136,18 +138,18 @@ def _query_with_retries(run, hedge=None):
                 start_hedge(f"has not answered in {HEDGE_DELAY_S:.0f} s")
         if "value" in box:
             return box["value"]
-        last = box.get("error") or TimeoutError(f"Data Lab TAP exceeded {ATTEMPT_BUDGET_S:.0f} s")
+        last = box.get("error") or TimeoutError(f"Data Lab TAP exceeded {budget:.0f} s")
         start_hedge("attempt failed")
         if hedge_value() is not None:
             return hedge_value()
-        if attempt + 1 < ATTEMPTS:
+        if attempt + 1 < attempts:
             time.sleep(2.0 * (attempt + 1))
     if hedged.get("thread") is not None:  # the viewer may still be on its way
         hedged["thread"].join(VIEWER_TIMEOUT_S[1] + VIEWER_TIMEOUT_S[0])
         if hedge_value() is not None:
             return hedge_value()
     err = TapTimeout if isinstance(last, TimeoutError) else RuntimeError
-    raise err(f"Legacy Surveys TAP failed after {ATTEMPTS} attempts: {last!r}")
+    raise err(f"Legacy Surveys TAP failed after {attempts} attempts: {last!r}")
 
 
 def _box_target(fn, box):

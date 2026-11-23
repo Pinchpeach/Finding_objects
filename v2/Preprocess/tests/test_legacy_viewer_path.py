@@ -199,3 +199,26 @@ def test_a_viewer_answer_is_cached_for_a_day_only():
     df = pd.DataFrame({"ra": [1.0], "dec": [2.0], "legacy_query_status": ["viewer_fallback"]})
     assert archive_cache.cacheable(df) and archive_cache.fallback(df)
     assert archive_cache._ttl("desi_legacy", 1, True) == archive_cache.FALLBACK_TTL_DAYS
+
+
+def test_a_caller_may_wait_less_than_the_legacy_surveys_defaults(monkeypatch):
+    """FastSpecFit (2.59.0): two attempts of 50 s, not three of 80 s; the helper takes them per call."""
+    import time as _t
+
+    fs_spec = importlib.util.spec_from_file_location("desi_fastspec_t", GET / "desi_fastspec.py")
+    fs = importlib.util.module_from_spec(fs_spec)
+    fs_spec.loader.exec_module(fs)
+    assert (fs.ATTEMPTS, fs.ATTEMPT_BUDGET_S, fs.BUDGET_S) == (2, 50.0, 110.0)
+    assert fs.ATTEMPTS * fs.ATTEMPT_BUDGET_S + 2.0 < fs.BUDGET_S  # the controller budget leaves room for both attempts
+    calls = []
+
+    def stall():
+        calls.append(_t.monotonic())
+        _t.sleep(5)
+
+    monkeypatch.setattr(ls, "ATTEMPTS", 3)  # the module defaults stay what they were
+    monkeypatch.setattr(ls, "ATTEMPT_BUDGET_S", 3.0)
+    t0 = _t.monotonic()
+    with pytest.raises(ls.TapTimeout):
+        ls._query_with_retries(stall, attempts=2, attempt_budget_s=0.5)
+    assert len(calls) == 2 and _t.monotonic() - t0 < 4.0
