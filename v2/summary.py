@@ -55,6 +55,9 @@ COLUMNS = [
     "host_redshift",
     "designation_catalog",
     "catalogs",
+    # run-level: archives this search could not reach (catalog_coverage.annotate, 2.57.0)
+    "run_archives_status",
+    "run_archives_missing",
     "object_id",
 ]
 SUMMARY = "objects_summary.csv"

@@ -13,6 +13,11 @@ Examples::
     # ... keeping only objects within 0.2 arcmin of a position:
     python v2/pipeline.py --raw-dir v2/rawdata --ra 188.4155 --dec 9.1751 --radius 0.2 --work runs/core
 
+    # After a run that lost an archive (the warning and the run_archives_status
+    # column of the results say so): ask only the failed key archives again and
+    # classify again; add "all" to ask every failed archive.
+    python v2/pipeline.py --work runs/ngc4522 --retry-failed
+
 Every stage writes its CSV into ``--work`` so intermediate products stay
 inspectable; per-stage wall time is written to ``pipeline_summary.csv``.
 ``objects_summary.csv`` holds the columns to read first, one row per
@@ -82,6 +87,8 @@ EMPTY_RESULT_COLUMNS = [
     "subclass",
     "subclass_tags",
     "subclass_status",
+    "run_archives_status",
+    "run_archives_missing",
 ]
 
 
@@ -94,7 +101,12 @@ def run(
     min_confidence: float | None = None,
     workers: int = 6,
     field_prior: bool = False,
+    retry_failed: str | None = None,
 ) -> pd.DataFrame:
+    """``retry_failed`` ("key" or "all"): do not search again; ask only the failed
+    archives (key ones, or all) of the last search in ``work`` again and classify
+    again (2.57.0).  The search is the one in ``work/raw`` that ``ra/dec/radius``
+    name, else the newest."""
     work = Path(work)
     work.mkdir(parents=True, exist_ok=True)
     timings = []
@@ -106,7 +118,37 @@ def run(
         print(f"[pipeline] {name}: {timings[-1]['seconds']} s", flush=True)
 
     collect = raw_dir is None
-    if collect:
+    if retry_failed:
+        if raw_dir is not None:
+            raise ValueError("--retry-failed asks the archives of a search in --work again; it takes no --raw-dir")
+        controller = _load(GET / "controller.py", "v2_get_data_controller")
+        if None not in (ra, dec, radius):
+            raw_dir = work / "raw" / controller._tag(ra, dec, radius)
+        else:
+            # the search these results were classified from, else the newest one
+            prev = (_load(V2 / "catalog_coverage.py", "v2_catalog_coverage").read(work) or {}).get("raw_dir")
+            raw_dir = (
+                Path(prev)
+                if prev and (Path(prev) / controller.SEARCH_FILE).exists()
+                else controller.last_collection(work)
+            )
+        if raw_dir is None or not Path(raw_dir).is_dir():
+            raise ValueError(f"no earlier search with a collection summary in {work / 'raw'}: run the search first")
+        cone = controller.read_search(raw_dir) or (None if None in (ra, dec, radius) else (ra, dec, radius))
+        if cone is None:
+            raise ValueError(f"{raw_dir} has no search.json (a search of an older version): give --ra/--dec/--radius")
+        ra, dec, radius = cone
+        if not controller.failed_collectors(raw_dir, retry_failed) and (work / "classified_objects.csv").exists():
+            print(
+                f"[retry] no failed {'key ' if retry_failed == 'key' else ''}archives in {raw_dir.name}: "
+                "nothing to ask again"
+                + (" (--retry-failed all asks every failed archive)" if retry_failed == "key" else ""),
+                flush=True,
+            )
+            return pd.read_csv(work / "classified_objects.csv", low_memory=False)
+        step("retry", controller.retry_failed, raw_dir, ra, dec, radius, workers, retry_failed)
+        collect = True  # a search with a centre, not a cone cut of collected files (names.annotate below)
+    elif collect:
         if None in (ra, dec, radius):
             raise ValueError("give --raw-dir, or --ra/--dec/--radius to collect")
         controller = _load(GET / "controller.py", "v2_get_data_controller")
@@ -130,10 +172,11 @@ def run(
         # Nothing detected (empty sky patch, tiny radius, or every archive
         # down): an empty result, not a failure of the later stages.
         out = pd.DataFrame(columns=EMPTY_RESULT_COLUMNS)
+        coverage = _coverage(work, raw_dir)
+        out = _load(V2 / "catalog_coverage.py", "v2_catalog_coverage").annotate(out, coverage)
         out.to_csv(work / "classified_objects.csv", index=False)
         _load(V2 / "summary.py", "v2_summary").write(out, work)
         pd.DataFrame(timings).to_csv(work / "pipeline_summary.csv", index=False)
-        _coverage(work, raw_dir)
         print("[pipeline] 0 objects: no detections in the search area", flush=True)
         return out
     step("2_integrate", s2.run, work / "source_association.csv", Path(raw_dir), work / "integrated_objects.csv")
@@ -183,6 +226,8 @@ def run(
     # (2.36.0, catalog_coverage.py / high_confidence.py).
     coverage = _coverage(work, raw_dir)
     out = _load(V2 / "high_confidence.py", "v2_high_confidence").apply(out, coverage)
+    # The same information inside the tables, for whoever gets only the CSV (2.57.0).
+    out = _load(V2 / "catalog_coverage.py", "v2_catalog_coverage").annotate(out, coverage)
     out.to_csv(work / "classified_objects.csv", index=False)
     # The columns a user reads first, one row per independent detected object;
     # galaxy parts and NED/SIMBAD-only entries apart (2.54.0, summary.py).
@@ -226,7 +271,32 @@ def main():
         action="store_true",
         help="re-weight coarse classes by this field's EM-estimated class mix (off by default)",
     )
+    p.add_argument(
+        "--retry-failed",
+        nargs="?",
+        const="key",
+        choices=("key", "all"),
+        help="do not search again: ask only the archives that failed in the last search in --work "
+        "(default 'key': the archives the classification rests on; 'all': every failed one) and classify "
+        "again.  The search is the one --ra/--dec/--radius name, else the newest in WORK/raw",
+    )
     a = p.parse_args()
+    if a.retry_failed and a.raw_dir is not None:
+        p.error("--retry-failed takes no --raw-dir (it asks the archives of a search in --work again)")
+    if a.retry_failed and (a.ra is None) != (a.dec is None):
+        p.error("give both --ra and --dec")
+    if a.retry_failed:
+        if a.radius is not None and a.radius <= 0:
+            p.error("--radius must be > 0")
+        if a.radius is not None and None in (a.ra, a.dec):
+            p.error("--radius needs --ra and --dec")
+        if (a.ra is not None) and a.radius is None:
+            p.error("give all of --ra/--dec/--radius to name the search to retry, or none for the newest")
+        try:
+            run(a.work, None, a.ra, a.dec, a.radius, a.min_confidence, max(1, a.workers), a.field_prior, a.retry_failed)
+        except ValueError as exc:
+            p.error(str(exc))
+        return
     if a.raw_dir is None and None in (a.ra, a.dec, a.radius):
         p.error("give --raw-dir, or all of --ra/--dec/--radius")
     if (a.ra is None) != (a.dec is None):
