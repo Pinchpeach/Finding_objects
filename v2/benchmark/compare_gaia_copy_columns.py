@@ -113,14 +113,14 @@ def ucd(n: int) -> dict:
         got = list(ex.map(ask, t.itertuples()))
     r = pd.DataFrame(got, index=t.index)
     ok = r.get("teff", pd.Series(np.nan, index=t.index)).notna()
-    diff = (r.teff - t.teff_espucd).abs()[ok]
+    diff = (r["teff"] - t["teff_espucd"]).abs()[ok]
     out = {
         "asked": int(len(t)),
         "errors": int(r.get("error", pd.Series(dtype=object)).notna().sum()),
         "with_copy_teff_ucd": int(ok.sum()),
         "teff_within_1K": int((diff <= 1.0).sum()),
         "teff_max_abs_diff_K": float(diff.max()) if ok.any() else None,
-        "flags_equal": int(_same(r.flags[ok], t.flags_espucd[ok], "flags_espucd").sum()) if ok.any() else 0,
+        "flags_equal": int(_same(r["flags"][ok], t["flags_espucd"][ok], "flags_espucd").sum()) if ok.any() else 0,
     }
     print("ucd", json.dumps(out), flush=True)
     return out
