@@ -1,0 +1,831 @@
+{
+ "fields": [
+  "deep_cosmos_1",
+  "deep_cosmos_2",
+  "deep_cosmos_3",
+  "deep_cosmos_4",
+  "deep_cosmos_5",
+  "deep_cosmos_6",
+  "deep_cosmos_7",
+  "deep_cosmos_8",
+  "deep_cosmos_9"
+ ],
+ "truth_in_fields": {
+  "TYPE2": 396,
+  "TYPE1": 160,
+  "UNKNOWN": 25,
+  "STAR": 19
+ },
+ "tables": {
+  "cal/type1_all": {
+   "truth": 99,
+   "matched": 90,
+   "qso": 27,
+   "qso_recall_of_matched": 0.3,
+   "wilson95": [
+    0.2151,
+    0.4013
+   ],
+   "by_r": [
+    {
+     "bin": "r -inf-21.0",
+     "n": 11,
+     "QSO": 10,
+     "GALAXY": 1,
+     "STAR": 0,
+     "UNKNOWN": 0,
+     "qso_recall": 0.9091,
+     "wilson95": [
+      0.6226,
+      0.9838
+     ]
+    },
+    {
+     "bin": "r 21.0-22.0",
+     "n": 12,
+     "QSO": 10,
+     "GALAXY": 1,
+     "STAR": 0,
+     "UNKNOWN": 1,
+     "qso_recall": 0.8333,
+     "wilson95": [
+      0.552,
+      0.953
+     ]
+    },
+    {
+     "bin": "r 22.0-23.0",
+     "n": 22,
+     "QSO": 5,
+     "GALAXY": 14,
+     "STAR": 0,
+     "UNKNOWN": 3,
+     "qso_recall": 0.2273,
+     "wilson95": [
+      0.1012,
+      0.4344
+     ]
+    },
+    {
+     "bin": "r 23.0-24.0",
+     "n": 20,
+     "QSO": 2,
+     "GALAXY": 18,
+     "STAR": 0,
+     "UNKNOWN": 0,
+     "qso_recall": 0.1,
+     "wilson95": [
+      0.0279,
+      0.301
+     ]
+    },
+    {
+     "bin": "r 24.0-inf",
+     "n": 21,
+     "QSO": 0,
+     "GALAXY": 21,
+     "STAR": 0,
+     "UNKNOWN": 0,
+     "qso_recall": 0.0,
+     "wilson95": [
+      0.0,
+      0.1546
+     ]
+    },
+    {
+     "bin": "matched, no LS r",
+     "n": 4,
+     "QSO": 0,
+     "GALAXY": 1,
+     "STAR": 0,
+     "UNKNOWN": 3,
+     "qso_recall": 0.0,
+     "wilson95": [
+      0.0,
+      0.4899
+     ]
+    }
+   ]
+  },
+  "cal/type1_spec": {
+   "truth": 77,
+   "matched": 74,
+   "qso": 26,
+   "qso_recall_of_matched": 0.3514,
+   "wilson95": [
+    0.2524,
+    0.465
+   ],
+   "by_r": [
+    {
+     "bin": "r -inf-21.0",
+     "n": 11,
+     "QSO": 10,
+     "GALAXY": 1,
+     "STAR": 0,
+     "UNKNOWN": 0,
+     "qso_recall": 0.9091,
+     "wilson95": [
+      0.6226,
+      0.9838
+     ]
+    },
+    {
+     "bin": "r 21.0-22.0",
+     "n": 12,
+     "QSO": 10,
+     "GALAXY": 1,
+     "STAR": 0,
+     "UNKNOWN": 1,
+     "qso_recall": 0.8333,
+     "wilson95": [
+      0.552,
+      0.953
+     ]
+    },
+    {
+     "bin": "r 22.0-23.0",
+     "n": 20,
+     "QSO": 4,
+     "GALAXY": 13,
+     "STAR": 0,
+     "UNKNOWN": 3,
+     "qso_recall": 0.2,
+     "wilson95": [
+      0.0807,
+      0.416
+     ]
+    },
+    {
+     "bin": "r 23.0-24.0",
+     "n": 18,
+     "QSO": 2,
+     "GALAXY": 16,
+     "STAR": 0,
+     "UNKNOWN": 0,
+     "qso_recall": 0.1111,
+     "wilson95": [
+      0.031,
+      0.328
+     ]
+    },
+    {
+     "bin": "r 24.0-inf",
+     "n": 12,
+     "QSO": 0,
+     "GALAXY": 12,
+     "STAR": 0,
+     "UNKNOWN": 0,
+     "qso_recall": 0.0,
+     "wilson95": [
+      0.0,
+      0.2425
+     ]
+    },
+    {
+     "bin": "matched, no LS r",
+     "n": 1,
+     "QSO": 0,
+     "GALAXY": 1,
+     "STAR": 0,
+     "UNKNOWN": 0,
+     "qso_recall": 0.0,
+     "wilson95": [
+      0.0,
+      0.7935
+     ]
+    }
+   ]
+  },
+  "cal/type2_all": {
+   "truth": 225,
+   "matched": 207,
+   "qso": 4,
+   "qso_recall_of_matched": 0.0193,
+   "wilson95": [
+    0.0075,
+    0.0486
+   ],
+   "by_r": [
+    {
+     "bin": "r -inf-21.0",
+     "n": 22,
+     "QSO": 1,
+     "GALAXY": 21,
+     "STAR": 0,
+     "UNKNOWN": 0,
+     "qso_recall": 0.0455,
+     "wilson95": [
+      0.0081,
+      0.218
+     ]
+    },
+    {
+     "bin": "r 21.0-22.0",
+     "n": 23,
+     "QSO": 0,
+     "GALAXY": 23,
+     "STAR": 0,
+     "UNKNOWN": 0,
+     "qso_recall": 0.0,
+     "wilson95": [
+      -0.0,
+      0.1431
+     ]
+    },
+    {
+     "bin": "r 22.0-23.0",
+     "n": 34,
+     "QSO": 1,
+     "GALAXY": 31,
+     "STAR": 1,
+     "UNKNOWN": 1,
+     "qso_recall": 0.0294,
+     "wilson95": [
+      0.0052,
+      0.1492
+     ]
+    },
+    {
+     "bin": "r 23.0-24.0",
+     "n": 34,
+     "QSO": 0,
+     "GALAXY": 34,
+     "STAR": 0,
+     "UNKNOWN": 0,
+     "qso_recall": 0.0,
+     "wilson95": [
+      0.0,
+      0.1015
+     ]
+    },
+    {
+     "bin": "r 24.0-inf",
+     "n": 70,
+     "QSO": 0,
+     "GALAXY": 63,
+     "STAR": 7,
+     "UNKNOWN": 0,
+     "qso_recall": 0.0,
+     "wilson95": [
+      0.0,
+      0.052
+     ]
+    },
+    {
+     "bin": "matched, no LS r",
+     "n": 24,
+     "QSO": 2,
+     "GALAXY": 1,
+     "STAR": 0,
+     "UNKNOWN": 21,
+     "qso_recall": 0.0833,
+     "wilson95": [
+      0.0232,
+      0.2585
+     ]
+    }
+   ]
+  },
+  "test/type1_all": {
+   "truth": 61,
+   "matched": 60,
+   "qso": 21,
+   "qso_recall_of_matched": 0.35,
+   "wilson95": [
+    0.2417,
+    0.4764
+   ],
+   "by_r": [
+    {
+     "bin": "r -inf-21.0",
+     "n": 14,
+     "QSO": 14,
+     "GALAXY": 0,
+     "STAR": 0,
+     "UNKNOWN": 0,
+     "qso_recall": 1.0,
+     "wilson95": [
+      0.7847,
+      1.0
+     ]
+    },
+    {
+     "bin": "r 21.0-22.0",
+     "n": 9,
+     "QSO": 6,
+     "GALAXY": 1,
+     "STAR": 2,
+     "UNKNOWN": 0,
+     "qso_recall": 0.6667,
+     "wilson95": [
+      0.3542,
+      0.8794
+     ]
+    },
+    {
+     "bin": "r 22.0-23.0",
+     "n": 10,
+     "QSO": 1,
+     "GALAXY": 7,
+     "STAR": 1,
+     "UNKNOWN": 1,
+     "qso_recall": 0.1,
+     "wilson95": [
+      0.0179,
+      0.4042
+     ]
+    },
+    {
+     "bin": "r 23.0-24.0",
+     "n": 11,
+     "QSO": 0,
+     "GALAXY": 10,
+     "STAR": 0,
+     "UNKNOWN": 1,
+     "qso_recall": 0.0,
+     "wilson95": [
+      0.0,
+      0.2588
+     ]
+    },
+    {
+     "bin": "r 24.0-inf",
+     "n": 12,
+     "QSO": 0,
+     "GALAXY": 11,
+     "STAR": 1,
+     "UNKNOWN": 0,
+     "qso_recall": 0.0,
+     "wilson95": [
+      0.0,
+      0.2425
+     ]
+    },
+    {
+     "bin": "matched, no LS r",
+     "n": 4,
+     "QSO": 0,
+     "GALAXY": 0,
+     "STAR": 0,
+     "UNKNOWN": 4,
+     "qso_recall": 0.0,
+     "wilson95": [
+      0.0,
+      0.4899
+     ]
+    }
+   ]
+  },
+  "test/type1_spec": {
+   "truth": 42,
+   "matched": 42,
+   "qso": 21,
+   "qso_recall_of_matched": 0.5,
+   "wilson95": [
+    0.3553,
+    0.6447
+   ],
+   "by_r": [
+    {
+     "bin": "r -inf-21.0",
+     "n": 14,
+     "QSO": 14,
+     "GALAXY": 0,
+     "STAR": 0,
+     "UNKNOWN": 0,
+     "qso_recall": 1.0,
+     "wilson95": [
+      0.7847,
+      1.0
+     ]
+    },
+    {
+     "bin": "r 21.0-22.0",
+     "n": 9,
+     "QSO": 6,
+     "GALAXY": 1,
+     "STAR": 2,
+     "UNKNOWN": 0,
+     "qso_recall": 0.6667,
+     "wilson95": [
+      0.3542,
+      0.8794
+     ]
+    },
+    {
+     "bin": "r 22.0-23.0",
+     "n": 9,
+     "QSO": 1,
+     "GALAXY": 7,
+     "STAR": 1,
+     "UNKNOWN": 0,
+     "qso_recall": 0.1111,
+     "wilson95": [
+      0.0199,
+      0.435
+     ]
+    },
+    {
+     "bin": "r 23.0-24.0",
+     "n": 7,
+     "QSO": 0,
+     "GALAXY": 6,
+     "STAR": 0,
+     "UNKNOWN": 1,
+     "qso_recall": 0.0,
+     "wilson95": [
+      0.0,
+      0.3543
+     ]
+    },
+    {
+     "bin": "r 24.0-inf",
+     "n": 3,
+     "QSO": 0,
+     "GALAXY": 3,
+     "STAR": 0,
+     "UNKNOWN": 0,
+     "qso_recall": 0.0,
+     "wilson95": [
+      0.0,
+      0.5615
+     ]
+    },
+    {
+     "bin": "matched, no LS r",
+     "n": 0,
+     "QSO": 0,
+     "GALAXY": 0,
+     "STAR": 0,
+     "UNKNOWN": 0,
+     "qso_recall": null,
+     "wilson95": [
+      NaN,
+      NaN
+     ]
+    }
+   ]
+  },
+  "test/type2_all": {
+   "truth": 171,
+   "matched": 157,
+   "qso": 4,
+   "qso_recall_of_matched": 0.0255,
+   "wilson95": [
+    0.01,
+    0.0637
+   ],
+   "by_r": [
+    {
+     "bin": "r -inf-21.0",
+     "n": 18,
+     "QSO": 0,
+     "GALAXY": 18,
+     "STAR": 0,
+     "UNKNOWN": 0,
+     "qso_recall": 0.0,
+     "wilson95": [
+      0.0,
+      0.1759
+     ]
+    },
+    {
+     "bin": "r 21.0-22.0",
+     "n": 15,
+     "QSO": 2,
+     "GALAXY": 13,
+     "STAR": 0,
+     "UNKNOWN": 0,
+     "qso_recall": 0.1333,
+     "wilson95": [
+      0.0374,
+      0.3788
+     ]
+    },
+    {
+     "bin": "r 22.0-23.0",
+     "n": 22,
+     "QSO": 1,
+     "GALAXY": 21,
+     "STAR": 0,
+     "UNKNOWN": 0,
+     "qso_recall": 0.0455,
+     "wilson95": [
+      0.0081,
+      0.218
+     ]
+    },
+    {
+     "bin": "r 23.0-24.0",
+     "n": 36,
+     "QSO": 0,
+     "GALAXY": 36,
+     "STAR": 0,
+     "UNKNOWN": 0,
+     "qso_recall": 0.0,
+     "wilson95": [
+      0.0,
+      0.0964
+     ]
+    },
+    {
+     "bin": "r 24.0-inf",
+     "n": 50,
+     "QSO": 1,
+     "GALAXY": 41,
+     "STAR": 7,
+     "UNKNOWN": 1,
+     "qso_recall": 0.02,
+     "wilson95": [
+      0.0035,
+      0.105
+     ]
+    },
+    {
+     "bin": "matched, no LS r",
+     "n": 16,
+     "QSO": 0,
+     "GALAXY": 2,
+     "STAR": 0,
+     "UNKNOWN": 14,
+     "qso_recall": 0.0,
+     "wilson95": [
+      0.0,
+      0.1936
+     ]
+    }
+   ]
+  },
+  "all/type1_all": {
+   "truth": 160,
+   "matched": 150,
+   "qso": 48,
+   "qso_recall_of_matched": 0.32,
+   "wilson95": [
+    0.2506,
+    0.3983
+   ],
+   "by_r": [
+    {
+     "bin": "r -inf-21.0",
+     "n": 25,
+     "QSO": 24,
+     "GALAXY": 1,
+     "STAR": 0,
+     "UNKNOWN": 0,
+     "qso_recall": 0.96,
+     "wilson95": [
+      0.8046,
+      0.9929
+     ]
+    },
+    {
+     "bin": "r 21.0-22.0",
+     "n": 21,
+     "QSO": 16,
+     "GALAXY": 2,
+     "STAR": 2,
+     "UNKNOWN": 1,
+     "qso_recall": 0.7619,
+     "wilson95": [
+      0.5491,
+      0.8937
+     ]
+    },
+    {
+     "bin": "r 22.0-23.0",
+     "n": 32,
+     "QSO": 6,
+     "GALAXY": 21,
+     "STAR": 1,
+     "UNKNOWN": 4,
+     "qso_recall": 0.1875,
+     "wilson95": [
+      0.0889,
+      0.3531
+     ]
+    },
+    {
+     "bin": "r 23.0-24.0",
+     "n": 31,
+     "QSO": 2,
+     "GALAXY": 28,
+     "STAR": 0,
+     "UNKNOWN": 1,
+     "qso_recall": 0.0645,
+     "wilson95": [
+      0.0179,
+      0.2072
+     ]
+    },
+    {
+     "bin": "r 24.0-inf",
+     "n": 33,
+     "QSO": 0,
+     "GALAXY": 32,
+     "STAR": 1,
+     "UNKNOWN": 0,
+     "qso_recall": 0.0,
+     "wilson95": [
+      0.0,
+      0.1043
+     ]
+    },
+    {
+     "bin": "matched, no LS r",
+     "n": 8,
+     "QSO": 0,
+     "GALAXY": 1,
+     "STAR": 0,
+     "UNKNOWN": 7,
+     "qso_recall": 0.0,
+     "wilson95": [
+      0.0,
+      0.3244
+     ]
+    }
+   ]
+  },
+  "all/type1_spec": {
+   "truth": 119,
+   "matched": 116,
+   "qso": 47,
+   "qso_recall_of_matched": 0.4052,
+   "wilson95": [
+    0.3203,
+    0.4962
+   ],
+   "by_r": [
+    {
+     "bin": "r -inf-21.0",
+     "n": 25,
+     "QSO": 24,
+     "GALAXY": 1,
+     "STAR": 0,
+     "UNKNOWN": 0,
+     "qso_recall": 0.96,
+     "wilson95": [
+      0.8046,
+      0.9929
+     ]
+    },
+    {
+     "bin": "r 21.0-22.0",
+     "n": 21,
+     "QSO": 16,
+     "GALAXY": 2,
+     "STAR": 2,
+     "UNKNOWN": 1,
+     "qso_recall": 0.7619,
+     "wilson95": [
+      0.5491,
+      0.8937
+     ]
+    },
+    {
+     "bin": "r 22.0-23.0",
+     "n": 29,
+     "QSO": 5,
+     "GALAXY": 20,
+     "STAR": 1,
+     "UNKNOWN": 3,
+     "qso_recall": 0.1724,
+     "wilson95": [
+      0.076,
+      0.3455
+     ]
+    },
+    {
+     "bin": "r 23.0-24.0",
+     "n": 25,
+     "QSO": 2,
+     "GALAXY": 22,
+     "STAR": 0,
+     "UNKNOWN": 1,
+     "qso_recall": 0.08,
+     "wilson95": [
+      0.0222,
+      0.2497
+     ]
+    },
+    {
+     "bin": "r 24.0-inf",
+     "n": 15,
+     "QSO": 0,
+     "GALAXY": 15,
+     "STAR": 0,
+     "UNKNOWN": 0,
+     "qso_recall": 0.0,
+     "wilson95": [
+      -0.0,
+      0.2039
+     ]
+    },
+    {
+     "bin": "matched, no LS r",
+     "n": 1,
+     "QSO": 0,
+     "GALAXY": 1,
+     "STAR": 0,
+     "UNKNOWN": 0,
+     "qso_recall": 0.0,
+     "wilson95": [
+      0.0,
+      0.7935
+     ]
+    }
+   ]
+  },
+  "all/type2_all": {
+   "truth": 396,
+   "matched": 364,
+   "qso": 8,
+   "qso_recall_of_matched": 0.022,
+   "wilson95": [
+    0.0112,
+    0.0428
+   ],
+   "by_r": [
+    {
+     "bin": "r -inf-21.0",
+     "n": 40,
+     "QSO": 1,
+     "GALAXY": 39,
+     "STAR": 0,
+     "UNKNOWN": 0,
+     "qso_recall": 0.025,
+     "wilson95": [
+      0.0044,
+      0.1288
+     ]
+    },
+    {
+     "bin": "r 21.0-22.0",
+     "n": 38,
+     "QSO": 2,
+     "GALAXY": 36,
+     "STAR": 0,
+     "UNKNOWN": 0,
+     "qso_recall": 0.0526,
+     "wilson95": [
+      0.0146,
+      0.1729
+     ]
+    },
+    {
+     "bin": "r 22.0-23.0",
+     "n": 56,
+     "QSO": 2,
+     "GALAXY": 52,
+     "STAR": 1,
+     "UNKNOWN": 1,
+     "qso_recall": 0.0357,
+     "wilson95": [
+      0.0098,
+      0.1212
+     ]
+    },
+    {
+     "bin": "r 23.0-24.0",
+     "n": 70,
+     "QSO": 0,
+     "GALAXY": 70,
+     "STAR": 0,
+     "UNKNOWN": 0,
+     "qso_recall": 0.0,
+     "wilson95": [
+      0.0,
+      0.052
+     ]
+    },
+    {
+     "bin": "r 24.0-inf",
+     "n": 120,
+     "QSO": 1,
+     "GALAXY": 104,
+     "STAR": 14,
+     "UNKNOWN": 1,
+     "qso_recall": 0.0083,
+     "wilson95": [
+      0.0015,
+      0.0457
+     ]
+    },
+    {
+     "bin": "matched, no LS r",
+     "n": 40,
+     "QSO": 2,
+     "GALAXY": 3,
+     "STAR": 0,
+     "UNKNOWN": 35,
+     "qso_recall": 0.05,
+     "wilson95": [
+      0.0138,
+      0.165
+     ]
+    }
+   ]
+  }
+ }
+}

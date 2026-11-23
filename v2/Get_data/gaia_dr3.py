@@ -150,6 +150,23 @@ def _tap(query: str, retries: int = 4, deadline: float | None = None) -> pd.Data
 
     last = None
     expired = lambda: deadline is not None and time.monotonic() >= deadline
+    # Synchronous first (2.56.0).  An asynchronous job is 3-4 requests (submit,
+    # status polls, results), each paced 3-5 s (throttle.py): 12.6 s for a 2'
+    # cone that the synchronous endpoint answers in one request, 4.9 s
+    # (2026-11-23).  The four jobs of a field (base + three optional tables)
+    # took 55-64 s whatever the field, most of a 60 s collection.  Sync
+    # answers are capped at SYNC_MAX_ROWS, so a full page is asked again
+    # asynchronously, as is a failed request.
+    truncated = False
+    try:
+        df = Gaia.launch_job(query).get_results().to_pandas()
+        if len(df) < SYNC_MAX_ROWS:
+            return df
+        truncated = True
+    except Exception as exc:
+        last = exc
+    if expired():
+        raise TimeoutError(f"Gaia TAP deadline passed; last={last!r}")
     for attempt in range(retries):
         try:
             return Gaia.launch_job_async(query).get_results().to_pandas()
@@ -161,6 +178,8 @@ def _tap(query: str, retries: int = 4, deadline: float | None = None) -> pd.Data
                 time.sleep(min(8, 2**attempt))
     if expired():
         raise TimeoutError(f"Gaia TAP deadline passed; last={last!r}")
+    if truncated:
+        raise RuntimeError(f"Gaia sync TAP result truncated at {SYNC_MAX_ROWS} rows; async={last!r}")
     try:
         df = Gaia.launch_job(query).get_results().to_pandas()
     except Exception as exc:
@@ -236,7 +255,9 @@ def _merge_fidelity(base: pd.DataFrame, deadline: float | None = None) -> pd.Dat
         svc = pyvo.dal.TAPService(FIDELITY_TAP)
         pieces = []
         for start in range(0, len(ids), OPTIONAL_CHUNK):
-            left = OPTIONAL_TAP_BUDGET_S if deadline is None else min(OPTIONAL_TAP_BUDGET_S, deadline - time.monotonic())
+            left = (
+                OPTIONAL_TAP_BUDGET_S if deadline is None else min(OPTIONAL_TAP_BUDGET_S, deadline - time.monotonic())
+            )
             if left <= 0:
                 raise TimeoutError("fidelity: shared deadline passed")
             q = f"SELECT source_id, fidelity_v2 FROM {FIDELITY_TABLE} WHERE source_id IN ({','.join(ids[start:start + OPTIONAL_CHUNK])})"
@@ -424,7 +445,10 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     df["psf_fwhm_arcsec"] = 0.18
     df = _gspspec_quality(df)
     # Native RA/Dec errors are mas; Stage-1 performs the conversion.
-    return df.drop_duplicates("catalog_object_id", keep="last").reset_index(drop=True)
+    # Ordered by source_id (2.56.0): the sync and async endpoints return the
+    # same rows in different orders, and the output must not depend on which answered.
+    df = df.drop_duplicates("catalog_object_id", keep="last")
+    return df.sort_values("source_id", kind="stable").reset_index(drop=True)
 
 
 def save(df: pd.DataFrame, path) -> None:

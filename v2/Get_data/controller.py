@@ -155,7 +155,7 @@ def _collect_one(
         df = archive_cache.get(
             name, source, ra, dec, radius_arcmin, float(getattr(module, "CACHE_FILTER_MARGIN_ARCMIN", 0.0))
         )
-        prev = None if (df is not None or name in CORE) else archive_cache.recent_failure(name)
+        prev = None if (df is not None or name in CORE) else archive_cache.recent_failure(name, ra, dec, radius_arcmin)
         if prev:
             # Failed a moment ago: not asked again until the memory expires (2.55.0).
             age = time.time() - float(prev.get("t", 0))
@@ -347,7 +347,9 @@ def collect_all(
     )
     for r in results:  # remember failures of this search, forget recovered services (2.55.0)
         if r.get("cache") != "recent_failure" and r["status"] != "outside_footprint":
-            archive_cache.note_outcome(r["collector"], r["status"], r.get("error", ""))
+            archive_cache.note_outcome(
+                r["collector"], r["status"], r.get("error", ""), ra, dec, radius_arcmin, r.get("elapsed_seconds")
+            )
 
     summary = pd.DataFrame(results)
     summary_path = out_dir / f"collection_summary_{tag}.csv"
