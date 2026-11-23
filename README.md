@@ -65,8 +65,8 @@ objects_summary.csv (요약) · literature_only_entries.csv · classified_object
 - **Pan-STARRS1:** MAST가 실패하면 VizieR의 DR2 사본을 쓴다.
 - **ATNF 펄서 (2.55.0):** HEASARC가 30초 안에 답하지 않으면 VizieR 사본(B/psr)을 쓴다.
 - **최근 실패 기억 (2.55.0, 범위 2.56.0):** 핵심이 아닌 수집기가 실패하면 10분 동안은 같은 영역에서 다시 기다리지 않는다(경고는 그대로 표시). 다른 영역은 시간 초과였거나, 실패에 30초 이상 걸렸거나, 두 영역에서 실패했을 때만 건너뛴다.
-- **Legacy Surveys (2.57.0):** Data Lab TAP이 30초 안에 답하지 않거나 한 번 실패하면, 같은 Tractor 행을 주는 Legacy Surveys 뷰어 카탈로그(`cat.fits`)에도 함께 묻고 먼저 온 답을 쓴다(반경 10′ 이하). 값은 같다(세 영역에서 `ls_id`와 45개 열이 일치).
-- **Gaia (2.57.0):** ESA 아카이브가 점검 안내 페이지를 돌려주면(HTTP 200이라 내용으로 판별) 비동기 재시도 없이 바로 VizieR 사본으로 간다. 사본의 세 질의는 동시에 보낸다. `V2_GAIA_SOURCE=vizier`로 ESA를 아예 묻지 않을 수 있다. 사본이 빠뜨리는 자료(변광 요약, FLAME, ESP-UCD, 광속 열)는 경고에 적힌다.
+- **Legacy Surveys (2.57.0):** Data Lab TAP이 30초 안에 답하지 않거나 한 번 실패하면, 같은 Tractor 행을 주는 Legacy Surveys 뷰어 카탈로그(`cat.fits`)에도 함께 묻고 먼저 온 답을 쓴다(반경 10′ 이하, DR10 South 영역만). 남쪽에서는 값이 같다(다섯 영역에서 `ls_id`와 45개 열이 일치). DR9 North 영역(북쪽 은하 반구, Dec ≥ 32.375°)에서는 뷰어 값이 TAP과 달라(i 밴드, `fracflux_*`) 쓰지 않는다.
+- **Gaia (2.57.0):** ESA 아카이브가 점검 안내 페이지를 돌려주면(HTTP 200이라 내용으로 판별) 비동기 재시도 없이 바로 VizieR 사본으로 간다. 사본의 세 질의는 동시에 보낸다. `V2_GAIA_SOURCE=vizier`로 ESA를 아예 묻지 않을 수 있다. 사본이 빠뜨리는 자료(변광 요약 `in_vari_*`, 광속 열)는 경고에 적힌다. FLAME·ESP-UCD는 사본(`I/355/paramp`)에서도 받는다(ESA 값과 VizieR 반올림 안에서 같음).
 - **실패한 수집기만 다시 받기 (2.57.0):** `python v2/pipeline.py --work DIR --retry-failed` (핵심 아카이브만, `all`은 실패한 전부). 앱에서는 경고 띠의 "Ask failed archives again" 버튼. 성공한 수집기는 묻지 않고, 10분 실패 기억도 이 요청을 막지 않으며, 대체 자료로 받은 Gaia·PS1은 원래 자료를 다시 받는다.
 - **관측 범위 밖:** NVSS·VLASS(δ < −40°), TGSS(δ < −53°), eROSITA-DE(동쪽 은하 반구)는 조회하지 않는다.
 
@@ -100,7 +100,7 @@ objects_summary.csv (요약) · literature_only_entries.csv · classified_object
 | PS1 중복·조각 | 한 은하를 PS1이 여러 번 잰 측정을 그 은하의 부속으로 묶음 | 2.34.0 |
 | 밝은 별 헤일로 | G < 16 별 주변의 단일 목록 가짜 천체를 별 아래로 묶음 | 2.35.0 |
 | 검출 품질 | PS1에만 2회 잡히고 더 깊은 LS에 없는 천체를 `UNCONFIRMED`로 표시 | 2.30.0 |
-| 어두운 QSO 후보 | 22 ≤ LS r < 24에서 라벨이 QSO가 아니어도 `p_qso` ≥ 0.1이면 `secondary_class = QSO`, 사유 `FAINT_QSO_CANDIDATE`. 1차 라벨은 그대로. 깊은 COSMOS 시험 영역에서 1형 AGN 재현율 라벨만 4.8 % → 후보 포함 33 %, 후보 순도 약 21 %(정답 없는 후보까지 16–40 %) | 2.58.0 |
+| 어두운 QSO 후보 | 22 ≤ LS r < 24에서 라벨이 QSO가 아니어도 `p_qso` ≥ 0.1이면 `secondary_class = QSO`, 사유 `FAINT_QSO_CANDIDATE`. 1차 라벨은 그대로. 깊은 COSMOS 시험 영역에서 1형 AGN 재현율 라벨만 4.8 % → 후보 포함 33 %, 후보 순도 약 21 %(정답 없는 후보까지 16–40 %). 앱의 "Also" 열에는 회색 "QSO?"와 순도 툴팁으로 보인다(분류가 아니라 실마리) | 2.58.0 |
 | z 전용 검출 | LS에만 있고 r을 측정했는데 검출되지 않은 z ≥ 20 천체를 `UNCONFIRMED`로 표시(COSMOS2020 대응 천체 9 %, 우연 3.5 %) | 2.55.0 |
 | 전파 천체 | 목록 가짜 항목, 전파은하 lobe 같은 다중 성분을 `RADIO_COMPONENT`로 표시 | 2.31.0 |
 | 은하단 | BCG와 분광 적색이동으로 소속 판정 | 2.32.0 |

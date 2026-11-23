@@ -117,8 +117,17 @@ def _statuses(df: pd.DataFrame) -> set:
     return out
 
 
+# Status columns that only a collector's alternative source writes (panstarrs1.py: the MAST path has no
+# ps1_query_status).  An empty answer with such a column came from the alternative source (PR #73 review):
+# an explicit retry (controller._collect_one(retry=True)) then asks the primary source instead of serving it
+# from the cache.  Its cache time is one day either way (EMPTY_TTL_DAYS = FALLBACK_TTL_DAYS).
+HEADER_ONLY_FALLBACK = frozenset({"ps1_query_status"})
+
+
 def fallback(df: pd.DataFrame) -> bool:
     """True when the rows came from a collector's alternative source."""
+    if df.empty and HEADER_ONLY_FALLBACK & {str(c) for c in df.columns}:
+        return True
     return bool(_statuses(df) & FALLBACK_STATUS)
 
 

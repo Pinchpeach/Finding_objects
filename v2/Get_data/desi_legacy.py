@@ -9,16 +9,26 @@ hosted at NERSC; the URL formats are documented at ``/viewer/urls``) serves the
 same Tractor rows.  Checked on NGC 4522 (0.5', 28 rows) and COSMOS (see
 WORK_REPORT_2026-11-23b.md): the same ``ls_id`` set, and every column of the
 TAP query equal (``ls_id`` = release * 2**40 + brickid * 2**20 + objid, and the
-viewer's ``dchisq`` array = dchisq_1..5), for the DR10 South release (10000) as
-for the DR9 North one (9011).  The Data Lab TAP stalled for 300 s in the first
+viewer's ``dchisq`` array = dchisq_1..5), for the DR10 South release (10000).
+The 2.57.0 review compared both paths with the live TAP
+(``benchmark/compare_ls_viewer.py``): identical in DR10 South (NGC 4522 2',
+417 rows; Dec 32.30 in the NGC just south of the north/south split, 436; the
+SGC at Dec 33.5, 154), but not in the DR9 North part of ``ls_dr10`` (north
+Galactic cap, Dec >= 32.375; 2026-11-23, three cones, 178-219 rows each).
+There the Data Lab keeps the DR9 ``ls_id`` (brickid shifted by 16, not 20;
+fixed below, the ids now match), but the values differ: the TAP has i-band
+columns the viewer's DR9 North table lacks (or fills with 0 near the split),
+``fracflux_*`` differ (up to 3 % relative near the split, a zero against a
+value deep in the north), and fluxes by up to 3e-4 relative.  So the viewer
+is asked only for cones wholly in DR10 South (``viewer_usable``).  The Data Lab TAP stalled for 300 s in the first
 COSMOS search of 2026-11-23 (270 objects instead of 3,582 in the result), and
 a TAP outage on 2026-11-17 made every run wait 246-300 s.  The viewer is
 asked in addition (request hedging, Dean & Barroso 2013, CACM 56, 74: a second
 request after the time a healthy answer takes, the first answer wins) when the
 Data Lab has not answered within HEDGE_DELAY_S or an attempt failed; a healthy
 day sends it nothing.  It is a visualisation server, not a TAP service: only
-cones up to MAX_VIEWER_RADIUS_ARCMIN (a 30' cone is 688 MB and 88 s) and
-not near a pole.
+cones up to MAX_VIEWER_RADIUS_ARCMIN (a 30' cone is 688 MB and 88 s), wholly
+in DR10 South, and not near a pole.
 """
 
 from pathlib import Path
@@ -55,7 +65,7 @@ _SERVICE = None
 
 # ---- second path: the Legacy Surveys viewer catalogue (2.57.0) -----------------
 VIEWER_URL = "https://www.legacysurvey.org/viewer/{layer}/cat.fits"
-VIEWER_LAYER = "ls-dr10"  # DR10 South; the same layer returns the DR9 North rows (release 9011) in the North
+VIEWER_LAYER = "ls-dr10"  # DR10 South rows below the split (the layer also serves DR9 North, not used: see above)
 # A healthy Data Lab cone takes 5-16 s (controller.py); 30 s is about twice that.
 HEDGE_DELAY_S = 30.0
 VIEWER_TIMEOUT_S = (15.0, 90.0)  # connect, read
@@ -150,9 +160,30 @@ def _box_target(fn, box):
     return target
 
 
+# ls_dr10.tractor takes the DR9 North (BASS + MzLS) rows in the north Galactic cap at Dec >= 32.375 deg
+# and the DR10 South (DECam) rows elsewhere: the Legacy Surveys north/south split (DR9/DR10 documentation,
+# "(dec >= 32.375) & (b > 0)" is north).  The viewer path was found identical to the TAP only in DR10 South
+# (module docstring: in DR9 North the i band, fracflux_* and fluxes differ).
+NORTH_DEC_SPLIT = 32.375
+
+
+def _wholly_south(ra: float, dec: float, r_deg: float) -> bool:
+    """The whole cone is in the DR10 South part of ls_dr10 (south of the split, or in the south Galactic cap)."""
+    if float(dec) + r_deg < NORTH_DEC_SPLIT:
+        return True
+    import astropy.units as u
+    from astropy.coordinates import SkyCoord
+
+    return float(SkyCoord(float(ra) * u.deg, float(dec) * u.deg).galactic.b.deg) < -r_deg
+
+
 def viewer_usable(ra: float, dec: float, radius_arcmin: float) -> bool:
-    """The viewer catalogue is a second path for this cone (small, away from a pole)."""
-    return 0 < float(radius_arcmin) <= MAX_VIEWER_RADIUS_ARCMIN and abs(float(dec)) + float(radius_arcmin) / 60.0 < 89.0
+    """The viewer catalogue is a second path for this cone: small, away from a pole, and wholly in DR10 South
+    (2.57.0 review: in the DR9 North part the viewer rows differ from the TAP's, see the module docstring)."""
+    r = float(radius_arcmin)
+    if not (0 < r <= MAX_VIEWER_RADIUS_ARCMIN) or abs(float(dec)) + r / 60.0 >= 89.0:
+        return False
+    return _wholly_south(ra, dec, r / 60.0)
 
 
 def viewer_boxes(ra: float, dec: float, radius_arcmin: float) -> list[tuple[float, float, float, float]]:
@@ -204,13 +235,18 @@ def _viewer_fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
         data = {}
         for name in TAP_COLUMNS:
             if name == "ls_id":
-                data[name] = (
-                    col("release").astype(np.int64) * 2**40 + col("brickid").astype(np.int64) * 2**20
-                ) + col("objid").astype(np.int64)
+                # The Data Lab ls_dr10 ids: DR10 South rows release<<40 | brickid<<20 | objid, DR9 North rows
+                # their DR9 id release<<40 | brickid<<16 | objid (2.57.0 review, compare_ls_viewer.py: the 219
+                # rows north of the split had the same release, brickid and objid and only this differed).
+                rel = col("release").astype(np.int64)
+                shift = np.where(rel < 10000, 2**16, 2**20)
+                data[name] = rel * 2**40 + col("brickid").astype(np.int64) * shift + col("objid").astype(np.int64)
             elif name.startswith("dchisq_"):
                 data[name] = col("dchisq")[:, int(name[-1]) - 1]
             elif name == "type":
                 data[name] = np.char.strip(np.char.decode(col("type").astype("S"), "ascii"))
+            elif name not in tab.colnames:  # DR9 North (BASS + MzLS) has no i band
+                data[name] = np.full(len(tab), np.nan)
             else:
                 data[name] = col(name)
         df = pd.DataFrame(data)

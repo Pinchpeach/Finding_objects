@@ -96,6 +96,25 @@ def test_viewer_rows_have_the_tap_columns_ids_and_the_cone(monkeypatch):
     assert out.catalog_object_id.iloc[0] == str(10000 * 2**40 + 384210 * 2**20 + 1550)
 
 
+def test_dr9_north_rows_keep_the_dr9_id_and_have_no_i_band(monkeypatch):
+    """2.57.0 review: the Data Lab ls_dr10 ids of DR9 North rows are release<<40 | brickid<<16 | objid (219 of
+    219 rows north of the split: same release, brickid, objid; only the shift differed).  BASS + MzLS have no
+    i band, so the viewer table has no *_i columns (a KeyError before)."""
+    ra0, dec0 = 180.0, 32.45
+    rows = [{"objid": 2956, "ra": ra0, "dec": dec0}]
+    blob = _viewer_fits(rows, release=9011, brick=508642)
+    from astropy.table import Table
+
+    tab = Table.read(io.BytesIO(blob), format="fits")
+    tab.remove_columns([c for c in tab.colnames if c.endswith("_i")])
+    buf = io.BytesIO()
+    tab.write(buf, format="fits")
+    monkeypatch.setattr("requests.get", lambda *a, **k: _Resp(buf.getvalue()))
+    df = ls._viewer_fetch(ra0, dec0, 0.5)
+    assert df.ls_id.tolist() == [9907732612254604]  # the TAP's id of this source (2026-11-23)
+    assert df.flux_i.isna().all() and df.nobs_i.isna().all()
+
+
 def test_empty_box_answer_is_an_empty_table(monkeypatch):
     monkeypatch.setattr("requests.get", lambda *a, **k: _Resp(b"No catalog sources in layer and RA,Dec box"))
     df = ls._viewer_fetch(283.80, -2.10, 1.0)
@@ -114,6 +133,17 @@ def test_boxes_split_at_ra_zero_and_stay_out_of_the_poles():
     assert lo[1] == 360.0 and hi[0] == 0.0 and hi[1] < 0.1
     assert ls.viewer_usable(150.0, 2.0, 10.0) and not ls.viewer_usable(150.0, 2.0, 10.5)  # 30' would be 688 MB
     assert not ls.viewer_usable(10.0, 89.5, 1.0)
+
+
+def test_viewer_only_for_cones_wholly_in_dr10_south():
+    """2.57.0 review (compare_ls_viewer.py): in the DR9 North part of ls_dr10 the viewer rows lack the i band
+    and carry other ls_id values than the TAP's; DR10 South (incl. the SGC above Dec 32.375) is identical."""
+    assert ls.viewer_usable(188.4155, 9.1751, 2.0)  # NGC 4522
+    assert ls.viewer_usable(180.0, 32.30, 2.0)  # NGC just south of the split
+    assert ls.viewer_usable(20.0, 33.5, 2.0)  # SGC above the split: DR10 South only
+    assert not ls.viewer_usable(180.0, 32.45, 2.0)  # NGC just north of the split: DR9 North
+    assert not ls.viewer_usable(245.0, 43.0, 2.0) and not ls.viewer_usable(150.0, 50.0, 2.0)
+    assert not ls.viewer_usable(180.0, 32.35, 2.0)  # centre south, cone reaches the split
 
 
 def test_hedge_answers_when_the_tap_is_silent(monkeypatch, capsys):

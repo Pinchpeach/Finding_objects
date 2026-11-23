@@ -294,6 +294,38 @@ def test_literature_only_entries_hidden_and_labelled():
     assert model.data(model.index(0, col), Qt.DisplayRole) == "0.900"
 
 
+def test_faint_qso_candidate_does_not_read_like_a_dual_label():
+    """2.58.0 review: a FAINT_QSO_CANDIDATE (about 1 in 5 a quasar in the COSMOS test fields) is shown as
+    "QSO?" in grey with its measured purity, not as "QSO" like the 2.46.0 dual readings."""
+    pytest.importorskip("PySide6")
+    import pandas as pd
+    from PySide6.QtCore import Qt
+    from PySide6.QtWidgets import QApplication
+    from qt_models import CLASS_COLORS, TABLE_COLUMNS, DataFrameModel
+
+    app = QApplication.instance() or QApplication([])
+    df = pd.DataFrame(
+        {
+            "object_id": ["A", "B", "C"],
+            "designation": ["A", "B", "C"],
+            "primary_class": ["GALAXY", "GALAXY", "QSO"],
+            "secondary_class": ["QSO", "QSO", "GALAXY"],
+            "secondary_class_reason": ["GALAXY_WISE_AGN", "FAINT_QSO_CANDIDATE", "QSO_RESOLVED_HOST"],
+            "p_qso": [0.4, 0.07, 0.9],
+        }
+    )
+    model = DataFrameModel(df)
+    col = [c for c in TABLE_COLUMNS if c in df].index("secondary_class")
+    show = [model.data(model.index(i, col), Qt.DisplayRole) for i in range(3)]
+    assert show == ["QSO", "QSO?", "GALAXY"]
+    assert model.data(model.index(1, col), Qt.ForegroundRole).name() == CLASS_COLORS["UNKNOWN"]
+    assert model.data(model.index(0, col), Qt.ForegroundRole).name() == CLASS_COLORS["QSO"]
+    tip = model.data(model.index(1, col), Qt.ToolTipRole)
+    assert "1 in 5" in tip and "default 0.1" in tip  # the purity is the default threshold's (PR #74 review)
+    assert tip.startswith("P(QSO) of this object: 0.07")
+    assert "WISE AGN" in model.data(model.index(0, col), Qt.ToolTipRole)
+
+
 def test_pipeline_on_an_empty_field_returns_no_objects(tmp_path):
     import importlib.util, sys
 

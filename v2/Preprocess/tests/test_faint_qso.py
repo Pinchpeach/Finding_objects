@@ -62,3 +62,45 @@ def test_share_factor_is_off_by_default_and_tempered_by_mode(monkeypatch):
     monkeypatch.setenv("V2_FAINT_QSO_SHARE", "x")
     with pytest.raises(ValueError):
         Q.share_mode()
+
+
+def _bench(name):
+    import sys
+
+    bench = ROOT.parent / "benchmark"
+    sys.path.insert(0, str(bench))
+    s = importlib.util.spec_from_file_location(f"{name}_t", bench / f"{name}.py")
+    m = importlib.util.module_from_spec(s)
+    s.loader.exec_module(m)
+    return m
+
+
+def test_union_table_with_an_empty_split_does_not_divide_by_zero():
+    """PR #74 review: with --fields of one split only, the other split has no type 1 objects."""
+    pytest.importorskip("astropy")
+    F = _bench("faint_qso_candidates")
+    m = pd.DataFrame(
+        {
+            "split": ["cal", "cal", "cal"],
+            "truth": ["TYPE1", "GALAXY", "GALAXY"],
+            "o_std_mag__ls_r": [22.5, 22.6, 23.1],
+            "o_primary_class": ["GALAXY", "GALAXY", "GALAXY"],
+            "o_p_qso": [0.3, 0.2, 0.01],
+        }
+    )
+    t = F.union_table(m, thresholds=(0.1,))
+    test = t[t.split == "test"].iloc[0]
+    assert test.n_type1 == 0 and np.isnan(test.recall) and test.recall_wilson95 is None
+    cal = t[t.split == "cal"].iloc[0]
+    assert cal.type1_claimed == 1 and cal.claims == 2 and cal.recall == 1.0
+
+
+def test_reference_scores_do_not_count_a_faint_candidate_as_the_other_reading():
+    """PR #74 review: validate_reference_objects counted secondary QSO (coarse_either, type tokens) also when it
+    was only a FAINT_QSO_CANDIDATE."""
+    V = _bench("validate_reference_objects")
+    assert "secondary_class_reason" in V.KEEP and "secondary_class_reason" not in V.LABEL_COLS
+    cand = {"primary_class": "GALAXY", "secondary_class": "QSO", "secondary_class_reason": "FAINT_QSO_CANDIDATE"}
+    dual = {"primary_class": "GALAXY", "secondary_class": "QSO", "secondary_class_reason": "GALAXY_WISE_AGN"}
+    assert "QSO" not in V.tokens(V.drop_candidate(cand))
+    assert "QSO" in V.tokens(V.drop_candidate(dual))

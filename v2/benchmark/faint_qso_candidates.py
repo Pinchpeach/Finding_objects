@@ -25,6 +25,7 @@ import argparse
 import json
 import math
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -122,12 +123,20 @@ def accuracy_tables(deep: Path, variants: list[str], out: Path, nboot: int = 100
     import prior_layer_study as PLS
 
     layout(deep, variants)
+    # compare_ab_fields.py scores every variant folder it finds and intersects their truth matches: give it
+    # only the requested variants, not others left in deep/ab by earlier experiments (PR #74 review)
+    sel = deep / "ab_selected" / "-".join(variants)
+    if sel.exists():
+        shutil.rmtree(sel)
+    sel.mkdir(parents=True)
+    for v in variants:
+        (sel / v).symlink_to((deep / "ab" / v).resolve(), target_is_directory=True)
     ab_out = deep / "ab_out"
     subprocess.run(
         [
             sys.executable,
             str(B / "compare_ab_fields.py"),
-            str(deep / "ab"),
+            str(sel),
             "--out",
             str(ab_out),
             "--base",
@@ -205,7 +214,11 @@ def compare(deep: Path, base: str, variant: str) -> dict:
                 )
     # every object, matched by object_id: where do the labels change?
     ch = []
-    for f in FIELDS:
+    # only the fields both runs classified (classify --fields may have done a subset; PR #74 review)
+    both = [
+        f for f in FIELDS if all((deep / f"run_{v}" / f / "classified_objects.csv").exists() for v in (base, variant))
+    ]
+    for f in both:
         a = pd.read_csv(
             deep / f"run_{base}" / f / "classified_objects.csv",
             low_memory=False,
@@ -437,7 +450,8 @@ def union_table(m: pd.DataFrame, thresholds=(0.02, 0.05, 0.1, 0.15, 0.2, 0.3, 0.
             claim = (s.o_primary_class == "QSO") | candidate(s, t)
             tp = int((claim & (s.truth == "TYPE1")).sum())
             n = int(claim.sum())
-            p, r = (tp / n if n else float("nan")), tp / n1
+            # an empty split (e.g. --fields of one split only) or no type 1 in the range: recall undefined (PR #74 review)
+            p, r = (tp / n if n else float("nan")), (tp / n1 if n1 else float("nan"))
             row = {
                 "split": split,
                 "threshold": t,
@@ -447,7 +461,7 @@ def union_table(m: pd.DataFrame, thresholds=(0.02, 0.05, 0.1, 0.15, 0.2, 0.3, 0.
                 "purity": round(p, 3),
                 "purity_wilson95": wilson(tp, n) if n else None,
                 "recall": round(r, 3),
-                "recall_wilson95": wilson(tp, n1),
+                "recall_wilson95": wilson(tp, n1) if n1 else None,
                 "f1": round(2 * p * r / (p + r), 3) if n and tp else 0.0,
             }
             for k in ("GALAXY", "STAR", "TYPE2"):
