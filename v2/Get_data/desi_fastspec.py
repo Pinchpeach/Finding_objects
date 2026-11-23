@@ -31,6 +31,17 @@ save = save_csv  # collector API: save(df, path)
 
 CATALOG = "DESI DR1 FastSpecFit"
 TABLE = "desi_dr1.agngal"
+# Same footprint as desi_spectroscopy.py (DESI DR1 tiles, footprint.py, 2.59.0).
+FOOTPRINT = {"tiles": "desi_dr1_tiles.csv.gz", "tile_radius_deg": 1.7}
+# Waiting (2.59.0).  FastSpecFit only refines the emission-line sub-class of galaxies and is not a key
+# archive.  27 collections of the probes 2026-11-10..23 took 4.9-19 s when Data Lab answered (median
+# 10.8 s; one 44 s in a re-measure on 2026-11-23) and 246 s -- three attempts of 80 s -- in all 6 that
+# fell in the two outage runs: none of the 18 attempts of an outage recovered while waiting.  Two
+# attempts of 50 s end a stall after ~100 s instead of ~250 s.  The lines are asked again by
+# ``--retry-failed all`` (not by the default ``key``).
+ATTEMPTS = 2
+ATTEMPT_BUDGET_S = 50.0
+BUDGET_S = 110.0
 LINES = {"ha": "halpha", "hb": "hbeta", "oiii5007": "oiii_5007", "nii6584": "nii_6584"}
 EXTRA = ["halpha_broad_flux", "halpha_broad_flux_ivar", "halpha_broad_sigma", "opt_uv_type", "agn_maskbits"]
 # [O II] 3726+3729 (2.28.0): the doublet, summed, for galaxies whose H-alpha
@@ -103,7 +114,9 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
         f"SELECT {', '.join(cols)} FROM {TABLE} WHERE 't' = q3c_radial_query(target_ra, target_dec, "
         f"{float(ra):.10f}, {float(dec):.10f}, {float(radius_arcmin) / 60.0:.10f})"
     )
-    df = _query_with_retries(lambda: _service().search(query).to_table().to_pandas())
+    df = _query_with_retries(
+        lambda: _service().search(query).to_table().to_pandas(), attempts=ATTEMPTS, attempt_budget_s=ATTEMPT_BUDGET_S
+    )
     if df.empty:
         return empty_frame(*LINE_FIELDS)
     df.columns = [str(c).strip() for c in df.columns]

@@ -1,0 +1,34 @@
+name: Probe DESI FastSpecFit timing by cone radius
+
+# 2.59.0 review: desi_fastspec.py now waits 2 x 50 s.  Does a healthy Data Lab
+# answer large cones within one 50 s attempt?  Times the collector itself.
+on:
+  push:
+    branches-ignore: [main, validation-data]
+    paths: [".github/workflows/probe-desi-fastspec.yml"]
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas numpy requests astropy pyvo
+      - name: Time the collector
+        working-directory: v2/Get_data
+        run: |
+          python -u - <<'PY'
+          import time
+          import desi_fastspec as f
+          for name, ra, dec in (("COSMOS", 150.1191, 2.2058), ("XMM-LSS", 36.0, -4.5)):
+              for r in (2.0, 6.0, 10.0, 20.0, 30.0):
+                  t0 = time.monotonic()
+                  try:
+                      d = f.fetch(ra, dec, r)
+                      print(f"{name} r={r:4.0f}' rows={len(d):6d} {time.monotonic() - t0:6.1f} s", flush=True)
+                  except Exception as exc:
+                      print(f"{name} r={r:4.0f}' FAILED {time.monotonic() - t0:6.1f} s {exc!r}"[:300], flush=True)
+          PY

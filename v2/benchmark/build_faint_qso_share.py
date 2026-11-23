@@ -43,12 +43,31 @@ def build(matched: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def from_census(census: pd.DataFrame) -> pd.DataFrame:
+    """The share table with every detected object as the denominator (2.59.0; faint_qso_candidates.py census)."""
+    cal = census[(census.split == "cal") & (census.r_lo >= 22) & (census.r_hi <= 24)]
+    return pd.DataFrame(
+        {
+            "r_lo": cal.r_lo.astype(float),
+            "r_hi": cal.r_hi.astype(float),
+            "n_type1": cal.n_type1,
+            "n_other": cal.n_objects - cal.n_type1,
+            "fields": cal.fields,
+        }
+    ).reset_index(drop=True)
+
+
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--matched", type=Path, required=True)
+    p.add_argument(
+        "--matched", type=Path, help="matched_<variant>.csv.gz: truth-matched objects as the denominator (2.58.0)"
+    )
+    p.add_argument("--census", type=Path, help="pi_qso_census.csv: every detected object as the denominator (2.59.0)")
     p.add_argument("--out", type=Path, default=V2 / "Preprocess" / "faint_qso_share_cosmos.csv")
     a = p.parse_args()
-    t = build(pd.read_csv(a.matched, low_memory=False))
+    if bool(a.matched) == bool(a.census):
+        p.error("give one of --matched and --census")
+    t = build(pd.read_csv(a.matched, low_memory=False)) if a.matched else from_census(pd.read_csv(a.census))
     t.to_csv(a.out, index=False)
     print(t.drop(columns="fields").to_string(index=False), "->", a.out)
     return 0

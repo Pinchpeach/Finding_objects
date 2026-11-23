@@ -47,6 +47,15 @@ CAND_R_MIN, CAND_R_MAX = 22.0, 24.0
 COSMOS2020 = "J_ApJS_258_11_classic.csv.gz"
 
 
+def load_fields(path: Path) -> dict:
+    """{name: (ra, dec)} of a fields file (name, ra, dec[, r]; e.g. deep_cosmos_fields_2.csv, 2.59.0).  The split stays the
+    parity rule of ``split_of``; every field has the radius RADIUS_ARCMIN."""
+    t = pd.read_csv(path)
+    if "r" in t and not (t.r.astype(float) == RADIUS_ARCMIN).all():
+        raise ValueError(f"{path}: every field must have radius {RADIUS_ARCMIN}'")
+    return {r.name: (float(r.ra), float(r.dec)) for r in t.itertuples()}
+
+
 def split_of(field: str) -> str:
     return "cal" if int(field.rsplit("_", 1)[1]) % 2 else "test"
 
@@ -277,6 +286,101 @@ def probability_scores(m: pd.DataFrame, lo: float = CAND_R_MIN, hi: float = CAND
     }
 
 
+def census(deep: Path, variant: str = "base", bins=((21, 22), (22, 23), (23, 24), (24, 25))) -> pd.DataFrame:
+    """Chandra type 1 per magnitude bin against **all** detected independent objects of the fields (2.59.0).
+
+    The class fraction of the QSO prior is a fraction of the objects at that magnitude, whether or not the
+    classifier or the truth has a class for them, so the denominator is every independent object (galaxy
+    parts are grouped under their host) inside the edge cut, not only the ones with a COSMOS2020 class
+    (2.58.0 used the latter: 0.95 % / 0.41 %, 15-30 % too high at 22-24 and 2x at 24-25)."""
+    m = matched(deep, variant)
+    rows = []
+    for split in ("cal", "test"):
+        fields = [f for f in FIELDS if split_of(f) == split]
+        objs = []
+        for f in fields:
+            ra0, de0 = FIELDS[f]
+            o = pd.read_csv(
+                deep / f"run_{variant}" / f / "classified_objects.csv",
+                low_memory=False,
+                usecols=["ra", "dec", "std_mag__ls_r", "parent_object_id", "classification_status"],
+            )
+            o = o[o.parent_object_id.isna()]
+            sep = X.sep_arcsec(ra0, de0, o.ra.to_numpy(float), o.dec.to_numpy(float)) / 60
+            objs.append(o[sep <= RADIUS_ARCMIN - EDGE_ARCMIN])
+        o = pd.concat(objs)
+        area = len(fields) * math.pi * ((RADIUS_ARCMIN - EDGE_ARCMIN) / 60) ** 2
+        for lo, hi in bins:
+            sel = (o.std_mag__ls_r >= lo) & (o.std_mag__ls_r < hi)
+            x = m[(m.split == split) & (m.o_std_mag__ls_r >= lo) & (m.o_std_mag__ls_r < hi)]
+            n1, n_all = int((x.truth == "TYPE1").sum()), int(sel.sum())
+            rows.append(
+                {
+                    "split": split,
+                    "r_lo": lo,
+                    "r_hi": hi,
+                    "area_deg2": round(area, 4),
+                    "n_objects": n_all,
+                    "dens_objects": round(n_all / area),
+                    "n_truth_matched": len(x),
+                    "n_type1": n1,
+                    "type1_dens": round(n1 / area, 1),
+                    "share_all": round(n1 / n_all, 5) if n_all else None,
+                    "share_truth_matched": round(n1 / len(x), 5) if len(x) else None,
+                    "fields": " ".join(fields),
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def _lower_bound(k: int, n: int, level: float = 0.16) -> float:
+    """One-sided lower bound of a proportion (Jeffreys beta, 84 % = 1 sigma as in natural_purity.py)."""
+    from scipy.stats import beta
+
+    return float(beta.ppf(level, k + 0.5, n - k + 0.5)) if n else float("nan")
+
+
+def high_confidence_effect(before: pd.DataFrame, after: pd.DataFrame) -> pd.DataFrame:
+    """The photometric high-confidence GALAXY of r > 22 (``photometry (r>22``) before / after a change that withholds
+    it from faint QSO candidates (2.59.0).  Per split: how many there are, how many are released and what they are, and
+    the purity (truth GALAXY among the ones with a truth class; the 98 % target and its one-sided 84 % bound of
+    natural_purity.COSMOS_FLOOR) and the completeness (share of the truth galaxies at r > 22 that are high confidence).
+    Two truth readings: ``cosmos2020`` = COSMOS2020 stars and galaxies only (the 2.52.0 measurement), ``extended`` = with
+    the Chandra type 1 as QSO (a type-1 AGN called high-confidence GALAXY is an error) and type 2 as GALAXY."""
+    k = ["field", "ra", "dec", "truth"]
+    m = before.merge(after, on=k, suffixes=("_b", "_a"))
+    r = m.o_std_mag__ls_r_b
+    isg = (
+        lambda sfx: (m[f"o_primary_class_{sfx}"] == "GALAXY")
+        & m[f"o_high_confidence_{sfx}"].fillna(False).astype(bool)
+        & m[f"o_high_confidence_basis_{sfx}"].fillna("").astype(str).str.startswith("photometry (r>22")
+    )
+    m["hc_b"], m["hc_a"] = isg("b") & (r > 22), isg("a") & (r > 22)
+    rows = []
+    for split in ("cal", "test", "all"):
+        x = m if split == "all" else m[m.split_b == split]
+        for reading in ("cosmos2020", "extended"):
+            y = x[x.truth.isin(["STAR", "GALAXY"])] if reading == "cosmos2020" else x
+            want = y.truth.map({"STAR": "STAR", "GALAXY": "GALAXY", "TYPE1": "QSO", "TYPE2": "GALAXY"})
+            row = {
+                "split": split,
+                "truth_reading": reading,
+                "n_truth_r_gt_22_galaxy": int(((y.o_std_mag__ls_r_b > 22) & (want == "GALAXY")).sum()),
+            }
+            for tag in ("b", "a"):
+                hc = y[f"hc_{tag}"]
+                n, ok = int(hc.sum()), int((hc & (want == "GALAXY")).sum())
+                row[f"hc_{tag}"] = n
+                row[f"purity_{tag}"] = round(ok / n, 4) if n else None
+                row[f"purity_{tag}_lower84"] = round(_lower_bound(ok, n), 4)
+                row[f"completeness_{tag}"] = round(ok / max(row["n_truth_r_gt_22_galaxy"], 1), 4)
+            rel = y[y.hc_b & ~y.hc_a]
+            row["released"] = len(rel)
+            row.update({f"released_{t}": int((rel.truth == t).sum()) for t in ("TYPE1", "TYPE2", "GALAXY", "STAR")})
+            rows.append(row)
+    return pd.DataFrame(rows)
+
+
 def split_of_series(fields: pd.Series) -> pd.Series:
     return fields.map(split_of)
 
@@ -350,6 +454,8 @@ COLS = (
     "secondary_class_reason",
     "parent_object_id",
     "classification_basis",
+    "high_confidence",
+    "high_confidence_basis",
 )
 
 
@@ -520,7 +626,7 @@ def main() -> int:
     c.add_argument("--deep", type=Path, required=True)
     c.add_argument("--variant", required=True)
     c.add_argument("--env", nargs="*", default=[], metavar="K=V")
-    c.add_argument("--fields", default=",".join(FIELDS))
+    c.add_argument("--fields", default="", help="comma list; default: every field")
     c.add_argument("--jobs", type=int, default=1, help="fields classified at a time")
     q = sub.add_parser(
         "accuracy", help="COSMOS2020 accuracy, McNemar and ECE per variant (compare_ab_fields.py layout)"
@@ -533,15 +639,48 @@ def main() -> int:
     cp.add_argument("--base", default="base")
     cp.add_argument("--variant", required=True)
     cp.add_argument("--out", type=Path, required=True)
+    ce = sub.add_parser("census", help="type 1 share per magnitude bin against all detected objects")
+    ce.add_argument("--deep", type=Path, required=True)
+    ce.add_argument("--variant", default="base")
+    ce.add_argument("--out", type=Path, required=True)
+    hc = sub.add_parser("highconf", help="r > 22 photometric GALAXY high confidence before / after (2.59.0)")
+    hc.add_argument("--deep", type=Path, required=True)
+    hc.add_argument("--base", default="base")
+    hc.add_argument("--variant", required=True)
+    hc.add_argument("--out", type=Path, required=True)
     t = sub.add_parser("tables")
     t.add_argument("--deep", type=Path, required=True)
     t.add_argument("--variants", default="base")
     t.add_argument("--out", type=Path, required=True)
+    for sp in sub.choices.values():
+        sp.add_argument(
+            "--fields-file", type=Path, help="fields csv (name, ra, dec) instead of the nine deep_cosmos fields"
+        )
     a = ap.parse_args()
+    if a.fields_file:
+        global FIELDS
+        FIELDS = load_fields(a.fields_file)
     if a.cmd == "classify":
-        classify(a.deep, a.variant, dict(kv.split("=", 1) for kv in a.env), a.fields.split(","), a.jobs)
+        classify(
+            a.deep,
+            a.variant,
+            dict(kv.split("=", 1) for kv in a.env),
+            (a.fields.split(",") if a.fields else list(FIELDS)),
+            a.jobs,
+        )
         return 0
     a.out.mkdir(parents=True, exist_ok=True)
+    if a.cmd == "highconf":
+        e = high_confidence_effect(matched(a.deep, a.base), matched(a.deep, a.variant))
+        e.to_csv(a.out / f"highconf_{a.variant}.csv", index=False)
+        pd.set_option("display.width", 250)
+        print(e.to_string(index=False))
+        return 0
+    if a.cmd == "census":
+        c = census(a.deep, a.variant)
+        c.to_csv(a.out / "pi_qso_census.csv", index=False)
+        print(c.drop(columns="fields").to_string(index=False))
+        return 0
     if a.cmd == "compare":
         res = compare(a.deep, a.base, a.variant)
         for k, v in res.items():

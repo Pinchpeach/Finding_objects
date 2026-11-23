@@ -1,0 +1,122 @@
+name: v2 deep COSMOS fields, second set (collect blind, store on validation-data)
+
+# Preparation of the faint-QSO candidate confirmation (v2/benchmark/DEEP_COSMOS_EXPANSION.md, 2.59.0).
+# Collects the blind raw catalogues (no spectroscopic or literature collectors) and the COSMOS2020 truth of
+# the fields in v2/benchmark/deep_cosmos_fields_2.csv, and keeps them on the validation-data branch
+# (deep_cosmos2/<run id>/<field>.tar.gz), never on main.  The classification and the measurement run
+# afterwards on a machine that has the bundles (README of DEEP_COSMOS_EXPANSION.md).
+#
+# Guards, so a baseline collection cannot be spoiled:
+#   * the field list must be the locked one (its SHA-256 is written in DEEP_COSMOS_EXPANSION.md);
+#   * the Gaia ESA archive must answer (VOSI availability XML): during its downtime (DR4 release, 2026-11-25 to
+#     12-02 and after) Gaia would come from the VizieR copy, which lacks 24 columns;
+#   * every field is collected with --require-gaia-tap: a Gaia file from the VizieR copy fails the field.
+# Manual only.  Do not run before the ESA archive is back.
+on:
+  workflow_dispatch:
+    inputs:
+      only:
+        description: "space-separated field names (default: every field of the list)"
+        default: ""
+      note:
+        description: "free text for the commit message"
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      matrix: ${{ steps.p.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas numpy requests astropy astroquery pyvo scipy
+      - name: The field list is the locked one
+        run: |
+          expected=$(grep -o 'sha256: `[0-9a-f]\{64\}`' v2/benchmark/DEEP_COSMOS_EXPANSION.md | grep -o '[0-9a-f]\{64\}' | head -1)
+          actual=$(sha256sum v2/benchmark/deep_cosmos_fields_2.csv | cut -d' ' -f1)
+          echo "locked $expected"; echo "actual $actual"
+          [ -n "$expected" ] && [ "$expected" = "$actual" ] || { echo "the field list differs from the locked one"; exit 1; }
+      - name: The Gaia ESA archive is up
+        run: |
+          python - <<'PY'
+          import re, sys, requests
+          url = "https://gea.esac.esa.int/tap-server/tap/availability"
+          text = requests.get(url, timeout=(10, 30)).text[:4000]
+          print(text[:300].replace("\n", " "))
+          if re.search(r"<html", text, re.I) or not re.search(r"available\s*>\s*true", text, re.I):
+              sys.exit("the Gaia ESA archive is not available (maintenance page or unavailable): collecting now would use the VizieR copy")
+          PY
+      - id: p
+        env:
+          ONLY: ${{ github.event.inputs.only }}
+        run: |
+          python - <<'PY'
+          import json, os
+          import pandas as pd
+          names = list(pd.read_csv("v2/benchmark/deep_cosmos_fields_2.csv").name)
+          only = os.environ.get("ONLY", "").split()
+          if only:
+              unknown = [n for n in only if n not in names]
+              assert not unknown, f"not in the list: {unknown}"
+              names = [n for n in names if n in only]
+          open(os.environ["GITHUB_OUTPUT"], "a").write("matrix=" + json.dumps(names) + "\n")
+          print(names)
+          PY
+
+  field:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        name: ${{ fromJson(needs.plan.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas numpy requests astropy astroquery pyvo scipy
+      - name: Collect (blind) with the COSMOS2020 truth; Gaia must be the ESA archive's
+        run: |
+          python -u v2/benchmark/collect_deep_cosmos.py --fields-file v2/benchmark/deep_cosmos_fields_2.csv \
+            --fields ${{ matrix.name }} --out /tmp/deep --require-gaia-tap
+      - name: Pack
+        run: |
+          mkdir -p out && tar -C /tmp/deep/${{ matrix.name }} -czf out/${{ matrix.name }}.tar.gz .
+          cp /tmp/deep/collection_state.json out/${{ matrix.name }}.collection_state.json
+          ls -la out
+      - uses: actions/upload-artifact@v4
+        with:
+          name: deep-${{ matrix.name }}
+          path: out/
+          retention-days: 7
+
+  store:
+    needs: field
+    if: ${{ !cancelled() && needs.field.result != 'skipped' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with: {path: code}
+      - uses: actions/checkout@v4
+        with: {ref: validation-data, fetch-depth: 1, path: data}
+      - uses: actions/download-artifact@v4
+        with: {pattern: deep-*, path: /tmp/deep, merge-multiple: true}
+      - name: Commit to validation-data
+        working-directory: data
+        run: |
+          d=deep_cosmos2/${{ github.run_id }}
+          mkdir -p $d && cp /tmp/deep/* $d/ && cp ../code/v2/benchmark/deep_cosmos_fields_2.csv $d/ && ls -la $d
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add $d && git commit -qm "deep COSMOS second set ${{ github.run_id }}: blind raw catalogues and COSMOS2020 truth ${{ github.event.inputs.note }}"
+          bash ../code/.github/scripts/push_with_retry.sh validation-data
