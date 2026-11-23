@@ -116,6 +116,17 @@ def test_boxes_split_at_ra_zero_and_stay_out_of_the_poles():
     assert not ls.viewer_usable(10.0, 89.5, 1.0)
 
 
+def test_viewer_only_for_cones_wholly_in_dr10_south():
+    """2.57.0 review (compare_ls_viewer.py): in the DR9 North part of ls_dr10 the viewer rows lack the i band
+    and carry other ls_id values than the TAP's; DR10 South (incl. the SGC above Dec 32.375) is identical."""
+    assert ls.viewer_usable(188.4155, 9.1751, 2.0)  # NGC 4522
+    assert ls.viewer_usable(180.0, 32.30, 2.0)  # NGC just south of the split
+    assert ls.viewer_usable(20.0, 33.5, 2.0)  # SGC above the split: DR10 South only
+    assert not ls.viewer_usable(180.0, 32.45, 2.0)  # NGC just north of the split: DR9 North
+    assert not ls.viewer_usable(245.0, 43.0, 2.0) and not ls.viewer_usable(150.0, 50.0, 2.0)
+    assert not ls.viewer_usable(180.0, 32.35, 2.0)  # centre south, cone reaches the split
+
+
 def test_hedge_answers_when_the_tap_is_silent(monkeypatch, capsys):
     monkeypatch.setattr(ls, "HEDGE_DELAY_S", 0.2)
     monkeypatch.setattr(ls, "ATTEMPT_BUDGET_S", 3.0)

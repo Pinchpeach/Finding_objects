@@ -107,6 +107,32 @@ def compare(tap: pd.DataFrame, view: pd.DataFrame) -> dict:
         for c, s in cols.items()
         if isinstance(s, str) or s.get("differ", 0) or s.get("nan_differ", 0) or s.get("max_rel", 0) > 1e-5
     }
+    diag = {}
+    if len(only_t) or len(only_v):  # same sources under other ids?  match the leftovers by position
+        from astropy.coordinates import SkyCoord
+        import astropy.units as u
+
+        a, b = t.loc[only_t], v.loc[only_v]
+        if len(a) and len(b):
+            i, sep, _ = SkyCoord(a.ra.to_numpy() * u.deg, a.dec.to_numpy() * u.deg).match_to_catalog_sky(
+                SkyCoord(b.ra.to_numpy() * u.deg, b.dec.to_numpy() * u.deg)
+            )
+            m = sep.arcsec < 0.01
+            bb = b.iloc[i[m]]
+            aa = a[m]
+            diag = {
+                "matched_by_position_0p01arcsec": int(m.sum()),
+                "same_brickid": int((aa.brickid.to_numpy() == bb.brickid.to_numpy()).sum()),
+                "same_objid": int((aa.objid.to_numpy() == bb.objid.to_numpy()).sum()),
+                "same_release": int((aa.release.to_numpy() == bb.release.to_numpy()).sum()),
+                "examples_tap_viewer": [
+                    [
+                        {k: int(x[k]) for k in ("release", "brickid", "objid")} | {"ls_id": int(ia)},
+                        {k: int(y[k]) for k in ("release", "brickid", "objid")} | {"ls_id": int(ib)},
+                    ]
+                    for (ia, x), (ib, y) in list(zip(aa.iterrows(), bb.iterrows()))[:3]
+                ],
+            }
     return {
         "rows_tap": int(len(t)),
         "rows_viewer": int(len(v)),
@@ -118,6 +144,7 @@ def compare(tap: pd.DataFrame, view: pd.DataFrame) -> dict:
         "columns_compared": len(cols),
         "columns_differing": bad,
         "identical": not len(only_t) and not len(only_v) and not bad,
+        "leftovers_by_position": diag,
     }
 
 

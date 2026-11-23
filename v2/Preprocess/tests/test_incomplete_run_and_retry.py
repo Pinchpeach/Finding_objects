@@ -235,7 +235,8 @@ def test_gaia_from_the_vizier_copy_is_reported_with_what_it_lacks(tmp_path):
     assert not c["failed"] and [a["collector"] for a in c["alternative"]] == ["gaia_dr3"]
     assert cov.status(c) == "degraded" and cov.missing(c) == "gaia_dr3:alternative_source"
     msg = cov.message(c)
-    assert "VizieR I/355 copy" in msg and "variability summary" in msg and "FLAME" in msg  # the lost columns, by name
+    assert "VizieR I/355 copy" in msg and "variability summary" in msg and "in_vari_" in msg  # the lost columns, by name
+    assert "FLAME" not in msg and "ESP-UCD" not in msg  # 2.57.0 review: the copy has them (I/355/paramp)
     _gaia_raw(raw, "tap")  # the archive's own answer: complete, no warning
     c = cov.summarize(raw)
     assert cov.status(c) == "complete" and cov.message(c) == ""

@@ -94,10 +94,10 @@ ALTERNATIVE = {
         "gaia_base_query_status",
         "vizier_fallback",
         "the VizieR I/355 copy",
+        # ESP-UCD and FLAME come from I/355/paramp since the 2.57.0 review; the 9 variability summary
+        # flags (gaia_source in_vari_*) have no VizieR copy (I/358 holds the classifications, not the flags).
         (
-            "variability summary flags (in_vari_*)",
-            "FLAME mass / age / evolutionary stage",
-            "ESP-UCD ultracool-dwarf Teff",
+            "variability summary flags (in_vari_*: Gaia AGN / compact-companion candidates)",
             "G / BP / RP fluxes, bp_g, g_rp, rv_nb_transits",
         ),
     ),

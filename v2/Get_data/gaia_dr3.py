@@ -341,6 +341,15 @@ _PARAMP = {
     "Flags": "flags_gspspec",
     "ClassELS": "classlabel_espels",
     "f_ClassELS": "classlabel_espels_flag",
+    # 2.57.0 review: ESP-UCD and FLAME are in I/355/paramp too (VizieR column list, 2026-11-23: Teff-UCD,
+    # Flags-UCD, Mass-Flame, Age-Flame, Flags-Flame, Evol), same units as the archive (K, Msun, Gyr); the
+    # flags may come as integers ("01" -> 1): physical._ucd_quality and evolved_star zero-pad them.
+    "Teff-UCD": "teff_espucd",
+    "Flags-UCD": "flags_espucd",
+    "Mass-Flame": "mass_flame",
+    "Age-Flame": "age_flame",
+    "Flags-Flame": "flags_flame",
+    "Evol": "evolstage_flame",
 }
 
 
