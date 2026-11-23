@@ -12,6 +12,8 @@ on:
       - ".github/workflows/compare-archive-alternatives.yml"
       - "v2/benchmark/compare_ls_viewer.py"
       - "v2/benchmark/compare_gaia_copy_columns.py"
+      - "v2/Get_data/desi_legacy.py"
+      - "v2/Get_data/gaia_dr3.py"
   workflow_dispatch:
 
 jobs:
