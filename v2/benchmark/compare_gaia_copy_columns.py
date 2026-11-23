@@ -42,6 +42,8 @@ def _num(t: str) -> float:
 
 
 def _same(a: pd.Series, b: pd.Series, col: str) -> np.ndarray:
+    if col == "flags_gspspec":  # 41-digit text ("F" + digits, gaia_dr3._gspspec_quality on both sides): no int
+        return a.astype(str).str.strip().to_numpy() == b.astype(str).str.strip().to_numpy()
     if col in FLAGS or col.startswith("classlabel"):
 
         def norm(x):
@@ -83,7 +85,9 @@ def fields(paths: list[Path]) -> dict:
         m = TAG.search(p.name)
         ra, dec, r = _num(m["ra"]), _num(m["dec"]), _num(m["r"])
         esa = pd.read_csv(p, low_memory=False)
-        copy = g._vizier_fallback(ra, dec, r)
+        # the encodings fetch() applies to both paths (PR #73 review: flags_gspspec is "F" + 41 digits in the
+        # stored ESA files, the bare VizieR value before _gspspec_quality)
+        copy = g._gspspec_quality(g._vizier_fallback(ra, dec, r))
         res[p.stem] = compare_columns(esa, copy, cols)
         print(p.stem, json.dumps(res[p.stem]), flush=True)
     return res

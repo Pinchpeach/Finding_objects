@@ -111,6 +111,12 @@ ALTERNATIVE = {
 }
 
 
+# Collectors whose primary source never writes the status column: an empty answer that still has the column
+# in its header came from the alternative source (PR #73 review: PS1 from the VizieR copy with no rows was
+# read as "complete" -- and the copy omits sources with two detections that MAST would return).
+EMPTY_HEADER_MARKS = frozenset({"panstarrs1"})
+
+
 def _alternative(raw_dir: Path, failed: set) -> list[dict]:
     """Collectors that answered from an alternative source (see ``ALTERNATIVE``)."""
     out = []
@@ -122,7 +128,7 @@ def _alternative(raw_dir: Path, failed: set) -> list[dict]:
                 st = pd.read_csv(path, usecols=[column], dtype=str, keep_default_na=False)[column]
             except (ValueError, OSError):  # a file without the column: the primary source's output
                 continue
-            if (st == value).any():
+            if (st == value).any() or (st.empty and collector in EMPTY_HEADER_MARKS):
                 out.append(
                     {
                         "collector": collector,

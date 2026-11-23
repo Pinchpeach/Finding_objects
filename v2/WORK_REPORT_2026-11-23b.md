@@ -238,4 +238,8 @@ NGC 4522 2′ 단독 호출을 단계별로 쟀다(수정 전 코드, V2_HTTP_LO
 - **새 열 2개**(`run_archives_status`, `run_archives_missing`): `objects_summary.csv`가 26열에서 28열이 된다. 분류 코드(`v2/Classifier`, `v2/Preprocess`의 판정 경로)는 이 열을 읽지 않는다(`query_status` 열도 읽지 않음). 앱 시험 통과.
 - **세트 C**: 1차 분류 판정 경로(`v2/Classifier`, `v2/Preprocess` 비시험 코드)는 바뀌지 않았고, 수집 경로는 장애 때만 바뀐다. 채점하지 않는다.
 - **병합 순서**: 같은 브랜치에서 2단계(어두운 QSO 후보 A/B)가 진행 중이다. 1단계는 독립적이고 Gaia 점검(11-25부터)이 곧이라 먼저 병합한다. 작업 세션은 `git fetch origin main && git merge origin/main`으로 받으면 된다. squash 병합이라 16e7fc1과 내용이 같은 부분은 충돌 없이 합쳐진다. 검토 수정은 위 파일들에만 있다.
-- 시험 246개 통과(앱 시험 포함).
+- **Codex 검토(PR #73) 세 건을 고쳤다.**
+  - **`--retry-failed` 지름길.** 실패한 수집기가 없으면 작업 폴더의 `classified_objects.csv`를 그대로 돌려줬다. 그런데 그 파일은 폴더의 모든 검색이 함께 쓰므로, 옛 검색을 지정하면 다른 하늘의 결과가 나왔다. 이제 `catalog_coverage.json`의 `raw_dir`가 지정한 검색일 때만 돌려주고, 아니면 수집 없이 그 검색을 다시 분류한다.
+  - **PS1 사본의 빈 응답.** MAST가 실패하고 VizieR 사본이 0행을 주면, 상태 열에 값이 없어 대체 출처로 알아보지 못했다(`complete`, 재시도 대상 아님). 사본은 검출 2번인 천체를 빼므로 실제로 빠진 천체가 있을 수 있다. PS1의 MAST 경로는 `ps1_query_status` 열을 쓰지 않으므로, 머리글에 그 열이 있는 빈 파일은 사본의 응답으로 본다(`catalog_coverage.EMPTY_HEADER_MARKS`, `archive_cache.HEADER_ONLY_FALLBACK`). 명시적 재시도는 캐시의 빈 사본 응답 대신 MAST를 다시 묻는다.
+  - **비교 스크립트의 GSP-Spec 플래그.** 저장된 ESA 파일은 `F` + 41자리 문자열이고 사본은 변환 전 값이라 인코딩이 달랐다. 41자리를 정수로 바꾸는 비교도 자릿수를 잃는다. 사본에도 `_gspspec_quality`를 적용하고 문자열로 비교한다. 이번 세 영역에는 GSP-Spec 값이 없어 9.3절 수치는 그대로다.
+- 시험 248개 통과(앱 시험 포함).

@@ -211,9 +211,29 @@ def test_pipeline_retry_with_nothing_failed_returns_the_existing_results(tmp_pat
     pd.DataFrame({"object_id": ["OBJ1"], "primary_class": ["STAR"]}).to_csv(
         work / "classified_objects.csv", index=False
     )
+    (work / "catalog_coverage.json").write_text(json.dumps({"known": True, "failed": [], "raw_dir": str(raw)}))
     t0 = time.time()
     out = pipe.run(work, retry_failed="key")
     assert out.primary_class.tolist() == ["STAR"] and time.time() - t0 < 5  # no collection, no classification
+
+
+def test_pipeline_retry_of_another_search_does_not_return_these_results(tmp_path, capsys):
+    """PR #73 review: classified_objects.csv belongs to the search it was classified from
+    (catalog_coverage.json raw_dir); retrying an older search with nothing failed classifies that search again."""
+    pipe = _mod("v2_pipeline_retry_other", V2 / "pipeline.py")
+    work = tmp_path / "work"
+    old = work / "raw" / "ra1_dec2_r1arcmin"
+    new = work / "raw" / "ra50_dec20_r1arcmin"
+    for raw, (ra, dec) in ((old, (1.0, 2.0)), (new, (50.0, 20.0))):
+        _summary(raw, [{"collector": "allwise", "status": "ok", "rows": 0, "error": ""}])
+        (raw / "search.json").write_text(json.dumps({"ra": ra, "dec": dec, "radius_arcmin": 1.0}))
+    pd.DataFrame({"object_id": ["NEW1"], "primary_class": ["STAR"]}).to_csv(
+        work / "classified_objects.csv", index=False
+    )
+    (work / "catalog_coverage.json").write_text(json.dumps({"known": True, "failed": [], "raw_dir": str(new)}))
+    out = pipe.run(work, ra=1.0, dec=2.0, radius=1.0, retry_failed="key")
+    assert "NEW1" not in out.get("object_id", pd.Series(dtype=str)).tolist()  # not the other search's objects
+    assert "classifying ra1_dec2_r1arcmin again" in capsys.readouterr().out
 
 
 # ------------------------------------------------ collectors served by a reduced alternative source
@@ -235,7 +255,9 @@ def test_gaia_from_the_vizier_copy_is_reported_with_what_it_lacks(tmp_path):
     assert not c["failed"] and [a["collector"] for a in c["alternative"]] == ["gaia_dr3"]
     assert cov.status(c) == "degraded" and cov.missing(c) == "gaia_dr3:alternative_source"
     msg = cov.message(c)
-    assert "VizieR I/355 copy" in msg and "variability summary" in msg and "in_vari_" in msg  # the lost columns, by name
+    assert (
+        "VizieR I/355 copy" in msg and "variability summary" in msg and "in_vari_" in msg
+    )  # the lost columns, by name
     assert "FLAME" not in msg and "ESP-UCD" not in msg  # 2.57.0 review: the copy has them (I/355/paramp)
     _gaia_raw(raw, "tap")  # the archive's own answer: complete, no warning
     c = cov.summarize(raw)
@@ -244,6 +266,22 @@ def test_gaia_from_the_vizier_copy_is_reported_with_what_it_lacks(tmp_path):
     _summary(raw, [{"collector": "gaia_dr3", "status": "timeout", "rows": 0, "error": "x"}])
     _gaia_raw(raw, "vizier_fallback")
     assert cov.summarize(raw)["alternative"] == [] and cov.status(cov.summarize(raw)) == "key_archives_missing"
+
+
+def test_an_empty_ps1_answer_from_the_vizier_copy_is_still_an_alternative_source(tmp_path):
+    """PR #73 review: the MAST path never writes ps1_query_status, so an empty file that has it in its header is
+    the VizieR copy's answer -- reported (degraded, retryable) and not served from the cache to a retry."""
+    raw = tmp_path / "raw"
+    _summary(raw, [{"collector": "panstarrs1", "status": "empty", "rows": 0, "error": ""}])
+    cols = ["catalog", "catalog_object_id", "object_name", "ra", "dec", "ps1_query_status"]
+    pd.DataFrame(columns=cols).to_csv(raw / "panstarrs1_ra1_dec2_r1arcmin.csv", index=False)
+    c = cov.summarize(raw)
+    assert [a["collector"] for a in c["alternative"]] == ["panstarrs1"] and cov.status(c) == "degraded"
+    assert controller.failed_collectors(raw, "key") == ["panstarrs1"]
+    assert archive_cache.fallback(pd.DataFrame(columns=cols))
+    # the MAST path's empty answer (no status column) is a complete empty cone
+    pd.DataFrame(columns=cols[:-1]).to_csv(raw / "panstarrs1_ra1_dec2_r1arcmin.csv", index=False)
+    assert cov.status(cov.summarize(raw)) == "complete" and not archive_cache.fallback(pd.DataFrame(columns=cols[:-1]))
 
 
 def test_retry_gets_the_primary_source_instead_of_the_cached_copy(world):

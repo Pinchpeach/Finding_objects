@@ -122,11 +122,12 @@ def run(
         if raw_dir is not None:
             raise ValueError("--retry-failed asks the archives of a search in --work again; it takes no --raw-dir")
         controller = _load(GET / "controller.py", "v2_get_data_controller")
+        # the search the results in ``work`` were classified from (catalog_coverage.json)
+        prev = (_load(V2 / "catalog_coverage.py", "v2_catalog_coverage").read(work) or {}).get("raw_dir")
         if None not in (ra, dec, radius):
             raw_dir = work / "raw" / controller._tag(ra, dec, radius)
         else:
             # the search these results were classified from, else the newest one
-            prev = (_load(V2 / "catalog_coverage.py", "v2_catalog_coverage").read(work) or {}).get("raw_dir")
             raw_dir = (
                 Path(prev)
                 if prev and (Path(prev) / controller.SEARCH_FILE).exists()
@@ -138,15 +139,20 @@ def run(
         if cone is None:
             raise ValueError(f"{raw_dir} has no search.json (a search of an older version): give --ra/--dec/--radius")
         ra, dec, radius = cone
-        if not controller.failed_collectors(raw_dir, retry_failed) and (work / "classified_objects.csv").exists():
-            print(
-                f"[retry] no failed {'key ' if retry_failed == 'key' else ''}archives in {raw_dir.name}: "
-                "nothing to ask again"
-                + (" (--retry-failed all asks every failed archive)" if retry_failed == "key" else ""),
-                flush=True,
+        if not controller.failed_collectors(raw_dir, retry_failed):
+            note = (
+                f"[retry] no failed {'key ' if retry_failed == 'key' else ''}archives in {raw_dir.name}: nothing to ask again"
+                + (" (--retry-failed all asks every failed archive)" if retry_failed == "key" else "")
             )
-            return pd.read_csv(work / "classified_objects.csv", low_memory=False)
-        step("retry", controller.retry_failed, raw_dir, ra, dec, radius, workers, retry_failed)
+            # The results in ``work`` are shared by every search of the folder: return them only when they were
+            # classified from this search (PR #73 review), else classify this search again without collecting.
+            same = bool(prev) and Path(prev).resolve() == Path(raw_dir).resolve()
+            if same and (work / "classified_objects.csv").exists():
+                print(note, flush=True)
+                return pd.read_csv(work / "classified_objects.csv", low_memory=False)
+            print(note + f"; classifying {raw_dir.name} again", flush=True)
+        else:
+            step("retry", controller.retry_failed, raw_dir, ra, dec, radius, workers, retry_failed)
         collect = True  # a search with a centre, not a cone cut of collected files (names.annotate below)
     elif collect:
         if None in (ra, dec, radius):
