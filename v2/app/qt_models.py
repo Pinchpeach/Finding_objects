@@ -67,6 +67,22 @@ def literature_only(df: pd.DataFrame) -> pd.Series:
     return cats.map(lambda c: bool(c) and c <= LITERATURE).astype(bool)
 
 
+# What the "Also" column means, by secondary_class_reason (2.58.0 review).  The two 2.46.0 dual readings
+# are the same object read under the other catalogue convention; the faint quasar candidate is a lead, not
+# a class: shown as "QSO?" in grey so it does not read like the dual labels.
+SECONDARY_NOTES = {
+    "QSO_RESOLVED_HOST": "Quasar with a resolved host galaxy (Legacy Surveys model): also a galaxy.",
+    "GALAXY_WISE_AGN": "Galaxy with WISE AGN colours (Stern 2012 / Assef 2018): also a quasar / AGN.",
+    "FAINT_QSO_CANDIDATE": (
+        "Faint quasar candidate, not a classification: 22 <= LS r < 24 and P(QSO) >= 0.1.\n"
+        "In the deep COSMOS test fields about 1 in 5 such candidates was a type-1 quasar\n"
+        "(7 of 34 = 21 %, 95 % interval 10-37 %; X-ray-selected truth, so a lower bound).\n"
+        "Needs a spectrum or X-ray / variability data to confirm."
+    ),
+}
+CANDIDATE_TEXT = {"FAINT_QSO_CANDIDATE": "QSO?"}
+
+
 def class_color(name: str) -> QColor:
     return QColor(CLASS_COLORS.get(str(name), CLASS_COLORS["UNKNOWN"]))
 
@@ -148,6 +164,12 @@ class DataFrameModel(QAbstractTableModel):
             self._icons = icons
         return self._icons[row] if row < len(self._icons) else None
 
+    def _reason_at(self, row: int) -> str:
+        if "secondary_class_reason" not in self._df:
+            return ""
+        v = self._df.iat[row, self._df.columns.get_loc("secondary_class_reason")]
+        return "" if v is None or (isinstance(v, float) and v != v) else str(v)
+
     def _status_at(self, row: int) -> str:
         if "classification_status" not in self._df:
             return ""
@@ -176,7 +198,10 @@ class DataFrameModel(QAbstractTableModel):
         value = self._df.iat[index.row(), self._df.columns.get_loc(col)]
         if hasattr(value, "item"):  # numpy scalar -> Python (Qt cannot take numpy types)
             value = value.item()
+        reason = self._reason_at(index.row()) if col == "secondary_class" else ""
         if role == Qt.DisplayRole:
+            if reason in CANDIDATE_TEXT and value:
+                return CANDIDATE_TEXT[reason]
             if isinstance(value, float):
                 if math.isnan(value):
                     # a NED / SIMBAD type without a measurement has no probability (2.54.0)
@@ -186,7 +211,9 @@ class DataFrameModel(QAbstractTableModel):
                 return f"{value:.5f}" if col in ("ra", "dec") else f"{value:.3f}"
             return "" if value is None else str(value)
         if role == Qt.ForegroundRole and col in ("primary_class", "secondary_class"):
-            return class_color(value)
+            return class_color("UNKNOWN" if reason in CANDIDATE_TEXT else value)
+        if role == Qt.ToolTipRole and col == "secondary_class" and reason in SECONDARY_NOTES:
+            return SECONDARY_NOTES[reason]
         if role == Qt.DecorationRole and index.column() == 0:
             return self._icon(index.row())
         if role == Qt.ToolTipRole and col in ("subclass", "designation"):
