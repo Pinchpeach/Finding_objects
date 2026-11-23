@@ -1,0 +1,25 @@
+name: Compare Legacy Surveys viewer with Data Lab TAP
+
+# 2.57.0 review: the viewer catalogue (desi_legacy.py second path) was compared
+# with the Data Lab TAP on DR10-South cones only.  This compares DR9-North
+# cones, the north/south boundary and the SGC above Dec 32.375.
+on:
+  push:
+    branches-ignore: [main, validation-data]
+    paths: [".github/workflows/compare-ls-viewer.yml", "v2/benchmark/compare_ls_viewer.py"]
+  workflow_dispatch:
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas numpy requests astropy pyvo
+      - name: Compare
+        run: python -u v2/benchmark/compare_ls_viewer.py --out ls_viewer_metrics.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: ls-viewer-metrics, path: ls_viewer_metrics.json}
