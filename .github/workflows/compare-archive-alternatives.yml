@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.11"}
-      - run: pip install pandas numpy requests astropy pyvo
+      - run: pip install pandas numpy scipy requests astropy pyvo
       - name: Compare
         run: python -u v2/benchmark/compare_ls_viewer.py --out ls_viewer_metrics.json
       - uses: actions/upload-artifact@v4
