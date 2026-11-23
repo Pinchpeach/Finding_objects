@@ -192,8 +192,10 @@ jobs:
               sys.exit("archives unhealthy (or < 90 % of regions finished): not scored; re-run when the archives recover")
           PY
           out=v2/benchmark/locked_c/$V; mkdir -p $out
-          (cd v2/benchmark && python -u compare_ab_fields.py /tmp/c --aggregate-only --out /tmp/score) | tee $out/score.log
+          (cd v2/benchmark && python -u compare_ab_fields.py /tmp/c --aggregate-only --by-pool --out /tmp/score) | tee $out/score.log
           cp /tmp/score/ab_summary.csv $out/summary.csv
+          # aggregates by region pool (csth / cpln / clam; 2.57.0): the 2.51.0 notes asked for them, still no per-object output
+          cp /tmp/score/ab_summary_by_pool.csv $out/summary_by_pool.csv
           n=$(ls -d /tmp/c/base/*/ 2>/dev/null | wc -l)
           python - <<PY
           import json, os, datetime

@@ -32,7 +32,7 @@
 1. **Once per release.**
    - Run `v2_locked_set_c.yml` (workflow_dispatch) after `v2/VERSION` is bumped.
    - It refuses a VERSION that already has `locked_c/<VERSION>/`.
-2. **Aggregate only.** The run commits only `locked_c/<VERSION>/summary.csv`, `score.log` and `run.json`:
+2. **Aggregate only.** The run commits only `locked_c/<VERSION>/summary.csv`, `summary_by_pool.csv` (2.57.0), `score.log` and `run.json`:
    - accuracy with a field-bootstrap 95 % CI;
    - balanced accuracy with CI;
    - per-class recall and precision;
@@ -40,6 +40,8 @@
    - the unmatched-truth rate.
 
    Per-object errors and probabilities are not written (`compare_ab_fields.py --aggregate-only`). Run artifacts expire after 7 days.
+
+   **By pool (2.57.0).** `summary_by_pool.csv` repeats the accuracy (field-bootstrap CI), balanced accuracy, per-class recall and precision and the baselines for each pool of `fields_c.csv` separately (csth, cpln, clam; `compare_ab_fields.py --by-pool`, `field_stats.by_pool`). The 2.51.0 notes asked for it: the all-region number is dominated by the 30 clam regions, and the low-latitude pool (cpln) was never reported on its own. A pool is 12-30 regions chosen by one sky rule, so its aggregate is no more per-object than the all-region one. The scores below (2.51.0, 2.52.0) were taken before it existed and have no pool split; it starts with the next release's look. The rule does not change: no tuning on a pool's number either.
 3. **No tuning.**
    - Do not change a rule, threshold or weight because of a set-C number.
    - A drop on C is reported in the CHANGELOG with the release. Investigate it on sets A / B / COSMOS, never on C.
