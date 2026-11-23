@@ -64,7 +64,7 @@ objects_summary.csv (요약) · literature_only_entries.csv · classified_object
 - **SIMBAD:** Harvard 미러로 넘어간다.
 - **Pan-STARRS1:** MAST가 실패하면 VizieR의 DR2 사본을 쓴다.
 - **ATNF 펄서 (2.55.0):** HEASARC가 30초 안에 답하지 않으면 VizieR 사본(B/psr)을 쓴다.
-- **최근 실패 기억 (2.55.0):** 핵심이 아닌 수집기가 실패하면 10분 동안은 다시 기다리지 않는다(경고는 그대로 표시).
+- **최근 실패 기억 (2.55.0, 범위 2.56.0):** 핵심이 아닌 수집기가 실패하면 10분 동안은 같은 영역에서 다시 기다리지 않는다(경고는 그대로 표시). 다른 영역은 시간 초과였거나 두 영역에서 실패했을 때만 건너뛴다.
 - **관측 범위 밖:** NVSS·VLASS(δ < −40°), TGSS(δ < −53°), eROSITA-DE(동쪽 은하 반구)는 조회하지 않는다.
 
 ## 4. 1차 분류 (STAR / GALAXY / QSO)

@@ -1,0 +1,35 @@
+{
+ "spectra": 3489,
+ "with_ha_ew": 2625,
+ "with_ha_ew_err": 2623,
+ "with_nii_ew_err": 2625,
+ "line_source": {
+  "Portsmouth": 2609,
+  "NaN": 864,
+  "MPA-JHU": 16
+ },
+ "median_ha_ew_err": 0.592,
+ "ew_1_to_5_A": 467,
+ "ew_1_to_5_A_within_2sigma_of_3A": 183,
+ "verdict_without_err": {
+  "QUIESCENT": 1110,
+  "STAR_FORMING": 999,
+  "undecided": 879,
+  "COMPOSITE": 379,
+  "AGN": 122
+ },
+ "verdict_with_err": {
+  "undecided": 1109,
+  "STAR_FORMING": 989,
+  "QUIESCENT": 944,
+  "COMPOSITE": 359,
+  "AGN": 88
+ },
+ "changed": 230,
+ "changed_from_to": {
+  "AGN -> undecided": 34,
+  "COMPOSITE -> undecided": 20,
+  "QUIESCENT -> undecided": 166,
+  "STAR_FORMING -> undecided": 10
+ }
+}

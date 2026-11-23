@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 import math
+import time
 from pathlib import Path
 import pandas as pd
 
@@ -175,6 +176,33 @@ def j2000_degrees(df: pd.DataFrame):
 
 
 SDSS_MAX_CONE_ARCMIN = 3.0
+# 2026-11-23: 4 of 12 identical photometry cones, 4 s apart, got the error page;
+# five tries leave (1/3)^5 = 0.4 % at that rate.  Each try is also paced 3-5 s (throttle.py).
+SKYSERVER_RETRY_WAITS_S = (1.0, 1.0, 1.0, 1.0)
+
+
+class SkyServerError(RuntimeError):
+    """SkyServer answered with an error page instead of a table."""
+
+
+def skyserver_error(response) -> str:
+    """The message of a SkyServer error page ('' for a table / JSON answer)."""
+    text = getattr(response, "text", "") or ""
+    head = text[:400].lstrip().lower()
+    if not (head.startswith("<html") or head.startswith("<!doctype") or "skyserver error" in head):
+        return ""
+    import re
+
+    plain = re.sub(r"<style.*?</style>|<!--.*?-->|<[^>]+>", " ", text, flags=re.S | re.I)
+    return " ".join(plain.split())[:300] or "SkyServer error page"
+
+
+def _forget_cached(client) -> None:
+    """Remove the last request's answer from astroquery's cache, if it was stored."""
+    try:
+        client._last_query.request_file(client.cache_location).unlink(missing_ok=True)
+    except Exception:
+        pass
 
 
 def _sdss():
@@ -188,6 +216,39 @@ def _sdss():
     from astroquery.sdss.core import SDSSClass
 
     class FullPrecisionSDSS(SDSSClass):
+        def _request(self, *args, **kwargs):
+            """No SkyServer error page is parsed, or kept in astroquery's cache (2.56.0).
+
+            SkyServer reports a failure as an HTML page with HTTP status 200
+            (seen 2026-11-23: "Skyserver Error ... 403 - Forbidden: Access is
+            denied", once among ~40 identical requests that succeeded).
+            astroquery stores every 200 answer for a week under the request's
+            hash, so that one page was replayed to every later search of the
+            same cone, and read as a table it raised InconsistentTableError
+            ("Number of header columns (1) inconsistent with data columns in
+            data line 9"): the SDSS spectra of NGC 4522 2' failed in three
+            runs on three days (2.55.0 evaluation), and the EW-error line
+            query of COSMOS "failed" the same way.  The stored page is
+            removed, the request repeated without the cache, and a page that
+            keeps coming is raised as what it is.
+            """
+            response = super()._request(*args, **kwargs)
+            for wait in SKYSERVER_RETRY_WAITS_S:
+                message = skyserver_error(response)
+                if not message:
+                    return response
+                if "404" in message:  # an over-long GET (sdss_spectroscopy.MAX_ENCODED_SQL): the same again
+                    break
+                _forget_cached(self)
+                print(f"[sdss] SkyServer error page ({message[:80]}); again in {wait:.0f} s", flush=True)
+                time.sleep(wait)
+                response = super()._request(*args, **{**kwargs, "cache": False})
+            message = skyserver_error(response)
+            if message:
+                _forget_cached(self)
+                raise SkyServerError(message)
+            return response
+
         def _rectangle_sql(self, ra, dec, width, height=None):
             height = width if height is None else height
             d0, d1 = max(dec - height / 2.0, -90.0), min(dec + height / 2.0, 90.0)
