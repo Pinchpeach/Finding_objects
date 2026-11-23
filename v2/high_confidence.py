@@ -16,6 +16,14 @@ An object is flagged ``high_confidence`` when its coarse class is either
 
 The photometric route is withheld when a key archive (catalog_coverage.py)
 failed for the search: the thresholds were measured with those data.
+
+It is also withheld from an object that is reported as a faint quasar
+candidate (``secondary_class_reason`` = FAINT_QSO_CANDIDATE, qso_options.py,
+2.59.0).  On 2026-11-23 a COSMOS galaxy (LS r = 22.7, GALAXY p = 0.87,
+LS-GBM QSO score 0.99, a Chandra source) was "high confidence GALAXY" and a
+"QSO candidate" at once.  The two statements contradict each other, and the
+98 % purity of the faint GALAXY threshold was measured over all objects, not
+over the ones the evidence also points at a quasar.  A spectrum still confirms.
 """
 
 from __future__ import annotations
@@ -35,6 +43,7 @@ SPECTRA = (
     ("lamost_dr_catalog", "Class", "catalog_confidence_lamost_spectroscopy", "LAMOST DR5"),
 )
 CLASSES = ("STAR", "GALAXY", "QSO")
+CANDIDATE_REASON = "FAINT_QSO_CANDIDATE"  # qso_options.CANDIDATE_REASON
 
 
 def load_table(path: Path = TABLE) -> dict | None:
@@ -96,12 +105,14 @@ def apply(df: pd.DataFrame, coverage: dict | None = None, table: dict | None = N
         basis_col = df.get("classification_basis", pd.Series("evidence", index=df.index)).fillna("evidence").astype(str)
         conf = np.where(basis_col.isin(["evidence", "nan", ""]), conf, np.nan)
         cls = df.primary_class.astype(str).to_numpy()
+        reason = df.get("secondary_class_reason", pd.Series("", index=df.index)).fillna("").astype(str)
+        candidate = reason.eq(CANDIDATE_REASON).to_numpy()  # also a faint quasar candidate: no photometric certainty
         lower = table.get("purity_lower_bound", {})
         for b, per_class in table["thresholds"].items():
             for c, t in per_class.items():
                 if t is None:
                     continue
-                hit = classified & ~flag & (bins == b) & (cls == c) & (conf >= t)  # NaN confidence -> False
+                hit = classified & ~flag & ~candidate & (bins == b) & (cls == c) & (conf >= t)  # NaN confidence -> False
                 if hit.any():
                     p = lower.get(b, {}).get(c)
                     flag[hit] = True

@@ -104,3 +104,69 @@ def test_reference_scores_do_not_count_a_faint_candidate_as_the_other_reading():
     dual = {"primary_class": "GALAXY", "secondary_class": "QSO", "secondary_class_reason": "GALAXY_WISE_AGN"}
     assert "QSO" not in V.tokens(V.drop_candidate(cand))
     assert "QSO" in V.tokens(V.drop_candidate(dual))
+
+
+def test_without_legacy_surveys_no_other_survey_r_stands_in_for_the_candidate_range(monkeypatch):
+    """2.59.0 check: outside the Legacy Surveys footprint (the Galactic plane fields) only PS1 / SDSS / Gaia r exist.
+    The candidate range 22 <= r < 24 and the 0.1 threshold were measured on LS r, so another survey's r is not used."""
+    monkeypatch.setenv("V2_FAINT_QSO_CANDIDATE", "0.1")
+    df = pd.DataFrame(
+        {
+            "std_mag__ps1_r": [23.0, 23.0],
+            "std_mag__sdss_r": [23.0, np.nan],
+            "gaia_dr3__phot_g_mean_mag": [20.5, 20.5],
+        }
+    )
+    sec, why = Q.faint_candidates(df, ["GALAXY", "GALAXY"], [0.9, 0.9], ["", ""], ["", ""])
+    assert sec == ["", ""] and why == ["", ""]
+    df["std_mag__ls_r"] = [23.0, 23.0]  # the same rows with a Legacy Surveys r are flagged
+    assert Q.faint_candidates(df, ["GALAXY", "GALAXY"], [0.9, 0.9], ["", ""], ["", ""])[0] == ["QSO", "QSO"]
+
+
+# ---------------------------------------------------- the second set of deep COSMOS fields (2.59.0 preparation)
+BENCH = ROOT.parent / "benchmark"
+
+
+def _bench(name):
+    import sys
+
+    sys.path.insert(0, str(BENCH))
+    s = importlib.util.spec_from_file_location(name, BENCH / f"{name}.py")
+    m = importlib.util.module_from_spec(s)
+    s.loader.exec_module(m)
+    return m
+
+
+def test_new_field_list_follows_its_rule():
+    sel = _bench("select_deep_cosmos_2")
+    c = sel.candidates()
+    assert len(c) >= 10
+    # no new field touches an existing one or another new one (6' radius: centres >= 12.6' apart)
+    for r in c.itertuples():
+        assert r.gap_to_existing_deg >= sel.GRID_STEP_DEG - 1e-6 and r.n_chandra >= c.attrs["floor"]
+    for i, a in c.iterrows():
+        for _, b in c.iloc[i + 1 :].iterrows():
+            assert sel.sep_deg(a.ra, a.dec, b.ra, b.dec) >= sel.GRID_STEP_DEG - 1e-3
+    assert list(c.distance_deg) == sorted(c.distance_deg)  # ordered by distance from the anchor
+
+
+def test_the_committed_field_list_is_the_rule_output():
+    """The file is locked by its SHA-256 (DEEP_COSMOS_EXPANSION.md): rows keep the names, centres and the parity split."""
+    sel = _bench("select_deep_cosmos_2")
+    if not sel.OUT.exists():
+        pytest.skip("field list not written yet")
+    t = pd.read_csv(sel.OUT)
+    assert list(t.name) == [f"deep_cosmos_{sel.FIRST_NUMBER + k}" for k in range(len(t))]
+    assert (t.r == 6.0).all()
+    assert all(s == ("cal" if int(n.rsplit("_", 1)[1]) % 2 else "test") for n, s in zip(t.name, t.split))
+    offline = sel.candidates().set_index(["ra", "dec"])
+    assert all((r.ra, r.dec) in offline.index for r in t.itertuples())  # the archive checks only drop, never add
+
+
+def test_gaia_source_of_a_collection(tmp_path):
+    col = _bench("collect_deep_cosmos")
+    assert col.gaia_source(tmp_path) == "none"
+    pd.DataFrame({"gaia_base_query_status": ["tap"]}).to_csv(tmp_path / "gaia_dr3_ra1_dec2_r6arcmin.csv", index=False)
+    assert col.gaia_source(tmp_path) == "tap"
+    pd.DataFrame({"gaia_base_query_status": ["vizier_fallback"]}).to_csv(tmp_path / "gaia_dr3_ra1_dec2_r6arcmin.csv", index=False)
+    assert col.gaia_source(tmp_path) == "vizier_fallback"

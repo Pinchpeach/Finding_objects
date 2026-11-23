@@ -141,6 +141,12 @@ def share_mode() -> str:
     return v
 
 
+def share_table_path() -> Path:
+    """The share table: V2_FAINT_QSO_SHARE_TABLE (for an A/B of another table), else the bundled one."""
+    v = os.environ.get("V2_FAINT_QSO_SHARE_TABLE", "").strip()
+    return Path(v) if v else SHARE_TABLE
+
+
 def faint_share_factor(df, table=None, mode=None) -> np.ndarray:
     """Factor on the QSO odds from the COSMOS type-1 share per LS r bin; NaN where it does not apply
     (mode off, r outside the table, no r)."""
@@ -148,7 +154,7 @@ def faint_share_factor(df, table=None, mode=None) -> np.ndarray:
     out = np.full(len(df), np.nan)
     if mode == "off" or not len(df):
         return out
-    t = pd.read_csv(SHARE_TABLE) if table is None else table
+    t = pd.read_csv(share_table_path()) if table is None else table
     r = _col(df, LS_R_COLUMN)
     train = 1.0 / 3.0
     for row in t.itertuples():
