@@ -34,6 +34,8 @@ def main():
         help="also aggregate by region pool (name prefix: csth / cpln / clam); aggregates only",
     )
     a = ap.parse_args()
+    if a.out:
+        a.out.mkdir(parents=True, exist_ok=True)  # per-object files are written before the summary (2.57.0)
     variants = sorted(p.name for p in a.root.iterdir() if p.is_dir())
     bench = S.benchmark_positions()
     per = {}

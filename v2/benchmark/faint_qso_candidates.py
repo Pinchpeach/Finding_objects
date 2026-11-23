@@ -236,6 +236,34 @@ def compare(deep: Path, base: str, variant: str) -> dict:
     return {"truth_pairs": pd.DataFrame(rows), "all_object_label_changes": pd.DataFrame(lab)}
 
 
+def probability_scores(m: pd.DataFrame, lo: float = CAND_R_MIN, hi: float = CAND_R_MAX, type2: str = "exclude") -> dict:
+    """Accuracy, ECE, class-wise ECE, NLL and the Brier score of p_qso on the matched truth objects with LS r in
+    [lo, hi), truth classes STAR / GALAXY / QSO (= Chandra type 1).  The COSMOS2020 A/B of 2.52.0 has no QSO
+    truth (Chandra AGN are lptype 2), so a prior that moves probability to QSO can only lose there; this adds
+    the type-1 AGN.  ``type2``: "exclude" the host-dominated type-2 AGN or count them as GALAXY."""
+    import prior_layer_study as PLS
+
+    x = m[(m.o_std_mag__ls_r >= lo) & (m.o_std_mag__ls_r < hi)].copy()
+    x["want"] = x.truth.map(EXPECTED)
+    if type2 == "exclude":
+        x = x[x.truth != "TYPE2"]
+    x = x[x[["o_p_star", "o_p_galaxy", "o_p_qso"]].notna().all(axis=1)]
+    P = x[["o_p_star", "o_p_galaxy", "o_p_qso"]].to_numpy(float)
+    y = x.want.map({"STAR": 0, "GALAXY": 1, "QSO": 2}).to_numpy()
+    q = (y == 2).astype(float)
+    return {
+        "n": len(x),
+        "n_qso": int(q.sum()),
+        "acc": round(100 * float((x.o_primary_class == x.want).mean()), 3),
+        "ece": round(100 * PLS.ece(P, y), 3),
+        "classwise_ece": round(100 * PLS.classwise_ece(P, y), 3),
+        "nll": round(float(-np.log(np.clip(P[np.arange(len(y)), y], 1e-12, 1)).mean()), 4),
+        "brier_qso": round(float(np.mean((P[:, 2] - q) ** 2)), 5),
+        "mean_p_qso": round(float(P[:, 2].mean()), 5),
+        "type1_fraction": round(float(q.mean()), 5),
+    }
+
+
 def split_of_series(fields: pd.Series) -> pd.Series:
     return fields.map(split_of)
 
