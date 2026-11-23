@@ -1,0 +1,55 @@
+name: Compare alternative archive sources
+
+# 2.57.0 review.  (1) The Legacy Surveys viewer catalogue (desi_legacy.py second
+# path) against the Data Lab TAP, incl. DR9-North cones, the north/south split
+# and the SGC above Dec 32.375.  (2) The Gaia VizieR I/355 copy's
+# astrophysical parameters (DSC, GSP-Spec, ESP-ELS, ESP-UCD, FLAME) against
+# ESA-archive values stored on the validation-data branch.
+on:
+  push:
+    branches-ignore: [main, validation-data]
+    paths:
+      - ".github/workflows/compare-archive-alternatives.yml"
+      - "v2/benchmark/compare_ls_viewer.py"
+      - "v2/benchmark/compare_gaia_copy_columns.py"
+      - "v2/Get_data/desi_legacy.py"
+      - "v2/Get_data/gaia_dr3.py"
+  workflow_dispatch:
+
+jobs:
+  legacy-viewer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas numpy scipy requests astropy pyvo
+      - name: Compare
+        run: python -u v2/benchmark/compare_ls_viewer.py --out ls_viewer_metrics.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: ls-viewer-metrics, path: ls_viewer_metrics.json}
+
+  gaia-copy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas numpy requests astropy astroquery pyvo
+      - name: ESA-archive Gaia files of the practical-use probe (validation-data)
+        run: |
+          git fetch --depth 1 origin validation-data
+          mkdir -p /tmp/esa && cd /tmp/esa
+          for f in cosmos ngc4522 plane_l30_bm2; do
+            git -C "$GITHUB_WORKSPACE" show FETCH_HEAD:practical_probe/44176464564/${f}_raw.tar.gz > $f.tgz
+            tar xzf $f.tgz --wildcards '*gaia_dr3_ra*.csv'
+          done
+          find /tmp/esa -name 'gaia_dr3_ra*.csv' | tee /tmp/esa/files.txt
+      - name: Compare
+        run: python -u v2/benchmark/compare_gaia_copy_columns.py --gaia-files $(cat /tmp/esa/files.txt) --ucd 200 --out gaia_copy_metrics.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: gaia-copy-metrics, path: gaia_copy_metrics.json}

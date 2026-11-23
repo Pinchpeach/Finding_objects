@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import importlib
 import importlib.util
+import json
 import os
 import sys
 import time
@@ -111,15 +112,20 @@ CORE = ("gaia_dr3", "desi_legacy", "panstarrs1", "allwise", "twomass")
 # (MAST, then VizieR) need their full budget to reach the fallback (PR #71
 # review).  Legacy Surveys: with the Data Lab TAP down (2026-11-17) its three
 # 80 s attempts made every re-run wait 246-300 s, while a healthy LS cone
-# takes 5-16 s, so one attempt (90 s) still catches a recovery.
+# takes 5-16 s, so one attempt (90 s) still catches a recovery.  2.57.0: its
+# second path (the viewer catalogue, desi_legacy.py) is asked after 30 s and
+# answers in 5-15 s, so it fits inside the 90 s as well.
 
 
-def _budget(name: str, default: float) -> float:
+def _budget(name: str, default: float, retry: bool = False) -> float:
+    """Wall-time budget of one collector.  ``retry``: the user asked for this
+    collector again after it failed (2.57.0), which counts as a recent failure
+    whatever the failure memory says (it expires after 10 min)."""
     try:
         b = min(default, float(getattr(_load_collector(name), "BUDGET_S", default)))
     except Exception:
         b = default
-    if name in CORE and archive_cache.recent_failure(name):
+    if retry or (name in CORE and archive_cache.recent_failure(name)):
         try:
             retry = getattr(_load_collector(name), "RETRY_BUDGET_S", None)
         except Exception:
@@ -130,8 +136,10 @@ def _budget(name: str, default: float) -> float:
 
 
 def _collect_one(
-    name: str, ra: float, dec: float, radius_arcmin: float, out_dir: Path, tag: str, cancelled=None
+    name: str, ra: float, dec: float, radius_arcmin: float, out_dir: Path, tag: str, cancelled=None, retry: bool = False
 ) -> dict:
+    """Collect one archive.  ``retry``: asked for again by the user after a
+    failure (2.57.0), so a remembered recent failure does not skip it."""
     started = time.monotonic()
     output = out_dir / f"{name}_{tag}.csv"
     cache = "off"
@@ -155,7 +163,13 @@ def _collect_one(
         df = archive_cache.get(
             name, source, ra, dec, radius_arcmin, float(getattr(module, "CACHE_FILTER_MARGIN_ARCMIN", 0.0))
         )
-        prev = None if (df is not None or name in CORE) else archive_cache.recent_failure(name, ra, dec, radius_arcmin)
+        if retry and df is not None and archive_cache.fallback(df):
+            df = None  # asked again to get the primary source: not the alternative source's cached copy (2.57.0)
+        prev = (
+            None
+            if (df is not None or name in CORE or retry)
+            else archive_cache.recent_failure(name, ra, dec, radius_arcmin)
+        )
         if prev:
             # Failed a moment ago: not asked again until the memory expires (2.55.0).
             age = time.time() - float(prev.get("t", 0))
@@ -335,6 +349,7 @@ def collect_all(
     out_dir.mkdir(parents=True, exist_ok=True)
     tag = _tag(ra, dec, radius_arcmin)
     started = time.monotonic()
+    write_search(out_dir, ra, dec, radius_arcmin)
     _disable_astroquery_cache()
     pruned = archive_cache.prune({n: GET_DATA / f"{n}.py" for n in COLLECTORS})
     if any(pruned.values()):
@@ -361,6 +376,134 @@ def collect_all(
     )
     print(f"Summary: {summary_path}", flush=True)
     return summary
+
+
+SEARCH_FILE = "search.json"
+FAILED = ("error", "timeout")
+
+
+def write_search(out_dir: Path, ra: float, dec: float, radius_arcmin: float) -> None:
+    """Record the exact search cone next to the raw files (2.57.0).
+
+    The folder tag rounds to 6 decimals, and the archive cache treats a cone as
+    "the same" only to 1e-6 arcmin: a cone parsed back from the tag would miss
+    the cache of every archive that already answered, and ``retry_failed``
+    would ask them all again."""
+    try:
+        (Path(out_dir) / SEARCH_FILE).write_text(
+            json.dumps({"ra": float(ra), "dec": float(dec), "radius_arcmin": float(radius_arcmin)}),
+            encoding="utf-8",
+        )
+    except OSError:
+        pass  # only the retry path needs it, and it then asks for the position
+
+
+def read_search(raw_dir: Path) -> tuple[float, float, float] | None:
+    """(ra, dec, radius_arcmin) of the collection in ``raw_dir``, or None."""
+    try:
+        d = json.loads((Path(raw_dir) / SEARCH_FILE).read_text(encoding="utf-8"))
+        return float(d["ra"]), float(d["dec"]), float(d["radius_arcmin"])
+    except (OSError, ValueError, KeyError, TypeError):
+        return None
+
+
+def last_collection(work: Path) -> Path | None:
+    """Raw folder of the newest collection in ``work/raw`` (has a collection summary)."""
+    try:
+        folders = [d for d in (Path(work) / "raw").iterdir() if d.is_dir() and any(d.glob("collection_summary_*.csv"))]
+    except OSError:
+        return None
+    return max(folders, key=lambda d: max(f.stat().st_mtime for f in d.glob("collection_summary_*.csv")), default=None)
+
+
+def _coverage_module():
+    spec = importlib.util.spec_from_file_location("v2_catalog_coverage_ctrl", ROOT / "catalog_coverage.py")
+    cov = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(cov)
+    return cov
+
+
+def failed_collectors(raw_dir: Path, which: str = "key") -> list[str]:
+    """Collectors of the collection in ``raw_dir`` worth asking again: those that failed
+    (error / timeout) and those that answered from a reduced alternative source
+    (catalog_coverage.ALTERNATIVE: Gaia from the VizieR copy while the ESA archive is down).
+    ``which`` = "key" the archives the classification rests on (catalog_coverage.IMPACT),
+    "all" every one of them."""
+    files = sorted(Path(raw_dir).glob("collection_summary_*.csv"))
+    if not files:
+        return []
+    cov = _coverage_module().summarize(raw_dir)
+    names = [f["collector"] for f in cov.get("failed", [])] + [a["collector"] for a in cov.get("alternative", [])]
+    if which == "all":
+        return names
+    key = {f["collector"] for f in cov.get("failed", []) if f.get("key")} | {
+        a["collector"] for a in cov.get("alternative", [])
+    }
+    return [n for n in names if n in key]
+
+
+def retry_failed(
+    raw_dir: Path,
+    ra: float,
+    dec: float,
+    radius_arcmin: float,
+    workers: int = 1,
+    which: str = "key",
+    budget_s: float = COLLECTOR_BUDGET_S,
+) -> pd.DataFrame:
+    """Ask again only the collectors of the last collection in ``raw_dir`` that
+    failed or answered from a reduced alternative source, and replace their rows
+    in its collection summary (2.57.0).
+
+    A run on a bad archive day (2026-11-23: Legacy Surveys timed out at
+    300 s in the first COSMOS search, 270 objects instead of 3,582) was
+    recovered by running everything again; the archives that had answered are
+    served by ``archive_cache`` and cost nothing, but the rest of the run was
+    redone and the user had to know to do it.  Here nothing that succeeded is
+    asked at all, and nothing is re-collected when nothing failed.
+
+    A retry is an explicit request: the 10-minute failure memory
+    (``archive_cache``) does not skip it, and a collector that declares
+    ``RETRY_BUDGET_S`` gets only that long (a healthy service answers in a
+    fraction of it; the budget exists so that a retry during an outage is not
+    another 5-minute wait).  Returns the rows that were re-collected."""
+    raw_dir = Path(raw_dir)
+    names = failed_collectors(raw_dir, which)
+    if not names:
+        print("[retry] no failed archives to ask again", flush=True)
+        return pd.DataFrame()
+    tag = _tag(ra, dec, radius_arcmin)
+    started = time.monotonic()
+    _disable_astroquery_cache()
+    if workers > 1:
+        _preload()
+    print(f"[retry] asking again: {', '.join(names)}", flush=True)
+    budgets = {n: _budget(n, budget_s, retry=True) for n in names}
+    results = _run_bounded(
+        lambda n, c: _collect_one(n, ra, dec, radius_arcmin, raw_dir, tag, c, retry=True), names, workers, budgets
+    )
+    for r in results:
+        archive_cache.note_outcome(
+            r["collector"], r["status"], r.get("error", ""), ra, dec, radius_arcmin, r.get("elapsed_seconds")
+        )
+    new = pd.DataFrame(results)
+    summary_path = sorted(raw_dir.glob("collection_summary_*.csv"))[-1]
+    old = pd.read_csv(summary_path, keep_default_na=False)
+    keep = old[~old.collector.isin(new.collector)]
+    merged = pd.concat([keep, new], ignore_index=True)
+    order = {n: i for i, n in enumerate(COLLECTORS)}  # the summary keeps COLLECTORS order
+    merged = merged.sort_values("collector", key=lambda c: c.map(order).fillna(len(order)), kind="stable")
+    merged.to_csv(summary_path, index=False)
+    after = _coverage_module().summarize(raw_dir)
+    still = [f["collector"] for f in after.get("failed", []) if f["collector"] in names]
+    reduced = [a["collector"] for a in after.get("alternative", []) if a["collector"] in names]
+    print(
+        f"[retry] {len(names) - len(still) - len(reduced)}/{len(names)} recovered in {time.monotonic() - started:.1f} s"
+        + (f"; still failing: {', '.join(still)}" if still else "")
+        + (f"; still from the alternative source: {', '.join(reduced)}" if reduced else ""),
+        flush=True,
+    )
+    return new
 
 
 def main() -> int:

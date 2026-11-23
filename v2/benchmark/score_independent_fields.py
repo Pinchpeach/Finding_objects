@@ -252,6 +252,16 @@ def field_matches(fdir, which, bench):
     alt = m["secondary_class"].fillna("").astype(str) if "secondary_class" in m else pd.Series("", index=m.index)
     if has_parent and "secondary_class" in o:
         alt[part] = m.parent_object_id[part].map(o.set_index("object_id").secondary_class).fillna("").astype(str)
+    # 2.58.0 review: the faint quasar candidate (qso_options.faint_candidates, about 1 in 5 a quasar) is a lead,
+    # not the other reading of a dual GALAXY/QSO object; the "either of the dual labels" line keeps its 2.46.0
+    # meaning and does not count it.
+    if "secondary_class_reason" in m:
+        why = m["secondary_class_reason"].fillna("").astype(str)
+        if has_parent and "secondary_class_reason" in o:
+            why[part] = (
+                m.parent_object_id[part].map(o.set_index("object_id").secondary_class_reason).fillna("").astype(str)
+            )
+        alt = alt.where(why.ne("FAINT_QSO_CANDIDATE"), "")
     m["ours_alt"] = alt
     m = pd.concat([t.add_prefix("t_"), m], axis=1)
     m = m[m.t_matched & ~m.t_in_benchmark]

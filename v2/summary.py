@@ -47,6 +47,7 @@ COLUMNS = [
     "high_confidence",
     "high_confidence_basis",
     "secondary_class",
+    "secondary_class_reason",
     "subclass",
     "subclass_provenance",
     "subclass_tags",
@@ -55,6 +56,9 @@ COLUMNS = [
     "host_redshift",
     "designation_catalog",
     "catalogs",
+    # run-level: archives this search could not reach (catalog_coverage.annotate, 2.57.0)
+    "run_archives_status",
+    "run_archives_missing",
     "object_id",
 ]
 SUMMARY = "objects_summary.csv"

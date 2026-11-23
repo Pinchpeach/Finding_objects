@@ -176,6 +176,27 @@ def coverage_text(results_dir: Path) -> str:
         return ""
 
 
+def retry_mode(results_dir: Path) -> str | None:
+    """``--retry-failed`` mode ("key" or "all") that can ask the archives of the search in
+    ``results_dir`` again, or None: nothing failed and nothing came from a reduced alternative
+    source, or a search made before 2.57.0 that did not record its position (2.57.0).  "key"
+    when a key archive failed or answered from an alternative source (the others are the
+    user's lesser concern and may be slow to ask again)."""
+    try:
+        cov = _load_v2("v2_catalog_coverage", "catalog_coverage.py").read(results_dir)
+        raw = cov.get("raw_dir") if cov else None
+        if (
+            not cov
+            or not (cov.get("failed") or cov.get("alternative"))
+            or not raw
+            or not (Path(raw) / "search.json").exists()
+        ):
+            return None
+        return "key" if cov.get("key_failed") or cov.get("alternative") else "all"
+    except Exception:
+        return None
+
+
 class _NameResolver(QRunnable):
     """Resolve an object name to ICRS coordinates (CDS Sesame) off the GUI thread."""
 
@@ -249,7 +270,13 @@ class MainWindow(QMainWindow):
             "QLabel { background: #fff3cd; color: #664d03; border: 1px solid #e0c36c; padding: 4px; }"
         )
         self.lbl_coverage.setVisible(False)
-        tl.addWidget(self.lbl_coverage)
+        self.btn_retry = QPushButton("Ask failed archives again")
+        self.btn_retry.setVisible(False)
+        self.btn_retry.clicked.connect(self.retry_failed_archives)
+        banner = QHBoxLayout()
+        banner.addWidget(self.lbl_coverage, 1)
+        banner.addWidget(self.btn_retry, 0, Qt.AlignTop)
+        tl.addLayout(banner)
         bar = QHBoxLayout()
         self.cmb_class = QComboBox()
         self.cmb_class.addItems(["ALL", "STAR", "GALAXY", "QSO", "UNKNOWN"])
@@ -610,8 +637,31 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, APP_NAME, str(exc))
             return
         self._save()
+        self._start(args, collecting=self.rb_sky.isChecked())
+
+    def retry_failed_archives(self):
+        """Ask only the archives that failed in the shown search again, then classify again (2.57.0)."""
+        mode = retry_mode(self.results_path.parent) if self.results_path else None
+        if mode is None or (self.proc and self.proc.state() != QProcess.NotRunning):
+            return
+        args = [
+            "--work",
+            str(self.results_path.parent),
+            "--retry-failed",
+            mode,
+            "--workers",
+            str(int(self.sp_workers.value())),
+        ]
+        if self.sp_minconf.value() > 0:
+            args += ["--min-confidence", f"{self.sp_minconf.value():.2f}"]
+        if self.chk_prior.isChecked():
+            args.append("--field-prior")
+        # collecting=False: the number of archives asked again is read from the worker's "[retry]" line
+        self._start(args, collecting=False)
+
+    def _start(self, args: list[str], collecting: bool):
         self.work_dir = Path(args[1])
-        self.tracker = ProgressTracker(collecting=self.rb_sky.isChecked())
+        self.tracker = ProgressTracker(collecting=collecting)
         self.applog.start_run(f"run {APP_NAME}")
         self._log("$ pipeline " + " ".join(args))
         self._out_buf = b""
@@ -699,6 +749,18 @@ class MainWindow(QMainWindow):
         warn = coverage_text(path.parent)
         self.lbl_coverage.setText("⚠ " + warn if warn else "")
         self.lbl_coverage.setVisible(bool(warn))
+        mode = retry_mode(path.parent) if warn else None
+        self.btn_retry.setVisible(mode is not None)
+        if mode:
+            self.btn_retry.setToolTip(
+                "Asks only the archives that failed in this search again (the ones that answered are not\n"
+                "asked) and classifies again."
+                + (
+                    "\nOnly the archives the classification rests on; run with --retry-failed all for the rest."
+                    if mode == "key"
+                    else ""
+                )
+            )
         self.sky.set_frame(self.model.frame(), self.model.kinds())
         cols = [self.model.column_name(i) for i in range(self.model.columnCount())]
         if "separation_arcmin" in cols:  # nearest to the search centre first

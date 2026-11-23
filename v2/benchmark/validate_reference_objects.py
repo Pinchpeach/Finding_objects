@@ -66,7 +66,21 @@ PROVENANCE_OF = {
     "phenomenon_class": "phenomenon_provenance", "phenomenon_subtype": "phenomenon_provenance",
     "subclass_code": "subclass_provenance", "subclass_tags": "subclass_provenance",
 }
-KEEP = LABEL_COLS + ("classification_status", "primary_confidence", "object_id", "catalogs") + tuple(sorted(set(PROVENANCE_OF.values())))
+KEEP = (
+    LABEL_COLS
+    + ("classification_status", "primary_confidence", "object_id", "catalogs", "secondary_class_reason")
+    + tuple(sorted(set(PROVENANCE_OF.values())))
+)
+# 2.58.0 (PR #74 review): a faint quasar candidate (qso_options.faint_candidates, about 1 in 5 a quasar) is a
+# lead, not the 2.46.0 dual GALAXY/QSO reading: it counts neither for "coarse_either" nor as a type token.
+CANDIDATE_REASON = "FAINT_QSO_CANDIDATE"
+
+
+def drop_candidate(rec: dict) -> dict:
+    """The record without a secondary class that is only a faint quasar candidate."""
+    if str(rec.get("secondary_class_reason", "")) == CANDIDATE_REASON:
+        rec = dict(rec, secondary_class=None)
+    return rec
 
 # Classifier labels that count as recognising each reference type (any one).
 EXPECT = {
@@ -248,7 +262,9 @@ def score(a):
             coarse = g.coarse_class.iloc[0]
             pc = g[f"{mode}_primary_class"].astype(str)
             sc = g.get(f"{mode}_secondary_class", pd.Series("", index=g.index)).astype(str)
-            recs = [{c: rr.get(f"{mode}_{c}") for c in KEEP} for rr in g.to_dict("records")]
+            why = g.get(f"{mode}_secondary_class_reason", pd.Series("", index=g.index)).astype(str)
+            sc = sc.where(why.ne(CANDIDATE_REASON), "")
+            recs = [drop_candidate({c: rr.get(f"{mode}_{c}") for c in KEEP}) for rr in g.to_dict("records")]
             tok = [tokens(rr) for rr in recs]
             tok_inf = [tokens(rr, inferred_only=True) for rr in recs]
             exp = set(EXPECT.get(typ, ()))

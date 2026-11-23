@@ -51,7 +51,9 @@ OK_STATUS = {"", "ok", "tap", "missing_source_id", "nan", "<NA>", "None"}
 # so a re-run of the search does not repeat the ~60 s fallback, while the
 # next day tries the primary source again (it was not cached at all: in the
 # practical-use probe every warm re-run spent 56-60 s on Gaia).
-FALLBACK_STATUS = {"vizier_fallback", "fallback_partial", "fallback_unavailable"}
+# 2.57.0: "viewer_fallback" = the Legacy Surveys rows from the viewer catalogue
+# when the Data Lab TAP did not answer (desi_legacy.py); same rows, kept a day.
+FALLBACK_STATUS = {"vizier_fallback", "fallback_partial", "fallback_unavailable", "viewer_fallback"}
 FALLBACK_TTL_DAYS = 1.0
 SAME_TOL_ARCMIN = 1e-6
 LOCK_STALE_S = 30.0
@@ -115,8 +117,17 @@ def _statuses(df: pd.DataFrame) -> set:
     return out
 
 
+# Status columns that only a collector's alternative source writes (panstarrs1.py: the MAST path has no
+# ps1_query_status).  An empty answer with such a column came from the alternative source (PR #73 review):
+# an explicit retry (controller._collect_one(retry=True)) then asks the primary source instead of serving it
+# from the cache.  Its cache time is one day either way (EMPTY_TTL_DAYS = FALLBACK_TTL_DAYS).
+HEADER_ONLY_FALLBACK = frozenset({"ps1_query_status"})
+
+
 def fallback(df: pd.DataFrame) -> bool:
     """True when the rows came from a collector's alternative source."""
+    if df.empty and HEADER_ONLY_FALLBACK & {str(c) for c in df.columns}:
+        return True
     return bool(_statuses(df) & FALLBACK_STATUS)
 
 

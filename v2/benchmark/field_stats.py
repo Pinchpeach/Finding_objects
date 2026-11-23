@@ -84,3 +84,35 @@ def summary(m, nboot=1000):
         r["ours_on_dsc"] = round(100 * float((pred[has] == truth[has]).mean()), 2)
         r["dsc_coverage"] = round(100 * float(has.mean()), 1)
     return r
+
+
+# ---------------------------------------------------------------- region pools (2.57.0)
+def pool_of(field: str) -> str:
+    """Pool of a locked-set region: the part of its name before the first "_"
+    (``csth_304m58`` -> ``csth``; fields_c.csv has csth, cpln, clam)."""
+    return str(field).split("_", 1)[0]
+
+
+def by_pool(m, nboot=1000):
+    """One row per pool with the aggregate numbers of ``summary`` (accuracy with a field-bootstrap CI,
+    balanced accuracy, precision, baselines), the number of regions and objects and the per-class
+    recall and truth counts.
+
+    The locked-set protocol records aggregates only (LOCKED_TEST_SET_C.md rule 2).  A pool is a set of
+    regions chosen by the same sky rule, so its aggregate is no more per-object than the all-region one.
+    The 2.51.0 look said the low-latitude pool (cpln) was never reported on its own; the all-region
+    accuracy is dominated by the 30 clam regions.  A pool with a single region has a degenerate interval."""
+    rows = []
+    if m.empty:
+        return rows
+    pools = m.field.map(pool_of)
+    for pool in sorted(pools.unique()):
+        g = m[pools == pool].reset_index(drop=True)
+        row = {"pool": pool, "n_regions": int(g.field.nunique()), "n": len(g)}
+        row.update(summary(g, nboot))
+        for c in C:
+            t = g.t_truth == c
+            row[f"recall_{c}"] = round(100 * float((g.ours == c)[t].mean()), 2) if t.any() else None
+            row[f"n_{c}"] = int(t.sum())
+        rows.append(row)
+    return rows
