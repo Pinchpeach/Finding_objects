@@ -78,6 +78,17 @@ def test_a_timeout_is_remembered_for_every_cone(tmp_path, monkeypatch):
     assert s.cache.tolist() == ["recent_failure"] and not calls
 
 
+def test_a_slow_error_is_remembered_for_every_cone(tmp_path, monkeypatch):
+    """2.56.0 review: an error that took SLOW_FAILURE_S or more (HEASARC "System
+    overloaded" after 66 s) is a wait like a timeout; a quick one is not."""
+    monkeypatch.setenv("V2_CACHE_DIR", str(tmp_path / "cache"))
+    archive_cache.note_outcome("ned", "error", "quick parse error", 188.4155, 9.1751, 2.0, seconds=2.0)
+    assert archive_cache.recent_failure("ned", 150.10, 2.25, 2.0) is None
+    archive_cache.note_outcome("ned", "ok")
+    archive_cache.note_outcome("ned", "error", "System overloaded", 188.4155, 9.1751, 2.0, seconds=66.0)
+    assert archive_cache.recent_failure("ned", 150.10, 2.25, 2.0)["error"] == "System overloaded"
+
+
 def test_a_2_55_failure_file_is_read_as_service_wide(tmp_path, monkeypatch):
     monkeypatch.setenv("V2_CACHE_DIR", str(tmp_path / "cache"))
     archive_cache._write_failures({"ned": {"t": time.time(), "status": "error", "error": "x"}})

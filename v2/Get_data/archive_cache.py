@@ -133,13 +133,20 @@ def fallback(df: pd.DataFrame) -> bool:
 # followed (2.55.0 evaluation).  A failure now stops
 #   * the same cone, always (the re-run 2.55.0 was written for);
 #   * every other cone only if it was a "timeout" (the service did not answer
-#     inside its budget: the wait 2.55.0 removed, 60-300 s per search), or if
+#     inside its budget: the wait 2.55.0 removed, 60-300 s per search) or took
+#     SLOW_FAILURE_S or more to fail (review), or if
 #     the collector failed at two different cones inside the memory (an outage
 #     that answers quickly with an error page).
 # A quick "error" at one cone costs the next cone one more quick request, not
 # a wait.  Any success of the collector forgets its failures.
 FAILURE_MEMORY_S = 600.0
 SAME_CONE_DEG = 1e-4  # 0.36": the same search, not a neighbouring one
+# A failure that took this long is a wait like a timeout, and is applied to
+# every cone too (2.56.0 review): e.g. the HEASARC TAP answered "System
+# overloaded" only after 66 s, and SkyServer error pages retried five times
+# take ~30 s; a quick parse error (< SLOW_FAILURE_S) still costs the next cone
+# only one request.
+SLOW_FAILURE_S = 30.0
 
 
 def failure_memory_s() -> float:
@@ -207,7 +214,11 @@ def recent_failure(name: str, ra: float | None = None, dec: float | None = None,
     same = [e for e in entries if _same_cone(e, cone)]
     if same:
         return same[-1]
-    wide = [e for e in entries if e.get("status") == "timeout" or e.get("ra") is None]
+    wide = [
+        e
+        for e in entries
+        if e.get("status") == "timeout" or e.get("ra") is None or float(e.get("seconds", 0.0)) >= SLOW_FAILURE_S
+    ]
     if wide:
         return wide[-1]
     return entries[-1] if len(entries) >= 2 else None  # one entry per cone (note_outcome)
@@ -220,6 +231,7 @@ def note_outcome(
     ra: float | None = None,
     dec: float | None = None,
     radius_arcmin: float | None = None,
+    seconds: float | None = None,
 ) -> None:
     """Remember a failure (error / timeout) or forget the collector's failures after a success."""
     if not enabled() or failure_memory_s() <= 0:
@@ -231,6 +243,8 @@ def note_outcome(
             if status in ("error", "timeout"):
                 cone = _cone(ra, dec, radius_arcmin)
                 e = {"t": time.time(), "status": status, "error": str(error)[:300]}
+                if seconds is not None:
+                    e["seconds"] = float(seconds)
                 if cone is not None:
                     e.update(ra=cone[0], dec=cone[1], radius=cone[2])
                 d[name] = [x for x in d.get(name, []) if not _same_cone(x, cone)] + [e]

@@ -347,7 +347,9 @@ def collect_all(
     )
     for r in results:  # remember failures of this search, forget recovered services (2.55.0)
         if r.get("cache") != "recent_failure" and r["status"] != "outside_footprint":
-            archive_cache.note_outcome(r["collector"], r["status"], r.get("error", ""), ra, dec, radius_arcmin)
+            archive_cache.note_outcome(
+                r["collector"], r["status"], r.get("error", ""), ra, dec, radius_arcmin, r.get("elapsed_seconds")
+            )
 
     summary = pd.DataFrame(results)
     summary_path = out_dir / f"collection_summary_{tag}.csv"
