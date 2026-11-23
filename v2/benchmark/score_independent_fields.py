@@ -105,9 +105,7 @@ def truth_table(truth_dir):
         t.append(_rows(d[_num(d, "SNR").ge(10)], "STAR", "Gaia-ESO DR5"))
     d = _read(truth_dir, "J_MNRAS_353_601_smc2df")
     if d is not None:
-        t.append(
-            _rows(d[d.get("SpType", pd.Series("", index=d.index)).astype(str).str.strip().ne("")], "STAR", "2dF SMC")
-        )
+        t.append(_rows(d[d.get("SpType", pd.Series("", index=d.index)).astype(str).str.strip().ne("")], "STAR", "2dF SMC"))
     d = _read(truth_dir, "J_ApJ_775_92_agn_mc")
     if d is not None:
         q = d.get("Qs", pd.Series("", index=d.index)).astype(str).str.strip()
@@ -123,7 +121,8 @@ def truth_table(truth_dir):
         mu, lp, f814 = _num(d, "ACSmuClass"), _num(d, "lptype"), _num(d, "ACSF814Wmag")
         ok = f814.lt(24.5)
         cls = np.where(mu.eq(2) & lp.eq(1), "STAR", np.where(mu.eq(1) & lp.eq(0), "GALAXY", None))
-        print("COSMOS2020 truth check (ACSmuClass x lptype, F814W < 24.5):", pd.crosstab(mu[ok], lp[ok]).to_dict())
+        print("COSMOS2020 truth check (ACSmuClass x lptype, F814W < 24.5):",
+              pd.crosstab(mu[ok], lp[ok]).to_dict())
         t.append(_rows(d[ok], pd.Series(cls, index=d.index)[ok], "COSMOS2020 ACS+SED"))
     t = pd.concat(t, ignore_index=True) if t else pd.DataFrame(columns=["ra", "dec", "truth", "survey"])
     # One object per 1" group; disagreeing surveys drop it.
@@ -131,12 +130,7 @@ def truth_table(truth_dir):
     t["key"] = pd.factorize(pd.Series(key))[0] if len(t) else []
     g = t.groupby("key")
     agree = g.truth.nunique().eq(1)
-    out = g.agg(
-        ra=("ra", "mean"),
-        dec=("dec", "mean"),
-        truth=("truth", "first"),
-        survey=("survey", lambda s: "+".join(sorted(set(s)))),
-    )
+    out = g.agg(ra=("ra", "mean"), dec=("dec", "mean"), truth=("truth", "first"), survey=("survey", lambda s: "+".join(sorted(set(s)))))
     return out[agree].reset_index(drop=True), int((~agree).sum())
 
 
@@ -152,10 +146,7 @@ def _nearest(ra1, de1, ra2, de2):
 
 
 def benchmark_positions():
-    p = [
-        pd.read_csv(B / f, usecols=["ra", "dec"])
-        for f in ("desi_external/truth.csv", "truth_data/ground_truth.csv", "desi_fusion/truth.csv")
-    ]
+    p = [pd.read_csv(B / f, usecols=["ra", "dec"]) for f in ("desi_external/truth.csv", "truth_data/ground_truth.csv", "desi_fusion/truth.csv")]
     g = pd.read_csv(B / "desi_gbm_truth/train.csv.gz", usecols=["p_ra", "p_dec"])  # LS-GBM-001 training set
     p.append(g.rename(columns={"p_ra": "ra", "p_dec": "dec"}))
     return pd.concat(p, ignore_index=True).dropna()
@@ -164,21 +155,9 @@ def benchmark_positions():
 def other_labels(m):
     g = lambda c: _num(m, c)
     lab = {}
-    ps = (
-        g("gaia_dr3__classprob_dsc_combmod_star").fillna(0)
-        + g("gaia_dr3__classprob_dsc_combmod_whitedwarf").fillna(0)
-        + g("gaia_dr3__classprob_dsc_combmod_binarystar").fillna(0)
-    )
-    dsc = pd.DataFrame(
-        {
-            "STAR": ps,
-            "GALAXY": g("gaia_dr3__classprob_dsc_combmod_galaxy"),
-            "QSO": g("gaia_dr3__classprob_dsc_combmod_quasar"),
-        }
-    )
-    lab["Gaia DR3 DSC-Combmod"] = (
-        dsc.fillna(-1).idxmax(axis=1).where(g("gaia_dr3__classprob_dsc_combmod_quasar").notna())
-    )
+    ps = g("gaia_dr3__classprob_dsc_combmod_star").fillna(0) + g("gaia_dr3__classprob_dsc_combmod_whitedwarf").fillna(0) + g("gaia_dr3__classprob_dsc_combmod_binarystar").fillna(0)
+    dsc = pd.DataFrame({"STAR": ps, "GALAXY": g("gaia_dr3__classprob_dsc_combmod_galaxy"), "QSO": g("gaia_dr3__classprob_dsc_combmod_quasar")})
+    lab["Gaia DR3 DSC-Combmod"] = dsc.fillna(-1).idxmax(axis=1).where(g("gaia_dr3__classprob_dsc_combmod_quasar").notna())
     gb = pd.DataFrame({c: g(f"lsgbm_{c}") for c in C})
     lab["LS-GBM (LS photometry only)"] = gb.fillna(-1).idxmax(axis=1).where(gb.notna().any(axis=1))
     typ = m.get("desi_legacy_surveys_dr10__type", pd.Series("", index=m.index)).astype(str).str.upper().str.strip()
@@ -187,12 +166,10 @@ def other_labels(m):
     mw = pd.Series(np.where(ext, "GALAXY", np.where(w12 >= 0.8, "QSO", "STAR")), index=m.index)
     lab["LS morphology + WISE W1-W2>=0.8"] = mw.where((typ.eq("PSF") & w12.notna()) | ext)
     pe = {
-        "LS Tractor PSF vs extended": pd.Series(
-            np.where(typ.eq("PSF"), "POINT", np.where(ext, "EXT", None)), index=m.index
+        "LS Tractor PSF vs extended": pd.Series(np.where(typ.eq("PSF"), "POINT", np.where(ext, "EXT", None)), index=m.index),
+        "PS1 iPSF-iKron>0.05": (g("pan_starrs1_dr2_meanobject__iMeanPSFMag") - g("pan_starrs1_dr2_meanobject__iMeanKronMag")).map(
+            lambda x: None if not np.isfinite(x) or abs(x) > 5 else ("EXT" if x > 0.05 else "POINT")
         ),
-        "PS1 iPSF-iKron>0.05": (
-            g("pan_starrs1_dr2_meanobject__iMeanPSFMag") - g("pan_starrs1_dr2_meanobject__iMeanKronMag")
-        ).map(lambda x: None if not np.isfinite(x) or abs(x) > 5 else ("EXT" if x > 0.05 else "POINT")),
     }
     return lab, pe
 
@@ -288,13 +265,7 @@ def field_matches(fdir, which, bench):
     m["ours_alt"] = alt
     m = pd.concat([t.add_prefix("t_"), m], axis=1)
     m = m[m.t_matched & ~m.t_in_benchmark]
-    return m, dict(
-        info=info,
-        n_truth=len(t),
-        conflicts=conflicts,
-        unmatched=int((~t.matched).sum()),
-        in_bench=int(t.in_benchmark.sum()),
-    )
+    return m, dict(info=info, n_truth=len(t), conflicts=conflicts, unmatched=int((~t.matched).sum()), in_bench=int(t.in_benchmark.sum()))
 
 
 def _galactic(ra, dec):
@@ -339,18 +310,10 @@ def markdown_table(rows, M):
         o2 = g.ours.map({"STAR": "POINT", "QSO": "POINT", "GALAXY": "EXT"}).to_numpy()
         v = pe["PS1 iPSF-iKron>0.05"].to_numpy()
         mm = pd.notna(v)
-        ps1 = (
-            f"{100 * np.mean(v[mm] == pt[mm]):.1f} / {100 * np.mean(o2[mm] == pt[mm]):.1f} (n={mm.sum()})"
-            if mm.any()
-            else "–"
-        )
+        ps1 = f"{100 * np.mean(v[mm] == pt[mm]):.1f} / {100 * np.mean(o2[mm] == pt[mm]):.1f} (n={mm.sum()})" if mm.any() else "–"
         hc = high_confidence_score(g)
         hct = f"{hc['n']} / {hc['acc']} %" if hc else "–"
-        covf = (
-            Path(r["root"])
-            / r["field"]
-            / ("objects_blind_coverage.json" if r.get("which") == "blind" else "objects_coverage.json")
-        )
+        covf = Path(r["root"]) / r["field"] / ("objects_blind_coverage.json" if r.get("which") == "blind" else "objects_coverage.json")
         try:
             cov = json.loads(covf.read_text())
             failed = ", ".join(f["collector"] for f in cov.get("failed", [])) or "없음"
@@ -384,24 +347,11 @@ def main():
         m.insert(0, "field", fdir.name)
         allm.append(m)
         info = st["info"]
-        print(
-            f"\n=== {fdir.name}: centre ({info['ra']:.4f}, {info['dec']:+.4f}) r={info['radius_arcmin']}' seeing {info.get('seeing')}"
-        )
+        print(f"\n=== {fdir.name}: centre ({info['ra']:.4f}, {info['dec']:+.4f}) r={info['radius_arcmin']}' seeing {info.get('seeing')}")
         print(f"single-catalogue fragments next to a truth object: {int(m.t_n_fragments.gt(0).sum())}")
-        print(
-            f"truth in field {st['n_truth']} (unmatched {st['unmatched']}, in SDSS/DESI benchmark {st['in_bench']}, survey conflicts {st['conflicts']}); scored {len(m)}"
-        )
+        print(f"truth in field {st['n_truth']} (unmatched {st['unmatched']}, in SDSS/DESI benchmark {st['in_bench']}, survey conflicts {st['conflicts']}); scored {len(m)}")
         print("   by survey:", m.t_survey.value_counts().to_dict(), "| truth mix:", m.t_truth.value_counts().to_dict())
-        r = dict(
-            field=fdir.name,
-            root=str(a.root),
-            which=a.which,
-            ra=info["ra"],
-            dec=info["dec"],
-            n=len(m),
-            ours=score(m.ours, m.t_truth),
-            high=high_confidence_score(m),
-        )
+        r = dict(field=fdir.name, root=str(a.root), which=a.which, ra=info["ra"], dec=info["dec"], n=len(m), ours=score(m.ours, m.t_truth), high=high_confidence_score(m))
         lab, pe = other_labels(m)
         for k, v in lab.items():
             r[k] = score(v, m.t_truth)
@@ -414,9 +364,7 @@ def main():
     print(f"\n=== ALL FIELDS ({a.which}): {len(M)} objects; truth mix {M.t_truth.value_counts().to_dict()}")
     print("ours:", score(M.ours, M.t_truth))
     either = M.ours.where(M.ours == M.t_truth, M.ours_alt.where(M.ours_alt == M.t_truth, M.ours))
-    print(
-        f"ours, either of the dual GALAXY/QSO labels: {score(either, M.t_truth)} ({int(M.ours_alt.ne('').sum())} dual labels)"
-    )
+    print(f"ours, either of the dual GALAXY/QSO labels: {score(either, M.t_truth)} ({int(M.ours_alt.ne('').sum())} dual labels)")
     print("high confidence:", high_confidence_score(M))
     print(pd.crosstab(M.t_truth, M.ours, margins=True).to_string())
     lab, pe = other_labels(M)
@@ -426,9 +374,7 @@ def main():
     o2 = M.ours.map({"STAR": "POINT", "QSO": "POINT", "GALAXY": "EXT"})
     for k, v in pe.items():
         mm = v.notna().to_numpy()
-        print(
-            f"\n{k}: n={mm.sum()} acc {100 * np.mean(v[mm] == pt[mm]):.1f}% | ours collapsed on same {100 * np.mean(o2[mm] == pt[mm]):.1f}%"
-        )
+        print(f"\n{k}: n={mm.sum()} acc {100 * np.mean(v[mm] == pt[mm]):.1f}% | ours collapsed on same {100 * np.mean(o2[mm] == pt[mm]):.1f}%")
     print("\nby survey:")
     for s_, g in M.groupby(M.t_survey.str.split("+").str[0]):
         print(f"   {s_}: {score(g.ours, g.t_truth)}")
