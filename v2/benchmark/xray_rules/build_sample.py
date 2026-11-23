@@ -11,6 +11,9 @@ h = allo[allo.truth == "CORONAL_STAR"].copy()
 h_x = h[h.xmm_sep.notna() | h.csc_sep.notna()]
 h_e = h[h.ero_sep.notna() & h.xmm_sep.isna() & h.csc_sep.isna()].sample(20000, random_state=1)
 h = pd.concat([h_x, h_e]); h["truth"] = "CORONAL_STAR_HAMSTAR"
+# drop HamStar controls that are compact-object truth (3"), as for SDSS below (PR #72 review)
+ch, ct0 = SkyCoord(h.ra.values * u.deg, h.dec.values * u.deg), SkyCoord(t.ra.values * u.deg, t.dec.values * u.deg)
+h = h[ch.match_to_catalog_sky(ct0)[1].arcsec > 3]
 # SDSS DR18 spectroscopic stars (no CV / WD) and QSOs, zWarning = 0
 s = pd.read_csv(f"{D}/sdss_star_qso.csv.gz", low_memory=False)
 sub = s.subclass.astype(str).str.upper()
@@ -66,3 +69,6 @@ m = m.merge(g, on="k", how="left").merge(k2, on="k", how="left")
 # HamStar: use its own Gaia counterpart (exact source_id) when the nearest Gaia star is another one
 m.to_pickle(f"{D}/sample.pkl")
 print(m.groupby("truth").agg(n=("k", "size"), gaia=("g_source_id", lambda x: x.notna().sum()), tmass=("t_kmag", lambda x: x.notna().sum())))
+# the evaluator's input (evaluate_xray_rules.py reads sample.csv.gz with 2MASS columns t_Kmag, t_e_Kmag, t_Qflg)
+m.rename(columns={"t_kmag": "t_Kmag", "t_e_kmag": "t_e_Kmag", "t_qflg": "t_Qflg"}).to_csv(f"{D}/sample.csv.gz", index=False)
+print("wrote", f"{D}/sample.csv.gz", "-> copy to v2/benchmark/xray_rules/sample.csv.gz")

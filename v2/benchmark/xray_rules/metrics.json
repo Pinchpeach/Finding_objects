@@ -1,11 +1,19 @@
 {
  "sample": {
-  "CORONAL_STAR_HAMSTAR": 25779,
+  "CORONAL_STAR_HAMSTAR": 25699,
   "QSO_SDSS_SPEC": 7276,
   "CV": 1429,
   "STAR_SDSS_SPEC": 1343,
   "LMXB": 451,
   "HMXB": 190
+ },
+ "ks_upper_limits_left_out": {
+  "CORONAL_STAR_HAMSTAR": 120,
+  "CV": 85,
+  "HMXB": 8,
+  "LMXB": 34,
+  "QSO_SDSS_SPEC": 390,
+  "STAR_SDSS_SPEC": 74
  },
  "rodriguez_2024": {
   "4XMM 0.2-12 keV (Rodriguez), match <= 3 sigma | Gaia G and BP-RP": {
@@ -60,14 +68,14 @@
     "with_flux": 625
    },
    "CORONAL_STAR_HAMSTAR": {
-    "k": 86,
-    "n": 4854,
-    "rate": 0.0177,
+    "k": 44,
+    "n": 4800,
+    "rate": 0.0092,
     "wilson95": [
-     0.0144,
-     0.0218
+     0.0068,
+     0.0123
     ],
-    "with_flux": 4883
+    "with_flux": 4829
    },
    "QSO_SDSS_SPEC": {
     "k": 1550,
@@ -90,11 +98,11 @@
    },
    "purity_vs_CORONAL_STAR_HAMSTAR": {
     "k": 338,
-    "n": 424,
-    "rate": 0.7972,
+    "n": 382,
+    "rate": 0.8848,
     "wilson95": [
-     0.7563,
-     0.8327
+     0.8489,
+     0.9131
     ]
    }
   },
@@ -150,14 +158,14 @@
     "with_flux": 625
    },
    "CORONAL_STAR_HAMSTAR": {
-    "k": 37,
-    "n": 3031,
-    "rate": 0.0122,
+    "k": 18,
+    "n": 3002,
+    "rate": 0.006,
     "wilson95": [
-     0.0089,
-     0.0168
+     0.0038,
+     0.0095
     ],
-    "with_flux": 4883
+    "with_flux": 4829
    },
    "QSO_SDSS_SPEC": {
     "k": 0,
@@ -180,11 +188,11 @@
    },
    "purity_vs_CORONAL_STAR_HAMSTAR": {
     "k": 117,
-    "n": 154,
-    "rate": 0.7597,
+    "n": 135,
+    "rate": 0.8667,
     "wilson95": [
-     0.6865,
-     0.8204
+     0.7991,
+     0.914
     ]
    }
   },
@@ -240,14 +248,14 @@
     "with_flux": 268
    },
    "CORONAL_STAR_HAMSTAR": {
-    "k": 64,
-    "n": 3734,
-    "rate": 0.0171,
+    "k": 29,
+    "n": 3687,
+    "rate": 0.0079,
     "wilson95": [
-     0.0134,
-     0.0218
+     0.0055,
+     0.0113
     ],
-    "with_flux": 3754
+    "with_flux": 3707
    },
    "QSO_SDSS_SPEC": {
     "k": 1383,
@@ -270,11 +278,11 @@
    },
    "purity_vs_CORONAL_STAR_HAMSTAR": {
     "k": 274,
-    "n": 338,
-    "rate": 0.8107,
+    "n": 303,
+    "rate": 0.9043,
     "wilson95": [
-     0.7655,
-     0.8488
+     0.8659,
+     0.9325
     ]
    }
   },
@@ -330,14 +338,14 @@
     "with_flux": 268
    },
    "CORONAL_STAR_HAMSTAR": {
-    "k": 28,
-    "n": 2332,
-    "rate": 0.012,
+    "k": 12,
+    "n": 2306,
+    "rate": 0.0052,
     "wilson95": [
-     0.0083,
-     0.0173
+     0.003,
+     0.0091
     ],
-    "with_flux": 3754
+    "with_flux": 3707
    },
    "QSO_SDSS_SPEC": {
     "k": 0,
@@ -360,11 +368,11 @@
    },
    "purity_vs_CORONAL_STAR_HAMSTAR": {
     "k": 101,
-    "n": 129,
-    "rate": 0.7829,
+    "n": 113,
+    "rate": 0.8938,
     "wilson95": [
-     0.7042,
-     0.8453
+     0.8235,
+     0.9382
     ]
    }
   },
@@ -420,14 +428,14 @@
     "with_flux": 565
    },
    "CORONAL_STAR_HAMSTAR": {
-    "k": 135,
-    "n": 25637,
-    "rate": 0.0053,
+    "k": 79,
+    "n": 25557,
+    "rate": 0.0031,
     "wilson95": [
-     0.0045,
-     0.0062
+     0.0025,
+     0.0039
     ],
-    "with_flux": 25695
+    "with_flux": 25615
    },
    "QSO_SDSS_SPEC": {
     "k": 5499,
@@ -450,11 +458,11 @@
    },
    "purity_vs_CORONAL_STAR_HAMSTAR": {
     "k": 332,
-    "n": 467,
-    "rate": 0.7109,
+    "n": 411,
+    "rate": 0.8078,
     "wilson95": [
-     0.6682,
-     0.7502
+     0.7669,
+     0.843
     ]
    }
   },
@@ -510,14 +518,14 @@
     "with_flux": 565
    },
    "CORONAL_STAR_HAMSTAR": {
-    "k": 50,
-    "n": 16919,
-    "rate": 0.003,
+    "k": 30,
+    "n": 16879,
+    "rate": 0.0018,
     "wilson95": [
-     0.0022,
-     0.0039
+     0.0012,
+     0.0025
     ],
-    "with_flux": 25695
+    "with_flux": 25615
    },
    "QSO_SDSS_SPEC": {
     "k": 0,
@@ -540,11 +548,11 @@
    },
    "purity_vs_CORONAL_STAR_HAMSTAR": {
     "k": 125,
-    "n": 175,
-    "rate": 0.7143,
+    "n": 155,
+    "rate": 0.8065,
     "wilson95": [
-     0.6433,
-     0.7761
+     0.7372,
+     0.8609
     ]
    }
   },
@@ -600,14 +608,14 @@
     "with_flux": 12
    },
    "CORONAL_STAR_HAMSTAR": {
-    "k": 51,
-    "n": 2897,
-    "rate": 0.0176,
+    "k": 22,
+    "n": 2861,
+    "rate": 0.0077,
     "wilson95": [
-     0.0134,
-     0.0231
+     0.0051,
+     0.0116
     ],
-    "with_flux": 2915
+    "with_flux": 2879
    },
    "QSO_SDSS_SPEC": {
     "k": 790,
@@ -630,11 +638,11 @@
    },
    "purity_vs_CORONAL_STAR_HAMSTAR": {
     "k": 79,
-    "n": 130,
-    "rate": 0.6077,
+    "n": 101,
+    "rate": 0.7822,
     "wilson95": [
-     0.5218,
-     0.6874
+     0.6922,
+     0.8515
     ]
    }
   },
@@ -690,14 +698,14 @@
     "with_flux": 12
    },
    "CORONAL_STAR_HAMSTAR": {
-    "k": 20,
-    "n": 1821,
-    "rate": 0.011,
+    "k": 8,
+    "n": 1802,
+    "rate": 0.0044,
     "wilson95": [
-     0.0071,
-     0.0169
+     0.0023,
+     0.0087
     ],
-    "with_flux": 2915
+    "with_flux": 2879
    },
    "QSO_SDSS_SPEC": {
     "k": 0,
@@ -720,11 +728,11 @@
    },
    "purity_vs_CORONAL_STAR_HAMSTAR": {
     "k": 29,
-    "n": 49,
-    "rate": 0.5918,
+    "n": 37,
+    "rate": 0.7838,
     "wilson95": [
-     0.4525,
-     0.7178
+     0.628,
+     0.8861
     ]
    }
   },
@@ -780,14 +788,14 @@
     "with_flux": 228
    },
    "CORONAL_STAR_HAMSTAR": {
-    "k": 12,
-    "n": 1484,
-    "rate": 0.0081,
+    "k": 8,
+    "n": 1468,
+    "rate": 0.0054,
     "wilson95": [
-     0.0046,
-     0.0141
+     0.0028,
+     0.0107
     ],
-    "with_flux": 1486
+    "with_flux": 1470
    },
    "QSO_SDSS_SPEC": {
     "k": 966,
@@ -810,11 +818,11 @@
    },
    "purity_vs_CORONAL_STAR_HAMSTAR": {
     "k": 103,
-    "n": 115,
-    "rate": 0.8957,
+    "n": 111,
+    "rate": 0.9279,
     "wilson95": [
-     0.8264,
-     0.9393
+     0.8642,
+     0.963
     ]
    }
   },
@@ -870,14 +878,14 @@
     "with_flux": 228
    },
    "CORONAL_STAR_HAMSTAR": {
-    "k": 5,
-    "n": 904,
-    "rate": 0.0055,
+    "k": 4,
+    "n": 893,
+    "rate": 0.0045,
     "wilson95": [
-     0.0024,
-     0.0129
+     0.0017,
+     0.0115
     ],
-    "with_flux": 1486
+    "with_flux": 1470
    },
    "QSO_SDSS_SPEC": {
     "k": 0,
@@ -900,11 +908,11 @@
    },
    "purity_vs_CORONAL_STAR_HAMSTAR": {
     "k": 36,
-    "n": 41,
-    "rate": 0.878,
+    "n": 40,
+    "rate": 0.9,
     "wilson95": [
-     0.7446,
-     0.9468
+     0.7695,
+     0.9604
     ]
    }
   },
@@ -960,14 +968,14 @@
     "with_flux": 166
    },
    "CORONAL_STAR_HAMSTAR": {
-    "k": 10,
-    "n": 1191,
-    "rate": 0.0084,
+    "k": 6,
+    "n": 1175,
+    "rate": 0.0051,
     "wilson95": [
-     0.0046,
-     0.0154
+     0.0023,
+     0.0111
     ],
-    "with_flux": 1193
+    "with_flux": 1177
    },
    "QSO_SDSS_SPEC": {
     "k": 874,
@@ -990,11 +998,11 @@
    },
    "purity_vs_CORONAL_STAR_HAMSTAR": {
     "k": 94,
-    "n": 104,
-    "rate": 0.9038,
+    "n": 100,
+    "rate": 0.94,
     "wilson95": [
-     0.832,
-     0.9469
+     0.8752,
+     0.9722
     ]
    }
   },
@@ -1050,14 +1058,14 @@
     "with_flux": 166
    },
    "CORONAL_STAR_HAMSTAR": {
-    "k": 3,
-    "n": 722,
-    "rate": 0.0042,
+    "k": 2,
+    "n": 711,
+    "rate": 0.0028,
     "wilson95": [
-     0.0014,
-     0.0121
+     0.0008,
+     0.0102
     ],
-    "with_flux": 1193
+    "with_flux": 1177
    },
    "QSO_SDSS_SPEC": {
     "k": 0,
@@ -1080,11 +1088,11 @@
    },
    "purity_vs_CORONAL_STAR_HAMSTAR": {
     "k": 32,
-    "n": 35,
-    "rate": 0.9143,
+    "n": 34,
+    "rate": 0.9412,
     "wilson95": [
-     0.7762,
-     0.9704
+     0.8091,
+     0.9837
     ]
    }
   }
@@ -1092,217 +1100,217 @@
  "lin_2012": {
   "4XMM F8max (0.2-12 keV maximum) | 2MASS Ks | match <= 3 sigma": {
    "STAR_SDSS_SPEC": {
-    "k": 326,
-    "n": 446,
-    "rate": 0.7309,
+    "k": 320,
+    "n": 422,
+    "rate": 0.7583,
     "wilson95": [
-     0.6879,
-     0.77
+     0.7152,
+     0.7967
     ],
     "with_xmm": 625
    },
    "CORONAL_STAR_HAMSTAR": {
-    "k": 4605,
-    "n": 4742,
-    "rate": 0.9711,
+    "k": 4559,
+    "n": 4650,
+    "rate": 0.9804,
     "wilson95": [
-     0.9659,
-     0.9755
+     0.976,
+     0.984
     ],
-    "with_xmm": 4883
+    "with_xmm": 4829
    },
    "COMPACT": {
-    "k": 57,
-    "n": 329,
-    "rate": 0.1733,
+    "k": 52,
+    "n": 294,
+    "rate": 0.1769,
     "wilson95": [
-     0.1362,
-     0.2179
+     0.1375,
+     0.2246
     ],
     "with_xmm": 538
    },
    "CV": {
     "k": 8,
-    "n": 164,
-    "rate": 0.0488,
+    "n": 149,
+    "rate": 0.0537,
     "wilson95": [
-     0.0249,
-     0.0933
+     0.0275,
+     0.1024
     ],
     "with_xmm": 268
    },
    "LMXB": {
-    "k": 21,
-    "n": 72,
-    "rate": 0.2917,
+    "k": 18,
+    "n": 57,
+    "rate": 0.3158,
     "wilson95": [
-     0.1994,
-     0.4051
+     0.21,
+     0.4448
     ],
     "with_xmm": 170
    },
    "HMXB": {
-    "k": 28,
-    "n": 93,
-    "rate": 0.3011,
+    "k": 26,
+    "n": 88,
+    "rate": 0.2955,
     "wilson95": [
-     0.2173,
-     0.4007
+     0.2103,
+     0.3977
     ],
     "with_xmm": 100
    },
    "QSO_SDSS_SPEC": {
-    "k": 41,
-    "n": 1562,
-    "rate": 0.0262,
+    "k": 40,
+    "n": 1458,
+    "rate": 0.0274,
     "wilson95": [
-     0.0194,
-     0.0354
+     0.0202,
+     0.0371
     ],
     "with_xmm": 1589
    },
    "purity_STAR_SDSS_SPEC_vs_compact": {
-    "k": 326,
-    "n": 383,
-    "rate": 0.8512,
+    "k": 320,
+    "n": 372,
+    "rate": 0.8602,
     "wilson95": [
-     0.812,
-     0.8833
+     0.8213,
+     0.8918
     ]
    },
    "purity_STAR_SDSS_SPEC_vs_compact_and_qso": {
-    "k": 326,
-    "n": 424,
-    "rate": 0.7689,
+    "k": 320,
+    "n": 412,
+    "rate": 0.7767,
     "wilson95": [
-     0.7264,
-     0.8065
+     0.734,
+     0.8143
     ]
    },
    "purity_CORONAL_STAR_HAMSTAR_vs_compact": {
-    "k": 4605,
-    "n": 4662,
-    "rate": 0.9878,
+    "k": 4559,
+    "n": 4611,
+    "rate": 0.9887,
     "wilson95": [
-     0.9842,
-     0.9906
+     0.9852,
+     0.9914
     ]
    },
    "purity_CORONAL_STAR_HAMSTAR_vs_compact_and_qso": {
-    "k": 4605,
-    "n": 4703,
-    "rate": 0.9792,
+    "k": 4559,
+    "n": 4651,
+    "rate": 0.9802,
     "wilson95": [
-     0.9747,
-     0.9829
+     0.9758,
+     0.9838
     ]
    }
   },
   "4XMM F8max (0.2-12 keV maximum) | 2MASS Ks | match <= 1.5": {
    "STAR_SDSS_SPEC": {
-    "k": 165,
-    "n": 216,
-    "rate": 0.7639,
+    "k": 162,
+    "n": 209,
+    "rate": 0.7751,
     "wilson95": [
-     0.7029,
-     0.8156
+     0.7138,
+     0.8265
     ],
     "with_xmm": 268
    },
    "CORONAL_STAR_HAMSTAR": {
-    "k": 3578,
-    "n": 3681,
-    "rate": 0.972,
+    "k": 3540,
+    "n": 3605,
+    "rate": 0.982,
     "wilson95": [
-     0.9662,
-     0.9769
+     0.9771,
+     0.9858
     ],
-    "with_xmm": 3754
+    "with_xmm": 3707
    },
    "COMPACT": {
-    "k": 40,
-    "n": 261,
-    "rate": 0.1533,
+    "k": 37,
+    "n": 236,
+    "rate": 0.1568,
     "wilson95": [
-     0.1146,
-     0.202
+     0.1159,
+     0.2086
     ],
     "with_xmm": 422
    },
    "CV": {
     "k": 3,
-    "n": 126,
-    "rate": 0.0238,
+    "n": 114,
+    "rate": 0.0263,
     "wilson95": [
-     0.0081,
-     0.0677
+     0.009,
+     0.0745
     ],
     "with_xmm": 207
    },
    "LMXB": {
-    "k": 11,
-    "n": 51,
-    "rate": 0.2157,
+    "k": 9,
+    "n": 41,
+    "rate": 0.2195,
     "wilson95": [
-     0.1249,
-     0.3463
+     0.12,
+     0.3671
     ],
     "with_xmm": 126
    },
    "HMXB": {
-    "k": 26,
-    "n": 84,
-    "rate": 0.3095,
+    "k": 25,
+    "n": 81,
+    "rate": 0.3086,
     "wilson95": [
-     0.2208,
-     0.4149
+     0.2186,
+     0.416
     ],
     "with_xmm": 89
    },
    "QSO_SDSS_SPEC": {
-    "k": 26,
-    "n": 1387,
-    "rate": 0.0187,
+    "k": 25,
+    "n": 1297,
+    "rate": 0.0193,
     "wilson95": [
-     0.0128,
-     0.0273
+     0.0131,
+     0.0283
     ],
     "with_xmm": 1409
    },
    "purity_STAR_SDSS_SPEC_vs_compact": {
-    "k": 165,
-    "n": 205,
-    "rate": 0.8049,
+    "k": 162,
+    "n": 199,
+    "rate": 0.8141,
     "wilson95": [
-     0.7452,
-     0.8533
+     0.7543,
+     0.862
     ]
    },
    "purity_STAR_SDSS_SPEC_vs_compact_and_qso": {
-    "k": 165,
-    "n": 231,
-    "rate": 0.7143,
+    "k": 162,
+    "n": 224,
+    "rate": 0.7232,
     "wilson95": [
-     0.6529,
-     0.7687
+     0.6612,
+     0.7777
     ]
    },
    "purity_CORONAL_STAR_HAMSTAR_vs_compact": {
-    "k": 3578,
-    "n": 3618,
-    "rate": 0.9889,
+    "k": 3540,
+    "n": 3577,
+    "rate": 0.9897,
     "wilson95": [
-     0.985,
-     0.9919
+     0.9858,
+     0.9925
     ]
    },
    "purity_CORONAL_STAR_HAMSTAR_vs_compact_and_qso": {
-    "k": 3578,
-    "n": 3644,
-    "rate": 0.9819,
+    "k": 3540,
+    "n": 3602,
+    "rate": 0.9828,
     "wilson95": [
-     0.977,
-     0.9857
+     0.978,
+     0.9865
     ]
    }
   }
