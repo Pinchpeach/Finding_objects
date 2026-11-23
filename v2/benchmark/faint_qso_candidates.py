@@ -168,6 +168,74 @@ def accuracy_tables(deep: Path, variants: list[str], out: Path, nboot: int = 100
     return res
 
 
+EXPECTED = {"STAR": "STAR", "GALAXY": "GALAXY", "TYPE1": "QSO", "TYPE2": "GALAXY"}
+
+
+def compare(deep: Path, base: str, variant: str) -> dict:
+    """What a variant changes against ``base``: paired fixes / breaks by truth class and r bin on the matched
+    truth objects (Type 1 expected QSO; Type 2 expected GALAXY, shown apart because host-dominated AGN are
+    ambiguous), exact McNemar on the test fields, and the label changes of *every* object by r bin."""
+    from scipy.stats import binomtest
+
+    mb, mv = matched(deep, base), matched(deep, variant)
+    k = ["field", "ra", "dec", "truth"]
+    m = mb.merge(mv, on=k, suffixes=("_b", "_v"))
+    m["want"] = m.truth.map(EXPECTED)
+    m["ok_b"], m["ok_v"] = m.o_primary_class_b == m.want, m.o_primary_class_v == m.want
+    rows = []
+    for split in ("cal", "test"):
+        for lo, hi in ALL_BINS + [(CAND_R_MIN, CAND_R_MAX)]:
+            x = m[(m.split_b == split) & (m.o_std_mag__ls_r_b >= lo) & (m.o_std_mag__ls_r_b < hi)]
+            for tr in ("ALL", "TYPE1", "TYPE2", "GALAXY", "STAR"):
+                y = x if tr == "ALL" else x[x.truth == tr]
+                fixed, broken = int((y.ok_v & ~y.ok_b).sum()), int((~y.ok_v & y.ok_b).sum())
+                p = binomtest(fixed, fixed + broken, 0.5).pvalue if fixed + broken else 1.0
+                rows.append(
+                    {
+                        "split": split,
+                        "r": f"{lo:g}-{hi:g}",
+                        "truth": tr,
+                        "n": len(y),
+                        "acc_base": round(100 * float(y.ok_b.mean()), 3) if len(y) else None,
+                        "acc_variant": round(100 * float(y.ok_v.mean()), 3) if len(y) else None,
+                        "fixed": fixed,
+                        "broken": broken,
+                        "mcnemar_p": round(float(p), 4),
+                    }
+                )
+    # every object, matched by object_id: where do the labels change?
+    ch = []
+    for f in FIELDS:
+        a = pd.read_csv(
+            deep / f"run_{base}" / f / "classified_objects.csv",
+            low_memory=False,
+            usecols=["object_id", "primary_class", "std_mag__ls_r"],
+        )
+        b = pd.read_csv(
+            deep / f"run_{variant}" / f / "classified_objects.csv",
+            low_memory=False,
+            usecols=["object_id", "primary_class"],
+        )
+        j = a.merge(b, on="object_id", suffixes=("_b", "_v"))
+        j["field"], j["split"] = f, split_of(f)
+        ch.append(j)
+    ch = pd.concat(ch, ignore_index=True)
+    ch["changed"] = ch.primary_class_b != ch.primary_class_v
+    lab = []
+    for lo, hi in ALL_BINS + [(np.nan, np.nan)]:
+        x = ch[ch.std_mag__ls_r.isna()] if np.isnan(lo) else ch[(ch.std_mag__ls_r >= lo) & (ch.std_mag__ls_r < hi)]
+        lab.append(
+            {
+                "r": "no r" if np.isnan(lo) else f"{lo:g}-{hi:g}",
+                "objects": len(x),
+                "changed": int(x.changed.sum()),
+                "to_QSO": int(((x.primary_class_v == "QSO") & x.changed).sum()),
+                "from_QSO": int(((x.primary_class_b == "QSO") & x.changed).sum()),
+            }
+        )
+    return {"truth_pairs": pd.DataFrame(rows), "all_object_label_changes": pd.DataFrame(lab)}
+
+
 def split_of_series(fields: pd.Series) -> pd.Series:
     return fields.map(split_of)
 
@@ -386,6 +454,11 @@ def main() -> int:
     q.add_argument("--deep", type=Path, required=True)
     q.add_argument("--variants", default="base")
     q.add_argument("--out", type=Path, required=True)
+    cp = sub.add_parser("compare", help="paired fixes / breaks and label changes of a variant against base")
+    cp.add_argument("--deep", type=Path, required=True)
+    cp.add_argument("--base", default="base")
+    cp.add_argument("--variant", required=True)
+    cp.add_argument("--out", type=Path, required=True)
     t = sub.add_parser("tables")
     t.add_argument("--deep", type=Path, required=True)
     t.add_argument("--variants", default="base")
@@ -395,6 +468,14 @@ def main() -> int:
         classify(a.deep, a.variant, dict(kv.split("=", 1) for kv in a.env), a.fields.split(","), a.jobs)
         return 0
     a.out.mkdir(parents=True, exist_ok=True)
+    if a.cmd == "compare":
+        res = compare(a.deep, a.base, a.variant)
+        for k, v in res.items():
+            v.to_csv(a.out / f"{k}_{a.variant}.csv", index=False)
+        print(res["all_object_label_changes"].to_string(index=False))
+        tp = res["truth_pairs"]
+        print(tp[(tp.split == "test") & tp.r.isin(["22-24"])].to_string(index=False))
+        return 0
     if a.cmd == "accuracy":
         print(accuracy_tables(a.deep, a.variants.split(","), a.out).to_string(index=False))
         return 0
