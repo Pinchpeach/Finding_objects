@@ -170,3 +170,16 @@ def test_gaia_source_of_a_collection(tmp_path):
     assert col.gaia_source(tmp_path) == "tap"
     pd.DataFrame({"gaia_base_query_status": ["vizier_fallback"]}).to_csv(tmp_path / "gaia_dr3_ra1_dec2_r6arcmin.csv", index=False)
     assert col.gaia_source(tmp_path) == "vizier_fallback"
+
+
+def test_the_field_list_is_locked_by_the_hash_in_its_document():
+    """The workflow v2_deep_cosmos.yml refuses a list whose SHA-256 differs from the one in DEEP_COSMOS_EXPANSION.md."""
+    import hashlib
+    import re
+
+    sel = _bench("select_deep_cosmos_2")
+    if not sel.OUT.exists():
+        pytest.skip("field list not written yet")
+    doc = (BENCH / "DEEP_COSMOS_EXPANSION.md").read_text(encoding="utf-8")
+    locked = re.search(r"sha256: `([0-9a-f]{64})`", doc).group(1)
+    assert hashlib.sha256(sel.OUT.read_bytes()).hexdigest() == locked
