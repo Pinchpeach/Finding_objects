@@ -66,6 +66,7 @@ objects_summary.csv (요약) · literature_only_entries.csv · classified_object
 - **ATNF 펄서 (2.55.0):** HEASARC가 30초 안에 답하지 않으면 VizieR 사본(B/psr)을 쓴다.
 - **최근 실패 기억 (2.55.0, 범위 2.56.0):** 핵심이 아닌 수집기가 실패하면 10분 동안은 같은 영역에서 다시 기다리지 않는다(경고는 그대로 표시). 다른 영역은 시간 초과였거나, 실패에 30초 이상 걸렸거나, 두 영역에서 실패했을 때만 건너뛴다.
 - **Legacy Surveys (2.57.0):** Data Lab TAP이 30초 안에 답하지 않거나 한 번 실패하면, 같은 Tractor 행을 주는 Legacy Surveys 뷰어 카탈로그(`cat.fits`)에도 함께 묻고 먼저 온 답을 쓴다(반경 10′ 이하, DR10 South 영역만). 남쪽에서는 값이 같다(다섯 영역에서 `ls_id`와 45개 열이 일치). DR9 North 영역(북쪽 은하 반구, Dec ≥ 32.375°)에서는 뷰어 값이 TAP과 달라(i 밴드, `fracflux_*`) 쓰지 않는다.
+- **DESI 영역 밖 (2.59.0):** DESI DR1 공식 타일 목록(4,648개 중심, 반경 1.7° + 마진 1°) 밖의 영역은 DESI 분광(VizieR)과 FastSpecFit(Data Lab)을 묻지 않는다. 은하면 영역은 가장 가까운 타일이 11° 떨어져 있다. FastSpecFit는 시도 2회 × 50초로 줄었고(Data Lab이 답하면 4.9–19초, 멈추면 이전 3×80초도 모두 실패), 놓치면 `--retry-failed all`로만 되받는다(기본 `key`는 묻지 않는다).
 - **Gaia (2.57.0):** ESA 아카이브가 점검 안내 페이지를 돌려주면(HTTP 200이라 내용으로 판별) 비동기 재시도 없이 바로 VizieR 사본으로 간다. 사본의 세 질의는 동시에 보낸다. `V2_GAIA_SOURCE=vizier`로 ESA를 아예 묻지 않을 수 있다. 사본이 빠뜨리는 자료(변광 요약 `in_vari_*`, 광속 열)는 경고에 적힌다. FLAME·ESP-UCD는 사본(`I/355/paramp`)에서도 받는다(ESA 값과 VizieR 반올림 안에서 같음).
 - **실패한 수집기만 다시 받기 (2.57.0):** `python v2/pipeline.py --work DIR --retry-failed` (핵심 아카이브만, `all`은 실패한 전부). 앱에서는 경고 띠의 "Ask failed archives again" 버튼. 성공한 수집기는 묻지 않고, 10분 실패 기억도 이 요청을 막지 않으며, 대체 자료로 받은 Gaia·PS1은 원래 자료를 다시 받는다.
 - **관측 범위 밖:** NVSS·VLASS(δ < −40°), TGSS(δ < −53°), eROSITA-DE(동쪽 은하 반구)는 조회하지 않는다.
@@ -106,7 +107,7 @@ objects_summary.csv (요약) · literature_only_entries.csv · classified_object
 | 은하단 | BCG와 분광 적색이동으로 소속 판정 | 2.32.0 |
 | 태양계 천체 | PS1 표지와 SDSS 이동 속도로 소행성 판정 | 2.29.0 |
 | 아카이브 경고 | 실패한 수집기와 잃는 정보를 `catalog_coverage.json`과 앱 경고 띠로 알림. 2.57.0부터 결과 표의 `run_archives_*` 열에도 적고, 대체 자료로 받은 수집기가 잃는 열을 구체적으로 알림 | 2.36.0 |
-| 고신뢰 판정 | 분광으로 확인됐거나 실제 하늘 순도 ≥ 98 %이면 `high_confidence`와 근거를 기록 | 2.36.0 |
+| 고신뢰 판정 | 분광으로 확인됐거나 실제 하늘 순도 ≥ 98 %이면 `high_confidence`와 근거를 기록. 2.59.0부터 `FAINT_QSO_CANDIDATE`가 붙은 천체에는 측광 고신뢰를 주지 않음(분광은 유지) | 2.36.0 |
 
 ## 6. 세부 분류
 
