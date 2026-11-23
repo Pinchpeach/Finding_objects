@@ -15,7 +15,10 @@ class Resp:
 
 
 @pytest.fixture(autouse=True)
-def no_pause(monkeypatch):
+def no_pause(monkeypatch, tmp_path):
+    monkeypatch.setenv("V2_CACHE_DIR", str(tmp_path))  # the mirror memory shared with other searches (2.60.0)
+    monkeypatch.delenv("V2_CACHE", raising=False)
+    monkeypatch.delenv("V2_FAILURE_MEMORY_S", raising=False)
     monkeypatch.setattr(throttle, "pause", lambda: 0.0)
     throttle._preferred.update(host=None, until=0.0)
     throttle._unreachable.clear()
@@ -241,3 +244,50 @@ def test_confirmation_with_rows_is_not_an_empty_cone():
     r = throttle._with_mirrors(send)(None, "POST", "https://vizier.cds.unistra.fr/viz-bin/votable", data=MINI)
     assert r.text.count("<TR>") == 2
     assert seen[:4] == ["vizier.cds.unistra.fr", "vizier.cfa.harvard.edu", "vizier.cfa.harvard.edu", "vizier.nao.ac.jp"]
+
+
+def test_a_mirror_that_failed_is_tried_last_by_the_next_search():
+    """2.60.0: the failed-mirror memory is shared through archive_cache, so a new process does not ask the
+    refusing / timing-out mirrors first again (a cold search spent ~57 s of collector time on them)."""
+    seen = []
+    behaviour = {"vizier.cds.unistra.fr": "refuse", "vizier.cfa.harvard.edu": 404, "vizier.nao.ac.jp": "refuse",
+                 "vizier.iucaa.in": "slow"}
+    req = throttle._with_mirrors(_send(behaviour, seen))
+    r = req(None, "GET", "https://vizier.cds.unistra.fr/viz-bin/votable?-source=J/x")
+    assert r.status_code == 200 and "vizier.china-vo.org" in seen[-1]  # cds, cfa, nao, iucaa failed first
+    assert len(seen) == 5
+    # a new process: nothing in memory, only the file
+    throttle._preferred.update(host=None, until=0.0)
+    throttle._unreachable.clear()
+    order = throttle._vizier_order("vizier.cds.unistra.fr")
+    assert order[0] == "vizier.china-vo.org" or order[:2] == ["vizier.china-vo.org", "vizier.idia.ac.za"]
+    assert set(order[-4:]) == {"vizier.cds.unistra.fr", "vizier.cfa.harvard.edu", "vizier.nao.ac.jp", "vizier.iucaa.in"}
+    seen.clear()
+    assert req(None, "GET", "https://vizier.cds.unistra.fr/viz-bin/votable").status_code == 200
+    assert len(seen) == 1  # China-VO answered at once: the four failed mirrors were not asked
+
+
+def test_the_failed_mirror_is_asked_when_the_others_fail_and_an_answer_forgets_it():
+    import archive_cache
+
+    seen = []
+    behaviour = {h: "refuse" for h in throttle.VIZIER_HOSTS if h != "vizier.nao.ac.jp"}
+    req = throttle._with_mirrors(_send(behaviour, seen))
+    throttle._unreachable.clear()
+    archive_cache.note_source("vizier:vizier.nao.ac.jp", False)
+    assert req(None, "GET", "https://vizier.cds.unistra.fr/viz-bin/votable").status_code == 200  # NAO answered last
+    assert seen[-1].startswith("https://vizier.nao.ac.jp")
+    assert not archive_cache.source_down("vizier:vizier.nao.ac.jp")  # it answered: forgotten
+
+
+def test_the_mirror_memory_is_off_without_the_cache(monkeypatch):
+    import archive_cache
+
+    monkeypatch.setenv("V2_CACHE", "0")
+    seen = []
+    req = throttle._with_mirrors(_send({"vizier.cds.unistra.fr": "refuse"}, seen))
+    req(None, "GET", "https://vizier.cds.unistra.fr/viz-bin/votable")
+    throttle._unreachable.clear()  # a new process: only the file could tell
+    throttle._preferred.update(host=None, until=0.0)
+    assert not archive_cache.source_down("vizier:vizier.cds.unistra.fr")
+    assert throttle._vizier_order("vizier.cds.unistra.fr")[0] == "vizier.cds.unistra.fr"

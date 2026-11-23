@@ -67,31 +67,65 @@ def test_ps1_vizier_copy_keeps_the_detection_cut(monkeypatch):
     assert len(panstarrs1._fetch_vizier(150.1191, 2.2058, 1.0)) == 1
 
 
-def test_simbad_falls_back_to_the_harvard_mirror(monkeypatch):
-    class Table:  # what fetch() uses of astroquery's result (no astropy in the Preprocess CI job)
+def test_simbad_falls_back_to_the_harvard_mirror(monkeypatch, tmp_path):
+    """2.60.0: the direct TAP query (one POST) asks the mirror when Strasbourg answers 404."""
+
+    class Table:  # what fetch() uses of an astropy table (no astropy in the Preprocess CI job)
         def __init__(self, cols):
             self.cols = cols
 
         def to_pandas(self):
             return pd.DataFrame(self.cols)
 
+        def __len__(self):
+            return len(next(iter(self.cols.values())))
+
     tried = []
+
+    def tap(server, adql, maxrec=simbad.MAXREC):
+        tried.append(server)
+        if server == "simbad.cds.unistra.fr":
+            raise simbad._ServerFailed("HTTP 404")
+        if "has_ref" in adql:
+            raise RuntimeError("references failed in this test")
+        return Table({"main_id": ["NGC 4522"], "ra": [188.4155], "dec": [9.1751], "otype": ["G"]}), False
+
+    monkeypatch.setenv("V2_CACHE_DIR", str(tmp_path))
+    monkeypatch.setattr(simbad, "_tap_sync", tap)
+    monkeypatch.setattr(simbad, "_cone_numbers", lambda ra, dec, r: (ra, dec, r / 60.0))
+    d = simbad.fetch(188.4155, 9.1751, 1.0)
+    assert tried == ["simbad.cds.unistra.fr", "simbad.harvard.edu", "simbad.harvard.edu"]  # CDS, cone, references
+    assert d.object_name.tolist() == ["NGC 4522"] and d.simbad_server.iloc[0] == "simbad.harvard.edu"
+    assert d.simbad_reference_query_status.iloc[0].startswith("error")  # references failed: not cached
+
+
+def test_simbad_astroquery_path_when_the_direct_query_is_rejected(monkeypatch, tmp_path):
+    """A column SIMBAD renamed (plx -> plx_value was one) is a 400: astroquery's mapping takes over."""
+
+    class Table:
+        def to_pandas(self):
+            return pd.DataFrame({"main_id": ["NGC 4522"], "ra": [188.4155], "dec": [9.1751], "otype": ["G"]})
 
     class Client:
         def query_tap(self, q):
             raise RuntimeError("no TAP in this test")
 
+    def rejected(server, adql, maxrec=simbad.MAXREC):
+        raise simbad._QueryRejected("Incorrect ADQL query: 1 unresolved identifiers: plx_value")
+
+    tried = []
+
     def query(server, ra, dec, radius):
         tried.append(server)
-        if server == "simbad.cds.unistra.fr":
-            raise RuntimeError("404 Not Found: sim-tap/capabilities")
-        return Client(), Table({"main_id": ["NGC 4522"], "ra": [188.4155], "dec": [9.1751], "otype": ["G"]})
+        return Client(), Table()
 
+    monkeypatch.setenv("V2_CACHE_DIR", str(tmp_path))
+    monkeypatch.setattr(simbad, "_tap_sync", rejected)
+    monkeypatch.setattr(simbad, "_cone_numbers", lambda ra, dec, r: (ra, dec, r / 60.0))
     monkeypatch.setattr(simbad, "_query", query)
     d = simbad.fetch(188.4155, 9.1751, 1.0)
-    assert tried == ["simbad.cds.unistra.fr", "simbad.harvard.edu"]
-    assert d.object_name.tolist() == ["NGC 4522"] and d.simbad_server.iloc[0] == "simbad.harvard.edu"
-    assert d.simbad_reference_query_status.iloc[0].startswith("error")  # references failed: not cached
+    assert tried == ["simbad.cds.unistra.fr"] and d.object_name.tolist() == ["NGC 4522"]
+    assert d.simbad_reference_query_status.iloc[0].startswith("error")
 
 
 def test_atnf_uses_the_vizier_copy_when_heasarc_fails(monkeypatch):

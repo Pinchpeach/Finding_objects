@@ -19,6 +19,14 @@ slowly that every query ran into the 60 s read timeout; either stopped every
 VizieR-backed collector.  A mirror that answered is preferred for
 MIRROR_STICKY_S, then Strasbourg is tried first again.
 
+Mirror memory across searches (2.60.0).  The failed-mirror memory above lived in the process: every new search
+asked the unreachable mirrors again.  A cold search of a new field (2026-11-23, Strasbourg down) sent 57-60 of its
+83-96 requests to VizieR, 6-7 of them to the mirrors NAO and China-VO (connection refused) and IUCAA (10 s read
+timeout), ~57 s of the collectors' time per search, for every catalogue the CfA mirror lacked.  A mirror that
+refused, timed out or answered a RETRY_STATUS is now also remembered in ``archive_cache`` (``note_source``,
+V2_FAILURE_MEMORY_S, 600 s, shared by the processes through a file) and tried last by every later search until
+it answers again.  Only the order changes: no mirror is ever skipped.
+
 Connect timeout (2.44.0): a VizieR request waits at most CONNECT_TIMEOUT_S
 for the TCP connection (the read timeout the client asked for is kept).  On
 2026-10-30 the Strasbourg server stopped accepting connections; each request
@@ -92,7 +100,9 @@ def pause() -> float:
 def _log(host, outcome, started) -> None:
     """One line per archive request when V2_HTTP_LOG=1 (2.54.0): the thread
     name is the collector (controller._run_bounded), so a slow collector's
-    time can be split into requests, mirrors and their answers."""
+    time can be split into requests, mirrors and their answers.  A thread a
+    collector starts is named ``<collector>/<job>`` (``child_name``), so the
+    requests of a collector are the lines whose name starts with it (2.60.0)."""
     if os.environ.get("V2_HTTP_LOG", "").strip() not in {"1", "true", "yes", "on"}:
         return
     print(
@@ -101,19 +111,61 @@ def _log(host, outcome, started) -> None:
     )
 
 
-def _paced(send):
+def child_name(job: str) -> str:
+    """Name for a thread a collector starts: ``<this thread's name>/<job>`` (V2_HTTP_LOG lines)."""
+    return f"{threading.current_thread().name}/{job}"
+
+
+def _paced(send, via_requests: bool = False):
     def request(*args, **kwargs):
         if getattr(_local, "inside", False):  # an outer layer already paused
             return send(*args, **kwargs)
         _local.inside = True
+        _local.via_requests = via_requests
         try:
             pause()
             return send(*args, **kwargs)
         finally:
             _local.inside = False
+            _local.via_requests = False
 
     request.__wrapped__ = send
     return request
+
+
+def _logged_client(send):
+    """http.client.HTTPConnection.request that writes the V2_HTTP_LOG line of a request that did not come
+    through ``requests`` (astroquery's Gaia TAP client): those were not in the log before 2.60.0."""
+
+    def request(self, method, url, *args, **kwargs):
+        t0 = time.monotonic()
+        try:
+            return send(self, method, url, *args, **kwargs)
+        finally:
+            if not getattr(_local, "via_requests", False):
+                _log(getattr(self, "host", "?"), f"{method} {str(url).split('?')[0][:48]} (http.client)", t0)
+
+    request.__wrapped__ = send
+    return request
+
+
+def _remember(host: str, ok: bool) -> None:
+    """Share the health of a VizieR mirror with the other processes (archive_cache; a failure is tried last)."""
+    try:
+        import archive_cache
+
+        archive_cache.note_source(f"vizier:{host}", ok)
+    except Exception:  # never fail a request over the memory
+        pass
+
+
+def _recently_failed() -> set:
+    try:
+        import archive_cache
+
+        return {k.split(":", 1)[1] for k in archive_cache.down_keys() if k.startswith("vizier:")}
+    except Exception:
+        return set()
 
 
 def _vizier_order(host: str) -> list[str]:
@@ -124,8 +176,9 @@ def _vizier_order(host: str) -> list[str]:
     if pref and now < _preferred["until"] and pref in hosts:
         hosts.remove(pref)
         hosts.insert(0, pref)
-    # stable: reachable hosts keep their order, unreachable ones go last
-    return sorted(hosts, key=lambda h: now < _unreachable.get(h, 0.0))
+    # stable: reachable hosts keep their order, unreachable ones go last (also those another search saw failing)
+    failed = _recently_failed()
+    return sorted(hosts, key=lambda h: now < _unreachable.get(h, 0.0) or h in failed)
 
 
 def _without_mini_form(data):
@@ -218,9 +271,14 @@ def _with_mirrors(send):
                 _log(host, type(exc).__name__, t0)
                 if isinstance(exc, requests.exceptions.ConnectionError):  # not connected (a read timeout is a slow answer)
                     _unreachable[host] = time.monotonic() + MIRROR_STICKY_S
+                _remember(host, False)  # other searches ask it last, a timeout included
                 last = exc
                 continue
             _log(host, f"{resp.status_code}{' tableless' if _tableless_votable(resp) else ''}", t0)
+            if resp.status_code in RETRY_STATUS:
+                _remember(host, False)
+            else:
+                _remember(host, True)  # it answered
             if resp.status_code in RETRY_STATUS and i < len(hosts) - 1:
                 _unreachable[host] = time.monotonic() + MIRROR_STICKY_S  # failing: tried last for a while
                 last = resp
@@ -260,6 +318,6 @@ def install() -> None:
             return
         import requests
 
-        requests.Session.request = _paced(_with_mirrors(requests.Session.request))
-        http.client.HTTPConnection.request = _paced(http.client.HTTPConnection.request)
+        requests.Session.request = _paced(_with_mirrors(requests.Session.request), via_requests=True)
+        http.client.HTTPConnection.request = _paced(_logged_client(http.client.HTTPConnection.request))
         _installed = True

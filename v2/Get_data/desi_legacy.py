@@ -117,7 +117,9 @@ def _query_with_retries(run, hedge=None, attempts=None, attempt_budget_s=None):
     def start_hedge(why):
         if hedge is None or hedged:
             return
-        hedged["thread"] = threading.Thread(target=_box_target(hedge, hedged), daemon=True)
+        hedged["thread"] = threading.Thread(
+            target=_box_target(hedge, hedged), daemon=True, name=throttle.child_name("viewer")
+        )
         hedged["thread"].start()
         print(f"[desi_legacy] Data Lab TAP {why}: asking the Legacy Surveys viewer catalogue as well", flush=True)
 
@@ -128,7 +130,7 @@ def _query_with_retries(run, hedge=None, attempts=None, attempt_budget_s=None):
     for attempt in range(attempts):
         box = {}
         t0 = time.monotonic()
-        t = threading.Thread(target=_box_target(run, box), daemon=True)
+        t = threading.Thread(target=_box_target(run, box), daemon=True, name=throttle.child_name("tap"))
         t.start()
         while t.is_alive() and time.monotonic() - t0 < budget:
             t.join(0.25)
