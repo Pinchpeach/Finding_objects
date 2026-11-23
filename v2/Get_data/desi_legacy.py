@@ -14,10 +14,13 @@ The 2.57.0 review compared both paths with the live TAP
 (``benchmark/compare_ls_viewer.py``): identical in DR10 South (NGC 4522 2',
 417 rows; Dec 32.30 in the NGC just south of the north/south split, 436; the
 SGC at Dec 33.5, 154), but not in the DR9 North part of ``ls_dr10`` (north
-Galactic cap, Dec >= 32.375): there the viewer table has no i-band columns
-(a KeyError deep in the north) and its ``ls_id`` did not match the TAP's on
-any of the 219 rows just north of the split.  So the viewer is asked only for
-cones wholly in DR10 South (``viewer_usable``).  The Data Lab TAP stalled for 300 s in the first
+Galactic cap, Dec >= 32.375; 2026-11-23, three cones, 178-219 rows each).
+There the Data Lab keeps the DR9 ``ls_id`` (brickid shifted by 16, not 20;
+fixed below, the ids now match), but the values differ: the TAP has i-band
+columns the viewer's DR9 North table lacks (or fills with 0 near the split),
+``fracflux_*`` differ (up to 3 % relative near the split, a zero against a
+value deep in the north), and fluxes by up to 3e-4 relative.  So the viewer
+is asked only for cones wholly in DR10 South (``viewer_usable``).  The Data Lab TAP stalled for 300 s in the first
 COSMOS search of 2026-11-23 (270 objects instead of 3,582 in the result), and
 a TAP outage on 2026-11-17 made every run wait 246-300 s.  The viewer is
 asked in addition (request hedging, Dean & Barroso 2013, CACM 56, 74: a second
@@ -159,7 +162,8 @@ def _box_target(fn, box):
 
 # ls_dr10.tractor takes the DR9 North (BASS + MzLS) rows in the north Galactic cap at Dec >= 32.375 deg
 # and the DR10 South (DECam) rows elsewhere: the Legacy Surveys north/south split (DR9/DR10 documentation,
-# "(dec >= 32.375) & (b > 0)" is north).  The viewer path was found identical to the TAP only in DR10 South.
+# "(dec >= 32.375) & (b > 0)" is north).  The viewer path was found identical to the TAP only in DR10 South
+# (module docstring: in DR9 North the i band, fracflux_* and fluxes differ).
 NORTH_DEC_SPLIT = 32.375
 
 

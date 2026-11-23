@@ -72,7 +72,7 @@ FIRST(VizieR 미러 연결 실패)와 SDSS 분광(SkyServer 403)이 실패한 �
 | NGC 4522 2′ (프로브 원자료) | 417행 | 417행 | 같음, **45열 상대오차 < 1e-6, NaN 위치 같음** |
 | COSMOS 2′ (150.1191, 2.2058; 프로브 원자료) | 1,046행 | 1,046행 | 같음, 45열 같음 |
 | 은하면 1′ (프로브 원자료) | 0행 | 0행 | 양쪽 빈 결과 |
-| 북쪽 (245, +43), 2′ | – | 295행, release 9011(DR9 북쪽) | **값은 비교하지 못함**(Data Lab 장애). 범위가 Data Lab과 같은 DR10 남 + DR9 북임만 확인 |
+| 북쪽 (245, +43), 2′ | – | 295행, release 9011(DR9 북쪽) | **값은 비교하지 못함**(Data Lab 장애). 범위가 Data Lab과 같은 DR10 남 + DR9 북임만 확인. *검토(9절): 북쪽은 값이 달라 쓰지 않음* |
 
 ### 뷰어의 한계와 대응
 - 크기: 상자 2′ 1,179행 3.0 MB 4.0 s, 10′ 31,845행 78 MB 14.5 s, 30′ 281,328행 688 MB 88.5 s. → **반경 10′ 이하**만 대상(`MAX_VIEWER_RADIUS_ARCMIN`).
@@ -130,7 +130,7 @@ NGC 4522 2′ 단독 호출을 단계별로 쟀다(수정 전 코드, V2_HTTP_LO
 | 은하면 1′ | 349 | 722 | 29.1 s | **0** | 위 + `rv_nb_transits` |
 
 - 세 영역 모두 `source_id` 집합 같음. 1차 분류 합계도 같다(은하면 STAR 534·UNKNOWN 188, COSMOS GALAXY 3,294·UNKNOWN 253·STAR 63·QSO 11).
-- **사본이 구조적으로 못 채우는 열은 62개 중 24개**: 광속·색 9(`phot_{g,bp,rp}_mean_flux(_error)`, `bp_g`, `g_rp`, `rv_nb_transits`), FLAME 4, ESP-UCD 2(`teff_espucd`, `flags_espucd`), 변광 요약 9(`in_vari_*`). DSC 확률(`paramp`)·GSP-Phot·GSP-Spec·ESP-ELS·변광 분류(`I/358`)·충실도(GAVO)는 사본에서 온다.
+- *검토(9절) 정정: FLAME 4열과 ESP-UCD 2열은 `I/355/paramp`에 있어 사본에서도 받는다. 사본이 못 채우는 열은 18개(광속·색 9, 변광 요약 9).* 원래 기록: **사본이 구조적으로 못 채우는 열은 62개 중 24개**: 광속·색 9(`phot_{g,bp,rp}_mean_flux(_error)`, `bp_g`, `g_rp`, `rv_nb_transits`), FLAME 4, ESP-UCD 2(`teff_espucd`, `flags_espucd`), 변광 요약 9(`in_vari_*`). DSC 확률(`paramp`)·GSP-Phot·GSP-Spec·ESP-ELS·변광 분류(`I/358`)·충실도(GAVO)는 사본에서 온다.
 - 1차 분류가 변하지 않는 이유: 위 24열을 읽는 곳은 `in_vari_*`(`axes/compact.py`, `axes/extragalactic.py`), FLAME(`branches/evolved_star.py`), ESP-UCD(`subclass.py`, `axes/physical.py`)이고, 광속·색은 학습 스크립트뿐이다. 1차 분류 단계(Stage 3–5)는 읽지 않는다. 그 세부 축이 달라질 수 있는 천체(변광·진화한 별·초저온 왜성)가 이 세 영역 표본에는 없었다. **"세부 분류가 항상 같다"는 증거는 아니다**: 변광성·적색 거성이 많은 영역에서는 달라질 수 있어 경고에 적는다.
 - 2.56.0 보고의 "은하면 4개가 DSC 유무로 바뀜"은 다른 상황이다. 그때는 ESA의 선택 표 세 개가 실패해 DSC가 없던 실행과 사본을 비교한 것이다. 사본은 DSC를 가진다.
 
@@ -166,8 +166,76 @@ NGC 4522 2′ 단독 호출을 단계별로 쟀다(수정 전 코드, V2_HTTP_LO
 ## 8. 확인된 한계와 남은 것
 
 - **Gaia 사본·LS 뷰어는 정상 날에는 쓰이지 않는다.** 정상 아카이브에서 결과가 바뀌지 않아야 하므로 정상 경로 코드는 건드리지 않았다. 단, 같은 영역을 세 번 이상 돌려 비교하지는 않았다(정상 ESA 접속 불가).
-- **북쪽 하늘(DR9 북쪽) 뷰어 값은 TAP과 비교하지 못했다.** Data Lab이 멈춘 시간이라서다. Data Lab이 돌아오면 `compare_ls.py` 방식(저장된 TAP 행 대 뷰어)으로 한 번 더 확인하는 것이 좋다.
+- *(검토 9절에서 비교함: 북쪽은 값이 달라 뷰어를 쓰지 않는다.)* **북쪽 하늘(DR9 북쪽) 뷰어 값은 TAP과 비교하지 못했다.** Data Lab이 멈춘 시간이라서다. Data Lab이 돌아오면 `compare_ls.py` 방식(저장된 TAP 행 대 뷰어)으로 한 번 더 확인하는 것이 좋다.
 - **SDSS 분광은 이 컨테이너에서 SkyServer 403 페이지가 계속 와서 실패**한다(2.56.0이 5번 재시도 뒤 오류로 보고하는 것까지만 동작). 코드 문제가 아니라 접속 환경이다.
 - 재시도 버튼은 2.57.0 이전 검색(`search.json` 없음)에는 보이지 않는다. 명령줄은 `--ra/--dec/--radius`로 가능하다.
 - **수집 캐시는 코드 해시가 바뀌어 한 번 비워진다**(`Get_data/*.py`가 바뀜).
 - 릴리스(태그)는 만들지 않았다.
+
+## 9. 병합 전 검토 (코드 개발 세션)
+
+검토·계획 세션의 요청으로 커밋 16e7fc1을 검토했다. 아래 수정을 더해 병합한다. 측정은 GitHub Actions(`compare-archive-alternatives.yml`)에서 실제 서비스로 했다. 이 컨테이너에서는 legacysurvey.org·Data Lab·VizieR에 닿지 않는다.
+
+### 9.1 CI: Preprocess 시험이 실패하고 있었다
+- `test_legacy_viewer_path.py`가 모듈 수준에서 `astropy.io.fits`를 쓰는데, `test-preprocess.yml`이 astropy를 설치하지 않아 수집 단계에서 오류가 났다(로컬 244 통과와 다른 결과).
+- astropy는 파이프라인의 의존성이므로(`app/requirements.txt`) CI 설치 목록에 넣었다. 시험을 건너뛰게 만들면 뷰어 경로가 CI에서 검사되지 않는다.
+
+### 9.2 Legacy Surveys 뷰어: DR10 South에서만 쓴다
+`benchmark/compare_ls_viewer.py`가 같은 원뿔(2′)을 TAP만으로, 뷰어만으로 `fetch`해 같은 후처리를 거친 행을 비교한다. Data Lab이 정상이던 세 번의 실행에서 결과가 같았다.
+
+| 원뿔 | 영역 | 행 | 결과 |
+|---|---|---|---|
+| NGC 4522 (188.42, +9.18) | DR10 South | 417 | 같음(45열, `ls_id`) |
+| NGC, Dec 32.30 (분할선 바로 남쪽) | DR10 South | 436 | 같음 |
+| SGC, Dec 33.5 (분할선 위의 남쪽 은하 반구) | DR10 South | 154 | 같음 |
+| NGC, Dec 32.45 (분할선 바로 북쪽) | DR9 North | 219 | **다름** |
+| (245, +43), (150, +50) | DR9 North | 219, 178 | **다름** |
+
+북쪽에서 다른 점:
+- **`ls_id`.** Data Lab의 `ls_dr10`은 DR9 North 행에 DR9의 id(`release<<40 | brickid<<16 | objid`)를 그대로 쓴다. DR10 South 행은 `brickid<<20`이다. 위치로 맞추면 219행 모두 release·brickid·objid가 같고 이 자리 이동만 달랐다. 고쳤다(이제 id 일치).
+- **i 밴드.** DR9 North(BASS + MzLS)에는 i 밴드가 없어 깊은 북쪽에서는 뷰어 표에 열이 없었다(`KeyError('flux_i')`; 그래서 헤징이 늘 실패했다). 분할선 근처에서는 뷰어가 남쪽 표와 합치며 0으로 채운다. TAP은 두 경우 모두 값을 준다. 빈 열을 NaN으로 두도록 고쳤지만 TAP 값과는 다르다.
+- **`fracflux_*`** 는 분할선 근처에서 최대 3 % 차이가 났고, 깊은 북쪽에서는 한쪽이 0이었다. 광속은 최대 3e-4 상대 차이가 났다. 뷰어가 읽는 북쪽 Tractor 파일과 Data Lab 표의 판이 다른 것으로 보인다(원인은 확인하지 못함).
+
+판단:
+- **`viewer_usable`은 원뿔 전체가 DR10 South일 때만 참이다.** 원뿔 북쪽 끝이 Dec 32.375 아래이거나, 은위 b < −r인 경우다(LS의 북/남 구분: Dec ≥ 32.375이고 b > 0이면 북쪽).
+- 북쪽은 2.56.0과 같다(두 번째 경로 없음). i 밴드와 `fracflux`는 분류 특징으로 쓰이므로, 다른 값을 "같은 행"으로 넣지 않는다.
+- 남쪽 결과는 TAP과 같으므로 `degraded`로 표시하지 않는다. 출처는 원자료의 `legacy_query_status = viewer_fallback`에 남는다.
+- 시험: `test_viewer_only_for_cones_wholly_in_dr10_south`, `test_dr9_north_rows_keep_the_dr9_id_and_have_no_i_band`.
+
+**뷰어 이용 조건.** 이 컨테이너에서는 legacysurvey.org에 접속할 수 없어 뷰어 소스(GitHub `legacysurvey/imagine`)를 읽었다.
+- `cat.fits`는 뷰어의 "data for RA,Dec box" 페이지가 사용자에게 주는 "Catalog" 내려받기 링크다(`map/views.py`, `any_fits_cat`). 응답은 해당 brick의 Tractor 파일을 상자로 자른 것이다.
+- URL 안내 페이지(`templates/urls.html`)에는 실려 있지 않다.
+- 소스에서 요청 빈도 제한이나 이용 조건 문구는 찾지 못했다.
+- 우리 사용량은 Data Lab이 30초 안에 답하지 않거나 실패한 검색마다 상자 한두 개(반경 ≤ 10′)다. 정상인 날에는 0이다.
+- 대량 조회가 아니므로 유지하되, 위 사실(공식 API로 문서화되지 않음)을 여기에 남긴다.
+
+### 9.3 Gaia 사본: ESP-UCD와 FLAME은 사본에도 있다
+- 2.57.0은 FLAME 4열과 ESP-UCD 2열을 "사본이 구조적으로 못 채우는 열"로 보고 경고에 적었다. VizieR `I/355/paramp`의 열 목록(215개, 2026-11-23)에는 `Teff-UCD`, `Flags-UCD`, `Mass-Flame`, `Age-Flame`, `Flags-Flame`, `Evol`이 있다. 수집기가 요청하지 않았을 뿐이다.
+- `_PARAMP`에 넣어 사본도 이 열을 채운다. 사본이 못 채우는 열은 24개에서 18개로 줄었다(광속·색 9, 변광 요약 `in_vari_*` 9). `catalog_coverage.ALTERNATIVE`의 경고 문구도 그에 맞췄다.
+- **값 비교** (`benchmark/compare_gaia_copy_columns.py`): ESA에서 받은 세 영역 원자료(프로브 44176464564, `validation-data`)와 같은 원뿔의 사본을 `source_id`로 맞췄다.
+
+| 열 | ESA·사본 둘 다 값 | 같음 / 최대 차이 |
+|---|---|---|
+| `evolstage_flame` | 4 + 36 | 모두 같음 |
+| `flags_flame` | 1 + 6 + 40 | 모두 같음 |
+| `mass_flame` | 4 + 30 | 최대 5e-4 M☉ (VizieR가 소수 셋째 자리로 반올림) |
+| `age_flame` | 4 + 27 | 최대 5e-4 Gyr |
+| DSC 확률 5개 | 13 + 17 + 289 | 최대 5e-9 |
+
+- **ESP-UCD 값 비교**: 세 영역에는 초저온 왜성이 없어, ESA ESP-UCD Teff가 있는 Best+2018 왜성 641개 중 무작위 200개의 위치(5″)에서 사본을 물었다. 200개 모두 사본에 `Teff-UCD`가 있었고, Teff 차이는 최대 0.005 K(반올림), 품질 플래그는 200개 모두 같았다.
+
+- **왜 중요한가.**
+  - ESP-UCD는 초저온 왜성 표시(`ULTRACOOL_DWARF`, 세부 `STAR:M:UCD`)의 유일한 Gaia 근거다(나머지는 SIMBAD BD*). Best+2018 초저온 왜성 9,888개 중 ESA ESP-UCD로 선택되는 것은 532개다(M7–M9의 45–58 %, L0–L3의 14–32 %; `new_targets/truth/ucd_summary.json`). 2.57.0 그대로라면 Gaia 점검 기간에는 이 표시가 모두 사라진다.
+  - FLAME은 거성 경로(`branches/evolved_star.py`)의 근거다. RGB 정답 203개 중 12개(2.13.0)가 FLAME으로 찾아진다.
+- **남는 결손.** 변광 요약 `in_vari_agn`·`in_vari_compact_companion`(Gaia가 뽑은 AGN·밀집 동반성 후보 표시)은 VizieR에 없다. 변광 분류 자체(`I/358`)는 사본에서 온다. 영향을 받는 천체(변광 AGN 후보, 밀집 동반성 후보)는 세 영역 표본에 없어 라벨 변화를 재지 못했다. 경고 문구가 이 두 표시를 이름으로 적는다.
+
+### 9.4 그 밖의 확인
+- **`--retry-failed`가 장애 서버에 요청을 몰아주는가.**
+  - 사용자가 누를 때만 묻는다. 앱 버튼은 실행 중에는 동작하지 않는다(`proc.state()` 확인).
+  - 수집기마다 한 번만 묻고, `RETRY_BUDGET_S` 규칙을 따른다(LS 90 s).
+  - Gaia는 점검 중이면 ESA에 동기 1건과 가용성 1건만 보내고 사본으로 간다.
+  - 실패 기억을 건너뛰는 것은 이 명시적 요청뿐이다. 자동 재시도는 없다.
+- **새 열 2개**(`run_archives_status`, `run_archives_missing`): `objects_summary.csv`가 26열에서 28열이 된다. 분류 코드(`v2/Classifier`, `v2/Preprocess`의 판정 경로)는 이 열을 읽지 않는다(`query_status` 열도 읽지 않음). 앱 시험 통과.
+- **세트 C**: 1차 분류 판정 경로(`v2/Classifier`, `v2/Preprocess` 비시험 코드)는 바뀌지 않았고, 수집 경로는 장애 때만 바뀐다. 채점하지 않는다.
+- **병합 순서**: 같은 브랜치에서 2단계(어두운 QSO 후보 A/B)가 진행 중이다. 1단계는 독립적이고 Gaia 점검(11-25부터)이 곧이라 먼저 병합한다. 작업 세션은 `git fetch origin main && git merge origin/main`으로 받으면 된다. squash 병합이라 16e7fc1과 내용이 같은 부분은 충돌 없이 합쳐진다. 검토 수정은 위 파일들에만 있다.
+- 시험 246개 통과(앱 시험 포함).
