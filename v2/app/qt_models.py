@@ -74,10 +74,11 @@ SECONDARY_NOTES = {
     "QSO_RESOLVED_HOST": "Quasar with a resolved host galaxy (Legacy Surveys model): also a galaxy.",
     "GALAXY_WISE_AGN": "Galaxy with WISE AGN colours (Stern 2012 / Assef 2018): also a quasar / AGN.",
     "FAINT_QSO_CANDIDATE": (
-        "Faint quasar candidate, not a classification: 22 <= LS r < 24 and P(QSO) >= 0.1.\n"
-        "In the deep COSMOS test fields about 1 in 5 such candidates was a type-1 quasar\n"
-        "(7 of 34 = 21 %, 95 % interval 10-37 %; X-ray-selected truth, so a lower bound).\n"
-        "Needs a spectrum or X-ray / variability data to confirm."
+        "Faint quasar candidate, not a classification: 22 <= LS r < 24 and P(QSO) at or above the candidate\n"
+        "threshold (0.1 by default; V2_FAINT_QSO_CANDIDATE changes it).\n"
+        "Measured at the default 0.1: in the deep COSMOS test fields about 1 in 5 such candidates was a type-1\n"
+        "quasar (7 of 34 = 21 %, 95 % interval 10-37 %; X-ray-selected truth, so a lower bound); a lower\n"
+        "threshold gives fewer.  Needs a spectrum or X-ray / variability data to confirm."
     ),
 }
 CANDIDATE_TEXT = {"FAINT_QSO_CANDIDATE": "QSO?"}
@@ -213,7 +214,14 @@ class DataFrameModel(QAbstractTableModel):
         if role == Qt.ForegroundRole and col in ("primary_class", "secondary_class"):
             return class_color("UNKNOWN" if reason in CANDIDATE_TEXT else value)
         if role == Qt.ToolTipRole and col == "secondary_class" and reason in SECONDARY_NOTES:
-            return SECONDARY_NOTES[reason]
+            note = SECONDARY_NOTES[reason]
+            if reason in CANDIDATE_TEXT and "p_qso" in self._df:  # the object's own probability (PR #74 review)
+                p = pd.to_numeric(
+                    pd.Series([self._df.iat[index.row(), self._df.columns.get_loc("p_qso")]]), errors="coerce"
+                )[0]
+                if p == p:
+                    note = f"P(QSO) of this object: {p:.2f}.\n" + note
+            return note
         if role == Qt.DecorationRole and index.column() == 0:
             return self._icon(index.row())
         if role == Qt.ToolTipRole and col in ("subclass", "designation"):

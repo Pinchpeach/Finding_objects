@@ -311,6 +311,7 @@ def test_faint_qso_candidate_does_not_read_like_a_dual_label():
             "primary_class": ["GALAXY", "GALAXY", "QSO"],
             "secondary_class": ["QSO", "QSO", "GALAXY"],
             "secondary_class_reason": ["GALAXY_WISE_AGN", "FAINT_QSO_CANDIDATE", "QSO_RESOLVED_HOST"],
+            "p_qso": [0.4, 0.07, 0.9],
         }
     )
     model = DataFrameModel(df)
@@ -319,7 +320,9 @@ def test_faint_qso_candidate_does_not_read_like_a_dual_label():
     assert show == ["QSO", "QSO?", "GALAXY"]
     assert model.data(model.index(1, col), Qt.ForegroundRole).name() == CLASS_COLORS["UNKNOWN"]
     assert model.data(model.index(0, col), Qt.ForegroundRole).name() == CLASS_COLORS["QSO"]
-    assert "1 in 5" in model.data(model.index(1, col), Qt.ToolTipRole)
+    tip = model.data(model.index(1, col), Qt.ToolTipRole)
+    assert "1 in 5" in tip and "default 0.1" in tip  # the purity is the default threshold's (PR #74 review)
+    assert tip.startswith("P(QSO) of this object: 0.07")
     assert "WISE AGN" in model.data(model.index(0, col), Qt.ToolTipRole)
 
 

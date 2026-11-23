@@ -437,7 +437,8 @@ def union_table(m: pd.DataFrame, thresholds=(0.02, 0.05, 0.1, 0.15, 0.2, 0.3, 0.
             claim = (s.o_primary_class == "QSO") | candidate(s, t)
             tp = int((claim & (s.truth == "TYPE1")).sum())
             n = int(claim.sum())
-            p, r = (tp / n if n else float("nan")), tp / n1
+            # an empty split (e.g. --fields of one split only) or no type 1 in the range: recall undefined (PR #74 review)
+            p, r = (tp / n if n else float("nan")), (tp / n1 if n1 else float("nan"))
             row = {
                 "split": split,
                 "threshold": t,
@@ -447,7 +448,7 @@ def union_table(m: pd.DataFrame, thresholds=(0.02, 0.05, 0.1, 0.15, 0.2, 0.3, 0.
                 "purity": round(p, 3),
                 "purity_wilson95": wilson(tp, n) if n else None,
                 "recall": round(r, 3),
-                "recall_wilson95": wilson(tp, n1),
+                "recall_wilson95": wilson(tp, n1) if n1 else None,
                 "f1": round(2 * p * r / (p + r), 3) if n and tp else 0.0,
             }
             for k in ("GALAXY", "STAR", "TYPE2"):
