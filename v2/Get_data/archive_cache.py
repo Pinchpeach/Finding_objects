@@ -126,7 +126,27 @@ def fallback(df: pd.DataFrame) -> bool:
 # the two failing services.  controller.py skips a non-core collector that
 # failed less than FAILURE_MEMORY_S ago (V2_FAILURE_MEMORY_S, 0 = off) and
 # reports it as an error, so the missing-archive warning still shows it.
+#
+# Scope of a remembered failure (2.56.0).  2.55.0 remembered the collector
+# name only, so one SDSS answer that could not be parsed at NGC 4522 switched
+# SDSS spectroscopy off for the COSMOS and Galactic-plane searches that
+# followed (2.55.0 evaluation).  A failure now stops
+#   * the same cone, always (the re-run 2.55.0 was written for);
+#   * every other cone only if it was a "timeout" (the service did not answer
+#     inside its budget: the wait 2.55.0 removed, 60-300 s per search) or took
+#     SLOW_FAILURE_S or more to fail (review), or if
+#     the collector failed at two different cones inside the memory (an outage
+#     that answers quickly with an error page).
+# A quick "error" at one cone costs the next cone one more quick request, not
+# a wait.  Any success of the collector forgets its failures.
 FAILURE_MEMORY_S = 600.0
+SAME_CONE_DEG = 1e-4  # 0.36": the same search, not a neighbouring one
+# A failure that took this long is a wait like a timeout, and is applied to
+# every cone too (2.56.0 review): e.g. the HEASARC TAP answered "System
+# overloaded" only after 66 s, and SkyServer error pages retried five times
+# take ~30 s; a quick parse error (< SLOW_FAILURE_S) still costs the next cone
+# only one request.
+SLOW_FAILURE_S = 30.0
 
 
 def failure_memory_s() -> float:
@@ -141,10 +161,12 @@ def _failures_path() -> Path:
 
 
 def _read_failures() -> dict:
+    """{collector: [failure, ...]}; a 2.55.0 file ({collector: failure}) is read as service-wide."""
     try:
-        return json.loads(_failures_path().read_text())
+        d = json.loads(_failures_path().read_text())
     except Exception:
         return {}
+    return {k: (v if isinstance(v, list) else [v]) for k, v in d.items() if isinstance(v, (list, dict))}
 
 
 def _write_failures(d: dict) -> None:
@@ -156,31 +178,79 @@ def _write_failures(d: dict) -> None:
     os.replace(tmp, path)
 
 
-def recent_failure(name: str) -> dict | None:
-    """The last failure of ``name`` if it is younger than the memory, else None."""
+def _cone(ra, dec, radius_arcmin):
+    return None if ra is None or dec is None else (float(ra), float(dec), float(radius_arcmin or 0.0))
+
+
+def _same_cone(e: dict, cone) -> bool:
+    if cone is None or e.get("ra") is None:
+        return False
+    dra = abs((float(e["ra"]) - cone[0] + 180.0) % 360.0 - 180.0) * math.cos(math.radians(cone[1]))
+    return (
+        dra < SAME_CONE_DEG
+        and abs(float(e["dec"]) - cone[1]) < SAME_CONE_DEG
+        and abs(float(e.get("radius", 0.0)) - cone[2]) < 1e-3
+    )
+
+
+def _recent(entries: list) -> list:
+    now = time.time()
+    return [e for e in entries if now - float(e.get("t", 0)) <= failure_memory_s()]
+
+
+def recent_failure(name: str, ra: float | None = None, dec: float | None = None, radius_arcmin: float | None = None):
+    """The remembered failure of ``name`` that applies to this cone, else None.
+
+    Without a position: the last failure of the collector at any cone.
+    """
     if not enabled() or failure_memory_s() <= 0:
         return None
-    e = _read_failures().get(name)
-    if not e or time.time() - float(e.get("t", 0)) > failure_memory_s():
+    entries = sorted(_recent(_read_failures().get(name, [])), key=lambda e: float(e.get("t", 0)))
+    if not entries:
         return None
-    return e
+    cone = _cone(ra, dec, radius_arcmin)
+    if cone is None:
+        return entries[-1]
+    same = [e for e in entries if _same_cone(e, cone)]
+    if same:
+        return same[-1]
+    wide = [
+        e
+        for e in entries
+        if e.get("status") == "timeout" or e.get("ra") is None or float(e.get("seconds", 0.0)) >= SLOW_FAILURE_S
+    ]
+    if wide:
+        return wide[-1]
+    return entries[-1] if len(entries) >= 2 else None  # one entry per cone (note_outcome)
 
 
-def note_outcome(name: str, status: str, error: str = "") -> None:
-    """Remember a failure (error / timeout) or forget one after a success."""
+def note_outcome(
+    name: str,
+    status: str,
+    error: str = "",
+    ra: float | None = None,
+    dec: float | None = None,
+    radius_arcmin: float | None = None,
+    seconds: float | None = None,
+) -> None:
+    """Remember a failure (error / timeout) or forget the collector's failures after a success."""
     if not enabled() or failure_memory_s() <= 0:
         return
     try:
         root().mkdir(parents=True, exist_ok=True)
         with _LOCK, _FileLock(root() / "failures.lock"):
-            d = _read_failures()
-            now = time.time()
-            d = {k: v for k, v in d.items() if now - float(v.get("t", 0)) <= failure_memory_s()}
+            d = {k: _recent(v) for k, v in _read_failures().items()}
             if status in ("error", "timeout"):
-                d[name] = {"t": now, "status": status, "error": str(error)[:300]}
+                cone = _cone(ra, dec, radius_arcmin)
+                e = {"t": time.time(), "status": status, "error": str(error)[:300]}
+                if seconds is not None:
+                    e["seconds"] = float(seconds)
+                if cone is not None:
+                    e.update(ra=cone[0], dec=cone[1], radius=cone[2])
+                d[name] = [x for x in d.get(name, []) if not _same_cone(x, cone)] + [e]
             else:
                 d.pop(name, None)
-            _write_failures(d)
+            _write_failures({k: v for k, v in d.items() if v})
     except Exception as exc:  # never fail a collection over this
         print(f"[cache] failure memory not updated ({exc!r})", flush=True)
 

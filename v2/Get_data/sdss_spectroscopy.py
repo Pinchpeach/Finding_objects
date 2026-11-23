@@ -51,8 +51,14 @@ LINES = {
 # EWs must not be lost for two optional columns).
 EW_ERR = ("line_ha_ew_err", "line_nii6584_ew_err")
 LINE_FIELDS = [*LINES, "line_source", "port_bpt", "d4000_n"]
+
+
 def _port_sql(lines):
-    return "SELECT specObjID,BPT," + ",".join(p for p, _ in lines.values()) + " FROM emissionLinesPort WHERE specObjID IN ({ids})"
+    return (
+        "SELECT specObjID,BPT,"
+        + ",".join(p for p, _ in lines.values())
+        + " FROM emissionLinesPort WHERE specObjID IN ({ids})"
+    )
 
 
 def _mpa_sql(lines):
@@ -66,12 +72,41 @@ LINES_NO_ERR = {k: v for k, v in LINES.items() if k not in EW_ERR}
 PORT_SQL, MPA_SQL = _port_sql(LINES), _mpa_sql(LINES)
 
 
-def _sql(template: str, ids: list[str]) -> pd.DataFrame:
-    from astroquery.sdss import SDSS
+# SkyServer's SQL search is a GET request, and the server (IIS) answers "404 -
+# File or directory not found" once the query string passes 2,048 characters
+# (measured 2026-11-23: a 2,073-character URL answered, 2,123 did not).  Up
+# to 2.55.0 the ids were sent 80 at a time whatever their length: with the
+# 19-20 digit ids of BOSS spectra the MPA-JHU query passed the limit, and
+# after 2.53.0 added two EW-error columns the Portsmouth query did too, so a
+# field with ~80 galaxies lost the EW errors ("retry without EW errors") and
+# Dn4000.  The ids are now packed by the encoded length of the query.
+MAX_ENCODED_SQL = 1800  # + URL, "cmd=" and "&format=csv": under 2,000
 
+
+def _chunks(template: str, ids: list[str]) -> list[list[str]]:
+    from urllib.parse import quote_plus
+
+    room = MAX_ENCODED_SQL - len(quote_plus(template.format(ids="")))
+    out, cur, used = [], [], 0
+    for i in ids:
+        cost = len(i) + 3  # "%2C"
+        if cur and used + cost > room:
+            out.append(cur)
+            cur, used = [], 0
+        cur.append(i)
+        used += cost
+    if cur:
+        out.append(cur)
+    return out
+
+
+def _sql(template: str, ids: list[str]) -> pd.DataFrame:
+    from _catalog_utils import _sdss
+
+    SDSS = _sdss()  # no SkyServer error page parsed or cached (2.56.0)
     parts = []
-    for s in range(0, len(ids), 80):  # SkyServer answers 404 to over-long GET queries
-        t = SDSS.query_sql(template.format(ids=",".join(ids[s : s + 80])), data_release=18)
+    for chunk in _chunks(template, ids):
+        t = SDSS.query_sql(template.format(ids=",".join(chunk)), data_release=18)
         if t is not None and len(t):
             parts.append(t.to_pandas())
     if not parts:
@@ -144,7 +179,11 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     # Repeat spectra of one target (SDSS-I/II + BOSS re-observations) are one
     # object: keep a zwarning == 0 spectrum, the smallest-zerr one first, as
     # for LAMOST (2026-10-21).  1" is inside the 2-3" fibres.
-    zw = pd.to_numeric(df["zwarning"], errors="coerce").fillna(1).eq(0) if "zwarning" in df else pd.Series(True, index=df.index)
+    zw = (
+        pd.to_numeric(df["zwarning"], errors="coerce").fillna(1).eq(0)
+        if "zwarning" in df
+        else pd.Series(True, index=df.index)
+    )
     ze = pd.to_numeric(df["zerr"], errors="coerce").abs() if "zerr" in df else pd.Series(0.0, index=df.index)
     df = unique_positions(df, 1.0, zw.astype(float) - ze.fillna(1.0).clip(0, 0.99)).reset_index(drop=True)
     gal = df.loc[df["class"].astype(str).str.strip().str.upper().eq("GALAXY"), "specobjid"].tolist()
