@@ -25,10 +25,15 @@ def vizier_query(catalog: str, ra: float, dec: float, radius_arcmin: float, colu
     from astropy.coordinates import SkyCoord
     import astropy.units as u
 
+    # cache=False (2.60.0 review): astroquery's Vizier.query_region passes cache=True explicitly, which overrides
+    # the global switch controller._disable_astroquery_cache() sets (2.19.0), so every VizieR answer -- also a
+    # mirror's answer without the table (2026-11-07) -- was replayed for 7 days from ~/.cache/astropy, outside
+    # archive_cache's rules (code hash, partial results, short life of fallbacks) and even with V2_CACHE=0.
     return Vizier(columns=list(columns), row_limit=-1).query_region(
         SkyCoord(float(ra) * u.deg, float(dec) * u.deg, frame="icrs"),
         radius=float(radius_arcmin) * u.arcmin,
         catalog=catalog,
+        cache=False,
     )
 
 

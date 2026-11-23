@@ -209,3 +209,40 @@ def test_the_request_log_has_the_requests_astroquery_gaia_makes_and_names_helper
     t.start()
     t.join()
     assert names == ["gaia_dr3/tap"]
+
+
+def test_a_cone_with_very_many_objects_skips_the_references(sim, monkeypatch):
+    """2.60.0 review: the references of a cone are objects x papers with titles (COSMOS 20', 192,486 objects:
+    1.9 GB with them); above REFERENCE_MAX_OBJECTS only the cone rows are fetched, and the result says so."""
+    monkeypatch.setattr(simbad, "REFERENCE_MAX_OBJECTS", 1)
+    calls = sim()
+    d = simbad.fetch(150.15, 2.15, 2.0)
+    assert [c[0] for c in calls] == [CDS]  # the cone only
+    assert len(d) == 2 and d.simbad_reference_status.str.startswith("skipped:more_than_1_objects").all()
+    assert d.simbad_reference_query_status.eq("ok").all()  # not a failure: the cone is complete
+    assert d.simbad_otype_label.tolist() == ["Supernova Remnant", "Galaxy"]
+
+
+def test_vizier_cone_queries_bypass_astroquerys_disk_cache(monkeypatch):
+    """2.60.0 review: Vizier.query_region passes cache=True itself, which overrode the global switch of
+    controller._disable_astroquery_cache(); every VizieR answer was replayed for 7 days."""
+    import astroquery.vizier as av
+    import _catalog_utils
+
+    seen = {}
+
+    class FakeVizier:
+        def __init__(self, *a, **k):
+            pass
+
+        def query_region(self, *a, **k):
+            seen.update(k)
+            return []
+
+    monkeypatch.setattr(av, "Vizier", FakeVizier)
+    assert _catalog_utils.vizier_cone("I/355/gaiadr3", 10.0, 20.0, 1.0) is None
+    assert seen.get("cache") is False
+    src = (GET / "pn_spectroscopy.py").read_text()
+    import re
+
+    assert re.search(r"query_constraints\(\s*catalog=INTENS,\s*PNG=png,\s*cache=False\s*\)", src)
