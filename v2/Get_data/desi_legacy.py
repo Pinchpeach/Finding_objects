@@ -231,13 +231,18 @@ def _viewer_fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
         data = {}
         for name in TAP_COLUMNS:
             if name == "ls_id":
-                data[name] = (
-                    col("release").astype(np.int64) * 2**40 + col("brickid").astype(np.int64) * 2**20
-                ) + col("objid").astype(np.int64)
+                # The Data Lab ls_dr10 ids: DR10 South rows release<<40 | brickid<<20 | objid, DR9 North rows
+                # their DR9 id release<<40 | brickid<<16 | objid (2.57.0 review, compare_ls_viewer.py: the 219
+                # rows north of the split had the same release, brickid and objid and only this differed).
+                rel = col("release").astype(np.int64)
+                shift = np.where(rel < 10000, 2**16, 2**20)
+                data[name] = rel * 2**40 + col("brickid").astype(np.int64) * shift + col("objid").astype(np.int64)
             elif name.startswith("dchisq_"):
                 data[name] = col("dchisq")[:, int(name[-1]) - 1]
             elif name == "type":
                 data[name] = np.char.strip(np.char.decode(col("type").astype("S"), "ascii"))
+            elif name not in tab.colnames:  # DR9 North (BASS + MzLS) has no i band
+                data[name] = np.full(len(tab), np.nan)
             else:
                 data[name] = col(name)
         df = pd.DataFrame(data)

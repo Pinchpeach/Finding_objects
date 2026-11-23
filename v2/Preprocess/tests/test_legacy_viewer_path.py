@@ -96,6 +96,25 @@ def test_viewer_rows_have_the_tap_columns_ids_and_the_cone(monkeypatch):
     assert out.catalog_object_id.iloc[0] == str(10000 * 2**40 + 384210 * 2**20 + 1550)
 
 
+def test_dr9_north_rows_keep_the_dr9_id_and_have_no_i_band(monkeypatch):
+    """2.57.0 review: the Data Lab ls_dr10 ids of DR9 North rows are release<<40 | brickid<<16 | objid (219 of
+    219 rows north of the split: same release, brickid, objid; only the shift differed).  BASS + MzLS have no
+    i band, so the viewer table has no *_i columns (a KeyError before)."""
+    ra0, dec0 = 180.0, 32.45
+    rows = [{"objid": 2956, "ra": ra0, "dec": dec0}]
+    blob = _viewer_fits(rows, release=9011, brick=508642)
+    from astropy.table import Table
+
+    tab = Table.read(io.BytesIO(blob), format="fits")
+    tab.remove_columns([c for c in tab.colnames if c.endswith("_i")])
+    buf = io.BytesIO()
+    tab.write(buf, format="fits")
+    monkeypatch.setattr("requests.get", lambda *a, **k: _Resp(buf.getvalue()))
+    df = ls._viewer_fetch(ra0, dec0, 0.5)
+    assert df.ls_id.tolist() == [9907732612254604]  # the TAP's id of this source (2026-11-23)
+    assert df.flux_i.isna().all() and df.nobs_i.isna().all()
+
+
 def test_empty_box_answer_is_an_empty_table(monkeypatch):
     monkeypatch.setattr("requests.get", lambda *a, **k: _Resp(b"No catalog sources in layer and RA,Dec box"))
     df = ls._viewer_fetch(283.80, -2.10, 1.0)
