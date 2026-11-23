@@ -68,6 +68,11 @@ def compare_columns(esa: pd.DataFrame, copy: pd.DataFrame, cols) -> dict:
         both = fa & fb
         eq = _same(a[both], b[both], c) if both.any() else np.array([], bool)
         out[c] = {"esa": int(fa.sum()), "copy": int(fb.sum()), "both": int(both.sum()), "equal": int(eq.sum())}
+        if both.any() and c not in FLAGS and not c.startswith("classlabel"):
+            # VizieR stores the values rounded (e.g. probabilities to 1e-4): the largest difference
+            d = np.abs(pd.to_numeric(a[both], errors="coerce") - pd.to_numeric(b[both], errors="coerce"))
+            out[c]["max_abs_diff"] = float(d.max())
+            out[c]["max_rel_diff"] = float((d / pd.to_numeric(a[both], errors="coerce").abs().clip(lower=1e-30)).max())
     return out
 
 
@@ -85,41 +90,37 @@ def fields(paths: list[Path]) -> dict:
 
 
 def ucd(n: int) -> dict:
-    import astropy.units as u
-    from astropy.coordinates import SkyCoord
-    from astroquery.vizier import Vizier
+    """The copy's ESP-UCD at the positions of Best+2018 dwarfs with an ESA ESP-UCD Teff (matched within 5")."""
+    from concurrent.futures import ThreadPoolExecutor
 
     t = pd.read_csv(UCD_TRUTH)
     t = t[t.teff_espucd.notna()].sample(min(n, int(t.teff_espucd.notna().sum())), random_state=1).reset_index(drop=True)
-    pos = SkyCoord(t.ra.to_numpy() * u.deg, t.dec.to_numpy() * u.deg)
-    res = None
-    for host in ("vizier.cfa.harvard.edu", "vizier.cds.unistra.fr", "vizier.iucaa.in"):
-        v = Vizier(columns=["Source", "RA_ICRS", "DE_ICRS", "Teff-UCD", "Flags-UCD"], row_limit=-1)
-        v.VIZIER_SERVER = host
-        v.TIMEOUT = 300
+
+    def ask(row):
         try:
-            r = v.query_region(pos, radius=3 * u.arcsec, catalog="I/355/paramp")
-            if len(r):
-                res = r[0].to_pandas()
-                break
+            d = g.vizier_cone("I/355/paramp", row.ra, row.dec, 5.0 / 60.0, ["Source", "Teff-UCD", "Flags-UCD"])
         except Exception as exc:  # noqa: BLE001
-            print("mirror failed", host, repr(exc)[:200], flush=True)
-    if res is None:
-        return {"error": "I/355/paramp not reachable"}
-    res = res[res["Teff-UCD"].notna()]
-    res["_q"] = res["_q"].astype(int) - 1
-    best = res.sort_values("_q").drop_duplicates("_q")  # one row per asked position (the UCD row)
-    m = t.join(best.set_index("_q"), how="inner")
-    teq = np.isclose(m["Teff-UCD"].astype(float), m.teff_espucd.astype(float), rtol=1e-4)
-    feq = _same(m["Flags-UCD"], m.flags_espucd, "flags_espucd")
+            return {"error": repr(exc)[:120]}
+        if d is None or d.empty or "Teff-UCD" not in d:
+            return {}
+        d = d[pd.to_numeric(d["Teff-UCD"], errors="coerce").notna()]
+        if d.empty:
+            return {}
+        k = (pd.to_numeric(d["Teff-UCD"], errors="coerce") - row.teff_espucd).abs().idxmin()
+        return {"teff": float(d.loc[k, "Teff-UCD"]), "flags": d.loc[k, "Flags-UCD"]}
+
+    with ThreadPoolExecutor(8) as ex:
+        got = list(ex.map(ask, t.itertuples()))
+    r = pd.DataFrame(got, index=t.index)
+    ok = r.get("teff", pd.Series(np.nan, index=t.index)).notna()
+    diff = (r.teff - t.teff_espucd).abs()[ok]
     out = {
         "asked": int(len(t)),
-        "with_copy_teff_ucd": int(len(m)),
-        "teff_equal": int(teq.sum()),
-        "flags_equal": int(feq.sum()),
-        "teff_max_abs_diff_K": (
-            float(np.nanmax(np.abs(m["Teff-UCD"].astype(float) - m.teff_espucd.astype(float)))) if len(m) else None
-        ),
+        "errors": int(r.get("error", pd.Series(dtype=object)).notna().sum()),
+        "with_copy_teff_ucd": int(ok.sum()),
+        "teff_within_1K": int((diff <= 1.0).sum()),
+        "teff_max_abs_diff_K": float(diff.max()) if ok.any() else None,
+        "flags_equal": int(_same(r.flags[ok], t.flags_espucd[ok], "flags_espucd").sum()) if ok.any() else 0,
     }
     print("ucd", json.dumps(out), flush=True)
     return out
