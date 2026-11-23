@@ -425,6 +425,38 @@ def purity_table(m: pd.DataFrame, thresholds=THRESHOLDS) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def union_table(m: pd.DataFrame, thresholds=(0.02, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5)) -> pd.DataFrame:
+    """The table the threshold is chosen from: the claims a user would read as "quasar" at 22 <= r < 24 are the
+    objects labelled QSO plus the flagged candidates (``candidate``).  purity = type 1 among the claims,
+    recall = type 1 claimed / all type 1, f1 their harmonic mean; false claims by truth class."""
+    rows = []
+    for split in ("cal", "test"):
+        s = rbin(m[m.split == split], CAND_R_MIN, CAND_R_MAX)
+        n1 = int((s.truth == "TYPE1").sum())
+        for t in thresholds:
+            claim = (s.o_primary_class == "QSO") | candidate(s, t)
+            tp = int((claim & (s.truth == "TYPE1")).sum())
+            n = int(claim.sum())
+            p, r = (tp / n if n else float("nan")), tp / n1
+            row = {
+                "split": split,
+                "threshold": t,
+                "claims": n,
+                "type1_claimed": tp,
+                "n_type1": n1,
+                "purity": round(p, 3),
+                "purity_wilson95": wilson(tp, n) if n else None,
+                "recall": round(r, 3),
+                "recall_wilson95": wilson(tp, n1),
+                "f1": round(2 * p * r / (p + r), 3) if n and tp else 0.0,
+            }
+            for k in ("GALAXY", "STAR", "TYPE2"):
+                row[f"false_{k}"] = int((claim & (s.truth == k)).sum())
+                row[f"rate_{k}"] = round(row[f"false_{k}"] / max(int((s.truth == k).sum()), 1), 4)
+            rows.append(row)
+    return pd.DataFrame(rows)
+
+
 def calibration_table(m: pd.DataFrame, edges=(0, 0.01, 0.02, 0.05, 0.1, 0.2, 0.3, 0.5, 1.0001)) -> pd.DataFrame:
     """Observed type-1 fraction in bins of p_qso (22 <= r < 24, objects with a truth class): is p_qso a probability?"""
     rows = []
@@ -513,6 +545,7 @@ def main() -> int:
         recall_table(m).to_csv(a.out / f"recall_{v}.csv", index=False)
         purity_table(m).to_csv(a.out / f"purity_{v}.csv", index=False)
         calibration_table(m).to_csv(a.out / f"calibration_{v}.csv", index=False)
+        union_table(m).to_csv(a.out / f"union_{v}.csv", index=False)
         label_table(m).to_csv(a.out / f"labels_{v}.csv", index=False)
         print(f"== {v}: {len(m)} matched truth objects, truth {m.truth.value_counts().to_dict()}")
         print(recall_table(m)[lambda d: d.split == "test"].to_string(index=False))

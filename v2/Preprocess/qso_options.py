@@ -86,11 +86,11 @@ def parse(options=None) -> frozenset:
 # Where the posterior cannot make a quasar the label (the sky holds ~10^2-10^3 galaxies per quasar at
 # r > 22, Bayes), the object is still reported as a candidate next to its label, as the label-less
 # "other reading" of agn_host.py: secondary_class = QSO, reason FAINT_QSO_CANDIDATE.  The primary class
-# and every accuracy stay as they were.  Off unless a threshold is set (V2_FAINT_QSO_CANDIDATE, default
-# CANDIDATE_P): the threshold of the table in the work report, chosen on the odd COSMOS fields.
+# and every accuracy stay as they were.  On by default since 2.57.0 at CANDIDATE_P (the threshold of the table
+# in the work report, chosen on the odd COSMOS fields); V2_FAINT_QSO_CANDIDATE=off or another value overrides it.
 CANDIDATE_R = (22.0, 24.0)  # LS r; r >= 24 is not touched (no measurement of the purity there)
 CANDIDATE_REASON = "FAINT_QSO_CANDIDATE"
-CANDIDATE_P = None  # set once measured (see the work report); None = off
+CANDIDATE_P = 0.1  # the F1-optimal threshold of the odd COSMOS fields (work report section 11); None = off
 LS_R_COLUMN = "std_mag__ls_r"
 
 
