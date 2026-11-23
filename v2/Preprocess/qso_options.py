@@ -57,8 +57,16 @@ KNOWN = ("c1a", "c2", "c3b", "c4", "c8")
 ADOPTED = ("c1a_half", "c1b", "c3a", "c5", "c6", "c7")
 VETO = 0.1
 
-# Real-sky QSO fraction per r bin: true class mix of the 18 search fields
+# QSO fraction per r bin from the true class mix of the 18 search fields
 # (benchmark/natural_purity/natural_purity.csv, 2.36.0).
+# Known inconsistency (2.59.0, WORK_REPORT_2026-11-23c.md section 6): the last bin is not the real-sky
+# fraction at r > 22.  natural_purity.py fixes the QSO count of a bin from the published density
+# (QSO_DENSITY "r>22" = 110 deg^-2, one magnitude, 22-23) but divides by every classified object from
+# r = 22 to the faint end, so 0.0011 is the share at 24-25; the measured COSMOS shares are 3-7 times
+# higher at 22-23 (0.0051-0.0081) and 23-24 (0.0023-0.0033).  Kept: the two corrected variants
+# (measured COSMOS share, literature density) broke 3 and 5 COSMOS2020 labels with no fix and made the
+# test-field ECE and NLL worse, also on the truth extended with Chandra type-1 quasars (ECE 0.41 ->
+# 0.64 / 0.67 %).  Faint quasars are reported as candidates instead (faint_candidates below).
 MAG_EDGES = (-np.inf, 18.0, 20.0, 21.0, 22.0, np.inf)
 PI_QSO = (0.0007, 0.0037, 0.0056, 0.0077, 0.0011)
 MAG_COLUMNS = ("ls_r_mag", "pan_starrs1_dr2_meanobject__rMeanPSFMag", "sdss_dr18_photoobj__r", "gaia_dr3__phot_g_mean_mag")
