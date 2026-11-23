@@ -19,7 +19,7 @@
 | 1차 분류 | `STAR` · `GALAXY` · `QSO` · `UNKNOWN`. 증거가 부족하면 이유와 함께 `UNKNOWN`으로 기권한다. 실제로 판정을 정하는 것은 광학 색·형태, Gaia 천체측정·DSC, WISE 중적외선이다. X선·전파는 세부 분류와 표지에 쓴다(2.51.0 파장대 끄기 시험). |
 | 판정 출처 | 판정마다 `CATALOG`(목록에서 옮김) / `EXTERNAL_CLASSIFIER`(다른 탐사의 분류기) / `INFERRED`(측정에서 추론)를 표시한다(2.51.0). 1차 클래스는 목록 표지를 빼도 측정만으로 같은 클래스가 나오면 `INFERRED`다(2.55.0). NED·SIMBAD 문헌 종류만 있고 측정이 없는 천체는 확률 없이 `LITERATURE_LABEL`로 둔다(2.54.0). |
 | 세부 분류 | 분광형, 백색왜성, 뜨거운 준왜성, 초저온 왜성, 적색거성·AGB(탄소/산소), 변광성(미라·세페이드·RR Lyrae·YSO), 펄서, AGN, 블레이자, 행성상성운, 은하 활동성 등. 여기에 5개 독립 축이 더해진다. |
-| 출력 | `objects_summary.csv`(2.54.0): 먼저 읽을 열 26개만, 탐사에 검출된 독립 천체당 한 행. 큰 은하의 조각과 NED·SIMBAD에만 있는 항목(`literature_only_entries.csv`)은 따로 둔다. `classified_objects.csv`: 모든 단계의 열을 담은 전체 기록(천체당 한 행, 1,500–2,400열). 단계별 CSV와 아카이브 상태 파일(`catalog_coverage.json`)도 함께 나온다. |
+| 출력 | `objects_summary.csv`(2.54.0): 먼저 읽을 열 28개만, 탐사에 검출된 독립 천체당 한 행. 마지막 쪽의 `run_archives_status`·`run_archives_missing`(2.57.0)은 이 검색에서 아카이브가 빠졌거나 대체 자료로 받았는지를 모든 행에 적는다(`complete`일 때만 완전한 실행; CSV만 전달돼도 불완전한 실행임을 알 수 있다). 큰 은하의 조각과 NED·SIMBAD에만 있는 항목(`literature_only_entries.csv`)은 따로 둔다. `classified_objects.csv`: 모든 단계의 열을 담은 전체 기록(천체당 한 행, 1,500–2,400열). 단계별 CSV와 아카이브 상태 파일(`catalog_coverage.json`)도 함께 나온다. |
 | 사용 방법 | 데스크톱 앱(Windows·macOS·Linux, 파이썬 설치 불필요) 또는 명령줄 `v2/pipeline.py` |
 | 원칙 | 모든 임계값·규칙은 문헌 근거를 코드 주석과 `LITERATURE*.md`에 남긴다. 정확도와 속도를 함께 측정한다. |
 
@@ -65,6 +65,9 @@ objects_summary.csv (요약) · literature_only_entries.csv · classified_object
 - **Pan-STARRS1:** MAST가 실패하면 VizieR의 DR2 사본을 쓴다.
 - **ATNF 펄서 (2.55.0):** HEASARC가 30초 안에 답하지 않으면 VizieR 사본(B/psr)을 쓴다.
 - **최근 실패 기억 (2.55.0, 범위 2.56.0):** 핵심이 아닌 수집기가 실패하면 10분 동안은 같은 영역에서 다시 기다리지 않는다(경고는 그대로 표시). 다른 영역은 시간 초과였거나, 실패에 30초 이상 걸렸거나, 두 영역에서 실패했을 때만 건너뛴다.
+- **Legacy Surveys (2.57.0):** Data Lab TAP이 30초 안에 답하지 않거나 한 번 실패하면, 같은 Tractor 행을 주는 Legacy Surveys 뷰어 카탈로그(`cat.fits`)에도 함께 묻고 먼저 온 답을 쓴다(반경 10′ 이하, DR10 South 영역만). 남쪽에서는 값이 같다(다섯 영역에서 `ls_id`와 45개 열이 일치). DR9 North 영역(북쪽 은하 반구, Dec ≥ 32.375°)에서는 뷰어 값이 TAP과 달라(i 밴드, `fracflux_*`) 쓰지 않는다.
+- **Gaia (2.57.0):** ESA 아카이브가 점검 안내 페이지를 돌려주면(HTTP 200이라 내용으로 판별) 비동기 재시도 없이 바로 VizieR 사본으로 간다. 사본의 세 질의는 동시에 보낸다. `V2_GAIA_SOURCE=vizier`로 ESA를 아예 묻지 않을 수 있다. 사본이 빠뜨리는 자료(변광 요약 `in_vari_*`, 광속 열)는 경고에 적힌다. FLAME·ESP-UCD는 사본(`I/355/paramp`)에서도 받는다(ESA 값과 VizieR 반올림 안에서 같음).
+- **실패한 수집기만 다시 받기 (2.57.0):** `python v2/pipeline.py --work DIR --retry-failed` (핵심 아카이브만, `all`은 실패한 전부). 앱에서는 경고 띠의 "Ask failed archives again" 버튼. 성공한 수집기는 묻지 않고, 10분 실패 기억도 이 요청을 막지 않으며, 대체 자료로 받은 Gaia·PS1은 원래 자료를 다시 받는다.
 - **관측 범위 밖:** NVSS·VLASS(δ < −40°), TGSS(δ < −53°), eROSITA-DE(동쪽 은하 반구)는 조회하지 않는다.
 
 ## 4. 1차 분류 (STAR / GALAXY / QSO)
@@ -101,7 +104,7 @@ objects_summary.csv (요약) · literature_only_entries.csv · classified_object
 | 전파 천체 | 목록 가짜 항목, 전파은하 lobe 같은 다중 성분을 `RADIO_COMPONENT`로 표시 | 2.31.0 |
 | 은하단 | BCG와 분광 적색이동으로 소속 판정 | 2.32.0 |
 | 태양계 천체 | PS1 표지와 SDSS 이동 속도로 소행성 판정 | 2.29.0 |
-| 아카이브 경고 | 실패한 수집기와 잃는 정보를 `catalog_coverage.json`과 앱 경고 띠로 알림 | 2.36.0 |
+| 아카이브 경고 | 실패한 수집기와 잃는 정보를 `catalog_coverage.json`과 앱 경고 띠로 알림. 2.57.0부터 결과 표의 `run_archives_*` 열에도 적고, 대체 자료로 받은 수집기가 잃는 열을 구체적으로 알림 | 2.36.0 |
 | 고신뢰 판정 | 분광으로 확인됐거나 실제 하늘 순도 ≥ 98 %이면 `high_confidence`와 근거를 기록 | 2.36.0 |
 
 ## 6. 세부 분류

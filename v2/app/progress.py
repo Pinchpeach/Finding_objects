@@ -12,6 +12,9 @@ import re
 STAGES = ("1_associate", "2_integrate", "3_features", "4_evidence", "5_coarse", "6_prepare", "7_classify")
 _COLLECTOR = re.compile(r"^\[(?P<name>[A-Za-z0-9_]+)\] (?P<status>ok|empty|error|timeout)\b")
 _STAGE = re.compile(r"^\[pipeline\] (?P<stage>[0-9a-z_]+): (?P<sec>[0-9.]+) s")
+# "--retry-failed" run (2.57.0): the worker names the archives it asks again, so the
+# progress bar counts those instead of all collectors.
+_RETRY = re.compile(r"^\[retry\] asking again: (?P<names>.+)$")
 
 
 @lru_cache(maxsize=1)
@@ -43,6 +46,11 @@ class ProgressTracker:
     def feed(self, line: str) -> str | None:
         """Consume one log line; return a short human-readable status if it advanced."""
         line = line.strip()
+        m = _RETRY.match(line)
+        if m:
+            self.n_collectors = len([n for n in m["names"].split(",") if n.strip()])
+            self.total = self.n_collectors + len(STAGES)
+            return f"asking again: {m['names']}"
         m = _STAGE.match(line)
         if m:
             stage = m["stage"]

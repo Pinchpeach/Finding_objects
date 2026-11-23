@@ -408,3 +408,70 @@ def test_sky_map_paints_without_positions_and_stale_lookups_are_ignored(tmp_path
     w._resolved(stale, 10.684, 41.269, "M31")  # the old answer arrives late
     assert (round(w.sp_ra.value(), 3), round(w.sp_dec.value(), 3)) == (10.0, 20.0)
     w.close()
+
+
+def test_progress_tracker_counts_only_the_archives_asked_again():
+    """--retry-failed (2.57.0): the worker names the archives it asks again."""
+    from progress import ProgressTracker, STAGES
+
+    t = ProgressTracker(collecting=False)
+    assert t.feed("[gaia_dr3] ok: 5 rows (1 s)") is None  # not a collecting run until the worker says so
+    assert t.feed("[retry] asking again: desi_legacy, gaia_dr3") == "asking again: desi_legacy, gaia_dr3"
+    assert t.total == 2 + len(STAGES)
+    t.feed("[desi_legacy] ok: 3,582 rows (12 s)")
+    t.feed("[gaia_dr3] timeout: abandoned after 300 s")
+    for s in STAGES:
+        t.feed(f"[pipeline] {s}: 0.1 s")
+    assert t.fraction == 1.0 and t.failed_archives == ["gaia_dr3"]
+
+
+def test_retry_button_follows_the_run_coverage(tmp_path):
+    pytest.importorskip("PySide6")
+    import json
+
+    import pandas as pd
+    from PySide6.QtWidgets import QApplication
+    import qt_app
+
+    app = QApplication.instance() or QApplication([])
+    os.environ["FINDING_OBJECTS_LOG"] = str(tmp_path / "logs" / "f.log")
+    os.environ["FINDING_OBJECTS_BOOKMARKS"] = str(tmp_path / "bm" / "b.json")
+    work = tmp_path / "work"
+    raw = work / "raw" / "ra1_dec2_r1arcmin"
+    raw.mkdir(parents=True)
+    (raw / "search.json").write_text(json.dumps({"ra": 1.0, "dec": 2.0, "radius_arcmin": 1.0}))
+    pd.DataFrame({"object_id": ["OBJ1"], "designation": ["A"], "primary_class": ["STAR"]}).to_csv(
+        work / "classified_objects.csv", index=False
+    )
+    failed = {
+        "collector": "desi_legacy",
+        "catalog": "DESI Legacy Surveys DR10",
+        "status": "timeout",
+        "impact": "x",
+        "key": True,
+    }
+    cov = {"known": True, "attempted": 2, "failed": [failed], "key_failed": True, "raw_dir": str(raw)}
+    (work / "catalog_coverage.json").write_text(json.dumps(cov))
+    assert qt_app.retry_mode(work) == "key"
+    # an archive that is not a key one: ask every failed archive
+    cov2 = dict(cov, failed=[dict(failed, collector="nvss", key=False)], key_failed=False)
+    (work / "catalog_coverage.json").write_text(json.dumps(cov2))
+    assert qt_app.retry_mode(work) == "all"
+    # nothing failed / results of a search made before 2.57.0 (no search.json) / another folder's search
+    (work / "catalog_coverage.json").write_text(json.dumps(dict(cov, failed=[], key_failed=False)))
+    assert qt_app.retry_mode(work) is None
+    (work / "catalog_coverage.json").write_text(json.dumps(dict(cov, raw_dir=str(work / "raw" / "other"))))
+    assert qt_app.retry_mode(work) is None
+    (work / "catalog_coverage.json").write_text(json.dumps(cov))
+
+    w = qt_app.MainWindow()
+    started = []
+    w._start = lambda args, collecting: started.append((args, collecting))
+    assert w.load_results(work / "classified_objects.csv")
+    assert not w.btn_retry.isHidden() and "DESI Legacy" in w.lbl_coverage.text()
+    w.retry_failed_archives()
+    ((args, collecting),) = started
+    assert args[:4] == ["--work", str(work), "--retry-failed", "key"] and collecting is False
+    (work / "catalog_coverage.json").write_text(json.dumps(dict(cov, failed=[], key_failed=False)))
+    assert w.load_results(work / "classified_objects.csv") and w.btn_retry.isHidden()
+    w.close()

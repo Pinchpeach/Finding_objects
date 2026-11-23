@@ -4,6 +4,12 @@ The primary path retrieves gaiadr3.gaia_source first, then optional products by
 source_id.  If the Gaia TAP service fails completely, VizieR I/355 + I/358 is
 used as a read-only fallback so transient archive outages do not erase base
 astrometry or variability classification evidence.
+
+2.57.0: ``V2_GAIA_SOURCE=vizier`` skips the ESA archive and uses the VizieR copy
+(a known archive downtime, and tests of the downtime: Gaia DR4 preparation
+takes the archive down 2026-11-25 to 12-02); a maintenance page of the ESA
+archive is recognised and sent to the VizieR copy at once (see ``_tap``); the
+three VizieR queries of the copy run side by side.
 """
 
 from __future__ import annotations
@@ -120,6 +126,46 @@ SYNC_MAX_ROWS = 2000
 FALLBACK_FIDELITY_BUDGET_S = 60.0
 
 
+# ESA TAP availability (IVOA VOSI).  During maintenance every URL of the TAP
+# server, availability and sync included, answers HTTP 200 with the "ESDC
+# Archives downtime" HTML page (2026-11-23), so only the content tells.
+AVAILABILITY_URL = "https://gea.esac.esa.int/tap-server/tap/availability"
+
+
+def source_mode() -> str:
+    """ "auto" (ESA TAP, then the VizieR copy) or "vizier" (the copy only; V2_GAIA_SOURCE)."""
+    import os
+
+    v = os.environ.get("V2_GAIA_SOURCE", "auto").strip().lower() or "auto"
+    if v not in {"auto", "vizier"}:
+        raise ValueError(f"V2_GAIA_SOURCE must be 'auto' or 'vizier', got {v!r}")
+    return v
+
+
+class ArchiveDown(RuntimeError):
+    """The ESA archive answers with a maintenance page, not data."""
+
+
+def archive_down_reason(timeout=(10.0, 15.0)) -> str | None:
+    """Why the ESA TAP is known to be down, else None.
+
+    Only a document that is not the VOSI availability XML (the maintenance HTML page), or one
+    saying ``available`` is false, counts; a failed request is "unknown" (the ordinary retries
+    decide), so a slow network never turns an archive off."""
+    import re
+    import requests
+
+    try:
+        text = requests.get(AVAILABILITY_URL, timeout=timeout).text[:4000]
+    except Exception:
+        return None
+    if re.search(r"<html", text, re.I):
+        return "the archive answers with a maintenance page"
+    if re.search(r"available\s*>\s*false", text, re.I):
+        return "the archive reports itself unavailable"
+    return None
+
+
 def _bounded(fn, budget_s, *args):
     # Daemon thread: an abandoned slow query must not block interpreter exit.
     # ``fn`` gets the deadline so an abandoned thread stops retrying instead
@@ -167,6 +213,12 @@ def _tap(query: str, retries: int = 4, deadline: float | None = None) -> pd.Data
         last = exc
     if expired():
         raise TimeoutError(f"Gaia TAP deadline passed; last={last!r}")
+    # 2026-11-23: with the archive in maintenance every request returns an HTML page; the four
+    # asynchronous attempts (3-5 s pause, request, 1-4 s back-off each) then cost 33 s before the
+    # VizieR copy was asked.  One availability request tells the two situations apart.
+    down = archive_down_reason() if last is not None else None  # a full sync page means the archive answered
+    if down:
+        raise ArchiveDown(f"Gaia TAP is down: {down}; sync={last!r}")
     for attempt in range(retries):
         try:
             return Gaia.launch_job_async(query).get_results().to_pandas()
@@ -275,8 +327,67 @@ def _merge_fidelity(base: pd.DataFrame, deadline: float | None = None) -> pd.Dat
     return base
 
 
+# VizieR I/355/paramp column -> collector column (DSC-Combmod class probabilities, GSP-Spec, ESP-ELS).
+_PARAMP = {
+    "PQSO": "classprob_dsc_combmod_quasar",
+    "PGal": "classprob_dsc_combmod_galaxy",
+    "Pstar": "classprob_dsc_combmod_star",
+    "PWD": "classprob_dsc_combmod_whitedwarf",
+    "Pbin": "classprob_dsc_combmod_binarystar",
+    # VizieR I/355/paramp names of the GSP-Spec and ESP-ELS columns.
+    "Teff-S": "teff_gspspec",
+    "logg-S": "logg_gspspec",
+    "[M/H]-S": "mh_gspspec",
+    "Flags": "flags_gspspec",
+    "ClassELS": "classlabel_espels",
+    "f_ClassELS": "classlabel_espels_flag",
+    # 2.57.0 review: ESP-UCD and FLAME are in I/355/paramp too (VizieR column list, 2026-11-23: Teff-UCD,
+    # Flags-UCD, Mass-Flame, Age-Flame, Flags-Flame, Evol), same units as the archive (K, Msun, Gyr); the
+    # flags may come as integers ("01" -> 1): physical._ucd_quality and evolved_star zero-pad them.
+    "Teff-UCD": "teff_espucd",
+    "Flags-UCD": "flags_espucd",
+    "Mass-Flame": "mass_flame",
+    "Age-Flame": "age_flame",
+    "Flags-Flame": "flags_flame",
+    "Evol": "evolstage_flame",
+}
+
+
+def _spawn(fn, *args) -> dict:
+    """Run ``fn(*args)`` in a daemon thread (named after the collector, for V2_HTTP_LOG)."""
+    import threading
+
+    box: dict = {}
+
+    def target():
+        try:
+            box["value"] = fn(*args)
+        except BaseException as exc:
+            box["error"] = exc
+
+    box["thread"] = threading.Thread(target=target, daemon=True, name="gaia_dr3")
+    box["thread"].start()
+    return box
+
+
+def _result(box: dict, strict: bool):
+    """The value of a ``_spawn`` job; its error is raised when ``strict``, else None."""
+    box["thread"].join()
+    if "error" in box:
+        if strict:
+            raise box["error"]
+        return None
+    return box.get("value")
+
+
 def _vizier_fallback(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
-    src = vizier_cone(RELEASES["DR3"].vizier_source, ra, dec, radius_arcmin)
+    # The three cone queries do not depend on each other; mirror hopping made them 22 + 70 + 25 s
+    # one after the other on 2026-11-23 (118 s), and the slowest alone is 70 s.  The base query
+    # decides first: an empty cone returns without waiting for the other two.
+    b_src = _spawn(vizier_cone, RELEASES["DR3"].vizier_source, ra, dec, radius_arcmin)
+    b_ap = _spawn(vizier_cone, "I/355/paramp", ra, dec, radius_arcmin, ["Source", *_PARAMP])
+    b_var = _spawn(vizier_cone, "I/358/vclassre", ra, dec, radius_arcmin)
+    src = _result(b_src, True)
     if src is None:
         return pd.DataFrame()
     if src.empty:
@@ -319,30 +430,18 @@ def _vizier_fallback(ra: float, dec: float, radius_arcmin: float) -> pd.DataFram
     out["designation"] = "Gaia DR3 " + out["source_id"].astype("string")
     # Gaia DSC-Combmod class probabilities (astrophysical-parameter table).
     try:
-        dsc = {
-            "PQSO": "classprob_dsc_combmod_quasar",
-            "PGal": "classprob_dsc_combmod_galaxy",
-            "Pstar": "classprob_dsc_combmod_star",
-            "PWD": "classprob_dsc_combmod_whitedwarf",
-            "Pbin": "classprob_dsc_combmod_binarystar",
-            # VizieR I/355/paramp names of the GSP-Spec and ESP-ELS columns.
-            "Teff-S": "teff_gspspec",
-            "logg-S": "logg_gspspec",
-            "[M/H]-S": "mh_gspspec",
-            "Flags": "flags_gspspec",
-            "ClassELS": "classlabel_espels",
-            "f_ClassELS": "classlabel_espels_flag",
-        }
-        ap = vizier_cone("I/355/paramp", ra, dec, radius_arcmin, ["Source", *dsc])
+        ap = _result(b_ap, False)
         if ap is not None and not ap.empty and "Source" in ap.columns:
-            ap = ap[["Source", *[k for k in dsc if k in ap.columns]]].rename(columns={"Source": "source_id", **dsc})
+            ap = ap[["Source", *[k for k in _PARAMP if k in ap.columns]]].rename(
+                columns={"Source": "source_id", **_PARAMP}
+            )
             ap["source_id"] = pd.to_numeric(ap["source_id"], errors="coerce").astype("Int64")
             out = out.merge(ap.drop_duplicates("source_id"), on="source_id", how="left")
     except Exception:
         pass
     # Independent variability table fallback. A cone query is cheap for named-source validation.
     try:
-        var = vizier_cone("I/358/vclassre", ra, dec, radius_arcmin)
+        var = _result(b_var, False)
         if var is not None and not var.empty:
             sid = pick(var, ["Source", "source_id"])
             cl = pick(var, ["Class", "best_class_name"])
@@ -399,7 +498,10 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     used = rel
     select = ",".join(SOURCE)
     q = f"""SELECT {select} FROM {_table(rel,'gaia_source')} WHERE 1=CONTAINS(POINT('ICRS',ra,dec),CIRCLE('ICRS',{float(ra):.10f},{float(dec):.10f},{float(radius_arcmin)/60.0:.10f}))"""
+    mode = source_mode()  # a bad V2_GAIA_SOURCE raises here, not as a silent fall back
     try:
+        if mode == "vizier":
+            raise ArchiveDown("V2_GAIA_SOURCE=vizier: the ESA archive is not asked")
         df = _bounded(_tap, BASE_TAP_BUDGET_S, q)
         df["gaia_base_query_status"] = "tap"
         if not df.empty:
