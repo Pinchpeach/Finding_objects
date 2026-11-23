@@ -17,7 +17,25 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.11"}
-      - run: pip install pandas numpy requests astropy pyvo
+      - run: pip install pandas numpy requests astropy pyvo astroquery
+      - name: Columns of the Gaia VizieR copy (I/355/paramp) for ESP-UCD and FLAME
+        continue-on-error: true
+        run: |
+          python - <<'PYEOF'
+          from astroquery.vizier import Vizier
+          for host in ("vizier.cds.unistra.fr", "vizier.cfa.harvard.edu", "vizier.iucaa.in"):
+              v = Vizier(columns=["**"], row_limit=1)
+              v.VIZIER_SERVER = host
+              try:
+                  r = v.get_catalogs("I/355/paramp")
+                  cols = r[0].colnames
+                  print(host, len(cols), "columns")
+                  print("UCD/FLAME/mass/age/evol:", [c for c in cols if any(k in c.lower() for k in ("ucd", "flame", "mass", "age", "evol", "lum", "rad"))])
+                  print("all:", cols)
+                  break
+              except Exception as e:
+                  print(host, repr(e)[:200])
+          PYEOF
       - name: Compare
         run: python -u v2/benchmark/compare_ls_viewer.py --out ls_viewer_metrics.json
       - uses: actions/upload-artifact@v4
