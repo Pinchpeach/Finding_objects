@@ -46,6 +46,7 @@ evidence, not proof).
 from __future__ import annotations
 
 import os
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -79,6 +80,83 @@ def parse(options=None) -> frozenset:
     if bad:
         raise ValueError(f"unknown V2_QSO_OPTIONS {sorted(bad)}; known: {KNOWN}")
     return opts
+
+
+# ---- faint QSO candidates (2.57.0; WORK_REPORT_2026-11-23b.md section 11) ----------------------
+# Where the posterior cannot make a quasar the label (the sky holds ~10^2-10^3 galaxies per quasar at
+# r > 22, Bayes), the object is still reported as a candidate next to its label, as the label-less
+# "other reading" of agn_host.py: secondary_class = QSO, reason FAINT_QSO_CANDIDATE.  The primary class
+# and every accuracy stay as they were.  Off unless a threshold is set (V2_FAINT_QSO_CANDIDATE, default
+# CANDIDATE_P): the threshold of the table in the work report, chosen on the odd COSMOS fields.
+CANDIDATE_R = (22.0, 24.0)  # LS r; r >= 24 is not touched (no measurement of the purity there)
+CANDIDATE_REASON = "FAINT_QSO_CANDIDATE"
+CANDIDATE_P = None  # set once measured (see the work report); None = off
+LS_R_COLUMN = "std_mag__ls_r"
+
+
+def candidate_threshold():
+    """Threshold on p_qso for the candidate flag, or None when it is off."""
+    v = os.environ.get("V2_FAINT_QSO_CANDIDATE", "" if CANDIDATE_P is None else str(CANDIDATE_P)).strip().lower()
+    if v in ("", "off", "0", "none", "false", "no"):
+        return None
+    t = float(v)
+    if not 0.0 < t < 1.0:
+        raise ValueError(f"V2_FAINT_QSO_CANDIDATE={v!r}: a probability in (0, 1), or 'off'")
+    return t
+
+
+def faint_candidates(df, labels, p_qso, sec, why):
+    """Add the QSO candidate reading to rows that have no other reading yet.
+
+    ``labels`` the primary classes, ``p_qso`` the final quasar probabilities (NaN where none), ``sec`` / ``why``
+    the lists of agn_host.secondary.  A row qualifies when its label is not QSO, its Legacy Surveys r is
+    in CANDIDATE_R and p_qso >= the threshold."""
+    t = candidate_threshold()
+    if t is None or not len(df):
+        return sec, why
+    r = _col(df, LS_R_COLUMN)
+    p = np.asarray(p_qso, float)
+    hit = (np.asarray(labels, object) != "QSO") & (r >= CANDIDATE_R[0]) & (r < CANDIDATE_R[1]) & (p >= t)
+    sec, why = list(sec), list(why)
+    for i in np.flatnonzero(hit):
+        if not sec[i]:
+            sec[i], why[i] = "QSO", CANDIDATE_REASON
+    return sec, why
+
+
+# ---- QSO share of the faint prior from COSMOS (2.57.0; variant (b) of the work report) ---------
+# faint_class_prior_cosmos.csv (2.52.0) holds star and galaxy counts only, and the QSO magnitude prior
+# above takes its last bin (r > 22, 0.11 %) from spectroscopic fields that hardly reach it.  With
+# V2_FAINT_QSO_SHARE=half|full the QSO odds at 22 <= r < 24 come from the Chandra type-1 share of the
+# COSMOS calibration fields (benchmark/build_faint_qso_share.py -> faint_qso_share_cosmos.csv), tempered
+# by the square root like the default prior ("half") or not ("full").  Off by default.
+SHARE_TABLE = Path(__file__).resolve().parent / "faint_qso_share_cosmos.csv"
+SHARE_MODES = ("off", "half", "full")
+
+
+def share_mode() -> str:
+    v = os.environ.get("V2_FAINT_QSO_SHARE", "off").strip().lower() or "off"
+    if v not in SHARE_MODES:
+        raise ValueError(f"V2_FAINT_QSO_SHARE={v!r}; known: {SHARE_MODES}")
+    return v
+
+
+def faint_share_factor(df, table=None, mode=None) -> np.ndarray:
+    """Factor on the QSO odds from the COSMOS type-1 share per LS r bin; NaN where it does not apply
+    (mode off, r outside the table, no r)."""
+    mode = share_mode() if mode is None else mode
+    out = np.full(len(df), np.nan)
+    if mode == "off" or not len(df):
+        return out
+    t = pd.read_csv(SHARE_TABLE) if table is None else table
+    r = _col(df, LS_R_COLUMN)
+    train = 1.0 / 3.0
+    for row in t.itertuples():
+        pi = (row.n_type1 + 0.5) / (row.n_type1 + row.n_other + 1.0)  # Jeffreys smoothing
+        f = (pi / (1.0 - pi)) / (train / (1.0 - train))
+        f = np.sqrt(f) if mode == "half" else f
+        out = np.where((r >= row.r_lo) & (r < row.r_hi), min(float(f), 1.0), out)
+    return out
 
 
 def _col(df, name):
