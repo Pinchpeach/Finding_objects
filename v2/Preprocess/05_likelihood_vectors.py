@@ -655,6 +655,9 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     # QSO-rich benchmarks lose (SDSS -0.75, DESI -3.4 %p).  Option c1a
     # applies the full prior.
     qmag = QSO_OPT.magnitude_prior(df, half="c1a" not in opts)
+    # COSMOS type-1 share at 22 <= r < 24 instead of the spectroscopic-field bin (2.57.0; off by default)
+    share = QSO_OPT.faint_share_factor(df)
+    qmag = np.where(np.isfinite(share), share, qmag)
     qf *= qmag
     # DESI QSO preselection W1 < 22.3 and W2 < 22.3 AB (Chaussidon et al.
     # 2023, Sect. 3; removes stars faint in WISE, e.g. the Sagittarius
@@ -901,6 +904,8 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     )
     # Dual GALAXY/QSO reading of active galaxies (2.46.0, agn_host.py).
     sec, why = AGN_HOST.secondary(df, labels, item_lists)
+    # Faint quasar candidates (2.57.0, qso_options.faint_candidates): next to a label that is not QSO
+    sec, why = QSO_OPT.faint_candidates(df, labels, np.asarray(result_columns["p_qso"], dtype=float), sec, why)
     result_columns["secondary_class"] = sec
     result_columns["secondary_class_reason"] = why
     df = pd.concat([df, pd.DataFrame(result_columns, index=df.index)], axis=1)

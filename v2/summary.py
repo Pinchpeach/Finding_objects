@@ -47,6 +47,7 @@ COLUMNS = [
     "high_confidence",
     "high_confidence_basis",
     "secondary_class",
+    "secondary_class_reason",
     "subclass",
     "subclass_provenance",
     "subclass_tags",

@@ -28,7 +28,14 @@ def main():
     ap.add_argument("--out", type=Path)
     ap.add_argument("--aggregate-only", action="store_true", help="no per-object files (locked set C protocol)")
     ap.add_argument("--nboot", type=int, default=1000)
+    ap.add_argument(
+        "--by-pool",
+        action="store_true",
+        help="also aggregate by region pool (name prefix: csth / cpln / clam); aggregates only",
+    )
     a = ap.parse_args()
+    if a.out:
+        a.out.mkdir(parents=True, exist_ok=True)  # per-object files are written before the summary (2.57.0)
     variants = sorted(p.name for p in a.root.iterdir() if p.is_dir())
     bench = S.benchmark_positions()
     per = {}
@@ -111,6 +118,19 @@ def main():
             diff.to_csv(a.out / f"changed_{v}.csv", index=False)
     res = pd.DataFrame(out)
     print(res.to_string(index=False))
+    if a.by_pool:
+        # aggregate by pool (2.57.0): the same numbers as above, per region pool, still no per-object output
+        rows = []
+        for v, m in per.items():
+            m = m.assign(k=m[key].round(6).apply(tuple, axis=1))
+            m = m[m.k.isin(common)].reset_index(drop=True)
+            for r in FS.by_pool(m, a.nboot):
+                rows.append({"variant": v, **r})
+        pool = pd.DataFrame(rows)
+        print(pool.to_string(index=False))
+        if a.out:
+            a.out.mkdir(parents=True, exist_ok=True)
+            pool.to_csv(a.out / "ab_summary_by_pool.csv", index=False)
     if stats:
         st = pd.DataFrame(stats)
         agg = st.drop(columns="field").groupby("variant").sum(numeric_only=True)

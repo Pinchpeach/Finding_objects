@@ -85,3 +85,76 @@ def test_vizier_multitarget_rows_map_back_to_their_targets():
     assert abs(xm.angDist.iloc[1] - 1.0) < 0.01
     o = C.from_xmatch(xm, chunk, "twomass", "2MASS PSC")
     assert o.benchmark_id.tolist() == ["A", "B"] and o.catalog_object_id.tolist() == ["a", "b1"]
+
+
+def test_pools_come_from_the_region_name_and_aggregate_each_one():
+    """Locked set C (2.57.0): csth / cpln / clam aggregates, no per-object output."""
+    assert (
+        FS.pool_of("csth_304m58") == "csth"
+        and FS.pool_of("clam_113p02") == "clam"
+        and FS.pool_of("deep_cosmos_5") == "deep"
+    )
+    rng = np.random.default_rng(5)
+    rows = []
+    for pool, n_reg, err in (("csth", 4, 0.02), ("cpln", 3, 0.20), ("clam", 5, 0.05)):
+        for f in range(n_reg):
+            for _ in range(40):
+                t = rng.choice(["STAR", "GALAXY", "QSO"], p=[0.8, 0.15, 0.05])
+                rows.append({"field": f"{pool}_{f}", "t_truth": t, "ours": t if rng.random() > err else "STAR"})
+    m = pd.DataFrame(rows)
+    out = {r["pool"]: r for r in FS.by_pool(m, nboot=100)}
+    assert set(out) == {"cpln", "csth", "clam"}
+    assert (out["csth"]["n_regions"], out["cpln"]["n_regions"], out["clam"]["n_regions"]) == (4, 3, 5)
+    assert out["csth"]["n"] == 160 and out["clam"]["n"] == 200
+    assert (
+        out["cpln"]["acc"] < out["clam"]["acc"] < out["csth"]["acc"] + 1e-9 or out["cpln"]["acc"] < out["csth"]["acc"]
+    )
+    assert out["cpln"]["acc_lo"] <= out["cpln"]["acc"] <= out["cpln"]["acc_hi"]
+    # aggregate only: nothing in a row is per object
+    assert all(not isinstance(v, (list, np.ndarray, pd.Series)) for r in out.values() for v in r.values())
+    assert FS.by_pool(m.iloc[0:0]) == []
+
+
+def test_compare_ab_fields_writes_pool_aggregates_and_no_per_object_files(tmp_path, monkeypatch):
+    import compare_ab_fields as CAB
+    import score_independent_fields as S
+
+    rng = np.random.default_rng(7)
+    root = tmp_path / "ab"
+    names = [f"csth_{i}" for i in range(3)] + [f"cpln_{i}" for i in range(2)] + [f"clam_{i}" for i in range(4)]
+    for v in ("base", "new"):
+        for f in names:
+            d = root / v / f
+            d.mkdir(parents=True)
+            (d / "field.json").write_text("{}")
+            (d / "objects_blind.csv.gz").write_text("")
+
+    def fake_matches(fdir, mode, bench):
+        rows = []
+        for k in range(30):
+            t = rng.choice(["STAR", "GALAXY", "QSO"], p=[0.8, 0.15, 0.05])
+            rows.append(
+                {
+                    "t_ra": fdir.name.__hash__() % 360 + k * 1e-3,
+                    "t_dec": 1.0,
+                    "t_truth": t,
+                    "t_survey": "x",
+                    "t_n_fragments": 0,
+                    "ours": t,
+                }
+            )
+        return pd.DataFrame(rows), {"n_truth": 30, "unmatched": 0, "in_bench": 0}
+
+    monkeypatch.setattr(S, "field_matches", fake_matches)
+    monkeypatch.setattr(S, "benchmark_positions", lambda: None)
+    out = tmp_path / "out"
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["compare_ab_fields.py", str(root), "--aggregate-only", "--by-pool", "--nboot", "50", "--out", str(out)],
+    )
+    CAB.main()
+    pool = pd.read_csv(out / "ab_summary_by_pool.csv")
+    assert set(pool.pool) == {"csth", "cpln", "clam"} and set(pool.variant) == {"base", "new"}
+    assert pool.set_index(["variant", "pool"]).loc[("base", "clam"), "n_regions"] == 4
+    assert sorted(p.name for p in out.iterdir()) == ["ab_summary.csv", "ab_summary_by_pool.csv"]  # aggregates only
