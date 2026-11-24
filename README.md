@@ -1,6 +1,6 @@
 # Finding Objects: program overview
 
-Version 2.60.2 · 2026-11-24 · A field-level multi-catalogue integration and annotation tool for sources on the sky (radio to X-ray), with a coarse STAR / GALAXY / QSO classifier and a sub-classification layer
+Program version 2.60.2 · 2026-11-24 · A field-level multi-catalogue integration and annotation tool for sources on the sky (radio to X-ray), with a coarse STAR / GALAXY / QSO classifier and a sub-classification layer
 
 **Read first:** [Overview PDF, version 2.60.2 (English)](v2/document/OVERVIEW_v2.60.2.pdf) · [Release 2.60.2 with Windows, macOS and Linux downloads](https://github.com/Pinchpeach/Finding_objects/releases/tag/v2.60.2) · [How to run](#12-running-it) · [Algorithm in detail (Korean)](v2/ALGORITHM.md) · [Changelog (Korean)](v2/CHANGELOG.md)
 
@@ -154,7 +154,8 @@ Accuracy counts an abstention as wrong. Intervals are 95 % intervals from a boot
 - **The "QSO?" candidate flag** (threshold 0.1, chosen on five calibration fields), measured on the 21 deep COSMOS fields not used to choose it: **purity 29/119 = 24 % (Wilson 18–33 %)**, **recall 47/97 = 48 % (39–58 %)**. Purity counts only candidates that lie where HST/ACS covers the field (the nearest COSMOS2020 row within 1.0″ has F814W photometry), because the COSMOS2020 star and galaxy classes exist only there (without this the new fields read 0.357). The truth is X-ray selected, so purity is a lower bound; nine candidates inside the ACS area have no COSMOS2020 row, and counting them all as false would give 29/128 = 23 %. Three of four candidates are something else. It is a lead that needs a spectrum or X-ray / variability data.
 - **`p_qso` is under-confident at 22 ≤ r < 24.** In deep COSMOS the observed type-1 fraction is above the mean `p_qso` in every probability bin (0.05–0.1: 0.15 against 0.07; 0.1–0.2: 0.20 against 0.14; 0.3–0.5: 0.57 against 0.38). The 2.52.0 calibration (ECE 0.37 %) does not cover these probabilities.
 - **Known inconsistency of the r > 22 QSO prior.** The prior for QSO at r > 22 (`PI_QSO` = 0.0011) is not the real-sky fraction: its numerator is the literature density of one magnitude bin (22 to 23) and its denominator all objects from r = 22 on, so it is 3–7 times lower than the fractions measured in deep COSMOS (0.51–0.81 % at 22–23, 0.23–0.33 % at 23–24). Two corrected variants broke COSMOS2020 labels without fixing any and worsened ECE and NLL, so the prior was not changed; the faint quasar is treated as a candidate flag instead.
-- **r ≥ 24 is not classified,** and many faint objects have only a literature type: in the COSMOS 2′ field 2,361 of 3,621 objects carry only a NED or SIMBAD type, shown without a probability (2.54.0).
+- **Quasars are not recovered at r ≥ 24:** none of 33 X-ray-selected type-1 AGN there received the QSO label (deep COSMOS, 2.56.0), and the candidate flag is applied only at 22 ≤ r < 24 because no truth measures its purity fainter. Stars and galaxies at r ≥ 24 are still labelled.
+- **Many faint objects have only a literature type:** in the COSMOS 2′ field 2,361 of 3,621 objects carry only a NED or SIMBAD type, shown without a probability (2.54.0).
 
 ## 9. How it is validated
 
@@ -198,7 +199,7 @@ The program is only as available as the archives it queries; results change with
 - **Marking a degraded run:** warning band in the app, `catalog_coverage.json`, and `run_archives_status` / `run_archives_missing` on every result row. Only `complete` is a complete run.
 - **Asking again:** `python v2/pipeline.py --work DIR --retry-failed` asks only the key archives that failed in the last search (`all`: every failed one) and classifies again; the app has an "Ask failed archives again" button.
 - **Footprints:** archives that do not cover the field are not asked (NVSS, VLASS south of −40°, TGSS south of −53°, eRASS1-DE outside its half of the sky, LoTSS DR2 south of +16°, FIRST outside its two areas, DESI outside its tile list, MYStIX outside its 20 regions).
-- **Bulk use is limited:** 1.5–3 minutes per field and dependent on external services.
+- **Bulk use is limited:** about 2–4 minutes per field (128–235 s end to end for the 1–2′ test fields in the table above) and dependent on external services.
 
 ### Dated notes (not permanent facts)
 
@@ -209,8 +210,8 @@ The program is only as available as the archives it queries; results change with
 ## 11. What is not claimed
 
 - **No novelty over Gaia DSC on the bright sky.** On the locked set the pipeline reaches 99.8 % where Gaia DSC alone reaches 99.5 % on the same objects. No independent scientific result is claimed yet; the contribution is the integration, the provenance, the validation design and the measured limits.
-- **No calibrated QSO probabilities at the faint end** (22 ≤ r < 24 is under-confident, r ≥ 24 is not classified).
-- **Not a bulk-processing tool**, and not a replacement for a spectrum: sub-classes are mostly look-ups of other people's catalogues, and the pipeline's own sub-type recovery without spectra or literature lists is 45.8 % on the 520-object check.
+- **No calibrated QSO probabilities at the faint end** (22 ≤ r < 24 is under-confident; at r ≥ 24 quasars are not recovered, 0 of 33 type-1 AGN, and no truth measures the candidate flag there).
+- **Not a bulk-processing tool**, and not a replacement for a spectrum: sub-classes are mostly look-ups of other people's catalogues, and the pipeline's own sub-type recovery without spectra or literature lists is 45.8 % on the 520-object check (2.47.0).
 - **Not validated** for dense low-latitude fields at r > 20 (no truth there).
 - **Development-set numbers** (sets A and B, the 520 objects, COSMOS fields used for calibration) are not unbiased; the unbiased ones are the locked set C and the COSMOS confirmation fields.
 
@@ -286,7 +287,8 @@ python v2/document/build_overview.py
 | [`v2/STATUS_2026-11-12.md`](v2/STATUS_2026-11-12.md) | Korean | state of the classifier after the first locked-set scoring, and the directions drawn from it |
 | [`v2/benchmark/LOCKED_TEST_SET_C.md`](v2/benchmark/LOCKED_TEST_SET_C.md) | English | protocol and scores of the locked test set |
 | `v2/WORK_REPORT_*.md` | Korean | work reports: results, errors and the design reasons and dropped alternatives |
-| `v2/LITERATURE*.md`, `v2/Preprocess/LITERATURE.md`, `v2/Classifier/LITERATURE_*.md` | English / mixed | the literature basis of the rules and thresholds |
+| `v2/Preprocess/LITERATURE.md`, `v2/Classifier/LITERATURE_*.md` | English | the literature basis of the rules and thresholds |
+| `v2/LITERATURE*.md` | Korean (citations in English; `LITERATURE_REVIEW_2026-10.md` mostly English) | literature surveys behind later changes (dated) |
 | [`v2/document/OVERVIEW_v2.36.1.pdf`](v2/document/OVERVIEW_v2.36.1.pdf) | Korean | the previous overview (version 2.36.1, 2026-10-23); its figures are out of date |
 | [`v2/document/PIPELINE_STACK_v2.44.0.pdf`](v2/document/PIPELINE_STACK_v2.44.0.pdf) ([PPTX](v2/document/PIPELINE_STACK_v2.44.0.pptx)) | English | **the v2.44.0 deck**, 12 slides on the pipeline and tech stack; **not updated since version 2.44.0**, so its headline figures (29 archives, 36 + 2 rules and models, 99.16 % blind accuracy, 141 tests) are out of date |
 

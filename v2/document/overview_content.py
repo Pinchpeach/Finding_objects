@@ -16,7 +16,10 @@ Block kinds: ``p`` paragraph, ``ul`` bullet list, ``table`` (head, rows, widths 
 
 from __future__ import annotations
 
-PROGRAM_VERSION = "2.60.2"  # the program the text describes (docs are rebuilt in later PATCH versions)
+# The released program the text describes: the header reads "Program version" and links its release.  A later
+# documentation-only PATCH (v2/VERSION 2.60.3 for this text) keeps it; change it when the text is checked against a
+# new release.
+PROGRAM_VERSION = "2.60.2"
 DATE = "2026-11-24"
 REPO = "https://github.com/Pinchpeach/Finding_objects"
 RELEASE_URL = f"{REPO}/releases/tag/v{PROGRAM_VERSION}"
@@ -518,7 +521,10 @@ section(
             "its denominator all objects from r = 22 on, so it is 3–7 times lower than the fractions measured in deep "
             "COSMOS (0.51–0.81 % at 22–23, 0.23–0.33 % at 23–24). Two corrected variants broke COSMOS2020 labels "
             "without fixing any and worsened ECE and NLL, so the prior was not changed; the faint quasar is treated as a candidate flag instead.",
-            "**r ≥ 24 is not classified,** and many faint objects have only a literature type: in the COSMOS 2′ "
+            "**Quasars are not recovered at r ≥ 24:** none of 33 X-ray-selected type-1 AGN there received the QSO "
+            "label (deep COSMOS, 2.56.0), and the candidate flag is applied only at 22 ≤ r < 24 because no truth "
+            "measures its purity fainter. Stars and galaxies at r ≥ 24 are still labelled.",
+            "**Many faint objects have only a literature type:** in the COSMOS 2′ "
             "field 2,361 of 3,621 objects carry only a NED or SIMBAD type, shown without a probability (2.54.0).",
         ]
     ),
@@ -622,7 +628,8 @@ section(
             "**Footprints:** archives that do not cover the field are not asked (NVSS, VLASS south of −40°, TGSS "
             "south of −53°, eRASS1-DE outside its half of the sky, LoTSS DR2 south of +16°, FIRST outside its two "
             "areas, DESI outside its tile list, MYStIX outside its 20 regions).",
-            "**Bulk use is limited:** 1.5–3 minutes per field and dependent on external services.",
+            "**Bulk use is limited:** about 2–4 minutes per field (128–235 s end to end for the 1–2′ test fields "
+            "in the table above) and dependent on external services.",
         ]
     ),
     H3("Dated notes (not permanent facts)"),
@@ -648,11 +655,11 @@ section(
             "**No novelty over Gaia DSC on the bright sky.** On the locked set the pipeline reaches 99.8 % where Gaia "
             "DSC alone reaches 99.5 % on the same objects. No independent scientific result is claimed yet; the "
             "contribution is the integration, the provenance, the validation design and the measured limits.",
-            "**No calibrated QSO probabilities at the faint end** (22 ≤ r < 24 is under-confident, r ≥ 24 is not "
-            "classified).",
+            "**No calibrated QSO probabilities at the faint end** (22 ≤ r < 24 is under-confident; at r ≥ 24 "
+            "quasars are not recovered, 0 of 33 type-1 AGN, and no truth measures the candidate flag there).",
             "**Not a bulk-processing tool**, and not a replacement for a spectrum: sub-classes are mostly look-ups "
             "of other people's catalogues, and the pipeline's own sub-type recovery without spectra or literature "
-            "lists is 45.8 % on the 520-object check.",
+            "lists is 45.8 % on the 520-object check (2.47.0).",
             "**Not validated** for dense low-latitude fields at r > 20 (no truth there).",
             "**Development-set numbers** (sets A and B, the 520 objects, COSMOS fields used for calibration) are "
             "not unbiased; the unbiased ones are the locked set C and the COSMOS confirmation fields.",
@@ -793,9 +800,14 @@ section(
                 "work reports: results, errors and the design reasons and dropped alternatives",
             ],
             [
-                "`v2/LITERATURE*.md`, `v2/Preprocess/LITERATURE.md`, `v2/Classifier/LITERATURE_*.md`",
-                "English / mixed",
+                "`v2/Preprocess/LITERATURE.md`, `v2/Classifier/LITERATURE_*.md`",
+                "English",
                 "the literature basis of the rules and thresholds",
+            ],
+            [
+                "`v2/LITERATURE*.md`",
+                "Korean (citations in English; `LITERATURE_REVIEW_2026-10.md` mostly English)",
+                "literature surveys behind later changes (dated)",
             ],
             [
                 "[`v2/document/OVERVIEW_v2.36.1.pdf`](v2/document/OVERVIEW_v2.36.1.pdf)",

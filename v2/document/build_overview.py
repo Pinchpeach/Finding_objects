@@ -76,7 +76,7 @@ def render_markdown() -> str:
     pdf_link = f"v2/document/{pdf_name()}"
     out = [
         f"# {C.TITLE}",
-        f"Version {C.PROGRAM_VERSION} · {C.DATE} · {C.SUBTITLE}",
+        f"Program version {C.PROGRAM_VERSION} · {C.DATE} · {C.SUBTITLE}",
         f"**Read first:** [Overview PDF, version {C.PROGRAM_VERSION} (English)]({pdf_link}) · "
         f"[Release {C.PROGRAM_VERSION} with Windows, macOS and Linux downloads]({C.RELEASE_URL}) · "
         "[How to run](#12-running-it) · "
@@ -326,7 +326,7 @@ def build_pdf(path: Path) -> int:
 
     story = [
         Paragraph(html.escape(C.TITLE), h1),
-        Paragraph(_inline(f"Version {C.PROGRAM_VERSION} · {C.DATE} · {C.SUBTITLE}"), sub),
+        Paragraph(_inline(f"Program version {C.PROGRAM_VERSION} · {C.DATE} · {C.SUBTITLE}"), sub),
         Paragraph(
             _inline(
                 f"Source, tests and downloads: [{C.REPO}]({C.REPO}) · [Release {C.PROGRAM_VERSION}]({C.RELEASE_URL}). "
