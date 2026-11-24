@@ -76,9 +76,11 @@ SECONDARY_NOTES = {
     "FAINT_QSO_CANDIDATE": (
         "Faint quasar candidate, not a classification: 22 <= LS r < 24 and P(QSO) at or above the candidate\n"
         "threshold (0.1 by default; V2_FAINT_QSO_CANDIDATE changes it).\n"
-        "Measured at the default 0.1: in the deep COSMOS test fields about 1 in 5 such candidates was a type-1\n"
-        "quasar (7 of 34 = 21 %, 95 % interval 10-37 %; X-ray-selected truth, so a lower bound); a lower\n"
-        "threshold gives fewer.  Needs a spectrum or X-ray / variability data to confirm."
+        "Measured at the default 0.1 in the 21 deep COSMOS fields not used to choose it: about 1 in 4 such\n"
+        "candidates was a type-1 quasar (29 of 119 = 24 %, 95 % interval 18-33 %; counted where HST/ACS covers\n"
+        "the field), and 48 % (39-58 %) of the type-1 quasars at 22 <= r < 24 were labelled QSO or flagged.\n"
+        "The truth is X-ray selected, so the purity is a lower bound; a lower threshold gives fewer.\n"
+        "Needs a spectrum or X-ray / variability data to confirm."
     ),
 }
 CANDIDATE_TEXT = {"FAINT_QSO_CANDIDATE": "QSO?"}
