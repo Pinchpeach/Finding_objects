@@ -312,7 +312,7 @@ def _probe_body(data):
 
 
 def _holds_probe(send, session, method, target, args, kwargs) -> str:
-    """"holds" when the mirror returns a row of the catalogue without any cone, "lacks" when the answer has no table
+    """ "holds" when the mirror returns a row of the catalogue without any cone, "lacks" when the answer has no table
     (or says "not found"), "backend" when its database failed twice, "error"."""
     data = _probe_body(kwargs.get("data"))
     if data is None:
@@ -428,6 +428,10 @@ def _with_mirrors(send):
         kwargs["timeout"] = (CONNECT_TIMEOUT_S, read)
         last = None
         empty = None
+        # 2.60.2 review: answers that say the mirror's database failed or that it lacks the catalogue are never an
+        # empty cone.  When no mirror gives data they end in an error (the collector reports it) instead of being
+        # returned as a table-less answer, which astroquery reads as "no rows" (the 2026-11-07 kind of silence).
+        lacked = None
         retried: set = set()  # mirrors asked again after a database error of their own
         for i, host in enumerate(hosts):
             if i:
@@ -450,7 +454,11 @@ def _with_mirrors(send):
                 continue
             tableless = _tableless_votable(resp)
             reason = _answer_error(resp) if tableless else None
-            _log(host, f"{resp.status_code}{' tableless' if tableless else ''}{' error: ' + reason[:60] if reason else ''}", t0)
+            _log(
+                host,
+                f"{resp.status_code}{' tableless' if tableless else ''}{' error: ' + reason[:60] if reason else ''}",
+                t0,
+            )
             if resp.status_code in RETRY_STATUS or (reason is not None and _error_kind(reason) == "backend"):
                 _remember(host, False)
             elif reason is None:
@@ -469,14 +477,10 @@ def _with_mirrors(send):
                         retried.add(host)
                         hosts.insert(i + 1, host)  # the same mirror once more (the pause is at the top of the loop)
                         continue
-                    last = resp
-                    if i < len(hosts) - 1:
-                        continue
                 else:
                     _lacks(host, catalog)  # other searches ask this mirror last for this catalogue
-                    empty = empty or resp
-                    if i < len(hosts) - 1:
-                        continue
+                lacked = resp
+                continue  # the last mirror too: an error answer is never returned as the result
             # A mirror's table-less answer is not trusted on its own (2.47.0):
             # on 2026-11-07, with Strasbourg unreachable, the CfA mirror
             # answered 200 with a VOTable holding no table for every
@@ -487,10 +491,15 @@ def _with_mirrors(send):
             # only if no other mirror returns a table.
             if host != VIZIER_HOSTS[0] and tableless and reason is None:
                 what = _confirm_status(send, self, method, target, args, kwargs)
+                probe = None
                 if what == "no table":
                     # an empty cone of a catalogue the mirror holds (CfA) or a mirror without the catalogue: the
                     # existence probe tells them apart (a probe done less than the failure memory ago is kept)
-                    probe = "holds" if _holds_known(host, catalog) else _holds_probe(send, self, method, target, args, kwargs)
+                    probe = (
+                        "holds"
+                        if _holds_known(host, catalog)
+                        else _holds_probe(send, self, method, target, args, kwargs)
+                    )
                     if probe == "holds":
                         _holds_note(host, catalog)
                         what = "empty table"
@@ -504,6 +513,9 @@ def _with_mirrors(send):
                     _remember(host, False)
                 if what == "empty table":
                     _lacks(host, catalog, ok=True)  # it holds the catalogue (the cone is empty)
+                elif what in ("not found", "backend") or probe in ("lacks", "backend"):
+                    lacked = resp  # lacks the catalogue or its database failed: not an empty cone
+                    continue
                 else:
                     empty = empty or resp
                     continue
@@ -513,7 +525,10 @@ def _with_mirrors(send):
                 _preferred.update(host=None, until=0.0)
             return resp
         if empty is not None:
-            return empty
+            return empty  # a table-less answer without an error that no mirror contradicted (2.47.0)
+        if lacked is not None:
+            why = _answer_error(lacked) or "no table, and the mirror lacks the catalogue"
+            raise RuntimeError(f"VizieR: no mirror gave {catalog or 'the table'}: {why[:160]}")
         if isinstance(last, Exception):
             raise last
         return last

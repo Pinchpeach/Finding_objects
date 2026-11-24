@@ -560,3 +560,48 @@ def test_a_mirror_that_timed_out_is_tried_last_by_the_next_request_of_the_proces
     throttle._preferred.update(host=None, until=0.0)
     req(None, "GET", "https://vizier.cds.unistra.fr/viz-bin/votable")
     assert len(seen) == 1 and "vizier.iucaa.in" in seen[0]  # the three that did not answer are not asked first again
+
+
+def test_a_failed_database_everywhere_is_an_error_not_an_empty_cone():
+    """2.60.2 review: CfA's 'database not reachable' (HTTP 200, no table) on the last mirror left was returned as the
+    answer, which astroquery reads as a cone without rows; it is an error now."""
+    import pytest
+
+    def send(self, method, url, *a, data=None, **k):
+        host = url.split("/")[2]
+        if host == "vizier.cfa.harvard.edu":
+            return _V(DB_DOWN)
+        raise __import__("requests").exceptions.ConnectionError("refused")
+
+    with pytest.raises(RuntimeError, match="NOT CURRENTLY REACHABLE"):
+        throttle._with_mirrors(send)(None, "POST", "https://vizier.cds.unistra.fr/viz-bin/votable", data=MINI)
+    assert throttle._preferred["host"] is None  # the failing mirror is not preferred
+
+
+def test_a_catalogue_no_reachable_mirror_holds_is_an_error_not_an_empty_cone():
+    """2.60.2 review: Strasbourg down, CfA 'Table or Catalog not found', the rest refused: not an empty cone."""
+    import pytest
+
+    def send(self, method, url, *a, data=None, **k):
+        host = url.split("/")[2]
+        if host == "vizier.cfa.harvard.edu":
+            return _V(NOT_FOUND)
+        raise __import__("requests").exceptions.ConnectionError("refused")
+
+    with pytest.raises(RuntimeError, match="not found"):
+        throttle._with_mirrors(send)(None, "POST", "https://vizier.cds.unistra.fr/viz-bin/votable", data=MINI)
+
+
+def test_a_mirror_whose_probe_says_it_lacks_the_catalogue_is_not_an_empty_cone_when_no_other_answers():
+    """2.60.2 review: table-less cone and confirmation, and the existence probe without a table (the mirror lacks the
+    catalogue): with every other mirror refused this is an error, not an empty result."""
+    import pytest
+
+    def send(self, method, url, *a, data=None, **k):
+        host = url.split("/")[2]
+        if host == "vizier.cfa.harvard.edu":
+            return _V(EMPTY)  # cone, confirmation and probe: no table, no error
+        raise __import__("requests").exceptions.ConnectionError("refused")
+
+    with pytest.raises(RuntimeError, match="lacks the catalogue"):
+        throttle._with_mirrors(send)(None, "POST", "https://vizier.cds.unistra.fr/viz-bin/votable", data=MINI)
