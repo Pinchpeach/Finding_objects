@@ -99,6 +99,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           v="$(tr -d '[:space:]' < v2/VERSION)"
-          notes="$(awk -v v="$v" '$0 ~ "^## "v" " {on=1; print; next} on && /^## / {exit} on {print}' v2/CHANGELOG.md)"
+          # the changelog is a table: the script reads the row of this version (or a "## <version>" section)
+          notes="$(python3 .github/scripts/release_notes.py "$v" v2/CHANGELOG.md)"
           gh release create "${TAG}" FindingObjects-*-"${TAG}".zip --target "${GITHUB_SHA}" \
             --title "Finding Objects ${TAG}" --notes "${notes:-See v2/CHANGELOG.md}"
