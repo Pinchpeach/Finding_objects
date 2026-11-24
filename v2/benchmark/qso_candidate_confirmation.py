@@ -24,7 +24,7 @@ Definitions (22 <= LS r < 24, the edge cut of the measurement, truth classes as 
                  COSMOS2020 rows of the central field 5, 30-37 % of the outer new fields).  Chandra type 1 are known
                  everywhere, so the purity above counts the type 1 of the whole field against the false claims of
                  the ACS part only: too high where the ACS covers part of a field.  ``purity_acs`` uses only the
-                 claims that lie where the ACS has photometry (nearest COSMOS2020 row within 1.5" has ACSF814Wmag),
+                 claims that lie where the ACS has photometry (nearest COSMOS2020 row within MATCH_ARCSEC = 1.0" has ACSF814Wmag),
                  graded among them / all of them (the range for the ungraded ones, as above).
 
     python v2/benchmark/qso_candidate_confirmation.py --deep DIR --fields-file ALL26.csv --out OUT [--run base]
