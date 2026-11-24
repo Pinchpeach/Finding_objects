@@ -61,6 +61,7 @@ objects_summary.csv (요약) · literature_only_entries.csv · classified_object
 
 아카이브 장애에 대한 대비(2.54.0):
 - **VizieR:** 공식 미러로 넘어간다. 미러가 빈 원뿔에 표 없이 답하면 같은 미러에 한 번 더 물어 확인한다. 응답하지 않는 미러는 뒤로 미룬다(2.60.0부터 이 기억이 검색 사이에서도 유지된다: 연속 검색에서 죽은 미러로 가는 요청 7–15번 → 0번).
+  - 2.60.2: 미러가 HTTP 200으로 "The database is not currently reachable"(표 없는 VOTable)를 주는 것을 빈 원뿔이나 "이 미러엔 카탈로그 없음"으로 읽지 않고 같은 미러에 한 번 더 묻는다(CfA, 2026-11-24 표본 24번 중 8번). 카탈로그가 없다는 답("Table or Catalog not found")은 그 미러를 해당 목록에서 뒤로 미룬다(24시간). 같은 카탈로그의 표 여럿(Suh 2021 AGB 4표, Gaia SOS 3표)은 한 요청으로 묻는다.
 - **SIMBAD (2.60.0):** 직접 TAP 질의 한 번으로 원뿔과 천체 유형 이름표를, 한 번 더 질의로 참고문헌을 받는다(2.59.0까지는 빈 원뿔 8번, COSMOS 2′ 19번). Strasbourg가 실패하면 Harvard 미러로 넘어가고, 실패한 서버는 10분간 맨 뒤로 보낸다(프로세스 사이에서 공유). SIMBAD가 질의를 거부하면 이전의 astroquery 경로를 쓴다.
 - **Pan-STARRS1:** MAST가 실패하면 VizieR의 DR2 사본을 쓴다.
 - **ATNF 펄서 (2.55.0):** HEASARC가 30초 안에 답하지 않으면 VizieR 사본(B/psr)을 쓴다.
@@ -70,6 +71,7 @@ objects_summary.csv (요약) · literature_only_entries.csv · classified_object
 - **Gaia (2.57.0):** ESA 아카이브가 점검 안내 페이지를 돌려주면(HTTP 200이라 내용으로 판별) 비동기 재시도 없이 바로 VizieR 사본으로 간다. 사본의 세 질의는 동시에 보낸다. `V2_GAIA_SOURCE=vizier`로 ESA를 아예 묻지 않을 수 있다. 사본이 빠뜨리는 자료(변광 요약 `in_vari_*`, 광속 열)는 경고에 적힌다. FLAME·ESP-UCD는 사본(`I/355/paramp`)에서도 받는다(ESA 값과 VizieR 반올림 안에서 같음).
 - **실패한 수집기만 다시 받기 (2.57.0):** `python v2/pipeline.py --work DIR --retry-failed` (핵심 아카이브만, `all`은 실패한 전부). 앱에서는 경고 띠의 "Ask failed archives again" 버튼. 성공한 수집기는 묻지 않고, 10분 실패 기억도 이 요청을 막지 않으며, 대체 자료로 받은 Gaia·PS1은 원래 자료를 다시 받는다.
 - **관측 범위 밖:** NVSS·VLASS(δ < −40°), TGSS(δ < −53°), eROSITA-DE(동쪽 은하 반구)는 조회하지 않는다.
+  - 2.60.2부터: LoTSS DR2(공식 MOC에서 δ < +16°, 5,634 deg²), FIRST(공식 커버리지 지도 두 장의 RA·Dec 상자), MYStIX(20개 별탄생 영역의 원)도 영역 밖은 묻지 않는다. 경계의 출처와 해시는 `v2/Get_data/footprint.py` 머리말.
 
 ## 4. 1차 분류 (STAR / GALAXY / QSO)
 

@@ -1,0 +1,11 @@
+collector,cone,rows_old,rows_new,requests_old,requests_new,seconds_old,seconds_new,same_columns,same_rows_and_cells
+agb_suh2021,Galactic bulge 10′ (rows),10,10,12,2,159.1,18.9,True,True
+agb_suh2021,COSMOS 6′ (empty),0,0,19,3,267.5,24.0,True,True
+gaia_dr3_variability_sos_vizier,LMC 20′ (rows),2029,2029,4,2,27.7,19.1,True,True
+gaia_dr3_variability_sos_vizier,COSMOS 6′ (empty),0,0,12,3,85.6,22.6,True,True
+first,"COSMOS 6′ (rows, inside)",2,2,2,3,18.9,20.8,True,True
+first,plane 6′ (outside the maps; function called directly),0,0,3,9,19.8,84.4,True,True
+lotss,"Dec +45 6′ (rows, inside)",40,40,7,2,67.1,18.8,True,True
+lotss,COSMOS 6′ (outside; function called directly),0,0,3,10,23.7,94.3,True,True
+mystix_mpcm,"Orion 6′ (rows, inside a region)",1101,1101,2,3,17.4,22.3,True,True
+mystix_mpcm,COSMOS 6′ (outside; function called directly),0,0,3,8,20.8,78.6,True,True

@@ -80,3 +80,44 @@ def test_controller_asks_no_desi_archive_outside_the_footprint(tmp_path):
         r = controller._collect_one(name, 283.80, -2.10, 1.0, tmp_path, "t")
         assert r["status"] == "outside_footprint" and r["rows"] == 0 and r["error"] == ""
     assert not list(tmp_path.glob("*.csv"))
+
+
+# --- 2.60.2: LoTSS DR2 (dec_min), FIRST (boxes), MYStIX (regions): a search outside them asks nothing
+COSMOS, NGC4522, PLANE_L30 = (150.10, 2.25), (188.4155, 9.1751), (283.80, -2.10)
+
+
+def test_lotss_is_skipped_south_of_its_coverage_only():
+    import lotss
+
+    for ra, dec in (COSMOS, NGC4522, PLANE_L30):
+        assert footprint.outside(lotss.FOOTPRINT, ra, dec, 2.0)
+    assert footprint.outside(lotss.FOOTPRINT, 200.0, 14.5, 2.0)  # the lowest covered cell centre is at +16.26
+    assert not footprint.outside(lotss.FOOTPRINT, 200.0, 16.0, 2.0)
+    assert not footprint.outside(lotss.FOOTPRINT, 150.0, 40.0, 2.0)
+    assert not footprint.outside(lotss.FOOTPRINT, 1.0, 20.0, 2.0)  # the RA-1 region
+
+
+def test_first_is_skipped_outside_the_boxes_of_its_coverage_maps():
+    import first
+
+    assert not footprint.outside(first.FOOTPRINT, *COSMOS, 2.0) and not footprint.outside(
+        first.FOOTPRINT, *NGC4522, 2.0
+    )
+    assert footprint.outside(first.FOOTPRINT, *PLANE_L30, 1.0)  # RA 283.8 is in neither cap
+    assert footprint.outside(first.FOOTPRINT, 270.0, 10.0, 2.0)  # 3.5 deg east of the north cap
+    assert not footprint.outside(first.FOOTPRINT, 267.0, 10.0, 2.0)  # inside the margin of its edge
+    assert not footprint.outside(first.FOOTPRINT, 10.0, 0.0, 2.0)  # the south cap wraps through RA = 0
+    assert footprint.outside(first.FOOTPRINT, 150.0, 80.0, 2.0)  # north of the covered declinations
+    assert footprint.outside(first.FOOTPRINT, 150.0, -30.0, 2.0)
+
+
+def test_mystix_is_skipped_away_from_its_20_regions():
+    import mystix_mpcm
+
+    fp = mystix_mpcm.FOOTPRINT
+    assert len(fp["regions"]) == 20
+    for ra, dec in (COSMOS, NGC4522, PLANE_L30):
+        assert footprint.outside(fp, ra, dec, 2.0)
+    assert not footprint.outside(fp, 83.82, -5.39, 2.0)  # the Orion Nebula
+    assert not footprint.outside(fp, 97.92, 6.4, 6.0)  # 1.4 deg north of the Rosette centre, radius 1.5
+    assert footprint.outside(fp, 97.92, 9.0, 2.0)

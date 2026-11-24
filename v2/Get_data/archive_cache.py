@@ -151,6 +151,7 @@ def fallback(df: pd.DataFrame) -> bool:
 # A quick "error" at one cone costs the next cone one more quick request, not
 # a wait.  Any success of the collector forgets its failures.
 FAILURE_MEMORY_S = 600.0
+CATALOG_MEMORY_S = 86400.0  # a mirror without a catalogue (2.60.2): the holdings of a mirror change slowly
 SAME_CONE_DEG = 1e-4  # 0.36": the same search, not a neighbouring one
 # A failure that took this long is a wait like a timeout, and is applied to
 # every cone too (2.56.0 review): e.g. the HEASARC TAP answered "System
@@ -276,13 +277,27 @@ def _sources_path() -> Path:
     return root() / "sources.json"
 
 
+def catalog_memory_s() -> float:
+    """How long a mirror that lacks a catalogue is remembered (2.60.2; V2_CATALOG_MEMORY_S, 0 = off)."""
+    try:
+        return max(0.0, float(os.environ.get("V2_CATALOG_MEMORY_S", CATALOG_MEMORY_S)))
+    except ValueError:
+        return CATALOG_MEMORY_S
+
+
 def _read_sources() -> dict:
+    """{key: (time, stored ttl or None)} of the entries still valid; no ttl (a 2.60.0 file: {key: time}) = the failure memory."""
     try:
         d = json.loads(_sources_path().read_text())
     except Exception:
         return {}
-    now = time.time()
-    return {k: float(t) for k, t in d.items() if isinstance(t, (int, float)) and now - float(t) <= failure_memory_s()}
+    now, out = time.time(), {}
+    for k, v in d.items():
+        t, stored = (v[0], v[1]) if isinstance(v, list) and len(v) == 2 else (v, None)
+        ttl = failure_memory_s() if stored is None else stored  # a server failure ends with the failure memory of now
+        if isinstance(t, (int, float)) and isinstance(ttl, (int, float)) and now - float(t) <= float(ttl):
+            out[k] = (float(t), stored)
+    return out
 
 
 def down_keys() -> set:
@@ -299,21 +314,20 @@ def source_down(key: str) -> bool:
     return key in _read_sources()
 
 
-def note_source(key: str, ok: bool) -> None:
-    """Remember that ``key`` failed (``ok`` False) or forget its failure (``ok`` True)."""
+def note_source(key: str, ok: bool, ttl: float | None = None) -> None:
+    """Remember that ``key`` failed (``ok`` False; for ``ttl`` seconds, default the failure memory) or forget it."""
     if not enabled() or failure_memory_s() <= 0:
         return
     try:
-        known = _read_sources()
-        if ok and key not in known:
+        if ok and key not in _read_sources():
             return  # nothing to forget: no file access on the normal path
         root().mkdir(parents=True, exist_ok=True)
         with _LOCK, _FileLock(root() / "sources.lock"):
-            d = _read_sources()
+            d = {k: [t, tl] for k, (t, tl) in _read_sources().items()}
             if ok:
                 d.pop(key, None)
             else:
-                d[key] = time.time()
+                d[key] = [time.time(), None if ttl is None else float(ttl)]
             path = _sources_path()
             fd, tmp = tempfile.mkstemp(dir=path.parent, suffix=".json.tmp")
             with os.fdopen(fd, "w") as fh:

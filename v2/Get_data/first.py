@@ -12,6 +12,8 @@ save = save_csv  # collector API: save(df, path)
 
 CATALOG = "FIRST"
 VIZIER_CATALOG = "VIII/92/first14"
+# 2.60.2: the boxes around the official 2014 December 17 coverage maps (north cap, south cap), see footprint.py
+FOOTPRINT = {"boxes": [(98.9, 266.5, -8.15, 64.75), (305.2, 59.7, -11.45, 15.40)]}
 
 
 def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:

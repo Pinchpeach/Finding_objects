@@ -41,3 +41,4 @@ Finding Objects 자체 코드는 MIT License(`LICENSE`)를 따른다.
 - VizieR / SIMBAD (CDS) : https://cds.unistra.fr/vizier-org/licences_vizier.html
 - NED : https://ned.ipac.caltech.edu/Documents/Guides/Policies/Acknowledgment
 - ZTF, NVSS, FIRST, VLASS, TGSS, LoTSS, Chandra, XMM-Newton, eROSITA, ATNF, HASH 등은 각 카탈로그 논문을 인용한다(`v2/document/` 참고).
+- 조회를 건너뛰는 영역 경계(`v2/Get_data/footprint.py`, `desi_dr1_tiles.csv.gz`)는 각 서베이가 공개한 영역 정의에서 옮긴 값이다: DESI DR1 타일 목록(`tiles-iron.csv`), FIRST 커버리지 지도(https://sundog.stsci.edu/first/catalogs/ , Helfand et al. 2015), LoTSS DR2 커버리지 MOC(https://lofar-surveys.org/dr2_release.html , Shimwell et al. 2022), MYStIX 20개 영역의 중심과 크기(VizieR J/ApJS/209/32 `reg`·`mpcm`, Broos et al. 2013). 카탈로그 목록 자체를 담은 것이 아니라 경계 숫자와 DESI 타일 중심이다. 작고 고정된 목록(Suh 2021 AGB, Roma-BZCAT 등)의 사본은 재배포 조건을 원문에서 찾지 못해 넣지 않았다(`v2/WORK_REPORT_2026-11-24.md` 11.1절).
