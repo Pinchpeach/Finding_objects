@@ -49,6 +49,11 @@ FIELDS = ("otype", "sp", "plx", "pmra", "pmdec", "rvz_redshift")  # astroquery p
 TAP_SYNC = "https://{server}/simbad/sim-tap/sync"
 MAXREC = 2_000_000  # SIMBAD's hard limit (its TAP capabilities); astroquery's query_region asks the same
 CONNECT_TIMEOUT_S, READ_TIMEOUT_S = 10.0, 120.0
+# References of a cone with more objects than this are not asked (2.60.0 review).  They are optional (not used by
+# the classification) and their answer is objects x papers with titles: COSMOS 10' (59,540 objects) peaked at
+# 788 MB with them, 20' (192,486) at 1.9 GB (WORK_REPORT_2026-11-23d.md 2.3), next to the other collectors of
+# the search in the desktop app.  The measured 10' case is kept; beyond it only the cone rows are fetched.
+REFERENCE_MAX_OBJECTS = 60_000
 # The columns astroquery 0.4.11 selects for ``add_votable_fields("otype", "sp", "plx", "pmra", "pmdec",
 # "rvz_redshift")`` (its query payload, 2026-11-23), in its order.
 MAIN_COLUMNS = (
@@ -245,7 +250,10 @@ def fetch(ra, dec, radius_arcmin):
     # *_query_status is what archive_cache.cacheable() checks: a failed
     # reference / object-type lookup must not be cached for LIVE_TTL_DAYS.
     st = df["simbad_reference_status"].astype(str)
-    df["simbad_reference_query_status"] = st.where(st.str.startswith("error"), "ok")
+    # A cone whose references were skipped (REFERENCE_MAX_OBJECTS) is not cached either (PR #76 review):
+    # archive_cache serves smaller cones from a containing one, which would then lack references a search of
+    # their own size gets.  Its rows are complete; only the cache leaves it out.
+    df["simbad_reference_query_status"] = st.where(st.str.startswith(("error", "skipped")), "ok")
     return df
 
 
@@ -291,6 +299,9 @@ def _attach_references_cone(server, df, cone, label, per_object=3):
     df["simbad_otype_label"] = label.to_numpy() if label is not None else None
     if df.empty:  # nothing in the cone: no request
         return _merge_references(df, None, per_object)
+    if len(df) > REFERENCE_MAX_OBJECTS:  # memory of an objects x papers answer (see REFERENCE_MAX_OBJECTS)
+        df["simbad_reference_status"] = f"skipped:more_than_{REFERENCE_MAX_OBJECTS}_objects"
+        return df
     table, overflow = _tap_sync(server, _references_adql(*cone))
     if overflow:
         raise RuntimeError(f"SIMBAD references exceed {MAXREC} rows")

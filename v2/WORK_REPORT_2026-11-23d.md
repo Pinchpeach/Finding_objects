@@ -195,3 +195,47 @@ SIMBAD 수집기 출력(단독): 행 집합 같음. 열 순서는 고정으로 �
 - 측정 범위: "전"은 영역마다 한 번(SIMBAD 단독은 3–4번), "후"는 영역마다 한두 번이다. VizieR 미러 상태가 시각마다 달라 합계 요청 수의 차이(예: 91 → 96, 83 → 89)는 SIMBAD 감소보다 큰 잡음이다. 이 날 Gaia는 ESA 원본이었다(점검은 11-25 12:00 CET부터).
 - 정상인 날의 수집 시간(5절의 모형값)은 Data Lab이 정상인 날에 재서 확인해야 한다.
 - 범위 밖으로 둔 것: 대기 규칙 변경, 분류 코드 변경, 깊은 COSMOS 수집, DR4 전환.
+
+---
+
+## 10. 병합 전 검토 (코드 개발 세션)
+
+검토·계획 세션의 요청으로 8d04336을 검토했다. 확인한 것과 더한 것은 아래와 같다.
+
+### 10.1 astroquery의 VizieR 디스크 캐시를 실제로 끔
+- **문제.** 4.1절의 관찰은 맞다. `controller._disable_astroquery_cache()`(2.19.0)는 "astroquery의 디스크 캐시가 `archive_cache`와 겹치므로 끈다"며 `cache_conf.cache_active = False`를 둔다. 그런데 astroquery 0.4.11의 `Vizier.query_region_async`, `query_constraints_async`, `query_object_async`는 기본값 `cache=True`를 명시해서 넘긴다. 이 명시값이 전역 설정을 이긴다(`BaseQuery._request`: `if cache is None: cache = cache_conf.cache_active`).
+- **결과.** 2.19.0의 결정은 VizieR에서 한 번도 작동하지 않았다. 모든 VizieR 응답이 7일 동안 `~/.cache/astropy/astroquery/Vizier`에서 재생되었다. 저장소 캐시의 규칙(코드 해시, 부분 실패는 저장 안 함, 대체 출처는 하루)을 거치지 않고, `V2_CACHE=0`으로도 꺼지지 않았다. 2026-11-07처럼 미러가 표 없이 답한 응답도 7일 남을 수 있었다.
+- **사용자 결정이 필요한 새 정책이 아니다.** 이미 정한 정책(2.19.0)이 작동하지 않던 버그다. 그래서 고쳤다.
+  - `_catalog_utils.vizier_query`와 `pn_spectroscopy`의 `query_constraints`에 `cache=False`를 넘긴다.
+  - 시험: `test_vizier_cone_queries_bypass_astroquerys_disk_cache`.
+- **속도 영향.** 같은 영역을 다시 검색하면 `archive_cache`(기본 켬, 90일)가 수집기 결과를 준다. 그래서 실사용의 반복 검색은 거의 느려지지 않는다. 빨라 보이던 것은 측정 조건(따뜻한 캐시)이었다.
+- **SDSS는 그대로 둔다.** astroquery의 SDSS 질의도 `cache=True`가 기본값이다. 다만 2.56.0이 오류 페이지를 그 캐시에서 지우는 처리(`_forget_cached`)를 넣었고, 이번 범위 밖이라 두었다. 같은 방식으로 끄는 것이 일관되므로 다음 할 일로 적는다.
+- **시간 측정의 함의.** 2.54–2.59 보고서의 "정상인 날" 수집 시간 일부는 같은 영역을 되풀이해 잰 따뜻한 캐시 값이다(검토 세션 확인과 같다). 앞으로의 시간 측정은 새 영역이나 빈 `XDG_CACHE_HOME`으로 한다. 이 고침 뒤에는 기본이 차가운 조건이다.
+
+### 10.2 SIMBAD 직접 TAP
+- **열 고정.** `test_the_cone_query_selects_what_astroquery_selected`가 열 목록(`MAIN_COLUMNS` 16개)과 순서를 고정한다. astroquery 판이 바뀌어도 이 수집기는 astroquery의 질의 본문을 쓰지 않으므로 열 구성이 따라 바뀌지 않는다. SIMBAD가 열 이름을 바꾸면 400이 나고, astroquery 경로로 돌아간다.
+- **`otypedef` LEFT JOIN.** LEFT JOIN이라 `otypedef`에 없는 코드의 천체도 남고, 라벨만 비어 있다. `otype`이 `otypedef`에서 유일하지 않더라도 행이 늘어날 뿐이다. 바로 뒤의 `drop_duplicates(catalog_object_id)`가 천체당 한 행으로 줄이고, 라벨은 그 뒤에 꺼내므로 행과 어긋나지 않는다.
+- **큰 원뿔의 메모리.** 측정은 COSMOS 10′(59,540개) 최대 788 MB, 20′(192,486개) 1.9 GB였다. 무게의 대부분은 참고문헌 응답(천체 × 논문, 제목 포함)이다. 참고문헌은 분류에 쓰이지 않는 선택 정보다.
+  - 천체가 `REFERENCE_MAX_OBJECTS` = 60,000(측정한 10′ 경우가 들어가는 값)을 넘는 원뿔에서는 참고문헌을 묻지 않는다. `simbad_reference_status = skipped:more_than_60000_objects`로 표시하고, 원뿔 행은 그대로 받는다(수집기 실패 아님).
+  - 시험: `test_a_cone_with_very_many_objects_skips_the_references`.
+  - 2.54.0 경로라면 같은 원뿔에서 참고문헌 질의만 수백 번이라 수집기 예산(300 s) 안에 끝나지 않았다.
+  - 참고문헌을 건너뛴 결과는 저장소 캐시에 넣지 않는다(`simbad_reference_query_status = skipped…`, PR #76 Codex 검토). 캐시는 큰 원뿔로 그 안의 작은 원뿔을 채우므로, 넣으면 작은 검색도 참고문헌 없이 나온다.
+
+### 10.3 실패한 서버 기억이 복구를 늦추지 않는가
+- **순서만 바꾸고 건너뛰지 않는다**(`_ordered_servers`, `_vizier_order`).
+- **기억이 사라지는 조건.** 기억은 마지막 실패에서 600 s 뒤에 사라진다. 그 서버가 답하면 그 즉시 사라진다.
+- **CDS가 복구된 경우.**
+  - 미러가 정상이면 Strasbourg는 묻지 않으므로 기억이 새로 쌓이지 않는다. 최대 10분 뒤 원래 순서로 돌아간다.
+  - 미러가 실패하면 그 검색이 Strasbourg를 물어 답을 받고 기억을 지운다.
+- 그래서 복구 뒤 미러를 쓰는 시간은 최대 10분이다.
+
+### 10.4 NED 이용 지침(동시 자동 질의 금지)
+- **앱과 파이프라인은 지킨다.**
+  - NED를 묻는 수집기는 `ned.py` 하나다. 한 검색 안에서 수집기는 서로 다르므로 NED 질의는 한 번에 하나이고, 요청마다 3–5 s 대기가 있다(초당 1회 이하).
+  - 앱은 실행 중에 새 실행을 받지 않는다. `--retry-failed`도 앞 실행이 끝난 뒤에 돈다.
+- **벤치마크 워크플로는 지키지 않는다(이번 변경 전부터).** `experiment-ab-fields.yml`(영역 행렬 max-parallel 20)과 `v2_independent_truth.yml`(6)은 영역마다 전체 파이프라인을 돌린다. 그래서 러너들이 NED를 동시에 묻는다. 블라인드 결과에서는 NED 파일을 빼지만 질의는 이미 나간 뒤다.
+- **할 일.** `v2_deep_cosmos.yml`과 `collect_deep_cosmos.py`는 NED를 수집하지 않으므로 해당하지 않는다. 앞의 두 워크플로에서 NED를 직렬화하거나 블라인드 수집에서 빼는 것을 다음 할 일로 둔다. 이번 PR 범위를 넓히지 않았다.
+
+### 10.5 정확도·속도
+- 1차·세부 라벨은 바뀌지 않는다(6절). 이번 검토 수정도 수집 경로만 바꾼다(VizieR 디스크 캐시, 큰 원뿔의 SIMBAD 참고문헌). 세트 C는 채점하지 않는다.
+- 시험 283개 통과(앱 시험 포함, 검토 시험 2개 추가). CI 시험 작업에는 astroquery가 없어, VizieR 캐시 시험은 가짜 `astroquery.vizier` 모듈로 돈다(Codex 검토).

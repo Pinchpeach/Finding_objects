@@ -49,7 +49,9 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
         rec = {"catalog_object_id": png, "object_name": "PNG " + png, "ra": raval.loc[idx], "dec": decval.loc[idx]}
         records.append(rec)
         try:
-            detail = Vizier(columns=["**"], row_limit=-1).query_constraints(catalog=INTENS, PNG=png)
+            detail = Vizier(columns=["**"], row_limit=-1).query_constraints(
+                catalog=INTENS, PNG=png, cache=False
+            )  # _catalog_utils.vizier_query
         except Exception as exc:
             # Unknown, not "no spectra": a failed query must not read as zero (2.23.0).
             rec.update(pn_spectra_count=pd.NA, pn_query_status=f"error:{type(exc).__name__}")
