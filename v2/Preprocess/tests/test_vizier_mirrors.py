@@ -605,3 +605,26 @@ def test_a_mirror_whose_probe_says_it_lacks_the_catalogue_is_not_an_empty_cone_w
 
     with pytest.raises(RuntimeError, match="lacks the catalogue"):
         throttle._with_mirrors(send)(None, "POST", "https://vizier.cds.unistra.fr/viz-bin/votable", data=MINI)
+
+
+def test_a_failed_confirmation_is_not_settled_by_the_existence_probe():
+    """PR #78 review: CfA's cone answer has no table, its confirmation fails with 503 and its existence probe finds the
+    catalogue; the cone must not be taken as empty: the next mirror's rows win."""
+    calls = {"cfa": 0}
+
+    class R:
+        def __init__(self, code, text):
+            self.status_code, self.text, self.headers = code, text, {"Content-Type": "text/xml;content=x-votable"}
+
+    def send(self, method, url, *a, data=None, **k):
+        host = url.split("/")[2]
+        if host == "vizier.cds.unistra.fr":
+            raise __import__("requests").exceptions.ConnectionError("refused")
+        if host == "vizier.cfa.harvard.edu":
+            calls["cfa"] += 1
+            return {1: R(200, EMPTY), 2: R(503, "")}.get(calls["cfa"], R(200, ROWS))  # cone, confirmation, probe
+        return R(200, ROWS.replace("<TD>1</TD>", "<TD>nao</TD>"))
+
+    r = throttle._with_mirrors(send)(None, "POST", "https://vizier.cds.unistra.fr/viz-bin/votable", data=MINI)
+    assert "nao" in r.text  # not CfA's empty cone
+    assert calls["cfa"] == 2  # no existence probe after a failed confirmation

@@ -282,6 +282,11 @@ def _confirm_status(send, session, method, target, args, kwargs) -> str:
             _log(target.split("/")[2], f"confirm backend error, again: {reason[:60]}", t0)
             continue
         break
+    if resp.status_code != 200:
+        # a failed confirmation (503, 404 ...) says nothing about the cone: the next mirror is asked (PR #78 review:
+        # it was "no table", and an existence probe that found the catalogue then accepted the first, empty answer)
+        _log(target.split("/")[2], f"confirm {resp.status_code} error", t0)
+        return "error"
     text = (resp.text or "").upper()
     if reason is not None:
         what = _error_kind(reason)
