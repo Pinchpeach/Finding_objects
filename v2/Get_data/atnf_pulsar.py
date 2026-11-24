@@ -50,7 +50,7 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
         except BaseException as exc:
             box["error"] = exc
 
-    t = threading.Thread(target=heasarc, daemon=True)
+    t = threading.Thread(target=heasarc, daemon=True, name=throttle.child_name("heasarc"))
     t.start()
     t.join(HEASARC_BUDGET_S)
     if "df" in box:

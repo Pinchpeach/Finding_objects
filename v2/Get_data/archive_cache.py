@@ -266,6 +266,63 @@ def note_outcome(
         print(f"[cache] failure memory not updated ({exc!r})", flush=True)
 
 
+# Servers that failed (2.60.0).  A collector with two equivalent servers (SIMBAD: CDS Strasbourg and its
+# Harvard-CfA mirror) asks the second when the first fails.  That failure was forgotten when the process ended,
+# so every search paid for the failing server again: Strasbourg has answered 404 to every SIMBAD request since
+# 2026-11-15, two requests and ~8 s of the 3-5 s pauses per search.  ``note_source(key, ok)`` remembers a failed
+# server for the failure memory (V2_FAILURE_MEMORY_S, 600 s; 0 or V2_CACHE=0 = off) and any answer of it forgets
+# the failure; ``source_down(key)`` tells the collector to ask that server last (never to skip it).
+def _sources_path() -> Path:
+    return root() / "sources.json"
+
+
+def _read_sources() -> dict:
+    try:
+        d = json.loads(_sources_path().read_text())
+    except Exception:
+        return {}
+    now = time.time()
+    return {k: float(t) for k, t in d.items() if isinstance(t, (int, float)) and now - float(t) <= failure_memory_s()}
+
+
+def down_keys() -> set:
+    """Every server key remembered as failed (one read of the file)."""
+    if not enabled() or failure_memory_s() <= 0:
+        return set()
+    return set(_read_sources())
+
+
+def source_down(key: str) -> bool:
+    """True when ``key`` (e.g. ``simbad:simbad.cds.unistra.fr``) failed less than the failure memory ago."""
+    if not enabled() or failure_memory_s() <= 0:
+        return False
+    return key in _read_sources()
+
+
+def note_source(key: str, ok: bool) -> None:
+    """Remember that ``key`` failed (``ok`` False) or forget its failure (``ok`` True)."""
+    if not enabled() or failure_memory_s() <= 0:
+        return
+    try:
+        known = _read_sources()
+        if ok and key not in known:
+            return  # nothing to forget: no file access on the normal path
+        root().mkdir(parents=True, exist_ok=True)
+        with _LOCK, _FileLock(root() / "sources.lock"):
+            d = _read_sources()
+            if ok:
+                d.pop(key, None)
+            else:
+                d[key] = time.time()
+            path = _sources_path()
+            fd, tmp = tempfile.mkstemp(dir=path.parent, suffix=".json.tmp")
+            with os.fdopen(fd, "w") as fh:
+                json.dump(d, fh)
+            os.replace(tmp, path)
+    except Exception as exc:  # never fail a collection over this
+        print(f"[cache] source memory not updated ({exc!r})", flush=True)
+
+
 def cacheable(df: pd.DataFrame) -> bool:
     """False for partial results (a ``*_query_status`` column reporting a
     failure); an alternative source's complete answer is cacheable (briefly)."""

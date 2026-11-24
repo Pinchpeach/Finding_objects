@@ -21,6 +21,7 @@ import sys
 
 if str(Path(__file__).resolve().parent) not in sys.path:  # loaded by file path elsewhere
     sys.path.insert(0, str(Path(__file__).resolve().parent))
+import throttle  # noqa: E402  (child_name for the V2_HTTP_LOG thread names)
 from gaia_release import SLOT_CATALOG, current as _release, table as _table, RELEASES
 from _catalog_utils import BASE, pick, save_csv, vizier_cone
 
@@ -181,7 +182,7 @@ def _bounded(fn, budget_s, *args):
         except BaseException as exc:
             box["error"] = exc
 
-    t = threading.Thread(target=target, daemon=True)
+    t = threading.Thread(target=target, daemon=True, name=throttle.child_name("tap"))
     t.start()
     t.join(budget_s)
     if t.is_alive():
