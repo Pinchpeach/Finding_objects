@@ -1,0 +1,7 @@
+split,truth_reading,n_truth_r_gt_22_galaxy,hc_b,purity_b,purity_b_lower84,completeness_b,hc_a,purity_a,purity_a_lower84,completeness_a,released,released_TYPE1,released_TYPE2,released_GALAXY,released_STAR
+cal,cosmos2020,11986,11868,0.9831,0.9818,0.9734,11868,0.9831,0.9818,0.9734,0,0,0,0,0
+cal,extended,12190,12078,0.9808,0.9795,0.9718,12078,0.9808,0.9795,0.9718,0,0,0,0,0
+test,cosmos2020,12395,12301,0.9831,0.9819,0.9756,12301,0.9831,0.9819,0.9756,0,0,0,0,0
+test,extended,12609,12517,0.9815,0.9803,0.9744,12517,0.9815,0.9803,0.9744,0,0,0,0,0
+all,cosmos2020,24381,24169,0.9831,0.9822,0.9745,24169,0.9831,0.9822,0.9745,0,0,0,0,0
+all,extended,24799,24595,0.9812,0.9803,0.9731,24595,0.9812,0.9803,0.9731,0,0,0,0,0

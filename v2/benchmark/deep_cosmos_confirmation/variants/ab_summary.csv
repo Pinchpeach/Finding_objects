@@ -1,0 +1,5 @@
+variant,n,acc,unknown,fixed,broken,truth_with_fragments,recall_STAR,recall_GALAXY,recall_QSO,n_fields,bal_acc,acc_lo,acc_hi,bal_lo,bal_hi,precision_STAR,precision_GALAXY,precision_QSO,baseline_majority,baseline_dsc,ours_on_dsc,dsc_coverage,unmatched_truth_pct,mcnemar_p,only_variant_right,only_base_right,w1_changed,w1_median_abs_diff
+base,32814,96.718,14,0,0,1995,80.95,98.29,,17,89.62,96.55,96.86,88.94,90.36,82.96,98.12,0.0,GALAXY 90.93,92.66,99.84,2.0,1.42,,,,,
+pi22,32814,96.697,19,0,7,1995,80.92,98.27,,17,89.6,96.52,96.85,88.88,90.36,82.95,98.15,0.0,GALAXY 90.93,92.66,99.84,2.0,1.42,0.015625,0.0,7.0,0.0,0.0
+pi22lit,32814,96.693,19,0,8,1995,80.92,98.27,,17,89.59,96.52,96.84,88.89,90.36,82.95,98.15,0.0,GALAXY 90.93,92.66,99.84,2.0,1.42,0.0078125,0.0,8.0,0.0,0.0
+qa,32814,96.697,17,0,7,1995,80.92,98.27,,17,89.6,96.52,96.85,88.88,90.36,82.95,98.15,0.0,GALAXY 90.93,92.66,99.84,2.0,1.42,0.015625,0.0,7.0,0.0,0.0

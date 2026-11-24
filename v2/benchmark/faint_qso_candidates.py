@@ -648,6 +648,10 @@ def main() -> int:
     hc.add_argument("--base", default="base")
     hc.add_argument("--variant", required=True)
     hc.add_argument("--out", type=Path, required=True)
+    sc = sub.add_parser("scores", help="p_qso scores (accuracy, ECE, NLL, Brier) on the type-1-extended truth (2.60.2)")
+    sc.add_argument("--deep", type=Path, required=True)
+    sc.add_argument("--variants", default="base")
+    sc.add_argument("--out", type=Path, required=True)
     t = sub.add_parser("tables")
     t.add_argument("--deep", type=Path, required=True)
     t.add_argument("--variants", default="base")
@@ -673,6 +677,19 @@ def main() -> int:
     if a.cmd == "highconf":
         e = high_confidence_effect(matched(a.deep, a.base), matched(a.deep, a.variant))
         e.to_csv(a.out / f"highconf_{a.variant}.csv", index=False)
+        pd.set_option("display.width", 250)
+        print(e.to_string(index=False))
+        return 0
+    if a.cmd == "scores":
+        rows = []
+        for v in a.variants.split(","):
+            m = matched(a.deep, v)
+            for split in ("cal", "test", "all"):
+                x = m if split == "all" else m[m.split == split]
+                for lo, hi in ((CAND_R_MIN, CAND_R_MAX), (22.0, 23.0), (23.0, 24.0)):
+                    rows.append({"variant": v, "split": split, "r": f"{lo:g}-{hi:g}", **probability_scores(x, lo, hi)})
+        e = pd.DataFrame(rows)
+        e.to_csv(a.out / "probability_scores.csv", index=False)
         pd.set_option("display.width", 250)
         print(e.to_string(index=False))
         return 0
