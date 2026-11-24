@@ -1,4 +1,4 @@
-# v2/document — 인용 문헌 모음
+# v2/document — 인용 문헌 모음과 개요 문서
 
 v2의 분류기 코드와 문서가 근거로 인용하는 과학 논문, 카탈로그·탐사 출판물, 설명서를 한곳에 모은 폴더입니다.
 작업 규칙 1(과학적 근거 우선)에 따라 규칙·임계값·모델에는 문헌 근거가 붙어 있는데, 이 인용은
@@ -10,6 +10,10 @@ v2의 분류기 코드와 문서가 근거로 인용하는 과학 논문, 카탈
 | 파일 | 내용 |
 |---|---|
 | [`PAPERS.md`](PAPERS.md) | 분야별 표. 인용, 학술지·권·쪽, ADS bibcode, 사용처(파일·규칙 ID), 용도. 끝에 "확인이 필요한 인용" 목록이 있음 |
+| [`OVERVIEW_v2.60.2.pdf`](OVERVIEW_v2.60.2.pdf) | 프로그램 개요(영어, 9쪽). 저장소 첫 화면 `README.md`와 같은 원본에서 생성 |
+| [`overview_content.py`](overview_content.py), [`build_overview.py`](build_overview.py) | 그 원본과 생성기. `python v2/document/build_overview.py`가 `README.md`와 PDF를 다시 쓴다(`pip install reportlab`, DejaVu Sans 글꼴). 글은 `overview_content.py`에서만 고친다 |
+| `OVERVIEW_v2.36.1.pdf` | 이전 개요(한국어, 2.36.1). 수치는 낡았다 |
+| `PIPELINE_STACK_v2.44.0.pdf`·`.pptx`·`_preview.png` | 2.44.0 발표 자료(영어, 12쪽). 갱신하지 않았다 |
 | [`papers.csv`](papers.csv) | 같은 항목의 기계 판독용 표. 열: `category, citation, journal_ref, bibcode, used_in, purpose` (`used_in`은 `;`로 구분) |
 
 ## 구성 원칙

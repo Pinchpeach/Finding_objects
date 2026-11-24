@@ -1,303 +1,321 @@
-[![Finding Objects v2 — pipeline and tech stack (v2.44.0)](v2/document/PIPELINE_STACK_v2.44.0_preview.png)](v2/document/PIPELINE_STACK_v2.44.0.pdf)
+# Finding Objects: program overview
 
-**Pipeline and tech stack overview (v2.44.0, 12 slides):** [PDF](v2/document/PIPELINE_STACK_v2.44.0.pdf) · [PPTX](v2/document/PIPELINE_STACK_v2.44.0.pptx)
+Program version 2.60.2 · 2026-11-24 · A field-level multi-catalogue integration and annotation tool for sources on the sky (radio to X-ray), with a coarse STAR / GALAXY / QSO classifier and a sub-classification layer
 
----
+**Read first:** [Overview PDF, version 2.60.2 (English)](v2/document/OVERVIEW_v2.60.2.pdf) · [Release 2.60.2 with Windows, macOS and Linux downloads](https://github.com/Pinchpeach/Finding_objects/releases/tag/v2.60.2) · [How to run](#12-running-it) · [Algorithm in detail (Korean)](v2/ALGORITHM.md) · [Changelog (Korean)](v2/CHANGELOG.md)
 
-# Finding Objects — 프로그램 개요
+The older material is listed in [section 15](#15-other-documents): the 2.36.1 overview (Korean) and the 2.44.0 deck (English) are kept but not updated.
 
-버전 2.55.0 · 전 파장대 관측 자료로 하늘 영역의 천체를 찾고 분류하는 프로그램
+## 1. At a glance
 
-이전 판(2.36.1) 개요 PDF: [`v2/document/OVERVIEW_v2.36.1.pdf`](v2/document/OVERVIEW_v2.36.1.pdf) · 알고리즘 상세: [`v2/ALGORITHM.md`](v2/ALGORITHM.md) · 버전별 변경: [`v2/CHANGELOG.md`](v2/CHANGELOG.md)
-
-## 1. 한눈에 보기
-
-| 항목 | 내용 |
+| Item | What it is |
 |---|---|
-| 목적 | 하늘의 한 영역(중심 좌표 + 반경)에 있는 모든 천체를 찾고, 전파부터 X선까지의 공개 목록을 종합해 종류를 판정한다. |
-| 입력 | 천체 이름 또는 좌표(RA, Dec)와 반경. 또는 이미 모아 둔 목록 파일 폴더. |
-| 1차 분류 | `STAR` · `GALAXY` · `QSO` · `UNKNOWN`. 증거가 부족하면 이유와 함께 `UNKNOWN`으로 기권한다. 실제로 판정을 정하는 것은 광학 색·형태, Gaia 천체측정·DSC, WISE 중적외선이다. X선·전파는 세부 분류와 표지에 쓴다(2.51.0 파장대 끄기 시험). |
-| 판정 출처 | 판정마다 `CATALOG`(목록에서 옮김) / `EXTERNAL_CLASSIFIER`(다른 탐사의 분류기) / `INFERRED`(측정에서 추론)를 표시한다(2.51.0). 1차 클래스는 목록 표지를 빼도 측정만으로 같은 클래스가 나오면 `INFERRED`다(2.55.0). NED·SIMBAD 문헌 종류만 있고 측정이 없는 천체는 확률 없이 `LITERATURE_LABEL`로 둔다(2.54.0). |
-| 세부 분류 | 분광형, 백색왜성, 뜨거운 준왜성, 초저온 왜성, 적색거성·AGB(탄소/산소), 변광성(미라·세페이드·RR Lyrae·YSO), 펄서, AGN, 블레이자, 행성상성운, 은하 활동성 등. 여기에 5개 독립 축이 더해진다. |
-| 출력 | `objects_summary.csv`(2.54.0): 먼저 읽을 열 29개만, 탐사에 검출된 독립 천체당 한 행. 마지막 쪽의 `run_archives_status`·`run_archives_missing`(2.57.0)은 이 검색에서 아카이브가 빠졌거나 대체 자료로 받았는지를 모든 행에 적는다(`complete`일 때만 완전한 실행; CSV만 전달돼도 불완전한 실행임을 알 수 있다). 큰 은하의 조각과 NED·SIMBAD에만 있는 항목(`literature_only_entries.csv`)은 따로 둔다. `classified_objects.csv`: 모든 단계의 열을 담은 전체 기록(천체당 한 행, 1,500–2,400열). 단계별 CSV와 아카이브 상태 파일(`catalog_coverage.json`)도 함께 나온다. |
-| 사용 방법 | 데스크톱 앱(Windows·macOS·Linux, 파이썬 설치 불필요) 또는 명령줄 `v2/pipeline.py` |
-| 원칙 | 모든 임계값·규칙은 문헌 근거를 코드 주석과 `LITERATURE*.md`에 남긴다. 정확도와 속도를 함께 측정한다. |
+| What it does | You give it a position and a radius (or an object name). It asks **30 public archives** for every catalogued source there, cross-matches the detections into **one row per object**, and reports for each object a coarse class, a sub-class where one can be given, the evidence behind the decision and **where each decision came from**. |
+| Input | An object name (Sesame) or RA, Dec in degrees plus a radius; or a folder of catalogue files that were already collected (`--raw-dir`). |
+| Coarse class | `STAR`, `GALAXY`, `QSO` or `UNKNOWN` (the classifier abstains, and says why, when the evidence is weak or in conflict). **What decides the class is optical colour and morphology, WISE mid-infrared colours, Gaia astrometry and the Gaia DSC class probabilities.** X-ray and radio data contribute nothing measurable to the coarse class (rule-ablation tests, version 2.51.0); they are used for tags and sub-types. It is not an "all-wavelength" classifier. |
+| Provenance | Every decision says whether it was copied from a catalogue (`CATALOG`), taken from another survey's classifier (`EXTERNAL_CLASSIFIER`), inferred from measurements by this program (`INFERRED`) or is missing (`NONE`). The accuracy of a look-up is the accuracy of the catalogue it came from. |
+| Sub-classes | Spectral types, white dwarfs, hot subdwarfs, ultracool dwarfs, red giants and AGB stars (carbon or oxygen rich), variable stars, pulsars, AGN and blazars, planetary nebulae, galaxy activity and more, plus five independent axes (physical state, variability, compact objects, extragalactic, phenomena). **Most sub-classes are catalogue look-ups**, see section 6. |
+| Output | `objects_summary.csv` (29 columns to read first, one row per independent detected object), `classified_objects.csv` (the full record, 833–2,513 columns in the three 2.60.2 test fields depending on how many archives cover the field), `literature_only_entries.csv` (objects known only from NED or SIMBAD), stage CSVs, `catalog_coverage.json` and `pipeline_summary.csv`. |
+| How to use | Desktop app for Windows, macOS and Linux (no Python needed) or the command line `v2/pipeline.py`, see section 12. |
+| Working rules | Every threshold and rule needs a literature basis recorded in a code comment or a `LITERATURE*.md` note. Accuracy and speed are measured together; a change that costs one needs measurements for both. |
 
-## 2. 처리 흐름
+## 2. Processing flow
 
-```
-(RA, Dec, 반경)
-  │
-  ├─ 수집         30개 수집기 병렬 조회 (요청마다 3–5초 간격, 수집기별 시간 제한, 로컬 캐시,
-  │               VizieR·SIMBAD 미러, PS1 VizieR 사본, 관측 범위 밖 탐사 건너뛰기)
-  │               실패한 수집기는 기록된다
-  ├─ 1 연관       같은 천체의 검출을 묶음 — 위치·관측 시기·오차·고유운동을 고려한 우도비
-  ├─ 2 통합       천체당 한 행, 단위 통일 (AB 등급, mJy, 적색이동)
-  ├─ 3 특징       색·형태·품질 지표, 목록별 품질 신뢰도
-  ├─ 4 증거       37개 문헌 규칙이 STAR / GALAXY / QSO 증거를 냄
-  ├─ 5 1차 분류   학습된 융합 (경사 부스팅 나무 + 선형 모델), 결정적 운동 규칙, 은하 위도 사전확률, 기권
-  ├─ 6–7 세부 분류 세부 분류기 + 5개 독립 축 (물리 상태·변광·밀집천체·외부은하·현상)
-  └─ 후처리       큰 은하 조각, PS1 중복, 밝은 별 헤일로, 미확인 검출, 전파 성분, 은하단,
-                  아카이브 경고, 고신뢰 판정
-  ↓
-objects_summary.csv (요약) · literature_only_entries.csv · classified_objects.csv (전체)
-```
+| Stage | What happens |
+|---|---|
+| **Collect** | 30 collectors in parallel (6 workers, a time budget per archive, a 3–5 s pause before every request, local cache, mirrors and fallback routes, footprint checks that skip archives that do not cover the field). A failed collector is recorded, not hidden. |
+| **1 Associate** | Detections of the same object are grouped: positional likelihood ratio with each catalogue's error model, epoch and proper-motion propagation, chance-coincidence probability. |
+| **2 Integrate** | One row per object, all original columns kept, units unified (AB magnitudes, mJy, redshift). |
+| **3 Features** | Colours, morphology, signal-to-noise, quality flags, per-catalogue quality confidence. |
+| **4 Evidence** | 35 literature-based rules turn measurements into STAR / GALAXY / QSO evidence. |
+| **5 Coarse class** | Trained fusion (gradient-boosted trees plus a sign-constrained linear model), deterministic motion rule, one prior layer (position, magnitude, faint star:galaxy ratio), abstention. |
+| **6-7 Sub-classes** | Sub-classifiers and five independent axes, each with the measured precision of the rule. |
+| **Post-processing** | Large-galaxy fragments, duplicate PS1 detections, bright-star halos, unconfirmed detections, radio components, galaxy clusters, archive warnings, faint-quasar candidate flag, high-confidence flag. |
 
-## 3. 사용하는 관측 자료 (30개 수집기)
+Output: `objects_summary.csv` (summary), `literature_only_entries.csv`, `classified_objects.csv` (full record). Every stage also writes its own CSV into the work directory so intermediate products can be inspected.
 
-| 파장·종류 | 목록 | 주로 주는 정보 |
+## 3. Data sources (30 collectors)
+
+| Kind | Collectors | Mainly provides |
 |---|---|---|
-| 위치측정 | Gaia DR3 (+ 변광 SOS, DSC·천체물리 변수) | 시차·고유운동(별의 결정적 증거), 분류 확률, 변광 |
-| 광학 영상 | Pan-STARRS1 DR2, DESI Legacy Surveys DR10, SDSS DR18 영상 | 색, 형태(점광원/퍼진 광원), 어두운 천체 분류(LS-GBM) |
-| 자외선·적외선 | GALEX, 2MASS, AllWISE | UV 색, 근적외 색, 중적외 AGN 색 |
-| 전파 | LoTSS, FIRST, NVSS, TGSS, VLASS | 전파 세기, 전파 성분 |
-| X선 | 4XMM, Chandra CSC, eROSITA eRASS1 | X선/광학 비(AGN), 은하단 가스 |
-| 분광 | SDSS, DESI DR1 (+FastSpecFit), LAMOST DR5 | 분광 종류(1차 분류 증거), 적색이동, 방출선, 항성 변수 |
-| 시간 영역 | ZTF 주기 변광성 | 변광성 세부형 |
-| 특수 목록 | ATNF 펄서, Roma-BZCAT, AGB(Suh 2021), Siena Galaxy Atlas, 은하단 목록 | 펄서·블레이자·AGB 표지, 큰 은하 크기, 은하단 |
-| 문헌 데이터베이스 | SIMBAD, NED | 문헌 표지(낮은 가중치의 증거) |
+| Astrometry | Gaia DR3 (+ variability SOS, DSC, astrophysical parameters) | parallax and proper motion (decisive evidence for stars), class probabilities, variability |
+| Optical | Pan-STARRS1 DR2, DESI Legacy Surveys DR10, SDSS DR18 imaging | colours, morphology (point source or extended), faint-object machine-learning evidence (LS-GBM) |
+| UV / infrared | GALEX, 2MASS, AllWISE | UV colour, near-infrared colour, mid-infrared AGN colours |
+| Radio | LoTSS DR2, FIRST, NVSS, TGSS, VLASS | radio flux, multi-component radio sources |
+| X-ray | 4XMM-DR13, Chandra CSC 2.0, eROSITA eRASS1 | X-ray to optical ratio (tags and sub-types), cluster gas |
+| Spectroscopy | SDSS DR18, DESI DR1 (+ FastSpecFit), LAMOST DR5 | spectral class (evidence), redshift, emission lines, stellar parameters |
+| Time domain | ZTF periodic variables | variable-star sub-types |
+| Special lists | ATNF pulsars, Roma-BZCAT, Suh 2021 AGB stars, Siena Galaxy Atlas, galaxy-cluster lists, MYStIX young stars, Galaxy Zoo DESI | pulsar, blazar and AGB tags, large-galaxy sizes, cluster membership, young-star membership, galaxy morphology |
+| Literature databases | SIMBAD, NED | literature object types (low-weight evidence; objects known only from the literature are listed separately) |
 
-핵심 아카이브(Gaia, PS1, Legacy Surveys, AllWISE)가 조회에 실패하면 결과 표 위에 경고가 뜬다. 이때 측광만으로 판정하는 고신뢰 경로는 쓰지 않는다.
+If a key archive (Gaia, Pan-STARRS1, Legacy Surveys, AllWISE) cannot be queried, a warning is shown above the result table and the photometry-only high-confidence path is switched off. Section 10 describes the fallback routes.
 
-아카이브 장애에 대한 대비(2.54.0):
-- **VizieR:** 공식 미러로 넘어간다. 미러가 빈 원뿔에 표 없이 답하면 같은 미러에 한 번 더 물어 확인한다. 응답하지 않는 미러는 뒤로 미룬다(2.60.0부터 이 기억이 검색 사이에서도 유지된다: 연속 검색에서 죽은 미러로 가는 요청 7–15번 → 0번).
-  - 2.60.2: 미러가 HTTP 200으로 "The database is not currently reachable"(표 없는 VOTable)를 주는 것을 빈 원뿔이나 "이 미러엔 카탈로그 없음"으로 읽지 않고 같은 미러에 한 번 더 묻는다(CfA, 2026-11-24 표본 24번 중 8번). 카탈로그가 없다는 답("Table or Catalog not found")은 그 미러를 해당 목록에서 뒤로 미룬다(24시간). 같은 카탈로그의 표 여럿(Suh 2021 AGB 4표, Gaia SOS 3표)은 한 요청으로 묻는다.
-- **SIMBAD (2.60.0):** 직접 TAP 질의 한 번으로 원뿔과 천체 유형 이름표를, 한 번 더 질의로 참고문헌을 받는다(2.59.0까지는 빈 원뿔 8번, COSMOS 2′ 19번). Strasbourg가 실패하면 Harvard 미러로 넘어가고, 실패한 서버는 10분간 맨 뒤로 보낸다(프로세스 사이에서 공유). SIMBAD가 질의를 거부하면 이전의 astroquery 경로를 쓴다.
-- **Pan-STARRS1:** MAST가 실패하면 VizieR의 DR2 사본을 쓴다.
-- **ATNF 펄서 (2.55.0):** HEASARC가 30초 안에 답하지 않으면 VizieR 사본(B/psr)을 쓴다.
-- **최근 실패 기억 (2.55.0, 범위 2.56.0):** 핵심이 아닌 수집기가 실패하면 10분 동안은 같은 영역에서 다시 기다리지 않는다(경고는 그대로 표시). 다른 영역은 시간 초과였거나, 실패에 30초 이상 걸렸거나, 두 영역에서 실패했을 때만 건너뛴다.
-- **Legacy Surveys (2.57.0):** Data Lab TAP이 30초 안에 답하지 않거나 한 번 실패하면, 같은 Tractor 행을 주는 Legacy Surveys 뷰어 카탈로그(`cat.fits`)에도 함께 묻고 먼저 온 답을 쓴다(반경 10′ 이하, DR10 South 영역만). 남쪽에서는 값이 같다(다섯 영역에서 `ls_id`와 45개 열이 일치). DR9 North 영역(북쪽 은하 반구, Dec ≥ 32.375°)에서는 뷰어 값이 TAP과 달라(i 밴드, `fracflux_*`) 쓰지 않는다.
-- **DESI 영역 밖 (2.59.0):** DESI DR1 공식 타일 목록(4,648개 중심, 반경 1.7° + 마진 1°) 밖의 영역은 DESI 분광(VizieR)과 FastSpecFit(Data Lab)을 묻지 않는다. 은하면 영역은 가장 가까운 타일이 11° 떨어져 있다. FastSpecFit는 시도 2회 × 50초로 줄었고(Data Lab이 답하면 4.9–19초, 멈추면 이전 3×80초도 모두 실패), 놓치면 `--retry-failed all`로만 되받는다(기본 `key`는 묻지 않는다).
-- **Gaia (2.57.0):** ESA 아카이브가 점검 안내 페이지를 돌려주면(HTTP 200이라 내용으로 판별) 비동기 재시도 없이 바로 VizieR 사본으로 간다. 사본의 세 질의는 동시에 보낸다. `V2_GAIA_SOURCE=vizier`로 ESA를 아예 묻지 않을 수 있다. 사본이 빠뜨리는 자료(변광 요약 `in_vari_*`, 광속 열)는 경고에 적힌다. FLAME·ESP-UCD는 사본(`I/355/paramp`)에서도 받는다(ESA 값과 VizieR 반올림 안에서 같음).
-- **실패한 수집기만 다시 받기 (2.57.0):** `python v2/pipeline.py --work DIR --retry-failed` (핵심 아카이브만, `all`은 실패한 전부). 앱에서는 경고 띠의 "Ask failed archives again" 버튼. 성공한 수집기는 묻지 않고, 10분 실패 기억도 이 요청을 막지 않으며, 대체 자료로 받은 Gaia·PS1은 원래 자료를 다시 받는다.
-- **관측 범위 밖:** NVSS·VLASS(δ < −40°), TGSS(δ < −53°), eROSITA-DE(동쪽 은하 반구)는 조회하지 않는다.
-  - 2.60.2부터: LoTSS DR2(공식 MOC에서 δ < +16°, 5,634 deg²), FIRST(공식 커버리지 지도 두 장의 RA·Dec 상자), MYStIX(20개 별탄생 영역의 원)도 영역 밖은 묻지 않는다. 경계의 출처와 해시는 `v2/Get_data/footprint.py` 머리말.
+## 4. Coarse classification (STAR / GALAXY / QSO)
 
-## 4. 1차 분류 (STAR / GALAXY / QSO)
+### What actually decides the class
 
-### 증거 규칙 37개 ([`v2/Preprocess/classification_rules.csv`](v2/Preprocess/classification_rules.csv))
+Rule-ablation tests (2.51.0; the same raw data classified with one rule group switched off) show which wavelengths do the work. Counts are objects whose label becomes right / wrong when the group is removed.
 
-| 규칙 묶음 | 개수 | 내용 |
-|---|---|---|
-| SPC (분광) | 9 | SDSS·DESI·LAMOST 분광 종류. 품질(경고 없음, Δχ², S/N)에 따라 신뢰도 1.0 또는 0.5 |
-| PS1 / LS / SDSS | 13 | 형태(PSF−Kron, Tractor 모형), 색 kNN, LS-GBM(어두운 천체 기계학습), 고적색이동 QSO 색 선택, PS1 변광(비활성) |
-| AST (Gaia) | 4 | 시차·고유운동이 유의하면 별, 0과 같으면 외부은하 |
-| DSC / VAR | 2 | Gaia 분류 확률, Gaia 변광 |
-| WISE | 2 | 중적외 AGN 색(Assef+2018 R90 등) |
-| RADIO / XRAY | 2 | 전파 세기, X선/광학 비 (선형 특징) |
-| SGA / NED / SIMBAD | 3 | 큰 은하 목록, 문헌 표지 |
-
-### 증거 결합
-
-- **혼합 융합:** 경사 부스팅 나무와 부호 제약 선형 모델을 학습해 기하평균한다. 학습 근거가 없는 증거(분광·문헌 표지)는 문헌 사전 가중치로 더한다.
-- **학습:** SDSS·DESI 정답 세트의 train 분할만 쓴다. test 분할은 보고용이다.
-- **결정적 운동:** Gaia 시차·고유운동이 10σ 이상이면 다른 증거와 충돌해도 STAR로 판정한다.
-- **은하 위도 사전확률:** |b| < 20°에서는 GALAXY·QSO 확률을 sin|b|/sin20°만큼 낮춘다. 학습 자료가 고위도뿐이기 때문이다.
-- **기권:** 확신도가 0.50 미만이거나 1·2위 차이가 작으면 `UNKNOWN`으로 두고 이유를 기록한다.
-
-## 5. 후처리와 결과 정리
-
-| 단계 | 하는 일 | 도입 |
-|---|---|---|
-| 큰 은하 묶기 | SGA D26 타원 안의 조각(HII 영역·핵·팔)을 모은하 아래로 묶음 | 2.2.0 |
-| PS1 중복·조각 | 한 은하를 PS1이 여러 번 잰 측정을 그 은하의 부속으로 묶음 | 2.34.0 |
-| 밝은 별 헤일로 | G < 16 별 주변의 단일 목록 가짜 천체를 별 아래로 묶음 | 2.35.0 |
-| 검출 품질 | PS1에만 2회 잡히고 더 깊은 LS에 없는 천체를 `UNCONFIRMED`로 표시 | 2.30.0 |
-| 어두운 QSO 후보 | 22 ≤ LS r < 24에서 라벨이 QSO가 아니어도 `p_qso` ≥ 0.1이면 `secondary_class = QSO`, 사유 `FAINT_QSO_CANDIDATE`. 1차 라벨은 그대로. 깊은 COSMOS에서 문턱을 정하는 데 쓰지 않은 21개 영역의 합: 1형 AGN 재현율 라벨만 20 % → 후보 포함 48 %(39–58 %), 후보 순도 29/119 = 24 %(18–33 %, HST/ACS가 덮은 곳의 후보만 세며 X선으로 고른 정답이라 하한; 2.60.2). 앱의 "Also" 열에는 회색 "QSO?"와 순도 툴팁으로 보인다(분류가 아니라 실마리) | 2.58.0 |
-| z 전용 검출 | LS에만 있고 r을 측정했는데 검출되지 않은 z ≥ 20 천체를 `UNCONFIRMED`로 표시(COSMOS2020 대응 천체 9 %, 우연 3.5 %) | 2.55.0 |
-| 전파 천체 | 목록 가짜 항목, 전파은하 lobe 같은 다중 성분을 `RADIO_COMPONENT`로 표시 | 2.31.0 |
-| 은하단 | BCG와 분광 적색이동으로 소속 판정 | 2.32.0 |
-| 태양계 천체 | PS1 표지와 SDSS 이동 속도로 소행성 판정 | 2.29.0 |
-| 아카이브 경고 | 실패한 수집기와 잃는 정보를 `catalog_coverage.json`과 앱 경고 띠로 알림. 2.57.0부터 결과 표의 `run_archives_*` 열에도 적고, 대체 자료로 받은 수집기가 잃는 열을 구체적으로 알림 | 2.36.0 |
-| 고신뢰 판정 | 분광으로 확인됐거나 실제 하늘 순도 ≥ 98 %이면 `high_confidence`와 근거를 기록. 2.59.0부터 `FAINT_QSO_CANDIDATE`가 붙은 천체에는 측광 고신뢰를 주지 않음(분광은 유지) | 2.36.0 |
-
-## 6. 세부 분류
-
-- **STAR:** 분광형·광도 계급(MK), 백색왜성(세부형 DA/DB 등), 뜨거운 준왜성, 초저온 왜성, 적색거성(RGB/AGB), AGB 화학형(탄소/산소), 미라·세페이드·RR Lyrae·YSO 변광, 쌍성 후보, 헤일로 별, 대변광성(CV) 등
-- **GALAXY:** 별 생성/정지/녹색 계곡, AGN 숙주(BPT·WISE·X선), 형태(원반·조기형), 은하단 소속
-- **QSO:** 측광 적색이동(z < 2.1 여부), 전파 강한 QSO, 블레이자
-- **5개 독립 축:** 물리 상태, 변광, 밀집천체(펄서·WD), 외부은하, 현상(행성상성운·초신성 잔해 등). 각 판정의 확신도는 독립 정답에서 잰 규칙 정밀도다.
-- **문헌 표지:** 분류되지 않은 천체도 SIMBAD/NED의 문헌 종류를 'from paper'로 보여 준다.
-
-## 7. 성능
-
-### 현재 핵심 수치 (1차 분류 STAR / GALAXY / QSO)
-
-| 시험 | 판 | 결과 | 비교 기준 |
+| Switched off | Bright fields (3,428 objects) | COSMOS deep fields (28,194) | Reading |
 |---|---|---|---|
-| **잠근 시험 세트 C** (60개 영역, 판마다 한 번·집계만, [`LOCKED_TEST_SET_C.md`](v2/benchmark/LOCKED_TEST_SET_C.md)) | 2.52.0 | **99.65 %** (99.40–99.86), 3,170개 | 전부 별 95.24 %; 같은 천체의 Gaia DSC 99.52 % (우리 99.81 %) |
-| 같은 세트 C, 첫 채점 | 2.51.0 | 99.62 % (99.34–99.86), 3,150개 | |
-| 사전확률 보정 시험 영역 (87개 영역 중 결과 보기 전에 정한 시험 영역, 13,857개) | 2.52.0 | **96.65 %** (2.51: 94.99 %), ECE 0.37 % | |
-| COSMOS 깊은 영역 (HST/ACS 정답, 28,194개) | 2.51.0 | 94.31 % | 전부 은하 91.09 % |
-| 하늘 전체 SDSS 분광 (처음 보는 9,999개, [`sdss_sky/`](v2/benchmark/sdss_sky/)) | 2.51.3 | 93.79 % (93.24–94.30); r > 21 88.0 %, QSO 재현율 84.1 % | |
-| SDSS / DESI 분광 벤치마크 시험 분할 | 2.52.0 | 97.99 % / 90.33 % | |
+| Optical colour | 7 / 22 | 935 / 1,895 | the backbone of the classification |
+| Optical morphology | 0 / 2 | 55 / 87 | matters at the faint end |
+| WISE mid-infrared | 1 / 3 | 3 / 22 | contributes; QSO recall 96 to 92 % without it |
+| Gaia astrometry | 2 / 4 | 0 / 0 | not significant in these samples |
+| Gaia DSC | 3 / 3 | 0 / 0 | no effect when Legacy Surveys is present (large effect when it is missing) |
+| Variability | 0 / 1 | 0 / 9 | small |
+| X-ray and radio | 0 / 0 | 0 / 0 | **no contribution to the coarse class** (third confirmation) |
 
-- **밝은 하늘에서는 안정적이다.** 다만 세트 C는 별이 약 95 %인 표본이라 은하·QSO 성능은 이 값으로 알 수 없다.
-- **어두운 끝(r > 21)과 QSO가 약하다.**
-- 세부 분류는 대부분 목록 조회다(판정 출처 `CATALOG`). 측정에서 추론한 세부 종류는 일부뿐이다(아래 세부 분류 정확도).
+Gaia parallax and proper motion remain decisive evidence when they are significant (rule below), although removing them changed few labels in these samples. X-ray, radio and UV information is used for tags and sub-types.
 
-아래는 판마다의 측정 이력이다.
+### Evidence rules (35 rows of `v2/Preprocess/classification_rules.csv`)
 
-### 벤치마크 (시험 분할, 학습에 쓰지 않음)
-
-| 시험 | 결과 | 비고 |
+| Group | Rows | Content |
 |---|---|---|
-| SDSS 분광 정답 (1,991개) | 97.94 % | 밝은 천체 위주 |
-| DESI DR1 분광 정답 (962개) | 88.98 % | r 18–23의 어두운 천체, 종류별 같은 수 |
+| Spectroscopy (SPC) | 9 | SDSS, DESI and LAMOST spectral classes; confidence 1.0 or 0.5 by quality. Excluded from validation, where spectra are the truth |
+| Optical (PS1, Legacy Surveys, SDSS) | 12 | morphology (PSF minus Kron, Tractor models), colour kNN, LS-GBM (gradient boosting trained on 149,769 DESI spectra, 95.6 % test accuracy), high-redshift QSO colour cut, PS1 variability |
+| Astrometry (Gaia) | 4 | significant parallax or proper motion means a Galactic star; consistent with zero means extragalactic |
+| Gaia DSC and variability | 2 | DSC class probability with its prior removed; Gaia variability |
+| WISE | 3 | mid-infrared AGN colours (Stern 2012, Assef 2018 R90) and a colour rule |
+| Radio and X-ray | 2 | radio strength, X-ray to optical ratio (linear features only) |
+| Lists (SGA, NED, SIMBAD) | 3 | large-galaxy catalogue, literature types (low weight) |
 
-벤치마크 정답은 QSO가 실제 하늘보다 수십~수백 배 많다(DESI는 종류별 같은 수). 2.40.0부터는 실제 하늘의 밝기별 QSO 비율을 사전확률로 쓰기 때문에 이 표본에서는 정확도가 낮게 나온다(2.39.1: 98.64 / 92.52 %). 대신 실제 하늘에 가까운 독립 영역에서는 QSO 오판이 줄고 정확도가 오른다(아래).
-| 같은 천체에서 다른 분류기와 비교 | Gaia DSC·LS 단독 ML·형태·WISE 색 기준보다 모두 높음 | [`v2/benchmark/COMPARISON_2026-10-21.md`](v2/benchmark/COMPARISON_2026-10-21.md) |
+### How the evidence is combined
 
-### 독립 검증: 200개 하늘 영역 (2.39.1)
+- **Fusion:** gradient-boosted trees and a sign-constrained multinomial logistic model, each trained on the train split of the SDSS and DESI spectroscopic benchmarks, combined as a geometric mean. Evidence without training support (spectra, literature types) enters through literature prior weights. The test split is for reporting only.
+- **Deterministic motion:** parallax or proper motion at 10σ or more with good quality means STAR, even against other evidence (extragalactic objects do not move).
+- **One prior layer (2.52.0):** the probabilities are trained on a 1:1:1 class mix, so the real-sky class mix is applied once, before the decision (Saerens et al. 2002): a local Gaia-density position prior, a magnitude prior for QSOs, and a faint star:galaxy ratio counted from COSMOS2020 truth (4 % stars at r = 24). Before 2.52.0 the faint ratio was applied to the label only, so probability and label disagreed for 1,635 of 28,194 COSMOS objects.
+- **Abstention:** the object is `UNKNOWN` with a reason when the top probability is below 0.50 or strong evidence conflicts (Chow 1970 reject option). `--min-confidence` raises the threshold.
+- **Literature-only objects:** if the only basis is a NED or SIMBAD type, the type is shown with status `LITERATURE_LABEL` and no probability (a catalogue type is not a calibrated classifier output).
 
-학습에 쓰지 않은 분광 탐사(LAMOST, 2QZ/6QZ, 2SLAQ, 2dFGRS, 6dFGS, WiggleZ, RAVE, APOGEE, Gaia-ESO 등)를 정답으로 썼다. 서로 3.5° 이상 떨어진 영역이고, 성단·별 생성 영역·마젤란 성운·별폭발 은하를 포함한다. 점수표는 [`v2/benchmark/independent_fields_scores/`](v2/benchmark/independent_fields_scores/).
+### Provenance of every decision
 
-| 항목 | blind (분광·문헌 목록 제외) |
+`CATALOG` (copied from a literature or spectroscopic list), `EXTERNAL_CLASSIFIER` (another survey's classifier: Gaia variability, ESP and DSC candidates, ZTF periodic list, Galaxy Zoo DESI), `INFERRED` (measured and inferred here), `NONE`. The coarse class is `CATALOG` only if removing the catalogue tags would change or remove the decision; if measurements alone give the same class it is `INFERRED`. The pipeline's own performance is therefore measured on `INFERRED` decisions.
+
+## 5. Post-processing and result tables
+
+| Step | What it does | Since |
+|---|---|---|
+| Large-galaxy grouping | pieces inside an SGA-2020 D26 ellipse (HII regions, nuclei, arms) are grouped under the parent galaxy | 2.2.0 |
+| PS1 duplicates | several PS1 measurements of one galaxy become parts of that galaxy | 2.34.0 |
+| Bright-star halos | single-catalogue artefacts around G < 16 stars are grouped under the star | 2.35.0 |
+| Unconfirmed detections | objects seen only twice in PS1 and absent from the deeper Legacy Surveys, and Legacy-Surveys-only z-band detections without an r detection, are marked `UNCONFIRMED` (9 % of the latter have a COSMOS2020 counterpart, chance 3.5 %) | 2.30.0, 2.55.0 |
+| Radio components | catalogue artefacts and lobes of radio galaxies are marked `RADIO_COMPONENT` | 2.31.0 |
+| Galaxy clusters | brightest cluster galaxy and spectroscopic-redshift membership | 2.32.0 |
+| Solar-system objects | PS1 flag and SDSS motion | 2.29.0 |
+| Faint-quasar candidate | 22 ≤ LS r < 24, not labelled QSO, `p_qso` ≥ 0.1: `secondary_class = QSO` with reason `FAINT_QSO_CANDIDATE`; the primary label is untouched; shown grey as "QSO?" in the app. A lead, not a classification (section 8) | 2.58.0 |
+| Archive warning | failed collectors and what is lost are written to `catalog_coverage.json`, the app banner and the `run_archives_status` / `run_archives_missing` columns of every row; only `complete` is a complete run, so a CSV passed on without the app still says it was degraded | 2.36.0, 2.57.0 |
+| High-confidence flag | `high_confidence` with its reason: confirmed by a spectrum or an estimated real-sky purity of at least 98 %. Objects with the faint-quasar flag get no photometric high confidence (spectroscopic stays) | 2.36.0, 2.59.0 |
+
+`objects_summary.csv` is the file to read first (one row per independent object detected by a survey; large-galaxy pieces and NED/SIMBAD-only entries are kept out of it). `classified_objects.csv` is the full record.
+
+## 6. Sub-classification and independent axes
+
+Sub-classes are decided per primary class, each with a stated basis and the precision of its rule measured on independent truth where such truth exists. Five independent axes (physical state, variability, compact objects, extragalactic, phenomena) are judged separately and each says UNKNOWN when it has no basis.
+
+| Mostly look-ups (`CATALOG`, `EXTERNAL_CLASSIFIER`) | Inferred here (`INFERRED`) |
 |---|---|
-| 정확도 (14,503개) | 98.3 % (미분류 0.8 %) |
-| 재현율 별 / 은하 / QSO | 99.2 / 93.5 / 94.4 % |
-| 고신뢰로 표시된 천체 | 13,566개, 그중 99.76 % 정확 |
-| full (모든 목록 사용) | 98.8 % |
+| SIMBAD MK spectral types and LAMOST / SDSS templates; ATNF pulsars; Roma-BZCAT blazars; HASH and Acker planetary nebulae; supernova lists; Suh 2021 AGB stars; Gaia SOS (RR Lyrae, Cepheids) and Gaia variability classes; ZTF periodic variables; Galaxy Zoo DESI morphology | photometric spectral type (Gaia BP-RP and temperature on the Pecaut and Mamajek sequence); luminosity class from parallax; AGB chemistry (carbon or oxygen) from a photometric model; white-dwarf, hot-subdwarf and red-giant gates from the Gaia HR-diagram position; galaxy activity from WISE W1-W2 and W2-W3, GALEX NUV-r and emission-line ratios (WHAN, BPT) from the spectra; light-profile type; AGN and QSO tags |
 
-처음 보는 200개 영역(세트 B, 2.40.0, 세트 A와 3.5° 이상 떨어짐)에서는 blind 98.6 %(10,205개), 고신뢰 99.78 %, 재현율 별/은하/QSO 99.5 / 93.3 / 94.3 %였다([`v2/benchmark/VALIDATION_SET_B_2026-10-26.md`](v2/benchmark/VALIDATION_SET_B_2026-10-26.md)).
+| Measured on independent truth | Result | Note |
+|---|---|---|
+| Mira / Cepheid / RR Lyrae / long-period variables | 94.8 / 93.2 / 82.4 / 63.6 % | random independent truth, 250 per class (ALGORITHM section 7) |
+| Planetary nebulae | 89.2 % | same cross-validation |
+| AGB chemistry (carbon / oxygen) | 95.8 % | photometric model |
+| Red giant branch / AGB, sequence match | 51.7 / 42.4 % | the two cannot be separated without asteroseismology, so they are merged into `RED_GIANT` in the physical-state axis |
+| Pulsars | 0.4 % (cross-validation), 21.6 % recall (separate benchmark) | the truth set has almost no TGSS-NVSS pairs; pulsar tags are mostly ATNF look-ups |
+| 520 literature-confirmed objects, 52 types, 10 each (2.47.0) | blind: coarse class 89.5 %, sub-type 45.8 %; full: 87.9 % / 55.0 % | blind = spectra and literature lists removed from the evidence. Fixes were made after seeing failures on these objects, so they are cases, not statistics |
 
-2.41.0(어두운 은하 조각 묶기, 성운 속 젊은 별의 2MASS 점광원 사전확률)에서 blind는 세트 A 98.26 → 98.72 %, 세트 B 98.57 → 98.84 %로 올랐다. 별 생성 영역은 97.6 → 98.5 %, 고신뢰 정확도는 99.75 / 99.78 %다([`v2/WORK_REPORT_2026-10-27.md`](v2/WORK_REPORT_2026-10-27.md)).
+**X-ray rules that were tested and not adopted (2.56.0).** (1) The Rodriguez et al. 2024 F_X/F_opt line recovers 101/135 = 75 % of accreting binaries but calls 9/126 = 7.1 % of SDSS spectroscopic stars accretors; applied to the 4XMM × Gaia galaxy sample the precision ceiling is about 0.80. (2) The Lin et al. 2012 F_X/F_IR star rule keeps 162/209 = 78 % of spectroscopic stars but calls 22–32 % of X-ray binaries stars. Neither was added.
 
-2.42.0(MYStIX 젊은 별 구성원, Gaia 천체측정 신뢰도, DESI BGS Gaia 별·은하 구분)에서 blind는 세트 A 98.88 %, 세트 B 99.10 %다. 별 생성 영역은 99.5 %(ONC 95.6 %, NGC 2024 98.3 %), SGP 띠는 96.5 %다([`v2/WORK_REPORT_2026-10-28.md`](v2/WORK_REPORT_2026-10-28.md)).
+## 7. Performance of the coarse classifier
 
-2.43.0(근거 없는 천체의 Gaia 점광원·중적외선 사전확률)에서 blind는 세트 A 98.99 %, 세트 B 99.14 %, 구상성단 영역은 99.6 %다([`v2/WORK_REPORT_2026-10-29.md`](v2/WORK_REPORT_2026-10-29.md)).
+Accuracy counts an abstention as wrong. Intervals are 95 % intervals from a bootstrap over regions (or sky cells), not over objects. Each row names its sample, because the samples differ a lot.
 
-2.44.0(Legacy Surveys 모형 적합도·크기 유의도, z − W1 별 궤적 초과량, WISE 색 특징으로 LS-GBM·융합 재학습)에서 blind는 세트 A 99.15 %, 세트 B 99.16 %, 고신뢰 99.70 / 99.81 %다. 같은 정답 천체 24,636개에서 99.05 → 99.16 %(고침 51, 깨짐 23), DESI 벤치마크 88.98 → 90.02 %([`v2/WORK_REPORT_2026-10-30.md`](v2/WORK_REPORT_2026-10-30.md)).
-
-2.45.0(밝은 별 조각과 은하 쌍의 미분류 정리)에서 blind는 세트 A 99.28 %, 세트 B 99.31 %다. 같은 정답 천체 24,663개에서 고침 34, 깨짐 0([`v2/WORK_REPORT_2026-11-06.md`](v2/WORK_REPORT_2026-11-06.md)).
-
-2.46.0(어두운 천체의 등급·은위별 별:은하 사전확률, Henrion+2011; AGN 은하의 GALAXY/QSO 이중 표기)에서 blind는 세트 A 99.30 %, 세트 B 99.33 %다(고침 4, 깨짐 0). 이중 표기 중 하나가 맞으면 정답으로 치면 A 99.34 %, B 99.37 %다([`v2/WORK_REPORT_2026-11-07.md`](v2/WORK_REPORT_2026-11-07.md)).
-
-문헌으로 정체가 확정된 천체 520개(52종류, [`v2/reference_objects/`](v2/reference_objects/))로 한 검증(2.47.0): blind 큰 범주 89.5 %, 세부 종류 45.8 %; full 큰 범주 87.9 %, 세부 종류 55.0 %([`REFERENCE_VALIDATION_2026-11-07.md`](v2/reference_objects/validation/REFERENCE_VALIDATION_2026-11-07.md)).
-
-비슷한 역할의 파이프라인(NWAY, MUWCLASS, Clarke+2020, Hughes+2022, Gaia DSC 등)과 비교하고 NWAY의 연관 설계를 적용했다(2.48.0, [`v2/LITERATURE_SIMILAR_PIPELINES_2026-11-08.md`](v2/LITERATURE_SIMILAR_PIPELINES_2026-11-08.md)): 위치를 옮긴 목록으로 잰 거짓 연관이 AllWISE −14 %, 2MASS −24 %이고 정답 정확도는 같다.
-
-개선 로드맵 1–4단계(2.49.0, [`v2/WORK_REPORT_2026-11-09.md`](v2/WORK_REPORT_2026-11-09.md)): 연관 받는 반경을 거짓 연관률 5 %로 보정(AllWISE 20.9 → 5.6 %), COSMOS 깊은 정답 영역(HST/ACS, 어두운 천체 28,210개), Galaxy Zoo DESI 형태(은하 세부 17 → 26/50). 2.48.0의 거짓 연관 비율은 2.49.0에서 정정했다.
-
-분류 기준 126개를 문헌 원문과 독립 영역 정밀도로 점검했다(2.50.0, [`v2/LITERATURE_CRITERIA_AUDIT_2026-11-10.md`](v2/LITERATURE_CRITERIA_AUDIT_2026-11-10.md)). 문헌과 다른 고적색이동 QSO 색 규칙 둘을 고치거나 뺐고, 인용 오류를 바로잡았다.
-
-2.40.0의 밝기별 QSO 사전확률은 같은 영역 재생에서 1차 분류 정확도 96.21 → 96.31 %, QSO 정밀도 79.5 → 86.9 %, QSO 재현율 94.4 → 90.9 %였다([`v2/benchmark/qso_options/`](v2/benchmark/qso_options/)).
-
-### 실제 하늘 비율 기준 순도 (blind, 18개 영역, 2.36.0 측정)
-
-| 종류 | 확신도 ≥ 0.5 | ≥ 0.8 | ≥ 0.9 |
+| Test | Version | Result | Sample and caveat |
 |---|---|---|---|
-| 별 | 75.5 % | 97.6 % | 97.6 % |
-| 은하 | 98.8 % | 99.2 % | 99.5 % |
-| QSO (측광만) | 4.1 % | 5.7 % | 6.4 % |
+| **Locked test set C** (60 regions, 12′ radius, list locked by SHA-256, scored once per release, aggregate only) | 2.52.0 | **99.65 %** (99.40–99.86), 3,170 objects | Regions never used in development. About 95 % of the truth are stars (always answering STAR scores 95.24 %), about 144 galaxies and 7 QSOs: **little information on galaxies and QSOs**. On the 97.8 % of objects that have a Gaia DSC class, DSC alone scores 99.52 % and the pipeline 99.81 %. Not scored again since 2.52.0 (2.55.0 changed the coarse path for sources without an r detection). |
+| **Sky-spread SDSS spectroscopic benchmark** (768 equal-area sky cells) | 2.51.3 | **93.79 %** (93.24–94.30), 9,999 objects | All objects unseen in training; 3,333 per class, so the class mix is artificial; SDSS spectroscopic targets only. Recall STAR / GALAXY / QSO 98.7 / 98.5 / 84.1 %. **r > 21: 87.99 %** (QSO recall 71.6 %, star precision 69.9 %). \|b\| < 20°: 96.09 % but only 32 galaxies and 49 QSOs. Labels unchanged by 2.52.0. |
+| **COSMOS deep fields**, HST/ACS truth (galaxy morphology plus SED, Weaver et al. 2022) | 2.51.0 | 94.31 % against 91.09 % for always answering GALAXY, 28,194 objects | Nine fields, faint objects (hard end); no QSOs in this truth; truth exists only where HST/ACS covers the field. Before the 2.52.0 prior layer. |
+| COSMOS test fields after the prior layer | 2.52.0 | **96.36 %** (was 94.48 %), ECE 0.37 % (was 1.52 %), 12,245 objects | Prior counted on separate calibration fields (split rule fixed before the results). Cost: COSMOS r > 23 star recall 81 to 65 %, precision 47 to 64 % (stars are about 5 % there). |
+| COSMOS, **17 new fields**, confirmation only (nothing tuned on them) | 2.60.1 code | 96.68 % and 96.75 % (two halves, 16,057 and 16,757 objects), ECE 0.37 and 0.33 % | Odd / even field split by field number. The always-GALAXY baseline was not recomputed for these fields (91.09 % for the first nine). |
+| Independent blind fields, sets A and B (200 regions each, 3.5° apart) | 2.46.0 | 99.30 % and 99.33 % (24,663 objects together) | **Development sets**: about 15 releases were built while looking at them (set B was scored once unseen, 98.6 % at 2.40.2). Blind = spectroscopic and literature lists removed from the evidence. |
+| Old SDSS / DESI spectroscopic benchmarks, test split | 2.52.0 | 97.99 % (n = 1,991) / 90.33 % (n = 962) | **Not representative:** class-balanced, concentrated in 142 SDSS plates (7 for galaxies), about 4 points higher than the sky-spread benchmark. Kept for the fusion-training lineage. |
 
-- **QSO:** 어두운 하늘은 은하가 퀘이사보다 약 100배 많다. 그래서 측광만으로 낸 QSO 판정은 대부분 실제로는 은하나 별이고, QSO는 분광이 있을 때만 고신뢰가 된다.
-- **별:** 확신도 0.5 기준 순도가 낮은 것은 r > 22의 어두운 '별' 판정 때문이다.
-- 계산 방법: [`v2/benchmark/natural_purity.py`](v2/benchmark/natural_purity.py)
+- **Bright sky:** stable. The locked set shows 99.6 % on a sample that is mostly stars, only slightly above Gaia DSC alone (99.5 % on the same objects), so it says little about galaxies and QSOs.
+- **Faint end (r > 21) and QSOs are weak,** see section 8.
+- **Probabilities** are calibrated where they were measured (high-latitude COSMOS and set B regions, ECE 0.37 %, `coarse_probability_calibrated = True` since 2.52.0); not for faint QSO probabilities and not for dense low-latitude fields at r > 20, where there is no truth.
 
-### 세부 분류 정확도 (독립 정답)
+## 8. Limits at the faint end
 
-| 대상 | 결과 |
+- **r > 22 high-confidence GALAXY is little more than the base rate.** The flag requires an estimated real-sky purity of at least 98 % (threshold 0.6 at r > 22) and it holds: purity 0.983 (84 % lower bound 0.982) on the 17 new COSMOS fields (24,169 flagged objects), 0.982 on the first nine. But faint objects are mostly galaxies anyway (stars are 5 % of the COSMOS2020 truth at r > 23 and 4 % at r = 24), so the flag adds only a few points over the base rate: it says the label is as reliable as the prior, not that this object was individually identified.
+- **Faint stars are uncertain.** COSMOS r > 23: star recall 65 %, precision 64 % (2.52.0); SDSS sky benchmark r > 21: star precision 69.9 %. The faint-star truth sample is small, so some magnitude bins cannot prove a high-confidence star label.
+- **Type-1 AGN recall by magnitude.** The QSO label recovers 96 % of X-ray-selected (Chandra COSMOS Legacy) type-1 AGN at r < 21, 76 % at 21–22, 19 % at 22–23 and 6–7 % at 23–24 (nine fields, 2.56.0 and its reproduction in 2.58.0); 20 % over 22–24 on the 21 fields not used to choose the candidate threshold. Galaxies outnumber quasars by hundreds to one there, so the posterior rarely exceeds 0.5.
+- **The "QSO?" candidate flag** (threshold 0.1, chosen on five calibration fields), measured on the 21 deep COSMOS fields not used to choose it: **purity 29/119 = 24 % (Wilson 18–33 %)**, **recall 47/97 = 48 % (39–58 %)**. Purity counts only candidates that lie where HST/ACS covers the field (the nearest COSMOS2020 row within 1.0″ has F814W photometry), because the COSMOS2020 star and galaxy classes exist only there (without this the new fields read 0.357). The truth is X-ray selected, so purity is a lower bound; nine candidates inside the ACS area have no COSMOS2020 row, and counting them all as false would give 29/128 = 23 %. Three of four candidates are something else. It is a lead that needs a spectrum or X-ray / variability data.
+- **`p_qso` is under-confident at 22 ≤ r < 24.** In deep COSMOS the observed type-1 fraction is above the mean `p_qso` in every probability bin (0.05–0.1: 0.15 against 0.07; 0.1–0.2: 0.20 against 0.14; 0.3–0.5: 0.57 against 0.38). The 2.52.0 calibration (ECE 0.37 %) does not cover these probabilities.
+- **Known inconsistency of the r > 22 QSO prior.** The prior for QSO at r > 22 (`PI_QSO` = 0.0011) is not the real-sky fraction: its numerator is the literature density of one magnitude bin (22 to 23) and its denominator all objects from r = 22 on, so it is 3–7 times lower than the fractions measured in deep COSMOS (0.51–0.81 % at 22–23, 0.23–0.33 % at 23–24). Two corrected variants broke COSMOS2020 labels without fixing any and worsened ECE and NLL, so the prior was not changed; the faint quasar is treated as a candidate flag instead.
+- **Quasars are not recovered at r ≥ 24:** none of 33 X-ray-selected type-1 AGN there received the QSO label (deep COSMOS, 2.56.0), and the candidate flag is applied only at 22 ≤ r < 24 because no truth measures its purity fainter. Stars and galaxies at r ≥ 24 are still labelled.
+- **Many faint objects have only a literature type:** in the COSMOS 2′ field 2,361 of 3,621 objects carry only a NED or SIMBAD type, shown without a probability (2.54.0).
+
+## 9. How it is validated
+
+- **Blind independent fields.** Truth comes from spectroscopic surveys that were not used for training (LAMOST, 2QZ/6QZ, 2SLAQ, 2dFGRS, 6dFGS, WiggleZ, RAVE, APOGEE, Gaia-ESO and others); in the blind run the spectroscopic and literature catalogues are removed from the evidence, so the truth cannot leak. Sets A and B are now development sets.
+- **Locked test set C.** 60 regions at least 3.5° from sets A, B and COSMOS; the list is locked by SHA-256 and the workflow refuses to run if it changes. It is scored **once per release, aggregate only**, with no tuning on its number, and not at all when a core archive failed in more than 10 % of the regions.
+- **Sky-cell split benchmark.** SDSS spectra spread over 768 equal-area cells, split into train, calibration and test by cell, objects used for tuning removed.
+- **COSMOS deep fields** with HST/ACS truth and Chandra COSMOS Legacy AGN. Odd-numbered fields calibrate, even-numbered test (rule fixed before results); the 17 added fields are confirmation only (list locked by SHA-256).
+- **Statistics.** Bootstrap over fields or cells for the intervals, Wilson intervals for proportions, exact McNemar test for paired changes, balanced accuracy, ECE and NLL for probabilities.
+- **Baselines always reported:** the majority class, Gaia DSC alone, a single gradient-boosted classifier. (The single classifier won on the spectroscopic benchmarks in all 14 cases and on the sky-spread SDSS targets, but lost on real-sky COSMOS by 2.6 points, p below 1e-80, so it is not the default: success on spectroscopic targets does not carry over to the real sky.)
+- **Archive-health gate.** Scoring stops when the key archives are down, so the single look at a release is not spent on a degraded run.
+
+## 10. Operation: speed, archives and failures
+
+### Time and requests, first search of a new field (cold cache)
+
+Measured on 2026-11-24 for three fields (NGC 4522 2′, COSMOS 2′, Galactic plane 1′) with the cache switched off and an empty VizieR cache; every request waits 3–5 s first (project rule), so run time is set mainly by the number of requests.
+
+| Code | End to end | Collection (mean) | Archive requests |
+|---|---|---|---|
+| 2.60.2 | 128–235 s (6 runs) | 124–231 s (173 s) | 71–87 (mean 80.5) |
+| 2.60.1, before the request reduction | 160–304 s (9 runs) | 154–274 s (227 s) | 82–113 (mean 93.7) |
+
+- Classification adds 4–39 s depending on the number of objects (about 38 s for the roughly 3,600 objects of the COSMOS field).
+- The spread between repeats of the same code (154–274 s) comes from VizieR mirrors that were unstable that day (see the dated notes below); the 24 % faster mean is a direction, not a precise figure.
+- Searching the same field again uses the local cache (11–46 s end to end, measured at 2.54.0). Later searches in one session need 48–51 requests and none goes to a mirror known to be dead.
+
+### Dependence on external archives and what happens when one fails
+
+The program is only as available as the archives it queries; results change with archive state, and a degraded run is marked rather than hidden. Fallback routes:
+
+| Archive | Fallback |
 |---|---|
-| 미라 / 세페이드 / RR Lyrae | 94.8 / 93.2 / 82.4 % |
-| 행성상성운 | 89.2 % |
-| AGB 화학형(탄소/산소) | 95.8 % |
-| 은하 활동성 | 87.9 % |
-| 초저온 왜성(M7 이후) / 뜨거운 준왜성 | 92.7 % / 완전도 84.8 %·순도 81 % |
+| VizieR (CDS) | official mirrors in order; empty answers are confirmed, database-error answers are asked again, mirrors that lack a catalogue move to the back for 24 h; dead mirrors are remembered across searches |
+| SIMBAD | one direct TAP query for cone and types (and one for references); Harvard mirror if Strasbourg fails; astroquery path if SIMBAD rejects the query |
+| Gaia (ESA) | if the archive returns its maintenance page, the VizieR copy is used at once; columns the copy lacks are named in the warning and in `run_archives_missing` |
+| Pan-STARRS1 (MAST) | VizieR DR2 copy (objects with two detections are missing) |
+| Legacy Surveys (Data Lab) | viewer catalogue (`cat.fits`) is asked as well when Data Lab is slow (30 s) or fails, and the first answer is used; only for DR10 South within 10′ (DR9 North values differ, so it is not used there) |
+| ATNF pulsars (HEASARC) | VizieR copy after 30 s |
+| Any non-key collector | a failure is remembered for 10 minutes for that cone so it is not waited for again |
 
-### 속도
+- **Marking a degraded run:** warning band in the app, `catalog_coverage.json`, and `run_archives_status` / `run_archives_missing` on every result row. Only `complete` is a complete run.
+- **Asking again:** `python v2/pipeline.py --work DIR --retry-failed` asks only the key archives that failed in the last search (`all`: every failed one) and classifies again; the app has an "Ask failed archives again" button.
+- **Footprints:** archives that do not cover the field are not asked (NVSS, VLASS south of −40°, TGSS south of −53°, eRASS1-DE outside its half of the sky, LoTSS DR2 south of +16°, FIRST outside its two areas, DESI outside its tile list, MYStIX outside its 20 regions).
+- **Bulk use is limited:** about 2–4 minutes per field (128–235 s end to end for the 1–2′ test fields in the table above) and dependent on external services.
 
-2.54.0 실측이다. GitHub Actions에서 CDS Strasbourg가 404를 내던 날에 쟀다([`WORK_REPORT_2026-11-15.md`](v2/WORK_REPORT_2026-11-15.md)).
+### Dated notes (not permanent facts)
 
-| 영역 | 천체 | 수집 (2.53 → 2.54, 두 번 실행) | 전체 | 같은 영역 다시 |
-|---|---|---|---|---|
-| NGC 4522 주변 2′ | 675 | 311 → 85–101 s | 92–106 s | 11–14 s |
-| 은하면 b = −2°, 1′ | 722 | 341 → 87–131 s | 91–135 s | 18–19 s |
-| COSMOS 2′ | 3,621 (요약 1,102) | 312 → 129–135 s | 167–169 s | 45–46 s |
+- **2026-11-11:** VizieR answered 404 and NOIRLab 502 for hours; every field run of that day lost AllWISE / 2MASS or Legacy Surveys. This is why the locked-set scoring has an archive-health gate.
+- **From 2026-11-15:** CDS Strasbourg (SIMBAD and the main VizieR server) returned 404 or timed out after a CDS security incident. The mirror and fallback routes above were built or tightened in response, and the 2026-11-24 timings were measured in this state.
+- **2026-11-25 to 12-02 (announced):** the Gaia ESA archive is down for the Gaia DR4 release; Gaia data then come from the VizieR copy, which lacks some columns. DR4 is expected to need re-validation of every Gaia-dependent rule.
 
-- 분류(1–7단계)는 천체 수에 비례한다. COSMOS 3,621개에 약 40 s가 든다.
-- 남은 수집 병목은 둘이다.
-  - Gaia: ESA TAP가 50 s 안에 답하지 않으면 VizieR로 넘어가 약 75 s가 걸린다.
-  - (SIMBAD는 2.60.0에서 COSMOS 2′ 80 s → 약 15 s로 줄었다.) 새 영역(VizieR 응답이 캐시에 없음)의 수집은 VizieR 미러 순회(`agb_suh2021` 등 85–110 s)와 Data Lab 정체가 정한다.
-- 같은 영역을 다시 조회하면 로컬 캐시를 쓴다(Gaia 대체 결과는 하루).
+## 11. What is not claimed
 
-## 8. 데스크톱 앱
+- **No novelty over Gaia DSC on the bright sky.** On the locked set the pipeline reaches 99.8 % where Gaia DSC alone reaches 99.5 % on the same objects. No independent scientific result is claimed yet; the contribution is the integration, the provenance, the validation design and the measured limits.
+- **No calibrated QSO probabilities at the faint end** (22 ≤ r < 24 is under-confident; at r ≥ 24 quasars are not recovered, 0 of 33 type-1 AGN, and no truth measures the candidate flag there).
+- **Not a bulk-processing tool**, and not a replacement for a spectrum: sub-classes are mostly look-ups of other people's catalogues, and the pipeline's own sub-type recovery without spectra or literature lists is 45.8 % on the 520-object check (2.47.0).
+- **Not validated** for dense low-latitude fields at r > 20 (no truth there).
+- **Development-set numbers** (sets A and B, the 520 objects, COSMOS fields used for calibration) are not unbiased; the unbiased ones are the locked set C and the COSMOS confirmation fields.
 
-[Releases](https://github.com/Pinchpeach/Finding_objects/releases)에서 OS에 맞는 zip을 받아 압축을 풀고 `FindingObjects`(Windows는 `FindingObjects.exe`)를 실행한다. 파이썬 설치는 필요 없다.
+## 12. Running it
 
-| 기능 | 설명 |
-|---|---|
-| 검색 영역 | 천체 이름(Sesame) 또는 좌표 + 반경. 지도에서 더블클릭하면 그 위치를 중심으로 지정한다. |
-| 결과 표 | 정렬·필터(종류, 상태, 텍스트), 은하 부속 보기, **Show literature-only**(NED·SIMBAD에만 있는 항목, 기본으로 숨김, 2.54.0), **High confidence only** 필터. 문헌 종류만 있는 천체는 P(class) 칸에 확률 대신 `literature`로 표시 |
-| 천체 상세 | 1차 확률 막대, 근거 증거, 세부 분류와 근거, 문헌 링크(ADS), Legacy Viewer·SIMBAD 열기, 고신뢰 근거(★) |
-| 하늘 지도 | 종류·세부 종류별 아이콘, 큰 은하 실제 타원, 확대·이동, 이름 표시, 고신뢰 천체 **금색 테두리** |
-| 경고 | 조회에 실패한 아카이브와 그 영향을 결과 표 위 노란 띠로 계속 표시 |
-| 북마크 | `Ctrl+D`로 저장. **Bookmarks** 탭(`Ctrl+B`)에서 메모·검색, 다시 열기, 그 위치에서 새 검색 |
-| 로그 | 사용자당 로그 파일 하나, View > Log (`Ctrl+L`) |
-| 배포 | GitHub Releases에 Windows·macOS·Linux zip을 올린다. 빌드마다 세 OS에서 오프라인 스모크 시험을 한다. |
+**Desktop app (no Python needed).** Download the zip for your system from the [release page](https://github.com/Pinchpeach/Finding_objects/releases/tag/v2.60.2) (or [all releases](https://github.com/Pinchpeach/Finding_objects/releases)), unpack it and run `FindingObjects` (`FindingObjects.exe` on Windows). Search by object name or coordinates plus a radius, or double-click the map. The app has a sortable and filterable result table, an object panel with probabilities, evidence, sub-classes and links, a sky map (high-confidence objects have a gold ring), the archive warning band, bookmarks (Ctrl+D, Ctrl+B) and a log (Ctrl+L). Builds are tested offline on all three systems for every release.
 
-소스에서 실행:
+**From source:**
 
 ```bash
 pip install -r v2/app/requirements.txt
 python v2/app/qt_app.py
 ```
 
-명령줄:
+**Command line:**
 
 ```bash
-# 좌표 주변의 모든 탐사를 모아서 분류 (아카이브 접속 필요)
+# collect around a position and classify (needs archive access)
 python v2/pipeline.py --ra 188.4155 --dec 9.1751 --radius 0.5 --work runs/ngc4522
 
-# 이미 모아 둔 목록을 분류
+# classify catalogue files that were collected before
 python v2/pipeline.py --raw-dir v2/rawdata --work runs/ngc4522
+
+# after a run that lost an archive: ask only the failed key archives again
+# (add 'all' to ask every failed archive)
+python v2/pipeline.py --work runs/ngc4522 --retry-failed
 ```
 
-단계마다 `--work`에 CSV를 쓰고, `pipeline_summary.csv`에 단계별 시간을 기록한다. 결과는 `objects_summary.csv`(먼저 읽을 열만, 독립 천체당 한 행)부터 보면 된다. `classified_objects.csv`는 모든 단계의 열을 담은 전체 기록이다.
+`--radius` is in arcminutes. Start with `objects_summary.csv` in the `--work` directory; `classified_objects.csv` is the full record and `pipeline_summary.csv` has the time of each stage.
 
-## 9. 코드 구성
+## 13. Code layout and development
 
-| 위치 | 역할 |
+| Location | Role |
 |---|---|
-| `v2/Get_data/` | 30개 수집기, 병렬 실행·시간 제한(`controller.py`), 캐시, 요청 간격·미러(`throttle.py`), 관측 범위(`footprint.py`) |
-| `v2/Preprocess/` | 1–5단계(연관·통합·특징·증거·1차 분류), 규칙 표, 융합 가중치, `LITERATURE.md` |
-| `v2/Classifier/` | 세부 분류(`subclass.py`), 5개 축, 축별 보정, 고신뢰 기준표 |
-| `v2/*.py` | `pipeline.py`와 후처리 모듈(`host_groups`, `detection_quality`, `radio_sources`, `clusters`, `catalog_coverage`, `high_confidence`, `designations`, `summary`) |
-| `v2/app/` | PySide6 앱, PyInstaller 패키징 |
-| `v2/benchmark/` | 정답 세트, 보존된 목록 특징, 평가·학습·독립 검증·실제 하늘 순도 스크립트 |
-| `.github/workflows/` | 자료 수집·검증(수동 실행), 앱 빌드·배포 |
+| `v2/Get_data/` | the 30 collectors, parallel execution and time limits (`controller.py`), cache, request pause and mirrors (`throttle.py`), footprints (`footprint.py`) |
+| `v2/Preprocess/` | stages 1–5 (association, integration, features, evidence, coarse class), rule table, fusion weights, literature notes |
+| `v2/Classifier/` | sub-classification (`subclass.py`), the five axes, per-axis calibration, high-confidence table |
+| `v2/*.py` | `pipeline.py` and the post-processing modules |
+| `v2/app/` | PySide6 app and PyInstaller packaging |
+| `v2/benchmark/` | truth sets, preserved catalogue features, evaluation, training, independent-validation and purity scripts |
+| `.github/workflows/` | data collection and validation (manual runs), app build and release |
+| `v2/document/` | this overview (`overview_content.py`, `build_overview.py`), the paper list, older decks |
 
-## 10. 개발·검증 체계
-
-- **문헌 우선:** 규칙·임계값을 바꾸기 전에 근거를 조사하고 기록한다. 분류된 논문 목록은 [`v2/document/PAPERS.md`](v2/document/PAPERS.md)에 있다.
-- **시험:** pytest 189개(전처리·분류기·앱 통합; 앱 시험에는 PySide6가 필요하다). 벤치마크는 보존된 특징으로 네트워크 없이 재현한다.
-- **자료가 필요한 검증:** GitHub Actions 워크플로로 실행하고 결과를 커밋으로 받는다.
-- **버전:** main에 병합할 때마다 `v2/VERSION`과 `v2/CHANGELOG.md`(변경·이유·측정치)를 올린다. 작업 보고서(`v2/WORK_REPORT_*.md`)에는 설계 이유와 버린 대안을 적는다.
-- **채택 기준:** 벤치마크·독립 정답에서 유의한 개선이 없으면 채택하지 않는다. 예: GALEX UV, u 대역, PS1 변광은 측정 후 기각했다.
+- **Literature first:** a rule or threshold is changed only after its basis is recorded (code comment or `LITERATURE*.md`; classified paper list: [`v2/document/PAPERS.md`](v2/document/PAPERS.md)).
+- **Adoption rule:** a change without a significant gain on benchmarks and independent truth is not adopted (GALEX UV, the u band and PS1 variability were measured and rejected).
+- **Versions:** every merge raises `v2/VERSION` and adds a row with changes, reasons and measurements to `v2/CHANGELOG.md`; work reports (`v2/WORK_REPORT_*.md`) record the design reasons and the alternatives dropped.
+- **Tests:** 307 pytest tests at 2.60.2 (preprocessing, classifier and app; the app tests need PySide6). Benchmarks reproduce offline from the preserved catalogue features. Anything that needs the archives runs as a GitHub Actions workflow and returns its results as a commit.
 
 ```bash
-cd v2 && python -m pytest -q Preprocess/tests Classifier/tests app/tests   # 시험
-black v2                                                                     # 코드 모양 (pyproject.toml)
+# tests
+cd v2 && python -m pytest -q Preprocess/tests Classifier/tests app/tests
+
+# code style (pyproject.toml)
+black v2
+
+# rebuild README.md and the overview PDF from overview_content.py
+python v2/document/build_overview.py
 ```
 
-## 11. 한계와 다음 과제
+## 14. Licence and third-party data
 
-| 용도 | 지금 쓸 수 있나 |
+- Code: MIT licence, see [`LICENSE`](LICENSE).
+- **No catalogue data are bundled.** The program queries the archives when it runs. The repository holds only small derived files (for example the DESI DR1 tile centres used to skip the DESI archives, prior tables counted from COSMOS2020, fusion weights) and, for the benchmarks, preserved feature files.
+- Third-party components of the app (Qt / PySide6 under LGPLv3, Python, NumPy, pandas, Astropy, astroquery, PyVO, Requests, PyInstaller) and the terms of the data services are listed in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) (in Korean).
+- When you publish results, follow the citation and acknowledgement requirements of each survey you used.
+
+## 15. Other documents
+
+| Document | Language | Content |
+|---|---|---|
+| [`v2/ALGORITHM.md`](v2/ALGORITHM.md) | Korean | the classification algorithm in detail, stage by stage |
+| [`v2/CHANGELOG.md`](v2/CHANGELOG.md) | Korean | changes, reasons and measurements per version |
+| [`v2/STATUS_2026-11-12.md`](v2/STATUS_2026-11-12.md) | Korean | state of the classifier after the first locked-set scoring, and the directions drawn from it |
+| [`v2/benchmark/LOCKED_TEST_SET_C.md`](v2/benchmark/LOCKED_TEST_SET_C.md) | English | protocol and scores of the locked test set |
+| `v2/WORK_REPORT_*.md` | Korean | work reports: results, errors and the design reasons and dropped alternatives |
+| `v2/Preprocess/LITERATURE.md`, `v2/Classifier/LITERATURE_*.md` | English | the literature basis of the rules and thresholds |
+| `v2/LITERATURE*.md` | Korean (citations in English; `LITERATURE_REVIEW_2026-10.md` mostly English) | literature surveys behind later changes (dated) |
+| [`v2/document/OVERVIEW_v2.36.1.pdf`](v2/document/OVERVIEW_v2.36.1.pdf) | Korean | the previous overview (version 2.36.1, 2026-10-23); its figures are out of date |
+| [`v2/document/PIPELINE_STACK_v2.44.0.pdf`](v2/document/PIPELINE_STACK_v2.44.0.pdf) ([PPTX](v2/document/PIPELINE_STACK_v2.44.0.pptx)) | English | **the v2.44.0 deck**, 12 slides on the pipeline and tech stack; **not updated since version 2.44.0**, so its headline figures (29 archives, 36 + 2 rules and models, 99.16 % blind accuracy, 141 tests) are out of date |
+
+## Where the numbers come from
+
+Paths are relative to the repository root. All figures were read from these files at version 2.60.2.
+
+| Figure | File |
 |---|---|
-| 한 영역의 밝은 천체(r ≲ 20, 고은위)를 별·은하·QSO로 가르고 근거 보기 | 예 |
-| 알려진 천체의 여러 목록 정보를 한자리에 모아 보기 | 예 |
-| 어두운 천체(r > 21) 분류를 그대로 믿기 | 아니오. 확률을 참고로만 쓴다 |
-| 수백 개 이상 영역을 일괄 처리 | 제한적. 영역당 1.5–3분이고 외부 서비스에 의존한다 |
-| 새 천체의 세부 종류를 자체 추론으로 판정 | 대부분 아니오. 세부 분류는 대부분 목록 조회다 |
+| 30 collectors; 35 evidence rules; 29 summary columns; 307 tests | `v2/Get_data/controller.py` (COLLECTORS); `v2/Preprocess/classification_rules.csv`; `v2/summary.py`; `pytest` run of 2.60.2 |
+| 833 / 1,649 / 2,513 columns of `classified_objects.csv` | `v2/WORK_REPORT_2026-11-24.md` section 13 |
+| Locked set C (99.65 %, baselines, composition) | `v2/benchmark/LOCKED_TEST_SET_C.md` |
+| Sky-spread SDSS benchmark; ablation by wavelength; COSMOS 94.31 % and the single-classifier result | `v2/STATUS_2026-11-12.md` sections 2.2 and 2.3; `v2/WORK_REPORT_2026-11-11.md` |
+| Prior layer, COSMOS after 2.52.0, star recall cost | `v2/WORK_REPORT_2026-11-13.md` section 4; `v2/CHANGELOG.md` row 2.52.0; `v2/ALGORITHM.md` section 5 |
+| COSMOS 17 new fields, candidate flag purity and recall, ACS definition | `v2/WORK_REPORT_2026-11-24.md` sections 3, 6 and 15.1; `v2/benchmark/deep_cosmos_confirmation/` (`groups_base.csv`, `variants/accuracy_ece.csv`); `v2/benchmark/DEEP_COSMOS_EXPANSION.md` section 6.1 |
+| High-confidence purity at r > 22 | `v2/WORK_REPORT_2026-11-24.md` section 5; `v2/WORK_REPORT_2026-11-13.md` section 5 |
+| `p_qso` under-confidence; QSO prior inconsistency; type-1 recall by magnitude | `v2/ALGORITHM.md` sections 5 and 10; `v2/WORK_REPORT_2026-11-23c.md` |
+| Sets A and B (99.30 / 99.33 %) | `v2/WORK_REPORT_2026-11-07.md` |
+| Old SDSS / DESI benchmarks | `v2/ALGORITHM.md` section 5 (table of measured values) |
+| 520 reference objects | `v2/reference_objects/validation/REFERENCE_VALIDATION_2026-11-07.md` (2.47.0 section) |
+| Sub-class accuracies | `v2/ALGORITHM.md` sections 6 and 7; `v2/CHANGELOG.md` rows 2.22.0 and 2.18.0 |
+| X-ray rules not adopted | `v2/WORK_REPORT_2026-11-23.md` sections 9 and 10; `v2/CHANGELOG.md` row 2.56.0 |
+| Time and requests; mirror behaviour | `v2/WORK_REPORT_2026-11-24.md` sections 10–15; `v2/benchmark/request_reduction_2_60_2/pipeline_runs.csv`; `v2/WORK_REPORT_2026-11-15.md` (2.54.0 repeat timings) |
+| Fallback routes, footprints | `v2/ALGORITHM.md` section 1; `v2/CHANGELOG.md` rows 2.54.0–2.60.2 |
+| Dated archive notes | `v2/benchmark/LOCKED_TEST_SET_C.md` rule 4; `v2/ALGORITHM.md` section 1; `.github/workflows/v2_deep_cosmos.yml` |
+| Release page and zips | [https://github.com/Pinchpeach/Finding_objects/releases/tag/v2.60.2](https://github.com/Pinchpeach/Finding_objects/releases/tag/v2.60.2) |
 
-- **측광 QSO:** 실제 하늘 순도가 낮다. 어두운 하늘에서는 은하가 퀘이사보다 약 100배 많기 때문이다. r 22–24의 1형 AGN은 라벨로는 일부만 찾고(21개 영역 20 %) 후보 표시로 절반 가까이(48 %) 찾지만 후보의 4분의 3은 다른 천체다(순도 24 %, 2.58.0 시험 4개 영역은 21 %였고 2.60.2의 21개 영역 확인으로 갱신). r ≥ 24는 판별하지 않는다.
-- **LS z 전용 검출 (2.55.0):** LS에만 있고 r이 검출되지 않은 어두운 천체는 대부분 실재하지 않아(COSMOS2020 대조) `UNCONFIRMED`로 둔다. 2.54까지는 이들을 STAR로 냈다.
-- **어두운 끝:** r > 21 별과 퀘이사를 구분하기 어렵다(하늘 전체 SDSS r > 21 88 %, QSO 재현율 84 %). 이 깊이에서는 u 대역·변광 자료가 부족하다.
-- **아카이브 상태:** Legacy Surveys 밖에서는 미분류가 많고, 아카이브 상태에 따라 결과가 달라진다. 이 경우 경고를 띄운다. 2.54.0부터 VizieR·SIMBAD·PS1에는 대체 경로가 있다.
-- **고신뢰 증명:** 어두운 별 정답 표본이 작아, 일부 밝기 구간은 고신뢰를 증명하지 못한다.
+---
 
-## 라이선스
-
-- 코드: MIT License — [`LICENSE`](LICENSE)
-- 앱에 포함된 제3자 구성요소(Qt / PySide6, LGPLv3 등)와 자료 이용 조건: [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)
-- 결과를 발표할 때는 사용한 각 탐사의 인용·감사 문구 요구를 따른다.
+*This README and the overview PDF are generated from `v2/document/overview_content.py` by `v2/document/build_overview.py`. Edit that file, not this one.*
