@@ -1,4 +1,4 @@
-name: v2 deep COSMOS fields, second set (collect blind, store on validation-data)
+name: v2 deep COSMOS fields (collect blind, store on validation-data)
 
 # Preparation of the faint-QSO candidate confirmation (v2/benchmark/DEEP_COSMOS_EXPANSION.md, 2.59.0).
 # Collects the blind raw catalogues (no spectroscopic or literature collectors) and the COSMOS2020 truth of
@@ -12,9 +12,19 @@ name: v2 deep COSMOS fields, second set (collect blind, store on validation-data
 #     12-02 and after) Gaia would come from the VizieR copy, which lacks 24 columns;
 #   * every field is collected with --require-gaia-tap: a Gaia file from the VizieR copy fails the field.
 # Manual only.  Do not run before the ESA archive is back.
+#
+# set=first (2.60.1): the nine 6' fields of 2.52.0-2.59.0 (collect_deep_cosmos.FIELDS, the calibration and test
+# fields of the faint-QSO study) with the same guards except the list lock (the list is the script's own),
+# stored as deep_cosmos1/<run id>/.  Until then their raw data were only re-collected for each measurement, so
+# the numbers moved with the archives' state of the day (2.58.0 review).
 on:
   workflow_dispatch:
     inputs:
+      set:
+        description: "second = the 17 locked fields of deep_cosmos_fields_2.csv; first = the nine fields of 2.52.0-2.59.0"
+        type: choice
+        options: [second, first]
+        default: second
       only:
         description: "space-separated field names (default: every field of the list)"
         default: ""
@@ -37,6 +47,7 @@ jobs:
         with: {python-version: "3.11"}
       - run: pip install pandas numpy requests astropy astroquery pyvo scipy
       - name: The field list is the locked one
+        if: ${{ github.event.inputs.set != 'first' }}
         run: |
           expected=$(grep -o 'sha256: `[0-9a-f]\{64\}`' v2/benchmark/DEEP_COSMOS_EXPANSION.md | grep -o '[0-9a-f]\{64\}' | head -1)
           actual=$(sha256sum v2/benchmark/deep_cosmos_fields_2.csv | cut -d' ' -f1)
@@ -55,11 +66,17 @@ jobs:
       - id: p
         env:
           ONLY: ${{ github.event.inputs.only }}
+          SET: ${{ github.event.inputs.set || 'second' }}
         run: |
           python - <<'PY'
-          import json, os
+          import json, os, re
           import pandas as pd
-          names = list(pd.read_csv("v2/benchmark/deep_cosmos_fields_2.csv").name)
+          if os.environ["SET"] == "first":  # the script's own list (no import: the module pulls the collectors)
+              src = open("v2/benchmark/collect_deep_cosmos.py").read()
+              names = re.findall(r'"(deep_cosmos_[1-9])": \(', src)
+              assert len(names) == 9, names
+          else:
+              names = list(pd.read_csv("v2/benchmark/deep_cosmos_fields_2.csv").name)
           only = os.environ.get("ONLY", "").split()
           if only:
               unknown = [n for n in only if n not in names]
@@ -84,8 +101,11 @@ jobs:
         with: {python-version: "3.11"}
       - run: pip install pandas numpy requests astropy astroquery pyvo scipy
       - name: Collect (blind) with the COSMOS2020 truth; Gaia must be the ESA archive's
+        env:
+          SET: ${{ github.event.inputs.set || 'second' }}
         run: |
-          python -u v2/benchmark/collect_deep_cosmos.py --fields-file v2/benchmark/deep_cosmos_fields_2.csv \
+          list=""; [ "$SET" = first ] || list="--fields-file v2/benchmark/deep_cosmos_fields_2.csv"
+          python -u v2/benchmark/collect_deep_cosmos.py $list \
             --fields ${{ matrix.name }} --out /tmp/deep --require-gaia-tap
       - name: Pack
         run: |
@@ -113,10 +133,14 @@ jobs:
         with: {pattern: deep-*, path: /tmp/deep, merge-multiple: true}
       - name: Commit to validation-data
         working-directory: data
+        env:
+          SET: ${{ github.event.inputs.set || 'second' }}
         run: |
-          d=deep_cosmos2/${{ github.run_id }}
-          mkdir -p $d && cp /tmp/deep/* $d/ && cp ../code/v2/benchmark/deep_cosmos_fields_2.csv $d/ && ls -la $d
+          if [ "$SET" = first ]; then d=deep_cosmos1/${{ github.run_id }}; else d=deep_cosmos2/${{ github.run_id }}; fi
+          mkdir -p $d && cp /tmp/deep/* $d/
+          [ "$SET" = first ] || cp ../code/v2/benchmark/deep_cosmos_fields_2.csv $d/
+          ls -la $d
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add $d && git commit -qm "deep COSMOS second set ${{ github.run_id }}: blind raw catalogues and COSMOS2020 truth ${{ github.event.inputs.note }}"
+          git add $d && git commit -qm "deep COSMOS ${SET} set ${{ github.run_id }}: blind raw catalogues and COSMOS2020 truth ${{ github.event.inputs.note }}"
           bash ../code/.github/scripts/push_with_retry.sh validation-data

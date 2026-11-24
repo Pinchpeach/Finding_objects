@@ -72,8 +72,9 @@
 ## 4. 수집·분석 절차 (Gaia ESA 복구 뒤)
 
 1. **ESA 복구 확인.** `https://gea.esac.esa.int/tap-server/tap/availability`가 VOSI XML(`available` true)을 돌려주는지. 점검 중에는 HTTP 200으로 점검 안내 HTML이 온다. 워크플로가 같은 확인을 하고 멈춘다.
-2. **수집(Actions).** main에 병합된 뒤 `workflow_dispatch`: 워크플로 `v2 deep COSMOS fields, second set`(`.github/workflows/v2_deep_cosmos.yml`). 입력 `only`는 비워 둔다(일부만 하려면 영역 이름을 공백으로). 영역마다 `collect_deep_cosmos.py --fields-file … --require-gaia-tap`가 돌고, **Gaia 행이 VizieR 사본이면 그 영역은 실패**한다. 수집물은 `validation-data` 브랜치의 `deep_cosmos2/<실행 번호>/<영역>.tar.gz`(raw + COSMOS2020 정답 + field.json)에만 남고 main에는 두지 않는다.
+2. **수집(Actions).** main에 병합된 뒤 `workflow_dispatch`: 워크플로 `v2 deep COSMOS fields`(`.github/workflows/v2_deep_cosmos.yml`, 입력 `set` = `second`가 기본). 입력 `only`는 비워 둔다(일부만 하려면 영역 이름을 공백으로). 영역마다 `collect_deep_cosmos.py --fields-file … --require-gaia-tap`가 돌고, **Gaia 행이 VizieR 사본이면 그 영역은 실패**한다. 수집물은 `validation-data` 브랜치의 `deep_cosmos2/<실행 번호>/<영역>.tar.gz`(raw + COSMOS2020 정답 + field.json)에만 남고 main에는 두지 않는다.
    - GitHub MCP로: `actions_run_trigger`(workflow `v2_deep_cosmos.yml`, ref `main`).
+   - **원래 9개 영역(2.60.1):** 같은 워크플로를 `set` = `first`로 돌리면 2.52.0–2.59.0의 9개 영역(`collect_deep_cosmos.FIELDS`)을 같은 방식(블라인드, ESA Gaia 확인, `--require-gaia-tap`)으로 받아 `validation-data`의 `deep_cosmos1/<실행 번호>/`에 남긴다. 명단 해시 확인만 빠진다(명단이 스크립트 안에 있음). 그동안 이 영역들은 잴 때마다 다시 수집해 그날 아카이브 상태에 따라 수치가 흔들렸다(2.58.0 검토).
 3. **받기.** `git fetch --depth=1 --filter=blob:none origin validation-data`로 필요한 묶음만 받는다(`v2/benchmark/independent_fields/README.md`의 방식):
    ```
    git cat-file -p FETCH_HEAD:deep_cosmos2/<RUN>/deep_cosmos_10.tar.gz > deep_cosmos_10.tar.gz
