@@ -27,6 +27,23 @@ refused, timed out or answered a RETRY_STATUS is now also remembered in ``archiv
 V2_FAILURE_MEMORY_S, 600 s, shared by the processes through a file) and tried last by every later search until
 it answers again.  Only the order changes: no mirror is ever skipped.
 
+Empty answer of a mirror that holds the catalogue (2.60.2).  The confirmation above ("empty table") is not what
+every mirror answers: CfA answers a cone without rows with no <TABLE> also without the mini form, for tables it
+holds (``J/ApJS/256/43/table10`` and ``table12``: an all-sky one-row request returns a row on CfA).  The answer was
+taken for "this mirror lacks the catalogue" and the request went on through NAO, IUCAA and China-VO (refused or 10 s
+time-outs) to IDIA, which needs 8-17 s per request: 150 s for the four AGB tables of an empty cone.  A "no table"
+confirmation is now settled by one more request, the existence probe: the catalogue without a cone, one row.  A row
+means the mirror holds the catalogue, so the empty cone is accepted; no table means it lacks it (CfA lacks
+``VIII/92/first14``) and the next mirror is asked.  A mirror that answers no table to everything (2.47.0) still fails
+the probe.  "Holds" is remembered for the failure memory, "lacks" for V2_CATALOG_MEMORY_S.
+
+Mirror without the catalogue (2.60.2).  A mirror that lacks a catalogue answers a table-less VOTable to the
+cone and, asked again without the mini form, "no table" (the 2.54.0 confirmation).  A cold search paid for it
+for every catalogue the CfA mirror did not hold and then for the dead mirrors (NAO, IUCAA, China-VO) before
+IDIA answered: 8-13 requests and 85-110 s for the four tables of ``agb_suh2021`` (2026-11-23/24).  The pair
+(mirror, catalogue) is now remembered for V2_CATALOG_MEMORY_S (86,400 s; the holdings of a mirror change
+slowly) in ``archive_cache`` and the mirror is tried last for that catalogue.  Only the order changes.
+
 Connect timeout (2.44.0): a VizieR request waits at most CONNECT_TIMEOUT_S
 for the TCP connection (the read timeout the client asked for is kept).  On
 2026-10-30 the Strasbourg server stopped accepting connections; each request
@@ -59,6 +76,7 @@ from __future__ import annotations
 import http.client
 import os
 import random
+import re
 import threading
 import time
 
@@ -168,7 +186,55 @@ def _recently_failed() -> set:
         return set()
 
 
-def _vizier_order(host: str) -> list[str]:
+_SOURCE = re.compile(r"-source=([^\s&]+)")
+
+
+def _catalog_of(url: str, data) -> str | None:
+    """The VizieR catalogue a request asks for (``-source=`` in the query string or in the body)."""
+    text = url.split("?", 1)[1] if "?" in url else ""
+    if isinstance(data, dict):
+        v = data.get("-source")
+        text += f"&-source={v}" if v else ""
+    elif isinstance(data, bytes):
+        text += " " + data.decode(errors="replace")
+    elif isinstance(data, str):
+        text += " " + data
+    m = _SOURCE.search(text)
+    return m.group(1) if m else None
+
+
+def _lacks(host: str, catalog: str | None, ok: bool = False) -> None:
+    """Remember that the mirror ``host`` has no ``catalog`` (or forget it)."""
+    if catalog is None:
+        return
+    try:
+        import archive_cache
+
+        ttl = archive_cache.catalog_memory_s()
+        if ttl > 0:
+            archive_cache.note_source(f"vizier-catalog:{host}|{catalog}", ok, ttl=ttl)
+    except Exception:
+        pass
+
+
+def _lacking(catalog: str | None) -> set:
+    """The mirrors remembered as not holding ``catalog``."""
+    if catalog is None:
+        return set()
+    try:
+        import archive_cache
+
+        tail = f"|{catalog}"
+        return {
+            k[len("vizier-catalog:") : -len(tail)]
+            for k in archive_cache.down_keys()
+            if k.startswith("vizier-catalog:") and k.endswith(tail)
+        }
+    except Exception:
+        return set()
+
+
+def _vizier_order(host: str, catalog: str | None = None) -> list[str]:
     """Hosts to try for a VizieR request to ``host``: the recently working mirror first."""
     hosts = [host] + [h for h in VIZIER_HOSTS if h != host]
     now = time.monotonic()
@@ -178,7 +244,8 @@ def _vizier_order(host: str) -> list[str]:
         hosts.insert(0, pref)
     # stable: reachable hosts keep their order, unreachable ones go last (also those another search saw failing)
     failed = _recently_failed()
-    return sorted(hosts, key=lambda h: now < _unreachable.get(h, 0.0) or h in failed)
+    lacking = _lacking(catalog)
+    return sorted(hosts, key=lambda h: (now < _unreachable.get(h, 0.0) or h in failed, h in lacking))
 
 
 def _without_mini_form(data):
@@ -195,32 +262,137 @@ def _without_mini_form(data):
     return None
 
 
-def _confirmed_empty(send, session, method, target, args, kwargs) -> bool:
-    """Ask the mirror again without the mini form: an empty <TABLE> means the
-    catalogue is there and the cone has no rows."""
+def _confirm_status(send, session, method, target, args, kwargs) -> str:
+    """Ask the mirror again without the mini form: "empty table" means the catalogue is there and the cone has no
+    rows; "rows" the first answer was wrong; "no table" an answer without table and without error; "not found" the
+    mirror lacks the catalogue; "backend" its database failed (asked once more first); "error" / "unknown"."""
     data = _without_mini_form(kwargs.get("data"))
     if data is None:
-        return False
-    pause()
-    t0 = time.monotonic()
-    try:
-        resp = send(session, method, target, *args, **dict(kwargs, data=data))
-    except Exception as exc:
-        _log(target.split("/")[2], f"confirm {type(exc).__name__}", t0)
-        return False
+        return "unknown"
+    for attempt in range(2):
+        pause()
+        t0 = time.monotonic()
+        try:
+            resp = send(session, method, target, *args, **dict(kwargs, data=data))
+        except Exception as exc:
+            _log(target.split("/")[2], f"confirm {type(exc).__name__}", t0)
+            return "error"
+        reason = _answer_error(resp) if resp.status_code == 200 else None
+        if reason is not None and _error_kind(reason) == "backend" and attempt == 0:
+            _log(target.split("/")[2], f"confirm backend error, again: {reason[:60]}", t0)
+            continue
+        break
+    if resp.status_code != 200:
+        # a failed confirmation (503, 404 ...) says nothing about the cone: the next mirror is asked (PR #78 review:
+        # it was "no table", and an existence probe that found the catalogue then accepted the first, empty answer)
+        _log(target.split("/")[2], f"confirm {resp.status_code} error", t0)
+        return "error"
     text = (resp.text or "").upper()
+    if reason is not None:
+        what = _error_kind(reason)
+        _log(target.split("/")[2], f"confirm {resp.status_code} {what}: {reason[:60]}", t0)
+        return what
     # An empty <TABLE> only: rows here mean the first answer was wrong, not
     # empty (CfA answered table-less for a Gaia DR3 cone with 349 sources,
     # practical-use probe 2026-11-15), so the next mirror is asked.
     ok = resp.status_code == 200 and "<TABLE" in text and "<TR" not in text
     what = "empty table" if ok else ("rows" if "<TR" in text else "no table")
-    if what == "no table":  # the server's reason, for the log
-        import re
-
-        info = re.findall(r'<INFO[^>]*name="(?:QUERY_STATUS|Error|Warning)"[^>]*>([^<]{0,160})', resp.text or "", re.I)
-        what += f" {info[:2]}"
     _log(target.split("/")[2], f"confirm {resp.status_code} {what}", t0)
-    return ok
+    return what
+
+
+def _probe_body(data):
+    """The body of the existence probe: the catalogue of the request without its cone, one row, standard form."""
+    if isinstance(data, bytes):
+        probe = _probe_body(data.decode())
+        return None if probe is None else probe.encode()
+    if isinstance(data, str):
+        drop = ("-c", "-out.form=", "-out.max=", "-oc.form=")
+        return "\n".join([l for l in data.splitlines() if not l.startswith(drop)] + ["-out.max=1"])
+    if isinstance(data, dict):
+        d = {k: v for k, v in data.items() if not str(k).startswith("-c") and k not in ("-out.form", "-oc.form")}
+        d["-out.max"] = 1
+        return d
+    return None
+
+
+def _holds_probe(send, session, method, target, args, kwargs) -> str:
+    """ "holds" when the mirror returns a row of the catalogue without any cone, "lacks" when the answer has no table
+    (or says "not found"), "backend" when its database failed twice, "error"."""
+    data = _probe_body(kwargs.get("data"))
+    if data is None:
+        return "unknown"
+    for attempt in range(2):
+        pause()
+        t0 = time.monotonic()
+        try:
+            resp = send(session, method, target, *args, **dict(kwargs, data=data))
+        except Exception as exc:
+            _log(target.split("/")[2], f"probe {type(exc).__name__}", t0)
+            return "error"
+        reason = _answer_error(resp) if resp.status_code == 200 else None
+        if reason is not None and _error_kind(reason) == "backend" and attempt == 0:
+            _log(target.split("/")[2], f"probe backend error, again: {reason[:60]}", t0)
+            continue
+        break
+    if resp.status_code != 200:
+        what = "error"
+    elif reason is not None and _error_kind(reason) == "backend":
+        what = "backend"
+    elif "<TABLE" in (resp.text or "").upper():
+        what = "holds"
+    else:
+        what = "lacks"
+    _log(target.split("/")[2], f"probe {resp.status_code} {what}", t0)
+    return what
+
+
+def _holds_known(host: str, catalog: str | None) -> bool:
+    """True when the existence probe found the catalogue on the mirror less than the failure memory ago."""
+    if catalog is None:
+        return False
+    try:
+        import archive_cache
+
+        return f"vizier-holds:{host}|{catalog}" in archive_cache.down_keys()
+    except Exception:
+        return False
+
+
+def _holds_note(host: str, catalog: str | None) -> None:
+    """Remember that the mirror holds the catalogue (the entry is stored like a failure: for the failure memory)."""
+    if catalog is None:
+        return
+    try:
+        import archive_cache
+
+        archive_cache.note_source(f"vizier-holds:{host}|{catalog}", False)
+    except Exception:
+        pass
+
+
+def _confirmed_empty(send, session, method, target, args, kwargs) -> bool:
+    return _confirm_status(send, session, method, target, args, kwargs) == "empty table"
+
+
+_ERROR_INFO = re.compile(r'<INFO[^>]*\bname="error"[^>]*\bvalue="([^"]*)"', re.I)
+
+
+def _answer_error(resp) -> str | None:
+    """The reason a VOTable carries (``<INFO name="ERROR" value="...">``), None when it has none.  CfA answers with
+    HTTP 200 and no table both a database that it cannot reach ("The database is not currently reachable. -- no
+    connection", 1 request in 6 on 2026-11-24) and a catalogue it does not have ("Table or Catalog not found")."""
+    try:
+        text = resp.text or ""
+    except Exception:
+        return None
+    reasons = [v.strip(" -\n") for v in _ERROR_INFO.findall(text)]
+    reasons = [v for v in reasons if v]
+    return "; ".join(reasons) if reasons else None
+
+
+def _error_kind(reason: str) -> str:
+    return "not found" if re.search(r"not found", reason, re.I) else "backend"
 
 
 def _tableless_votable(resp) -> bool:
@@ -254,12 +426,18 @@ def _with_mirrors(send):
                 raise
             _log(parts.hostname, resp.status_code, t0)
             return resp
-        hosts = _vizier_order(parts.hostname)
+        catalog = _catalog_of(str(url), kwargs.get("data"))
+        hosts = _vizier_order(parts.hostname, catalog)
         read = kwargs.get("timeout")
         read = read[1] if isinstance(read, tuple) else read
         kwargs["timeout"] = (CONNECT_TIMEOUT_S, read)
         last = None
         empty = None
+        # 2.60.2 review: answers that say the mirror's database failed or that it lacks the catalogue are never an
+        # empty cone.  When no mirror gives data they end in an error (the collector reports it) instead of being
+        # returned as a table-less answer, which astroquery reads as "no rows" (the 2026-11-07 kind of silence).
+        lacked = None
+        retried: set = set()  # mirrors asked again after a database error of their own
         for i, host in enumerate(hosts):
             if i:
                 pause()  # every retry is an archive request too
@@ -267,22 +445,47 @@ def _with_mirrors(send):
             t0 = time.monotonic()
             try:
                 resp = send(self, method, target, *args, **kwargs)
-            except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as exc:  # refused, DNS, connect/read timeout
+            except (
+                requests.exceptions.ConnectionError,
+                requests.exceptions.Timeout,
+            ) as exc:  # refused, DNS, connect/read timeout
                 _log(host, type(exc).__name__, t0)
-                if isinstance(exc, requests.exceptions.ConnectionError):  # not connected (a read timeout is a slow answer)
-                    _unreachable[host] = time.monotonic() + MIRROR_STICKY_S
-                _remember(host, False)  # other searches ask it last, a timeout included
+                # not connected, or no answer in the 10 s of the client (IUCAA, 2026-11-24: every request, 6 in a
+                # search): the mirror is tried last for MIRROR_STICKY_S, in this process (2.60.2: a timeout too; 2.54.0
+                # left it out as "a slow answer") and in the others
+                _unreachable[host] = time.monotonic() + MIRROR_STICKY_S
+                _remember(host, False)
                 last = exc
                 continue
-            _log(host, f"{resp.status_code}{' tableless' if _tableless_votable(resp) else ''}", t0)
-            if resp.status_code in RETRY_STATUS:
+            tableless = _tableless_votable(resp)
+            reason = _answer_error(resp) if tableless else None
+            _log(
+                host,
+                f"{resp.status_code}{' tableless' if tableless else ''}{' error: ' + reason[:60] if reason else ''}",
+                t0,
+            )
+            if resp.status_code in RETRY_STATUS or (reason is not None and _error_kind(reason) == "backend"):
                 _remember(host, False)
-            else:
+            elif reason is None:
                 _remember(host, True)  # it answered
             if resp.status_code in RETRY_STATUS and i < len(hosts) - 1:
                 _unreachable[host] = time.monotonic() + MIRROR_STICKY_S  # failing: tried last for a while
                 last = resp
                 continue
+            if reason is not None:
+                # The mirror's database failed (CfA, "no connection": it answers HTTP 200 with a VOTable without a
+                # table) or it does not have the catalogue ("Table or Catalog not found"): neither is an empty cone.
+                # A failed database is asked once more first: CfA answers in 0.1-0.5 s, the mirrors after it refuse
+                # or need 8-17 s.
+                if _error_kind(reason) == "backend":
+                    if host not in retried:
+                        retried.add(host)
+                        hosts.insert(i + 1, host)  # the same mirror once more (the pause is at the top of the loop)
+                        continue
+                else:
+                    _lacks(host, catalog)  # other searches ask this mirror last for this catalogue
+                lacked = resp
+                continue  # the last mirror too: an error answer is never returned as the result
             # A mirror's table-less answer is not trusted on its own (2.47.0):
             # on 2026-11-07, with Strasbourg unreachable, the CfA mirror
             # answered 200 with a VOTable holding no table for every
@@ -291,8 +494,34 @@ def _with_mirrors(send):
             # preferred mirror, so every VizieR collector of the 520
             # reference-object runs came back empty.  Such an answer is kept
             # only if no other mirror returns a table.
-            if host != VIZIER_HOSTS[0] and _tableless_votable(resp):
-                if not _confirmed_empty(send, self, method, target, args, kwargs):
+            if host != VIZIER_HOSTS[0] and tableless and reason is None:
+                what = _confirm_status(send, self, method, target, args, kwargs)
+                probe = None
+                if what == "no table":
+                    # an empty cone of a catalogue the mirror holds (CfA) or a mirror without the catalogue: the
+                    # existence probe tells them apart (a probe done less than the failure memory ago is kept)
+                    probe = (
+                        "holds"
+                        if _holds_known(host, catalog)
+                        else _holds_probe(send, self, method, target, args, kwargs)
+                    )
+                    if probe == "holds":
+                        _holds_note(host, catalog)
+                        what = "empty table"
+                    elif probe == "lacks":
+                        _lacks(host, catalog)  # other searches ask this mirror last for this catalogue
+                    elif probe == "backend":
+                        _remember(host, False)
+                elif what == "not found":
+                    _lacks(host, catalog)
+                elif what == "backend":
+                    _remember(host, False)
+                if what == "empty table":
+                    _lacks(host, catalog, ok=True)  # it holds the catalogue (the cone is empty)
+                elif what in ("not found", "backend") or probe in ("lacks", "backend"):
+                    lacked = resp  # lacks the catalogue or its database failed: not an empty cone
+                    continue
+                else:
                     empty = empty or resp
                     continue
             if host != VIZIER_HOSTS[0]:
@@ -301,7 +530,10 @@ def _with_mirrors(send):
                 _preferred.update(host=None, until=0.0)
             return resp
         if empty is not None:
-            return empty
+            return empty  # a table-less answer without an error that no mirror contradicted (2.47.0)
+        if lacked is not None:
+            why = _answer_error(lacked) or "no table, and the mirror lacks the catalogue"
+            raise RuntimeError(f"VizieR: no mirror gave {catalog or 'the table'}: {why[:160]}")
         if isinstance(last, Exception):
             raise last
         return last

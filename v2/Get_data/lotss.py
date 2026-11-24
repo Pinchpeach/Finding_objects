@@ -7,6 +7,8 @@ save = save_csv  # collector API: save(df, path)
 
 CATALOG = "LoTSS DR2"
 VIZIER_CATALOG = "J/A+A/659/A1"
+# 2.60.2: nothing is covered south of Dec +16.26 (the project's coverage MOC, see footprint.py): 0 rows, 2 requests there
+FOOTPRINT = {"dec_min": 16.0}
 
 
 def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:

@@ -19,7 +19,7 @@ from __future__ import annotations
 from pathlib import Path
 import pandas as pd
 
-from _catalog_utils import add_standard_metadata, coordinates, empty_frame, pick, vizier_cone
+from _catalog_utils import add_standard_metadata, coordinates, empty_frame, pick, vizier_cone, vizier_query
 
 CATALOG = "Gaia DR3 variability SOS"
 TABLES = {
@@ -107,9 +107,22 @@ def fetch(ra: float, dec: float, radius_arcmin: float, kinds: tuple[str, ...] | 
     unknown = set(requested) - set(TABLES)
     if unknown:
         raise ValueError(f"unknown Gaia SOS product(s): {sorted(unknown)}")
+    # One request for the products (2.60.2: -source=a,b,c; every column, the parsers pick theirs by name): three
+    # requests of their own were 6-12 requests and 26-104 s of a cold search of an empty cone.  If it fails, the
+    # products are asked one by one as before.
+    joint = None
+    if len(requested) > 1:
+        try:
+            joint = vizier_query([TABLES[k][0] for k in requested], ra, dec, radius_arcmin, ["**"])
+        except Exception:
+            joint = None
+    have = set(joint.keys()) if joint is not None else set()
     for key in requested:
         table, columns = TABLES[key]
-        frame = vizier_cone(table, ra, dec, radius_arcmin, columns)
+        if joint is not None:
+            frame = joint[table].to_pandas() if table in have else None
+        else:
+            frame = vizier_cone(table, ra, dec, radius_arcmin, columns)
         if frame is not None and not frame.empty:
             pieces.append(PARSERS[key](frame, radius_arcmin))
     if not pieces:

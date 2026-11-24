@@ -22,6 +22,24 @@ as limits are used, and the margin keeps every cone near an edge queried:
                  1.622 deg from the nearest centre (none beyond 1.7 deg).
                  The Galactic plane at l ~ 30, b ~ -2 is 11 deg from any tile.
 
+  boxes          RA / Dec boxes ``(ra_lo, ra_hi, dec_lo, dec_hi)`` in degrees that together contain the survey
+                 (``ra_lo > ra_hi`` wraps through RA = 0), read from the survey's own coverage products
+                 (2.60.2).  FIRST (VIII/92/first14, Helfand et al. 2015, ApJ 801, 26): the official coverage maps
+                 of the 2014 December 17 release, https://sundog.stsci.edu/first/catalogs/
+                 coverage-north-3arcmin-14dec17.fits (sha256 61b50811...fa) and ...-south-... (559a574c...e9):
+                 the pixels with rms > 0 span RA 98.9-266.5, Dec -8.15..+64.75 (north cap, 8,444 deg^2 in the
+                 paper) and RA 305.2 -> 59.7 (through 0), Dec -11.45..+15.40 (south cap, 2,131 deg^2).  The box
+                 holds the whole map, so it is larger than the footprint (the south cap is ragged).
+  regions        discs ``(ra, dec, radius_deg)`` (2.60.2).  MYStIX (J/ApJS/209/32, Broos et al. 2013): the 20
+                 star-forming regions of the published ``reg`` table (centres) with the radius that holds every
+                 member of the ``mpcm`` table (31,549 rows) of that region plus 0.3 deg, rounded up to 0.1 deg.
+
+LoTSS DR2 (J/A+A/659/A1, Shimwell et al. 2022) is a ``dec_min``: the project's coverage MOC
+(https://lofar-surveys.org/public/DR2/catalogues/dr2-moc.moc, sha256 450399d3...90, 13,209 cells, 5,721 deg^2 against
+the paper's 5,634) has no covered cell centre south of Dec +16.26 (two regions: RA 90-300 Dec +22.8..+69.7 and RA
+300-60 Dec +16.3..+43.2); the limit is 16.0.  The CDS MOCs of these catalogues (MocServer) were not served on
+2026-11-24 (HTTP 413) and are built from source positions, which understate a survey's coverage.
+
 A cone outside every DESI tile cost one VizieR request (DESI DR1 redshifts)
 and, for the FastSpecFit lines, one Data Lab request, whose stalls took 246 s
 in every one of the six outage collections of the 2026-11-15/17/23 probes.
@@ -74,6 +92,28 @@ def tile_gap_deg(name: str, ra: float, dec: float) -> float:
     return float(np.degrees(np.arccos(np.clip(_tile_vectors(name) @ v, -1.0, 1.0))).min())
 
 
+def _sep_deg(ra1: float, dec1: float, ra2: float, dec2: float) -> float:
+    a, b, d1, d2 = (math.radians(v) for v in (ra1, ra2, dec1, dec2))
+    h = math.sin((d2 - d1) / 2) ** 2 + math.cos(d1) * math.cos(d2) * math.sin((b - a) / 2) ** 2
+    return math.degrees(2 * math.asin(min(1.0, math.sqrt(h))))
+
+
+def _box_overlaps(box, ra: float, dec: float, reach: float) -> bool:
+    """True unless the cone (centre, ``reach`` degrees) is clear of the RA / Dec box."""
+    ra_lo, ra_hi, dec_lo, dec_hi = (float(v) for v in box)
+    if dec + reach < dec_lo or dec - reach > dec_hi:
+        return False
+    top = abs(dec) + reach
+    if top >= 89.5:  # the cone reaches a pole: every RA
+        return True
+    half = math.degrees(math.asin(min(1.0, math.sin(math.radians(reach)) / math.cos(math.radians(top)))))
+    inside = _in_range(ra % 360.0, ra_lo, ra_hi)
+    if inside:
+        return True
+    gap = min(abs((ra - e + 180.0) % 360.0 - 180.0) for e in (ra_lo, ra_hi))
+    return gap <= half
+
+
 def _in_range(l: float, lo: float, hi: float) -> bool:
     return lo <= l <= hi if lo <= hi else (l >= lo or l <= hi)
 
@@ -88,6 +128,12 @@ def outside(fp: dict | None, ra: float, dec: float, radius_arcmin: float, margin
     if "tiles" in fp:
         # outside when even the nearest tile, widened to its radius, is farther than the cone plus the margin
         if tile_gap_deg(fp["tiles"], ra, dec) - float(fp["tile_radius_deg"]) > reach:
+            return True
+    if "boxes" in fp:
+        if not any(_box_overlaps(b, ra, dec, reach) for b in fp["boxes"]):
+            return True
+    if "regions" in fp:
+        if all(_sep_deg(ra, dec, r_ra, r_dec) - r_rad > reach for r_ra, r_dec, r_rad in fp["regions"]):
             return True
     if "gal_l_range" in fp:
         lo, hi = (float(v) for v in fp["gal_l_range"])

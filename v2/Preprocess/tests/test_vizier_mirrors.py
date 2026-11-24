@@ -136,7 +136,9 @@ def test_tableless_everywhere_is_a_real_empty_cone():
         def __init__(self):
             self.status_code, self.text, self.headers = 200, "<VOTABLE><RESOURCE></RESOURCE></VOTABLE>", {}
 
-    r = throttle._with_mirrors(lambda self, m, url, *a, **k: V())(None, "POST", "https://vizier.cds.unistra.fr/viz-bin/votable")
+    r = throttle._with_mirrors(lambda self, m, url, *a, **k: V())(
+        None, "POST", "https://vizier.cds.unistra.fr/viz-bin/votable"
+    )
     assert "<TABLE" not in r.text
 
 
@@ -170,11 +172,17 @@ def test_empty_cone_on_a_mirror_is_confirmed_not_cascaded():
             return Resp(404)
         if "-out.form=mini" in data:
             return _V("<VOTABLE><RESOURCE><INFO name='x'/></RESOURCE></VOTABLE>")
-        return _V("<VOTABLE><RESOURCE><TABLE><FIELD name='_RAJ2000'/><DATA><TABLEDATA></TABLEDATA></DATA></TABLE></RESOURCE></VOTABLE>")
+        return _V(
+            "<VOTABLE><RESOURCE><TABLE><FIELD name='_RAJ2000'/><DATA><TABLEDATA></TABLEDATA></DATA></TABLE></RESOURCE></VOTABLE>"
+        )
 
     r = throttle._with_mirrors(send)(None, "POST", "https://vizier.cds.unistra.fr/viz-bin/votable", data=MINI)
     assert "<TABLE" not in r.text  # the original (empty) answer is returned
-    assert seen == [("vizier.cds.unistra.fr", True), ("vizier.cfa.harvard.edu", True), ("vizier.cfa.harvard.edu", False)]
+    assert seen == [
+        ("vizier.cds.unistra.fr", True),
+        ("vizier.cfa.harvard.edu", True),
+        ("vizier.cfa.harvard.edu", False),
+    ]
     assert throttle._preferred["host"] == "vizier.cfa.harvard.edu"
 
 
@@ -194,7 +202,14 @@ def test_mirror_without_the_catalogue_is_still_passed_over():
 
     r = throttle._with_mirrors(send)(None, "POST", "https://vizier.cds.unistra.fr/viz-bin/votable", data=MINI)
     assert "<TR>" in r.text
-    assert seen[:4] == ["vizier.cds.unistra.fr", "vizier.cfa.harvard.edu", "vizier.cfa.harvard.edu", "vizier.nao.ac.jp"]
+    # the confirmation has no table either; the existence probe (the catalogue without a cone) has none: it lacks it
+    assert seen[:5] == [
+        "vizier.cds.unistra.fr",
+        "vizier.cfa.harvard.edu",
+        "vizier.cfa.harvard.edu",
+        "vizier.cfa.harvard.edu",
+        "vizier.nao.ac.jp",
+    ]
 
 
 def test_unreachable_mirror_is_tried_last():
@@ -238,8 +253,12 @@ def test_confirmation_with_rows_is_not_an_empty_cone():
         if host == "vizier.cfa.harvard.edu":
             if "-out.form=mini" in data:
                 return _V("<VOTABLE><RESOURCE></RESOURCE></VOTABLE>")
-            return _V("<VOTABLE><RESOURCE><TABLE><DATA><TABLEDATA><TR><TD>1</TD></TR></TABLEDATA></DATA></TABLE></RESOURCE></VOTABLE>")
-        return _V("<VOTABLE><RESOURCE><TABLE><DATA><TABLEDATA><TR><TD>1</TD></TR><TR><TD>2</TD></TR></TABLEDATA></DATA></TABLE></RESOURCE></VOTABLE>")
+            return _V(
+                "<VOTABLE><RESOURCE><TABLE><DATA><TABLEDATA><TR><TD>1</TD></TR></TABLEDATA></DATA></TABLE></RESOURCE></VOTABLE>"
+            )
+        return _V(
+            "<VOTABLE><RESOURCE><TABLE><DATA><TABLEDATA><TR><TD>1</TD></TR><TR><TD>2</TD></TR></TABLEDATA></DATA></TABLE></RESOURCE></VOTABLE>"
+        )
 
     r = throttle._with_mirrors(send)(None, "POST", "https://vizier.cds.unistra.fr/viz-bin/votable", data=MINI)
     assert r.text.count("<TR>") == 2
@@ -250,8 +269,12 @@ def test_a_mirror_that_failed_is_tried_last_by_the_next_search():
     """2.60.0: the failed-mirror memory is shared through archive_cache, so a new process does not ask the
     refusing / timing-out mirrors first again (a cold search spent ~57 s of collector time on them)."""
     seen = []
-    behaviour = {"vizier.cds.unistra.fr": "refuse", "vizier.cfa.harvard.edu": 404, "vizier.nao.ac.jp": "refuse",
-                 "vizier.iucaa.in": "slow"}
+    behaviour = {
+        "vizier.cds.unistra.fr": "refuse",
+        "vizier.cfa.harvard.edu": 404,
+        "vizier.nao.ac.jp": "refuse",
+        "vizier.iucaa.in": "slow",
+    }
     req = throttle._with_mirrors(_send(behaviour, seen))
     r = req(None, "GET", "https://vizier.cds.unistra.fr/viz-bin/votable?-source=J/x")
     assert r.status_code == 200 and "vizier.china-vo.org" in seen[-1]  # cds, cfa, nao, iucaa failed first
@@ -291,3 +314,317 @@ def test_the_mirror_memory_is_off_without_the_cache(monkeypatch):
     throttle._preferred.update(host=None, until=0.0)
     assert not archive_cache.source_down("vizier:vizier.cds.unistra.fr")
     assert throttle._vizier_order("vizier.cds.unistra.fr")[0] == "vizier.cds.unistra.fr"
+
+
+def test_catalogue_of_a_request():
+    assert (
+        throttle._catalog_of("https://vizier.cds.unistra.fr/viz-bin/votable?-source=II/246/out&-c=1", None)
+        == "II/246/out"
+    )
+    assert (
+        throttle._catalog_of("https://x/viz-bin/votable", "-c=1 2\n-source=J/ApJS/256/43/table9\n-out.form=mini")
+        == "J/ApJS/256/43/table9"
+    )
+    assert throttle._catalog_of("https://x/viz-bin/votable", b"-source=B/sn/sncat\n-out.max=1") == "B/sn/sncat"
+    assert (
+        throttle._catalog_of("https://x/viz-bin/votable", {"-source": "VII/274/bzcat5", "-c": "1 2"})
+        == "VII/274/bzcat5"
+    )
+    assert throttle._catalog_of("https://x/viz-bin/votable", None) is None
+
+
+def _catalogue_send(seen):
+    """cds 404; cfa holds nothing (table-less, also without the mini form); nao / iucaa / china refuse; idia has it."""
+    import requests
+
+    def send(self, method, url, *a, data=None, **k):
+        host = url.split("/")[2]
+        seen.append(host)
+        if host == "vizier.cds.unistra.fr":
+            return Resp(404)
+        if host == "vizier.cfa.harvard.edu":
+            return _V("<VOTABLE><RESOURCE></RESOURCE></VOTABLE>")
+        if host in ("vizier.nao.ac.jp", "vizier.china-vo.org"):
+            raise requests.exceptions.ConnectionError("refused")
+        if host == "vizier.iucaa.in":
+            raise requests.exceptions.ReadTimeout("read timed out")
+        return _V("<VOTABLE><RESOURCE><TABLE><TR><TD>1</TD></TR></TABLE></RESOURCE></VOTABLE>")
+
+    return send
+
+
+def test_a_mirror_without_the_catalogue_is_asked_last_for_that_catalogue_next_time():
+    """2.60.2: a cold search of the four AGB tables spent 8-13 requests on the CfA mirror (no table), the dead mirrors and
+    IDIA; the next search asks IDIA first for the catalogues CfA lacks, and CfA first for the others."""
+    body = "-source=J/ApJS/256/43/table9\n-out.form=mini"
+    seen = []
+    req = throttle._with_mirrors(_catalogue_send(seen))
+    url = "https://vizier.cds.unistra.fr/viz-bin/votable"
+    assert "<TR>" in req(None, "POST", url, data=body).text
+    assert seen == [
+        "vizier.cds.unistra.fr",
+        "vizier.cfa.harvard.edu",
+        "vizier.cfa.harvard.edu",  # the confirmation: no table
+        "vizier.cfa.harvard.edu",  # the existence probe: no table, it lacks the catalogue
+        "vizier.nao.ac.jp",
+        "vizier.iucaa.in",
+        "vizier.china-vo.org",
+        "vizier.idia.ac.za",
+    ]  # 8 requests
+    throttle._preferred.update(host=None, until=0.0)  # a new process: only the file remembers
+    throttle._unreachable.clear()
+    assert throttle._vizier_order("vizier.cds.unistra.fr", "J/ApJS/256/43/table9")[0] == "vizier.idia.ac.za"
+    assert (
+        throttle._vizier_order("vizier.cds.unistra.fr", "J/other")[0] == "vizier.cfa.harvard.edu"
+    )  # not lacking there
+    seen.clear()
+    assert "<TR>" in req(None, "POST", url, data=body).text
+    assert seen == ["vizier.idia.ac.za"]  # one request instead of eight
+
+
+def test_the_catalogue_memory_ends_off_and_is_forgotten_when_the_mirror_has_it(monkeypatch):
+    import archive_cache
+
+    body = "-source=J/x\n-out.form=mini"
+    seen = []
+    throttle._with_mirrors(_catalogue_send(seen))(
+        None, "POST", "https://vizier.cds.unistra.fr/viz-bin/votable", data=body
+    )
+    assert throttle._lacking("J/x") == {"vizier.cfa.harvard.edu"}
+    # the mirror answers with an empty table (it has the catalogue): the memory is forgotten
+    throttle._lacks("vizier.cfa.harvard.edu", "J/x", ok=True)
+    assert throttle._lacking("J/x") == set()
+    # off: V2_CATALOG_MEMORY_S = 0 remembers nothing
+    monkeypatch.setenv("V2_CATALOG_MEMORY_S", "0")
+    throttle._lacks("vizier.cfa.harvard.edu", "J/x")
+    assert throttle._lacking("J/x") == set()
+    # an entry ends with its own time, shorter than the failure memory
+    monkeypatch.setenv("V2_CATALOG_MEMORY_S", "0.05")
+    throttle._lacks("vizier.cfa.harvard.edu", "J/x")
+    assert throttle._lacking("J/x") == {"vizier.cfa.harvard.edu"}
+    import time
+
+    time.sleep(0.1)
+    assert throttle._lacking("J/x") == set()
+    # a 2.60.0 file ({key: time}) is still read with the failure memory
+    archive_cache._sources_path().write_text('{"vizier:vizier.nao.ac.jp": %f}' % time.time())
+    assert archive_cache.source_down("vizier:vizier.nao.ac.jp")
+
+
+def _holding_send(seen):
+    """cds 404; cfa answers an empty cone without a table (also without the mini form) but holds the catalogue."""
+
+    def send(self, method, url, *a, data=None, **k):
+        host = url.split("/")[2]
+        seen.append((host, "probe" if data and "-c=" not in data else "cone"))
+        if host == "vizier.cds.unistra.fr":
+            return Resp(404)
+        if "-c=" not in (data or ""):  # the existence probe: the catalogue without a cone has a row
+            return _V("<VOTABLE><RESOURCE><TABLE><TR><TD>1</TD></TR></TABLE></RESOURCE></VOTABLE>")
+        return _V("<VOTABLE><RESOURCE></RESOURCE></VOTABLE>")
+
+    return send
+
+
+def test_an_empty_cone_of_a_catalogue_the_mirror_holds_is_accepted_after_the_existence_probe():
+    """2.60.2: CfA answers an empty cone of J/ApJS/256/43/table10 without a table, before and after the mini form;
+    the probe finds a row, so the empty cone is accepted at CfA (before: NAO, IUCAA, China-VO, IDIA, 150 s)."""
+    body = "-source=J/ApJS/256/43/table10\n-c=266.4-28.9\n-c.rm=6.0\n-out.form=mini"
+    seen = []
+    req = throttle._with_mirrors(_holding_send(seen))
+    url = "https://vizier.cds.unistra.fr/viz-bin/votable"
+    r = req(None, "POST", url, data=body)
+    assert "<TABLE" not in r.text  # the empty answer is the answer
+    assert seen == [
+        ("vizier.cds.unistra.fr", "cone"),
+        ("vizier.cfa.harvard.edu", "cone"),
+        ("vizier.cfa.harvard.edu", "cone"),  # the confirmation (same cone, no mini form)
+        ("vizier.cfa.harvard.edu", "probe"),
+    ]
+    assert throttle._holds_known("vizier.cfa.harvard.edu", "J/ApJS/256/43/table10")
+    seen.clear()
+    throttle._preferred.update(host=None, until=0.0)
+    throttle._unreachable.clear()
+    req(None, "POST", url, data=body)  # a new process: the probe is remembered, the confirmation is not skipped
+    assert seen == [("vizier.cfa.harvard.edu", "cone"), ("vizier.cfa.harvard.edu", "cone")]
+
+
+def test_the_existence_probe_body_has_no_cone_and_one_row():
+    body = "-source=J/x\n-c=1+2\n-c.rm=6.0\n-out.all\n-out.max=unlimited\n-out.form=mini\n-oc.form=d"
+    assert throttle._probe_body(body).splitlines() == ["-source=J/x", "-out.all", "-out.max=1"]
+    d = throttle._probe_body({"-source": "J/x", "-c": "1 2", "-c.rm": 6, "-out.form": "mini"})
+    assert d == {"-source": "J/x", "-out.max": 1}
+    assert throttle._probe_body(None) is None
+
+
+DB_DOWN = (
+    '<VOTABLE><RESOURCE type="results"><INFO ID="ERROR" NAME="ERROR" VALUE="THE DATABASE IS NOT CURRENTLY REACHABLE."/>'
+    '<INFO NAME="ERROR" VALUE=" "/><INFO NAME="ERROR" VALUE=" -- NO CONNECTION"/></RESOURCE></VOTABLE>'
+)
+NOT_FOUND = (
+    '<VOTABLE><RESOURCE type="results"><INFO NAME="ERROR" VALUE="Table or Catalog not found: J/FAKE/999/none;--POSTGRES MSG"/>'
+    "</RESOURCE></VOTABLE>"
+)
+ROWS = "<VOTABLE><RESOURCE><TABLE><TR><TD>1</TD></TR></TABLE></RESOURCE></VOTABLE>"
+EMPTY = "<VOTABLE><RESOURCE></RESOURCE></VOTABLE>"
+
+
+def test_the_error_of_a_votable_is_read():
+    assert throttle._answer_error(_V(DB_DOWN)) == "THE DATABASE IS NOT CURRENTLY REACHABLE.; NO CONNECTION"
+    assert "not found" in throttle._answer_error(_V(NOT_FOUND)).lower()
+    assert throttle._error_kind(throttle._answer_error(_V(DB_DOWN))) == "backend"
+    assert throttle._error_kind(throttle._answer_error(_V(NOT_FOUND))) == "not found"
+    assert throttle._answer_error(_V(EMPTY)) is None and throttle._answer_error(_V(ROWS)) is None
+
+
+def test_a_failed_database_of_a_mirror_is_asked_again_before_the_next_mirror():
+    """2.60.2: CfA answers 200 with 'THE DATABASE IS NOT CURRENTLY REACHABLE' in 1 of 6 requests (0.1-0.5 s answers);
+    the mirrors after it refuse or need 8-17 s: the same mirror is asked once more."""
+    seen, calls = [], {"cfa": 0}
+
+    def send(self, method, url, *a, data=None, **k):
+        host = url.split("/")[2]
+        seen.append(host)
+        if host == "vizier.cds.unistra.fr":
+            return Resp(404)
+        calls["cfa"] += 1
+        return _V(DB_DOWN if calls["cfa"] == 1 else ROWS)
+
+    r = throttle._with_mirrors(send)(None, "POST", "https://vizier.cds.unistra.fr/viz-bin/votable", data=MINI)
+    assert "<TR>" in r.text and seen == ["vizier.cds.unistra.fr", "vizier.cfa.harvard.edu", "vizier.cfa.harvard.edu"]
+
+
+def test_a_mirror_whose_database_stays_down_is_left_for_the_next_one():
+    seen = []
+
+    def send(self, method, url, *a, data=None, **k):
+        host = url.split("/")[2]
+        seen.append(host)
+        if host == "vizier.cds.unistra.fr":
+            return Resp(404)
+        return _V(DB_DOWN if host == "vizier.cfa.harvard.edu" else ROWS)
+
+    r = throttle._with_mirrors(send)(None, "POST", "https://vizier.cds.unistra.fr/viz-bin/votable", data=MINI)
+    assert "<TR>" in r.text
+    assert seen == ["vizier.cds.unistra.fr", "vizier.cfa.harvard.edu", "vizier.cfa.harvard.edu", "vizier.nao.ac.jp"]
+    import archive_cache
+
+    assert archive_cache.source_down("vizier:vizier.cfa.harvard.edu")  # tried last by the next search
+
+
+def test_a_mirror_that_says_not_found_lacks_the_catalogue():
+    seen = []
+
+    def send(self, method, url, *a, data=None, **k):
+        host = url.split("/")[2]
+        seen.append(host)
+        if host == "vizier.cds.unistra.fr":
+            return Resp(404)
+        return _V(NOT_FOUND if host == "vizier.cfa.harvard.edu" else ROWS)
+
+    body = "-source=VIII/92/first14\n-c=1+2\n-out.form=mini"
+    r = throttle._with_mirrors(send)(None, "POST", "https://vizier.cds.unistra.fr/viz-bin/votable", data=body)
+    assert "<TR>" in r.text and seen == ["vizier.cds.unistra.fr", "vizier.cfa.harvard.edu", "vizier.nao.ac.jp"]
+    assert throttle._lacking("VIII/92/first14") == {"vizier.cfa.harvard.edu"}
+
+
+def test_the_confirmation_of_a_mirror_whose_database_failed_is_asked_again():
+    """The first answer is an empty cone; the confirmation hits a failed database once, then says 'empty table'."""
+    n = {"confirm": 0}
+    seen = []
+
+    def send(self, method, url, *a, data=None, **k):
+        host = url.split("/")[2]
+        seen.append(host)
+        if host == "vizier.cds.unistra.fr":
+            return Resp(404)
+        if "-out.form=mini" in (data or ""):
+            return _V(EMPTY)
+        n["confirm"] += 1
+        return _V(DB_DOWN if n["confirm"] == 1 else "<VOTABLE><RESOURCE><TABLE></TABLE></RESOURCE></VOTABLE>")
+
+    r = throttle._with_mirrors(send)(None, "POST", "https://vizier.cds.unistra.fr/viz-bin/votable", data=MINI)
+    assert "<TABLE" not in r.text  # the empty cone is the answer
+    assert seen == ["vizier.cds.unistra.fr"] + ["vizier.cfa.harvard.edu"] * 3  # cone, confirmation, confirmation again
+
+
+def test_a_mirror_that_timed_out_is_tried_last_by_the_next_request_of_the_process():
+    """2.60.2: IUCAA times out after 10 s every time; each of the collectors that ran in parallel paid it again."""
+    seen = []
+    req = throttle._with_mirrors(
+        _send({"vizier.cds.unistra.fr": "refuse", "vizier.cfa.harvard.edu": "slow", "vizier.nao.ac.jp": "slow"}, seen)
+    )
+    req(None, "GET", "https://vizier.cds.unistra.fr/viz-bin/votable")
+    assert seen[-1].startswith("https://vizier.nao.ac.jp") is False and "vizier.iucaa.in" in seen[-1]
+    seen.clear()
+    throttle._preferred.update(host=None, until=0.0)
+    req(None, "GET", "https://vizier.cds.unistra.fr/viz-bin/votable")
+    assert len(seen) == 1 and "vizier.iucaa.in" in seen[0]  # the three that did not answer are not asked first again
+
+
+def test_a_failed_database_everywhere_is_an_error_not_an_empty_cone():
+    """2.60.2 review: CfA's 'database not reachable' (HTTP 200, no table) on the last mirror left was returned as the
+    answer, which astroquery reads as a cone without rows; it is an error now."""
+    import pytest
+
+    def send(self, method, url, *a, data=None, **k):
+        host = url.split("/")[2]
+        if host == "vizier.cfa.harvard.edu":
+            return _V(DB_DOWN)
+        raise __import__("requests").exceptions.ConnectionError("refused")
+
+    with pytest.raises(RuntimeError, match="NOT CURRENTLY REACHABLE"):
+        throttle._with_mirrors(send)(None, "POST", "https://vizier.cds.unistra.fr/viz-bin/votable", data=MINI)
+    assert throttle._preferred["host"] is None  # the failing mirror is not preferred
+
+
+def test_a_catalogue_no_reachable_mirror_holds_is_an_error_not_an_empty_cone():
+    """2.60.2 review: Strasbourg down, CfA 'Table or Catalog not found', the rest refused: not an empty cone."""
+    import pytest
+
+    def send(self, method, url, *a, data=None, **k):
+        host = url.split("/")[2]
+        if host == "vizier.cfa.harvard.edu":
+            return _V(NOT_FOUND)
+        raise __import__("requests").exceptions.ConnectionError("refused")
+
+    with pytest.raises(RuntimeError, match="not found"):
+        throttle._with_mirrors(send)(None, "POST", "https://vizier.cds.unistra.fr/viz-bin/votable", data=MINI)
+
+
+def test_a_mirror_whose_probe_says_it_lacks_the_catalogue_is_not_an_empty_cone_when_no_other_answers():
+    """2.60.2 review: table-less cone and confirmation, and the existence probe without a table (the mirror lacks the
+    catalogue): with every other mirror refused this is an error, not an empty result."""
+    import pytest
+
+    def send(self, method, url, *a, data=None, **k):
+        host = url.split("/")[2]
+        if host == "vizier.cfa.harvard.edu":
+            return _V(EMPTY)  # cone, confirmation and probe: no table, no error
+        raise __import__("requests").exceptions.ConnectionError("refused")
+
+    with pytest.raises(RuntimeError, match="lacks the catalogue"):
+        throttle._with_mirrors(send)(None, "POST", "https://vizier.cds.unistra.fr/viz-bin/votable", data=MINI)
+
+
+def test_a_failed_confirmation_is_not_settled_by_the_existence_probe():
+    """PR #78 review: CfA's cone answer has no table, its confirmation fails with 503 and its existence probe finds the
+    catalogue; the cone must not be taken as empty: the next mirror's rows win."""
+    calls = {"cfa": 0}
+
+    class R:
+        def __init__(self, code, text):
+            self.status_code, self.text, self.headers = code, text, {"Content-Type": "text/xml;content=x-votable"}
+
+    def send(self, method, url, *a, data=None, **k):
+        host = url.split("/")[2]
+        if host == "vizier.cds.unistra.fr":
+            raise __import__("requests").exceptions.ConnectionError("refused")
+        if host == "vizier.cfa.harvard.edu":
+            calls["cfa"] += 1
+            return {1: R(200, EMPTY), 2: R(503, "")}.get(calls["cfa"], R(200, ROWS))  # cone, confirmation, probe
+        return R(200, ROWS.replace("<TD>1</TD>", "<TD>nao</TD>"))
+
+    r = throttle._with_mirrors(send)(None, "POST", "https://vizier.cds.unistra.fr/viz-bin/votable", data=MINI)
+    assert "nao" in r.text  # not CfA's empty cone
+    assert calls["cfa"] == 2  # no existence probe after a failed confirmation

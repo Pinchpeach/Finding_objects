@@ -23,10 +23,18 @@ META = {
 }
 
 
-def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
-    frames = []
-    failed = []
-    for table_id, subtype in TABLES.items():
+def _per_table(ra: float, dec: float, radius_arcmin: float):
+    """{table id: rows (a DataFrame) or None} and the tables that failed.  One request asks the four tables
+    together (2.60.2: ``-source=a,b,c,d``): a cold search of an empty cone spent 8-13 requests and 85-110 s on four
+    requests of its own; a request that fails is asked table by table as before."""
+    try:
+        tabs = vizier_query(list(TABLES), ra, dec, radius_arcmin)
+        have = set(tabs.keys())
+        return {t: (tabs[t].to_pandas() if t in have else None) for t in TABLES}, []
+    except Exception:
+        pass
+    out, failed = {}, []
+    for table_id in TABLES:
         # A failed table is recorded, not skipped silently: its rows would be
         # missing from a result that the archive cache keeps for 90 days.
         try:
@@ -34,7 +42,17 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
         except Exception as exc:
             failed.append(f"{table_id.rsplit('/',1)[-1]}:{type(exc).__name__}")
             continue
-        df = tabs[0].to_pandas() if tabs else None
+        out[table_id] = tabs[0].to_pandas() if tabs else None
+    return out, failed
+
+
+def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
+    frames = []
+    tables, failed = _per_table(ra, dec, radius_arcmin)
+    for table_id, subtype in TABLES.items():
+        if table_id not in tables:  # failed above
+            continue
+        df = tables[table_id]
         if df is None or df.empty:
             continue
         idc = pick(df, ["WISEA", "IRAS", "OI-N", "CI-N", "OW-N", "CW-N", "recStar"])

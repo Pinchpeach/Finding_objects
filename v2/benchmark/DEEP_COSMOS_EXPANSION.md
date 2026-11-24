@@ -94,3 +94,19 @@
 ## 5. 이 단계에서 하지 않은 것
 - 수집, 분류, 문턱 변경, 세트 C 채점.
 - Euclid Q1·4XMM 같은 다른 정답: 범위 밖.
+
+## 6. 결과 (2026-11-24)
+26개 영역이 ESA Gaia 기준으로 수집됐고(`validation-data/deep_cosmos2/45322742717/`, `deep_cosmos1/45325505343/`) 안 A대로 문턱 0.1 고정으로 확인 측정을 했다. 새 17개의 순도는 예측과 맞고(ACS 영상이 덮은 곳의 후보로 쟀을 때 0.253, 구간 0.17–0.35), 재현율은 예측보다 높다(0.526, 0.42–0.63). 문턱 선택에 안 쓴 21개 영역의 합은 재현율 0.484, 순도 0.244. 표·정의·원인 후보는 `WORK_REPORT_2026-11-24.md` 1단계, 수치 표는 `deep_cosmos_confirmation/`, 스크립트는 `qso_candidate_confirmation.py`.
+
+### 6.1 후보 순도의 정의 (ACS 덮개, 고정)
+- **후보 순도는 후보가 HST/ACS가 덮은 곳에 있을 때만 센다.** 분모 = ACS 안(가장 가까운 COSMOS2020 행이 1.0″(`MATCH_ARCSEC`, 정답 맞춤과 같은 반경) 안에서 `ACSF814Wmag`를 가짐)의 후보 중 정답 등급(Chandra 1형·2형, COSMOS2020 별·은하)이 있는 것, 분자 = 그중 Chandra 1형. 재현율은 Chandra 1형 정답만 쓰므로 ACS와 무관하다. 순도 범위는 같은 곳에서 정답 등급이 없는 후보를 모두 거짓 / 모두 참으로 센 값이다.
+- **이유:** COSMOS2020의 별·은하 등급(`ACSmuClass`, `lptype`)은 ACS 영상이 있는 곳에만 있고 Chandra 1형은 영역 전체에 있다. 2.58.0의 정의(1형은 전체, 거짓 후보는 ACS 쪽만)는 영역이 ACS로 거의 덮일 때(원래 9개 평균 78 %)만 맞고, 바깥의 새 17개(평균 51 %)에서는 분모에서 정답 없는 후보가 빠져 **새 17개의 순도가 0.357로 부풀려진다**(ACS 안만 세면 0.253). 원래 9개에서는 두 정의가 같다(0.333 대 0.329).
+- **재현되지 않는 2.58.0 수치:** 2.58.0 보고서의 "시험 후보 43개 중 정답 등급 없는 것 10개"는 저장된 2.58.0 분류 결과에 `qso_candidate_confirmation.py`를 돌려도 40개 중 7개(범위 17.5–35 %)로 나온다. 순도 7/34 = 21 % 자체는 정확히 재현된다.
+- **표시 수치(앱 툴팁·README·ALGORITHM, 2.60.2):** 문턱 선택에 쓰지 않은 21개 영역 `all26_without_orig_cal`: 순도 29/119 = 24 %(Wilson 18–33 %), 재현율 47/97 = 48 %(39–58 %). 26개 전부(0.289)는 쓰지 않는다.
+- **재현:** 4절 3의 방식으로 26개 영역 원자료를 `DIR/<영역>/`에 푼 뒤(원래 9개는 `deep_cosmos1/45325505343/`, 새 17개는 `deep_cosmos2/45322742717/`):
+  ```
+  F=v2/benchmark/deep_cosmos_confirmation/fields_all26.csv      # SHA-256 c00298015e91573e6095726316449733f2d29495e163a03ccdb77d77c3896100
+  python v2/benchmark/faint_qso_candidates.py classify --deep DIR --fields-file $F --variant base --jobs 3
+  python v2/benchmark/qso_candidate_confirmation.py --deep DIR --fields-file $F --out OUT --run base
+  ```
+  `OUT/groups_base.csv`의 `all26_without_orig_cal` 행(`tp_acs` 29, `graded_acs` 119, `type1_claimed` 47, `n_type1` 97)이 표시 수치이고 저장소의 `deep_cosmos_confirmation/groups_base.csv`와 같다.

@@ -295,7 +295,7 @@ def test_literature_only_entries_hidden_and_labelled():
 
 
 def test_faint_qso_candidate_does_not_read_like_a_dual_label():
-    """2.58.0 review: a FAINT_QSO_CANDIDATE (about 1 in 5 a quasar in the COSMOS test fields) is shown as
+    """2.58.0 review: a FAINT_QSO_CANDIDATE (about 1 in 4 a quasar in the 21 COSMOS fields, 2.60.2) is shown as
     "QSO?" in grey with its measured purity, not as "QSO" like the 2.46.0 dual readings."""
     pytest.importorskip("PySide6")
     import pandas as pd
@@ -321,7 +321,8 @@ def test_faint_qso_candidate_does_not_read_like_a_dual_label():
     assert model.data(model.index(1, col), Qt.ForegroundRole).name() == CLASS_COLORS["UNKNOWN"]
     assert model.data(model.index(0, col), Qt.ForegroundRole).name() == CLASS_COLORS["QSO"]
     tip = model.data(model.index(1, col), Qt.ToolTipRole)
-    assert "1 in 5" in tip and "default 0.1" in tip  # the purity is the default threshold's (PR #74 review)
+    # the purity is the default threshold's, measured on the 21 fields the threshold was not chosen on (2.60.2)
+    assert "1 in 4" in tip and "29 of 119" in tip and "default 0.1" in tip and "48 % (39-58 %)" in tip
     assert tip.startswith("P(QSO) of this object: 0.07")
     assert "WISE AGN" in model.data(model.index(0, col), Qt.ToolTipRole)
 
