@@ -219,6 +219,7 @@ SIMBAD 수집기 출력(단독): 행 집합 같음. 열 순서는 고정으로 �
   - 천체가 `REFERENCE_MAX_OBJECTS` = 60,000(측정한 10′ 경우가 들어가는 값)을 넘는 원뿔에서는 참고문헌을 묻지 않는다. `simbad_reference_status = skipped:more_than_60000_objects`로 표시하고, 원뿔 행은 그대로 받는다(수집기 실패 아님).
   - 시험: `test_a_cone_with_very_many_objects_skips_the_references`.
   - 2.54.0 경로라면 같은 원뿔에서 참고문헌 질의만 수백 번이라 수집기 예산(300 s) 안에 끝나지 않았다.
+  - 참고문헌을 건너뛴 결과는 저장소 캐시에 넣지 않는다(`simbad_reference_query_status = skipped…`, PR #76 Codex 검토). 캐시는 큰 원뿔로 그 안의 작은 원뿔을 채우므로, 넣으면 작은 검색도 참고문헌 없이 나온다.
 
 ### 10.3 실패한 서버 기억이 복구를 늦추지 않는가
 - **순서만 바꾸고 건너뛰지 않는다**(`_ordered_servers`, `_vizier_order`).
@@ -237,4 +238,4 @@ SIMBAD 수집기 출력(단독): 행 집합 같음. 열 순서는 고정으로 �
 
 ### 10.5 정확도·속도
 - 1차·세부 라벨은 바뀌지 않는다(6절). 이번 검토 수정도 수집 경로만 바꾼다(VizieR 디스크 캐시, 큰 원뿔의 SIMBAD 참고문헌). 세트 C는 채점하지 않는다.
-- 시험 283개 통과(앱 시험 포함, 검토 시험 2개 추가).
+- 시험 283개 통과(앱 시험 포함, 검토 시험 2개 추가). CI 시험 작업에는 astroquery가 없어, VizieR 캐시 시험은 가짜 `astroquery.vizier` 모듈로 돈다(Codex 검토).

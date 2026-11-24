@@ -219,14 +219,16 @@ def test_a_cone_with_very_many_objects_skips_the_references(sim, monkeypatch):
     d = simbad.fetch(150.15, 2.15, 2.0)
     assert [c[0] for c in calls] == [CDS]  # the cone only
     assert len(d) == 2 and d.simbad_reference_status.str.startswith("skipped:more_than_1_objects").all()
-    assert d.simbad_reference_query_status.eq("ok").all()  # not a failure: the cone is complete
     assert d.simbad_otype_label.tolist() == ["Supernova Remnant", "Galaxy"]
+    # complete rows, but not cached: a smaller cone served from it would lack its references (PR #76 review)
+    assert d.simbad_reference_query_status.str.startswith("skipped").all() and not archive_cache.cacheable(d)
 
 
 def test_vizier_cone_queries_bypass_astroquerys_disk_cache(monkeypatch):
     """2.60.0 review: Vizier.query_region passes cache=True itself, which overrode the global switch of
     controller._disable_astroquery_cache(); every VizieR answer was replayed for 7 days."""
-    import astroquery.vizier as av
+    import types
+
     import _catalog_utils
 
     seen = {}
@@ -239,7 +241,12 @@ def test_vizier_cone_queries_bypass_astroquerys_disk_cache(monkeypatch):
             seen.update(k)
             return []
 
-    monkeypatch.setattr(av, "Vizier", FakeVizier)
+    # a stand-in module: the CI test job has no astroquery (PR #76 review)
+    fake = types.ModuleType("astroquery.vizier")
+    fake.Vizier = FakeVizier
+    if "astroquery" not in sys.modules:
+        monkeypatch.setitem(sys.modules, "astroquery", types.ModuleType("astroquery"))
+    monkeypatch.setitem(sys.modules, "astroquery.vizier", fake)
     assert _catalog_utils.vizier_cone("I/355/gaiadr3", 10.0, 20.0, 1.0) is None
     assert seen.get("cache") is False
     src = (GET / "pn_spectroscopy.py").read_text()

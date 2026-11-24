@@ -250,7 +250,10 @@ def fetch(ra, dec, radius_arcmin):
     # *_query_status is what archive_cache.cacheable() checks: a failed
     # reference / object-type lookup must not be cached for LIVE_TTL_DAYS.
     st = df["simbad_reference_status"].astype(str)
-    df["simbad_reference_query_status"] = st.where(st.str.startswith("error"), "ok")
+    # A cone whose references were skipped (REFERENCE_MAX_OBJECTS) is not cached either (PR #76 review):
+    # archive_cache serves smaller cones from a containing one, which would then lack references a search of
+    # their own size gets.  Its rows are complete; only the cache leaves it out.
+    df["simbad_reference_query_status"] = st.where(st.str.startswith(("error", "skipped")), "ok")
     return df
 
 
