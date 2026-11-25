@@ -134,7 +134,8 @@ jobs:
           d=$((RANDOM % 90)); echo "start delay $d s"; sleep $d
           python -u v2/pipeline.py --ra $RA --dec $DEC --radius $R --work /tmp/field
       - name: Ask a failed Legacy Surveys archive again once (2.60.10)
-        # Only desi_legacy, only when it failed or came from the viewer copy, only once, after 2 minutes: the Data Lab
+        # Only desi_legacy, only when it failed (a viewer-copy result is kept and counted in ls_source_regions: a
+        # failing retry would turn a usable result into a gate failure), only once, after 2 minutes: the Data Lab
         # outages of 2026-11-25 lasted minutes.  The collection summary is rewritten, so the gate below counts the
         # outcome of the retry; the gate itself is unchanged.  A healthy run asks nothing.
         continue-on-error: true

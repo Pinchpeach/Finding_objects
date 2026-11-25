@@ -130,6 +130,19 @@ def hedge_delay_s(radius_arcmin: float) -> float:
     return min(ATTEMPT_BUDGET_S, HEDGE_DELAY_S * 1.5 * (r / 10.0) ** 2)
 
 
+def retry_budget_s(ra: float, dec: float, radius_arcmin: float) -> float:
+    """Budget of a retry, or of a search after a remembered failure (``controller._budget``; 2.60.10 review, Codex).
+
+    RETRY_BUDGET_S (90 s) keeps a retry during an outage from becoming another 5-minute wait, and it is enough for a
+    cone of up to 10' (a viewer box answers in ~15 s).  A larger cone that the viewer serves needs the hedge delay of
+    the cone plus all its tiles (20': up to 80 s + 170 s; 101 s measured for the four tiles): with 90 s a working
+    viewer could never finish during a Data Lab outage.  Cones the viewer does not serve keep 90 s."""
+    r = float(radius_arcmin)
+    if r <= 10.0 or not viewer_usable(ra, dec, r):
+        return RETRY_BUDGET_S
+    return max(RETRY_BUDGET_S, hedge_delay_s(r) + VIEWER_BUDGET_S + 10.0)
+
+
 def _query_with_retries(run, hedge=None, attempts=None, attempt_budget_s=None, hedge_delay=None):
     """Result of ``run()`` (the Data Lab TAP), in up to ATTEMPTS attempts of
     ATTEMPT_BUDGET_S each.  ``hedge`` (2.57.0): a second path to the same rows,
@@ -294,9 +307,12 @@ def _edge(x: float, direction: int) -> str:
     return f"{n / 1e8:.8f}"
 
 
-def _viewer_read(resp, limit: int = None) -> bytes:
+def _viewer_read(resp, limit: int = None, deadline: float = None) -> bytes:
     """The body of a viewer answer, at most VIEWER_MAX_BYTES: a box that is that large is not read on (a dense
-    field; the hedge fails, which is what happens without a hedge)."""
+    field; the hedge fails, which is what happens without a hedge).  ``deadline`` (``time.monotonic()``): the
+    cone's VIEWER_BUDGET_S is also kept while a slow answer streams in (2.60.10 review, Codex)."""
+    import time
+
     limit = VIEWER_MAX_BYTES if limit is None else limit
     if hasattr(resp, "iter_content"):
         chunks, n = [], 0
@@ -305,6 +321,9 @@ def _viewer_read(resp, limit: int = None) -> bytes:
             if n > limit:
                 resp.close()
                 raise RuntimeError(f"Legacy Surveys viewer: answer larger than {limit / 1e6:.0f} MB, not read")
+            if deadline is not None and time.monotonic() > deadline:
+                resp.close()
+                raise TimeoutError(f"Legacy Surveys viewer: tiles not done in {VIEWER_BUDGET_S:.0f} s (while reading)")
             chunks.append(c)
         return b"".join(chunks)
     if len(resp.content) > limit:
@@ -346,7 +365,7 @@ def _viewer_fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
             stream=True,
         )
         resp.raise_for_status()
-        body = _viewer_read(resp)
+        body = _viewer_read(resp, deadline=t0 + VIEWER_BUDGET_S)
         if body[:6] != b"SIMPLE":  # "No catalog sources in layer and RA,Dec box"
             if b"No catalog sources" in body[:200]:
                 continue
@@ -377,6 +396,8 @@ def _viewer_fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
         df = pd.DataFrame(data)
         keep = col("brick_primary").astype(bool) if "brick_primary" in tab.colnames else np.ones(len(df), bool)
         parts.append(df[keep])
+    if time.monotonic() - t0 > VIEWER_BUDGET_S:  # the last tile finished late: not accepted (2.60.10 review, Codex)
+        raise TimeoutError(f"Legacy Surveys viewer: {len(tiles)} tiles not done in {VIEWER_BUDGET_S:.0f} s")
     if not parts:
         return pd.DataFrame(columns=list(TAP_COLUMNS) + ["legacy_query_status"])
     df = pd.concat(parts, ignore_index=True).drop_duplicates("ls_id", keep="last")
