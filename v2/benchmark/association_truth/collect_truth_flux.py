@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""COSMOS2020 Classic positions, i-band magnitude and the fluxes of the blend model, per deep field (2.60.8).
+"""COSMOS2020 Classic positions, i-band magnitude and the fluxes of the blend model, per deep field (2.60.9).
 
     python collect_truth_flux.py --out DIR [--fields-file fields_split.csv]
 

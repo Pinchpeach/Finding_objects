@@ -56,10 +56,10 @@ def test_no_galaxy_class_no_host():
     assert hg.attach_galaxy_fragments(d).parent_object_id.isna().all()
 
 
-# ------------------------------------------------------------------------------------------ 2.60.8 tuning switches
+# ------------------------------------------------------------------------------------------ 2.60.9 tuning switches
 def _pair_of_hosts():
     """A bright extended galaxy and, 0.3'' away, a fainter extended galaxy that took the AllWISE and PS1 rows (the
-    two Tractor models of one source that the 2.60.8 COSMOS2020 measurement found most often)."""
+    two Tractor models of one source that the 2.60.9 COSMOS2020 measurement found most often)."""
     a = 1 / 3600
     d = _field().iloc[:1].copy()  # G: galaxy r = 18, r_e = 3''
     d["object_id"] = "H"

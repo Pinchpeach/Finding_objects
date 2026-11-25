@@ -1,4 +1,4 @@
-"""Likelihood-ratio diagnostics of the association stage and the measurement helpers (2.60.8)."""
+"""Likelihood-ratio diagnostics of the association stage and the measurement helpers (2.60.9)."""
 
 import importlib.util
 import math

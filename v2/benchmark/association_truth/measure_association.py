@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Association-stage measurement against COSMOS2020 positions (2.60.8, work order 2026-11-25, task 4 step 1).
+"""Association-stage measurement against COSMOS2020 positions (2.60.9, work order 2026-11-25, task 4 step 1).
 
 What the stage can be judged on.  Until now the only measurement of the association was the shifted-catalogue test
 (NWAY, Salvato et al. 2018: move AllWISE / 2MASS by 2', count the rows that still join an object).  It measures chance

@@ -218,7 +218,7 @@ jobs:
               snr3) export V2_LS_GBM_DOMAIN=snr3;;  # domain also r S/N >= 3
               fw-*) export V2_FUSION_WEIGHTS="$GITHUB_WORKSPACE/v2/Preprocess/${v#fw-}.json";;  # another fusion fit, e.g. fw-fusion_weights_nopresence
               off-*) r="${v#off-}"; export V2_DISABLE_RULES="${r//+/,}";;  # rule ablation, e.g. off-AST-EXT-001+PS1-MORPH-001
-              # fragment grouping (2.60.8; benchmark/association_truth/regroup.py): a host-qualified object may be the fragment
+              # fragment grouping (2.60.9; benchmark/association_truth/regroup.py): a host-qualified object may be the fragment
               # of a brighter host (fraghc), also within 1.5'' of the host centre (fragm15hc); the halo radius at the MEDIUM mask
               fraghc) export V2_FRAG_HOST_CANDIDATE=1;;
               fragm15hc) export V2_FRAG_HOST_CANDIDATE=1 V2_FRAG_MIN_ARCSEC=1.5;;

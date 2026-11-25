@@ -1,4 +1,4 @@
-"""Gaia release table and classification assumptions (2.60.5, DR4 readiness).
+"""Gaia release table and classification assumptions (2.60.6, DR4 readiness).
 
 DR3 must behave exactly as before the constants were gathered into per-release tables: the column lists and the
 queries the collector sends, the numbers Stage 3/4/5 use.  DR4 must not run through DR3's assumptions silently.
@@ -37,7 +37,7 @@ def _sha(cols):
 
 # --------------------------------------------------------------------------------------------- collection side
 def test_dr3_column_lists_are_what_the_collector_always_asked():
-    # hashes of the lists as they were in gaia_dr3.py before 2.60.5 (30 / 15 / 8 / 9 columns)
+    # hashes of the lists as they were in gaia_dr3.py before 2.60.6 (30 / 15 / 8 / 9 columns)
     assert _sha(gr.SOURCE) == "142419ccaf003568e0cd72ebf2cc7f11616c252999d17170805cc5fa985cc136"
     assert _sha(gr.AP) == "f1bdba4d991aed54733a914bbf700b37dbcfe372032edef7fd8bfe37eddf356a"
     assert _sha(gr.SPEC_AP) == "6b09b949197f7174b43c024b84a58de1c26c173f66f924b7fdfe892b43146507"
@@ -108,7 +108,7 @@ def _one_row():
     return df
 
 
-def test_dr4_without_a_product_map_asks_no_dr4_table_and_uses_the_dr3_copy(monkeypatch):
+def test_dr4_without_a_product_map_asks_no_dr4_table_and_uses_the_dr3_copy(monkeypatch, capsys):
     monkeypatch.setenv("V2_GAIA_RELEASE", "DR4")
     monkeypatch.delenv("V2_GAIA_SOURCE", raising=False)
     asked = []
@@ -122,6 +122,8 @@ def test_dr4_without_a_product_map_asks_no_dr4_table_and_uses_the_dr3_copy(monke
     assert set(out["gaia_release"]) == {"DR3"} and set(out["ref_epoch"]) == {2016.0}  # honestly labelled
     assert set(out["gaia_base_query_status"]) == {"vizier_fallback"}
     assert gr.RELEASES["DR4"].products is None and gr.RELEASES["DR4"].ref_epoch == 2017.5
+    # not silent: the run log says DR4 was asked and the DR3 copy answered (2.60.6 review)
+    assert "Gaia DR4 was requested; answered by the VizieR DR3 copy" in capsys.readouterr().out
 
 
 def test_the_cache_key_names_the_release(monkeypatch):
@@ -203,3 +205,35 @@ def test_stage4_refuses_dr4_rows_instead_of_using_dr3_zero_point():
     assert dr3 == s4.cstar_sigma({**src, "gaia_release": "DR3"})
     with pytest.raises(LookupError):
         s4.cstar_sigma({**src, "gaia_release": "DR4"})
+
+
+def test_dr4_check_fails_on_an_unverified_or_different_reference_epoch(capsys):
+    """2.60.6 review (Codex): the DR4 preflight must not pass when ref_epoch differs from gaia_release.py or cannot
+    be read, because the collector stamps that epoch on every row and Stage 1 propagates proper motions with it."""
+    import json
+    from types import SimpleNamespace
+
+    import check_gaia_release as chk
+
+    draft = json.loads(chk.DRAFT.read_text(encoding="utf-8"))
+
+    class FakeGaia:
+        def __init__(self, epoch):
+            self.epoch = epoch
+
+        def load_table(self, name):
+            schema, t = name.split(".", 1)
+            if schema != "gaiadr4" or t not in draft:
+                raise KeyError(name)
+            cols = list(draft[t]) + (chk.NEEDED_DR3_COLUMNS + ["tentative_parallax_bias"] if t == "gaia_source" else [])
+            return SimpleNamespace(columns=[SimpleNamespace(name=c) for c in cols])
+
+        def launch_job(self, q):
+            if self.epoch is None:
+                raise RuntimeError("TAP down")
+            return SimpleNamespace(get_results=lambda: {"ref_epoch": [self.epoch]})
+
+    assert chk.check_dr4(FakeGaia(gr.RELEASES["DR4"].ref_epoch), None) is False  # all present, epoch agrees
+    assert chk.check_dr4(FakeGaia(2016.0), None) is True  # DR3's epoch: rows would be propagated wrongly
+    assert chk.check_dr4(FakeGaia(None), None) is True  # epoch not verified
+    capsys.readouterr()

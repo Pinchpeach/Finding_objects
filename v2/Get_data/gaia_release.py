@@ -11,7 +11,7 @@ fixed by the release are kept here:
 * designation prefix ("Gaia DR3 <source_id>");
 * the VizieR mirror used as an outage fallback (DR3 only for now).
 
-2.60.5 (DR4 readiness, ``v2/GAIA_DR4_READINESS_2026-11-25.md``): the tables and columns the collector reads are a
+2.60.6 (DR4 readiness, ``v2/GAIA_DR4_READINESS_2026-11-25.md``): the tables and columns the collector reads are a
 per-release *product map* (``GaiaRelease.products``), not module constants of ``gaia_dr3.py``.  DR3 holds the map the
 collector always used (unchanged); DR4 holds ``None`` until the archive's own metadata has been checked
 (``check_gaia_release.py --release DR4``): the 2026-06-26 draft data model splits the astrophysical parameters into
@@ -57,7 +57,7 @@ class GaiaRelease:
     products: dict | None = None
 
 
-# --- DR3 column lists (moved from gaia_dr3.py in 2.60.5; the collector's behaviour is unchanged) -------------
+# --- DR3 column lists (moved from gaia_dr3.py in 2.60.6; the collector's behaviour is unchanged) -------------
 SOURCE = [
     "source_id",
     "designation",

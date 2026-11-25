@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Replay the three grouping steps of ``pipeline.py`` on a finished run and score fragments against COSMOS2020 (2.60.8).
+"""Replay the three grouping steps of ``pipeline.py`` on a finished run and score fragments against COSMOS2020 (2.60.9).
 
     python regroup.py --runs DIR --truth-flux DIR --variant base|... --out DIR [--fields-root DIR]
 

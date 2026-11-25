@@ -433,9 +433,9 @@ section(
         [
             [
                 "**Locked test set C** (60 regions, 12′ radius, list locked by SHA-256, scored once per release, aggregate only)",
-                "2.52.0",
-                "**99.65 %** (99.40–99.86), 3,170 objects",
-                "Regions never used in development. About 95 % of the truth are stars (always answering STAR scores 95.24 %), about 144 galaxies and 7 QSOs: **little information on galaxies and QSOs**. On the 97.8 % of objects that have a Gaia DSC class, DSC alone scores 99.52 % and the pipeline 99.81 %. Not scored again since 2.52.0 (2.55.0 changed the coarse path for sources without an r detection).",
+                "2.60.4 (coarse code of 2.60.2)",
+                "**99.65 %** (99.40–99.86), 3,162 objects",
+                "Regions never used in development. About 95 % of the truth are stars (always answering STAR scores 95.26 %), about 143 galaxies and 7 QSOs: **little information on galaxies and QSOs**. On the 98.0 % of objects that have a Gaia DSC class, DSC alone scores 99.52 % and the pipeline 99.81 %. Same as the 2.52.0 score (11 errors each). By region pool: low latitude 99.89 % (11 regions, 879 objects, all stars), south 99.08 % (218), LAMOST sky 99.61 % (2,065).",
             ],
             [
                 "**Sky-spread SDSS spectroscopic benchmark** (768 equal-area sky cells)",

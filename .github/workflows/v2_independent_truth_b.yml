@@ -47,7 +47,7 @@ jobs:
     strategy:
       fail-fast: false
       # spread the archive load (VizieR mirrors share it since 2.36.4; each job also waits 3-5 s per request); with NED asked:
-      # one job at a time (NED guidelines, 2.60.7)
+      # one job at a time (NED guidelines, 2.60.8)
       max-parallel: ${{ github.event.inputs.with_ned == 'true' && 1 || 6 }}
       matrix:
         region:

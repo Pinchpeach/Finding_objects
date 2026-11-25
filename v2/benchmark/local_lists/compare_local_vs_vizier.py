@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Local cone answers against live VizieR cones (2.60.6, ``Get_data/local_lists.py``).
+"""Local cone answers against live VizieR cones (2.60.7, ``Get_data/local_lists.py``).
 
     python v2/benchmark/local_lists/compare_local_vs_vizier.py --out OUT.csv [--hits 16] [--empty 4] [--seed N]
 

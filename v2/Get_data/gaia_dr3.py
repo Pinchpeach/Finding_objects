@@ -427,7 +427,7 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     try:
         if mode == "vizier":
             raise ArchiveDown("V2_GAIA_SOURCE=vizier: the ESA archive is not asked")
-        if rel.products is None:  # a release whose tables and columns have not been checked (DR4, 2.60.5)
+        if rel.products is None:  # a release whose tables and columns have not been checked (DR4, 2.60.6)
             raise ArchiveDown(f"Gaia {rel.name}: no product map yet (check_gaia_release.py), the DR3 copy is used")
         base = rel.products["source"]
         q = (
@@ -445,9 +445,15 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
                     )
             if rel.name == "DR3":  # the classifier was trained on (E)DR3 solutions
                 df = _merge_fidelity(df, opt_deadline)
-    except Exception:
+    except Exception as exc:
         # The VizieR mirror is DR3: label the rows DR3 (epoch 2016.0) even
         # when another release was requested, so propagation stays correct.
+        # The warning band names only "the VizieR I/355 copy": say which release was asked (2.60.6 review).
+        if rel.name != "DR3":
+            print(
+                f"[gaia_dr3] Gaia {rel.name} was requested; answered by the VizieR DR3 copy, labelled DR3 ({exc})",
+                flush=True,
+            )
         df = _vizier_fallback(ra, dec, radius_arcmin)
         used = RELEASES["DR3"]
         if not df.empty:  # fidelity is keyed on the DR3 source_id the copy carries (2.44.0)

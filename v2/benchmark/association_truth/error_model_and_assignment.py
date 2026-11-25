@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Position-error model and simultaneous assignment: measurements only (2.60.8, task 4 step 4).
+"""Position-error model and simultaneous assignment: measurements only (2.60.9, task 4 step 4).
 
     python error_model_and_assignment.py --rows rows_diag.csv.gz --out DIR
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Full pipeline (stages 1-7 + grouping) on the raw data of the 26 deep COSMOS fields for one variant (2.60.8).
+# Full pipeline (stages 1-7 + grouping) on the raw data of the 26 deep COSMOS fields for one variant (2.60.9).
 #   run_full.sh FIELDS_ROOT OUT_DIR [PARALLEL] [ENV=VALUE ...]
 # FIELDS_ROOT/<field>/{field.json,raw/<tag>/*.csv}; OUT_DIR/<field>/ gets the stage products.  The variant switches
 # are environment variables (V2_ASSOC_...), given after the parallelism.

@@ -67,7 +67,7 @@ _MODULES: dict[str, tuple[tuple, object]] = {}
 # What a blind run drops anyway (spectroscopic and literature compilations: the workflows' blind copy removes these
 # files, ``benchmark/collect_deep_cosmos.NOT_BLIND`` lists the same names).  A workflow that only scores the blind
 # run has no use for their answers; asking for them costs requests, and NED's guidelines ask for no concurrent
-# automated queries, which a matrix of parallel jobs makes (2.60.7).
+# automated queries, which a matrix of parallel jobs makes (2.60.8).
 BLIND_DROPPED = (
     "lamost_spectroscopy",
     "sdss_spectroscopy",

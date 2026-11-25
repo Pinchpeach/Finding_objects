@@ -28,7 +28,7 @@ def _per_table(ra: float, dec: float, radius_arcmin: float):
     """{table id: rows (a DataFrame) or None} and the tables that failed.  One request asks the four tables
     together (2.60.2: ``-source=a,b,c,d``): a cold search of an empty cone spent 8-13 requests and 85-110 s on four
     requests of its own; a request that fails is asked table by table as before.
-    2.60.6: a local copy of the four tables (``local_lists.py``, downloaded once on first use, when it is enabled)
+    2.60.7: a local copy of the four tables (``local_lists.py``, downloaded once on first use, when it is enabled)
     answers the cone without any request; None from it means VizieR is asked as above."""
     local = local_lists.cone("suh2021_agb", ra, dec, radius_arcmin)
     if local is not None:

@@ -24,7 +24,7 @@ _V2 = Path(__file__).resolve().parents[1]
 TABLE_IO = _load("v2_table_io", _V2 / "Preprocess" / "table_io.py")
 # SIMBAD otype hierarchy (catalog_confidence_simbad_type); loaded once, not per run().
 OTYPES = _load("v2_simbad_otypes_s3", _V2 / "Classifier" / "simbad_otypes.py")
-GA = _load("v2_gaia_assumptions", _V2 / "Preprocess" / "gaia_assumptions.py")  # Gaia release constants (2.60.5)
+GA = _load("v2_gaia_assumptions", _V2 / "Preprocess" / "gaia_assumptions.py")  # Gaia release constants (2.60.6)
 
 
 def safe_div(a, b):

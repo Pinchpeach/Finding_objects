@@ -24,7 +24,7 @@ def blazar_type(name) -> str | None:
 
 
 def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
-    local = local_lists.cone("roma_bzcat5", ra, dec, radius_arcmin)  # 2.60.6: the local copy, when enabled
+    local = local_lists.cone("roma_bzcat5", ra, dec, radius_arcmin)  # 2.60.7: the local copy, when enabled
     if local is None:
         df = vizier_cone(VIZIER_CATALOG, ra, dec, radius_arcmin)
     else:

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Is the association posterior a probability?  Reliability of three scores against COSMOS2020 (2.60.8, step 3).
+"""Is the association posterior a probability?  Reliability of three scores against COSMOS2020 (2.60.9, step 3).
 
     python posterior_calibration.py --rows rows_diag.csv.gz --assoc-dir DIR --out DIR
 

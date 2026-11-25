@@ -445,7 +445,7 @@ def attach_ps1_fragments(out: pd.DataFrame, assoc: pd.DataFrame, explain: dict |
 # and it is not a separate object by its own evidence: no Gaia parallax or
 # proper motion at >= FRAG_MOTION_SNR (or above 1 mas / 3 mas/yr where the
 # errors are not at hand) and no good spectrum of its own.
-# Tuning switches of the 2.60.8 measurements on the 26 deep COSMOS fields (benchmark/association_truth/regroup.py); the
+# Tuning switches of the 2.60.9 measurements on the 26 deep COSMOS fields (benchmark/association_truth/regroup.py); the
 # defaults are the 2.41.0 values.
 FRAG_RADII = float(os.environ.get("V2_FRAG_RADII", "1.0"))
 FRAG_MIN_ARCSEC = float(os.environ.get("V2_FRAG_MIN_ARCSEC", "1.0"))
