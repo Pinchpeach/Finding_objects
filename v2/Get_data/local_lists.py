@@ -286,7 +286,7 @@ def _tables(spec: ListSpec):
             return None
         try:
             store_dir(spec.key).mkdir(parents=True, exist_ok=True)
-            with archive_cache._FileLock(store_dir(spec.key) / ".lock", timeout=300.0):  # one process downloads
+            with _HeldLock(store_dir(spec.key) / ".lock", timeout=300.0):  # one process downloads
                 tabs, st = _tables_locked(spec)
         except Exception as exc:
             _FAILED[spec.key] = time.monotonic()
@@ -296,6 +296,36 @@ def _tables(spec: ListSpec):
             return None
         _MEMO[spec.key] = (st["manifest"]["downloaded"], tabs)
         return tabs
+
+
+class _HeldLock:
+    """``archive_cache._FileLock`` renewed while held (2.60.7 review, Codex): that lock is broken as stale after
+    ``LOCK_STALE_S`` (30 s) without a touch, and a download can take longer (VizieR mirror failover).  A thread touches
+    the lock file every quarter of that time, so a live holder keeps it; a crashed one still frees it after 30 s."""
+
+    def __init__(self, path: Path, timeout: float):
+        self.path, self._lock = path, archive_cache._FileLock(path, timeout=timeout)
+        self._stop = threading.Event()
+        self._beat = None
+
+    def __enter__(self):
+        self._lock.__enter__()
+
+        def beat():
+            while not self._stop.wait(max(0.05, archive_cache.LOCK_STALE_S / 4)):
+                try:
+                    os.utime(self.path, None)
+                except OSError:
+                    pass
+
+        self._beat = threading.Thread(target=beat, daemon=True, name="lists-lock")
+        self._beat.start()
+        return self
+
+    def __exit__(self, *exc):
+        self._stop.set()
+        self._beat.join(timeout=5)
+        return self._lock.__exit__(*exc)
 
 
 def _source_key(spec: ListSpec) -> str:

@@ -250,7 +250,9 @@ def measure_field(assoc: pd.DataFrame, truth: pd.DataFrame, shifted_from: pd.Dat
             # one-row-per-catalogue rule; how far is that other row from the truth source?
             blocked, bsep = False, np.nan
             if not m:
-                for o in holders - {own}:
+                # every blocking object, in a fixed order; the closest blocking row counts (2.60.9 review: the first
+                # member of a set depended on the hash seed)
+                for o in sorted(holders - {own}, key=str):
                     pos = members[cat].get(o)
                     if pos is not None and len(pos):
                         bd = (
@@ -260,10 +262,10 @@ def measure_field(assoc: pd.DataFrame, truth: pd.DataFrame, shifted_from: pd.Dat
                             )
                             * 3600.0
                         )
-                        blocked, bsep = True, float(bd.min())
-                        break
+                        blocked, bsep = True, float(np.fmin(bsep, bd.min()))
             detail.append(dict(catalog=cat, outcome=outcome, nsep=r.normalized_separation if m else np.nan,
-                               conf=r.association_confidence, any_holder=bool(holders), joined=bool(m),
+                               # an unjoined row's own object is no association opportunity (as for "missed")
+                               conf=r.association_confidence, any_holder=bool(holders if m else holders - {own}), joined=bool(m),
                                sep_dom=float(np.hypot(dra, ddec)), n_acc=len(acc_set), poserr=r.poserr_arcsec,
                                sigma=r.combined_sigma_arcsec if m else np.nan, density=r.source_density_arcsec2,
                                cand=r.candidate_count, field_row=r.detection_id, lr=getattr(r, 'likelihood_ratio', np.nan),

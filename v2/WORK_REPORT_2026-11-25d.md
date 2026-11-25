@@ -204,6 +204,11 @@ python v2/benchmark/association_truth/error_model_and_assignment.py --rows DIR/m
   - `V2_FRAG_RADII`를 ALGORITHM에 적었다.
   - `run_full.sh`는 인자 두 개로도 돈다.
 
+- **측정 스크립트 두 곳(Codex 지적, PR #83).**
+  - `measure_association.py`가 막힌 행의 "가로막은 행" 거리를 집합의 첫 원소로 골랐다. 순서가 해시 시드에 따라 달라 같은 입력에서도 `assignment_blocking`이 달라질 수 있었다. 이제 고정된 순서로 모든 가로막은 객체를 보고, 가장 가까운 행을 쓴다.
+  - 연관되지 않은 행의 `any_holder`(연관 기회가 있었나)에 자기 객체를 넣고 있었다. 그래서 정당하게 혼자인 행이 재현율 분모를 키웠다. 이제 "놓침" 판정처럼 자기 객체를 뺀다.
+  - **`results_2026-11-25/`의 `assignment_blocking.csv`와 `cut_curves_*.csv`의 재현율은 고치기 전 코드로 잰 것이다.** 거짓·놓침·병합·조각 수(3절 표)는 이 두 값에 기대지 않는다.
+
 ### 11.3 남은 것(후속)
 - **커밋된 스크립트로 만들 수 없는 결과.**
   - `isotonic_check_test_half.csv`(시험 영역 ECE 3.9 → 0.3 % 주장).

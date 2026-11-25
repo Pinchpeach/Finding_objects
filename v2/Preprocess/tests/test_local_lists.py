@@ -380,3 +380,28 @@ def test_an_unknown_switch_value_is_refused(monkeypatch):
     for v, want in (("all", "all"), ("auto", "auto"), ("0", "0"), ("off", "0"), ("", "auto")):
         monkeypatch.setenv("V2_LOCAL_LISTS", v)
         assert L.mode() == want
+
+
+def test_the_list_lock_stays_held_through_a_slow_download(monkeypatch, tmp_path):
+    """2.60.7 review (Codex): archive_cache._FileLock is broken as stale after LOCK_STALE_S without a touch; the list
+    lock is renewed while held, so a second process cannot enter during a download longer than that."""
+    import threading
+    import time as _t
+
+    monkeypatch.setattr(L.archive_cache, "LOCK_STALE_S", 0.3)
+    path = tmp_path / ".lock"
+    got = []
+
+    def contender():
+        try:
+            with L.archive_cache._FileLock(path, timeout=0.8):
+                got.append("entered")
+        except TimeoutError:
+            got.append("waited")
+
+    with L._HeldLock(path, timeout=1.0):
+        th = threading.Thread(target=contender)
+        th.start()
+        _t.sleep(1.0)  # longer than the stale time: without renewal the contender would break the lock
+        th.join()
+    assert got == ["waited"] and not path.exists()
