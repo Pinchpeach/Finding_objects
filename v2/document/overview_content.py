@@ -23,6 +23,8 @@ PROGRAM_VERSION = "2.60.2"
 DATE = "2026-11-24"
 REPO = "https://github.com/Pinchpeach/Finding_objects"
 RELEASE_URL = f"{REPO}/releases/tag/v{PROGRAM_VERSION}"
+# The 12-slide deck built by build_deck.py from deck_content.py (same program version as this text).
+DECK_STEM = f"PIPELINE_STACK_v{PROGRAM_VERSION}"
 TITLE = "Finding Objects: program overview"
 SUBTITLE = (
     "A field-level multi-catalogue integration and annotation tool for sources on the sky "
@@ -725,7 +727,7 @@ section(
             ["`.github/workflows/`", "data collection and validation (manual runs), app build and release"],
             [
                 "`v2/document/`",
-                "this overview (`overview_content.py`, `build_overview.py`), the paper list, older decks",
+                "this overview (`overview_content.py`, `build_overview.py`), the 12-slide deck (`deck_content.py`, `build_deck.py`), the paper list, older documents",
             ],
         ],
         widths=[0.25, 0.75],
@@ -818,7 +820,7 @@ section(
                 "[`v2/document/PIPELINE_STACK_v2.44.0.pdf`](v2/document/PIPELINE_STACK_v2.44.0.pdf) "
                 "([PPTX](v2/document/PIPELINE_STACK_v2.44.0.pptx))",
                 "English",
-                "**the v2.44.0 deck**, 12 slides on the pipeline and tech stack; **not updated since version 2.44.0**, so its headline figures (29 archives, 36 + 2 rules and models, 99.16 % blind accuracy, 141 tests) are out of date",
+                "**the v2.44.0 deck** (drawn by hand, 2026-11-01), replaced by the generated 2.60.2 deck linked at the top; **not updated since version 2.44.0**, so its headline figures (29 archives, 36 + 2 rules and models, 99.16 % blind accuracy, 141 tests) are out of date",
             ],
         ],
         widths=[0.47, 0.11, 0.42],
