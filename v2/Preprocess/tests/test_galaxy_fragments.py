@@ -121,6 +121,17 @@ def test_host_candidate_makes_no_chain_and_does_not_depend_on_row_order(monkeypa
     assert seen[0] == seen[1]  # the same grouping in both row orders
 
 
+def test_an_earlier_parent_is_never_made_a_fragment(monkeypatch):
+    """2.60.9 review (Codex): a galaxy that already holds a child from an earlier grouping step (consolidate, PS1
+    fragments) must not become another galaxy's fragment under the switch (child -> H1 -> H0)."""
+    monkeypatch.setattr(hg, "FRAG_HOST_AS_CANDIDATE", True)
+    rows = _chain_rows()[1:]  # H1 and H0
+    child = dict(rows[0], object_id="C", parent_object_id="H1", component_role="ps1_fragment")
+    out = hg.attach_galaxy_fragments(pd.DataFrame(rows + [child])).set_index("object_id")
+    assert pd.isna(out.loc["H1", "parent_object_id"])  # H1 keeps its child and stays top-level
+    assert out.loc["C", "parent_object_id"] == "H1"
+
+
 def test_without_the_switch_the_chain_rows_group_as_in_2_41_0():
     for rows in (_chain_rows(), _chain_rows()[::-1]):
         out = hg.attach_galaxy_fragments(pd.DataFrame(rows)).set_index("object_id")

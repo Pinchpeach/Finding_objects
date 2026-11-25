@@ -209,6 +209,10 @@ python v2/benchmark/association_truth/error_model_and_assignment.py --rows DIR/m
   - 연관되지 않은 행의 `any_holder`(연관 기회가 있었나)에 자기 객체를 넣고 있었다. 그래서 정당하게 혼자인 행이 재현율 분모를 키웠다. 이제 "놓침" 판정처럼 자기 객체를 뺀다.
   - **`results_2026-11-25/`의 `assignment_blocking.csv`와 `cut_curves_*.csv`의 재현율은 고치기 전 코드로 잰 것이다.** 거짓·놓침·병합·조각 수(3절 표)는 이 두 값에 기대지 않는다.
 
+- **Codex 재검토 두 곳(PR #83).**
+  - hc 스위치에서 앞 단계(`consolidate`, PS1 조각)로 이미 자식을 가진 은하도 조각이 될 수 있었다(자식 → H1 → H0). 이제 부모 표시를 기존 부모로 시작한다. 시험을 더했고, 고치기 전 코드에서 실패함을 확인했다.
+  - `run_full.sh`는 영역 하나라도 실패하면 완료 표시(`done.txt`)를 쓰지 않고 실패로 끝난다.
+
 ### 11.3 남은 것(후속)
 - **커밋된 스크립트로 만들 수 없는 결과.**
   - `isotonic_check_test_half.csv`(시험 영역 ECE 3.9 → 0.3 % 주장).
@@ -216,4 +220,5 @@ python v2/benchmark/association_truth/error_model_and_assignment.py --rows DIR/m
   - `calibration_summary_{conditional,unconditional}.csv`라는 이름. 스크립트는 `calibration_summary.csv`를 쓴다.
   - 작업 세션이 이 집계 스크립트를 커밋하거나 명령을 8절에 더해야 한다.
 - **A/B 전에 할 일.** hc 변형의 A/B 전에 `compare_ab_fields`/`score_independent_fields`에 최상위 객체만 세는 조각 수를 더해야 한다. 기존 수(세트 C의 `truth_with_fragments` 등)의 정의를 바꾸지 않도록 열을 새로 둔다.
+- **정답 수집에 여유 반경이 없다(Codex 지적, 후속).** `collect_truth_flux.py`는 영역과 같은 6′로 정답을 받는다. 그러나 기대 짝 탐색은 PSF 폭 세 배(AllWISE 18.3″)까지 본다. 그래서 가장자리 18″ 안(영역 넓이의 약 10 %)에서는 바깥의 더 밝은 정답 대신 안쪽의 어두운 정답이 기대 짝이 될 수 있다. 거짓·놓침 판정과 사후확률 보정에 가장자리 편향이 조금 들어간다. 고치려면 정답을 6.35′로 다시 받고, 채점 표본은 6′ 안으로 제한한 뒤 26개 영역 측정을 다시 해야 한다. 이 환경에서는 아카이브에 닿지 않으므로 작업 세션의 다음 측정으로 넘긴다.
 - **틀린 병합의 해석.** hc의 틀린 병합 +25 / +13(`regroup.merge_quality`)은 부모에게 0.6″ 안 정답이 없는 경우까지 "틀림"으로 센다. 그래서 진짜 이웃을 삼킨 수의 상한이다. 영역별 수만 남아 유형별로 나눌 수 없다.

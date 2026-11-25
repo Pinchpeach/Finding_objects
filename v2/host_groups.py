@@ -535,7 +535,9 @@ def attach_galaxy_fragments(out: pd.DataFrame) -> pd.DataFrame:
     oid = out.object_id.to_numpy()
     designation = out.designation.to_numpy() if "designation" in out else oid
     taken = np.zeros(len(out), bool)  # objects grouped under a host in this pass
-    parent = np.zeros(len(out), bool)  # objects that took a fragment in this pass
+    # objects that hold fragments: those of earlier grouping steps (consolidate, PS1 fragments) and of this pass
+    # (2.60.9 review, Codex: under the switch an existing parent must not become a fragment either)
+    parent = out.object_id.isin(set(out.parent_object_id.dropna())).to_numpy(dtype=bool, copy=True)
     for i, ks in zip(ci, near):
         if not ks or (FRAG_HOST_AS_CANDIDATE and parent[i]):  # a host that holds fragments is never one itself
             continue

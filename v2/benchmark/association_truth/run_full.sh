@@ -15,5 +15,9 @@ run_one() {
   python3 "$V2/pipeline.py" --work "$OUT/$f" --raw-dir "$raw" --ra "$ra" --dec "$dec" --radius 6 > "$OUT/$f.log" 2>&1
 }
 export -f run_one; export ROOT OUT V2
-ls "$ROOT" | grep '^deep_cosmos_' | xargs -P "$P" -I{} bash -c 'run_one {}'
+# a failed field fails the batch: no completion marker (2.60.9 review, Codex)
+if ! ls "$ROOT" | grep '^deep_cosmos_' | xargs -P "$P" -I{} bash -c 'run_one {}'; then
+  echo "run_full.sh: at least one field failed, see $OUT/*.log" >&2
+  exit 1
+fi
 echo done > "$OUT/done.txt"
