@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check a Gaia release on the ESA archive against what the collector needs (2.9.0; DR4 mode 2.60.4).
+"""Check a Gaia release on the ESA archive against what the collector needs (2.9.0; DR4 mode 2.60.5).
 
     python v2/Get_data/check_gaia_release.py --release DR3      # the product map of Get_data/gaia_release.py
     python v2/Get_data/check_gaia_release.py --release DR4      # schema discovery against the locked draft

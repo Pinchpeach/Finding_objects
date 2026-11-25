@@ -237,7 +237,7 @@ def _sdss():
             removed, the request repeated without the cache, and a page that
             keeps coming is raised as what it is.
             """
-            # 2.60.6: astroquery's own week-long disk cache is never used.  The SDSS methods pass ``cache=True``
+            # 2.60.7: astroquery's own week-long disk cache is never used.  The SDSS methods pass ``cache=True``
             # explicitly, which overrides the global switch controller._disable_astroquery_cache() sets, so every
             # 200 answer was replayed for 7 days from ~/.astropy outside archive_cache's rules (code hash,
             # partial results not stored) and even with V2_CACHE=0 (as VizieR's was until 2.60.0).  Repeats are

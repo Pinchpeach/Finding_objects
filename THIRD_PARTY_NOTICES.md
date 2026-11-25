@@ -31,7 +31,7 @@ Finding Objects 자체 코드는 MIT License(`LICENSE`)를 따른다.
 ## [3] 관측 데이터
 
 프로그램은 실행할 때 아래 아카이브에서 데이터를 받아 오며, 데이터 자체는 저장소에 포함하지 않는다(벤치마크용 특징 파일 제외).
-- **사용자 PC의 작은 목록 사본(2.60.5, 기본 꺼짐):** `V2_LOCAL_LISTS=all`이면 Suh (2021) AGB 표(VizieR J/ApJS/256/43 표 9–12, 18,381행)와 Roma-BZCAT 5판(VII/274, 3,561행)을 **사용자 컴퓨터가 VizieR에서 직접 한 번 받아** 그 사용자의 캐시 폴더(`V2_CACHE_DIR`, 기본 `~/.cache/finding_objects/v2/lists/`)에 둔다. 저장소와 앱 묶음에는 이 자료가 들어가지 않고, 다른 사람에게 건네지 않는다(재배포가 아니다). 내려받은 판·날짜·행 수·해시는 그 폴더의 `manifest.json`에 적힌다. **이용 조건의 원문은 아직 읽지 못했다**(CDS 이용 조건 페이지가 2026-11-15 사고 뒤 열리지 않음; Suh 표의 DOI 메타데이터는 "Refer to CDS usage"만 적고, BZCAT은 출처 표기를 요청할 뿐 사본에 대한 문장이 없다). 그래서 기본값에서는 쓰지 않는다(`V2_LOCAL_LISTS=auto`는 이용 조건을 확인한 목록만 쓰며 지금은 없다). 이 목록을 쓴 결과를 발표할 때는 아래 CDS와 원 논문의 인용 요구를 따른다.
+- **사용자 PC의 작은 목록 사본(2.60.6, 기본 꺼짐):** `V2_LOCAL_LISTS=all`이면 Suh (2021) AGB 표(VizieR J/ApJS/256/43 표 9–12, 18,381행)와 Roma-BZCAT 5판(VII/274, 3,561행)을 **사용자 컴퓨터가 VizieR에서 직접 한 번 받아** 그 사용자의 캐시 폴더(`V2_CACHE_DIR`, 기본 `~/.cache/finding_objects/v2/lists/`)에 둔다. 저장소와 앱 묶음에는 이 자료가 들어가지 않고, 다른 사람에게 건네지 않는다(재배포가 아니다). 내려받은 판·날짜·행 수·해시는 그 폴더의 `manifest.json`에 적힌다. **이용 조건의 원문은 아직 읽지 못했다**(CDS 이용 조건 페이지가 2026-11-15 사고 뒤 열리지 않음; Suh 표의 DOI 메타데이터는 "Refer to CDS usage"만 적고, BZCAT은 출처 표기를 요청할 뿐 사본에 대한 문장이 없다). 그래서 기본값에서는 쓰지 않는다(`V2_LOCAL_LISTS=auto`는 이용 조건을 확인한 목록만 쓰며 지금은 없다). 이 목록을 쓴 결과를 발표할 때는 아래 CDS와 원 논문의 인용 요구를 따른다.
 결과를 발표할 때는 각 서베이의 인용·감사 문구를 따른다.
 
 - ESA Gaia (DPAC) : https://www.cosmos.esa.int/web/gaia-users/credits

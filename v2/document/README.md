@@ -13,7 +13,9 @@ v2의 분류기 코드와 문서가 근거로 인용하는 과학 논문, 카탈
 | [`OVERVIEW_v2.60.2.pdf`](OVERVIEW_v2.60.2.pdf) | 프로그램 개요(영어, 9쪽). 저장소 첫 화면 `README.md`와 같은 원본에서 생성 |
 | [`overview_content.py`](overview_content.py), [`build_overview.py`](build_overview.py) | 그 원본과 생성기. `python v2/document/build_overview.py`가 `README.md`와 PDF를 다시 쓴다(`pip install reportlab`, DejaVu Sans 글꼴). 글은 `overview_content.py`에서만 고친다 |
 | `OVERVIEW_v2.36.1.pdf` | 이전 개요(한국어, 2.36.1). 수치는 낡았다 |
-| `PIPELINE_STACK_v2.44.0.pdf`·`.pptx`·`_preview.png` | 2.44.0 발표 자료(영어, 12쪽). 갱신하지 않았다 |
+| [`PIPELINE_STACK_v2.60.2.pdf`](PIPELINE_STACK_v2.60.2.pdf)·[`.pptx`](PIPELINE_STACK_v2.60.2.pptx)·`_preview.png` | 파이프라인·기술 스택 발표 자료(영어, 12쪽, 프로그램 2.60.2). 생성물이므로 직접 고치지 않는다 |
+| [`deck_content.py`](deck_content.py), [`build_deck.py`](build_deck.py) | 그 발표 자료의 글과 생성기. `python v2/document/build_deck.py`가 PPTX·PDF·미리보기를 다시 쓴다(`pip install python-pptx`, PDF는 LibreOffice `soffice`, 미리보기는 `pdftoppm`). 글은 `deck_content.py`에서만 고치고, 표·수치는 `overview_content.py`에서 읽어 온다 |
+| `PIPELINE_STACK_v2.44.0.pdf`·`.pptx`·`_preview.png` | 2.44.0 발표 자료(영어, 12쪽, 손으로 그린 것). 갱신하지 않았고 수치가 낡았다. 2.60.2 자료가 대신한다 |
 | [`papers.csv`](papers.csv) | 같은 항목의 기계 판독용 표. 열: `category, citation, journal_ref, bibcode, used_in, purpose` (`used_in`은 `;`로 구분) |
 
 ## 구성 원칙

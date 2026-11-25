@@ -1,4 +1,4 @@
-"""Small fixed catalogue tables kept on the user's own computer (2.60.5, ``Get_data/local_lists.py``)."""
+"""Small fixed catalogue tables kept on the user's own computer (2.60.6, ``Get_data/local_lists.py``)."""
 
 import json
 import sys

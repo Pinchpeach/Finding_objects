@@ -1,4 +1,4 @@
-"""Gaia release table and classification assumptions (2.60.4, DR4 readiness).
+"""Gaia release table and classification assumptions (2.60.5, DR4 readiness).
 
 DR3 must behave exactly as before the constants were gathered into per-release tables: the column lists and the
 queries the collector sends, the numbers Stage 3/4/5 use.  DR4 must not run through DR3's assumptions silently.
@@ -37,7 +37,7 @@ def _sha(cols):
 
 # --------------------------------------------------------------------------------------------- collection side
 def test_dr3_column_lists_are_what_the_collector_always_asked():
-    # hashes of the lists as they were in gaia_dr3.py before 2.60.4 (30 / 15 / 8 / 9 columns)
+    # hashes of the lists as they were in gaia_dr3.py before 2.60.5 (30 / 15 / 8 / 9 columns)
     assert _sha(gr.SOURCE) == "142419ccaf003568e0cd72ebf2cc7f11616c252999d17170805cc5fa985cc136"
     assert _sha(gr.AP) == "f1bdba4d991aed54733a914bbf700b37dbcfe372032edef7fd8bfe37eddf356a"
     assert _sha(gr.SPEC_AP) == "6b09b949197f7174b43c024b84a58de1c26c173f66f924b7fdfe892b43146507"

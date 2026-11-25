@@ -1,4 +1,4 @@
-"""Validation workflows and the services' guidelines (2.60.6): NED asks for no concurrent automated queries, SDSS
+"""Validation workflows and the services' guidelines (2.60.7): NED asks for no concurrent automated queries, SDSS
 SkyServer for at most 60 queries a minute; astroquery's own SDSS disk cache is not used."""
 
 import re

@@ -61,7 +61,7 @@ _cp_s = _tio_u.spec_from_file_location("v2_class_prior", Path(__file__).resolve(
 CLASS_PRIOR = _tio_u.module_from_spec(_cp_s)
 _cp_s.loader.exec_module(CLASS_PRIOR)
 _ga_s = _tio_u.spec_from_file_location("v2_gaia_assumptions", Path(__file__).resolve().parent / "gaia_assumptions.py")
-GA = _tio_u.module_from_spec(_ga_s)  # Gaia release constants (2.60.4)
+GA = _tio_u.module_from_spec(_ga_s)  # Gaia release constants (2.60.5)
 _ga_s.loader.exec_module(GA)
 # Coarse model (2.51.0, coarse_gbm.py): "fusion" = rule fusion (linear + trees
 # over evidence scores); "gbm" = one gradient-boosted model on the measured

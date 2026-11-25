@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Which workflow jobs ask NED and the SDSS SkyServer, and how many at once (2.60.6).
+"""Which workflow jobs ask NED and the SDSS SkyServer, and how many at once (2.60.7).
 
     python v2/benchmark/service_limits/workflow_table.py [CHECKOUT] > v2/benchmark/service_limits/workflows_2026-11-25.md
 

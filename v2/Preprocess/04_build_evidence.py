@@ -28,7 +28,7 @@ def _import_local(name):
 
 _V2 = Path(__file__).resolve().parents[1]
 TABLE_IO = _load("v2_table_io", _V2 / "Preprocess" / "table_io.py")
-GA = _load("v2_gaia_assumptions", _V2 / "Preprocess" / "gaia_assumptions.py")  # Gaia release constants (2.60.4)
+GA = _load("v2_gaia_assumptions", _V2 / "Preprocess" / "gaia_assumptions.py")  # Gaia release constants (2.60.5)
 OTYPES = _load("v2_simbad_otypes_s4", _V2 / "Classifier" / "simbad_otypes.py")
 # SIMBAD-TYPE-001 through the otype hierarchy (2.22.0; the old exact-code map
 # missed every child type, e.g. BLL, Sy1, cC*, Mi*, and listed "Star", which

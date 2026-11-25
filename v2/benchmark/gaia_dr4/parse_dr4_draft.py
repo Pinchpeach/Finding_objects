@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gaia DR4 draft data model -> table / column names, and the DR3 columns this project reads (2.60.4).
+"""Gaia DR4 draft data model -> table / column names, and the DR3 columns this project reads (2.60.5).
 
 The ESA draft data model of Gaia DR4 (pre-released 2026-06-26; ``Gaia DR4: preliminary catalogue data model``, 1,231
 pages, created 2026-05-20) is a PDF.  This script reads its text (``pdftotext -layout``), lists the columns of every table

@@ -427,7 +427,7 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     try:
         if mode == "vizier":
             raise ArchiveDown("V2_GAIA_SOURCE=vizier: the ESA archive is not asked")
-        if rel.products is None:  # a release whose tables and columns have not been checked (DR4, 2.60.4)
+        if rel.products is None:  # a release whose tables and columns have not been checked (DR4, 2.60.5)
             raise ArchiveDown(f"Gaia {rel.name}: no product map yet (check_gaia_release.py), the DR3 copy is used")
         base = rel.products["source"]
         q = (

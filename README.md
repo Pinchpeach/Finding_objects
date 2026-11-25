@@ -2,7 +2,7 @@
 
 Program version 2.60.2 · 2026-11-24 · A field-level multi-catalogue integration and annotation tool for sources on the sky (radio to X-ray), with a coarse STAR / GALAXY / QSO classifier and a sub-classification layer
 
-**Read first:** [Overview PDF, version 2.60.2 (English)](v2/document/OVERVIEW_v2.60.2.pdf) · [Release 2.60.2 with Windows, macOS and Linux downloads](https://github.com/Pinchpeach/Finding_objects/releases/tag/v2.60.2) · [How to run](#12-running-it) · [Algorithm in detail (Korean)](v2/ALGORITHM.md) · [Changelog (Korean)](v2/CHANGELOG.md)
+**Read first:** [Overview PDF, version 2.60.2 (English)](v2/document/OVERVIEW_v2.60.2.pdf) · [Pipeline and tech-stack deck, 12 slides](v2/document/PIPELINE_STACK_v2.60.2.pdf) ([PPTX](v2/document/PIPELINE_STACK_v2.60.2.pptx)) · [Release 2.60.2 with Windows, macOS and Linux downloads](https://github.com/Pinchpeach/Finding_objects/releases/tag/v2.60.2) · [How to run](#12-running-it) · [Algorithm in detail (Korean)](v2/ALGORITHM.md) · [Changelog (Korean)](v2/CHANGELOG.md)
 
 The older material is listed in [section 15](#15-other-documents): the 2.36.1 overview (Korean) and the 2.44.0 deck (English) are kept but not updated.
 
@@ -253,7 +253,7 @@ python v2/pipeline.py --work runs/ngc4522 --retry-failed
 | `v2/app/` | PySide6 app and PyInstaller packaging |
 | `v2/benchmark/` | truth sets, preserved catalogue features, evaluation, training, independent-validation and purity scripts |
 | `.github/workflows/` | data collection and validation (manual runs), app build and release |
-| `v2/document/` | this overview (`overview_content.py`, `build_overview.py`), the paper list, older decks |
+| `v2/document/` | this overview (`overview_content.py`, `build_overview.py`), the 12-slide deck (`deck_content.py`, `build_deck.py`), the paper list, older documents |
 
 - **Literature first:** a rule or threshold is changed only after its basis is recorded (code comment or `LITERATURE*.md`; classified paper list: [`v2/document/PAPERS.md`](v2/document/PAPERS.md)).
 - **Adoption rule:** a change without a significant gain on benchmarks and independent truth is not adopted (GALEX UV, the u band and PS1 variability were measured and rejected).
@@ -274,7 +274,7 @@ python v2/document/build_overview.py
 ## 14. Licence and third-party data
 
 - Code: MIT licence, see [`LICENSE`](LICENSE).
-- **No catalogue data are bundled.** The program queries the archives when it runs. The repository holds only small derived files (for example the DESI DR1 tile centres used to skip the DESI archives, prior tables counted from COSMOS2020, fusion weights) and, for the benchmarks, preserved feature files. An optional feature (off by default, `V2_LOCAL_LISTS=all`) lets the user's own computer download two small fixed VizieR tables once, on first use, and keep them in the user's cache folder to save requests; nothing is shipped or passed on, and it stays off until the terms of use of those tables have been read in the original text.
+- **No catalogue data are bundled.** The program queries the archives when it runs. The repository holds only small derived files (for example the DESI DR1 tile centres used to skip the DESI archives, prior tables counted from COSMOS2020, fusion weights) and, for the benchmarks, preserved feature files. An optional, off-by-default feature (`V2_LOCAL_LISTS=all`) lets the user's own computer keep two small VizieR tables in its cache after one first-use download; nothing is shipped.
 - Third-party components of the app (Qt / PySide6 under LGPLv3, Python, NumPy, pandas, Astropy, astroquery, PyVO, Requests, PyInstaller) and the terms of the data services are listed in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) (in Korean).
 - When you publish results, follow the citation and acknowledgement requirements of each survey you used.
 
@@ -290,7 +290,7 @@ python v2/document/build_overview.py
 | `v2/Preprocess/LITERATURE.md`, `v2/Classifier/LITERATURE_*.md` | English | the literature basis of the rules and thresholds |
 | `v2/LITERATURE*.md` | Korean (citations in English; `LITERATURE_REVIEW_2026-10.md` mostly English) | literature surveys behind later changes (dated) |
 | [`v2/document/OVERVIEW_v2.36.1.pdf`](v2/document/OVERVIEW_v2.36.1.pdf) | Korean | the previous overview (version 2.36.1, 2026-10-23); its figures are out of date |
-| [`v2/document/PIPELINE_STACK_v2.44.0.pdf`](v2/document/PIPELINE_STACK_v2.44.0.pdf) ([PPTX](v2/document/PIPELINE_STACK_v2.44.0.pptx)) | English | **the v2.44.0 deck**, 12 slides on the pipeline and tech stack; **not updated since version 2.44.0**, so its headline figures (29 archives, 36 + 2 rules and models, 99.16 % blind accuracy, 141 tests) are out of date |
+| [`v2/document/PIPELINE_STACK_v2.44.0.pdf`](v2/document/PIPELINE_STACK_v2.44.0.pdf) ([PPTX](v2/document/PIPELINE_STACK_v2.44.0.pptx)) | English | **the v2.44.0 deck** (drawn by hand, 2026-11-01), replaced by the generated 2.60.2 deck linked at the top; **not updated since version 2.44.0**, so its headline figures (29 archives, 36 + 2 rules and models, 99.16 % blind accuracy, 141 tests) are out of date |
 
 ## Where the numbers come from
 

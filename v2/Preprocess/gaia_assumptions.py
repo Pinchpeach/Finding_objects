@@ -1,4 +1,4 @@
-"""What the classification assumes about the Gaia release its Gaia columns come from (2.60.4, DR4 readiness).
+"""What the classification assumes about the Gaia release its Gaia columns come from (2.60.5, DR4 readiness).
 
 Collection (tables, columns, epoch) is in ``Get_data/gaia_release.py``.  This module holds the *classification-side*
 constants that are properties of one Gaia release, so that they live in one table keyed by the release name and a

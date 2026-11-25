@@ -1,4 +1,4 @@
-# 검증 워크플로의 NED·SkyServer 조회 (2.60.6, 2026-11-25)
+# 검증 워크플로의 NED·SkyServer 조회 (2.60.7, 2026-11-25)
 
 `python v2/benchmark/service_limits/workflow_table.py [CHECKOUT]`로 `.github/workflows/*.yml`에서 만든 표다. 수집기를 돌리는 job만 담았다(모든 job의 matrix 크기, `max-parallel`, `V2_SKIP_COLLECTORS`, NED가 어떻게 되는지).
 

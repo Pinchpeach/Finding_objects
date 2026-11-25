@@ -1,4 +1,4 @@
-"""Small fixed catalogue tables kept on the user's own computer, downloaded once on first use (2.60.5).
+"""Small fixed catalogue tables kept on the user's own computer, downloaded once on first use (2.60.6).
 
 Why.  A cold search spends most of its time in the 3-5 s pause before each request (``throttle.py``).  The two
 lists the collectors ask for that are small, fixed and almost always empty in a 2' cone -- the Suh (2021) AGB tables
