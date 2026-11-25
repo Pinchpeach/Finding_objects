@@ -74,10 +74,12 @@ def _md_block(b: dict) -> str:
 
 def render_markdown() -> str:
     pdf_link = f"v2/document/{pdf_name()}"
+    deck_link = f"v2/document/{C.DECK_STEM}"
     out = [
         f"# {C.TITLE}",
         f"Program version {C.PROGRAM_VERSION} · {C.DATE} · {C.SUBTITLE}",
         f"**Read first:** [Overview PDF, version {C.PROGRAM_VERSION} (English)]({pdf_link}) · "
+        f"[Pipeline and tech-stack deck, 12 slides]({deck_link}.pdf) ([PPTX]({deck_link}.pptx)) · "
         f"[Release {C.PROGRAM_VERSION} with Windows, macOS and Linux downloads]({C.RELEASE_URL}) · "
         "[How to run](#12-running-it) · "
         "[Algorithm in detail (Korean)](v2/ALGORITHM.md) · [Changelog (Korean)](v2/CHANGELOG.md)",
