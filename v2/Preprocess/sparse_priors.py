@@ -78,7 +78,7 @@ def gaia_point_star(df: pd.DataFrame) -> np.ndarray:
     in_gaia = _catalogs(df).str.contains("Gaia DR3", regex=False).to_numpy() & (g < G_MAX)
     full_solution = np.isfinite(_col(df, "gaia_dr3__parallax"))
     dens = QSO_OPT.density_prior(df)  # min(1, rho_ref / rho), NaN without Gaia coverage
-    crowded = np.isfinite(dens) & (dens <= QSO_OPT.RHO_REF / CROWDED_GAIA_DENSITY)
+    crowded = np.isfinite(dens) & (dens <= QSO_OPT.rho_ref(df) / CROWDED_GAIA_DENSITY)
     return in_gaia & (full_solution | crowded)
 
 

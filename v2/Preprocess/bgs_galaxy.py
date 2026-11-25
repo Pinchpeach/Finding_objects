@@ -65,7 +65,7 @@ def galaxy_test(df: pd.DataFrame) -> np.ndarray:
     g, r, z = (_raw_mag(df, b) for b in "grz")
     G = _col(df, "gaia_dr3__phot_g_mean_mag")
     dens = QSO_OPT.density_prior(df)  # min(1, rho_ref / rho); NaN without Gaia coverage
-    covered = np.isfinite(dens) & (dens >= QSO_OPT.RHO_REF / MAX_GAIA_DENSITY)
+    covered = np.isfinite(dens) & (dens >= QSO_OPT.rho_ref(df) / MAX_GAIA_DENSITY)
     bright = np.where(np.isfinite(r), r < R_MAX, (z < Z_MAX) | (g < G_MAX))
     no_gaia = ~np.isfinite(G) & bright
     with np.errstate(invalid="ignore"):

@@ -23,91 +23,17 @@ if str(Path(__file__).resolve().parent) not in sys.path:  # loaded by file path 
     sys.path.insert(0, str(Path(__file__).resolve().parent))
 import throttle  # noqa: E402  (child_name for the V2_HTTP_LOG thread names)
 from gaia_release import SLOT_CATALOG, current as _release, table as _table, RELEASES
+from gaia_release import (
+    SOURCE,
+    AP,
+    SPEC_AP,
+    VAR_SUMMARY,
+)  # noqa: F401  (the DR3 column lists live with the release table)
 from _catalog_utils import BASE, pick, save_csv, vizier_cone
 
 # Pipeline slot name for every Gaia release (see gaia_release.py); each row
 # records the release and epoch it really comes from.
 CATALOG = SLOT_CATALOG
-SOURCE = [
-    "source_id",
-    "designation",
-    "ra",
-    "dec",
-    "ra_error",
-    "dec_error",
-    "parallax",
-    "parallax_error",
-    "pmra",
-    "pmra_error",
-    "pmdec",
-    "pmdec_error",
-    "pmra_pmdec_corr",  # full proper-motion covariance for the zero-motion test (2.38.0; Li & Fynbo 2026)
-    "ruwe",
-    "phot_g_mean_flux",
-    "phot_g_mean_flux_error",
-    "phot_g_mean_mag",
-    "phot_bp_mean_flux",
-    "phot_bp_mean_flux_error",
-    "phot_bp_mean_mag",
-    "phot_rp_mean_flux",
-    "phot_rp_mean_flux_error",
-    "phot_rp_mean_mag",
-    "bp_rp",
-    "bp_g",
-    "g_rp",
-    "phot_bp_rp_excess_factor",
-    "radial_velocity",
-    "radial_velocity_error",
-    "rv_nb_transits",
-]
-AP = [
-    "teff_gspphot",
-    "logg_gspphot",
-    "mh_gspphot",
-    "distance_gspphot",
-    "ag_gspphot",
-    "ebpminrp_gspphot",
-    "mass_flame",
-    "age_flame",
-    "evolstage_flame",
-    "flags_flame",
-    "classprob_dsc_combmod_quasar",
-    "classprob_dsc_combmod_galaxy",
-    "classprob_dsc_combmod_star",
-    "classprob_dsc_combmod_whitedwarf",
-    "classprob_dsc_combmod_binarystar",
-]
-# Spectroscopic parameters: GSP-Spec from RVS spectra (Recio-Blanco et al.
-# 2023) and the ESP-ELS emission-line class from BP/RP (Creevey et al. 2023).
-# Same table as AP, fetched in the same query (column names checked against
-# the archive metadata, 2026-10-10): a second query would leave one more
-# abandoned daemon thread when TAP is slow, and abandoned threads crashed the
-# interpreter at exit (scientific cross-validation, compact-pulsar shard).
-# ESP-UCD (2.22.0): Teff of ultracool-dwarf candidates (< 2700 K, ~M7 and
-# later) from the RP spectrum and its quality category (Sarro et al. 2023,
-# A&A 669, A139); names checked against the archive (v2_new_targets.yml).
-# Not in the VizieR fallback (left empty there).
-SPEC_AP = [
-    "teff_gspspec",
-    "logg_gspspec",
-    "mh_gspspec",
-    "flags_gspspec",
-    "classlabel_espels",
-    "classlabel_espels_flag",
-    "teff_espucd",
-    "flags_espucd",
-]
-VAR_SUMMARY = [
-    "in_vari_classification_result",
-    "in_vari_rrlyrae",
-    "in_vari_cepheid",
-    "in_vari_long_period_variable",
-    "in_vari_eclipsing_binary",
-    "in_vari_rotation_modulation",
-    "in_vari_agn",
-    "in_vari_microlensing",
-    "in_vari_compact_companion",
-]
 
 # Wall-clock budgets: a slow Gaia archive previously held a field for ~26 min
 # in retries; past the budget the VizieR mirror fallback is used instead.
@@ -497,29 +423,26 @@ def _gspspec_quality(df: pd.DataFrame) -> pd.DataFrame:
 def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     rel = _release()
     used = rel
-    select = ",".join(SOURCE)
-    q = f"""SELECT {select} FROM {_table(rel,'gaia_source')} WHERE 1=CONTAINS(POINT('ICRS',ra,dec),CIRCLE('ICRS',{float(ra):.10f},{float(dec):.10f},{float(radius_arcmin)/60.0:.10f}))"""
     mode = source_mode()  # a bad V2_GAIA_SOURCE raises here, not as a silent fall back
     try:
         if mode == "vizier":
             raise ArchiveDown("V2_GAIA_SOURCE=vizier: the ESA archive is not asked")
+        if rel.products is None:  # a release whose tables and columns have not been checked (DR4, 2.60.4)
+            raise ArchiveDown(f"Gaia {rel.name}: no product map yet (check_gaia_release.py), the DR3 copy is used")
+        base = rel.products["source"]
+        q = (
+            f"SELECT {','.join(base.columns)} FROM {_table(rel, base.table)} WHERE 1=CONTAINS(POINT('ICRS',ra,dec),"
+            f"CIRCLE('ICRS',{float(ra):.10f},{float(dec):.10f},{float(radius_arcmin)/60.0:.10f}))"
+        )
         df = _bounded(_tap, BASE_TAP_BUDGET_S, q)
         df["gaia_base_query_status"] = "tap"
         if not df.empty:
             opt_deadline = time.monotonic() + OPTIONAL_TOTAL_BUDGET_S
-            df = _merge_optional(
-                df, _table(rel, "astrophysical_parameters"), AP + SPEC_AP, "gaia_ap_query_status", opt_deadline
-            )
-            df = _merge_optional(
-                df,
-                _table(rel, "vari_classifier_result"),
-                ["best_class_name", "best_class_score"],
-                "gaia_vari_classifier_query_status",
-                opt_deadline,
-            )
-            df = _merge_optional(
-                df, _table(rel, "vari_summary"), VAR_SUMMARY, "gaia_vari_summary_query_status", opt_deadline
-            )
+            for key, prod in rel.products.items():
+                if key != "source":  # the optional products, in the release's order, merged by source_id
+                    df = _merge_optional(
+                        df, _table(rel, prod.table), list(prod.columns), prod.status_column, opt_deadline
+                    )
             if rel.name == "DR3":  # the classifier was trained on (E)DR3 solutions
                 df = _merge_fidelity(df, opt_deadline)
     except Exception:

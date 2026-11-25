@@ -24,6 +24,7 @@ _V2 = Path(__file__).resolve().parents[1]
 TABLE_IO = _load("v2_table_io", _V2 / "Preprocess" / "table_io.py")
 # SIMBAD otype hierarchy (catalog_confidence_simbad_type); loaded once, not per run().
 OTYPES = _load("v2_simbad_otypes_s3", _V2 / "Classifier" / "simbad_otypes.py")
+GA = _load("v2_gaia_assumptions", _V2 / "Preprocess" / "gaia_assumptions.py")  # Gaia release constants (2.60.4)
 
 
 def safe_div(a, b):
@@ -54,7 +55,8 @@ def run(objects: Path, rules_path: Path, out: Path) -> Path:
     if gaia("parallax") and gaia("parallax_error"):
         plx, eplx = pd.to_numeric(df[gaia("parallax")], errors="coerce"), df[gaia("parallax_error")]
         derived["parallax_snr"] = safe_div(plx.abs(), eplx)
-        derived["normalized_corrected_parallax"] = safe_div((plx + 0.017).abs(), eplx)
+        offset = GA.for_values(df[gaia("gaia_release")] if gaia("gaia_release") else None).parallax_offset_mas
+        derived["normalized_corrected_parallax"] = safe_div((plx + offset).abs(), eplx)
     pm = [gaia(c) for c in ("pmra", "pmra_error", "pmdec", "pmdec_error")]
     if all(pm):
         a = safe_div(df[pm[0]], df[pm[1]])

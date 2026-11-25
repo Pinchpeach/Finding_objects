@@ -60,6 +60,9 @@ _cg_s.loader.exec_module(COARSE_GBM)
 _cp_s = _tio_u.spec_from_file_location("v2_class_prior", Path(__file__).resolve().parent / "class_prior.py")
 CLASS_PRIOR = _tio_u.module_from_spec(_cp_s)
 _cp_s.loader.exec_module(CLASS_PRIOR)
+_ga_s = _tio_u.spec_from_file_location("v2_gaia_assumptions", Path(__file__).resolve().parent / "gaia_assumptions.py")
+GA = _tio_u.module_from_spec(_ga_s)  # Gaia release constants (2.60.4)
+_ga_s.loader.exec_module(GA)
 # Coarse model (2.51.0, coarse_gbm.py): "fusion" = rule fusion (linear + trees
 # over evidence scores); "gbm" = one gradient-boosted model on the measured
 # quantities for every object without a catalogue label, the rule fusion where
@@ -504,7 +507,7 @@ MAGELLANIC = (
     ("LMC", 80.89, -69.76, 1.2e6, 1.97, 1.2e4, (1.871, 0.391), 0.4),
     ("SMC", 13.19, -72.83, 1.09e6, 0.66, 6.6e3, (0.686, -1.237), 0.3),
 )
-MAGELLANIC_PM_ERROR_SCALE = 1.1
+MAGELLANIC_PM_ERROR_SCALE = 1.1  # DR3 value; the live one is GaiaAssumptions.crf_error_scale (gaia_assumptions.py)
 MAGELLANIC_MIN_RELIABILITY = 0.8
 
 
@@ -532,7 +535,8 @@ def magellanic_factor(df: pd.DataFrame, systemic=None) -> np.ndarray:
     ra, dec = _col(df, "ra"), _col(df, "dec")
     f = np.ones(len(df))
     pa, pd_ = _col(df, "gaia_dr3__pmra"), _col(df, "gaia_dr3__pmdec")
-    ea, ed = (MAGELLANIC_PM_ERROR_SCALE * _col(df, c) for c in ("gaia_dr3__pmra_error", "gaia_dr3__pmdec_error"))
+    scale = GA.for_values(df["gaia_dr3__gaia_release"] if "gaia_dr3__gaia_release" in df else None).crf_error_scale
+    ea, ed = (scale * _col(df, c) for c in ("gaia_dr3__pmra_error", "gaia_dr3__pmdec_error"))
     rel = np.fmin(
         np.nan_to_num(_col(df, "catalog_confidence_gaia_astrometry"), nan=0.0),
         np.nan_to_num(_col(df, "association_confidence__gaia_dr3"), nan=1.0),
