@@ -311,3 +311,16 @@ def test_retry_gets_the_primary_source_instead_of_the_cached_copy(world):
     assert controller.failed_collectors(world.raw) == ["gaia_dr3"]
     controller.retry_failed(world.raw, 150.1, 2.25, 2.0)
     assert calls == ["gaia", "gaia"] and cov.status(cov.summarize(world.raw)) == "complete"
+
+
+def test_retry_only_asks_the_named_collectors_among_the_failed_ones(world):
+    """2.60.10: the validation workflows wait out a Data Lab outage and ask only desi_legacy again."""
+    world.fails.update(desi_legacy=True, gaia_dr3=True)
+    controller.collect_all(150.1, 2.25, 2.0, world.raw, workers=1)
+    assert sorted(controller.failed_collectors(world.raw)) == ["desi_legacy", "gaia_dr3"]
+    world.calls.clear()
+    world.fails.clear()
+    new = controller.retry_failed(world.raw, 150.1, 2.25, 2.0, only=("desi_legacy",))
+    assert world.calls == ["desi_legacy"] and new.collector.tolist() == ["desi_legacy"]
+    assert controller.failed_collectors(world.raw) == ["gaia_dr3"]  # the other one was not asked
+    assert controller.retry_failed(world.raw, 150.1, 2.25, 2.0, only=("nvss",)).empty  # nothing of it failed

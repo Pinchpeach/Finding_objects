@@ -1,0 +1,279 @@
+{
+ "checked_utc": "2026-11-25T11:19:52Z",
+ "cones": {
+  "cosmos_12": {
+   "ra": 150.12,
+   "dec": 2.2,
+   "radius_arcmin": 12.0,
+   "why": "COSMOS, one 12' request",
+   "viewer_s": 67.2,
+   "tap_s": 43.1,
+   "viewer_requests": 1,
+   "viewer_mb": 111.5,
+   "viewer_usable": true,
+   "rows_tap": 34901,
+   "rows_viewer": 34901,
+   "common": 34901,
+   "release_tap": {
+    "10000": 34901
+   },
+   "release_viewer": {
+    "10000": 34901
+   },
+   "only_tap": {},
+   "only_viewer": {},
+   "columns_compared": 45,
+   "columns_differing": {},
+   "identical": true,
+   "leftovers_by_position": {}
+  },
+  "ngc4522_12": {
+   "ra": 188.4155,
+   "dec": 9.1751,
+   "radius_arcmin": 12.0,
+   "why": "NGC 4522, 12'",
+   "viewer_s": 8.8,
+   "tap_s": 11.2,
+   "viewer_requests": 1,
+   "viewer_mb": 44.1,
+   "viewer_usable": true,
+   "rows_tap": 13708,
+   "rows_viewer": 13708,
+   "common": 13708,
+   "release_tap": {
+    "10000": 13708
+   },
+   "release_viewer": {
+    "10000": 13708
+   },
+   "only_tap": {},
+   "only_viewer": {},
+   "columns_compared": 45,
+   "columns_differing": {},
+   "identical": true,
+   "leftovers_by_position": {}
+  },
+  "c_csth_304m58": {
+   "ra": 303.73,
+   "dec": -58.39,
+   "radius_arcmin": 12.0,
+   "why": "set-C region csth_304m58 (south cap), 12'",
+   "viewer_s": 50.6,
+   "tap_s": 28.6,
+   "viewer_requests": 1,
+   "viewer_mb": 97.4,
+   "viewer_usable": true,
+   "rows_tap": 30723,
+   "rows_viewer": 30723,
+   "common": 30723,
+   "release_tap": {
+    "10000": 30723
+   },
+   "release_viewer": {
+    "10000": 30723
+   },
+   "only_tap": {},
+   "only_viewer": {},
+   "columns_compared": 45,
+   "columns_differing": {},
+   "identical": true,
+   "leftovers_by_position": {}
+  },
+  "c_csth_024m41": {
+   "ra": 23.51,
+   "dec": -41.29,
+   "radius_arcmin": 12.0,
+   "why": "set-C region csth_024m41, 12'",
+   "viewer_s": 21.0,
+   "tap_s": 36.9,
+   "viewer_requests": 1,
+   "viewer_mb": 70.4,
+   "viewer_usable": true,
+   "rows_tap": 21508,
+   "rows_viewer": 21508,
+   "common": 21508,
+   "release_tap": {
+    "10000": 21508
+   },
+   "release_viewer": {
+    "10000": 21508
+   },
+   "only_tap": {},
+   "only_viewer": {},
+   "columns_compared": 45,
+   "columns_differing": {},
+   "identical": true,
+   "leftovers_by_position": {}
+  },
+  "c_csth_212m34": {
+   "ra": 212.06,
+   "dec": -33.81,
+   "radius_arcmin": 12.0,
+   "why": "set-C region csth_212m34, 12'",
+   "viewer_s": 13.2,
+   "tap_s": 24.5,
+   "viewer_requests": 1,
+   "viewer_mb": 102.5,
+   "viewer_usable": true,
+   "rows_tap": 32357,
+   "rows_viewer": 32357,
+   "common": 32357,
+   "release_tap": {
+    "10000": 32357
+   },
+   "release_viewer": {
+    "10000": 32357
+   },
+   "only_tap": {},
+   "only_viewer": {},
+   "columns_compared": 45,
+   "columns_differing": {},
+   "identical": true,
+   "leftovers_by_position": {}
+  },
+  "c_cpln_113p02": {
+   "ra": 112.59,
+   "dec": 1.52,
+   "radius_arcmin": 12.0,
+   "why": "set-C region cpln_113p02 (low latitude), 12'",
+   "viewer_s": 5.7,
+   "tap_s": 12.0,
+   "viewer_requests": 1,
+   "viewer_mb": 0.0,
+   "viewer_usable": true,
+   "rows_tap": 0,
+   "rows_viewer": 0,
+   "identical": true
+  },
+  "c_clam_037p06": {
+   "ra": 36.97,
+   "dec": 5.92,
+   "radius_arcmin": 12.0,
+   "why": "set-C region clam_037p06, 12'",
+   "viewer_s": 9.8,
+   "tap_s": 11.4,
+   "viewer_requests": 1,
+   "viewer_mb": 32.3,
+   "viewer_usable": true,
+   "rows_tap": 9934,
+   "rows_viewer": 9934,
+   "common": 9934,
+   "release_tap": {
+    "10000": 9934
+   },
+   "release_viewer": {
+    "10000": 9934
+   },
+   "only_tap": {},
+   "only_viewer": {},
+   "columns_compared": 45,
+   "columns_differing": {},
+   "identical": true,
+   "leftovers_by_position": {}
+  },
+  "c_clam_230m05": {
+   "ra": 230.4,
+   "dec": -4.83,
+   "radius_arcmin": 12.0,
+   "why": "set-C region clam_230m05, 12'",
+   "viewer_s": 9.4,
+   "tap_s": 17.6,
+   "viewer_requests": 1,
+   "viewer_mb": 32.1,
+   "viewer_usable": true,
+   "rows_tap": 9972,
+   "rows_viewer": 9972,
+   "common": 9972,
+   "release_tap": {
+    "10000": 9972
+   },
+   "release_viewer": {
+    "10000": 9972
+   },
+   "only_tap": {},
+   "only_viewer": {},
+   "columns_compared": 45,
+   "columns_differing": {},
+   "identical": true,
+   "leftovers_by_position": {}
+  },
+  "wrap_ra0_12": {
+   "ra": 359.95,
+   "dec": -30.0,
+   "radius_arcmin": 12.0,
+   "why": "the cone crosses RA = 0 / 360 (two boxes), 12'",
+   "viewer_s": 14.8,
+   "tap_s": 13.7,
+   "viewer_requests": 2,
+   "viewer_mb": 40.0,
+   "viewer_usable": true,
+   "rows_tap": 12233,
+   "rows_viewer": 12233,
+   "common": 12233,
+   "release_tap": {
+    "10000": 12233
+   },
+   "release_viewer": {
+    "10000": 12233
+   },
+   "only_tap": {},
+   "only_viewer": {},
+   "columns_compared": 45,
+   "columns_differing": {},
+   "identical": true,
+   "leftovers_by_position": {}
+  },
+  "cosmos_16": {
+   "ra": 150.12,
+   "dec": 2.2,
+   "radius_arcmin": 16.0,
+   "why": "COSMOS, 16': four tiles",
+   "viewer_s": 71.2,
+   "tap_s": 17.7,
+   "viewer_requests": 4,
+   "viewer_mb": 195.8,
+   "viewer_usable": true,
+   "rows_tap": 61620,
+   "rows_viewer": 61620,
+   "common": 61620,
+   "release_tap": {
+    "10000": 61620
+   },
+   "release_viewer": {
+    "10000": 61620
+   },
+   "only_tap": {},
+   "only_viewer": {},
+   "columns_compared": 45,
+   "columns_differing": {},
+   "identical": true,
+   "leftovers_by_position": {}
+  },
+  "cosmos_20": {
+   "ra": 150.12,
+   "dec": 2.2,
+   "radius_arcmin": 20.0,
+   "why": "COSMOS, 20': four tiles of 20' x 20', the largest cone",
+   "viewer_s": 101.2,
+   "tap_s": 38.9,
+   "viewer_requests": 4,
+   "viewer_mb": 308.1,
+   "viewer_usable": true,
+   "rows_tap": 96489,
+   "rows_viewer": 96489,
+   "common": 96489,
+   "release_tap": {
+    "10000": 96489
+   },
+   "release_viewer": {
+    "10000": 96489
+   },
+   "only_tap": {},
+   "only_viewer": {},
+   "columns_compared": 45,
+   "columns_differing": {},
+   "identical": true,
+   "leftovers_by_position": {}
+  }
+ }
+}

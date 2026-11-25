@@ -168,17 +168,21 @@ CORE = ("gaia_dr3", "desi_legacy", "panstarrs1", "allwise", "twomass")
 # answers in 5-15 s, so it fits inside the 90 s as well.
 
 
-def _budget(name: str, default: float, retry: bool = False) -> float:
+def _budget(name: str, default: float, retry: bool = False, cone=None) -> float:
     """Wall-time budget of one collector.  ``retry``: the user asked for this
     collector again after it failed (2.57.0), which counts as a recent failure
-    whatever the failure memory says (it expires after 10 min)."""
+    whatever the failure memory says (it expires after 10 min).  ``cone`` (ra, dec, radius): a collector may size
+    its retry budget to the cone with ``retry_budget_s(ra, dec, radius_arcmin)`` instead of a fixed
+    ``RETRY_BUDGET_S`` (2.60.10 review: the Legacy Surveys viewer needs longer for cones over 10')."""
     try:
         b = min(default, float(getattr(_load_collector(name), "BUDGET_S", default)))
     except Exception:
         b = default
     if retry or (name in CORE and archive_cache.recent_failure(name)):
         try:
-            retry = getattr(_load_collector(name), "RETRY_BUDGET_S", None)
+            mod = _load_collector(name)
+            fn = getattr(mod, "retry_budget_s", None)
+            retry = fn(*cone) if (callable(fn) and cone is not None) else getattr(mod, "RETRY_BUDGET_S", None)
         except Exception:
             retry = None
         if retry is not None:
@@ -408,7 +412,7 @@ def collect_all(
     if workers > 1:
         _preload()
     names = collectors_to_run()
-    budgets = {n: _budget(n, budget_s) for n in names}
+    budgets = {n: _budget(n, budget_s, cone=(ra, dec, radius_arcmin)) for n in names}
     results = _run_bounded(
         lambda n, c: _collect_one(n, ra, dec, radius_arcmin, out_dir, tag, c), names, workers, budgets
     )
@@ -502,6 +506,7 @@ def retry_failed(
     workers: int = 1,
     which: str = "key",
     budget_s: float = COLLECTOR_BUDGET_S,
+    only=None,
 ) -> pd.DataFrame:
     """Ask again only the collectors of the last collection in ``raw_dir`` that
     failed or answered from a reduced alternative source, and replace their rows
@@ -518,9 +523,12 @@ def retry_failed(
     (``archive_cache``) does not skip it, and a collector that declares
     ``RETRY_BUDGET_S`` gets only that long (a healthy service answers in a
     fraction of it; the budget exists so that a retry during an outage is not
-    another 5-minute wait).  Returns the rows that were re-collected."""
+    another 5-minute wait).  ``only`` (2.60.10): ask again just these collectors among the failed ones.
+    Returns the rows that were re-collected."""
     raw_dir = Path(raw_dir)
     names = failed_collectors(raw_dir, which)
+    if only is not None:  # 2.60.10: a validation workflow asks again only the archive whose outage it is waiting out
+        names = [n for n in names if n in set(only)]
     if not names:
         print("[retry] no failed archives to ask again", flush=True)
         return pd.DataFrame()
@@ -530,7 +538,7 @@ def retry_failed(
     if workers > 1:
         _preload()
     print(f"[retry] asking again: {', '.join(names)}", flush=True)
-    budgets = {n: _budget(n, budget_s, retry=True) for n in names}
+    budgets = {n: _budget(n, budget_s, retry=True, cone=(ra, dec, radius_arcmin)) for n in names}
     results = _run_bounded(
         lambda n, c: _collect_one(n, ra, dec, radius_arcmin, raw_dir, tag, c, retry=True), names, workers, budgets
     )
