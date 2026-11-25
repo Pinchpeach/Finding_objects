@@ -15,6 +15,9 @@ _STAGE = re.compile(r"^\[pipeline\] (?P<stage>[0-9a-z_]+): (?P<sec>[0-9.]+) s")
 # "--retry-failed" run (2.57.0): the worker names the archives it asks again, so the
 # progress bar counts those instead of all collectors.
 _RETRY = re.compile(r"^\[retry\] asking again: (?P<names>.+)$")
+# A small fixed table downloaded once on first use (2.60.7, Get_data/local_lists.py): shown in the status bar so a
+# first search that waits for the download does not look stuck; it does not count as a collector.
+_LISTS = re.compile(r"^\[lists\] (?P<msg>.+)$")
 
 
 @lru_cache(maxsize=1)
@@ -51,6 +54,9 @@ class ProgressTracker:
             self.n_collectors = len([n for n in m["names"].split(",") if n.strip()])
             self.total = self.n_collectors + len(STAGES)
             return f"asking again: {m['names']}"
+        m = _LISTS.match(line)
+        if m:
+            return m["msg"][:140]
         m = _STAGE.match(line)
         if m:
             stage = m["stage"]

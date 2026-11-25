@@ -403,7 +403,12 @@ def assess_pair(a: Mapping[str, Any], b: Mapping[str, Any], density_arcsec2: flo
     posterior = (
         density_l / (density_l + density_arcsec2) if density_arcsec2 is not None and density_arcsec2 > 0 else positional
     )
+    # The same quantity as a likelihood ratio, L = f(r) / rho (Fleuren et al. 2012, MNRAS 423, 2407, eq. 5; Budavari &
+    # Szalay 2008 Bayes factor): the posterior above is L / (L + 1).  Kept for the posterior measurements
+    # (benchmark/association_truth); no decision reads it.
+    lr = density_l / density_arcsec2 if density_arcsec2 is not None and density_arcsec2 > 0 else None
     return {
+        "likelihood_ratio": lr,
         "association_posterior": posterior,
         "accepted": accepted,
         "separation_arcsec": sep,

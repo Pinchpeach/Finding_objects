@@ -47,6 +47,7 @@ it errs on the side of keeping the host together.
 from __future__ import annotations
 import json
 import math
+import os
 import re
 from pathlib import Path
 import numpy as np
@@ -444,9 +445,23 @@ def attach_ps1_fragments(out: pd.DataFrame, assoc: pd.DataFrame, explain: dict |
 # and it is not a separate object by its own evidence: no Gaia parallax or
 # proper motion at >= FRAG_MOTION_SNR (or above 1 mas / 3 mas/yr where the
 # errors are not at hand) and no good spectrum of its own.
-FRAG_RADII = 1.0
-FRAG_MIN_ARCSEC = 1.0
-FRAG_FAINTER_MAG = 2.0
+# Tuning switches of the 2.60.9 measurements on the 26 deep COSMOS fields (benchmark/association_truth/regroup.py); the
+# defaults are the 2.41.0 values.
+def _env_float(name: str, default: float, lo: float, hi: float) -> float:
+    """A switch read from the environment; an empty, non-finite or out-of-range value is refused, not used."""
+    raw = os.environ.get(name, "").strip()
+    if not raw:
+        return default
+    v = float(raw)
+    if not (math.isfinite(v) and lo <= v <= hi):
+        raise ValueError(f"{name}={raw!r}: expected a number in [{lo}, {hi}]")
+    return v
+
+
+FRAG_RADII = _env_float("V2_FRAG_RADII", 1.0, 0.1, 10.0)
+FRAG_MIN_ARCSEC = _env_float("V2_FRAG_MIN_ARCSEC", 1.0, 0.0, 30.0)
+FRAG_FAINTER_MAG = _env_float("V2_FRAG_FAINTER_MAG", 2.0, 0.0, 10.0)
+FRAG_HOST_AS_CANDIDATE = os.environ.get("V2_FRAG_HOST_CANDIDATE", "0") == "1"
 FRAG_MOTION_SNR = 5.0
 FRAG_KINDS = ("ls", "steal", "survey")
 STOLEN_CATALOGS = frozenset({"2MASS PSC", "AllWISE", PS1, SDSS, "GALEX AIS"})
@@ -496,12 +511,18 @@ def attach_galaxy_fragments(out: pd.DataFrame) -> pd.DataFrame:
     hc = importlib.util.module_from_spec(sp)
     sp.loader.exec_module(hc)
     spec = hc.spectroscopic(out).to_numpy() != ""
-    cand = top & ~host & ~_fragment_moving(out) & ~spec
+    cand = top & ~_fragment_moving(out) & ~spec
+    if not FRAG_HOST_AS_CANDIDATE:
+        cand &= ~host
     cand &= np.where(has_ls & np.isfinite(r), "ls" in FRAG_KINDS, ("survey" in FRAG_KINDS) & ~has_ls & ~has_gaia)
     ci = np.flatnonzero(cand)
     survey_sets = cats.map(lambda c: frozenset(c.split("|")) & STOLEN_CATALOGS).to_numpy()
     if not len(ci):
         return out
+    if FRAG_HOST_AS_CANDIDATE:
+        # brightest candidate first (2.60.9 review): whether a host-qualified object becomes a fragment must not depend
+        # on row order, and it is decided before any fainter object could pick it as its host
+        ci = ci[np.argsort(np.where(np.isfinite(r[ci]), r[ci], np.inf), kind="stable")]
     ra, dec = out.ra.to_numpy(float), out.dec.to_numpy(float)
     d0 = np.radians(np.nanmedian(dec[hi]))
     x = ((ra - ra[hi[0]] + 180.0) % 360.0 - 180.0) * math.cos(d0) * 3600.0
@@ -513,11 +534,19 @@ def attach_galaxy_fragments(out: pd.DataFrame) -> pd.DataFrame:
     near = tree.query_ball_point(np.c_[x[ci], y[ci]], r=float(lim.max()))
     oid = out.object_id.to_numpy()
     designation = out.designation.to_numpy() if "designation" in out else oid
+    taken = np.zeros(len(out), bool)  # objects grouped under a host in this pass
+    # objects that hold fragments: those of earlier grouping steps (consolidate, PS1 fragments) and of this pass
+    # (2.60.9 review, Codex: under the switch an existing parent must not become a fragment either)
+    parent = out.object_id.isin(set(out.parent_object_id.dropna())).to_numpy(dtype=bool, copy=True)
     for i, ks in zip(ci, near):
-        if not ks:
+        if not ks or (FRAG_HOST_AS_CANDIDATE and parent[i]):  # a host that holds fragments is never one itself
             continue
         ks = np.asarray(ks)
         d = np.hypot(x[hi[ks]] - x[i], y[hi[ks]] - y[i]) / lim[ks]
+        if FRAG_HOST_AS_CANDIDATE:
+            # a host-qualified object may itself be the fragment of a brighter host, never of itself or of an object
+            # that is a fragment in this pass; with the brightest-first order and the parent guard above: no chains
+            d = np.where((hi[ks] == i) | taken[hi[ks]], np.inf, d)
         if d.min() > 1:
             continue
         h = hi[ks[int(np.argmin(d))]]
@@ -528,6 +557,8 @@ def attach_galaxy_fragments(out: pd.DataFrame) -> pd.DataFrame:
                 continue
         out.iat[i, out.columns.get_loc("parent_object_id")] = oid[h]
         out.iat[i, out.columns.get_loc("component_role")] = "fragment"
+        taken[i] = True
+        parent[h] = True
         if "unknown_reason" in out:
             out.iat[i, out.columns.get_loc("unknown_reason")] = f"fragment or duplicate row of the galaxy {designation[h]} (grouped under it)"
     counts = out.parent_object_id.dropna().value_counts()
@@ -562,6 +593,10 @@ def attach_galaxy_fragments(out: pd.DataFrame) -> pd.DataFrame:
 # star; 21 multi-survey rows among them had been left UNKNOWN.
 HALO_G_MAX = 16.0
 HALO_MIN_ARCSEC = 2.0
+# Share of the legacypipe radius R(G) = 1630'' x 1.396^-G used (mask_radius_for_mag, legacypipe/reference.py, read in
+# the original source 2026-11-25): its BRIGHT mask (mask_mag < 13) is R/2 (get_reference_map halves it), its MEDIUM
+# mask (mask_mag < 16) the full R.  Here every G < 16 star uses the BRIGHT share, 0.5 (2.35.0 measurement).
+HALO_FRACTION = _env_float("V2_HALO_FRACTION", 0.5, 0.0, 2.0)
 HALO_CATALOGS = {PS1, "AllWISE", "GALEX AIS", SDSS, "2MASS PSC"}
 LS_COVER_ARCSEC = 60.0
 
@@ -569,7 +604,7 @@ LS_COVER_ARCSEC = 60.0
 def halo_radius_arcsec(g, ls_imaging=True):
     """Legacy Surveys BRIGHT-mask radius (arcsec) of a star of Gaia magnitude
     ``g``; half of it outside the Legacy Surveys footprint."""
-    return max((0.5 if ls_imaging else 0.25) * 1630.0 * 1.396 ** (-float(g)), HALO_MIN_ARCSEC)
+    return max(HALO_FRACTION * (1.0 if ls_imaging else 0.5) * 1630.0 * 1.396 ** (-float(g)), HALO_MIN_ARCSEC)
 
 
 def attach_bright_star_artifacts(out: pd.DataFrame) -> pd.DataFrame:

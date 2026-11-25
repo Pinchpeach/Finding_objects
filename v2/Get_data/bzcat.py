@@ -11,6 +11,7 @@ evidence, like ATNF for pulsars.  Columns checked against VizieR
 from __future__ import annotations
 import pandas as pd
 from _catalog_utils import add_standard_metadata, coordinates, empty_frame, pick, save_csv, vizier_cone
+import local_lists
 
 CATALOG = "Roma-BZCAT"
 VIZIER_CATALOG = "VII/274/bzcat5"
@@ -23,7 +24,11 @@ def blazar_type(name) -> str | None:
 
 
 def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
-    df = vizier_cone(VIZIER_CATALOG, ra, dec, radius_arcmin)
+    local = local_lists.cone("roma_bzcat5", ra, dec, radius_arcmin)  # 2.60.7: the local copy, when enabled
+    if local is None:
+        df = vizier_cone(VIZIER_CATALOG, ra, dec, radius_arcmin)
+    else:
+        df = local[0].to_pandas() if local else None
     if df is None or df.empty:
         return empty_frame("blazar_type")
     namec = pick(df, ["Name", "5BZCAT"])

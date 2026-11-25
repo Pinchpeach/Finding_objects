@@ -8,6 +8,7 @@ Stage-1 can use a survey-aware association model rather than a universal radius.
 from __future__ import annotations
 import pandas as pd
 from _catalog_utils import BASE, add_standard_metadata, coordinates, empty_frame, pick, save_csv, vizier_query
+import local_lists
 
 CATALOG = "Suh 2021 AGB Catalog"
 TABLES = {
@@ -26,7 +27,13 @@ META = {
 def _per_table(ra: float, dec: float, radius_arcmin: float):
     """{table id: rows (a DataFrame) or None} and the tables that failed.  One request asks the four tables
     together (2.60.2: ``-source=a,b,c,d``): a cold search of an empty cone spent 8-13 requests and 85-110 s on four
-    requests of its own; a request that fails is asked table by table as before."""
+    requests of its own; a request that fails is asked table by table as before.
+    2.60.7: a local copy of the four tables (``local_lists.py``, downloaded once on first use, when it is enabled)
+    answers the cone without any request; None from it means VizieR is asked as above."""
+    local = local_lists.cone("suh2021_agb", ra, dec, radius_arcmin)
+    if local is not None:
+        have = set(local.keys())
+        return {t: (local[t].to_pandas() if t in have else None) for t in TABLES}, []
     try:
         tabs = vizier_query(list(TABLES), ra, dec, radius_arcmin)
         have = set(tabs.keys())
