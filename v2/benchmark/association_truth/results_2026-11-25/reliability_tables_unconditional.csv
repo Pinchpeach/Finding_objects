@@ -1,0 +1,295 @@
+catalog,half,score,bin,n,correct,observed_pct,mean_score_pct,wilson
+AllWISE,calibration,current,"[0.5,0.8)",124,103,83.06,72.22,75.5-88.6
+AllWISE,calibration,current,"[0.8,0.9)",323,312,96.59,85.23,94.0-98.1
+AllWISE,calibration,current,"[0.9,0.95)",308,301,97.73,93.28,95.4-98.9
+AllWISE,calibration,current,"[0.95,0.99)",2343,2335,99.66,96.92,99.3-99.8
+AllWISE,calibration,current,"[0.99,0.999)",960,907,94.48,99.68,92.8-95.8
+AllWISE,calibration,current,"[0.999,1)",163,146,89.57,99.92,83.9-93.4
+AllWISE,calibration,conf_,"[0.5,0.8)",124,103,83.06,72.22,75.5-88.6
+AllWISE,calibration,conf_,"[0.8,0.9)",323,312,96.59,85.23,94.0-98.1
+AllWISE,calibration,conf_,"[0.9,0.95)",308,301,97.73,93.28,95.4-98.9
+AllWISE,calibration,conf_,"[0.95,0.99)",2343,2335,99.66,96.92,99.3-99.8
+AllWISE,calibration,conf_,"[0.99,0.999)",960,907,94.48,99.68,92.8-95.8
+AllWISE,calibration,conf_,"[0.999,1)",163,146,89.57,99.92,83.9-93.4
+AllWISE,calibration,fleuren,"[0,0.5)",25,20,80.0,35.78,60.9-91.1
+AllWISE,calibration,fleuren,"[0.5,0.8)",187,182,97.33,67.34,93.9-98.9
+AllWISE,calibration,fleuren,"[0.8,0.9)",53,49,92.45,85.48,82.1-97.0
+AllWISE,calibration,fleuren,"[0.9,0.95)",111,103,92.79,92.98,86.4-96.3
+AllWISE,calibration,fleuren,"[0.95,0.99)",155,139,89.68,97.42,83.9-93.5
+AllWISE,calibration,fleuren,"[0.99,0.999)",958,940,98.12,99.74,97.0-98.8
+AllWISE,calibration,fleuren,"[0.999,1)",2732,2671,97.77,99.97,97.1-98.3
+AllWISE,calibration,fleuren_q,"[0,0.5)",25,20,80.0,35.78,60.9-91.1
+AllWISE,calibration,fleuren_q,"[0.5,0.8)",187,182,97.33,67.34,93.9-98.9
+AllWISE,calibration,fleuren_q,"[0.8,0.9)",53,49,92.45,85.48,82.1-97.0
+AllWISE,calibration,fleuren_q,"[0.9,0.95)",113,105,92.92,93.0,86.6-96.4
+AllWISE,calibration,fleuren_q,"[0.95,0.99)",155,139,89.68,97.43,83.9-93.5
+AllWISE,calibration,fleuren_q,"[0.99,0.999)",978,960,98.16,99.74,97.1-98.8
+AllWISE,calibration,fleuren_q,"[0.999,1)",2710,2649,97.75,99.97,97.1-98.2
+AllWISE,calibration,fleuren1,"[0,0.5)",25,20,80.0,35.82,60.9-91.1
+AllWISE,calibration,fleuren1,"[0.5,0.8)",187,182,97.33,67.39,93.9-98.9
+AllWISE,calibration,fleuren1,"[0.8,0.9)",52,48,92.31,85.45,81.8-97.0
+AllWISE,calibration,fleuren1,"[0.9,0.95)",111,103,92.79,92.98,86.4-96.3
+AllWISE,calibration,fleuren1,"[0.95,0.99)",108,98,90.74,97.02,83.8-94.9
+AllWISE,calibration,fleuren1,"[0.99,0.999)",24,24,100.0,99.37,86.2-100.0
+AllWISE,calibration,fleuren1,"[0.999,1)",3714,3629,97.71,100.0,97.2-98.1
+AllWISE,test,current,"[0.5,0.8)",92,69,75.0,72.07,65.3-82.7
+AllWISE,test,current,"[0.8,0.9)",218,206,94.5,84.86,90.6-96.8
+AllWISE,test,current,"[0.9,0.95)",250,244,97.6,93.14,94.9-98.9
+AllWISE,test,current,"[0.95,0.99)",1867,1857,99.46,96.92,99.0-99.7
+AllWISE,test,current,"[0.99,0.999)",718,689,95.96,99.69,94.3-97.2
+AllWISE,test,current,"[0.999,1)",125,111,88.8,99.91,82.1-93.2
+AllWISE,test,conf_,"[0.5,0.8)",92,69,75.0,72.07,65.3-82.7
+AllWISE,test,conf_,"[0.8,0.9)",218,206,94.5,84.86,90.6-96.8
+AllWISE,test,conf_,"[0.9,0.95)",250,244,97.6,93.14,94.9-98.9
+AllWISE,test,conf_,"[0.95,0.99)",1867,1857,99.46,96.92,99.0-99.7
+AllWISE,test,conf_,"[0.99,0.999)",718,689,95.96,99.69,94.3-97.2
+AllWISE,test,conf_,"[0.999,1)",125,111,88.8,99.91,82.1-93.2
+AllWISE,test,fleuren,"[0,0.5)",14,12,85.71,33.6,60.1-96.0
+AllWISE,test,fleuren,"[0.5,0.8)",151,151,100.0,68.32,97.5-100.0
+AllWISE,test,fleuren,"[0.8,0.9)",28,27,96.43,86.55,82.3-99.4
+AllWISE,test,fleuren,"[0.9,0.95)",98,94,95.92,93.07,90.0-98.4
+AllWISE,test,fleuren,"[0.95,0.99)",108,101,93.52,97.21,87.2-96.8
+AllWISE,test,fleuren,"[0.99,0.999)",516,491,95.16,99.73,92.9-96.7
+AllWISE,test,fleuren,"[0.999,1)",2355,2300,97.66,99.97,97.0-98.2
+AllWISE,test,fleuren_q,"[0,0.5)",14,12,85.71,33.6,60.1-96.0
+AllWISE,test,fleuren_q,"[0.5,0.8)",151,151,100.0,68.31,97.5-100.0
+AllWISE,test,fleuren_q,"[0.8,0.9)",28,27,96.43,86.55,82.3-99.4
+AllWISE,test,fleuren_q,"[0.9,0.95)",98,94,95.92,93.06,90.0-98.4
+AllWISE,test,fleuren_q,"[0.95,0.99)",108,101,93.52,97.2,87.2-96.8
+AllWISE,test,fleuren_q,"[0.99,0.999)",524,499,95.23,99.73,93.1-96.7
+AllWISE,test,fleuren_q,"[0.999,1)",2347,2292,97.66,99.97,97.0-98.2
+AllWISE,test,fleuren1,"[0,0.5)",14,12,85.71,33.62,60.1-96.0
+AllWISE,test,fleuren1,"[0.5,0.8)",151,151,100.0,68.34,97.5-100.0
+AllWISE,test,fleuren1,"[0.8,0.9)",27,26,96.3,86.46,81.7-99.3
+AllWISE,test,fleuren1,"[0.9,0.95)",99,95,95.96,93.06,90.1-98.4
+AllWISE,test,fleuren1,"[0.95,0.99)",100,95,95.0,97.1,88.8-97.8
+AllWISE,test,fleuren1,"[0.99,0.999)",19,18,94.74,99.34,75.4-99.1
+AllWISE,test,fleuren1,"[0.999,1)",2860,2779,97.17,100.0,96.5-97.7
+AllWISE,all,current,"[0.5,0.8)",216,172,79.63,72.16,73.8-84.5
+AllWISE,all,current,"[0.8,0.9)",541,518,95.75,85.08,93.7-97.2
+AllWISE,all,current,"[0.9,0.95)",558,545,97.67,93.22,96.1-98.6
+AllWISE,all,current,"[0.95,0.99)",4210,4192,99.57,96.92,99.3-99.7
+AllWISE,all,current,"[0.99,0.999)",1678,1596,95.11,99.68,94.0-96.0
+AllWISE,all,current,"[0.999,1)",288,257,89.24,99.91,85.1-92.3
+AllWISE,all,conf_,"[0.5,0.8)",216,172,79.63,72.16,73.8-84.5
+AllWISE,all,conf_,"[0.8,0.9)",541,518,95.75,85.08,93.7-97.2
+AllWISE,all,conf_,"[0.9,0.95)",558,545,97.67,93.22,96.1-98.6
+AllWISE,all,conf_,"[0.95,0.99)",4210,4192,99.57,96.92,99.3-99.7
+AllWISE,all,conf_,"[0.99,0.999)",1678,1596,95.11,99.68,94.0-96.0
+AllWISE,all,conf_,"[0.999,1)",288,257,89.24,99.91,85.1-92.3
+AllWISE,all,fleuren,"[0,0.5)",39,32,82.05,35.0,67.3-91.0
+AllWISE,all,fleuren,"[0.5,0.8)",338,333,98.52,67.78,96.6-99.4
+AllWISE,all,fleuren,"[0.8,0.9)",81,76,93.83,85.85,86.4-97.3
+AllWISE,all,fleuren,"[0.9,0.95)",209,197,94.26,93.02,90.2-96.7
+AllWISE,all,fleuren,"[0.95,0.99)",263,240,91.25,97.33,87.2-94.1
+AllWISE,all,fleuren,"[0.99,0.999)",1474,1431,97.08,99.74,96.1-97.8
+AllWISE,all,fleuren,"[0.999,1)",5087,4971,97.72,99.97,97.3-98.1
+AllWISE,all,fleuren_q,"[0,0.5)",39,32,82.05,35.0,67.3-91.0
+AllWISE,all,fleuren_q,"[0.5,0.8)",338,333,98.52,67.78,96.6-99.4
+AllWISE,all,fleuren_q,"[0.8,0.9)",81,76,93.83,85.85,86.4-97.3
+AllWISE,all,fleuren_q,"[0.9,0.95)",211,199,94.31,93.03,90.3-96.7
+AllWISE,all,fleuren_q,"[0.95,0.99)",263,240,91.25,97.34,87.2-94.1
+AllWISE,all,fleuren_q,"[0.99,0.999)",1502,1459,97.14,99.73,96.2-97.9
+AllWISE,all,fleuren_q,"[0.999,1)",5057,4941,97.71,99.97,97.3-98.1
+AllWISE,all,fleuren1,"[0,0.5)",39,32,82.05,35.03,67.3-91.0
+AllWISE,all,fleuren1,"[0.5,0.8)",338,333,98.52,67.81,96.6-99.4
+AllWISE,all,fleuren1,"[0.8,0.9)",79,74,93.67,85.79,86.0-97.3
+AllWISE,all,fleuren1,"[0.9,0.95)",210,198,94.29,93.02,90.3-96.7
+AllWISE,all,fleuren1,"[0.95,0.99)",208,193,92.79,97.06,88.4-95.6
+AllWISE,all,fleuren1,"[0.99,0.999)",43,42,97.67,99.35,87.9-99.6
+AllWISE,all,fleuren1,"[0.999,1)",6574,6408,97.47,100.0,97.1-97.8
+2MASS PSC,calibration,current,"[0.5,0.8)",1,1,100.0,75.21,20.7-100.0
+2MASS PSC,calibration,current,"[0.8,0.9)",2,1,50.0,84.67,9.5-90.5
+2MASS PSC,calibration,current,"[0.9,0.95)",6,6,100.0,92.06,61.0-100.0
+2MASS PSC,calibration,current,"[0.95,0.99)",56,45,80.36,97.18,68.2-88.7
+2MASS PSC,calibration,current,"[0.99,0.999)",65,55,84.62,99.71,73.9-91.4
+2MASS PSC,calibration,current,"[0.999,1)",661,534,80.79,99.98,77.6-83.6
+2MASS PSC,calibration,conf_,"[0.5,0.8)",1,1,100.0,75.21,20.7-100.0
+2MASS PSC,calibration,conf_,"[0.8,0.9)",2,1,50.0,84.67,9.5-90.5
+2MASS PSC,calibration,conf_,"[0.9,0.95)",6,6,100.0,92.06,61.0-100.0
+2MASS PSC,calibration,conf_,"[0.95,0.99)",56,45,80.36,97.18,68.2-88.7
+2MASS PSC,calibration,conf_,"[0.99,0.999)",65,55,84.62,99.71,73.9-91.4
+2MASS PSC,calibration,conf_,"[0.999,1)",661,534,80.79,99.98,77.6-83.6
+2MASS PSC,calibration,fleuren,"[0,0.5)",1,1,100.0,11.12,20.7-100.0
+2MASS PSC,calibration,fleuren,"[0.5,0.8)",6,4,66.67,71.05,30.0-90.3
+2MASS PSC,calibration,fleuren,"[0.9,0.95)",1,1,100.0,92.04,20.7-100.0
+2MASS PSC,calibration,fleuren,"[0.95,0.99)",5,5,100.0,98.74,56.6-100.0
+2MASS PSC,calibration,fleuren,"[0.99,0.999)",30,22,73.33,99.58,55.6-85.8
+2MASS PSC,calibration,fleuren,"[0.999,1)",748,609,81.42,100.0,78.5-84.0
+2MASS PSC,calibration,fleuren_q,"[0,0.5)",1,1,100.0,11.12,20.7-100.0
+2MASS PSC,calibration,fleuren_q,"[0.5,0.8)",6,4,66.67,71.05,30.0-90.3
+2MASS PSC,calibration,fleuren_q,"[0.9,0.95)",1,1,100.0,92.04,20.7-100.0
+2MASS PSC,calibration,fleuren_q,"[0.95,0.99)",5,5,100.0,98.74,56.6-100.0
+2MASS PSC,calibration,fleuren_q,"[0.99,0.999)",31,22,70.97,99.59,53.4-83.9
+2MASS PSC,calibration,fleuren_q,"[0.999,1)",747,609,81.53,100.0,78.6-84.1
+2MASS PSC,calibration,fleuren1,"[0,0.5)",1,1,100.0,11.12,20.7-100.0
+2MASS PSC,calibration,fleuren1,"[0.5,0.8)",6,4,66.67,71.05,30.0-90.3
+2MASS PSC,calibration,fleuren1,"[0.9,0.95)",1,1,100.0,92.04,20.7-100.0
+2MASS PSC,calibration,fleuren1,"[0.95,0.99)",5,5,100.0,98.74,56.6-100.0
+2MASS PSC,calibration,fleuren1,"[0.99,0.999)",30,22,73.33,99.58,55.6-85.8
+2MASS PSC,calibration,fleuren1,"[0.999,1)",748,609,81.42,100.0,78.5-84.0
+2MASS PSC,test,current,"[0.5,0.8)",1,0,0.0,64.38,0.0-79.3
+2MASS PSC,test,current,"[0.8,0.9)",4,4,100.0,87.49,51.0-100.0
+2MASS PSC,test,current,"[0.9,0.95)",12,9,75.0,93.26,46.8-91.1
+2MASS PSC,test,current,"[0.95,0.99)",52,35,67.31,96.82,53.8-78.5
+2MASS PSC,test,current,"[0.99,0.999)",36,27,75.0,99.68,58.9-86.2
+2MASS PSC,test,current,"[0.999,1)",494,333,67.41,99.98,63.2-71.4
+2MASS PSC,test,conf_,"[0.5,0.8)",1,0,0.0,64.38,0.0-79.3
+2MASS PSC,test,conf_,"[0.8,0.9)",4,4,100.0,87.49,51.0-100.0
+2MASS PSC,test,conf_,"[0.9,0.95)",12,9,75.0,93.26,46.8-91.1
+2MASS PSC,test,conf_,"[0.95,0.99)",52,35,67.31,96.82,53.8-78.5
+2MASS PSC,test,conf_,"[0.99,0.999)",36,27,75.0,99.68,58.9-86.2
+2MASS PSC,test,conf_,"[0.999,1)",494,333,67.41,99.98,63.2-71.4
+2MASS PSC,test,fleuren,"[0,0.5)",1,1,100.0,15.4,20.7-100.0
+2MASS PSC,test,fleuren,"[0.5,0.8)",6,5,83.33,67.84,43.6-97.0
+2MASS PSC,test,fleuren,"[0.8,0.9)",1,0,0.0,89.37,0.0-79.3
+2MASS PSC,test,fleuren,"[0.9,0.95)",2,2,100.0,91.55,34.2-100.0
+2MASS PSC,test,fleuren,"[0.95,0.99)",1,1,100.0,97.84,20.7-100.0
+2MASS PSC,test,fleuren,"[0.99,0.999)",11,9,81.82,99.54,52.3-94.9
+2MASS PSC,test,fleuren,"[0.999,1)",577,390,67.59,100.0,63.7-71.3
+2MASS PSC,test,fleuren_q,"[0,0.5)",1,1,100.0,15.4,20.7-100.0
+2MASS PSC,test,fleuren_q,"[0.5,0.8)",6,5,83.33,67.84,43.6-97.0
+2MASS PSC,test,fleuren_q,"[0.8,0.9)",1,0,0.0,89.37,0.0-79.3
+2MASS PSC,test,fleuren_q,"[0.9,0.95)",2,2,100.0,91.55,34.2-100.0
+2MASS PSC,test,fleuren_q,"[0.95,0.99)",1,1,100.0,97.84,20.7-100.0
+2MASS PSC,test,fleuren_q,"[0.99,0.999)",11,9,81.82,99.54,52.3-94.9
+2MASS PSC,test,fleuren_q,"[0.999,1)",577,390,67.59,100.0,63.7-71.3
+2MASS PSC,test,fleuren1,"[0,0.5)",1,1,100.0,15.4,20.7-100.0
+2MASS PSC,test,fleuren1,"[0.5,0.8)",6,5,83.33,67.84,43.6-97.0
+2MASS PSC,test,fleuren1,"[0.8,0.9)",1,0,0.0,89.37,0.0-79.3
+2MASS PSC,test,fleuren1,"[0.9,0.95)",2,2,100.0,91.55,34.2-100.0
+2MASS PSC,test,fleuren1,"[0.95,0.99)",1,1,100.0,97.84,20.7-100.0
+2MASS PSC,test,fleuren1,"[0.99,0.999)",11,9,81.82,99.54,52.3-94.9
+2MASS PSC,test,fleuren1,"[0.999,1)",577,390,67.59,100.0,63.7-71.3
+2MASS PSC,all,current,"[0.5,0.8)",2,1,50.0,69.8,9.5-90.5
+2MASS PSC,all,current,"[0.8,0.9)",6,5,83.33,86.55,43.6-97.0
+2MASS PSC,all,current,"[0.9,0.95)",18,15,83.33,92.86,60.8-94.2
+2MASS PSC,all,current,"[0.95,0.99)",108,80,74.07,97.0,65.1-81.4
+2MASS PSC,all,current,"[0.99,0.999)",101,82,81.19,99.7,72.5-87.6
+2MASS PSC,all,current,"[0.999,1)",1155,867,75.06,99.98,72.5-77.5
+2MASS PSC,all,conf_,"[0.5,0.8)",2,1,50.0,69.8,9.5-90.5
+2MASS PSC,all,conf_,"[0.8,0.9)",6,5,83.33,86.55,43.6-97.0
+2MASS PSC,all,conf_,"[0.9,0.95)",18,15,83.33,92.86,60.8-94.2
+2MASS PSC,all,conf_,"[0.95,0.99)",108,80,74.07,97.0,65.1-81.4
+2MASS PSC,all,conf_,"[0.99,0.999)",101,82,81.19,99.7,72.5-87.6
+2MASS PSC,all,conf_,"[0.999,1)",1155,867,75.06,99.98,72.5-77.5
+2MASS PSC,all,fleuren,"[0,0.5)",2,2,100.0,13.26,34.2-100.0
+2MASS PSC,all,fleuren,"[0.5,0.8)",12,9,75.0,69.45,46.8-91.1
+2MASS PSC,all,fleuren,"[0.8,0.9)",1,0,0.0,89.37,0.0-79.3
+2MASS PSC,all,fleuren,"[0.9,0.95)",3,3,100.0,91.71,43.8-100.0
+2MASS PSC,all,fleuren,"[0.95,0.99)",6,6,100.0,98.59,61.0-100.0
+2MASS PSC,all,fleuren,"[0.99,0.999)",41,31,75.61,99.57,60.7-86.2
+2MASS PSC,all,fleuren,"[0.999,1)",1325,999,75.4,100.0,73.0-77.6
+2MASS PSC,all,fleuren_q,"[0,0.5)",2,2,100.0,13.26,34.2-100.0
+2MASS PSC,all,fleuren_q,"[0.5,0.8)",12,9,75.0,69.45,46.8-91.1
+2MASS PSC,all,fleuren_q,"[0.8,0.9)",1,0,0.0,89.37,0.0-79.3
+2MASS PSC,all,fleuren_q,"[0.9,0.95)",3,3,100.0,91.71,43.8-100.0
+2MASS PSC,all,fleuren_q,"[0.95,0.99)",6,6,100.0,98.59,61.0-100.0
+2MASS PSC,all,fleuren_q,"[0.99,0.999)",42,31,73.81,99.58,58.9-84.7
+2MASS PSC,all,fleuren_q,"[0.999,1)",1324,999,75.45,100.0,73.1-77.7
+2MASS PSC,all,fleuren1,"[0,0.5)",2,2,100.0,13.26,34.2-100.0
+2MASS PSC,all,fleuren1,"[0.5,0.8)",12,9,75.0,69.45,46.8-91.1
+2MASS PSC,all,fleuren1,"[0.8,0.9)",1,0,0.0,89.37,0.0-79.3
+2MASS PSC,all,fleuren1,"[0.9,0.95)",3,3,100.0,91.71,43.8-100.0
+2MASS PSC,all,fleuren1,"[0.95,0.99)",6,6,100.0,98.59,61.0-100.0
+2MASS PSC,all,fleuren1,"[0.99,0.999)",41,31,75.61,99.57,60.7-86.2
+2MASS PSC,all,fleuren1,"[0.999,1)",1325,999,75.4,100.0,73.0-77.6
+GALEX AIS,calibration,current,"[0,0.5)",127,93,73.23,18.87,64.9-80.2
+GALEX AIS,calibration,current,"[0.5,0.8)",219,160,73.06,68.36,66.8-78.5
+GALEX AIS,calibration,current,"[0.8,0.9)",160,116,72.5,85.31,65.1-78.8
+GALEX AIS,calibration,current,"[0.9,0.95)",124,103,83.06,92.9,75.5-88.6
+GALEX AIS,calibration,current,"[0.95,0.99)",348,277,79.6,97.02,75.1-83.5
+GALEX AIS,calibration,current,"[0.99,0.999)",237,199,83.97,99.73,78.8-88.1
+GALEX AIS,calibration,conf_,"[0,0.5)",127,93,73.23,18.87,64.9-80.2
+GALEX AIS,calibration,conf_,"[0.5,0.8)",219,160,73.06,68.36,66.8-78.5
+GALEX AIS,calibration,conf_,"[0.8,0.9)",160,116,72.5,85.31,65.1-78.8
+GALEX AIS,calibration,conf_,"[0.9,0.95)",124,103,83.06,92.9,75.5-88.6
+GALEX AIS,calibration,conf_,"[0.95,0.99)",348,277,79.6,97.02,75.1-83.5
+GALEX AIS,calibration,conf_,"[0.99,0.999)",237,199,83.97,99.73,78.8-88.1
+GALEX AIS,calibration,fleuren,"[0,0.5)",114,71,62.28,24.29,53.1-70.6
+GALEX AIS,calibration,fleuren,"[0.5,0.8)",154,111,72.08,66.62,64.5-78.6
+GALEX AIS,calibration,fleuren,"[0.8,0.9)",111,82,73.87,85.73,65.0-81.1
+GALEX AIS,calibration,fleuren,"[0.9,0.95)",143,118,82.52,92.8,75.5-87.9
+GALEX AIS,calibration,fleuren,"[0.95,0.99)",275,219,79.64,97.45,74.5-84.0
+GALEX AIS,calibration,fleuren,"[0.99,0.999)",259,213,82.24,99.49,77.1-86.4
+GALEX AIS,calibration,fleuren,"[0.999,1)",159,134,84.28,99.96,77.8-89.1
+GALEX AIS,calibration,fleuren_q,"[0,0.5)",123,80,65.04,24.68,56.3-72.9
+GALEX AIS,calibration,fleuren_q,"[0.5,0.8)",156,111,71.15,67.33,63.6-77.7
+GALEX AIS,calibration,fleuren_q,"[0.8,0.9)",118,87,73.73,85.68,65.1-80.8
+GALEX AIS,calibration,fleuren_q,"[0.9,0.95)",144,117,81.25,92.62,74.1-86.8
+GALEX AIS,calibration,fleuren_q,"[0.95,0.99)",272,215,79.04,97.37,73.8-83.5
+GALEX AIS,calibration,fleuren_q,"[0.99,0.999)",252,212,84.13,99.46,79.1-88.1
+GALEX AIS,calibration,fleuren_q,"[0.999,1)",150,126,84.0,99.95,77.3-89.0
+GALEX AIS,calibration,fleuren1,"[0,0.5)",50,24,48.0,28.45,34.8-61.5
+GALEX AIS,calibration,fleuren1,"[0.5,0.8)",110,84,76.36,67.11,67.6-83.3
+GALEX AIS,calibration,fleuren1,"[0.8,0.9)",62,39,62.9,85.71,50.5-73.8
+GALEX AIS,calibration,fleuren1,"[0.9,0.95)",62,49,79.03,92.42,67.4-87.3
+GALEX AIS,calibration,fleuren1,"[0.95,0.99)",106,85,80.19,97.39,71.6-86.7
+GALEX AIS,calibration,fleuren1,"[0.99,0.999)",60,48,80.0,99.56,68.2-88.2
+GALEX AIS,calibration,fleuren1,"[0.999,1)",765,619,80.92,100.0,78.0-83.5
+GALEX AIS,test,current,"[0,0.5)",103,90,87.38,13.91,79.6-92.5
+GALEX AIS,test,current,"[0.5,0.8)",153,116,75.82,68.1,68.5-81.9
+GALEX AIS,test,current,"[0.8,0.9)",120,106,88.33,85.05,81.4-92.9
+GALEX AIS,test,current,"[0.9,0.95)",96,89,92.71,92.98,85.7-96.4
+GALEX AIS,test,current,"[0.95,0.99)",252,226,89.68,97.0,85.3-92.9
+GALEX AIS,test,current,"[0.99,0.999)",191,170,89.01,99.72,83.8-92.7
+GALEX AIS,test,conf_,"[0,0.5)",103,90,87.38,13.91,79.6-92.5
+GALEX AIS,test,conf_,"[0.5,0.8)",153,116,75.82,68.1,68.5-81.9
+GALEX AIS,test,conf_,"[0.8,0.9)",120,106,88.33,85.05,81.4-92.9
+GALEX AIS,test,conf_,"[0.9,0.95)",96,89,92.71,92.98,85.7-96.4
+GALEX AIS,test,conf_,"[0.95,0.99)",251,225,89.64,96.99,85.3-92.8
+GALEX AIS,test,conf_,"[0.99,0.999)",192,171,89.06,99.72,83.9-92.7
+GALEX AIS,test,fleuren,"[0,0.5)",88,73,82.95,21.01,73.8-89.4
+GALEX AIS,test,fleuren,"[0.5,0.8)",118,97,82.2,67.29,74.3-88.1
+GALEX AIS,test,fleuren,"[0.8,0.9)",77,61,79.22,86.18,68.9-86.8
+GALEX AIS,test,fleuren,"[0.9,0.95)",101,89,88.12,92.98,80.4-93.1
+GALEX AIS,test,fleuren,"[0.95,0.99)",230,203,88.26,97.36,83.5-91.8
+GALEX AIS,test,fleuren,"[0.99,0.999)",197,178,90.36,99.45,85.4-93.7
+GALEX AIS,test,fleuren,"[0.999,1)",104,96,92.31,99.95,85.6-96.1
+GALEX AIS,test,fleuren_q,"[0,0.5)",92,77,83.7,20.62,74.8-89.9
+GALEX AIS,test,fleuren_q,"[0.5,0.8)",119,95,79.83,66.93,71.7-86.1
+GALEX AIS,test,fleuren_q,"[0.8,0.9)",90,76,84.44,85.99,75.6-90.5
+GALEX AIS,test,fleuren_q,"[0.9,0.95)",101,88,87.13,93.01,79.2-92.3
+GALEX AIS,test,fleuren_q,"[0.95,0.99)",237,211,89.03,97.38,84.4-92.4
+GALEX AIS,test,fleuren_q,"[0.99,0.999)",182,163,89.56,99.44,84.3-93.2
+GALEX AIS,test,fleuren_q,"[0.999,1)",94,87,92.55,99.95,85.4-96.3
+GALEX AIS,test,fleuren1,"[0,0.5)",25,17,68.0,32.96,48.4-82.8
+GALEX AIS,test,fleuren1,"[0.5,0.8)",81,61,75.31,68.42,64.9-83.4
+GALEX AIS,test,fleuren1,"[0.8,0.9)",46,40,86.96,85.77,74.3-93.9
+GALEX AIS,test,fleuren1,"[0.9,0.95)",46,41,89.13,92.59,77.0-95.3
+GALEX AIS,test,fleuren1,"[0.95,0.99)",96,77,80.21,97.23,71.1-86.9
+GALEX AIS,test,fleuren1,"[0.99,0.999)",60,49,81.67,99.5,70.1-89.4
+GALEX AIS,test,fleuren1,"[0.999,1)",561,512,91.27,100.0,88.6-93.3
+GALEX AIS,all,current,"[0,0.5)",230,183,79.57,16.65,73.9-84.3
+GALEX AIS,all,current,"[0.5,0.8)",372,276,74.19,68.25,69.5-78.4
+GALEX AIS,all,current,"[0.8,0.9)",280,222,79.29,85.2,74.2-83.6
+GALEX AIS,all,current,"[0.9,0.95)",220,192,87.27,92.93,82.2-91.0
+GALEX AIS,all,current,"[0.95,0.99)",600,503,83.83,97.01,80.7-86.6
+GALEX AIS,all,current,"[0.99,0.999)",428,369,86.21,99.72,82.6-89.2
+GALEX AIS,all,conf_,"[0,0.5)",230,183,79.57,16.65,73.9-84.3
+GALEX AIS,all,conf_,"[0.5,0.8)",372,276,74.19,68.25,69.5-78.4
+GALEX AIS,all,conf_,"[0.8,0.9)",280,222,79.29,85.2,74.2-83.6
+GALEX AIS,all,conf_,"[0.9,0.95)",220,192,87.27,92.93,82.2-91.0
+GALEX AIS,all,conf_,"[0.95,0.99)",599,502,83.81,97.01,80.6-86.5
+GALEX AIS,all,conf_,"[0.99,0.999)",429,370,86.25,99.72,82.7-89.2
+GALEX AIS,all,fleuren,"[0,0.5)",202,144,71.29,22.86,64.7-77.1
+GALEX AIS,all,fleuren,"[0.5,0.8)",272,208,76.47,66.91,71.1-81.1
+GALEX AIS,all,fleuren,"[0.8,0.9)",188,143,76.06,85.92,69.5-81.6
+GALEX AIS,all,fleuren,"[0.9,0.95)",244,207,84.84,92.87,79.8-88.8
+GALEX AIS,all,fleuren,"[0.95,0.99)",505,422,83.56,97.41,80.1-86.5
+GALEX AIS,all,fleuren,"[0.99,0.999)",456,391,85.75,99.47,82.2-88.7
+GALEX AIS,all,fleuren,"[0.999,1)",263,230,87.45,99.96,82.9-90.9
+GALEX AIS,all,fleuren_q,"[0,0.5)",215,157,73.02,22.94,66.7-78.5
+GALEX AIS,all,fleuren_q,"[0.5,0.8)",275,206,74.91,67.16,69.5-79.7
+GALEX AIS,all,fleuren_q,"[0.8,0.9)",208,163,78.37,85.81,72.3-83.4
+GALEX AIS,all,fleuren_q,"[0.9,0.95)",245,205,83.67,92.78,78.5-87.8
+GALEX AIS,all,fleuren_q,"[0.95,0.99)",509,426,83.69,97.38,80.2-86.6
+GALEX AIS,all,fleuren_q,"[0.99,0.999)",434,375,86.41,99.45,82.9-89.3
+GALEX AIS,all,fleuren_q,"[0.999,1)",244,213,87.3,99.95,82.5-90.9
+GALEX AIS,all,fleuren1,"[0,0.5)",75,41,54.67,29.96,43.4-65.4
+GALEX AIS,all,fleuren1,"[0.5,0.8)",191,145,75.92,67.66,69.4-81.4
+GALEX AIS,all,fleuren1,"[0.8,0.9)",108,79,73.15,85.73,64.1-80.6
+GALEX AIS,all,fleuren1,"[0.9,0.95)",108,90,83.33,92.49,75.2-89.2
+GALEX AIS,all,fleuren1,"[0.95,0.99)",202,162,80.2,97.31,74.2-85.1
+GALEX AIS,all,fleuren1,"[0.99,0.999)",120,97,80.83,99.53,72.9-86.9
+GALEX AIS,all,fleuren1,"[0.999,1)",1326,1131,85.29,100.0,83.3-87.1
