@@ -42,9 +42,25 @@ CONES = [
 ]
 
 
+# 2.60.10: 12' cones (the set-C radius) and one 20' cone, all wholly in DR10 South, asked in tiles.
+CONES_TILES = [
+    ("cosmos_12", 150.12, 2.2, 12.0, "COSMOS, one 12' request"),
+    ("ngc4522_12", 188.4155, 9.1751, 12.0, "NGC 4522, 12'"),
+    ("c_csth_304m58", 303.73, -58.39, 12.0, "set-C region csth_304m58 (south cap), 12'"),
+    ("c_csth_024m41", 23.51, -41.29, 12.0, "set-C region csth_024m41, 12'"),
+    ("c_csth_212m34", 212.06, -33.81, 12.0, "set-C region csth_212m34, 12'"),
+    ("c_cpln_113p02", 112.59, 1.52, 12.0, "set-C region cpln_113p02 (low latitude), 12'"),
+    ("c_clam_037p06", 36.97, 5.92, 12.0, "set-C region clam_037p06, 12'"),
+    ("c_clam_230m05", 230.4, -4.83, 12.0, "set-C region clam_230m05, 12'"),
+    ("wrap_ra0_12", 359.95, -30.0, 12.0, "the cone crosses RA = 0 / 360 (two boxes), 12'"),
+    ("cosmos_16", 150.12, 2.2, 16.0, "COSMOS, 16': four tiles"),
+    ("cosmos_20", 150.12, 2.2, 20.0, "COSMOS, 20': four tiles of 20' x 20', the largest cone"),
+]
+
+
 def _tap_only(ra, dec, r):
     orig = dl._query_with_retries
-    dl._query_with_retries = lambda run, hedge=None: orig(run, None)
+    dl._query_with_retries = lambda run, hedge=None, **k: orig(run, None)
     try:
         return dl.fetch(ra, dec, r)
     finally:
@@ -53,7 +69,7 @@ def _tap_only(ra, dec, r):
 
 def _viewer_only(ra, dec, r):
     orig = dl._query_with_retries
-    dl._query_with_retries = lambda run, hedge=None: dl._viewer_fetch(ra, dec, r)
+    dl._query_with_retries = lambda run, hedge=None, **k: dl._viewer_fetch(ra, dec, r)
     try:
         return dl.fetch(ra, dec, r)
     finally:
@@ -151,12 +167,25 @@ def compare(tap: pd.DataFrame, view: pd.DataFrame) -> dict:
 def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--out", type=Path, default=BENCH / "ls_viewer_check" / "metrics.json")
+    p.add_argument("--cones", choices=("small", "tiles"), default="small", help="tiles: the 12' / 20' cones of 2.60.10")
     a = p.parse_args()
     out = {"checked_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "cones": {}}
-    for name, ra, dec, r, why in CONES:
+    got_bytes = []
+    orig_read = dl._viewer_read
+
+    def counting_read(resp, limit=None):
+        body = orig_read(resp, limit)
+        got_bytes.append(len(body))
+        return body
+
+    dl._viewer_read = counting_read
+    for name, ra, dec, r, why in CONES if a.cones == "small" else CONES_TILES:
+        got_bytes.clear()
         view, tv, ev = _timed(_viewer_only, ra, dec, r)
+        mb, nreq = round(sum(got_bytes) / 1e6, 1), len(got_bytes)
         tap, tt, et = _timed(_tap_only, ra, dec, r)
-        res = {"ra": ra, "dec": dec, "radius_arcmin": r, "why": why, "viewer_s": tv, "tap_s": tt}
+        res = {"ra": ra, "dec": dec, "radius_arcmin": r, "why": why, "viewer_s": tv, "tap_s": tt, "viewer_requests": nreq,
+               "viewer_mb": mb, "viewer_usable": dl.viewer_usable(ra, dec, r)}  # fmt: skip
         if ev or et:
             res.update({"viewer_error": ev, "tap_error": et})
         else:

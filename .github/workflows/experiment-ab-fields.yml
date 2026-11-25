@@ -164,7 +164,14 @@ jobs:
         if: steps.pick.outputs.run
         env:
           V2_SKIP_COLLECTORS: blind  # the blind run drops these collectors' files (NED: no concurrent automated queries)
-        run: python -u v2/pipeline.py --ra $RA --dec $DEC --radius $R --work /tmp/field
+        run: |
+          # 2.60.10: a random start delay (0-89 s) so that the regions of a wave do not ask the Data Lab at once
+          d=$((RANDOM % 90)); echo "start delay $d s"; sleep $d
+          python -u v2/pipeline.py --ra $RA --dec $DEC --radius $R --work /tmp/field
+      - name: Ask a failed Legacy Surveys archive again once (2.60.10)
+        if: steps.pick.outputs.run
+        continue-on-error: true
+        run: python -u .github/scripts/retry_failed_archive.py /tmp/field $RA $DEC $R --only desi_legacy --wait 120
       - name: Blind raw and shifted copy
         if: steps.pick.outputs.run
         run: |
