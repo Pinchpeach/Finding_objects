@@ -22,6 +22,7 @@ on:
       mode: {description: "'probe' lists VizieR catalogues only; 'fields' runs the regions", default: "fields"}
       only: {description: "comma-separated region names to run (empty = all)", default: ""}
       radius: {description: "field radius (arcmin)", default: "12"}
+      with_ned: {description: "true = also ask NED for the full run (one job at a time: NED asks for no concurrent automated queries); default false", default: "false"}
 
 permissions:
   contents: write
@@ -45,7 +46,9 @@ jobs:
     timeout-minutes: 240
     strategy:
       fail-fast: false
-      max-parallel: 6  # spread the archive load (VizieR mirrors share it since 2.36.4) (each job also waits 3-5 s per request)
+      # spread the archive load (VizieR mirrors share it since 2.36.4; each job also waits 3-5 s per request); with NED asked:
+      # one job at a time (NED guidelines, 2.60.8)
+      max-parallel: ${{ github.event.inputs.with_ned == 'true' && 1 || 6 }}
       matrix:
         region:
           # name, nominal centre (deg), why this region
@@ -280,6 +283,9 @@ jobs:
           echo "RA=$RA" >> "$GITHUB_ENV"; echo "DEC=$DEC" >> "$GITHUB_ENV"
       - name: Pipeline
         if: steps.pick.outputs.run
+        env:
+          # NED only when asked (with_ned=true, serialised above): the blind run drops it, the full run's NED labels are optional
+          V2_SKIP_COLLECTORS: ${{ github.event.inputs.with_ned == 'true' && ' ' || 'ned' }}
         run: python -u v2/pipeline.py --ra $RA --dec $DEC --radius $R --work /tmp/field
       - name: Blind run (no spectroscopic or literature catalogues)
         if: steps.pick.outputs.run

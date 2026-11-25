@@ -765,7 +765,9 @@ section(
             "Code: MIT licence, see [`LICENSE`](LICENSE).",
             "**No catalogue data are bundled.** The program queries the archives when it runs. The repository holds only "
             "small derived files (for example the DESI DR1 tile centres used to skip the DESI archives, prior tables "
-            "counted from COSMOS2020, fusion weights) and, for the benchmarks, preserved feature files.",
+            "counted from COSMOS2020, fusion weights) and, for the benchmarks, preserved feature files. An optional "
+            "feature, off by default (turn it on with `V2_LOCAL_LISTS=all`), lets the user's own computer keep two small "
+            "VizieR tables in its cache after one first-use download; nothing is shipped.",
             "Third-party components of the app (Qt / PySide6 under LGPLv3, Python, NumPy, pandas, Astropy, astroquery, "
             "PyVO, Requests, PyInstaller) and the terms of the data services are listed in "
             "[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) (in Korean).",

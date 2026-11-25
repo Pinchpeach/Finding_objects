@@ -1,0 +1,7 @@
+catalog,score,n,brier,ece_pct,sum_p,n_correct,sum_p_over_n
+AllWISE,current,3250,0.02222,3.945,3115.2,3176,0.9808
+AllWISE,isotonic(calibration half),3250,0.02074,0.342,3187.1,3176,1.0035
+2MASS PSC,current,408,0.00036,0.591,405.6,408,0.9941
+2MASS PSC,isotonic(calibration half),408,1e-05,0.165,407.3,408,0.9984
+GALEX AIS,current,851,0.13746,13.715,691.4,797,0.8675
+GALEX AIS,isotonic(calibration half),851,0.05806,0.911,799.1,797,1.0026

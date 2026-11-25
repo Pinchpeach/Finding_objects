@@ -370,6 +370,7 @@ def run(raw_dir: Path, out: Path):
                             "accepted": True,
                             "association_score": 1.0,
                             "association_posterior": 1.0,
+                            "likelihood_ratio": None,
                             "association_method": "catalog_alias",
                             "shared_aliases": "|".join(sorted(shared_aliases)),
                         }
@@ -385,6 +386,7 @@ def run(raw_dir: Path, out: Path):
                         result["association_score"] *= w
                         lik = result["positional_likelihood"] * w / (2.0 * math.pi * result["combined_sigma_arcsec"] ** 2)
                         result["association_posterior"] = lik / (lik + density) if density else min(1.0, result["positional_likelihood"] * w)
+                        result["likelihood_ratio"] = lik / density if density else None
                         result["accepted"] = result["accepted"] and result["association_score"] >= 1e-5
                         result["phot_weight"] = w
                 result["association_method"] = "position_epoch_likelihood"
@@ -493,6 +495,9 @@ def run(raw_dir: Path, out: Path):
                 "ambiguous_new" if ambiguous else ("event_new" if det["entity_kind"] == "transient_event" else "new")
             )
 
+        # Sum of the likelihood ratios of every accepted candidate (Fleuren et al. 2012 denominator); the posterior
+        # measurements read it, nothing else does.  A candidate without a ratio (shared identifier) counts as 0.
+        lr_sum = sum(float(c[3].get("likelihood_ratio") or 0.0) for c in candidates)
         confidence = match.get("association_posterior", match.get("association_score"))
         records.append(
             {
@@ -514,6 +519,8 @@ def run(raw_dir: Path, out: Path):
                 "association_method": match.get("association_method", "position_epoch_likelihood"),
                 "shared_aliases": match.get("shared_aliases", ""),
                 "candidate_count": len(candidates),
+                "likelihood_ratio": match.get("likelihood_ratio") if status == "matched" else None,
+                "lr_sum_candidates": lr_sum,
                 "phot_weight": match.get("phot_weight", 1.0),
             }
         )

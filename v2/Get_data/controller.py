@@ -64,6 +64,57 @@ COLLECTORS = [
 _MODULES: dict[str, tuple[tuple, object]] = {}
 
 
+# What a blind run drops anyway (spectroscopic and literature compilations: the workflows' blind copy removes these
+# files, ``benchmark/collect_deep_cosmos.NOT_BLIND`` lists the same names).  A workflow that only scores the blind
+# run has no use for their answers; asking for them costs requests, and NED's guidelines ask for no concurrent
+# automated queries, which a matrix of parallel jobs makes (2.60.8).
+BLIND_DROPPED = (
+    "lamost_spectroscopy",
+    "sdss_spectroscopy",
+    "desi_spectroscopy",
+    "desi_fastspec",
+    "simbad",
+    "ned",
+    "bzcat",
+    "pn_spectroscopy",
+    "hash_pn",
+    "asas_sn_supernova",
+    "asiago_supernova",
+    "agb_suh2021",
+    "atnf_pulsar",
+    "galaxy_clusters",
+)
+
+
+def skipped_collectors(value: str | None = None) -> set[str]:
+    """Collectors ``V2_SKIP_COLLECTORS`` asks not to run: a comma list of names, ``blind`` for ``BLIND_DROPPED``.
+
+    A name that is no collector (nor ``blind``) is an error: a typo must not leave NED switched on in a workflow
+    that meant to switch it off.  Names in BLIND_DROPPED that are not collectors of this version are fine."""
+    raw = os.environ.get("V2_SKIP_COLLECTORS", "") if value is None else value
+    out: set[str] = set()
+    for tok in (t.strip() for t in raw.split(",")):
+        if not tok:
+            continue
+        if tok == "blind":
+            out.update(BLIND_DROPPED)
+        elif tok in COLLECTORS:
+            out.add(tok)
+        else:
+            raise ValueError(
+                f"V2_SKIP_COLLECTORS: {tok!r} is not a collector (known: {', '.join(COLLECTORS)}, or 'blind')"
+            )
+    return out
+
+
+def collectors_to_run() -> list[str]:
+    skip = skipped_collectors()
+    run = [n for n in COLLECTORS if n not in skip]
+    if len(run) != len(COLLECTORS):
+        print(f"[collect] V2_SKIP_COLLECTORS: not asking {', '.join(n for n in COLLECTORS if n in skip)}", flush=True)
+    return run
+
+
 def _load_collector(name: str):
     """Collector module, executed once per file version (2.19.0: was on every
     call, and _preload() re-ran all 26 on every collect_all)."""
@@ -356,9 +407,10 @@ def collect_all(
         print(f"[cache] pruned {pruned}", flush=True)
     if workers > 1:
         _preload()
-    budgets = {n: _budget(n, budget_s) for n in COLLECTORS}
+    names = collectors_to_run()
+    budgets = {n: _budget(n, budget_s) for n in names}
     results = _run_bounded(
-        lambda n, c: _collect_one(n, ra, dec, radius_arcmin, out_dir, tag, c), COLLECTORS, workers, budgets
+        lambda n, c: _collect_one(n, ra, dec, radius_arcmin, out_dir, tag, c), names, workers, budgets
     )
     for r in results:  # remember failures of this search, forget recovered services (2.55.0)
         if r.get("cache") != "recent_failure" and r["status"] != "outside_footprint":
@@ -370,7 +422,7 @@ def collect_all(
     summary_path = out_dir / f"collection_summary_{tag}.csv"
     summary.to_csv(summary_path, index=False)
     print(
-        f"Completed: {len(summary)}/{len(COLLECTORS)} collectors attempted in "
+        f"Completed: {len(summary)}/{len(names)} collectors attempted in "
         f"{time.monotonic() - started:.1f} s (workers={workers})",
         flush=True,
     )

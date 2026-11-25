@@ -7,6 +7,7 @@ on:
     inputs:
       plan: {description: "plan file", default: "v2/reference_objects/validation/plan.csv"}
       keep: {description: "1 = upload per-object association tables (probe)", default: "0"}
+      with_ned: {description: "true = also ask NED for the full mode (shards one at a time: NED asks for no concurrent automated queries); default false", default: "false"}
   push:
     branches-ignore: [main, validation-data]
     paths: ["v2/reference_objects/validation/plan.csv"]
@@ -20,7 +21,8 @@ jobs:
     timeout-minutes: 300
     strategy:
       fail-fast: false
-      max-parallel: 26
+      # NED asked: one shard at a time (NED guidelines, 2.60.8); otherwise every shard at once as before
+      max-parallel: ${{ github.event.inputs.with_ned == 'true' && 1 || 26 }}
       matrix:
         shard: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25]
     steps:
@@ -29,6 +31,9 @@ jobs:
         with: {python-version: "3.11"}
       - run: pip install pandas numpy scipy requests astropy astroquery pyvo
       - name: Run shard
+        env:
+          # NED only when asked (with_ned=true, one shard at a time above); the blind mode drops it anyway (2.60.8)
+          V2_SKIP_COLLECTORS: ${{ github.event.inputs.with_ned == 'true' && ' ' || 'ned' }}
         run: |
           plan="${{ github.event.inputs.plan || 'v2/reference_objects/validation/plan.csv' }}"
           extra=""; [ "${{ github.event.inputs.keep }}" = "1" ] && extra="--keep /tmp/refval/keep"
