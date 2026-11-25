@@ -1,0 +1,13 @@
+run,field,collect_s,total_s,req,agb_req,agb_s,bz_req,bz_s,downloads,top
+OFF1,ngc,90.8,96.6,72,2,13,2,11,,gaia_dr3_variability_sos_vizier 49s
+OFF1,cosmos,71.1,109.7,55,2,12,2,10,,gaia_dr3 28s
+OFF1,plane,67.3,70.9,48,2,11,2,10,,desi_legacy 35s
+ON1,ngc,160.1,166.6,65,1,7,1,6,"3,561 rows 6 s;18,381 rows 7 s",desi_fastspec 102s
+ON1,cosmos,65.8,107.9,47,0,0,0,0,,desi_legacy 47s
+ON1,plane,64.6,68.1,43,0,0,0,0,,desi_legacy 34s
+OFF2,ngc,157.8,163.5,67,2,13,2,13,,desi_fastspec 102s
+OFF2,cosmos,63.1,103.3,51,2,11,2,11,,desi_legacy 36s
+OFF2,plane,66.2,69.7,48,2,12,2,10,,desi_legacy 36s
+ON2,ngc,100.6,107.0,76,1,12,1,9,"3,561 rows 9 s;18,381 rows 12 s",galex 51s
+ON2,cosmos,71.9,115.2,47,0,0,0,0,,gaia_dr3 33s
+ON2,plane,65.5,69.8,43,0,0,0,0,,gaia_dr3 36s

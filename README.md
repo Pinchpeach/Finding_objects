@@ -274,7 +274,7 @@ python v2/document/build_overview.py
 ## 14. Licence and third-party data
 
 - Code: MIT licence, see [`LICENSE`](LICENSE).
-- **No catalogue data are bundled.** The program queries the archives when it runs. The repository holds only small derived files (for example the DESI DR1 tile centres used to skip the DESI archives, prior tables counted from COSMOS2020, fusion weights) and, for the benchmarks, preserved feature files.
+- **No catalogue data are bundled.** The program queries the archives when it runs. The repository holds only small derived files (for example the DESI DR1 tile centres used to skip the DESI archives, prior tables counted from COSMOS2020, fusion weights) and, for the benchmarks, preserved feature files. An optional feature (off by default, `V2_LOCAL_LISTS=all`) lets the user's own computer download two small fixed VizieR tables once, on first use, and keep them in the user's cache folder to save requests; nothing is shipped or passed on, and it stays off until the terms of use of those tables have been read in the original text.
 - Third-party components of the app (Qt / PySide6 under LGPLv3, Python, NumPy, pandas, Astropy, astroquery, PyVO, Requests, PyInstaller) and the terms of the data services are listed in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) (in Korean).
 - When you publish results, follow the citation and acknowledgement requirements of each survey you used.
 
