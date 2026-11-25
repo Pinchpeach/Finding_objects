@@ -4,7 +4,11 @@
     python regroup.py --runs DIR --truth-flux DIR --variant base|... --out DIR [--fields-root DIR]
 
 The fragment grouping happens after classification (``host_groups.attach_ps1_fragments``, ``attach_galaxy_fragments``,
-``attach_bright_star_artifacts``) and changes no label, only which objects stay top-level.  So a variant of these rules
+``attach_bright_star_artifacts``) and changes no ``primary_class``, only which objects stay top-level.  The label a
+truth source gets in the score is the class of the object's parent when it is grouped (``score_accuracy``, as
+``score_independent_fields.field_matches`` reads it), so a rule that puts an object of another class under a host does
+change labels (``labels_changed``), while one that puts only GALAXY objects under GALAXY hosts (``V2_FRAG_HOST_CANDIDATE``
+alone) cannot.  So a variant of these rules
 can be tried on the stored ``classified_objects.csv`` of a base run without collecting or classifying again: the
 grouping that the base run applied (roles ps1_duplicate / fragment / bright_star_halo) is removed, the three steps are
 applied again with the variant, and the result is scored.  ``variant=base`` must give the grouping the run had (the
@@ -94,7 +98,7 @@ def cosmos_truth_classes(truth: pd.DataFrame) -> pd.DataFrame:
     """STAR / GALAXY truth of ``score_independent_fields.truth_table`` (COSMOS2020 ACS+SED, F814W < 24.5)."""
     mu, lp, f814 = (pd.to_numeric(truth.get(c), errors="coerce") for c in ("ACSmuClass", "lptype", "ACSF814Wmag"))
     cls = np.where(mu.eq(2) & lp.eq(1), "STAR", np.where(mu.eq(1) & lp.eq(0), "GALAXY", None))
-    t = truth[f814.lt(24.5) & pd.Series(cls, index=truth.index).notna()].copy()
+    t = truth[f814.lt(24.5) & pd.Series(cls, index=truth.index).notna() & M.inside(truth)].copy()
     t["truth"] = pd.Series(cls, index=truth.index)[t.index]
     return t
 
@@ -147,7 +151,9 @@ def main() -> int:
         d = a.runs / name
         out0 = pd.read_csv(d / "classified_objects.csv", low_memory=False)
         assoc = pd.read_csv(d / "source_association.csv", low_memory=False, dtype={"catalog_object_id": "string"})
-        truth = M.load_truth(a.truth_flux / f"{name}.csv.gz")
+        truth = M.load_truth(
+            a.truth_flux / f"{name}.csv.gz", (split.set_index("name").ra[name], split.set_index("name").dec[name])
+        )
         out = apply_steps(strip_grouping(out0), assoc, hosts)
         p0, p1 = out0.parent_object_id.fillna(""), out.parent_object_id.fillna("")
         same_parent += int((p0 == p1).sum())

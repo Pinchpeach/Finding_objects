@@ -210,7 +210,8 @@ def field_matches(fdir, which, bench):
     sep0 = np.hypot((t.ra - info["ra"]) * np.cos(np.radians(info["dec"])), t.dec - info["dec"]) * 60
     t = t[sep0 <= info["radius_arcmin"]].reset_index(drop=True)
     if t.empty:  # no truth object inside the field (e.g. a LAMOST plate gap)
-        return pd.DataFrame(), dict(info=info, n_truth=0, conflicts=conflicts, unmatched=0, in_bench=0)
+        return pd.DataFrame(), dict(info=info, n_truth=0, conflicts=conflicts, unmatched=0, in_bench=0,
+                                    n_top=int(o.parent_object_id.isna().sum()) if "parent_object_id" in o.columns else len(o))
     bi, bs = _nearest(t.ra.to_numpy(), t.dec.to_numpy(), bench.ra.to_numpy(), bench.dec.to_numpy())
     t["in_benchmark"] = bs < 1.5
     has_parent = "parent_object_id" in o.columns
@@ -232,6 +233,12 @@ def field_matches(fdir, which, bench):
     oc = SkyCoord(o.ra.to_numpy() * u.deg, o.dec.to_numpy() * u.deg)
     ti, oi, d2, _ = oc.search_around_sky(tc, 2.0 * u.arcsec) if len(t) and len(o) else ([], [], [], [])
     t["n_fragments"] = 0
+    # 2.60.11: the same count over the top-level objects only.  ``n_fragments`` (above, the set-C definition, kept as it
+    # was so that the locked set stays comparable) counts every row, also the rows the grouping steps put under a
+    # parent, so a grouping rule does not show in it; this one does.  Best object and counts are taken among top-level
+    # objects.
+    is_top = o.parent_object_id.isna().to_numpy() if has_parent else np.ones(len(o), bool)
+    t["n_fragments_top"] = 0
     for k in range(len(t)):
         sel = (np.asarray(ti) == k) & (np.asarray(d2.arcsec if len(ti) else []) <= lim[k])
         if sel.sum() > 1:
@@ -239,6 +246,11 @@ def field_matches(fdir, which, bench):
             best = cand[np.lexsort((np.asarray(d2.arcsec)[sel], -nc[cand]))[0]]
             i[k], s[k] = best, float(np.asarray(d2.arcsec)[sel][list(cand).index(best)])
             t.loc[k, "n_fragments"] = int((nc[cand] == 1).sum() - (nc[best] == 1))
+        top_sel = sel & is_top[np.asarray(oi)] if len(ti) else sel
+        if top_sel.sum() > 1:
+            ct = np.asarray(oi)[top_sel]
+            bt = ct[np.lexsort((np.asarray(d2.arcsec)[top_sel], -nc[ct]))[0]]
+            t.loc[k, "n_fragments_top"] = int((nc[ct] == 1).sum() - (nc[bt] == 1))
     t["sep"] = s
     m = o.iloc[np.where(t.matched, i, 0)].reset_index(drop=True)
     m.index = t.index
@@ -265,7 +277,7 @@ def field_matches(fdir, which, bench):
     m["ours_alt"] = alt
     m = pd.concat([t.add_prefix("t_"), m], axis=1)
     m = m[m.t_matched & ~m.t_in_benchmark]
-    return m, dict(info=info, n_truth=len(t), conflicts=conflicts, unmatched=int((~t.matched).sum()), in_bench=int(t.in_benchmark.sum()))
+    return m, dict(info=info, n_truth=len(t), conflicts=conflicts, unmatched=int((~t.matched).sum()), in_bench=int(t.in_benchmark.sum()), n_top=int(is_top.sum()))
 
 
 def _galactic(ra, dec):
@@ -348,7 +360,8 @@ def main():
         allm.append(m)
         info = st["info"]
         print(f"\n=== {fdir.name}: centre ({info['ra']:.4f}, {info['dec']:+.4f}) r={info['radius_arcmin']}' seeing {info.get('seeing')}")
-        print(f"single-catalogue fragments next to a truth object: {int(m.t_n_fragments.gt(0).sum())}")
+        print(f"single-catalogue fragments next to a truth object: {int(m.t_n_fragments.gt(0).sum())}"
+              f" (top-level objects only: {int(m.t_n_fragments_top.gt(0).sum())})")
         print(f"truth in field {st['n_truth']} (unmatched {st['unmatched']}, in SDSS/DESI benchmark {st['in_bench']}, survey conflicts {st['conflicts']}); scored {len(m)}")
         print("   by survey:", m.t_survey.value_counts().to_dict(), "| truth mix:", m.t_truth.value_counts().to_dict())
         r = dict(field=fdir.name, root=str(a.root), which=a.which, ra=info["ra"], dec=info["dec"], n=len(m), ours=score(m.ours, m.t_truth), high=high_confidence_score(m))

@@ -122,14 +122,29 @@ class Sky:
 
 
 # ------------------------------------------------------------------------------------------ truth
-def load_truth(path: Path) -> pd.DataFrame:
-    """One field's COSMOS2020 flux table (collect_truth_flux.py): ra, dec, imag, fluxes."""
+FIELD_ARCMIN = 6.0  # the fields are 6' cones; the truth file may reach 0.35' further (collect_truth_flux.py --radius)
+
+
+def load_truth(path: Path, centre=None) -> pd.DataFrame:
+    """One field's COSMOS2020 flux table (collect_truth_flux.py): ra, dec, imag, fluxes.
+
+    With ``centre`` = (ra, dec) of the field a column ``r_arcmin`` (distance from it) is added.  The sources beyond the
+    field are kept for the search of a low-resolution row's flux-dominant counterpart (3 FWHM, up to 18.3'' around a row
+    at the edge) and are left out of every count of truth sources (``inside``)."""
     t = pd.read_csv(path, low_memory=False)
     t = t.rename(columns={"RAJ2000": "ra", "DEJ2000": "dec", "_RAJ2000": "ra", "_DEJ2000": "dec"})
     for c in t.columns:
         if c not in ("ra", "dec"):
             t[c] = pd.to_numeric(t[c], errors="coerce")
-    return t.dropna(subset=["ra", "dec"]).reset_index(drop=True)
+    t = t.dropna(subset=["ra", "dec"]).reset_index(drop=True)
+    if centre is not None:
+        t["r_arcmin"] = np.hypot((t.ra - centre[0]) * np.cos(np.radians(centre[1])), t.dec - centre[1]) * 60.0
+    return t
+
+
+def inside(truth: pd.DataFrame) -> pd.Series:
+    """The truth sources inside the field (all of them when the table has no ``r_arcmin``)."""
+    return truth["r_arcmin"].le(FIELD_ARCMIN) if "r_arcmin" in truth else pd.Series(True, index=truth.index)
 
 
 def expected_counterparts(rows: pd.DataFrame, truth: pd.DataFrame, sky: Sky, col: str, fwhm: float):
@@ -307,7 +322,7 @@ def fragments(summary: pd.DataFrame, truth: pd.DataFrame) -> dict:
     """Fragment count of ``score_independent_fields.field_matches`` on COSMOS2020 sources of R with i < FRAG_MAG, and
     what the extra single-catalogue objects are: the same truth source again (a duplicate or shred of it), another
     truth source (a real neighbour, not a fragment) or no truth source within ID_RADIUS (a spurious row)."""
-    ref = truth[truth["HSCimagAuto"] < FRAG_MAG].reset_index(drop=True)
+    ref = truth[(truth["HSCimagAuto"] < FRAG_MAG) & inside(truth)].reset_index(drop=True)  # 2.60.11: inside 6' only
     top = summary
     nc = top.catalogs.fillna("").str.count(r"\|").add(1).to_numpy()
     sky = Sky(top.ra.to_numpy(float), top.dec.to_numpy(float))
@@ -445,7 +460,7 @@ def main() -> int:
             print("skip", name, f_assoc.exists(), f_truth.exists(), file=sys.stderr)
             continue
         assoc = pd.read_csv(f_assoc, low_memory=False, dtype={"catalog_object_id": "string"})
-        truth = load_truth(f_truth)
+        truth = load_truth(f_truth, (split.set_index("name").ra[name], split.set_index("name").dec[name]))
         sh = None
         if a.shifted_dir and (a.shifted_dir / name / "source_association.csv").exists():
             sh = pd.read_csv(a.shifted_dir / name / "source_association.csv", low_memory=False)
