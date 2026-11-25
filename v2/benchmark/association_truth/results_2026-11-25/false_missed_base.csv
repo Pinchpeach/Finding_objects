@@ -1,0 +1,10 @@
+variant,half,catalog,fields,rows,with_expected,matched,correct,false,unknown,missed,rightly_alone,false_pct_of_matched_known,false_wilson,false_boot,missed_pct_of_unjoined,missed_pct_of_expected,strict_false_pct,shifted_false_pct
+diag,calibration,AllWISE,15,6651,6609,4485,4103,81,265,918,1242,1.94,1.6-2.4,1.5-2.4,42.5,13.89,3.7,7.74
+diag,calibration,2MASS PSC,15,813,661,796,642,1,5,10,3,0.16,0.0-0.9,0.0-0.5,76.92,1.51,0.31,3.2
+diag,calibration,GALEX AIS,15,1919,1654,1452,948,62,237,369,38,6.14,4.8-7.8,4.2-8.4,90.66,22.31,12.08,31.89
+diag,test,AllWISE,11,5007,4980,3444,3176,74,173,676,881,2.28,1.8-2.8,1.7-2.9,43.42,13.57,3.91,7.47
+diag,test,2MASS PSC,11,613,418,602,408,0,3,6,1,0.0,0.0-0.9,0.0-0.0,85.71,1.44,0.0,4.24
+diag,test,GALEX AIS,11,1434,1344,1093,797,54,178,291,24,6.35,4.9-8.2,4.2-8.7,92.38,21.65,11.28,28.03
+diag,all,AllWISE,26,11658,11589,7929,7279,155,438,1594,2123,2.09,1.8-2.4,1.7-2.4,42.88,13.75,3.79,7.63
+diag,all,2MASS PSC,26,1426,1079,1398,1050,1,8,16,4,0.1,0.0-0.5,0.0-0.3,80.0,1.48,0.19,3.65
+diag,all,GALEX AIS,26,3353,2998,2545,1745,116,415,660,62,6.23,5.2-7.4,4.8-7.9,91.41,22.01,11.71,30.24
