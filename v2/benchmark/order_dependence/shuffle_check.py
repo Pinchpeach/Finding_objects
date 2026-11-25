@@ -5,6 +5,8 @@
     python shuffle_check.py full   --raw DIR --ra RA --dec DEC --radius ARCMIN --out DIR [--seeds 1 2]
     python shuffle_check.py later  --raw DIR --ra RA --dec DEC --radius ARCMIN --out DIR [--seeds 1 2]
     python shuffle_check.py ties   --raw DIR --out DIR
+    python shuffle_check.py root   --raw FIELDS_ROOT --out DIR --seeds N
+    python shuffle_check.py compare --a WORK_DIR --b WORK_DIR [--out DIR]
 
 The collectors return rows in whatever order the archive answers, and the same detections reach Stage 1 in another
 order when an archive changes its answer order (a Legacy Surveys viewer answer against its TAP answer, 2.60.10).  The
@@ -20,6 +22,12 @@ with the order as collected:
 ``later``   Stages 2-7 and the grouping steps alone: the association stays as collected and the rows of every stage
             output are permuted before the next stage reads them.  Object ids are the same, so the comparison is
             row by row on ``classified_objects.csv``.
+``root``    A copy of a folder of fields (``<field>/{field.json,raw/<tag>/*.csv}``, the layout of the 26 deep COSMOS
+            fields) with the rows of every raw file permuted by seed N, for the pipeline and association runs
+            of ``benchmark/association_truth`` (``run_full.sh``, ``run_variant.py``).
+``compare`` Two finished runs (pipeline ``--work`` folders), e.g. the same sky with a Legacy Surveys table answered by TAP
+            and by the viewer, where the rows have no common order: detections are matched by (catalogue, the
+            catalogue's own identifier), objects by their members, then the labels as in ``full``.
 ``ties``    How often the row order can decide anything in Stage 1: detections that agree on every key of the sort
             order except the row (``_anchor_key`` and catalogue), per catalogue.
 """
@@ -278,6 +286,34 @@ def later_diff(ref: pd.DataFrame, new: pd.DataFrame) -> dict:
     return out
 
 
+def cmd_compare(a) -> int:
+    def load_run(d: Path):
+        assoc = pd.read_csv(d / "source_association.csv", low_memory=False, dtype={"catalog_object_id": "string"})
+        assoc["key"] = list(zip(assoc.catalog, assoc.catalog_object_id))
+        return assoc, pd.read_csv(d / "classified_objects.csv", low_memory=False)
+
+    ra, rc = load_run(a.a)
+    na, nc = load_run(a.b)
+    r = compare_groups(ra, na)
+    r.update(label_diff(rc, nc, ra, na))
+    print(r)
+    if a.out:
+        a.out.mkdir(parents=True, exist_ok=True)
+        pd.DataFrame([r]).to_csv(a.out / "compare_summary.csv", index=False)
+    return 0
+
+
+def cmd_root(a) -> int:
+    seed = a.seeds[0]
+    for fdir in sorted(p for p in a.raw.iterdir() if (p / "field.json").exists()):
+        dst = a.out / fdir.name
+        dst.mkdir(parents=True, exist_ok=True)
+        shutil.copy(fdir / "field.json", dst / "field.json")
+        for tag in sorted((fdir / "raw").iterdir()):
+            shuffle_raw(tag, dst / "raw" / tag.name, seed)
+    return 0
+
+
 def cmd_ties(a) -> int:
     s1 = load_module(V2 / "Preprocess" / "01_source_association.py", "v2_stage1_ties")
     dets, _ = s1.load(a.raw)
@@ -300,9 +336,11 @@ def cmd_ties(a) -> int:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("mode", choices=["stage1", "full", "later", "ties"])
-    ap.add_argument("--raw", type=Path, required=True)
-    ap.add_argument("--out", type=Path, required=True)
+    ap.add_argument("mode", choices=["stage1", "full", "later", "ties", "root", "compare"])
+    ap.add_argument("--raw", type=Path)
+    ap.add_argument("--out", type=Path)
+    ap.add_argument("--a", type=Path)
+    ap.add_argument("--b", type=Path)
     ap.add_argument("--seeds", type=int, nargs="*", default=[1, 2, 3])
     ap.add_argument("--only", nargs="*", default=None, help="shuffle only files whose name starts with one of these")
     ap.add_argument("--ra", type=float)
@@ -314,8 +352,9 @@ def main() -> int:
     if a.v2:
         global V2
         V2 = a.v2.resolve()
-    a.out.mkdir(parents=True, exist_ok=True)
-    return {"stage1": cmd_stage1, "full": cmd_full, "later": cmd_later, "ties": cmd_ties}[a.mode](a)
+    if a.out and a.mode != "compare":
+        a.out.mkdir(parents=True, exist_ok=True)
+    return {"stage1": cmd_stage1, "full": cmd_full, "later": cmd_later, "ties": cmd_ties, "root": cmd_root, "compare": cmd_compare}[a.mode](a)
 
 
 if __name__ == "__main__":
