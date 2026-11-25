@@ -62,6 +62,7 @@
 |---|---|---|---|---|---|
 | 2.51.0 | 60 (58 with truth) | 3,150 | 99.62 % (99.34–99.86) | 93.95 % (79.33–99.47) | first look, 2026-11-12, archive health check passed. See the reading notes below the table. |
 | 2.52.0 | 60 (59 with truth) | 3,170 | 99.65 % (99.40–99.86) | 94.03 % (81.87–99.45) | 2026-11-14, commit `16cfdc3`. Third attempt: the first two (11-13, 11-14) stopped at the archive gate when Legacy Surveys timed out. No core collector failed this time. See the reading notes. |
+| 2.60.4 | 60 (59 with truth) | 3,162 | 99.65 % (99.40–99.86) | 94.02 % (81.87–99.45) | 2026-11-25, commit `a1dc84f`, run 45590188973. Coarse code of 2.60.2 / 2.60.3. Second attempt: the first (run 45583226997, same day) stopped at the archive gate when the Data Lab TAP answered 502 in 40 regions. No core collector failed this time. Gaia: ESA archive in 57 regions, VizieR DR3 copy in 3. First look with the pool split. See the reading notes. |
 
 **Reading the 2.51.0 score**
 - **Composition:** the truth mix is about 95.5 % stars. The majority-class baseline is 95.46 %.
@@ -83,3 +84,24 @@
 - **Unmatched truth:** 1.61 %. Truth objects with fragments: 744.
 - **Still not reported:** the per-pool split planned in the 2.51.0 notes. It needs a change to the score job before the next look.
 - **2.53.0 and 2.53.1 are not scored.** They change only sub-classes and validation inputs; the coarse-class code (`v2/Preprocess`) is the same as 2.52.0, and set C scores the coarse class only.
+
+**Reading the 2.60.4 score (2026-11-25)**
+- **Why now:** 2.55.0 changed the coarse path for sources without an r detection, so the coarse class changed after the last look (2.52.0). It is also the Gaia DR3 baseline before the Gaia DR4 switch (`v2/GAIA_DR4_READINESS_2026-11-25.md`, protocol (라)).
+- **Same as 2.52.0 within the noise:** 11 errors in 3,162 objects against 11 in 3,170: stars 5, galaxies 5, QSO 1 in both (counts recovered from the recall values and class totals 3,012 / 143 / 7). Accuracy, its interval and the balanced accuracy agree to 0.01 point. No change was expected either: the 2.55.0 path concerns faint objects without an r detection, and set C's spectroscopic truth is bright.
+- **Baselines:** majority class 95.26 %. On the 98.0 % with Gaia DSC, DSC scores 99.52 % and the pipeline 99.81 %, the same as in 2.52.0.
+- **By pool** (`summary_by_pool.csv`, first time):
+
+  | Pool | Regions with truth | Objects (STAR / GALAXY / QSO) | Accuracy (95 % CI) | Balanced accuracy | Majority class | DSC / pipeline on DSC (coverage) |
+  |---|---|---|---|---|---|---|
+  | clam (LAMOST / PS1 / LS-north) | 30 | 2,065 (2,008 / 50 / 7) | 99.61 % (99.31–99.86) | 93.17 % | 97.24 % | 99.51 / 99.76 % (98.9 %) |
+  | cpln (low latitude) | 11 | 879 (879 / 0 / 0) | 99.89 % (99.61–100) | – | 100 % | 100 / 100 % (99.2 %) |
+  | csth (DES / LS-south) | 18 | 218 (125 / 93 / 0) | 99.08 % (97.22–100) | 98.92 % | 57.34 % | 97.30 / 99.46 % (84.9 %) |
+
+  - **cpln** is the first number for the low-latitude regions. Its truth there is 879 spectroscopic stars and nothing else, so it measures only whether bright stars stay stars in crowded fields (one did not). The always-STAR answer scores 100 % on it. It says nothing about galaxies or QSOs behind the plane, and nothing about r > 20 there (the overview's "not validated" statement stands).
+  - **csth** is the only pool with a galaxy-rich truth (93 galaxies). There the pipeline is 2.2 points above Gaia DSC on the objects DSC covers, but on 218 objects the interval is wide. Its 2 errors are both galaxies, and at least one of them was labelled QSO, though the pool's truth has no QSO (QSO precision 0 % there).
+  - **clam** holds 65 % of the objects and all 7 QSOs, so it dominates the all-region number.
+- **Collection conditions** (`run.json`, 2.60.4): no core collector failed (gaia_dr3, desi_legacy, panstarrs1, allwise, twomass: 0 regions each). Gaia DR3 came from the ESA archive in 57 regions and from the VizieR copy in 3 (cpln_310p53, clam_317p12, clam_283p35: in these three the collector's ESA query failed or ran past its time budget, and it fell back to the copy. This was before the archive's announced shutdown at 11:00 UTC.). The copy changed 6 of 26,024 coarse labels in the deep COSMOS comparison (`WORK_REPORT_2026-11-24.md`).
+- **Fragments:** truth objects with single-catalogue fragments nearby fell from 744 to 555. This is the fragment folding of 2.54.0; it does not enter the accuracy.
+- **Unmatched truth:** 1.86 % (2.52.0: 1.61 %).
+- **Blind input for the Gaia DR4 comparison:** the `craw-<region>` artifacts of run 45590188973 (90 days, until about 2027-02-23). The first attempt's artifacts lack Legacy Surveys in 40 regions and are not used.
+- **2.53.0–2.60.3 are not scored separately.** This is the first look since 2.52.0, so it covers every coarse-class change made in between (the r-undetected path of 2.55.0 among them) together, not one by one.

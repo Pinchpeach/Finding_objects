@@ -331,9 +331,9 @@ PERFORMANCE = {
     "head": ["Test", "Result", "Sample and caveat"],
     "rows": [
         [
-            "**Locked test set C**\n60 regions, 12′ radius (2.52.0)",
-            "**99.65 %** (99.40–99.86)\n3,170 objects",
-            "About 95 % of the truth are stars: always answering STAR scores 95.24 %. Where Gaia DSC has a class, "
+            "**Locked test set C**\n60 regions, 12′ radius (2.60.4)",
+            "**99.65 %** (99.40–99.86)\n3,162 objects",
+            "About 95 % of the truth are stars: always answering STAR scores 95.26 %. Where Gaia DSC has a class, "
             "DSC alone scores 99.52 % and the pipeline 99.81 %. Little information on galaxies and QSOs.",
         ],
         [
