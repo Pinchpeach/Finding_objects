@@ -30,9 +30,10 @@ Definitions (written down before any number was looked at; the field split is ``
                           other object has a truth id in A(d), "rightly alone" otherwise.
   strict version          the same with A(d) = {dominant} (shown beside the lenient one).
   merge                   an object whose resolving rows carry two truth ids more than 2'' apart (1'' also listed).
-  fragments               the 2.45.0-style count of ``score_independent_fields``: truth sources of R with i < 23 that
-                          have, within 1.5'', a one-catalogue top-level object besides their best object (best = most
-                          catalogues, then nearest).  Needs ``objects_summary.csv``.
+  fragments               truth sources of R with i < 23 that have, within 1.5'', a one-catalogue top-level object
+                          besides their best object (best = most catalogues, then nearest).  Top-level objects only
+                          (rows grouped under a parent are not counted), unlike ``score_independent_fields``, which
+                          counts every row (2.60.9 review).  Needs ``objects_summary.csv``.
   shifted-catalogue test  the pipeline run on a copy with AllWISE moved +2' in Dec, 2MASS -2' in Dec and GALEX +2' in RA
                           (``run_variant.py --shift``): false rate = shifted rows joined to an object anchored by an
                           unshifted catalogue / shifted rows (the 2.49.0 definition).
@@ -249,7 +250,9 @@ def measure_field(assoc: pd.DataFrame, truth: pd.DataFrame, shifted_from: pd.Dat
             # one-row-per-catalogue rule; how far is that other row from the truth source?
             blocked, bsep = False, np.nan
             if not m:
-                for o in holders - {own}:
+                # every blocking object, in a fixed order; the closest blocking row counts (2.60.9 review: the first
+                # member of a set depended on the hash seed)
+                for o in sorted(holders - {own}, key=str):
                     pos = members[cat].get(o)
                     if pos is not None and len(pos):
                         bd = (
@@ -259,10 +262,10 @@ def measure_field(assoc: pd.DataFrame, truth: pd.DataFrame, shifted_from: pd.Dat
                             )
                             * 3600.0
                         )
-                        blocked, bsep = True, float(bd.min())
-                        break
+                        blocked, bsep = True, float(np.fmin(bsep, bd.min()))
             detail.append(dict(catalog=cat, outcome=outcome, nsep=r.normalized_separation if m else np.nan,
-                               conf=r.association_confidence, any_holder=bool(holders), joined=bool(m),
+                               # an unjoined row's own object is no association opportunity (as for "missed")
+                               conf=r.association_confidence, any_holder=bool(holders if m else holders - {own}), joined=bool(m),
                                sep_dom=float(np.hypot(dra, ddec)), n_acc=len(acc_set), poserr=r.poserr_arcsec,
                                sigma=r.combined_sigma_arcsec if m else np.nan, density=r.source_density_arcsec2,
                                cand=r.candidate_count, field_row=r.detection_id, lr=getattr(r, 'likelihood_ratio', np.nan),

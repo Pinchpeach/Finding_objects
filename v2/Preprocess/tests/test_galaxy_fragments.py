@@ -5,6 +5,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import pytest
 
 V2 = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(V2))
@@ -90,17 +91,60 @@ def test_two_hosts_stay_apart_unless_the_host_candidate_switch_is_on(monkeypatch
     assert pd.isna(out.loc["H", "parent_object_id"]) and out.loc["H", "n_components"] == 1
 
 
-def test_host_candidate_makes_no_chain_and_never_groups_a_host_under_itself(monkeypatch):
+def _chain_rows():
+    """I2 (faint, LS|SDSS) sits 0.7'' from H1; H1 (r = 21, extended, LS|PS1) sits 2.5'' from H0 (r = 18, r_e = 3'').
+    I2 is 3.2'' from H0, outside its r_e (2.60.9 review: this made I2 -> H1 -> H0 in one row order)."""
+    a = 1 / 3600
+    sdss = "SDSS DR18 PhotoObj"
+
+    def row(oid, dra, r, re, cats, t="SER", cls="GALAXY"):
+        return dict(object_id=oid, ra=150 + dra * a, dec=2.0, catalogs=cats, desi_legacy_surveys_dr10__type=t,
+                    desi_legacy_surveys_dr10__shape_r=re, std_mag__ls_r=r, primary_class=cls, parent_object_id=np.nan)  # fmt: skip
+
+    return [
+        row("I2", 3.2, 24.0, 0.0, f"{LS}|{sdss}", t="PSF", cls="STAR"),
+        row("H1", 2.5, 21.0, 0.8, f"{LS}|{PS1}"),
+        row("H0", 0.0, 18.0, 3.0, LS),
+    ]
+
+
+def test_host_candidate_makes_no_chain_and_does_not_depend_on_row_order(monkeypatch):
     monkeypatch.setattr(hg, "FRAG_HOST_AS_CANDIDATE", True)
-    d = _pair_of_hosts()
-    third = d.iloc[[1]].copy()
-    third["object_id"] = "L"
-    third["ra"] = 150.0 + 0.5 / 3600
-    third["std_mag__ls_r"] = 26.0
-    out = hg.attach_galaxy_fragments(pd.concat([d, third], ignore_index=True)).set_index("object_id")
-    parents = out.parent_object_id.dropna()
-    assert not parents.isin(parents.index).any(), "a fragment is the parent of another fragment"
-    assert "H" not in parents.index
+    seen = []
+    for rows in (_chain_rows(), _chain_rows()[::-1]):
+        out = hg.attach_galaxy_fragments(pd.DataFrame(rows)).set_index("object_id")
+        parents = out.parent_object_id.dropna()
+        assert not parents.isin(parents.index).any(), "a fragment is the parent of another fragment"
+        assert out.loc["H1", "parent_object_id"] == "H0" and pd.isna(out.loc["I2", "parent_object_id"])
+        assert out.loc["H0", "n_components"] == 1 and out.loc["H1", "n_components"] == 0
+        seen.append(parents.sort_index().to_dict())
+    assert seen[0] == seen[1]  # the same grouping in both row orders
+
+
+def test_an_earlier_parent_is_never_made_a_fragment(monkeypatch):
+    """2.60.9 review (Codex): a galaxy that already holds a child from an earlier grouping step (consolidate, PS1
+    fragments) must not become another galaxy's fragment under the switch (child -> H1 -> H0)."""
+    monkeypatch.setattr(hg, "FRAG_HOST_AS_CANDIDATE", True)
+    rows = _chain_rows()[1:]  # H1 and H0
+    child = dict(rows[0], object_id="C", parent_object_id="H1", component_role="ps1_fragment")
+    out = hg.attach_galaxy_fragments(pd.DataFrame(rows + [child])).set_index("object_id")
+    assert pd.isna(out.loc["H1", "parent_object_id"])  # H1 keeps its child and stays top-level
+    assert out.loc["C", "parent_object_id"] == "H1"
+
+
+def test_without_the_switch_the_chain_rows_group_as_in_2_41_0():
+    for rows in (_chain_rows(), _chain_rows()[::-1]):
+        out = hg.attach_galaxy_fragments(pd.DataFrame(rows)).set_index("object_id")
+        assert out.parent_object_id.dropna().to_dict() == {"I2": "H1"}  # the default path is unchanged
+
+
+def test_switch_values_are_checked(monkeypatch):
+    for bad in ("nan", "-1", "inf"):
+        monkeypatch.setenv("V2_HALO_FRACTION", bad)
+        with pytest.raises(ValueError, match="V2_HALO_FRACTION"):
+            hg._env_float("V2_HALO_FRACTION", 0.5, 0.0, 2.0)
+    monkeypatch.setenv("V2_HALO_FRACTION", "")
+    assert hg._env_float("V2_HALO_FRACTION", 0.5, 0.0, 2.0) == 0.5  # empty: the default
 
 
 def test_halo_radius_follows_the_fraction_switch(monkeypatch):

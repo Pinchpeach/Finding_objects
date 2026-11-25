@@ -167,9 +167,12 @@ def test_a_failed_download_falls_back_to_vizier_and_is_not_retried_at_once(monke
     assert L.cone("toy", 10.0, 20.0, 1.0) is None
     assert len(fake.calls) == 1  # not retried within RETRY_AFTER_S
     assert not (L.store_dir("toy") / "manifest.json").exists()
-    L._FAILED.clear()
+    L._FAILED.clear()  # a new process (the app runs one per search) ...
+    assert L.cone("toy", 10.0, 20.0, 1.0) is None and len(fake.calls) == 1  # ... still remembers it (2.60.7 review)
+    L.archive_cache.note_source("lists:toy", True)  # the failure memory has expired
     fake.fail = False
     assert L.cone("toy", 10.0, 20.0, 1.0) is not None  # a later try works
+    assert not L.archive_cache.source_down("lists:toy")  # and a success forgets the failure
 
 
 def test_a_wrong_row_count_is_never_stored(monkeypatch):
@@ -316,3 +319,89 @@ def test_a_failing_local_lookup_falls_back_to_vizier_instead_of_failing_the_coll
     assert L.cone("toy", 10.0, 20.0, 1.0) is None  # the collector asks VizieR
     assert "the local copy could not answer (ValueError" in capsys.readouterr().out
     assert L.cone("toy", 10.0, 20.0, 1.0) is None  # and is not offered the broken copy again for RETRY_AFTER_S
+
+
+def test_the_copy_is_text_and_a_planted_pickle_is_never_executed(monkeypatch):
+    """2.60.7 review: the copy is gzip ECSV read with astropy's safe YAML loader, never unpickled.  A folder whose
+    manifest hash matches a planted pickle (a tampered or someone else's cache) cannot run code."""
+    import gzip
+    import hashlib
+    import pickle
+
+    spec = _spec(True)
+    monkeypatch.setitem(L.SPECS, "toy", spec)
+    fake = _FakeQuery(_tables())
+    _patch_query(monkeypatch, fake)
+    assert L.cone("toy", 10.0, 20.0, 1.0) is not None
+    d = L.store_dir("toy")
+    assert sorted(p.name for p in d.glob("*.gz")) == ["T_1.ecsv.gz", "T_2.ecsv.gz"]
+    assert gzip.open(d / "T_1.ecsv.gz", "rt").read().startswith("# %ECSV")
+    ran = []
+
+    class Boom:
+        def __reduce__(self):
+            return (ran.append, ("executed",))
+
+    path = d / "T_1.ecsv.gz"
+    with gzip.open(path, "wb") as f:
+        pickle.dump(Boom(), f)
+    man = json.loads((d / "manifest.json").read_text())
+    man["tables"]["T/1"]["sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()  # the attacker fixes the hash
+    (d / "manifest.json").write_text(json.dumps(man))
+    L._MEMO.clear()
+    L.cone("toy", 10.0, 20.0, 1.0)  # unreadable as ECSV: downloaded again (or VizieR is asked), never unpickled
+    assert ran == []
+
+
+def test_the_round_trip_keeps_masks_dtypes_and_units(tmp_path):
+    from astropy.table import MaskedColumn, Table
+
+    tb = Table(
+        {
+            "recno": np.array([1, 2, 3], dtype="int32"),
+            "RAJ2000": MaskedColumn([10.0, np.nan, 50.0], unit="deg", mask=[False, True, False]),
+            "Name": MaskedColumn(["a", "", "c"], mask=[False, True, False]),
+            "Empty": MaskedColumn(["", "x", ""], mask=[False, False, True]),
+            "Flag": MaskedColumn([1, 0, 1], dtype="int16", mask=[False, False, True]),
+        }
+    )
+    path = tmp_path / "t.ecsv.gz"
+    L._write_table(tb, path)
+    back = L._read_table(path)
+    assert L._same_table(tb, back) and back["RAJ2000"].unit == tb["RAJ2000"].unit
+    assert back["Empty"][0] == "" and not back["Empty"].mask[0] and back["Empty"].mask[2]  # a real "" stays a value
+    assert [p.name for p in tmp_path.iterdir()] == ["t.ecsv.gz"]  # no temporary file left
+
+
+def test_an_unknown_switch_value_is_refused(monkeypatch):
+    monkeypatch.setenv("V2_LOCAL_LISTS", "on")  # reads like "on" but would silently mean auto (off): refused
+    with pytest.raises(ValueError, match="V2_LOCAL_LISTS"):
+        L.mode()
+    for v, want in (("all", "all"), ("auto", "auto"), ("0", "0"), ("off", "0"), ("", "auto")):
+        monkeypatch.setenv("V2_LOCAL_LISTS", v)
+        assert L.mode() == want
+
+
+def test_the_list_lock_stays_held_through_a_slow_download(monkeypatch, tmp_path):
+    """2.60.7 review (Codex): archive_cache._FileLock is broken as stale after LOCK_STALE_S without a touch; the list
+    lock is renewed while held, so a second process cannot enter during a download longer than that."""
+    import threading
+    import time as _t
+
+    monkeypatch.setattr(L.archive_cache, "LOCK_STALE_S", 0.3)
+    path = tmp_path / ".lock"
+    got = []
+
+    def contender():
+        try:
+            with L.archive_cache._FileLock(path, timeout=0.8):
+                got.append("entered")
+        except TimeoutError:
+            got.append("waited")
+
+    with L._HeldLock(path, timeout=1.0):
+        th = threading.Thread(target=contender)
+        th.start()
+        _t.sleep(1.0)  # longer than the stale time: without renewal the contender would break the lock
+        th.join()
+    assert got == ["waited"] and not path.exists()

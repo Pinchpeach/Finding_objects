@@ -3,7 +3,7 @@
 #   run_full.sh FIELDS_ROOT OUT_DIR [PARALLEL] [ENV=VALUE ...]
 # FIELDS_ROOT/<field>/{field.json,raw/<tag>/*.csv}; OUT_DIR/<field>/ gets the stage products.  The variant switches
 # are environment variables (V2_ASSOC_...), given after the parallelism.
-ROOT=$1; OUT=$2; P=${3:-3}; shift 3
+ROOT=$1; OUT=$2; P=${3:-3}; shift $(( $# < 3 ? $# : 3 ))  # two arguments are enough (2.60.9 review)
 export PYTHONHASHSEED=0 "$@"
 V2="$(cd "$(dirname "$0")/../.." && pwd)"
 mkdir -p "$OUT"
@@ -15,5 +15,9 @@ run_one() {
   python3 "$V2/pipeline.py" --work "$OUT/$f" --raw-dir "$raw" --ra "$ra" --dec "$dec" --radius 6 > "$OUT/$f.log" 2>&1
 }
 export -f run_one; export ROOT OUT V2
-ls "$ROOT" | grep '^deep_cosmos_' | xargs -P "$P" -I{} bash -c 'run_one {}'
+# a failed field fails the batch: no completion marker (2.60.9 review, Codex)
+if ! ls "$ROOT" | grep '^deep_cosmos_' | xargs -P "$P" -I{} bash -c 'run_one {}'; then
+  echo "run_full.sh: at least one field failed, see $OUT/*.log" >&2
+  exit 1
+fi
 echo done > "$OUT/done.txt"

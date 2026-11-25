@@ -81,3 +81,10 @@ NGC 4522, 반지름 2′, 같은 날 두 번 수집(`V2_CACHE=0`, 빈 사용자 
 - `Preprocess/tests/test_service_limits.py` 7개: 건너뛰기 이름 규칙·오타 오류·네 곳의 목록 일치·`collect_all`이 건너뛴 수집기를 묻지 않음·**수집기를 돌리는 matrix job은 NED를 건너뛰거나 `max-parallel: 1`일 것**·`with_ned` 입력과 기본값·SDSS `cache=False`.
 - 전체 시험은 보고서 마지막에.
 - 한계: GitHub Actions에서 실제로 돌려 본 것은 아니다(워크플로 문법은 YAML 해석과 시험으로만 확인). 첫 실행에서 `with_ned` 식(`github.event.inputs.with_ned == 'true' && 1 || 26`)이 숫자로 해석되는지 보면 된다.
+
+
+## 8. 병합 전 검토 (코드 개발 세션, 2.60.8)
+- **세트 C와의 충돌 없음.** `BLIND_DROPPED` 14개는 세트 C 워크플로가 블라인드 복사에서 지우던 14개 파일과 같다. 그래서 블라인드 입력은 구성상 같고 점수는 비교할 수 있다. 관문(핵심 수집기 다섯)과 2.60.4의 수집 조건 기록·90일 입력 보관 단계도 영향을 받지 않는다. 이 내용을 `LOCKED_TEST_SET_C.md`에 적었다.
+- **완전 모드 수치의 정의 변화.** 3절의 "의미가 바뀌는 곳"을 점수 안내(`benchmark/independent_fields/README.md`)에도 적었다. 예전 완전 모드 수치(2.40.2의 full 99.1 % 등)와 비교할 때 `with_ned=true`가 필요하다.
+- **`validation-data` 브랜치.** 독립 정답 워크플로는 그 브랜치에서 실행하는데, 그 브랜치는 지금 main(2.60.6)을 포함하지 않는다(마지막 커밋 2026-11-24). main을 그 브랜치에 들이기 전에 돌리면 NED 동시 조회가 그대로 남는다.
+- **CI.** Test Preprocess가 이 브랜치에서 실패하고 있었다. 과제 2의 `test_local_lists.py`가 astroquery를 모듈 첫 줄에서 불러오는데 CI에 astroquery가 없었기 때문이다. astroquery는 프로그램 의존성이므로 `test-preprocess.yml` 설치 목록에 넣었다. 덕분에 그동안 건너뛰던 astroquery 시험들도 돈다.

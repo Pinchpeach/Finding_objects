@@ -23,7 +23,13 @@ Contract.
   ``$V2_CACHE_DIR/lists/<key>/``.  The progress goes to the log (``[lists] ...``).  A failed download falls back to
   the remote cone for this search and is not retried for ``RETRY_AFTER_S``.
 * The copy is re-downloaded when it is older than ``max_age_days``, when a file does not match its manifest hash,
-  or when the user asks: ``python v2/Get_data/local_lists.py --refresh [key]`` (``--status``, ``--remove`` too).
+  or when the user asks: ``python v2/Get_data/local_lists.py refresh [key]`` (``status`` and ``remove`` too;
+  ``V2_LOCAL_LISTS_REFRESH=1`` forces the same for one run).
+* Stored as gzip ECSV (text; masks kept with ``serialize_method=data_mask``), never as pickle: a cache folder can come
+  from someone else (a shared drive, a copied folder, a restored backup), and reading it must not be able to run code
+  (2.60.7 review).  The manifest hash detects a damaged file; it is not a security check, since it sits in the same
+  folder.  A failed download is remembered across processes (``archive_cache.note_source``), and two processes never
+  download the same list at once (a lock file in the list's folder).
 * Same answer as VizieR: the rows are those within the radius of the table's own J2000 position, in table order;
   ``_r`` is the distance in arcmin to 4 decimals as VizieR prints it; columns, dtypes, masks and units are those of
   VizieR's own table (the tables are stored as downloaded, minus ``_r``).  ``test_local_lists.py`` and the
@@ -37,8 +43,8 @@ import gzip
 import hashlib
 import json
 import os
-import pickle
 import sys
+import tempfile
 import threading
 import time
 from dataclasses import dataclass
@@ -105,7 +111,12 @@ def mode() -> str:
     if not archive_cache.enabled():
         return "0"
     v = os.environ.get("V2_LOCAL_LISTS", "auto").strip().lower() or "auto"
-    return "0" if v in {"0", "false", "no", "off"} else ("all" if v == "all" else "auto")
+    if v in {"0", "false", "no", "off"}:
+        return "0"
+    if v in {"auto", "all"}:
+        return v
+    # "1", "on", "yes" read like "switch it on" but would silently mean auto (= off today): refuse (2.60.7 review)
+    raise ValueError(f"V2_LOCAL_LISTS={v!r}: use auto (verified lists only), all, or 0")
 
 
 def usable(spec: ListSpec) -> bool:
@@ -130,7 +141,7 @@ def _sha256(path: Path) -> str:
 
 
 def _fname(table_id: str) -> str:
-    return table_id.replace("/", "_") + ".pkl.gz"
+    return table_id.replace("/", "_") + ".ecsv.gz"
 
 
 def status(spec: ListSpec) -> dict:
@@ -175,10 +186,11 @@ def _download(spec: ListSpec) -> dict:
     files = {}
     for t, tb in out.items():
         path = d / _fname(t)
-        tmp = path.with_suffix(".tmp")
-        with gzip.open(tmp, "wb", compresslevel=6) as f:
-            pickle.dump(tb, f, protocol=4)
-        os.replace(tmp, path)
+        _write_table(tb, path)
+        back = _read_table(path)
+        if not _same_table(tb, back):  # the text round trip must give back VizieR's table, else nothing is stored
+            path.unlink(missing_ok=True)
+            raise RuntimeError(f"{t}: the stored copy does not read back as the downloaded table; not stored")
         files[t] = {"rows": len(tb), "sha256": _sha256(path), "bytes": path.stat().st_size}
     man = {
         "list": spec.key,
@@ -188,9 +200,9 @@ def _download(spec: ListSpec) -> dict:
         "tables": files,
         "terms_verified": spec.terms_verified,
         "terms": spec.terms,
-        "note": "stored on this computer only; delete the folder or run local_lists.py --remove to drop it",
+        "note": "stored on this computer only; delete the folder or run local_lists.py remove to drop it",
     }
-    (d / "manifest.json").write_text(json.dumps(man, indent=1) + "\n")
+    _atomic_write_text(d / "manifest.json", json.dumps(man, indent=1) + "\n")
     _log(f"downloaded {total:,} rows in {time.monotonic() - t0:.0f} s")
     return man
 
@@ -202,9 +214,60 @@ def _load(spec: ListSpec, man: dict) -> dict:
         path = d / _fname(t)
         if _sha256(path) != man["tables"][t]["sha256"]:
             raise ValueError(f"{path.name}: does not match the manifest hash")
-        with gzip.open(path, "rb") as f:
-            out[t] = pickle.load(f)  # our own file, verified above
+        out[t] = _read_table(path)  # ECSV text: reading cannot run code, whoever wrote the folder
     return out
+
+
+def _atomic_write_text(path: Path, text: str) -> None:
+    fd, tmp = tempfile.mkstemp(dir=path.parent, prefix=path.name + ".", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            f.write(text)
+        os.replace(tmp, path)
+    finally:
+        Path(tmp).unlink(missing_ok=True)
+
+
+def _write_table(tb, path: Path) -> None:
+    """gzip ECSV through a unique temporary name and a rename (two processes never share a temporary file)."""
+    from astropy.table import MaskedColumn
+
+    fd, tmp = tempfile.mkstemp(dir=path.parent, prefix=path.name + ".", suffix=".tmp")
+    os.close(fd)
+    try:
+        with gzip.open(tmp, "wt", encoding="utf-8", compresslevel=6) as f:
+            tb.write(f, format="ascii.ecsv", serialize_method={MaskedColumn: "data_mask"})
+        os.replace(tmp, path)
+    finally:
+        Path(tmp).unlink(missing_ok=True)
+
+
+def _read_table(path: Path):
+    from astropy.table import Table
+
+    with gzip.open(path, "rt", encoding="utf-8") as f:
+        return Table.read(f.read(), format="ascii.ecsv")
+
+
+def _same_table(a, b) -> bool:
+    """Same columns, dtypes, values and masks (what a collector reads through ``to_pandas``)."""
+    if a.colnames != b.colnames or len(a) != len(b):
+        return False
+    for c in a.colnames:
+        x, y = a[c], b[c]
+        if x.dtype != y.dtype:
+            return False
+        mx = np.ma.getmaskarray(x) if hasattr(x, "mask") else np.zeros(len(x), bool)
+        my = np.ma.getmaskarray(y) if hasattr(y, "mask") else np.zeros(len(y), bool)
+        if not np.array_equal(mx, my):
+            return False
+        vx, vy = np.asarray(x)[~mx], np.asarray(y)[~my]
+        if vx.dtype.kind == "f":
+            if not np.array_equal(vx, vy, equal_nan=True):
+                return False
+        elif not np.array_equal(vx, vy):
+            return False
+    return True
 
 
 def _tables(spec: ListSpec):
@@ -219,31 +282,74 @@ def _tables(spec: ListSpec):
         failed = _FAILED.get(spec.key)
         if failed is not None and time.monotonic() - failed < RETRY_AFTER_S:
             return None
+        if archive_cache.source_down(_source_key(spec)):  # a failure in another process (the app: one per search)
+            return None
         try:
-            need = not st.get("present") or st.get("stale") or os.environ.get("V2_LOCAL_LISTS_REFRESH") == "1"
-            if st.get("present") and st.get("stale"):
-                _log(
-                    f"{spec.label}: the copy is {st['age_days']:.0f} days old (limit {spec.max_age_days:.0f}), asking again"
-                )
-            tabs = None
-            if not need:
-                try:
-                    tabs = _load(spec, st["manifest"])
-                except Exception as exc:  # a damaged or unreadable file: the copy is rebuilt, not trusted
-                    _log(
-                        f"{spec.label}: the local copy is damaged ({type(exc).__name__}: {str(exc)[:100]}), downloading again"
-                    )
-                    need = True
-            if need:
-                st = {"manifest": _download(spec)}
-                tabs = _load(spec, st["manifest"])
+            store_dir(spec.key).mkdir(parents=True, exist_ok=True)
+            with _HeldLock(store_dir(spec.key) / ".lock", timeout=300.0):  # one process downloads
+                tabs, st = _tables_locked(spec)
         except Exception as exc:
             _FAILED[spec.key] = time.monotonic()
+            archive_cache.note_source(_source_key(spec), False, RETRY_AFTER_S)
             _log(f"{spec.label}: no local copy ({type(exc).__name__}: {str(exc)[:160]}); VizieR is asked for each cone")
             _MEMO.pop(spec.key, None)
             return None
         _MEMO[spec.key] = (st["manifest"]["downloaded"], tabs)
         return tabs
+
+
+class _HeldLock:
+    """``archive_cache._FileLock`` renewed while held (2.60.7 review, Codex): that lock is broken as stale after
+    ``LOCK_STALE_S`` (30 s) without a touch, and a download can take longer (VizieR mirror failover).  A thread touches
+    the lock file every quarter of that time, so a live holder keeps it; a crashed one still frees it after 30 s."""
+
+    def __init__(self, path: Path, timeout: float):
+        self.path, self._lock = path, archive_cache._FileLock(path, timeout=timeout)
+        self._stop = threading.Event()
+        self._beat = None
+
+    def __enter__(self):
+        self._lock.__enter__()
+
+        def beat():
+            while not self._stop.wait(max(0.05, archive_cache.LOCK_STALE_S / 4)):
+                try:
+                    os.utime(self.path, None)
+                except OSError:
+                    pass
+
+        self._beat = threading.Thread(target=beat, daemon=True, name="lists-lock")
+        self._beat.start()
+        return self
+
+    def __exit__(self, *exc):
+        self._stop.set()
+        self._beat.join(timeout=5)
+        return self._lock.__exit__(*exc)
+
+
+def _source_key(spec: ListSpec) -> str:
+    return f"lists:{spec.key}"
+
+
+def _tables_locked(spec: ListSpec):
+    """(tables, status) under the list's lock file: load the copy, or (re)download it; raises when neither works."""
+    st = status(spec)  # read again: another process may have just written it
+    need = not st.get("present") or st.get("stale") or os.environ.get("V2_LOCAL_LISTS_REFRESH") == "1"
+    if st.get("present") and st.get("stale"):
+        _log(f"{spec.label}: the copy is {st['age_days']:.0f} days old (limit {spec.max_age_days:.0f}), asking again")
+    tabs = None
+    if not need:
+        try:
+            tabs = _load(spec, st["manifest"])
+        except Exception as exc:  # a damaged or unreadable file: the copy is rebuilt, not trusted
+            _log(f"{spec.label}: the local copy is damaged ({type(exc).__name__}: {str(exc)[:100]}), downloading again")
+            need = True
+    if need:
+        st = {"manifest": _download(spec)}
+        tabs = _load(spec, st["manifest"])
+    archive_cache.note_source(_source_key(spec), True)  # forget an earlier failure
+    return tabs, st
 
 
 def _separation_arcmin(ra1, dec1, ra2, dec2) -> np.ndarray:
