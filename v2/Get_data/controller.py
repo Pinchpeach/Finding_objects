@@ -502,6 +502,7 @@ def retry_failed(
     workers: int = 1,
     which: str = "key",
     budget_s: float = COLLECTOR_BUDGET_S,
+    only=None,
 ) -> pd.DataFrame:
     """Ask again only the collectors of the last collection in ``raw_dir`` that
     failed or answered from a reduced alternative source, and replace their rows
@@ -518,9 +519,12 @@ def retry_failed(
     (``archive_cache``) does not skip it, and a collector that declares
     ``RETRY_BUDGET_S`` gets only that long (a healthy service answers in a
     fraction of it; the budget exists so that a retry during an outage is not
-    another 5-minute wait).  Returns the rows that were re-collected."""
+    another 5-minute wait).  ``only`` (2.60.10): ask again just these collectors among the failed ones.
+    Returns the rows that were re-collected."""
     raw_dir = Path(raw_dir)
     names = failed_collectors(raw_dir, which)
+    if only is not None:  # 2.60.10: a validation workflow asks again only the archive whose outage it is waiting out
+        names = [n for n in names if n in set(only)]
     if not names:
         print("[retry] no failed archives to ask again", flush=True)
         return pd.DataFrame()

@@ -128,7 +128,17 @@ jobs:
       - name: Collect
         env:
           V2_SKIP_COLLECTORS: blind  # the blind run drops these collectors' files (NED: no concurrent automated queries)
-        run: python -u v2/pipeline.py --ra $RA --dec $DEC --radius $R --work /tmp/field
+        run: |
+          # 2.60.10: a random start delay (0-89 s) so that the regions of a wave do not ask the Data Lab at the same
+          # moment (2026-11-25: NOIRLab answered 502 to 40 of 60 regions, clustered within two minutes)
+          d=$((RANDOM % 90)); echo "start delay $d s"; sleep $d
+          python -u v2/pipeline.py --ra $RA --dec $DEC --radius $R --work /tmp/field
+      - name: Ask a failed Legacy Surveys archive again once (2.60.10)
+        # Only desi_legacy, only when it failed or came from the viewer copy, only once, after 2 minutes: the Data Lab
+        # outages of 2026-11-25 lasted minutes.  The collection summary is rewritten, so the gate below counts the
+        # outcome of the retry; the gate itself is unchanged.  A healthy run asks nothing.
+        continue-on-error: true
+        run: python -u .github/scripts/retry_failed_archive.py /tmp/field $RA $DEC $R --only desi_legacy --wait 120
       - name: Blind run and compact record
         run: |
           raw=$(ls -d /tmp/field/raw/*/ | head -1)

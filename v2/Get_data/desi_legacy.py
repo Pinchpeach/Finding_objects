@@ -20,14 +20,15 @@ fixed below, the ids now match), but the values differ: the TAP has i-band
 columns the viewer's DR9 North table lacks (or fills with 0 near the split),
 ``fracflux_*`` differ (up to 3 % relative near the split, a zero against a
 value deep in the north), and fluxes by up to 3e-4 relative.  So the viewer
-is asked only for cones wholly in DR10 South (``viewer_usable``).  The Data Lab TAP stalled for 300 s in the first
+is asked only for cones wholly in DR10 South (``viewer_usable``).  2.60.10: cones of up to 20' are asked in
+tiles (``viewer_tiles``; 12' = one request of ~125 MB, 20' = four of ~78 MB) -- see WORK_REPORT_2026-11-25e.md.  The Data Lab TAP stalled for 300 s in the first
 COSMOS search of 2026-11-23 (270 objects instead of 3,582 in the result), and
 a TAP outage on 2026-11-17 made every run wait 246-300 s.  The viewer is
 asked in addition (request hedging, Dean & Barroso 2013, CACM 56, 74: a second
 request after the time a healthy answer takes, the first answer wins) when the
 Data Lab has not answered within HEDGE_DELAY_S or an attempt failed; a healthy
 day sends it nothing.  It is a visualisation server, not a TAP service: only
-cones up to MAX_VIEWER_RADIUS_ARCMIN (a 30' cone is 688 MB and 88 s), wholly
+cones up to MAX_VIEWER_RADIUS_ARCMIN (a 30' cone in one box is 688 MB and 88 s), wholly
 in DR10 South, and not near a pole.
 """
 
@@ -69,8 +70,23 @@ VIEWER_LAYER = "ls-dr10"  # DR10 South rows below the split (the layer also serv
 # A healthy Data Lab cone takes 5-16 s (controller.py); 30 s is about twice that.
 HEDGE_DELAY_S = 30.0
 VIEWER_TIMEOUT_S = (15.0, 90.0)  # connect, read
-# 10' = 31,845 rows, 78 MB, 14.5 s; 30' = 281,328 rows, 688 MB, 88 s (2026-11-23).
-MAX_VIEWER_RADIUS_ARCMIN = 10.0
+# 10' = 31,845 rows, 78 MB, 14.5 s; 30' = 281,328 rows, 688 MB, 88 s (2026-11-23, 2.57.0).  2.60.10: cones up to
+# 20' in tiles (see viewer_tiles): a request is at most VIEWER_TILE_ARCMIN on a side (<= ~25' x 25' = 625 arcmin^2,
+# about 1.6 times the 10' cone's box that was measured, so ~125 MB and ~25 s at COSMOS density), at most
+# VIEWER_MAX_TILES requests, so a 20' cone is 4 requests of 20' x 20' (the measured 10' size), ~310 MB, ~75 s.
+MAX_VIEWER_RADIUS_ARCMIN = 20.0
+VIEWER_TILE_ARCMIN = 25.0
+# The viewer drops the rows within about one pixel of a box edge (measured 2026-11-25 on the 24' COSMOS box: the 3 rows
+# of the cone within 0.6'' of the western edge, 0.00017 deg = box width / 2300, were missing, while the same edge in a
+# 0.01 deg box returned them).  Every tile is therefore asked with a margin on all four sides, max(VIEWER_MARGIN_ARCSEC,
+# VIEWER_MARGIN_FRACTION x its side): three times the loss measured, and the margins of neighbouring tiles overlap, so
+# no row of the cone falls between two boxes.  The cone cut that follows removes the rows the margin brought in.
+VIEWER_MARGIN_ARCSEC = 3.0
+VIEWER_MARGIN_FRACTION = 0.005
+VIEWER_MAX_TILES = 4
+VIEWER_MAX_BYTES = 250_000_000  # one answer; a denser field than COSMOS (a Galactic-plane box) is not read to the end
+VIEWER_BUDGET_S = 170.0  # all tiles of one cone
+VIEWER_JOIN_S = 180.0  # how long a failed TAP waits for the viewer thread (it started a few seconds into the failure)
 HEDGE_STATUS = "viewer_fallback"  # legacy_query_status; archive_cache keeps such a result one day
 # The columns of the TAP query below, in its order (a test keeps the two in step).
 TAP_COLUMNS = (
@@ -102,7 +118,19 @@ class TapTimeout(RuntimeError):
     """Every attempt ran out of time (as opposed to a rejected query)."""
 
 
-def _query_with_retries(run, hedge=None, attempts=None, attempt_budget_s=None):
+def hedge_delay_s(radius_arcmin: float) -> float:
+    """How long a healthy Data Lab answer can take before the viewer is asked as well (2.60.10).  Up to 10' it is
+    HEDGE_DELAY_S, about twice the 5-16 s of a 10' cone (2.57.0).  The Data Lab's time grows with the cone's area, and
+    a 12' cone was measured at 11-43 s on 2026-11-25 (COSMOS the slowest), so a larger cone waits 1.5 x 30 s x
+    (r / 10')^2 (12': 65 s), never longer than one attempt (ATTEMPT_BUDGET_S): none of the nine 12' cones of the
+    measurement would have started the viewer, a failed attempt (HTTP 502 at once) still does."""
+    r = float(radius_arcmin)
+    if r <= 10.0:
+        return HEDGE_DELAY_S
+    return min(ATTEMPT_BUDGET_S, HEDGE_DELAY_S * 1.5 * (r / 10.0) ** 2)
+
+
+def _query_with_retries(run, hedge=None, attempts=None, attempt_budget_s=None, hedge_delay=None):
     """Result of ``run()`` (the Data Lab TAP), in up to ATTEMPTS attempts of
     ATTEMPT_BUDGET_S each.  ``hedge`` (2.57.0): a second path to the same rows,
     started once, in its own thread, when an attempt fails or the first one has
@@ -110,6 +138,7 @@ def _query_with_retries(run, hedge=None, attempts=None, attempt_budget_s=None):
     (the TAP's when both are there)."""
     import threading, time
 
+    delay = HEDGE_DELAY_S if hedge_delay is None else hedge_delay
     attempts = ATTEMPTS if attempts is None else attempts  # a caller may wait less (desi_fastspec.py, 2.59.0)
     budget = ATTEMPT_BUDGET_S if attempt_budget_s is None else attempt_budget_s
     hedged = {}  # {"thread", "value", "error"} once started
@@ -136,8 +165,8 @@ def _query_with_retries(run, hedge=None, attempts=None, attempt_budget_s=None):
             t.join(0.25)
             if hedge_value() is not None and "value" not in box:
                 return hedge_value()
-            if time.monotonic() - t0 >= HEDGE_DELAY_S:
-                start_hedge(f"has not answered in {HEDGE_DELAY_S:.0f} s")
+            if time.monotonic() - t0 >= delay:
+                start_hedge(f"has not answered in {delay:.0f} s")
         if "value" in box:
             return box["value"]
         last = box.get("error") or TimeoutError(f"Data Lab TAP exceeded {budget:.0f} s")
@@ -147,7 +176,7 @@ def _query_with_retries(run, hedge=None, attempts=None, attempt_budget_s=None):
         if attempt + 1 < attempts:
             time.sleep(2.0 * (attempt + 1))
     if hedged.get("thread") is not None:  # the viewer may still be on its way
-        hedged["thread"].join(VIEWER_TIMEOUT_S[1] + VIEWER_TIMEOUT_S[0])
+        hedged["thread"].join(VIEWER_JOIN_S)
         if hedge_value() is not None:
             return hedge_value()
     err = TapTimeout if isinstance(last, TimeoutError) else RuntimeError
@@ -182,12 +211,13 @@ def _wholly_south(ra: float, dec: float, r_deg: float) -> bool:
 
 
 def viewer_usable(ra: float, dec: float, radius_arcmin: float) -> bool:
-    """The viewer catalogue is a second path for this cone: small, away from a pole, and wholly in DR10 South
-    (2.57.0 review: in the DR9 North part the viewer rows differ from the TAP's, see the module docstring)."""
+    """The viewer catalogue is a second path for this cone: not larger than MAX_VIEWER_RADIUS_ARCMIN (at most
+    VIEWER_MAX_TILES requests), away from a pole, and wholly in DR10 South (2.57.0 review: in the DR9 North part
+    the viewer rows differ from the TAP's, see the module docstring)."""
     r = float(radius_arcmin)
     if not (0 < r <= MAX_VIEWER_RADIUS_ARCMIN) or abs(float(dec)) + r / 60.0 >= 89.0:
         return False
-    return _wholly_south(ra, dec, r / 60.0)
+    return _wholly_south(ra, dec, r / 60.0) and len(viewer_tiles(ra, dec, r)) <= VIEWER_MAX_TILES
 
 
 def viewer_boxes(ra: float, dec: float, radius_arcmin: float) -> list[tuple[float, float, float, float]]:
@@ -206,6 +236,82 @@ def viewer_boxes(ra: float, dec: float, radius_arcmin: float) -> list[tuple[floa
     return [(lo, hi, dlo, dhi)]
 
 
+def _angle_diff(a: float, b: float) -> float:
+    """a - b in degrees, in [-180, 180)."""
+    return (a - b + 180.0) % 360.0 - 180.0
+
+
+def _tile_reaches_cone(tile, ra: float, dec: float, r_deg: float) -> bool:
+    """The (ralo, rahi, declo, dechi) box has a point within r_deg of the cone centre (clamping the centre into the
+    box; a margin of 0.5' keeps a tile that the clamp over-estimates, which only costs a request, never a row)."""
+    import math
+
+    ralo, rahi, declo, dechi = tile
+    d_lo, d_hi = _angle_diff(ralo, ra), _angle_diff(rahi, ra)
+    dra = 0.0 if d_lo <= 0.0 <= d_hi else (d_lo if d_lo > 0 else d_hi)
+    nd = min(max(float(dec), declo), dechi)
+    n_ra = float(ra) + dra
+    h = math.sin(math.radians(nd - dec) / 2) ** 2 + math.cos(math.radians(dec)) * math.cos(math.radians(nd)) * (
+        math.sin(math.radians(n_ra - ra) / 2) ** 2
+    )
+    sep = math.degrees(2 * math.asin(min(1.0, math.sqrt(max(0.0, h)))))
+    return sep <= r_deg + 0.5 / 60.0
+
+
+def viewer_tiles(ra: float, dec: float, radius_arcmin: float) -> list[tuple[float, float, float, float]]:
+    """The requests that cover the cone (2.60.10): the boxes of viewer_boxes, each cut into n x m tiles whose sides
+    are at most VIEWER_TILE_ARCMIN on the sky, every tile widened by its margin (see VIEWER_MARGIN_ARCSEC) and the
+    tiles that do not reach the cone dropped (the corner tiles of a large cone).  A cone of up to 12.5' is one
+    request, a 20' cone four.  Rows in the overlap of two tiles come twice and are removed by ls_id; the tiles
+    together cover the box with a margin, so a cone's rows are neither lost nor doubled."""
+    import math
+
+    r_deg = float(radius_arcmin) / 60.0
+    out = []
+    for ralo, rahi, declo, dechi in viewer_boxes(ra, dec, radius_arcmin):
+        cosd = max(math.cos(math.radians(float(dec))), 1e-6)
+        nx = max(1, math.ceil((rahi - ralo) * cosd * 60.0 / VIEWER_TILE_ARCMIN - 1e-3))
+        ny = max(1, math.ceil((dechi - declo) * 60.0 / VIEWER_TILE_ARCMIN - 1e-3))
+        xe = [ralo + (rahi - ralo) * i / nx for i in range(nx + 1)]
+        ye = [declo + (dechi - declo) * j / ny for j in range(ny + 1)]
+        for i in range(nx):
+            for j in range(ny):
+                m_dec = max(VIEWER_MARGIN_ARCSEC / 3600.0, VIEWER_MARGIN_FRACTION * (ye[j + 1] - ye[j]))
+                m_ra = max(VIEWER_MARGIN_ARCSEC / 3600.0 / cosd, VIEWER_MARGIN_FRACTION * (xe[i + 1] - xe[i]))
+                t = (xe[i] - m_ra, xe[i + 1] + m_ra, max(-90.0, ye[j] - m_dec), min(90.0, ye[j + 1] + m_dec))
+                if _tile_reaches_cone(t, float(ra), float(dec), r_deg):
+                    out.append(t)
+    return out
+
+
+def _edge(x: float, direction: int) -> str:
+    """A box edge as the viewer's 8-decimal text, moved outwards by 1e-7 deg (0.36 mas) and rounded outwards: a row
+    on the edge of the cone's box is inside the requested box whichever edge rule the viewer has (the cone cut that
+    follows removes whatever is not in the cone)."""
+    import math
+
+    n = math.floor(float(x) * 1e8) - 10 if direction < 0 else math.ceil(float(x) * 1e8) + 10
+    return f"{n / 1e8:.8f}"
+
+
+def _viewer_read(resp, limit: int = None) -> bytes:
+    """The body of a viewer answer, at most VIEWER_MAX_BYTES: a box that is that large is not read on (a dense
+    field; the hedge fails, which is what happens without a hedge)."""
+    limit = VIEWER_MAX_BYTES if limit is None else limit
+    if hasattr(resp, "iter_content"):
+        chunks, n = [], 0
+        for c in resp.iter_content(chunk_size=1 << 20):
+            n += len(c)
+            if n > limit:
+                resp.close()
+                raise RuntimeError(f"Legacy Surveys viewer: answer larger than {limit / 1e6:.0f} MB, not read")
+            chunks.append(c)
+        return b"".join(chunks)
+    if len(resp.content) > limit:
+        raise RuntimeError(f"Legacy Surveys viewer: answer larger than {limit / 1e6:.0f} MB, not read")
+    return resp.content
+
+
 def _viewer_fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     """The Tractor rows of the cone from the viewer catalogue, as the TAP query returns them.
 
@@ -218,19 +324,34 @@ def _viewer_fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
     import requests
     from astropy.table import Table
 
+    import time
+
     parts = []
-    for ralo, rahi, declo, dechi in viewer_boxes(ra, dec, radius_arcmin):
+    tiles = viewer_tiles(ra, dec, radius_arcmin)
+    t0 = time.monotonic()
+    if len(tiles) > 1:
+        print(f"[desi_legacy] viewer: {len(tiles)} tiles for the {float(radius_arcmin):g}' cone", flush=True)
+    for ralo, rahi, declo, dechi in tiles:
+        if time.monotonic() - t0 > VIEWER_BUDGET_S:
+            raise TimeoutError(f"Legacy Surveys viewer: {len(tiles)} tiles not done in {VIEWER_BUDGET_S:.0f} s")
         resp = requests.get(
             VIEWER_URL.format(layer=VIEWER_LAYER),
-            params={"ralo": f"{ralo:.8f}", "rahi": f"{rahi:.8f}", "declo": f"{declo:.8f}", "dechi": f"{dechi:.8f}"},
+            params={
+                "ralo": _edge(ralo, -1),
+                "rahi": _edge(rahi, +1),
+                "declo": _edge(declo, -1),
+                "dechi": _edge(dechi, +1),
+            },
             timeout=VIEWER_TIMEOUT_S,
+            stream=True,
         )
         resp.raise_for_status()
-        if resp.content[:6] != b"SIMPLE":  # "No catalog sources in layer and RA,Dec box"
-            if b"No catalog sources" in resp.content[:200]:
+        body = _viewer_read(resp)
+        if body[:6] != b"SIMPLE":  # "No catalog sources in layer and RA,Dec box"
+            if b"No catalog sources" in body[:200]:
                 continue
-            raise RuntimeError(f"Legacy Surveys viewer: not a FITS table: {resp.content[:100]!r}")
-        tab = Table.read(io.BytesIO(resp.content), format="fits")
+            raise RuntimeError(f"Legacy Surveys viewer: not a FITS table: {body[:100]!r}")
+        tab = Table.read(io.BytesIO(body), format="fits")
 
         def col(name):  # FITS is big-endian; pandas needs native byte order
             a = np.asarray(tab[name])
@@ -307,7 +428,9 @@ def fetch(ra: float, dec: float, radius_arcmin: float) -> pd.DataFrame:
         )
     """
     hedge = (lambda: _viewer_fetch(ra, dec, radius_arcmin)) if viewer_usable(ra, dec, radius_arcmin) else None
-    run = lambda q: _query_with_retries(lambda: _service().search(q).to_table().to_pandas(), hedge)
+    run = lambda q: _query_with_retries(
+        lambda: _service().search(q).to_table().to_pandas(), hedge, hedge_delay=hedge_delay_s(radius_arcmin)
+    )
     try:
         df = run(query.replace("{extra}", extra))
     except TapTimeout:
