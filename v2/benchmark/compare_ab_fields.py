@@ -45,7 +45,8 @@ def main():
         rows = []
         for fdir in sorted(p for p in (a.root / v).iterdir() if (p / "field.json").exists() and (p / "objects_blind.csv.gz").exists()):
             m, info = S.field_matches(fdir, "blind", bench)
-            cover.append({"variant": v, "field": fdir.name, "n_truth": info["n_truth"], "unmatched": info["unmatched"], "in_bench": info["in_bench"]})
+            cover.append({"variant": v, "field": fdir.name, "n_truth": info["n_truth"], "unmatched": info["unmatched"], "in_bench": info["in_bench"],
+                          "n_top": info.get("n_top", 0)})
             ev = fdir / "objects_blind_evidence.csv.gz"
             if not m.empty and ev.exists() and "object_id" in m:
                 # fused class probabilities of the matched objects (risk-coverage / abstention calibration)
@@ -78,7 +79,11 @@ def main():
         ok, okb = m.ours == m.t_truth, b.ours == b.t_truth
         r = dict(variant=v, n=len(m), acc=round(100 * ok.mean(), 3), unknown=int((m.ours == "UNKNOWN").sum()),
                  fixed=int((ok & ~okb).sum()), broken=int((~ok & okb).sum()),
-                 truth_with_fragments=int(m.t_n_fragments.gt(0).sum()))
+                 truth_with_fragments=int(m.t_n_fragments.gt(0).sum()),
+                 # 2.60.11: the same over top-level objects only (rows grouped under a parent are not counted); the set-C
+                 # definition above is unchanged
+                 truth_with_fragments_top=int(m.t_n_fragments_top.gt(0).sum()) if "t_n_fragments_top" in m else None,
+                 top_level_objects_in_fields=int(sum(c.get("n_top", 0) for c in cover if c["variant"] == v)))
         for c in S.C:
             t = m.t_truth == c
             r[f"recall_{c}"] = round(100 * ok[t].mean(), 2) if t.any() else None
@@ -106,7 +111,7 @@ def main():
                                 "object_id", "parent_object_id") if c in m]
             m[["field", "t_truth", "ours"] + pcols + mags].to_csv(a.out / f"truth_probs_{v}.csv.gz", index=False)
             # every wrong or UNKNOWN truth object of this variant, for error analysis
-            keep = [c for c in ("field", "t_ra", "t_dec", "t_truth", "t_survey", "t_n_fragments", "ours", "catalogs", "unknown_reason",
+            keep = [c for c in ("field", "t_ra", "t_dec", "t_truth", "t_survey", "t_n_fragments", "t_n_fragments_top", "ours", "catalogs", "unknown_reason",
                                 "primary_confidence", "classification_basis", "gaia_dr3__phot_g_mean_mag", "std_mag__ls_r",
                                 "std_mag__ps1_r", "std_mag__sdss_r", "desi_legacy_surveys_dr10__type", "subclass",
                                 "p_star", "p_galaxy", "p_qso") if c in m]

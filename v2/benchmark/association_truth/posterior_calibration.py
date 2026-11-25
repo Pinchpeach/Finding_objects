@@ -144,9 +144,10 @@ def main() -> int:
                 t.insert(0, "catalog", cat)
                 tabs.append(t)
                 sums.append(dict(catalog=cat, half=half, score=sc, **summarise(x[sc].to_numpy(), x.y.to_numpy())))
-    pd.concat(tabs).to_csv(a.out / "reliability_tables.csv", index=False)
+    tag = "unconditional" if a.include_no_counterpart else "conditional"  # 2.60.11: the names of results_2026-11-25/
+    pd.concat(tabs).to_csv(a.out / f"reliability_tables_{tag}.csv", index=False)
     s = pd.DataFrame(sums)
-    s.to_csv(a.out / "calibration_summary.csv", index=False)
+    s.to_csv(a.out / f"calibration_summary_{tag}.csv", index=False)
     with pd.option_context("display.width", 220, "display.max_columns", 30):
         print(pd.DataFrame(q0rows).groupby("catalog")[["q0"] + [f"one_minus_q0_r{r}" for r in RADII]].median().round(3))
         print(s[s.half != "calibration"].to_string(index=False))
