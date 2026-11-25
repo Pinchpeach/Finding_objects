@@ -50,6 +50,7 @@
    - If gaia_dr3, desi_legacy, panstarrs1, allwise or twomass failed (error / timeout) in more than 10 % of the regions, or fewer than 54 regions finished, it stops before writing `locked_c/<VERSION>/`. The release's single look is not spent.
    - Re-run when the archives recover.
    - Reason: on 2026-11-11 VizieR answered 404 and NOIRLab 502 for hours, and every field run of that day lost AllWISE / 2MASS or Legacy Surveys.
+   - **Collection step (2.60.6).** The set-C workflow collects with `V2_SKIP_COLLECTORS=blind`: the blind run drops the spectroscopic and literature collectors (NED, SIMBAD, LAMOST/SDSS/DESI spectra, BZCAT, AGB, ATNF, clusters) anyway, and NED asks for no concurrent automated queries, which a matrix of 20 parallel jobs makes. The gate below reads only the core collectors, so it is unchanged.
 5. **Retirement.**
    - If C is ever examined object by object, it becomes a development set.
    - A new set D is then selected the same way, excluding A, B, C and COSMOS.

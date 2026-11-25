@@ -126,6 +126,8 @@ jobs:
           echo "centre $RA $DEC ($N truth positions)"
           echo "RA=$RA" >> "$GITHUB_ENV"; echo "DEC=$DEC" >> "$GITHUB_ENV"
       - name: Collect
+        env:
+          V2_SKIP_COLLECTORS: blind  # the blind run drops these collectors' files (NED: no concurrent automated queries)
         run: python -u v2/pipeline.py --ra $RA --dec $DEC --radius $R --work /tmp/field
       - name: Blind run and compact record
         run: |

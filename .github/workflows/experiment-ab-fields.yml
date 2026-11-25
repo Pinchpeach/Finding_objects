@@ -162,6 +162,8 @@ jobs:
           git rm -rq --cached "v2/benchmark/independent_fields_b/$NAME" && rm -rf "v2/benchmark/independent_fields_b/$NAME"
       - name: Collect (once)
         if: steps.pick.outputs.run
+        env:
+          V2_SKIP_COLLECTORS: blind  # the blind run drops these collectors' files (NED: no concurrent automated queries)
         run: python -u v2/pipeline.py --ra $RA --dec $DEC --radius $R --work /tmp/field
       - name: Blind raw and shifted copy
         if: steps.pick.outputs.run

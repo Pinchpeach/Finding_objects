@@ -71,6 +71,7 @@ jobs:
     timeout-minutes: 60
     strategy:
       fail-fast: false
+      max-parallel: 1  # the probe measures what a user's search costs, NED included; NED asks for no concurrent automated queries (2.60.6)
       matrix:
         f:
           - {name: ngc4522, ra: 188.4155, dec: 9.1751, r: 2}
