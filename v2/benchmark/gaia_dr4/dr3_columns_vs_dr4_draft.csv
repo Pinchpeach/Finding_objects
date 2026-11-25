@@ -1,0 +1,65 @@
+dr3_table,column,dr4_tables_with_same_name,in_draft,same_table_name_as_dr3
+gaia_source,source_id,gaia_source all_source_astrometry all_source_photometry all_source_rvs all_source_flags ap_xp ap_rvs ap_class ap_chem ap_emission ap_hot vari_summary vari_classifier_result,yes,yes
+gaia_source,designation,gaia_source all_source_astrometry all_source_photometry all_source_rvs all_source_flags,yes,yes
+gaia_source,ra,gaia_source all_source_astrometry,yes,yes
+gaia_source,dec,gaia_source all_source_astrometry,yes,yes
+gaia_source,ra_error,gaia_source all_source_astrometry,yes,yes
+gaia_source,dec_error,gaia_source all_source_astrometry,yes,yes
+gaia_source,parallax,gaia_source all_source_astrometry,yes,yes
+gaia_source,parallax_error,gaia_source all_source_astrometry,yes,yes
+gaia_source,pmra,gaia_source all_source_astrometry,yes,yes
+gaia_source,pmra_error,gaia_source all_source_astrometry,yes,yes
+gaia_source,pmdec,gaia_source all_source_astrometry,yes,yes
+gaia_source,pmdec_error,gaia_source all_source_astrometry,yes,yes
+gaia_source,pmra_pmdec_corr,gaia_source all_source_astrometry,yes,yes
+gaia_source,ruwe,gaia_source all_source_astrometry,yes,yes
+gaia_source,phot_g_mean_flux,gaia_source all_source_photometry,yes,yes
+gaia_source,phot_g_mean_flux_error,gaia_source all_source_photometry,yes,yes
+gaia_source,phot_g_mean_mag,gaia_source all_source_photometry,yes,yes
+gaia_source,phot_bp_mean_flux,gaia_source all_source_photometry,yes,yes
+gaia_source,phot_bp_mean_flux_error,gaia_source all_source_photometry,yes,yes
+gaia_source,phot_bp_mean_mag,gaia_source all_source_photometry,yes,yes
+gaia_source,phot_rp_mean_flux,gaia_source all_source_photometry,yes,yes
+gaia_source,phot_rp_mean_flux_error,gaia_source all_source_photometry,yes,yes
+gaia_source,phot_rp_mean_mag,gaia_source all_source_photometry,yes,yes
+gaia_source,bp_rp,gaia_source all_source_photometry,yes,yes
+gaia_source,bp_g,all_source_photometry,yes,no
+gaia_source,g_rp,all_source_photometry,yes,no
+gaia_source,phot_bp_rp_excess_factor,,no,no
+gaia_source,radial_velocity,gaia_source,yes,yes
+gaia_source,radial_velocity_error,gaia_source,yes,yes
+gaia_source,rv_nb_transits,gaia_source all_source_rvs,yes,yes
+astrophysical_parameters,teff_gspphot,ap_xp,yes,no
+astrophysical_parameters,logg_gspphot,ap_xp,yes,no
+astrophysical_parameters,mh_gspphot,ap_xp,yes,no
+astrophysical_parameters,distance_gspphot,gaia_source ap_xp,yes,no
+astrophysical_parameters,ag_gspphot,ap_xp,yes,no
+astrophysical_parameters,ebpminrp_gspphot,ap_xp,yes,no
+astrophysical_parameters,mass_flame,ap_xp,yes,no
+astrophysical_parameters,age_flame,ap_xp,yes,no
+astrophysical_parameters,evolstage_flame,ap_xp,yes,no
+astrophysical_parameters,flags_flame,ap_xp,yes,no
+astrophysical_parameters,classprob_dsc_combmod_quasar,gaia_source ap_class,yes,no
+astrophysical_parameters,classprob_dsc_combmod_galaxy,gaia_source ap_class,yes,no
+astrophysical_parameters,classprob_dsc_combmod_star,gaia_source ap_class,yes,no
+astrophysical_parameters,classprob_dsc_combmod_whitedwarf,,no,no
+astrophysical_parameters,classprob_dsc_combmod_binarystar,,no,no
+astrophysical_parameters,teff_gspspec,ap_rvs,yes,no
+astrophysical_parameters,logg_gspspec,ap_rvs,yes,no
+astrophysical_parameters,mh_gspspec,ap_rvs,yes,no
+astrophysical_parameters,flags_gspspec,ap_rvs,yes,no
+astrophysical_parameters,classlabel_espels,ap_emission,yes,no
+astrophysical_parameters,classlabel_espels_flag,,no,no
+astrophysical_parameters,teff_espucd,ap_xp,yes,no
+astrophysical_parameters,flags_espucd,ap_xp,yes,no
+vari_classifier_result,best_class_name,,no,no
+vari_classifier_result,best_class_score,,no,no
+vari_summary,in_vari_classification_result,,no,no
+vari_summary,in_vari_rrlyrae,vari_summary,yes,yes
+vari_summary,in_vari_cepheid,vari_summary,yes,yes
+vari_summary,in_vari_long_period_variable,vari_summary,yes,yes
+vari_summary,in_vari_eclipsing_binary,vari_summary,yes,yes
+vari_summary,in_vari_rotation_modulation,vari_summary,yes,yes
+vari_summary,in_vari_agn,vari_summary,yes,yes
+vari_summary,in_vari_microlensing,vari_summary,yes,yes
+vari_summary,in_vari_compact_companion,vari_summary,yes,yes

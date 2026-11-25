@@ -49,6 +49,12 @@ import os
 from pathlib import Path
 
 import numpy as np
+import importlib.util as _gau
+from pathlib import Path as _P
+
+_gas = _gau.spec_from_file_location("v2_gaia_assumptions", _P(__file__).resolve().parent / "gaia_assumptions.py")
+_GA = _gau.module_from_spec(_gas)  # Gaia release constants (2.60.6)
+_gas.loader.exec_module(_GA)
 import pandas as pd
 
 KNOWN = ("c1a", "c2", "c3b", "c4", "c8")
@@ -72,7 +78,8 @@ PI_QSO = (0.0007, 0.0037, 0.0056, 0.0077, 0.0011)
 MAG_COLUMNS = ("ls_r_mag", "pan_starrs1_dr2_meanobject__rMeanPSFMag", "sdss_dr18_photoobj__r", "gaia_dr3__phot_g_mean_mag")
 # Gaia DR3 sources per deg^2 of the training sky: median of the 200-region
 # fields at |b| > 30 deg away from the Clouds (2026-10-24 counts).
-RHO_REF = 5.0e3
+# 2.60.6: the value lives in gaia_assumptions.py, per Gaia release; RHO_REF is the DR3 one (benchmarks, stored features).
+RHO_REF = _GA.for_release("DR3").density_reference_deg2
 KNN = 10
 # W1, W2 AB - Vega (Jarrett et al. 2011)
 W1_AB_VEGA, W2_AB_VEGA = 2.699, 3.339
@@ -236,12 +243,19 @@ def local_density(df) -> np.ndarray:
     return rho_out
 
 
+def rho_ref(df) -> float:
+    """The reference Gaia density of the release the data set holds (``gaia_dr3__gaia_release``; none: DR3)."""
+    col = "gaia_dr3__gaia_release"
+    return _GA.for_values(df[col] if col in df else None).density_reference_deg2
+
+
 def density_prior(df, rho=None) -> np.ndarray:
-    """c1b: min(1, RHO_REF / local Gaia density) from the 10th Gaia neighbour;
+    """c1b: min(1, rho_ref / local Gaia density) from the 10th Gaia neighbour;
     NaN where it cannot be measured (no position, <= KNN Gaia sources in the search)."""
     rho = local_density(df) if rho is None else rho
+    ref = rho_ref(df)
     with np.errstate(divide="ignore", invalid="ignore"):
-        return np.where(np.isfinite(rho), np.maximum(np.minimum(1.0, RHO_REF / rho), 1e-4), np.nan)
+        return np.where(np.isfinite(rho), np.maximum(np.minimum(1.0, ref / rho), 1e-4), np.nan)
 
 
 def desi_wise_cut(df) -> np.ndarray:

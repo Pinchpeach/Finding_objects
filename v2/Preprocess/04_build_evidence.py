@@ -28,6 +28,7 @@ def _import_local(name):
 
 _V2 = Path(__file__).resolve().parents[1]
 TABLE_IO = _load("v2_table_io", _V2 / "Preprocess" / "table_io.py")
+GA = _load("v2_gaia_assumptions", _V2 / "Preprocess" / "gaia_assumptions.py")  # Gaia release constants (2.60.6)
 OTYPES = _load("v2_simbad_otypes_s4", _V2 / "Classifier" / "simbad_otypes.py")
 # SIMBAD-TYPE-001 through the otype hierarchy (2.22.0; the old exact-code map
 # missed every child type, e.g. BLL, Sy1, cC*, Mi*, and listed "Star", which
@@ -63,7 +64,7 @@ NIR_POINT = "_nir_bright_point_source"  # row key set in run() (nir_star.py)
 # when sigma_plx is small: with sigma = 1 mas any star beyond ~0.2 kpc passes.
 # Emitted for sigma_plx <= 0.3 mas (G <~ 19.5 in DR3; Lindegren+2021 A2)
 # (2.16.0; DESI benchmark 89.29 -> 89.50 %, SDSS unchanged).
-AST_EXT_MAX_PLX_ERR = 0.3
+AST_EXT_MAX_PLX_ERR = 0.3  # DR3 value; the live one is GaiaAssumptions.ext_max_parallax_error_mas (gaia_assumptions.py)
 
 
 def _r90_sky(ra, dec):
@@ -104,6 +105,7 @@ class CatalogFields:
 # Rows are materialized with only these plus derived/confidence columns, so a
 # rule reading a new raw field must list it here.
 RAW_FIELDS = {
+    "gaia_release",  # which Gaia release the row holds: selects its constants (gaia_assumptions.py)
     "fidelity_v2",
     "parallax",
     "parallax_error",
@@ -186,13 +188,8 @@ def cstar_sigma(src):
     c, x, g = num(src, "phot_bp_rp_excess_factor"), num(src, "bp_rp"), num(src, "phot_g_mean_mag")
     if None in (c, x, g):
         return None
-    if x < 0.5:
-        f = 1.154360 + 0.033772 * x + 0.032277 * x * x
-    elif x < 4.0:
-        f = 1.162004 + 0.011464 * x + 0.049255 * x * x - 0.005879 * x**3
-    else:
-        f = 1.057572 + 0.140537 * x
-    return abs(c - f) / (0.0059898 + 8.817481e-12 * g**7.618399)
+    ga = GA.for_values([src.get("gaia_release")])  # the release's own coefficients (DR3: Riello+2021)
+    return abs(c - ga.cstar_correction(x)) / ga.cstar_scatter(g)
 
 
 def _tag_cstar(out, rid, src):
@@ -406,8 +403,9 @@ def evaluate(rule, row, namespaced=frozenset()):
 
     if rid == "AST-EXT-001":
         p, e = num(src, "parallax"), num(src, "parallax_error")
-        if p is not None and e and 0 < e <= AST_EXT_MAX_PLX_ERR:
-            x = abs((p + 0.017) / e)
+        ga = GA.for_values([src.get("gaia_release")])
+        if p is not None and e and 0 < e <= ga.ext_max_parallax_error_mas:
+            x = abs((p + ga.parallax_offset_mas) / e)
             if x < float(rule["threshold"]):
                 hit("EXTRAGALACTIC", 1 - x / float(rule["threshold"]), x)
     elif rid == "AST-EXT-002":
