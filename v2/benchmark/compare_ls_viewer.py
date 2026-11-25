@@ -173,8 +173,8 @@ def main() -> None:
     got_bytes = []
     orig_read = dl._viewer_read
 
-    def counting_read(resp, limit=None):
-        body = orig_read(resp, limit)
+    def counting_read(resp, limit=None, **kw):  # passes on the cone's deadline (2.60.10 review, Codex)
+        body = orig_read(resp, limit, **kw)
         got_bytes.append(len(body))
         return body
 

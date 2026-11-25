@@ -134,7 +134,8 @@ jobs:
           d=$((RANDOM % 90)); echo "start delay $d s"; sleep $d
           python -u v2/pipeline.py --ra $RA --dec $DEC --radius $R --work /tmp/field
       - name: Ask a failed Legacy Surveys archive again once (2.60.10)
-        # Only desi_legacy, only when it failed or came from the viewer copy, only once, after 2 minutes: the Data Lab
+        # Only desi_legacy, only when it failed (a viewer-copy result is kept and counted in ls_source_regions: a
+        # failing retry would turn a usable result into a gate failure), only once, after 2 minutes: the Data Lab
         # outages of 2026-11-25 lasted minutes.  The collection summary is rewritten, so the gate below counts the
         # outcome of the retry; the gate itself is unchanged.  A healthy run asks nothing.
         continue-on-error: true
@@ -156,7 +157,7 @@ jobs:
           python -u .github/scripts/independent_truth_field.py compact /tmp/blind $RA $DEC $R $out objects_blind
           cp /tmp/blind/pipeline_summary.csv $out/ || true
           cp /tmp/field/raw/*/collection_summary_*.csv $out/collection_summary.csv || true
-      - name: Gaia source of this region (tap = ESA archive, vizier_fallback = VizieR copy; 2.60.4)
+      - name: Gaia and Legacy Surveys source of this region (tap = primary archive, *_fallback = copy; 2.60.4, 2.60.10)
         # The Gaia DR4 before/after comparison needs to know which Gaia this
         # look used: the ESA archive is down 2026-11-25 11:00 UTC to 12-02 and
         # the collector then falls back to the VizieR DR3 copy.  One word per
@@ -166,15 +167,23 @@ jobs:
           python - <<'PY'
           import glob, os
           import pandas as pd
-          files = sorted(glob.glob("/tmp/field/raw/*/gaia_dr3_ra*.csv"))
-          s = "none"
-          if files:
-              st = pd.read_csv(files[0], usecols=lambda c: c == "gaia_base_query_status", dtype=str, keep_default_na=False)
-              s = str(st.iloc[0, 0]) if len(st) and st.shape[1] else "empty"
+          def source(pattern, column, primary):
+              files = sorted(glob.glob(f"/tmp/field/raw/*/{pattern}"))
+              if not files:
+                  return "none"
+              st = pd.read_csv(files[0], usecols=lambda c: c == column, dtype=str, keep_default_na=False)
+              if st.shape[1] == 0:  # the primary source does not write the column
+                  return primary if len(pd.read_csv(files[0], nrows=1)) else "empty"
+              return str(st.iloc[0, 0]) if len(st) else "empty"
           d = f"/tmp/c/base/{os.environ['NAME']}"
           os.makedirs(d, exist_ok=True)
+          s = source("gaia_dr3_ra*.csv", "gaia_base_query_status", "tap")
           open(f"{d}/gaia_source.txt", "w").write(s + "\n")
           print("gaia source:", s)
+          # Legacy Surveys (2.60.10): the Data Lab TAP writes no status column; the viewer copy writes viewer_fallback
+          ls = source("desi_legacy_ra*.csv", "legacy_query_status", "tap")
+          open(f"{d}/ls_source.txt", "w").write(ls + "\n")
+          print("ls source:", ls)
           PY
       - name: Keep the blind input for the Gaia DR4 comparison (90 days; 2.60.4)
         # The blind raw catalogues and the truth of this region, so the same
@@ -187,7 +196,7 @@ jobs:
           d=/tmp/craw/$NAME; mkdir -p $d
           [ -d /tmp/blindraw ] && cp -r /tmp/blindraw $d/raw
           [ -d /tmp/truth ] && cp -r /tmp/truth $d/truth
-          cp /tmp/c/base/$NAME/field.json /tmp/c/base/$NAME/gaia_source.txt /tmp/c/base/$NAME/collection_summary.csv $d/ 2>/dev/null || true
+          cp /tmp/c/base/$NAME/field.json /tmp/c/base/$NAME/gaia_source.txt /tmp/c/base/$NAME/ls_source.txt /tmp/c/base/$NAME/collection_summary.csv $d/ 2>/dev/null || true
           tar -C /tmp/craw -czf /tmp/craw_$NAME.tar.gz $NAME
           ls -la /tmp/craw_$NAME.tar.gz
       - uses: actions/upload-artifact@v4
@@ -272,6 +281,7 @@ jobs:
           out = f"v2/benchmark/locked_c/{os.environ['V']}/run.json"
           run = json.load(open(out))
           src = collections.Counter((open(f).read().strip() or "empty") for f in glob.glob("/tmp/c/base/*/gaia_source.txt"))
+          ls_src = collections.Counter((open(f).read().strip() or "empty") for f in glob.glob("/tmp/c/base/*/ls_source.txt"))
           core = ["gaia_dr3", "desi_legacy", "panstarrs1", "allwise", "twomass"]
           fails, n = collections.Counter(), 0
           for f in glob.glob("/tmp/c/base/*/collection_summary.csv"):
@@ -281,6 +291,7 @@ jobs:
                   fails[c] += d.status.get(c, "missing") in ("error", "timeout", "missing")
           run["gaia_release"] = os.environ.get("V2_GAIA_RELEASE", "DR3")
           run["gaia_source_regions"] = dict(src)  # tap = ESA archive, vizier_fallback = VizieR copy
+          run["ls_source_regions"] = dict(ls_src)  # tap = Data Lab TAP, viewer_fallback = viewer copy (2.60.10)
           run["core_failed_regions"] = {c: int(fails[c]) for c in core}
           run["regions_with_summary"] = n
           json.dump(run, open(out, "w"), indent=1)

@@ -381,3 +381,54 @@ def test_fetch_gives_the_hedge_the_delay_of_the_cone(monkeypatch):
     seen.clear()
     ls.fetch(150.12, 2.2, 25.0)  # beyond the viewer's reach: no second path at all
     assert seen["hedge"] is None
+
+
+def test_the_viewer_deadline_holds_while_an_answer_streams(monkeypatch):
+    """2.60.10 review (Codex): the cone's VIEWER_BUDGET_S is checked while a slow answer streams in, and a last tile
+    that finishes late is not accepted."""
+    import time as _t
+
+    class _Slow(_Resp):
+        closed = False
+
+        def iter_content(self, chunk_size=1):
+            for _ in range(5):
+                yield b"x" * 10
+
+        def close(self):
+            self.closed = True
+
+    r = _Slow(b"")
+    with pytest.raises(TimeoutError, match="while reading"):
+        ls._viewer_read(r, deadline=_t.monotonic() - 1.0)
+    assert r.closed
+    assert len(ls._viewer_read(_Slow(b""), deadline=_t.monotonic() + 60.0)) == 50
+
+    # one tile, answered (empty box) but only after the budget: rejected after the loop
+    clock = iter([0.0, 0.0, 500.0, 500.0, 500.0])
+    monkeypatch.setattr(_t, "monotonic", lambda: next(clock, 500.0))
+    monkeypatch.setattr("requests.get", lambda *a, **k: _Resp(b"No catalog sources in layer and RA,Dec box"))
+    with pytest.raises(TimeoutError, match="tiles not done"):
+        ls._viewer_fetch(150.12, 2.2, 5.0)
+
+
+def test_the_retry_budget_fits_the_viewer_of_large_cones():
+    """2.60.10 review (Codex): a retry, or a search after a remembered failure, gets RETRY_BUDGET_S (90 s), which a
+    20' cone's viewer tiles cannot meet; such cones get the hedge delay plus the tiles' budget."""
+    south = (150.12, 2.2)  # COSMOS: DR10 South
+    assert ls.retry_budget_s(*south, 10.0) == ls.RETRY_BUDGET_S
+    big = ls.retry_budget_s(*south, 20.0)
+    assert big >= ls.hedge_delay_s(20.0) + ls.VIEWER_BUDGET_S and big <= 300.0  # inside the controller's budget
+    assert ls.retry_budget_s(185.0, 45.0, 20.0) == ls.RETRY_BUDGET_S  # DR9 North: no viewer, the short retry
+
+
+def test_the_controller_sizes_retry_budgets_by_the_cone(monkeypatch):
+    import importlib.util
+
+    root = Path(__file__).resolve().parents[2] / "Get_data"
+    spec = importlib.util.spec_from_file_location("v2_controller_budget_t", root / "controller.py")
+    ctl = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(ctl)
+    assert ctl._budget("desi_legacy", 300.0, retry=True) == ls.RETRY_BUDGET_S  # no cone given: the fixed one
+    assert ctl._budget("desi_legacy", 300.0, retry=True, cone=(150.12, 2.2, 20.0)) == ls.retry_budget_s(150.12, 2.2, 20.0)
+    assert ctl._budget("desi_legacy", 300.0, retry=False, cone=(150.12, 2.2, 20.0)) == 300.0  # a fresh search: unchanged
