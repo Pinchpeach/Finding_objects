@@ -205,3 +205,35 @@ def test_stage4_refuses_dr4_rows_instead_of_using_dr3_zero_point():
     assert dr3 == s4.cstar_sigma({**src, "gaia_release": "DR3"})
     with pytest.raises(LookupError):
         s4.cstar_sigma({**src, "gaia_release": "DR4"})
+
+
+def test_dr4_check_fails_on_an_unverified_or_different_reference_epoch(capsys):
+    """2.60.6 review (Codex): the DR4 preflight must not pass when ref_epoch differs from gaia_release.py or cannot
+    be read, because the collector stamps that epoch on every row and Stage 1 propagates proper motions with it."""
+    import json
+    from types import SimpleNamespace
+
+    import check_gaia_release as chk
+
+    draft = json.loads(chk.DRAFT.read_text(encoding="utf-8"))
+
+    class FakeGaia:
+        def __init__(self, epoch):
+            self.epoch = epoch
+
+        def load_table(self, name):
+            schema, t = name.split(".", 1)
+            if schema != "gaiadr4" or t not in draft:
+                raise KeyError(name)
+            cols = list(draft[t]) + (chk.NEEDED_DR3_COLUMNS + ["tentative_parallax_bias"] if t == "gaia_source" else [])
+            return SimpleNamespace(columns=[SimpleNamespace(name=c) for c in cols])
+
+        def launch_job(self, q):
+            if self.epoch is None:
+                raise RuntimeError("TAP down")
+            return SimpleNamespace(get_results=lambda: {"ref_epoch": [self.epoch]})
+
+    assert chk.check_dr4(FakeGaia(gr.RELEASES["DR4"].ref_epoch), None) is False  # all present, epoch agrees
+    assert chk.check_dr4(FakeGaia(2016.0), None) is True  # DR3's epoch: rows would be propagated wrongly
+    assert chk.check_dr4(FakeGaia(None), None) is True  # epoch not verified
+    capsys.readouterr()

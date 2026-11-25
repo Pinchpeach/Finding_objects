@@ -135,11 +135,16 @@ def check_dr4(Gaia, schema: str | None) -> bool:
         print(f"  {c:38s} {', '.join(ts) if ts else '-'}")
         if not ts and c in NEEDED_DR3_COLUMNS:
             bad = True
+    # The collector stamps every row with gaia_release.py's epoch, not the archive's, and Stage 1 propagates proper
+    # motions with it: an epoch that differs or cannot be read fails the check, as on the DR3 path (2.60.6 review).
     try:
         r = Gaia.launch_job(f"SELECT TOP 1 ref_epoch FROM {used}.gaia_source").get_results()
-        print(f"\nref_epoch on the archive: {float(r['ref_epoch'][0])} (gaia_release.py: {RELEASES['DR4'].ref_epoch})")
+        ep = float(r["ref_epoch"][0])
+        print(f"\nref_epoch on the archive: {ep} (gaia_release.py: {RELEASES['DR4'].ref_epoch})")
+        bad |= abs(ep - RELEASES["DR4"].ref_epoch) > 1e-6
     except Exception as exc:
         print("\nref_epoch query failed:", str(exc)[:120])
+        bad = True
     for sc in ("gaiadr3", "gaiaedr3"):
         try:
             n = len(_meta(Gaia, f"{sc}.gaia_source"))
