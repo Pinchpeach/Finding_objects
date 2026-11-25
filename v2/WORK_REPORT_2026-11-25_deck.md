@@ -57,3 +57,35 @@
 ## 5. 개요와 저장소의 불일치
 
 찾지 못했다. 덱에 쓴 수치를 저장소와 대조한 것: 수집기 30(`controller.COLLECTORS`), 규칙 35와 규칙군별 9/12/4/2/3/2/3(`classification_rules.csv`의 rule_id), 요약 열 29(`summary.COLUMNS`), 작업자 6, 스택(`app/requirements.txt`, `packaging/requirements-build.txt`, spec의 `excludes=["sklearn", ...]`, `Preprocess/*.npz`를 numpy로 읽음, `build-app.yml`의 3개 OS와 smoke test). 참고 두 가지(불일치는 아님): ① 개요의 "307 tests at 2.60.2"는 2.60.2 시점 값이고 지금은 326개다(덱도 "at 2.60.2"로 적음). ② 10쪽 막대의 "6–7 %"는 높이 6.5로 그렸다.
+
+## 6. 병합 전 검토 (코드 개발 세션)
+
+검토·계획 세션이 물은 네 가지와, 검토 중 찾은 한 가지를 처리했다. PDF 12쪽을 모두 그림으로 뽑아 다시 보았다.
+
+### 6.1 고친 것
+
+- **근적외선(2MASS)이 표지에서 빠져 있었다.** 2MASS는 1차 분류에도 쓰인다. `nir_star.py`(2.41.0)는 Ks < 13의 깨끗한 2MASS 점광원을, 다른 근거가 없거나 근거가 STAR와 충돌할 때 STAR로 정한다(`05_likelihood_vectors.py`의 `nir_i` 분기). 그런데 표지 대역 목록에는 근적외선 줄이 없었고, 5쪽 결론 상자는 광학·WISE·Gaia만 분류를 정한다고 적었다.
+  - 표지에 "Near-infrared: 2MASS; bright point sources are STAR when other evidence is missing"를 파랑으로 넣었다.
+  - 5쪽 결론에 "bright 2MASS point sources are a fallback for stars"를 넣었다.
+  - 대안으로 회색(태그용)으로 두는 것을 생각했지만 버렸다. 코드가 실제로 라벨을 정하므로 회색은 틀린 말이 된다.
+  - 일곱 줄이 들어가도록 표지 대역 칸 높이를 0.64 → 0.56인치, 간격을 0.10 → 0.08인치로 줄였다. 범례와 주석이 바닥글과 겹치지 않는 것을 렌더로 확인했다.
+- **5쪽 "X-ray, radio and UV are used for tags and sub-types" 문장.** 규칙표(6쪽)에는 전파·X선 규칙이 2행 있다. 그래서 "태그에만 쓴다"는 말은 규칙표와 어긋난다. 측정에 맞춰 "X-ray and radio changed no label (0 / 0): with UV they serve tags and sub-types"로 바꿨다.
+- **CI에서 덱·개요 시험이 건너뛰어지던 문제.** `test-preprocess.yml`이 reportlab·python-pptx·pypdf를 깔고, `v2/document/**`와 `README.md`가 바뀔 때도 돌게 했다. 덱과 개요 시험은 `v2/Preprocess/tests`에 있는데, 문서만 바꾸는 변경에서는 CI가 아예 돌지 않았다. 세 패키지는 순수 Python이라 설치 시간이 짧다. LibreOffice는 시험에 필요 없다(PDF 시험은 커밋된 파일을 읽기만 한다).
+
+### 6.2 그대로 둔 것과 이유
+
+- **표지에서 "Astrometry"를 파랑으로 칠한 것.** 제거 실험에서 Gaia 천체측정은 이 표본들에서 유의하지 않았다(2/4, 0/0). 하지만 10σ 운동 규칙은 다른 근거를 이기는 결정 규칙이다(6쪽 "Deterministic motion"). 5쪽 읽기 칸도 "few labels change here; decisive when significant"라고 적었으므로 범례 "decides the coarse class"와 어긋나지 않는다.
+- **옛 덱 세 파일(v2.44.0)은 남긴다.** 2.36.1 개요와 같은 처리다. README 15절과 `v2/document/README.md`에 "갱신하지 않았고 수치가 낡았다"는 표시가 있고, 그때의 발표 기록이다. 지우는 일은 되돌릴 수는 있지만 사용자가 정할 일이다.
+
+### 6.3 세트 C 점수가 바뀔 때
+
+9쪽 성능 표의 세트 C 행(`deck_content.py`의 PERFORMANCE)은 개요 표에서 읽지 않고 덱에 직접 적혀 있다. 그래서 `overview_content.py`만 고치면 덱은 갱신되지 않는다.
+- 개요에서 99.65 %가 사라지면 `test_every_figure_of_the_deck_is_in_the_overview`가 실패한다. 이 시험이 덱만 낡는 것을 잡는다.
+- `test_pptx_builds_reproducibly...`에는 "99.65 %"가 고정되어 있어 이것도 바꿔야 한다.
+- 따라서 순서는 세 파일(`overview_content.py`, `deck_content.py`, 시험)을 고친 뒤 `build_overview.py`와 `build_deck.py`를 둘 다 다시 돌리는 것이다. 다음 세트 C 기록(2.60.5)에서 그렇게 한다.
+
+### 6.4 확인
+
+- 시험 326개 통과(덱 시험 7개는 건너뛴 것 없이 실행됨).
+- `build_overview.py --check` 통과(README 변화 없음).
+- 다시 만든 PDF의 1쪽과 5쪽을 눈으로 확인했다(넘침·겹침 없음).

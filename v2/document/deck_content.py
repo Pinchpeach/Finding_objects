@@ -49,6 +49,9 @@ TITLE = {
     "bands": [
         ("Radio", "LoTSS · FIRST · NVSS · TGSS · VLASS", False),
         ("Mid-infrared", "AllWISE", True),
+        # 2MASS decides only as a fallback (nir_star.py, 2.41.0): a bright clean point source is STAR
+        # when the other evidence is absent or conflicts with STAR.
+        ("Near-infrared", "2MASS; bright point sources are STAR when other evidence is missing", True),
         ("Optical", "Pan-STARRS1 · Legacy Surveys · SDSS", True),
         ("Astrometry", "Gaia DR3 parallax, proper motion, DSC", True),
         ("UV", "GALEX", False),
@@ -194,8 +197,9 @@ DECIDES = {
     "legend_right": "labels that become right without it",
     "scale_note": "Numbers are right / wrong. Bar length is scaled within each column (the two samples differ in size).",
     "takeaway": (
-        "**Optical colour and morphology, WISE mid-infrared and Gaia astrometry / DSC decide the class.** "
-        "X-ray, radio and UV are used for tags and sub-types."
+        "**Optical colour and morphology, WISE mid-infrared and Gaia astrometry / DSC decide the class;** "
+        "bright 2MASS point sources are a fallback for stars. X-ray and radio changed no label (0 / 0): "
+        "with UV they serve tags and sub-types."
     ),
 }
 

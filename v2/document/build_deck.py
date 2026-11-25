@@ -268,7 +268,7 @@ def slide_title(prs):
     # right: the bands collected, coloured by whether they decide the coarse class
     bx, bw = 8.25, 4.45
     text(s, bx, 0.7, bw, 0.3, T["bands_title"], size=14, bold=True)
-    y, bh, gap = 1.15, 0.64, 0.1
+    y, bh, gap = 1.15, 0.56, 0.08  # seven bands (near-infrared added) above the legend
     for label, detail, decides in T["bands"]:
         rect(s, bx, y, bw, bh, fill=BLUE if decides else CARD, line=None if decides else LINE)
         text(s, bx + 0.2, y, 1.5, bh, label, size=14, bold=True, color=WHITE if decides else INK, anchor="m")
