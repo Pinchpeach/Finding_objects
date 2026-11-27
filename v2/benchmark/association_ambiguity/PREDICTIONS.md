@@ -78,3 +78,31 @@ The 330 SDSS rows v1 split from their Legacy Surveys / PS1 object lie 0.55'' (me
 galaxies and their centroids are photon-noise limited, which the 45 mas figure does not cover.  v3 is the version under test from here on; the
 confirmation fields are run with v3 only.  The low-latitude `a_all` run that was in progress when v2 and v3 were written was deleted and
 restarted from scratch with v3.
+
+## Calibration results against the predictions, and the confirmation plan (written before any confirmation set is run)
+
+Calibration = COSMOS fields 1-9, the 169 blind low-latitude cones (150 sample quasars) and the 15 low-latitude cones with a spectral-class QSO
+object (the calibration part of the 32).  Final code (`profiles` v3).
+
+| prediction | calibration result | verdict |
+|---|---|---|
+| 1 size, 55-60 % of resolving ambiguities and 15-17 % of AllWISE / GALEX ones resolved by `same`+`nearest` | Stage 1: 908 ambiguous rows of fields 1-9 fall to 539 (-369, cascade); joins 24 AllWISE, 25 GALEX, 3 2MASS (predicted 22, 26, 3) | held |
+| 2 false rate within +0.1 pp, missed down | AllWISE false 2.69 -> 2.67 %, missed 41.7 -> 40.7 % (-1.0 pp, interval -1.4 to -0.7); GALEX false 4.99 -> 4.76 %, missed 93.8 -> 93.3 %; 0 new false links | held |
+| 2 `best`: AllWISE missed -2 to -4 points, GALEX -6 to -10, GALEX false +0.3 to +0.8 | AllWISE missed -6.5 pp (more than predicted, 0 false), GALEX missed -5.3 pp, GALEX false +0.10 pp (6 wrong of 101 known joins, interval -0.5 to +0.9) | magnitudes off: `best` gains more on AllWISE and less on GALEX than predicted |
+| 3 fragments down, no new merge | extra one-catalogue objects 867 -> 817 (`same`+`nearest`), 818 truth sources with fragments -> 782; merged objects 16 / 3 unchanged | held |
+| 4 `profiles` changes < 0.2 % of rows | v1 failed (above); v3: new objects +3, matched +22, COSMOS association numbers and fragments unchanged | held for v3 |
+| 5 `spectra` brings held spectroscopic QSOs from 5/32 to <= 2/32; `same` and `nearest` alone remove at most one of the five | calibration part: 3 of 14 held without a fix; `spectra`, `same`+`nearest` and `all` each hold 0 of 14 | first half held, **second half wrong**: `same`+`nearest` alone also release all three |
+| 6 low-latitude recall does not fall, false density does not rise | blind 169: sample quasars labelled QSO 86 -> 88 (`same`+`nearest`) -> 91 (`all`) of 150; QSO objects that are not the sample quasar 170 -> 164 -> 160 (positions matched: 12 / 16 lost, 6 / 6 gained) | held |
+| 7 shuffle differences 0 | 0 object differences and 0 status changes for `all` and `best` on two COSMOS fields and one spectroscopic cone, seeds 1-3 | held |
+| 8 Stage 1 time within 3 % | 190-208 s for 178 regions in every variant (base 197 s) | held |
+| primary labels change on < 0.3 % of objects | `same`+`nearest` and `all`: 58 of 85 770 objects (0.07 %), all to GALAXY (STAR 23, UNKNOWN 35), QSO labels 89 -> 89; truth-matched 25 943: 2 fixed, 1 broken (McNemar p = 1); `best`: 186 changed, 4 fixed, 10 broken (p = 0.18) | held |
+
+**Confirmed on the confirmation sets (once, final code, nothing tuned afterwards):** `all` (= `profiles`, `spectra`, `same`, `nearest`), `same`+`nearest` (to separate
+`profiles`, which is neutral on COSMOS but adds three quasars at low latitude) and, as the literature reference, `best`.  COSMOS fields 10-26 get the full pipeline for
+`base`, `same`+`nearest`, `all`, `best`; the 140 blind low-latitude confirmation cones `same`+`nearest` and `all` against the existing `base`; the 17 low-latitude
+confirmation cones with a spectral-class QSO object `base`, `same`+`nearest`, `spectra`, `all` with each survey switch.
+
+Point predictions for the confirmation, from the calibration per row (fields 10-26 hold 1.9 times the rows of fields 1-9): `same`+`nearest` newly joined AllWISE rows
+40 +- 15, GALEX 35 +- 15, no known-false join (upper bound 3); AllWISE missed -0.8 to -1.2 pp, GALEX -0.3 to -0.7 pp; extra fragment objects -70 to -110;
+labels changed 100 to 150 objects (0.07 % of ~165 000), QSO labels unchanged +- 2.  Low latitude: sample quasars labelled QSO +1 to +4 of 140 for `all`, false QSO
+objects not above the base; spectroscopic QSO objects held by `surveys2` / `surveys3` without a fix 0-5 of 17, with any variant 0 of 17.  The adoption rule above is unchanged.
