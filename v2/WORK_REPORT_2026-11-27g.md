@@ -139,3 +139,24 @@
 - 코드: `Classifier/truth/{deterministic,build_independent_truth_sets}.py`, `Classifier/{validate_independent_truth_sets,aggregate_independent_truth}.py`, `Classifier/calibration/fit_axis_calibration.py`, `.github/workflows/v2_scientific_cross_validation.yml`, `.github/scripts/push_with_retry.sh`.
 - 표와 도구: `Classifier/validation/reproducibility/`(README, `history_table.py`, `refit_check.py`, `ci_test_inventory.py`, `models_history.csv`, `sample_history.csv`, `sample_states.csv`, `exact_match_range.csv`, `refit_check.csv`, `ci_test_inventory.csv`).
 - 문서: `Classifier/truth/README.md`(동결 절차), `ALGORITHM.md`(`models.json` 출처).
+
+## 10. 병합 전 검토 (2.62.0으로 병합)
+
+작업 세션의 2.61.9 후보(e1f9f3c)에 하나를 더하고 판을 올렸다. 2.61.8(#93)을 squash 병합한 뒤 main 위에 이 브랜치를 합쳤다. 남은 변경은 d75b030..e1f9f3c의 변경과 줄 단위로 같다(CHANGELOG 행 순서만 다름).
+
+1. **`models.json`을 411ba89 직전 판(e19159e)으로 되돌렸다**(검토 세션 권고). 그래서 MINOR다. 주 라벨과 high_confidence는 그대로이고 `variability_reliability` 열만 바뀐다.
+   - 숫자: RR Lyrae 계수 0.309 → 1.366(양성 26 → 32, n 215 → 221). 점수 0.9의 신뢰도는 0.153 → 0.358이다. LPV 계수는 3.034 → 3.181이지만 점수 0.9의 신뢰도는 0.866으로 같다. PULSATING 항목(withheld)이 다시 들어가고, SOS RR Lyrae 규칙 n은 201 → 196이다.
+   - 근거: `sample_history.csv`를 보면 411ba89 실행에서 RR Lyrae 정답 집합이 바뀌었다(250개 중 115개만 이전 집합). 같은 실행에서 AGB 수집기가 VizieR 404를 받았다. 그날 VizieR 스트라스부르는 모든 요청에 404였고(2.61.6 보고서), 미러가 바뀌면 `row_limit`만 있는 질의가 다른 행을 준다는 이 보고서의 진단과 맞는다.
+   - e19159e의 RR Lyrae 집합(06c4b5c93f)은 25번의 봇 커밋 중 17번, LPV 집합(0cd45dd292)은 14번 나온 가장 흔한 상태다. 계수 1.366 / 3.181도 연속한 봇 커밋 여러 번에서 같은 값이다.
+   - 작업 세션은 "입력 근거 없이 역사 속 한 상태를 고르는 일"이라며 되돌리지 않았다(§6). 그 지적은 맞다. 그래도 장애 실행의 값을 다음 재적합까지 쓰는 것보다 낫다고 봤다. 이 값도 동결 목록 위 재적합(§7의 ③)이 대신한다.
+   - **배포 앱 v2.60.2의 `models.json`**(태그 v2.60.2, 앱은 `Classifier/`를 통째로 포함)은 또 다른 날의 표본이다: RR Lyrae 1.307 / −2.080, LPV 2.627 / −0.598, MIRA는 platt 계수 0.0(상수)이다. 다음 릴리스 노트에 "변광 축 신뢰도 보정이 그날의 정답 표본에서 나왔다"고 적을 일이다.
+2. **`PUSH_PREFER=ours`의 범위.** 이 워크플로의 "Commit validation products" 단계에만 걸린다. 같은 스크립트를 쓰는 다른 워크플로 42곳은 변수를 주지 않으므로 기본 동작(`-X` 없음)이 그대로다.
+   - 이 단계의 커밋에는 이 실행이 통째로 다시 쓰는 세 경로만 들어 있다(`independent_truth/`, `REAL_SAMPLE_VALIDATION.md`, `real_sample_validation.csv`). rebase는 이 커밋만 다시 얹으므로 `-X theirs`가 고르는 충돌도 이 파일들뿐이다.
+   - 같은 ref의 실행은 줄을 서고(`cancel-in-progress: false`) 시작 순서대로 끝나므로, 충돌에서 이기는 것은 나중 트리거의 산출물이다.
+3. **커버리지 허용치 0.05.** 근거가 약하다는 데 동의한다. 동결 뒤 CDS가 정상인 날 기준선을 3번 재고, 클래스별 분류 비율의 변동폭을 보고 정하는 것을 권한다(예: 관측 최대 폭의 2배). 지금 값은 기준선 파일에 함께 기록되므로(`tolerance`) 바꿀 때 코드를 고치지 않아도 된다.
+4. **동결 전 실행의 부담.** `truth/fixed/`가 커밋될 때까지는 경로 조건에 맞는 main push마다 UNFROZEN 실행이 표 전체를 질의한다(ASAS-SN II/366 유형별, Asiago B/sn/sncat 등; 예전에는 `row_limit=250`). `prepare`의 제한은 60분이다. CDS 장애가 길면 이 단계가 시간 초과로 끝날 수 있으니 동결(§7의 ①)을 먼저 하는 편이 낫다.
+5. **`real_sample_validation`**은 OK/DEGRADED 판정에 들어가지 않는다(§6에 적힘). 2.61.4 재생성에서 바뀐 것도 SIMBAD 접속 오류 문구뿐이었다. 그 수집 오류도 DEGRADED에 넣을지는 다음 과제 후보다.
+6. **`app/tests`는 어느 워크플로도 돌리지 않는다**(`ci_test_inventory.csv`로 확인). 이 PR에서는 넣지 않았다(검토 세션이 따로 정함).
+7. **확인**: 전체 시험 539개 통과. 워크플로의 새 "Unit tests" 단계와 같은 명령(저장소 루트에서 `python -m pytest -q v2/Classifier/tests`)은 97개 통과다. 2.61.7의 `unittest.SkipTest` 처리는 pytest로 바뀐 뒤에는 쓰이지 않지만 해가 없어 두었다.
+8. **정정(이 세션의 2.61.4 후속 보고)**: 411ba89의 `models.json` 변화를 "LPV 계수 재적합"이라고만 보고했다. 같은 커밋에서 RR Lyrae 계수가 1.366 → 0.309로 크게 바뀐 것을 놓쳤다(diff를 앞부분만 읽었다). 이 보고서 §3의 진단이 맞다.
+
