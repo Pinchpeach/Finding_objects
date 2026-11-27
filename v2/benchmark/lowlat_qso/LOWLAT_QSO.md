@@ -160,4 +160,9 @@ Checked against the committed tables (`results_2026-11-27/`) and the code; nothi
    A region without a record used to drop its quasars from every denominator silently; they are now `REGION_MISSING` in
    `per_truth.csv`, still in no denominator (they were not measured), counted in a `coverage` row of `recall_summary.csv` and in
    `coverage.json` (copied into the workflow's `run.json`), and the score log prints `INCOMPLETE` with the missing regions.  A run where no quasar has a counterpart (every region
-   empty) no longer stops at the summary: the per-object columns are added as missing values before grouping.
+   empty) no longer stops at the summary: the per-object columns are added as missing values before grouping.  A region classified without a key archive (Gaia, PS1,
+   Legacy Surveys or AllWISE: a failed query or time-out, not an empty answer) is now reported: the pipeline's
+   `run_archives_status` / `run_archives_missing` are kept in the compact record (for a region without rows the copied
+   collection summary is read), `regions.csv` has them per region, and `coverage.json` counts those regions and their quasars
+   (`degraded`; the score log prints `DEGRADED`).  The 2026-11-27 run predates this: its records were compacted without those
+   columns, and Section 3 states the collection outcome (Legacy Surveys timed out in 4 regions, asked again, answered with 0 rows).

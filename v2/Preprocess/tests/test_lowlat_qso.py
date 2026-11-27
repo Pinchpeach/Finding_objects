@@ -153,7 +153,9 @@ def test_empty_region_and_missing_region(tmp_path):
     assert T.loc["q2", "label"] == "NO_OBJECT" and T.loc["q2", "cause"] == "no_object"
     assert T.loc["q3", "label"] == S.MISSING and T.loc["q3", "cause"] == "region_missing"
     cov = S.coverage(res)
-    assert cov == dict(regions=3, regions_missing=1, quasars=3, quasars_not_scored=1, missing_regions=["r3"], complete=False)
+    assert {k: cov[k] for k in ("regions", "regions_missing", "quasars", "quasars_not_scored", "missing_regions", "complete")} == \
+        dict(regions=3, regions_missing=1, quasars=3, quasars_not_scored=1, missing_regions=["r3"], complete=False)
+    assert cov["archive_status_regions"] == {"unknown": 2} and not cov["degraded"]  # no archive record in these fixtures
     tabs = S.summarise(res)
     rs = tabs["recall_summary"].set_index(["by", "bin"])
     assert rs.loc[("all", "all"), "n"] == 1 and rs.loc[("all", "all incl. no object"), "n"] == 2
@@ -177,6 +179,39 @@ def test_summary_when_no_quasar_has_an_object(tmp_path):
     rs = tabs["recall_summary"].set_index(["by", "bin"])
     assert rs.loc[("all", "all"), "n"] == 0 and rs.loc[("all", "all incl. no object"), "n"] == 1
     assert S.coverage(res)["complete"]
+
+
+def test_regions_that_lost_a_key_archive_are_reported(tmp_path):
+    """A failed key archive (a query error or time-out, not an empty answer) marks the run DEGRADED: from the pipeline's
+    run_archives_status column, or from the copied collection summary for a region without rows."""
+    truth = pd.DataFrame(
+        dict(sample=["huo"] * 3, name=["q1", "q2", "q3"], ra=[150.0, 160.0, 170.0], dec=[2.0] * 3, l=[100.0] * 3,
+             b=[-12.0] * 3, z=[1.0] * 3, imag=[18.0] * 3, ebv=[0.1] * 3, cls=["qso"] * 3, also_in=[""] * 3)
+    )  # fmt: skip
+    regions = pd.DataFrame(dict(name=["r1", "r2", "r3"], stratum=["b10-15"] * 3, kind=["qso"] * 3, ra=[150.0, 160.0, 170.0],
+                                dec=[2.0] * 3))  # fmt: skip
+    _write_region(tmp_path, "r1", [dict(object_id="O1", ra=150.0, dec=2.0, primary_class="QSO",
+                                        run_archives_status="complete", run_archives_missing="")])  # fmt: skip
+    _write_region(tmp_path, "r2", [dict(object_id="O2", ra=160.0, dec=2.0, primary_class="STAR",
+                                        run_archives_status="key_archives_missing",
+                                        run_archives_missing="panstarrs1:timeout")])  # fmt: skip
+    (tmp_path / "r3").mkdir()
+    pd.DataFrame(columns=["object_id", "ra", "dec", "catalogs", "primary_class", "run_archives_status"]).to_csv(
+        tmp_path / "r3" / "objects.csv.gz", index=False)
+    pd.DataFrame(dict(collector=["gaia_dr3", "allwise", "desi_legacy", "lotss"], status=["ok", "timeout", "empty", "error"])).to_csv(
+        tmp_path / "r3" / "collection_summary.csv", index=False)  # fmt: skip
+    res = S.score_regions(regions, truth, tmp_path, radius_arcmin=3.0)
+    R = res["per_region"].set_index("name")
+    assert R.loc["r1", "archives_status"] == "complete"
+    assert R.loc["r2", "archives_status"] == "key_archives_missing"
+    assert R.loc["r3", "archives_status"] == "key_archives_missing"  # allwise timed out; an empty LS answer is not a failure
+    assert R.loc["r3", "archives_missing"] == "allwise:timeout|lotss:error"
+    cov = S.coverage(res)
+    assert cov["complete"] and cov["degraded"]
+    assert cov["regions_key_archive_missing"] == 2 and cov["quasars_in_those_regions"] == 2
+    assert cov["key_archive_missing"] == {"r2": "panstarrs1:timeout", "r3": "allwise:timeout|lotss:error"}
+    rs = S.summarise(res)["recall_summary"]
+    assert rs[rs.by == "coverage"].n.tolist() == [0, 2]
 
 
 def test_region_draw_is_deterministic_and_non_overlapping():
