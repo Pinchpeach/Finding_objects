@@ -1,0 +1,6 @@
+set,detections,ambiguous,clear_distance,clear_nsep,same_object,nearest_not_best,ambiguous_pct,clear_distance_pct_of_ambiguous,clear_nsep_pct_of_ambiguous,same_object_pct_of_ambiguous
+cosmos_new17,208500,1534.0,157.0,0.0,716.0,227.0,0.74,10.2,0.0,46.7
+cosmos_orig9,108932,908.0,78.0,0.0,413.0,120.0,0.83,8.6,0.0,45.5
+lowlat_cal,271636,906.0,81.0,0.0,186.0,174.0,0.33,8.9,0.0,20.5
+lowlat_cal_contam,29180,58.0,2.0,0.0,9.0,22.0,0.2,3.4,0.0,15.5
+lowlat_conf,236486,892.0,81.0,0.0,213.0,176.0,0.38,9.1,0.0,23.9

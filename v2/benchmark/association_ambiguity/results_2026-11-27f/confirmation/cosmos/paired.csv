@@ -1,0 +1,10 @@
+variant,catalog,d_false_pp,d_false_ci,d_missed_pp,d_missed_ci
+same_nearest,AllWISE,-0.017,-0.024 to -0.010,-1.173,-1.579 to -0.829
+same_nearest,2MASS PSC,-0.001,-0.002 to 0.000,-6.923,-12.857 to 0.000
+same_nearest,GALEX AIS,-0.277,-0.454 to -0.137,-1.039,-1.557 to -0.388
+all,AllWISE,-0.015,-0.022 to -0.008,-1.173,-1.593 to -0.815
+all,2MASS PSC,-0.001,-0.002 to 0.000,-6.923,-12.857 to 0.000
+all,GALEX AIS,-0.259,-0.442 to -0.113,-0.932,-1.436 to -0.281
+best,AllWISE,0.005,-0.112 to 0.140,-6.975,-8.188 to -5.953
+best,2MASS PSC,-0.001,-0.002 to 0.000,-6.923,-12.857 to 0.000
+best,GALEX AIS,0.427,-0.182 to 1.108,-6.865,-9.180 to -4.762

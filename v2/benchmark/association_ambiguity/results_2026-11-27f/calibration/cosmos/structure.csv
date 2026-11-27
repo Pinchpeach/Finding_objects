@@ -1,0 +1,6 @@
+variant,fields,objects,merged_gt1,merged_gt2,top_level_objects,truth_sources,truth_with_fragments,extra_fragment_objects
+base,9,86179,16,3,83782,13677,818,867
+same_nearest,9,85817,16,3,83754,13677,782,817
+profiles,9,86157,16,3,83777,13677,821,865
+best,9,85293,16,3,83630,13677,707,721
+all,9,85816,16,3,83753,13677,785,818

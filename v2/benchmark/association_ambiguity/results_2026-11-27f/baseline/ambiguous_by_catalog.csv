@@ -1,0 +1,87 @@
+set,catalog,detections,ambiguous,clear_distance,clear_nsep,same_object,nearest_not_best,median_candidates,ambiguous_pct,clear_distance_pct_of_ambiguous,clear_nsep_pct_of_ambiguous,same_object_pct_of_ambiguous,nearest_not_best_pct_of_ambiguous
+cosmos_new17,2MASS PSC,948,4.0,1.0,0.0,2.0,0.0,3.0,0.42,25.0,0.0,50.0,0.0
+cosmos_new17,AllWISE,7483,261.0,9.0,0.0,1.0,20.0,2.0,3.49,3.4,0.0,0.4,7.7
+cosmos_new17,Chandra CSC 2.0,810,18.0,0.0,0.0,6.0,6.0,3.0,2.22,0.0,0.0,33.3,33.3
+cosmos_new17,DESI Legacy Surveys DR10,151368,420.0,119.0,0.0,184.0,21.0,3.0,0.28,28.3,0.0,43.8,5.0
+cosmos_new17,FIRST,51,6.0,0.0,0.0,3.0,0.0,2.5,11.76,0.0,0.0,50.0,0.0
+cosmos_new17,GALEX AIS,2116,201.0,2.0,0.0,82.0,52.0,3.0,9.5,1.0,0.0,40.8,25.9
+cosmos_new17,Gaia DR3,2047,1.0,1.0,0.0,1.0,0.0,2.0,0.05,100.0,0.0,100.0,0.0
+cosmos_new17,Galaxy Zoo DESI,265,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,
+cosmos_new17,NVSS,30,16.0,0.0,0.0,0.0,5.0,3.0,53.33,0.0,0.0,0.0,31.2
+cosmos_new17,Pan-STARRS1 DR2 MeanObject,30089,4.0,1.0,0.0,2.0,0.0,2.0,0.01,25.0,0.0,50.0,0.0
+cosmos_new17,SDSS DR18 PhotoObj,12728,540.0,23.0,0.0,414.0,112.0,3.0,4.24,4.3,0.0,76.7,20.7
+cosmos_new17,SGA-2020,89,5.0,1.0,0.0,5.0,0.0,6.0,5.62,20.0,0.0,100.0,0.0
+cosmos_new17,TGSS ADR1,12,2.0,0.0,0.0,2.0,1.0,5.5,16.67,0.0,0.0,100.0,50.0
+cosmos_new17,VLASS,42,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,
+cosmos_new17,XMM 4XMM-DR13,405,50.0,0.0,0.0,14.0,9.0,3.0,12.35,0.0,0.0,28.0,18.0
+cosmos_new17,eROSITA eRASS1,17,6.0,0.0,0.0,0.0,1.0,3.0,35.29,0.0,0.0,0.0,16.7
+cosmos_orig9,2MASS PSC,478,4.0,1.0,0.0,0.0,3.0,2.0,0.84,25.0,0.0,0.0,75.0
+cosmos_orig9,AllWISE,4175,143.0,4.0,0.0,1.0,11.0,2.0,3.43,2.8,0.0,0.7,7.7
+cosmos_orig9,Chandra CSC 2.0,558,20.0,0.0,0.0,6.0,2.0,3.5,3.58,0.0,0.0,30.0,10.0
+cosmos_orig9,DESI Legacy Surveys DR10,77127,233.0,55.0,0.0,99.0,17.0,3.0,0.3,23.6,0.0,42.5,7.3
+cosmos_orig9,FIRST,16,2.0,0.0,0.0,1.0,0.0,4.5,12.5,0.0,0.0,50.0,0.0
+cosmos_orig9,GALEX AIS,1237,149.0,0.0,0.0,45.0,35.0,3.0,12.05,0.0,0.0,30.2,23.5
+cosmos_orig9,Gaia DR3,1118,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,
+cosmos_orig9,Galaxy Zoo DESI,140,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,
+cosmos_orig9,NVSS,12,3.0,0.0,0.0,0.0,0.0,5.0,25.0,0.0,0.0,0.0,0.0
+cosmos_orig9,Pan-STARRS1 DR2 MeanObject,16611,1.0,0.0,0.0,0.0,0.0,2.0,0.01,0.0,0.0,0.0,0.0
+cosmos_orig9,SDSS DR18 PhotoObj,7057,309.0,16.0,0.0,243.0,44.0,3.0,4.38,5.2,0.0,78.6,14.2
+cosmos_orig9,SGA-2020,40,4.0,2.0,0.0,4.0,0.0,5.0,10.0,50.0,0.0,100.0,0.0
+cosmos_orig9,TGSS ADR1,5,1.0,0.0,0.0,1.0,1.0,11.0,20.0,0.0,0.0,100.0,100.0
+cosmos_orig9,VLASS,19,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,
+cosmos_orig9,XMM 4XMM-DR13,328,36.0,0.0,0.0,12.0,7.0,3.0,10.98,0.0,0.0,33.3,19.4
+cosmos_orig9,eROSITA eRASS1,11,3.0,0.0,0.0,1.0,0.0,4.0,27.27,0.0,0.0,33.3,0.0
+lowlat_cal,2MASS PSC,17889,65.0,5.0,0.0,10.0,31.0,2.0,0.36,7.7,0.0,15.4,47.7
+lowlat_cal,AllWISE,25046,428.0,27.0,0.0,14.0,96.0,2.0,1.71,6.3,0.0,3.3,22.4
+lowlat_cal,Chandra CSC 2.0,3,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,
+lowlat_cal,DESI DR1 spectroscopy,16,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,
+lowlat_cal,DESI Legacy Surveys DR10,12791,38.0,11.0,0.0,21.0,2.0,3.0,0.3,28.9,0.0,55.3,5.3
+lowlat_cal,GALEX AIS,1736,89.0,0.0,0.0,18.0,10.0,3.0,5.13,0.0,0.0,20.2,11.2
+lowlat_cal,Gaia DR3,57464,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,
+lowlat_cal,Gaia DR3 variability SOS,15,1.0,1.0,0.0,1.0,0.0,2.0,6.67,100.0,0.0,100.0,0.0
+lowlat_cal,Galaxy Zoo DESI,23,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,
+lowlat_cal,LAMOST DR catalog,548,17.0,2.0,0.0,5.0,4.0,3.0,3.1,11.8,0.0,29.4,23.5
+lowlat_cal,LoTSS DR2,8,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,
+lowlat_cal,NVSS,103,27.0,0.0,0.0,3.0,6.0,3.0,26.21,0.0,0.0,11.1,22.2
+lowlat_cal,Pan-STARRS1 DR2 MeanObject,133699,28.0,0.0,0.0,0.0,0.0,2.0,0.02,0.0,0.0,0.0,0.0
+lowlat_cal,SDSS DR18 PhotoObj,21968,190.0,35.0,0.0,105.0,19.0,3.0,0.86,18.4,0.0,55.3,10.0
+lowlat_cal,SDSS DR18 spectroscopy,6,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,
+lowlat_cal,SGA-2020,7,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,
+lowlat_cal,TGSS ADR1,34,12.0,0.0,0.0,8.0,3.0,5.0,35.29,0.0,0.0,66.7,25.0
+lowlat_cal,VLASS,168,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,
+lowlat_cal,XMM 4XMM-DR13,7,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,
+lowlat_cal,ZTF periodic variables,67,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,
+lowlat_cal,eROSITA eRASS1,38,11.0,0.0,0.0,1.0,3.0,2.0,28.95,0.0,0.0,9.1,27.3
+lowlat_cal_contam,2MASS PSC,2782,8.0,0.0,0.0,2.0,3.0,2.0,0.29,0.0,0.0,25.0,37.5
+lowlat_cal_contam,AllWISE,3286,38.0,2.0,0.0,4.0,16.0,2.0,1.16,5.3,0.0,10.5,42.1
+lowlat_cal_contam,DESI Legacy Surveys DR10,294,2.0,0.0,0.0,1.0,1.0,3.0,0.68,0.0,0.0,50.0,50.0
+lowlat_cal_contam,GALEX AIS,66,1.0,0.0,0.0,0.0,1.0,2.0,1.52,0.0,0.0,0.0,100.0
+lowlat_cal_contam,Gaia DR3,7108,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,
+lowlat_cal_contam,Gaia DR3 variability SOS,1,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,
+lowlat_cal_contam,Galaxy Zoo DESI,1,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,
+lowlat_cal_contam,NVSS,8,1.0,0.0,0.0,0.0,1.0,3.0,12.5,0.0,0.0,0.0,100.0
+lowlat_cal_contam,Pan-STARRS1 DR2 MeanObject,15211,5.0,0.0,0.0,0.0,0.0,2.0,0.03,0.0,0.0,0.0,0.0
+lowlat_cal_contam,SDSS DR18 PhotoObj,399,3.0,0.0,0.0,2.0,0.0,5.0,0.75,0.0,0.0,66.7,0.0
+lowlat_cal_contam,VLASS,11,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,
+lowlat_cal_contam,ZTF periodic variables,10,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,
+lowlat_cal_contam,eROSITA eRASS1,3,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,
+lowlat_conf,2MASS PSC,15354,60.0,9.0,0.0,9.0,24.0,2.0,0.39,15.0,0.0,15.0,40.0
+lowlat_conf,AllWISE,22810,403.0,20.0,0.0,9.0,97.0,2.0,1.77,5.0,0.0,2.2,24.1
+lowlat_conf,Chandra CSC 2.0,7,1.0,0.0,0.0,0.0,0.0,2.0,14.29,0.0,0.0,0.0,0.0
+lowlat_conf,DESI DR1 spectroscopy,49,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,
+lowlat_conf,DESI Legacy Surveys DR10,13664,54.0,17.0,0.0,34.0,4.0,3.0,0.4,31.5,0.0,63.0,7.4
+lowlat_conf,GALEX AIS,1989,110.0,1.0,0.0,27.0,24.0,3.0,5.53,0.9,0.0,24.5,21.8
+lowlat_conf,Gaia DR3,46206,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,
+lowlat_conf,Gaia DR3 variability SOS,4,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,
+lowlat_conf,Galaxy Zoo DESI,37,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,
+lowlat_conf,LAMOST DR catalog,383,10.0,0.0,0.0,8.0,4.0,4.0,2.61,0.0,0.0,80.0,40.0
+lowlat_conf,NVSS,69,19.0,0.0,0.0,1.0,5.0,3.0,27.54,0.0,0.0,5.3,26.3
+lowlat_conf,Pan-STARRS1 DR2 MeanObject,117124,14.0,0.0,0.0,1.0,0.0,2.0,0.01,0.0,0.0,7.1,0.0
+lowlat_conf,SDSS DR18 PhotoObj,18522,208.0,34.0,0.0,117.0,14.0,3.0,1.12,16.3,0.0,56.2,6.7
+lowlat_conf,SDSS DR18 spectroscopy,7,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,
+lowlat_conf,SGA-2020,19,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,
+lowlat_conf,TGSS ADR1,19,7.0,0.0,0.0,6.0,4.0,4.0,36.84,0.0,0.0,85.7,57.1
+lowlat_conf,VLASS,144,2.0,0.0,0.0,0.0,0.0,2.0,1.39,0.0,0.0,0.0,0.0
+lowlat_conf,XMM 4XMM-DR13,6,1.0,0.0,0.0,0.0,0.0,2.0,16.67,0.0,0.0,0.0,0.0
+lowlat_conf,ZTF periodic variables,52,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,
+lowlat_conf,eROSITA eRASS1,21,3.0,0.0,0.0,1.0,0.0,6.0,14.29,0.0,0.0,33.3,0.0

@@ -99,6 +99,44 @@ PROFILES = {
 DEFAULT_PROFILE = SurveyProfile(None, 0.6, None, 5.0)
 LS_RESOLVED_FLOOR_ARCSEC = 0.6
 
+# ---------------------------------------------------------------------------------------------------------------------
+# Switches of the ambiguity study (2.61.7), all off by default: V2_ASSOC_AMBIG is a comma list of
+#   profiles  SurveyProfiles and position errors for catalogues that fell to DEFAULT_PROFILE (0.6'') (this module)
+#   spectra   LAMOST and SDSS spectra are targets like the DESI ones (Stage 1)
+#   same      a detection is not ambiguous when its two best candidates are one object (Stage 1)
+#   nearest   ... or when the nearest candidate is clearly nearest (Stage 1)
+#   best      never ambiguous: join the best-scoring candidate, as Marrese et al. 2017/2019 do (reference only)
+# and ``all`` = profiles + spectra + same + nearest.  Unknown words raise: a typo must not look like a variant that did nothing.
+AMBIG_OPTIONS = frozenset({"profiles", "spectra", "same", "nearest", "best"})
+
+
+def parse_ambig(text: str) -> frozenset:
+    words = {w.strip().lower() for w in str(text or "").split(",") if w.strip()}
+    if "all" in words:
+        words = (words - {"all"}) | {"profiles", "spectra", "same", "nearest"}
+    bad = words - AMBIG_OPTIONS
+    if bad:
+        raise ValueError(f"V2_ASSOC_AMBIG: unknown option(s) {sorted(bad)}; known: {sorted(AMBIG_OPTIONS)} and 'all'")
+    return frozenset(words)
+
+
+AMBIG_FIX = parse_ambig(os.environ.get("V2_ASSOC_AMBIG", ""))
+
+# Catalogues that have no entry in PROFILES and so are assumed to have 0.6'' position errors (DEFAULT_PROFILE).  Used only with
+# ``profiles``; the evidence for every number is in LITERATURE_ASSOCIATION_AMBIGUITY_2026-11-27.md.
+#   SDSS imaging: 45 mas rms per coordinate for r < ~20 point sources and ~100 mas at the survey limit, photon-statistics
+#     limited (Pier et al. 2003, AJ 125, 1559): 0.1'' for point sources brighter than r = 20 (the stored rows have no raErr/decErr),
+#     the old 0.6'' for everything else (see _extra_poserr).  Plus the imaging epoch from the row's ``mjd`` (infer_epoch).
+#   VLASS Epoch 1 Quick Look: 0.5'' for Dec > -20 deg, ~1'' further south (Gordon et al. 2021, ApJS 255, 30; NRAO users guide).
+#   LoTSS DR2: 0.2'' astrometric accuracy (0.5'' at S/N 5); the catalogue errors are statistical only (Shimwell et al. 2022).
+EXTRA_PROFILES = {
+    "VLASS": SurveyProfile(None, 0.5, None, 5.0),
+    "LoTSS DR2": SurveyProfile(None, 0.3, None, 5.0),
+}
+SDSS_BRIGHT_PSF_MAG = 20.0  # psfMag_r of the point sources the 45 mas rms of Pier et al. 2003 holds for
+VLASS_SYSTEMATIC_ARCSEC = (0.5, 1.0)  # Dec >= -20 deg, further south
+LOTSS_SYSTEMATIC_ARCSEC = 0.2
+
 
 def num(value: Any) -> float | None:
     try:
@@ -253,6 +291,8 @@ def profile_for(catalog: str, row: Mapping[str, Any] | None = None) -> SurveyPro
         if "WISE" in subtype:
             return SurveyProfile(2010.5, 1.0, 6.1, 10.0)
         return SurveyProfile(None, 5.0, 12.0, 20.0)
+    if "profiles" in AMBIG_FIX and catalog not in PROFILES:
+        return EXTRA_PROFILES.get(catalog, DEFAULT_PROFILE)
     return PROFILES.get(catalog, DEFAULT_PROFILE)
 
 
@@ -261,9 +301,35 @@ def infer_epoch(catalog: str, row: Mapping[str, Any]) -> float | None:
     if explicit is not None and 1800.0 < explicit < 2200.0:
         return explicit
     mjd = _first(row, ("obs_mjd", "mjd_obs", "observation_mjd", "epochmean"))
+    if mjd is None and "profiles" in AMBIG_FIX and catalog == "SDSS DR18 PhotoObj":
+        # SDSS imaging epochs span 2000-2009; with a 0.1'' sigma (below) a star's proper motion since then (0.5'' in 10 yr at
+        # 50 mas/yr) must be propagated or the star leaves its group.  ``mjd`` is the observation date of the imaging.
+        mjd = _first(row, ("mjd",))
     if mjd is not None and 10000 < mjd < 100000:
         return 2000.0 + (mjd - 51544.5) / 365.25
     return profile_for(catalog, row).ref_epoch
+
+
+def _extra_poserr(catalog: str, row: Mapping[str, Any]) -> float | None:
+    """Position errors of the catalogues in EXTRA_PROFILES (``profiles``; see the comment there)."""
+    if catalog == "SDSS DR18 PhotoObj":
+        typ, mag = _first(row, ("type",)), _first(row, ("psfmag_r",))
+        # 0.1'' only where the literature value holds: a point source (type 6) brighter than r ~ 20 (Pier et al. 2003: 45 mas rms per
+        # coordinate there).  Fainter "stars" are partly compact galaxies and their centroids are photon-noise limited, and a
+        # galaxy centre differs from another survey's by an arcsec: they keep the old 0.6'' (calibration, 2.61.7: a flat 0.1'' split
+        # 330 of 108 932 rows of the nine fields from their Legacy Surveys / PS1 object).
+        # 0 < mag: SDSS writes -9999 for a missing magnitude, which must not read as a bright source (Codex review of 2.61.8)
+        return 0.1 if typ is not None and int(typ) == 6 and mag is not None and 0.0 < mag < SDSS_BRIGHT_PSF_MAG else DEFAULT_PROFILE.fallback_poserr_arcsec
+    if catalog == "VLASS":
+        # e_RAJ2000 / e_DEJ2000 of the stored rows peak at 2e-4 and are evidently degrees (0.07'' median): the statistical part is
+        # far below the systematic one, which is what is used.
+        dec = _first(row, ("dec", "dej2000"))
+        return VLASS_SYSTEMATIC_ARCSEC[0] if dec is None or dec >= -20.0 else VLASS_SYSTEMATIC_ARCSEC[1]
+    if catalog == "LoTSS DR2":
+        a, b = _first(row, ("e_raj2000",)), _first(row, ("e_dej2000",))
+        stat = max(a, b) if a is not None and b is not None and max(a, b) > 0 else None
+        return math.hypot(stat, LOTSS_SYSTEMATIC_ARCSEC) if stat is not None else EXTRA_PROFILES[catalog].fallback_poserr_arcsec
+    return None
 
 
 def infer_poserr_arcsec(catalog: str, row: Mapping[str, Any]) -> float:
@@ -278,6 +344,11 @@ def infer_poserr_arcsec(catalog: str, row: Mapping[str, Any]) -> float:
     explicit = _first(row, ("poserr_arcsec", "pos_err", "radec_err", "err_maj", "errmaj"))
     if explicit is not None and explicit > 0:
         return explicit
+
+    if "profiles" in AMBIG_FIX:
+        extra = _extra_poserr(catalog, row)
+        if extra is not None:
+            return extra
 
     # Catalog-native RA/Dec error pairs in arcsec.
     for keys in (("sigra", "sigdec"), ("e_raj2000", "e_dej2000"), ("rasig", "desig")):

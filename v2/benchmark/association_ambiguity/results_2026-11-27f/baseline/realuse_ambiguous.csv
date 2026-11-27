@@ -1,0 +1,13 @@
+field,catalog,rows,ambiguous,pct
+cosmos,Chandra CSC 2.0,6,1,16.67
+cosmos,DESI Legacy Surveys DR10,912,2,0.22
+cosmos,GALEX AIS,11,1,9.09
+cosmos,XMM 4XMM-DR13,4,1,25.0
+cosmos,ALL,5981,5,0.08
+ngc,AllWISE,42,2,4.76
+ngc,DESI Legacy Surveys DR10,417,7,1.68
+ngc,NVSS,1,1,100.0
+ngc,ALL,800,10,1.25
+plane,2MASS PSC,90,1,1.11
+plane,AllWISE,22,1,4.55
+plane,ALL,1043,2,0.19

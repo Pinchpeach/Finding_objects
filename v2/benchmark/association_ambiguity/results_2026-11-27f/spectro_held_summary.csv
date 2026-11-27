@@ -1,0 +1,9 @@
+part,variant,objects,labelled_qso_in_variant_base,held_surveys2,held_surveys3,held_surveys2_keep,held_surveys3_keep
+calibration,base,15,14,3,3,0,0
+calibration,same_nearest,15,14,0,0,0,0
+calibration,spectra,15,14,0,0,0,0
+calibration,all,15,14,0,0,0,0
+confirmation,base,19,18,2,2,0,0
+confirmation,same_nearest,19,18,0,0,0,0
+confirmation,spectra,19,17,0,1,0,0
+confirmation,all,19,18,0,0,0,0

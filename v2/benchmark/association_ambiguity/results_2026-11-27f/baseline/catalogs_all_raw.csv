@@ -1,0 +1,23 @@
+catalog,rows,folders,has_profile,error-like columns
+DESI Legacy Surveys DR10,229824,28,True,"['dec_ivar', 'flux_ivar_g', 'flux_ivar_i', 'flux_ivar_r', 'flux_ivar_w1', 'flux_ivar_w2', 'flux_ivar_z', 'ra_ivar']"
+Pan-STARRS1 DR2 MeanObject,47790,29,True,"['decMeanErr', 'gMeanApMagErr', 'gMeanKronMagErr', 'gMeanPSFMagErr', 'iMeanApMagErr', 'iMeanKronMagErr', 'iMeanPSFMagErr', 'rMeanApMagErr']"
+SDSS DR18 PhotoObj,19785,26,False,"['colvErr', 'modelMagErr_g', 'modelMagErr_i', 'modelMagErr_r', 'modelMagErr_u', 'modelMagErr_z', 'petroMagErr_g', 'petroMagErr_i']"
+AllWISE,11772,29,True,"['cosig_pm', 'e_DE_pm', 'e_RA_pm']"
+Gaia DR3,3441,29,True,"['dec_error', 'designation', 'parallax_error', 'phot_bp_mean_flux_error', 'phot_g_mean_flux_error', 'phot_rp_mean_flux_error', 'pmdec_error', 'pmra_error']"
+GALEX AIS,3375,28,True,"['FXpos', 'FYpos', 'Ferr', 'Fperr', 'Ierr', 'NXpos', 'NYpos', 'Nerr']"
+SIMBAD,3227,2,False,"['coo_err_angle', 'coo_err_maj', 'coo_err_min']"
+NED,1576,2,False,['Positions']
+2MASS PSC,1529,29,True,"['Hcmsig', 'Jcmsig', 'Kcmsig', 'errMaj', 'errMin', 'errPA']"
+Chandra CSC 2.0,1374,27,True,[]
+XMM 4XMM-DR13,741,28,True,['ePos']
+Galaxy Zoo DESI,408,27,False,['poserr_arcsec']
+SGA-2020,138,27,True,['poserr_arcsec']
+Galaxy clusters,97,2,False,[]
+FIRST,67,25,True,[]
+VLASS,61,21,False,"['Xposn', 'XposnMax', 'Yposn', 'YposnMax', 'e_DEJ2000', 'e_DEMdeg', 'e_RAJ2000', 'e_RAMdeg']"
+NVSS,43,23,True,"['Xpos', 'Ypos', 'e_DEJ2000', 'e_RAJ2000']"
+DESI DR1 spectroscopy,30,2,True,[]
+eROSITA eRASS1,28,18,True,"['E_DE_ICRS', 'E_RA_ICRS', 'FNOCTSerr', 'FNOEXTerr', 'FNORADEerr', 'RADEErr', 'e_DE_ICRS', 'e_RA_ICRS']"
+DESI DR1 FastSpecFit,27,2,True,"['halpha_broad_flux_ivar', 'halpha_broad_sigma', 'halpha_ew_ivar', 'halpha_flux_ivar', 'hbeta_ew_ivar', 'hbeta_flux_ivar', 'line_ha_ew_err', 'line_ha_flux_err']"
+TGSS ADR1,17,11,True,"['e_DEJ2000', 'e_RAJ2000']"
+LAMOST DR catalog,3,2,False,"['lasp_feh_err', 'lasp_logg_err', 'lasp_teff_err']"
