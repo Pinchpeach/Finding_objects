@@ -54,6 +54,9 @@ import pandas as pd
 
 MATCH_ARCSEC = 2.0
 MISSING = "REGION_MISSING"  # label of a truth object whose region has no compact record
+# per_region columns (a run where no region has a record still has them, so the density and coverage code can run)
+REGION_COLS = ["name", "stratum", "kind", "status", "archives_status", "archives_missing", "objects", "qso_labelled",
+               "qso_other", "objects_i_lt_195", "qso_other_i_lt_195", "truth_in_cone", "area_deg2"]  # fmt: skip
 CLASSES = ("STAR", "GALAXY", "QSO")
 KEEP = [
     "object_id", "ra", "dec", "catalogs", "std_ebv", "primary_class", "primary_confidence", "primary_margin",
@@ -379,7 +382,7 @@ def score_regions(regions: pd.DataFrame, truth: pd.DataFrame, root: Path, radius
                              qso_labelled=int((top_level[in_cone].primary_class == "QSO").sum()), qso_other=int(within.sum()),
                              objects_i_lt_195=int(np.sum(all_i < 19.5)), qso_other_i_lt_195=int(np.sum(qi < 19.5)),
                              truth_in_cone=len(inside), area_deg2=math.pi * (radius_arcmin / 60.0) ** 2))  # fmt: skip
-    return dict(per_truth=pd.DataFrame(rows), per_region=pd.DataFrame(reg_rows), unique_quasars=uq,
+    return dict(per_truth=pd.DataFrame(rows), per_region=pd.DataFrame(reg_rows).reindex(columns=REGION_COLS), unique_quasars=uq,
                 qso_other=pd.DataFrame(other_rows))
 
 
@@ -473,10 +476,15 @@ def summarise(res: dict) -> dict[str, pd.DataFrame]:
                          per_deg2_i_lt_195_err=round(math.sqrt(max(n_b, 1)) / area, 2)))  # fmt: skip
     g = ok[ok.kind == "qso"]
     area, n_o, n_b = g.area_deg2.sum(), int(g.qso_other.sum()), int(g.qso_other_i_lt_195.sum())
-    dens.append(dict(stratum="all", regions=len(g), area_deg2=round(area, 4), objects_i_lt_195=int(g.objects_i_lt_195.sum()),
-                     qso_labelled_other=n_o, per_deg2=round(n_o / area, 2), per_deg2_err=round(math.sqrt(max(n_o, 1)) / area, 2),
-                     qso_labelled_other_i_lt_195=n_b, per_deg2_i_lt_195=round(n_b / area, 2),
-                     per_deg2_i_lt_195_err=round(math.sqrt(max(n_b, 1)) / area, 2)))  # fmt: skip
+    if not len(g) or not area > 0:  # no quasar region was scored: the density is unavailable, not zero
+        dens.append(dict(stratum="all", regions=0, area_deg2=0.0, objects_i_lt_195=0, qso_labelled_other=0,
+                         per_deg2=math.nan, per_deg2_err=math.nan, qso_labelled_other_i_lt_195=0,
+                         per_deg2_i_lt_195=math.nan, per_deg2_i_lt_195_err=math.nan))  # fmt: skip
+    else:
+        dens.append(dict(stratum="all", regions=len(g), area_deg2=round(area, 4), objects_i_lt_195=int(g.objects_i_lt_195.sum()),
+                         qso_labelled_other=n_o, per_deg2=round(n_o / area, 2), per_deg2_err=round(math.sqrt(max(n_o, 1)) / area, 2),
+                         qso_labelled_other_i_lt_195=n_b, per_deg2_i_lt_195=round(n_b / area, 2),
+                         per_deg2_i_lt_195_err=round(math.sqrt(max(n_b, 1)) / area, 2)))  # fmt: skip
     cf_rows = []
     for scen in ["label", *SCENARIOS]:
         for name_, g in [("all", have)] + [(f"|b| {lo:g}-{hi:g}", have[(have.b.abs() >= lo) & (have.b.abs() < hi)]) for lo, hi in B_BINS]:

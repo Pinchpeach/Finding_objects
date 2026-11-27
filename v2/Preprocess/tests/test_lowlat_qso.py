@@ -214,6 +214,21 @@ def test_regions_that_lost_a_key_archive_are_reported(tmp_path):
     assert rs[rs.by == "coverage"].n.tolist() == [0, 2]
 
 
+def test_run_where_no_region_has_a_record(tmp_path):
+    """Every region missing: the summary and coverage still come out (density unavailable, run INCOMPLETE)."""
+    truth = pd.DataFrame(dict(sample=["huo"], name=["q1"], ra=[150.0], dec=[2.0], l=[100.0], b=[-12.0], z=[1.0], imag=[18.0],
+                              ebv=[0.1], cls=["qso"], also_in=[""]))  # fmt: skip
+    regions = pd.DataFrame(dict(name=["r1"], stratum=["b10-15"], kind=["qso"], ra=[150.0], dec=[2.0]))
+    res = S.score_regions(regions, truth, tmp_path, radius_arcmin=3.0)
+    tabs = S.summarise(res)
+    dens = tabs["qso_density"].set_index("stratum").loc["all"]
+    assert dens.regions == 0 and math.isnan(dens.per_deg2)
+    cov = S.coverage(res)
+    assert not cov["complete"] and cov["quasars_not_scored"] == 1 and not cov["degraded"]
+    rs = tabs["recall_summary"].set_index(["by", "bin"])
+    assert rs.loc[("all", "all incl. no object"), "n"] == 0
+
+
 def test_region_draw_is_deterministic_and_non_overlapping():
     rng = np.random.default_rng(3)
     n = 800

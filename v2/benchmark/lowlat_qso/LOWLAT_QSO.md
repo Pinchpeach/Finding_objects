@@ -164,5 +164,6 @@ Checked against the committed tables (`results_2026-11-27/`) and the code; nothi
    Legacy Surveys or AllWISE: a failed query or time-out, not an empty answer) is now reported: the pipeline's
    `run_archives_status` / `run_archives_missing` are kept in the compact record (for a region without rows the copied
    collection summary is read), `regions.csv` has them per region, and `coverage.json` counts those regions and their quasars
-   (`degraded`; the score log prints `DEGRADED`).  The 2026-11-27 run predates this: its records were compacted without those
+   (`degraded`; the score log prints `DEGRADED`).  A run where no region has a record writes its tables and coverage with the
+   density marked unavailable (NaN) instead of stopping.  The 2026-11-27 run predates this: its records were compacted without those
    columns, and Section 3 states the collection outcome (Legacy Surveys timed out in 4 regions, asked again, answered with 0 rows).
