@@ -1,0 +1,18 @@
+bbin,cause,label,n
+"[0.0, 5.0)",abstained,UNKNOWN,1
+"[0.0, 5.0)",evidence,STAR,8
+"[0.0, 5.0)",position_prior,STAR,5
+"[0.0, 5.0)",qso_magnitude,GALAXY,1
+"[0.0, 5.0)",qso_magnitude,STAR,3
+"[10.0, 15.0)",evidence,STAR,1
+"[10.0, 15.0)",position_prior,STAR,3
+"[10.0, 15.0)",qso_magnitude,STAR,5
+"[15.0, 20.0)",abstained,UNKNOWN,1
+"[15.0, 20.0)",evidence,STAR,1
+"[15.0, 20.0)",position_prior,STAR,3
+"[15.0, 20.0)",qso_magnitude,STAR,4
+"[15.0, 20.0)",qso_veto,GALAXY,1
+"[5.0, 10.0)",evidence,STAR,4
+"[5.0, 10.0)",position_prior,STAR,10
+"[5.0, 10.0)",qso_magnitude,GALAXY,3
+"[5.0, 10.0)",qso_magnitude,STAR,10

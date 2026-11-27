@@ -14,8 +14,13 @@ regions of ``fields_lowlat.csv`` and the truth table of ``build_lowlat_truth.py`
   labels.csv                the label counts of the quasars (QSO / GALAXY / STAR / UNKNOWN / no object) by |b|
   missed.csv                every quasar that did not get the QSO label: the label, the cause (below), the numbers behind it
   causes.csv                the causes counted by |b| and by label
-  qso_density.csv           the objects labelled QSO per square degree of the cones, other than the sample quasars
-  contaminants.csv          what the 19 non-quasars of the Fu et al. 2022 candidate list were labelled
+  qso_density.csv           the objects labelled QSO per square degree of the cones, other than the sample quasars (all, and
+                            with PS1 i < 19.5, the range of the sample), and qso_other_objects.csv: those objects
+  contaminants.csv          what the 19 non-quasars of the Fu et al. 2022 candidate list were labelled (and what the stored
+                            factors would have given without a prior)
+  counterfactual_recall.csv the QSO recall the stored factors would give without the position prior, the QSO magnitude prior
+                            or both (labels set by a rule or an abstention are kept; the confidence gates are ignored): what
+                            a prior costs in recall, not a recommendation: the cost in false QSO labels is not measured here
   regions.csv               one row per region: objects, QSO-labelled objects, truth quasars in the cone, archive status
 
 Causes of a miss, first match wins:
@@ -25,7 +30,8 @@ Causes of a miss, first match wins:
   abstained          the label is UNKNOWN: ``classification_status`` (LOW_CONFIDENCE, CONFLICT, NO_EVIDENCE ...); split by
                      whether the evidence alone (``p_*_training_prior``) pointed at QSO
   evidence           the fused evidence alone (``p_*_training_prior``) does not point at QSO
-  position_prior     the evidence points at QSO and the Galactic position factor (``prior_position`` on GALAXY and QSO) turns it
+  position_prior     the evidence points at QSO and the position factor (``prior_position`` on GALAXY and QSO: the local Gaia
+                     density where it can be measured, else latitude x Magellanic Clouds; the detail says which) turns it
   qso_magnitude      ... the QSO magnitude prior (``prior_qso_magnitude``) turns it
   qso_veto           ... the veto factor (``prior_qso_veto``) turns it
   faint_star_galaxy  ... the faint STAR:GALAXY prior moves mass out of QSO's neighbours; the QSO label is lost by another factor
@@ -91,19 +97,25 @@ def compact(work: Path, out: Path) -> None:
     use = [c for c in KEEP if c in head] + (["evidence_json"] if "evidence_json" in head else [])
     d = pd.read_csv(work / "classified_objects.csv", usecols=use, low_memory=False)
     rules = {c: [] for c in CLASSES}
+    every = []
     for raw in d.get("evidence_json", pd.Series([""] * len(d))):
         try:
             ev = json.loads(raw) if isinstance(raw, str) else []
         except ValueError:
             ev = []
         per = {c: set() for c in CLASSES}
+        allr = set()
         for e in ev:
-            if e.get("class") in per and e.get("rule_id"):
-                per[e["class"]].add(str(e["rule_id"]))
+            if e.get("rule_id"):
+                allr.add(f"{e['rule_id']}:{e.get('class', '')}")  # e.g. WISE-AGN-R90-001:EXTRAGALACTIC (a rule can speak for a group)
+                if e.get("class") in per:
+                    per[e["class"]].add(str(e["rule_id"]))
         for c in CLASSES:
             rules[c].append(";".join(sorted(per[c])))
+        every.append(";".join(sorted(allr)))
     for c in CLASSES:
         d[f"rules_{c}"] = rules[c]
+    d["rules_all"] = every
     d = d.drop(columns=["evidence_json"], errors="ignore")
     d.to_csv(out / "objects.csv.gz", index=False)
     for f in ("collection_summary", "catalog_coverage.json", "pipeline_summary.csv"):
@@ -155,6 +167,36 @@ def decision_path(row: pd.Series) -> dict:
     return out
 
 
+def counterfactual(row: pd.Series, drop=()) -> str | None:
+    """The class the stored factors give without the factors in ``drop`` ("position", "qso_magnitude", "qso_veto", "faint"),
+    ignoring the confidence gates; None when the stored training-prior probabilities are missing."""
+    P = np.array([row.get(f"p_{c.lower()}_training_prior", np.nan) for c in CLASSES], float)
+    if not np.isfinite(P).all():
+        return None
+    f = lambda k: float(row[k]) if k in row and pd.notna(row[k]) else 1.0  # noqa: E731
+    q = P.copy()
+    if "position" not in drop:
+        q[1] *= f("prior_position")
+        q[2] *= f("prior_position")
+    if "qso_magnitude" not in drop:
+        q[2] *= f("prior_qso_magnitude")
+    if "qso_veto" not in drop:
+        q[2] *= f("prior_qso_veto")
+    u = _unit(q[None, :])[0]
+    fs, fg = row.get("prior_faint_star"), row.get("prior_faint_galaxy")
+    if "faint" not in drop and pd.notna(fs) and pd.notna(fg) and fs > 0 and fg > 0:
+        sm = u[0] + u[1]
+        odds = (u[1] / max(u[0], 1e-12)) * (fg / fs)
+        g = sm * odds / (1 + odds) if np.isfinite(odds) else sm
+        u[1], u[0] = g, sm - g
+    return CLASSES[int(np.argmax(u))]
+
+
+SCENARIOS = {"cf_no_position": ("position",), "cf_no_qso_magnitude": ("qso_magnitude",),
+             "cf_no_position_no_qso_magnitude": ("position", "qso_magnitude"),
+             "cf_evidence_only": ("position", "qso_magnitude", "qso_veto", "faint")}  # fmt: skip
+
+
 def cause(row: pd.Series, has_object: bool) -> tuple[str, str]:
     """(cause, detail) of a quasar that did not get the QSO label."""
     if not has_object:
@@ -174,7 +216,11 @@ def cause(row: pd.Series, has_object: bool) -> tuple[str, str]:
     for step, name in (("position", "position_prior"), ("qso_magnitude", "qso_magnitude"), ("qso_veto", "qso_veto"),
                        ("faint", "faint_star_galaxy")):  # fmt: skip
         if path[f"class_after_{step}"] != "QSO":
-            return name, f"{ev} -> {path[f'class_after_{step}']}"
+            extra = ""
+            if step == "position":  # the factor is the local Gaia density where it can be measured, else latitude x Clouds
+                dens = row.get("prior_gaia_density")
+                extra = "; local Gaia density" if pd.notna(dens) else "; latitude"
+            return name, f"{ev} -> {path[f'class_after_{step}']}{extra}"
     return "other", "decision gates"
 
 
@@ -195,11 +241,36 @@ def match_truth(objects: pd.DataFrame, t_ra, t_dec) -> int:
     return int(near[np.lexsort((s[near], -ncat))[0]])
 
 
+def ps1_mags(raw_dir: Path, ra, dec) -> np.ndarray:
+    """PS1 mean PSF i magnitude of the nearest PS1 row within 1.5'' of each position (NaN: none); from the raw PS1 csv of a
+    region (``<region>/raw/panstarrs1_*.csv``), so the compact record needs no magnitude column."""
+    out = np.full(len(ra), np.nan)
+    files = sorted(Path(raw_dir).glob("panstarrs1_*.csv"))
+    if not files or not len(ra):
+        return out
+    d = pd.read_csv(files[0], usecols=lambda c: c.lower() in ("ra", "dec", "imeanpsfmag"), low_memory=False)
+    d.columns = [c.lower() for c in d.columns]
+    if not {"ra", "dec", "imeanpsfmag"} <= set(d.columns) or not len(d):
+        return out
+    from scipy.spatial import cKDTree
+
+    def xyz(a, b):
+        a, b = np.radians(np.asarray(a, float)), np.radians(np.asarray(b, float))
+        return np.c_[np.cos(b) * np.cos(a), np.cos(b) * np.sin(a), np.sin(b)]
+
+    dist, idx = cKDTree(xyz(d.ra, d.dec)).query(xyz(ra, dec))
+    ok = np.degrees(dist) * 3600.0 <= 1.5
+    m = pd.to_numeric(d.imeanpsfmag, errors="coerce").to_numpy(float)
+    m = np.where(m > 0, m, np.nan)  # PS1 writes -999 for a missing mean magnitude
+    out[ok] = m[idx[ok]]
+    return out
+
+
 def score_regions(regions: pd.DataFrame, truth: pd.DataFrame, root: Path, radius_arcmin: float) -> dict:
     """Per truth object: label and cause; per region: counts.  ``root/<name>/objects.csv.gz``."""
     uq = truth[(truth.cls == "qso") & (truth.also_in.fillna("") != "huo")].reset_index(drop=True)
     t_all = truth[(truth.cls != "qso") | (truth.also_in.fillna("") != "huo")].reset_index(drop=True)
-    rows, reg_rows, dens_rows = [], [], []
+    rows, reg_rows, dens_rows, other_rows = [], [], [], []
     for r in regions.itertuples():
         f = root / r.name / "objects.csv.gz"
         if not f.exists():
@@ -226,10 +297,18 @@ def score_regions(regions: pd.DataFrame, truth: pd.DataFrame, root: Path, radius
                         top = top.iloc[0]
                 matched_ids.add(str(obj.object_id))
                 matched_ids.add(str(top.object_id))
+                # the label the stored factors would give without a prior; where a rule or an abstention set the label it stays
+                evid = str(top.get("classification_basis", "")) == "evidence" and str(top.primary_class) in CLASSES
+                for k, drop in SCENARIOS.items():
+                    cf = counterfactual(top, drop) if evid else None
+                    row[k] = cf if cf is not None else str(top.primary_class)
+                cats = str(top.get("catalogs", ""))
+                row.update(has_ls="DESI Legacy Surveys DR10" in cats, has_ps1="Pan-STARRS1" in cats, has_wise="AllWISE" in cats,
+                           has_gaia="Gaia DR3" in cats, n_catalogs=cats.count("|") + 1 if cats else 0)  # fmt: skip
                 row.update(label=str(top.primary_class), object_id=str(top.object_id), basis=str(top.get("classification_basis", "")),
                            status=str(top.get("classification_status", "")), secondary=str(top.get("secondary_class", "")),
                            p_qso=top.get("p_qso"), p_qso_evidence=top.get("p_qso_training_prior"), std_ebv=top.get("std_ebv"),
-                           r90=bool(r90_sky(t.ra, t.dec)), r90_rule=("WISE-AGN-R90-001" in str(top.get("rules_QSO", ""))),
+                           r90=bool(r90_sky(t.ra, t.dec)), r90_rule=("WISE-AGN-R90-001" in str(top.get("rules_all", ""))),
                            rules_QSO=str(top.get("rules_QSO", "")))  # fmt: skip
                 if t.cls == "qso" and top.primary_class != "QSO":
                     c, d = cause(top, True)
@@ -241,10 +320,19 @@ def score_regions(regions: pd.DataFrame, truth: pd.DataFrame, root: Path, radius
         qso_other = top_level[(top_level.primary_class == "QSO") & ~top_level.object_id.astype(str).isin(matched_ids)]
         within = _sep_arcsec(qso_other.ra, qso_other.dec, r.ra, r.dec) / 60.0 <= radius_arcmin
         in_cone = _sep_arcsec(top_level.ra, top_level.dec, r.ra, r.dec) / 60.0 <= radius_arcmin
+        qo = qso_other[within.to_numpy() if hasattr(within, "to_numpy") else within]
+        qi = ps1_mags(root / r.name / "raw", qo.ra.to_numpy(float), qo.dec.to_numpy(float))
+        for k, (_, obj) in enumerate(qo.iterrows()):
+            other_rows.append(dict(region=r.name, stratum=r.stratum, kind=r.kind, object_id=obj.object_id, ra=obj.ra, dec=obj.dec,
+                                   ps1_i=qi[k], p_qso=obj.get("p_qso"), p_qso_evidence=obj.get("p_qso_training_prior"),
+                                   basis=obj.get("classification_basis"), n_catalogs=str(obj.get("catalogs", "")).count("|") + 1))  # fmt: skip
+        all_i = ps1_mags(root / r.name / "raw", top_level[in_cone].ra.to_numpy(float), top_level[in_cone].dec.to_numpy(float))
         reg_rows.append(dict(name=r.name, stratum=r.stratum, kind=r.kind, status="ok", objects=int(in_cone.sum()),
                              qso_labelled=int((top_level[in_cone].primary_class == "QSO").sum()), qso_other=int(within.sum()),
+                             objects_i_lt_195=int(np.sum(all_i < 19.5)), qso_other_i_lt_195=int(np.sum(qi < 19.5)),
                              truth_in_cone=len(inside), area_deg2=math.pi * (radius_arcmin / 60.0) ** 2))  # fmt: skip
-    return dict(per_truth=pd.DataFrame(rows), per_region=pd.DataFrame(reg_rows), unique_quasars=uq)
+    return dict(per_truth=pd.DataFrame(rows), per_region=pd.DataFrame(reg_rows), unique_quasars=uq,
+                qso_other=pd.DataFrame(other_rows))
 
 
 def _bin_table(df: pd.DataFrame, col: str, bins, label: str, absval=False) -> list[dict]:
@@ -280,6 +368,11 @@ def summarise(res: dict) -> dict[str, pd.DataFrame]:
         n, k = len(g), int((g.label == "QSO").sum())
         a, b = wilson(k, n)
         rows.append(dict(by="sample", bin=sname, n=n, qso=k, recall=round(k / n, 4), lo=round(a, 4), hi=round(b, 4)))
+    for col, nm in (("has_ls", "Legacy Surveys DR10 row"), ("has_wise", "AllWISE row"), ("has_ps1", "Pan-STARRS1 row")):
+        for flag, g in have.groupby(col):
+            n, k = len(g), int((g.label == "QSO").sum())
+            a, b = wilson(k, n)
+            rows.append(dict(by=nm, bin="yes" if flag else "no", n=n, qso=k, recall=round(k / n, 4), lo=round(a, 4), hi=round(b, 4)))
     for flag, g in have.groupby("r90"):
         n, k = len(g), int((g.label == "QSO").sum())
         a, b = wilson(k, n)
@@ -293,12 +386,31 @@ def summarise(res: dict) -> dict[str, pd.DataFrame]:
     dens = []
     ok = R[R.status == "ok"]
     for s, g in ok[ok.kind == "qso"].groupby("stratum"):
-        area, n_o = g.area_deg2.sum(), int(g.qso_other.sum())
-        dens.append(dict(stratum=s, regions=len(g), area_deg2=round(area, 4), qso_labelled_other=n_o,
-                         per_deg2=round(n_o / area, 2), per_deg2_err=round(math.sqrt(max(n_o, 1)) / area, 2)))  # fmt: skip
-    cont = T[T.cls.isin(["star", "galaxy"])][["region", "name", "cls", "b", "imag", "label", "basis", "status"]]
+        area, n_o, n_b = g.area_deg2.sum(), int(g.qso_other.sum()), int(g.qso_other_i_lt_195.sum())
+        dens.append(dict(stratum=s, regions=len(g), area_deg2=round(area, 4), objects_i_lt_195=int(g.objects_i_lt_195.sum()),
+                         qso_labelled_other=n_o, per_deg2=round(n_o / area, 2), per_deg2_err=round(math.sqrt(max(n_o, 1)) / area, 2),
+                         qso_labelled_other_i_lt_195=n_b, per_deg2_i_lt_195=round(n_b / area, 2),
+                         per_deg2_i_lt_195_err=round(math.sqrt(max(n_b, 1)) / area, 2)))  # fmt: skip
+    g = ok[ok.kind == "qso"]
+    area, n_o, n_b = g.area_deg2.sum(), int(g.qso_other.sum()), int(g.qso_other_i_lt_195.sum())
+    dens.append(dict(stratum="all", regions=len(g), area_deg2=round(area, 4), objects_i_lt_195=int(g.objects_i_lt_195.sum()),
+                     qso_labelled_other=n_o, per_deg2=round(n_o / area, 2), per_deg2_err=round(math.sqrt(max(n_o, 1)) / area, 2),
+                     qso_labelled_other_i_lt_195=n_b, per_deg2_i_lt_195=round(n_b / area, 2),
+                     per_deg2_i_lt_195_err=round(math.sqrt(max(n_b, 1)) / area, 2)))  # fmt: skip
+    cf_rows = []
+    for scen in ["label", *SCENARIOS]:
+        for name_, g in [("all", have)] + [(f"|b| {lo:g}-{hi:g}", have[(have.b.abs() >= lo) & (have.b.abs() < hi)]) for lo, hi in B_BINS]:
+            if scen not in g or not len(g):
+                continue
+            k = int((g[scen] == "QSO").sum())
+            a, b = wilson(k, len(g))
+            cf_rows.append(dict(scenario="as run" if scen == "label" else scen, group=name_, n=len(g), qso=k,
+                                recall=round(k / len(g), 4), lo=round(a, 4), hi=round(b, 4)))  # fmt: skip
+    cont = T[T.cls.isin(["star", "galaxy"])]
+    cont = cont[[c for c in ["region", "name", "cls", "b", "imag", "label", "basis", "status", *SCENARIOS] if c in cont]]
     return dict(recall_summary=pd.DataFrame(rows), labels=lab.reset_index(), missed=missed, causes=causes,
-                qso_density=pd.DataFrame(dens), contaminants=cont, regions=R)  # fmt: skip
+                qso_density=pd.DataFrame(dens), contaminants=cont, regions=R,
+                counterfactual_recall=pd.DataFrame(cf_rows), qso_other_objects=res["qso_other"])  # fmt: skip
 
 
 def main() -> int:

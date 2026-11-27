@@ -1,0 +1,19 @@
+{
+ "version": "2.61.0",
+ "commit": "825bab976331427b922742be4fa0a5773cad56f7",
+ "regions": 169,
+ "regions_locked": 169,
+ "list_sha256": "8b0f52e28ea3819fd6a9ea97ab922c305acd2a404c5dcc8df9981337a7e4d0d7",
+ "gaia_source_regions": {
+  "vizier_fallback": 169
+ },
+ "desi_legacy_timeouts_retried": [
+  "lq0_005",
+  "lq0_010",
+  "lq0_014",
+  "lq1_001"
+ ],
+ "collected_where": "this cloud session container (live archives), blind (V2_SKIP_COLLECTORS=blind), radius 3 arcmin",
+ "date": "2026-11-27",
+ "note": "first measurement; Gaia from the VizieR I/355 copy (ESA archive down until 2026-12-02)"
+}
