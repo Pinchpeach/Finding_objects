@@ -3,6 +3,9 @@
 
     python run_stage1.py --sets NAME=KIND:ROOT[:FIELDS.csv] ... --out DIR [--env KEY=VALUE ...] [--jobs 4]
 
+Stage 1 starts without the caller's ``V2_*`` variables (only ``V2_CACHE`` / ``V2_CACHE_DIR`` pass), so that a switch left in the shell cannot
+change a run: every switch, ``V2_ASSOC_DIAG=1`` too, is given with ``--env``.
+
 ``KIND``: ``regions`` (``ROOT/<region>/raw`` for the regions of FIELDS.csv: the low-latitude calibration / confirmation
 regions, with or without the collected spectra) or ``cosmos`` (``ROOT/<field>/raw/<tag>``, the deep COSMOS fields;
 FIELDS.csv lists the fields).  Writes ``DIR/<set>/<region>.csv.gz``, the ``source_association.csv`` of the stage, and

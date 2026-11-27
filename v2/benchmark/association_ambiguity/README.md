@@ -35,14 +35,15 @@ best candidates of every detection (`diag_*`), nothing else reads them.
 ## Reproduce (calibration: COSMOS fields 1-9, low-latitude calibration cones; confirmation: fields 10-26 and the confirmation cones)
 
 ```
-V2_ASSOC_DIAG=1 python run_stage1.py --sets cosmos_orig9=cosmos:ROOT:FIELDS.csv ... --out DIR      # baseline with diagnostics
+python run_stage1.py --sets cosmos_orig9=cosmos:ROOT:FIELDS.csv ... --out DIR --env V2_ASSOC_DIAG=1   # baseline with diagnostics
+#   switches go through --env: run_stage1.py starts Stage 1 without the caller's V2_* variables (only V2_CACHE / V2_CACHE_DIR pass)
 python analyse_ambiguity.py --stage1 DIR --out OUT ; python candidate_truth.py --stage1 DIR --truth-flux TRUTH --out OUT
 bash ../association_truth/run_full.sh FIELDS_ROOT OUT 4 V2_ASSOC_AMBIG=same,nearest                     # full pipeline of a variant
 python ../association_truth/measure_association.py --truth-flux TRUTH --assoc-dir OUT --out M/<variant> --variant <variant>
 python compare_variants.py --measure M --variants base same_nearest all --out CMP
 python ../faint_qso_candidates.py compare --deep DEEP --base base --variant all --out LABELS               # fixed / broken, McNemar
 python label_changes.py --base OUT_BASE --variant OUT_VAR --fields deep_cosmos_1,... --out LC
-# low latitude: v2/benchmark/lowlat_qso/ab_variants.py on the compact records, then lowlat_exchange.py; spectro_held.py for the spectroscopic QSOs
+# low latitude: v2/benchmark/lowlat_qso/ab_variants.py on the compact records, then lowlat_exchange.py --table qso_labelled_not_sample_long.csv.gz; spectro_held.py for the spectroscopic QSOs
 ```
 
 `results_2026-11-27f/` holds the tables: `baseline/` (size, catalogue profiles, candidate truth, predicted joins), `calibration/` and `confirmation/`.
