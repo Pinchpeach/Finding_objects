@@ -154,3 +154,9 @@ Checked against the committed tables (`results_2026-11-27/`) and the code; nothi
    or QSO magnitude prior, a Stern latitude gate or a single-survey rule tuned on these numbers makes them a development set, and
    a claim about low-latitude QSO recall after such a change needs a new draw (quasars of the two samples not drawn here, or
    another spectroscopic sample) whose list is locked before collection, as this one was.
+6. **Scorer fixes from the code review** (they do not change the committed results, where all 169 regions have a record and
+   none is empty): a region without detections has the pipeline's empty-result schema (no `parent_object_id`, no `p_*`), which
+   aborted the whole scoring; the compact record is now completed with the missing columns and its quasar scores as `NO_OBJECT`.
+   A region without a record used to drop its quasars from every denominator silently; they are now `REGION_MISSING` in
+   `per_truth.csv`, still in no denominator (they were not measured), counted in a `coverage` row of `recall_summary.csv` and in
+   `coverage.json` (copied into the workflow's `run.json`), and the score log prints `INCOMPLETE` with the missing regions.

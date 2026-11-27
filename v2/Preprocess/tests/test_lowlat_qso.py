@@ -134,6 +134,35 @@ def test_scoring_counts_labels_causes_and_density(tmp_path):
     assert tabs["contaminants"].label.tolist() == ["QSO"]
 
 
+def test_empty_region_and_missing_region(tmp_path):
+    """A region without detections (the pipeline's empty-result schema) scores its quasar as NO_OBJECT; a region without a
+    record keeps its quasar out of every recall denominator and marks the run incomplete."""
+    truth = pd.DataFrame(
+        dict(sample=["huo", "huo", "huo"], name=["q1", "q2", "q3"], ra=[150.0, 160.0, 170.0], dec=[2.0] * 3, l=[100.0] * 3,
+             b=[-12.0] * 3, z=[1.0] * 3, imag=[18.0] * 3, ebv=[0.1] * 3, cls=["qso"] * 3, also_in=[""] * 3)
+    )  # fmt: skip
+    regions = pd.DataFrame(dict(name=["r1", "r2", "r3"], stratum=["b10-15"] * 3, kind=["qso"] * 3, ra=[150.0, 160.0, 170.0],
+                                dec=[2.0] * 3))  # fmt: skip
+    _write_region(tmp_path, "r1", [dict(object_id="O1", ra=150.0, dec=2.0, primary_class="QSO")])
+    (tmp_path / "r2").mkdir()
+    pd.DataFrame(columns=["object_id", "designation", "ra", "dec", "catalogs", "primary_class", "primary_confidence",
+                          "classification_status"]).to_csv(tmp_path / "r2" / "objects.csv.gz", index=False)  # fmt: skip
+    res = S.score_regions(regions, truth, tmp_path, radius_arcmin=3.0)  # r3 has no record
+    T = res["per_truth"].set_index("name")
+    assert T.loc["q1", "label"] == "QSO"
+    assert T.loc["q2", "label"] == "NO_OBJECT" and T.loc["q2", "cause"] == "no_object"
+    assert T.loc["q3", "label"] == S.MISSING and T.loc["q3", "cause"] == "region_missing"
+    cov = S.coverage(res)
+    assert cov == dict(regions=3, regions_missing=1, quasars=3, quasars_not_scored=1, missing_regions=["r3"], complete=False)
+    tabs = S.summarise(res)
+    rs = tabs["recall_summary"].set_index(["by", "bin"])
+    assert rs.loc[("all", "all"), "n"] == 1 and rs.loc[("all", "all incl. no object"), "n"] == 2
+    assert rs.xs("coverage").n.iloc[0] == 1
+    assert S.MISSING not in set(tabs["missed"].label)
+    dens = tabs["qso_density"].set_index("stratum").loc["all"]
+    assert dens.regions == 2 and dens.qso_labelled_other == 0
+
+
 def test_region_draw_is_deterministic_and_non_overlapping():
     rng = np.random.default_rng(3)
     n = 800

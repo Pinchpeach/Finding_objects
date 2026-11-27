@@ -22,6 +22,8 @@ regions of ``fields_lowlat.csv`` and the truth table of ``build_lowlat_truth.py`
                             or both (labels set by a rule or an abstention are kept; the confidence gates are ignored): what
                             a prior costs in recall, not a recommendation: the cost in false QSO labels is not measured here
   regions.csv               one row per region: objects, QSO-labelled objects, truth quasars in the cone, archive status
+  coverage.json             regions and quasars scored against the list; a run with a missing region is marked INCOMPLETE
+                            (its quasars are REGION_MISSING in per_truth.csv and in no recall denominator)
 
 Causes of a miss, first match wins:
   no_object          no object within ``MATCH_ARCSEC`` of the quasar (not detected in any catalogue, or not resolved)
@@ -49,6 +51,7 @@ import numpy as np
 import pandas as pd
 
 MATCH_ARCSEC = 2.0
+MISSING = "REGION_MISSING"  # label of a truth object whose region has no compact record
 CLASSES = ("STAR", "GALAXY", "QSO")
 KEEP = [
     "object_id", "ra", "dec", "catalogs", "std_ebv", "primary_class", "primary_confidence", "primary_margin",
@@ -274,9 +277,19 @@ def score_regions(regions: pd.DataFrame, truth: pd.DataFrame, root: Path, radius
     for r in regions.itertuples():
         f = root / r.name / "objects.csv.gz"
         if not f.exists():
+            # A region that was not collected or not compacted: its truth objects are listed as REGION_MISSING and kept
+            # out of every recall denominator, and the coverage is reported (summarise, main) so an incomplete run is
+            # not read as a measurement of the locked list.
+            s_m = _sep_arcsec(t_all.ra, t_all.dec, r.ra, r.dec) / 60.0
+            for t in t_all[s_m <= radius_arcmin].itertuples():
+                rows.append(dict(region=r.name, stratum=r.stratum, sample=t.sample, name=t.name, cls=t.cls, ra=t.ra,
+                                 dec=t.dec, b=t.b, l=t.l, ebv=t.ebv, imag=t.imag, z=t.z, label=MISSING, object_id="",
+                                 basis="", status="", cause="region_missing" if t.cls == "qso" else ""))  # fmt: skip
             reg_rows.append(dict(name=r.name, stratum=r.stratum, kind=r.kind, status="missing", objects=0))
             continue
         o = pd.read_csv(f, low_memory=False)
+        # a region without detections has the pipeline's empty-result schema (no grouping or probability columns)
+        o = o.reindex(columns=list(dict.fromkeys([*o.columns, *KEEP, "rules_QSO", "rules_all"])))
         by_id = o.set_index("object_id")
         s_c = _sep_arcsec(t_all.ra, t_all.dec, r.ra, r.dec) / 60.0
         inside = t_all[s_c <= radius_arcmin]
@@ -348,9 +361,21 @@ def _bin_table(df: pd.DataFrame, col: str, bins, label: str, absval=False) -> li
     return out
 
 
+def coverage(res: dict) -> dict:
+    """Regions and truth quasars scored against those of the list; ``complete`` is False when a region has no record."""
+    R, T = res["per_region"], res["per_truth"]
+    q = T[T.cls == "qso"] if len(T) else T
+    miss_q = int((q.label == MISSING).sum()) if len(q) else 0
+    n_miss = int((R.status == "missing").sum()) if len(R) else 0
+    return dict(regions=len(R), regions_missing=n_miss, quasars=len(q), quasars_not_scored=miss_q,
+                missing_regions=sorted(R.loc[R.status == "missing", "name"].tolist()) if n_miss else [],
+                complete=n_miss == 0)  # fmt: skip
+
+
 def summarise(res: dict) -> dict[str, pd.DataFrame]:
     T = res["per_truth"]
-    q = T[T.cls == "qso"].copy()
+    q_all = T[T.cls == "qso"].copy()
+    q = q_all[q_all.label != MISSING].copy()  # a quasar of a region without a record is not a miss: it was not measured
     have = q[q.label != "NO_OBJECT"].copy()
     have["ebv_use"] = have.ebv.where(have.ebv.notna(), have.get("std_ebv"))
     rows = []
@@ -360,6 +385,9 @@ def summarise(res: dict) -> dict[str, pd.DataFrame]:
     n2, k2 = len(q), int((q.label == "QSO").sum())
     a2, b2 = wilson(k2, n2)
     rows.append(dict(by="all", bin="all incl. no object", n=n2, qso=k2, recall=round(k2 / n2, 4) if n2 else math.nan, lo=round(a2, 4), hi=round(b2, 4)))
+    cov = coverage(res)
+    rows.append(dict(by="coverage", bin="quasars in regions without a record (not in any n)", n=cov["quasars_not_scored"],
+                     qso=math.nan, recall=math.nan, lo=math.nan, hi=math.nan))  # fmt: skip
     rows += _bin_table(have, "b", B_BINS, "|b| (deg)", absval=True)
     rows += _bin_table(have, "ebv_use", EBV_BINS, "E(B-V)")
     rows += _bin_table(have, "imag", I_BINS, "PS1 i")
@@ -377,7 +405,7 @@ def summarise(res: dict) -> dict[str, pd.DataFrame]:
         n, k = len(g), int((g.label == "QSO").sum())
         a, b = wilson(k, n)
         rows.append(dict(by="AllWISE R90 sky", bin="inside" if flag else "outside", n=n, qso=k, recall=round(k / n, 4), lo=round(a, 4), hi=round(b, 4)))
-    lab = (q.assign(bbin=pd.cut(q.b.abs(), [0, 5, 10, 15, 20.0001], right=False).astype(str))
+    lab = (q_all.assign(bbin=pd.cut(q.b.abs(), [0, 5, 10, 15, 20.0001], right=False).astype(str))
             .groupby(["bbin", "label"]).size().unstack(fill_value=0))  # fmt: skip
     missed = q[q.label != "QSO"]
     causes = (missed.assign(bbin=pd.cut(missed.b.abs(), [0, 5, 10, 15, 20.0001], right=False).astype(str))
@@ -435,6 +463,11 @@ def main() -> int:
     tabs = summarise(res)
     for k, v in tabs.items():
         v.to_csv(a.out / f"{k}.csv", index=False)
+    cov = coverage(res)
+    (a.out / "coverage.json").write_text(json.dumps(cov, indent=1) + "\n")
+    if not cov["complete"]:
+        print(f"INCOMPLETE: {cov['regions_missing']} of {cov['regions']} regions have no record "
+              f"({cov['quasars_not_scored']} of {cov['quasars']} quasars not scored): {', '.join(cov['missing_regions'])}")  # fmt: skip
     with pd.option_context("display.width", 250, "display.max_columns", 30, "display.max_rows", 200):
         print(tabs["recall_summary"].to_string(index=False))
         print(tabs["causes"].to_string(index=False))
