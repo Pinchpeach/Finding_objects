@@ -471,6 +471,9 @@ def _with_mirrors(send):
                 raise
             _log(parts.hostname, resp.status_code, t0)
             return resp
+        # 2.61.6 review: forget the last answer's mirror before asking, so that after a request that fails on every mirror
+        # ``distrust_last_mirror`` names no mirror instead of one that answered an earlier request well
+        _local.last_host = None
         catalog = _catalog_of(str(url), kwargs.get("data"))
         hosts = _vizier_order(parts.hostname, catalog)
         read = kwargs.get("timeout")
@@ -482,7 +485,7 @@ def _with_mirrors(send):
         # empty cone.  When no mirror gives data they end in an error (the collector reports it) instead of being
         # returned as a table-less answer, which astroquery reads as "no rows" (the 2026-11-07 kind of silence).
         lacked = None
-        cut = None  # the last answer that stopped before </VOTABLE> (2.61.6)
+        cut = None  # the last answer that stopped before </VOTABLE> or broke off in transfer (2.61.6)
         retried: set = set()  # mirrors asked again after a database error of their own
         for i, host in enumerate(hosts):
             if i:
@@ -504,6 +507,8 @@ def _with_mirrors(send):
                 _unreachable[host] = time.monotonic() + MIRROR_STICKY_S
                 _remember(host, False)
                 last = exc
+                if isinstance(exc, (requests.exceptions.ChunkedEncodingError, requests.exceptions.ContentDecodingError)):
+                    cut = exc  # the body broke off in transfer: the same "too long" signal as a cut VOTable (Codex, 2.61.6)
                 continue
             if _truncated_votable(resp):  # 200, but the table stops half way: a failure of this mirror (2.61.6)
                 _log(host, f"{resp.status_code} truncated", t0)
@@ -524,7 +529,9 @@ def _with_mirrors(send):
                 _remember(host, False)
             elif reason is None:
                 _remember(host, True)  # it answered
-            if resp.status_code in RETRY_STATUS and i < len(hosts) - 1:
+            # the last mirror's error status is returned as the answer, unless an earlier mirror cut the table off: that
+            # signal outranks it (Codex review of 4d216f9: CfA cut, the others 503 -> a 503, and the batch was never halved)
+            if resp.status_code in RETRY_STATUS and (i < len(hosts) - 1 or cut is not None):
                 _unreachable[host] = time.monotonic() + MIRROR_STICKY_S  # failing: tried last for a while
                 last = resp
                 continue
@@ -586,6 +593,16 @@ def _with_mirrors(send):
                 _preferred.update(host=None, until=0.0)
             _local.last_host = host
             return resp
+        if cut is not None:
+            # A mirror served the table but cut it off, and no mirror gave it whole (the others cut it too, refused, timed
+            # out, lacked it or answered table-less): the request is too long for the mirrors, not absent.  That signal
+            # outranks a later connection error or an empty answer, so a caller can ask again in smaller pieces
+            # (Codex review of 2.61.6: CfA cut, the other five refused -> ConnectionError, and the batch was never halved;
+            # the same for a body that broke off in transfer, ChunkedEncodingError / ContentDecodingError, on review of b51d74b).
+            how = f"in transfer ({type(cut).__name__})" if isinstance(cut, Exception) else "before </VOTABLE>"
+            raise requests.exceptions.ChunkedEncodingError(
+                f"VizieR: a mirror cut off a VOTable {how} and no mirror gave it whole ({catalog or 'the table'})"
+            ) from (cut if isinstance(cut, Exception) else None)
         if empty is not None:
             return empty  # a table-less answer without an error that no mirror contradicted (2.47.0)
         if lacked is not None:
@@ -593,10 +610,6 @@ def _with_mirrors(send):
             raise RuntimeError(f"VizieR: no mirror gave {catalog or 'the table'}: {why[:160]}")
         if isinstance(last, Exception):
             raise last
-        if cut is not None and last is cut:  # every mirror cut the answer off: never hand half a table to the parser
-            raise requests.exceptions.ChunkedEncodingError(
-                f"VizieR: every mirror answered a VOTable cut off before </VOTABLE> ({catalog or 'the table'})"
-            )
         return last
 
     request.__wrapped__ = send

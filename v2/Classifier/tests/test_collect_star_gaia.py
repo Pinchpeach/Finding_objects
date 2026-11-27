@@ -7,8 +7,14 @@ import sys
 import types
 from pathlib import Path
 
+import unittest
+
 import pandas as pd
-import pytest
+
+try:
+    import pytest
+except ImportError:  # the cross-validation workflow runs ``unittest discover`` without pytest (2.61.7)
+    raise unittest.SkipTest("these tests use pytest fixtures; run them with pytest")
 
 V2 = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(V2 / "Get_data"))
@@ -38,13 +44,18 @@ class FakeVizier:
 
     scenario: dict = {}
     calls: list = []
+    cached: dict = {}  # astroquery caches a body before parsing it and serves it again to an identical cached request
 
     def __init__(self, columns=None, row_limit=None):
         self.TIMEOUT = None
 
-    def query_region(self, coords, radius=None, catalog=None):
+    def query_region(self, coords, radius=None, catalog=None, cache=True):
         n = len(coords)
         seen = []
+        key = (n, float(coords[0].ra.deg))
+        if cache and key in FakeVizier.cached:
+            FakeVizier.calls.append((n, "cache"))
+            return self._read(FakeVizier.cached[key], n)
 
         def send(self, method, url, *a, **k):
             seen.append(url)
@@ -56,7 +67,13 @@ class FakeVizier:
 
         resp = throttle._with_mirrors(send)(None, "GET", "https://vizier.cds.unistra.fr/viz-bin/votable?-source=I/355/gaiadr3")
         FakeVizier.calls.append((n, throttle.last_host()))
-        if b"<!--bad-->" in resp.content:
+        if cache:
+            FakeVizier.cached[key] = resp.content
+        return self._read(resp.content, n)
+
+    @staticmethod
+    def _read(content, n):
+        if b"<!--bad-->" in content:
             raise ValueError("1027:862: no element found")  # TableParseError of astroquery
         d = pd.DataFrame({"_q": range(1, n + 1), "Source": range(n), "RA_ICRS": [10.0 + i for i in range(n)],
                           "DE_ICRS": [20.0] * n, "Plx": [1.0] * n})  # fmt: skip
@@ -71,7 +88,7 @@ def fallback(monkeypatch, tmp_path):
     monkeypatch.setattr(throttle, "install", lambda: None)  # no global patch of requests in the test process
     throttle._preferred.update(host=None, until=0.0)
     throttle._unreachable.clear()
-    FakeVizier.scenario, FakeVizier.calls = {}, []
+    FakeVizier.scenario, FakeVizier.calls, FakeVizier.cached = {}, [], {}
     pkg, vz = types.ModuleType("astroquery"), types.ModuleType("astroquery.vizier")
     vz.Vizier = FakeVizier
     monkeypatch.setitem(sys.modules, "astroquery", pkg)
@@ -123,7 +140,7 @@ def test_a_batch_at_the_smallest_size_that_still_fails_raises(fallback, monkeypa
     FakeVizier.scenario = {h: "bad" for h in throttle.VIZIER_HOSTS}
     with pytest.raises(ValueError, match="no element found"):
         fallback._vizier_fallback(_truth(5), 2.0)
-    assert len(FakeVizier.calls) == fallback.VIZIER_RETRIES_SMALL  # every attempt made, then the error is the caller's
+    assert len(FakeVizier.calls) == fallback.VIZIER_RETRIES  # every attempt made, then the error is the caller's
 
 
 def test_the_output_does_not_depend_on_how_the_answer_was_delivered(fallback):
@@ -141,14 +158,44 @@ def test_a_failure_that_is_not_about_the_answer_does_not_halve_the_batch(fallbac
 
     monkeypatch.setattr(fallback, "MIN_SPLIT", 2)
 
-    def refused(self, coords, radius=None, catalog=None):
+    def refused(self, coords, radius=None, catalog=None, cache=True):
         FakeVizier.calls.append((len(coords), None))
         raise requests.exceptions.ConnectionError("refused")
 
     monkeypatch.setattr(FakeVizier, "query_region", refused)
     with pytest.raises(requests.exceptions.ConnectionError):
         fallback._vizier_fallback(_truth(8), 2.0)
-    assert [n for n, _ in FakeVizier.calls] == [8] * fallback.VIZIER_RETRIES  # two attempts at 8 positions, no halving
+    assert [n for n, _ in FakeVizier.calls] == [8] * fallback.VIZIER_RETRIES  # four attempts at 8 positions, no halving
+
+
+def test_an_outage_gets_the_four_attempts_of_the_code_before_2_61_6(fallback, monkeypatch):
+    """CI run 46055319902: VizieR answered 404, then timed out; two attempts ended the crossmatch, four had not."""
+    import requests
+
+    monkeypatch.setattr(fallback, "MIN_SPLIT", 2)
+    real, failures = FakeVizier.query_region, []
+
+    def flaky(self, coords, radius=None, catalog=None, cache=True):
+        if len(failures) < fallback.VIZIER_RETRIES - 1:
+            failures.append(len(coords))
+            raise requests.exceptions.ReadTimeout("read timeout=300")
+        return real(self, coords, radius=radius, catalog=catalog, cache=cache)
+
+    monkeypatch.setattr(FakeVizier, "query_region", flaky)
+    out = fallback._vizier_fallback(_truth(8), 2.0)
+    assert sorted(out.benchmark_id) == [f"B{i:04d}" for i in range(8)]
+    assert failures == [8, 8, 8] and [n for n, _ in FakeVizier.calls] == [8]  # answered at the fourth attempt, not halved
+
+
+def test_a_halvable_batch_is_halved_after_two_unreadable_answers(fallback, monkeypatch):
+    monkeypatch.setattr(fallback, "MIN_SPLIT", 2)
+    FakeVizier.scenario = {h: {"n>": 3, "what": "bad"} for h in throttle.VIZIER_HOSTS}  # more than 3 positions: unreadable
+    out = fallback._vizier_fallback(_truth(8), 2.0)
+    assert sorted(out.benchmark_id) == [f"B{i:04d}" for i in range(8)]
+    hosts = [h for _, h in FakeVizier.calls]
+    # 8 (two mirrors, unreadable) -> 4 + 4 (still unreadable at the first) -> 2 + 2 + 2 + 2, each answered
+    assert [n for n, _ in FakeVizier.calls] == [8, 8, 4, 4, 2, 2, 2, 2]
+    assert hosts[0] != hosts[1] and "cache" not in hosts  # the retry asks another mirror, over the network
 
 
 def test_the_smaller_size_found_by_halving_is_kept_for_the_following_batches(fallback, monkeypatch):

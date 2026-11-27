@@ -719,3 +719,77 @@ def test_a_caller_that_could_not_read_an_answer_distrusts_its_mirror():
     seen.clear()
     req(None, "GET", "https://vizier.cds.unistra.fr/x")
     assert "vizier.cds.unistra.fr" not in seen[0]  # the retry starts at another mirror
+
+
+def test_a_request_that_fails_everywhere_leaves_no_mirror_to_distrust():
+    """2.61.6 review: after a request that every mirror cut off, the caller's distrust must not fall on the mirror that
+    answered the previous request well."""
+    import requests
+
+    seen = []
+    good = throttle._with_mirrors(_body_send({}, seen))
+    good(None, "GET", "https://vizier.cds.unistra.fr/x")
+    assert throttle.last_host() == "vizier.cds.unistra.fr"
+    bad = throttle._with_mirrors(_body_send({h: VOTABLE[:60] for h in throttle.VIZIER_HOSTS}, seen))
+    with pytest.raises(requests.exceptions.ChunkedEncodingError):
+        bad(None, "GET", "https://vizier.cds.unistra.fr/viz-bin/votable?-source=I/355/gaiadr3")
+    assert throttle.last_host() is None and throttle.distrust_last_mirror() is None
+
+
+def test_a_cut_answer_is_reported_even_when_the_other_mirrors_refuse():
+    """Codex review of 2.61.6: one mirror cuts the table off, every other refuses; the request ends in the truncation
+    error (the caller can ask in smaller pieces), not in the last connection error."""
+    import requests
+
+    seen = []
+    behaviour = {h: requests.exceptions.ConnectionError for h in throttle.VIZIER_HOSTS}
+    behaviour["vizier.cfa.harvard.edu"] = VOTABLE[:60]
+    req = throttle._with_mirrors(_body_send(behaviour, seen))
+    with pytest.raises(requests.exceptions.ChunkedEncodingError, match="cut off"):
+        req(None, "GET", "https://vizier.cds.unistra.fr/viz-bin/votable?-source=I/355/gaiadr3")
+    assert len(seen) == len(throttle.VIZIER_HOSTS)
+
+
+
+@pytest.mark.parametrize("broken", ["ChunkedEncodingError", "ContentDecodingError"])
+def test_a_body_broken_in_transfer_is_reported_even_when_the_other_mirrors_refuse(broken):
+    """Codex review of b51d74b: CfA's body breaks off in transfer, every later mirror refuses or times out; the
+    request ends in the truncation error, not in the last connection error, so the caller halves the batch."""
+    import requests
+
+    seen = []
+    errors = {h: requests.exceptions.ConnectionError("refused") for h in throttle.VIZIER_HOSTS}
+    errors["vizier.cfa.harvard.edu"] = getattr(requests.exceptions, broken)("IncompleteRead(1024 bytes read)")
+    errors[throttle.VIZIER_HOSTS[-1]] = requests.exceptions.ReadTimeout("read timeout=300")
+
+    def send(self, method, url, *a, **k):
+        seen.append(url)
+        raise next(e for h, e in errors.items() if h in url)
+
+    req = throttle._with_mirrors(send)
+    with pytest.raises(requests.exceptions.ChunkedEncodingError, match=rf"in transfer \({broken}\)"):
+        req(None, "GET", "https://vizier.cds.unistra.fr/viz-bin/votable?-source=I/355/gaiadr3")
+    assert len(seen) == len(throttle.VIZIER_HOSTS)
+
+
+@pytest.mark.parametrize("status", [503, 404])
+def test_a_cut_answer_outranks_the_error_status_of_the_last_mirror(status):
+    """Codex review of 4d216f9: CfA cuts the table off, every other mirror (the last one too) answers an error status;
+    the request ends in the truncation error, not in the last mirror's error response."""
+    import requests
+
+    seen = []
+    behaviour = {h: BodyResp(b"Service Unavailable", code=status, ctype="text/html") for h in throttle.VIZIER_HOSTS}
+    behaviour["vizier.cfa.harvard.edu"] = VOTABLE[:60]
+    req = throttle._with_mirrors(_body_send(behaviour, seen))
+    with pytest.raises(requests.exceptions.ChunkedEncodingError, match="before </VOTABLE>"):
+        req(None, "GET", "https://vizier.cds.unistra.fr/viz-bin/votable?-source=I/355/gaiadr3")
+    assert len(seen) == len(throttle.VIZIER_HOSTS)
+
+
+def test_the_last_mirror_error_status_is_still_returned_when_no_mirror_cut_the_table():
+    seen = []
+    behaviour = {h: BodyResp(b"Service Unavailable", code=503, ctype="text/html") for h in throttle.VIZIER_HOSTS}
+    req = throttle._with_mirrors(_body_send(behaviour, seen))
+    resp = req(None, "GET", "https://vizier.cds.unistra.fr/viz-bin/votable?-source=I/355/gaiadr3")
+    assert resp.status_code == 503 and len(seen) == len(throttle.VIZIER_HOSTS)
