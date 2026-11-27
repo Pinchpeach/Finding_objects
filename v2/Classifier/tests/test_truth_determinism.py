@@ -129,3 +129,69 @@ def test_verify_finds_a_changed_file_a_changed_class_and_a_failed_set(tmp_path, 
     monkeypatch.setattr(B, "_vizier", failing)
     B.build(tmp_path / "bad", 100)
     assert any("variables" in p and "error" in p for p in B.verify(tmp_path / "bad"))
+
+
+def test_run_mode_skips_a_push_only_until_the_list_is_frozen(tmp_path):
+    """2.62.1: a push before the freeze does nothing (SKIPPED_UNFROZEN); the skip ends by itself once truth/fixed holds a manifest."""
+    fixed = tmp_path / "fixed"
+    assert B.run_mode("push", "", fixed) == "skip"
+    assert B.run_mode("workflow_dispatch", "", fixed) == "false"  # a manual run still validates (UNFROZEN)
+    assert B.run_mode("workflow_dispatch", "true", fixed) == "candidate" and B.run_mode("push", True, fixed) == "candidate"
+    fixed.mkdir()
+    (fixed / B.MANIFEST).write_text("{}")
+    assert B.run_mode("push", "", fixed) == "true" and B.run_mode("workflow_dispatch", "false", fixed) == "true"
+
+
+def _fake_astroquery(monkeypatch, answer):
+    """astroquery.vizier.Vizier whose answer depends on the columns asked for; records every query."""
+    import types
+
+    calls = []
+
+    class Table:
+        def __init__(self, df):
+            self.df = df
+
+        def to_pandas(self):
+            return self.df
+
+    class Vizier:
+        def __init__(self, columns=None, row_limit=None, timeout=None):
+            self.columns = columns
+
+        def query_constraints(self, catalog=None, **kw):
+            calls.append(list(self.columns))
+            return [Table(answer(self.columns))]
+
+        get_catalogs = None
+
+    pkg, vz = types.ModuleType("astroquery"), types.ModuleType("astroquery.vizier")
+    vz.Vizier = Vizier
+    monkeypatch.setitem(sys.modules, "astroquery", pkg)
+    monkeypatch.setitem(sys.modules, "astroquery.vizier", vz)
+    monkeypatch.setattr(B.time, "sleep", lambda s: None)
+    return calls
+
+
+def test_a_narrow_query_asks_only_for_the_columns_the_builder_reads(monkeypatch):
+    full = pd.DataFrame({"ASASSN-V": ["V1"], "Prob": [0.9], "RAJ2000": [1.0], "DEJ2000": [2.0], "Other": [5]})
+    calls = _fake_astroquery(monkeypatch, lambda cols: full[[c for c in full.columns if c in cols]] if "**" not in cols else full)
+    df = B._vizier("II/366/catv2021", need=[["ASASSN-V", "ID"], ["Prob"]], Type="RRAB")
+    assert len(calls) == 1 and "**" not in calls[0] and {"ASASSN-V", "Prob", "RAJ2000", "_RAJ2000"} <= set(calls[0])
+    assert list(df.columns) == ["ASASSN-V", "Prob", "RAJ2000", "DEJ2000"]
+
+
+def test_a_narrow_answer_that_lacks_a_column_or_fails_falls_back_to_the_full_row(monkeypatch):
+    full = pd.DataFrame({"ASASSN-V": ["V1"], "Prob": [0.9], "RAJ2000": [1.0], "DEJ2000": [2.0]})
+    calls = _fake_astroquery(monkeypatch, lambda cols: full if "**" in cols else full[["RAJ2000", "DEJ2000"]])  # the narrow answer misses the id
+    df = B._vizier("II/366/catv2021", need=[["ASASSN-V", "ID"], ["Prob"]], Type="RRAB")
+    assert len(calls) == 2 and "**" in calls[1] and "ASASSN-V" in df.columns
+
+    def broken(cols):
+        if "**" not in cols:
+            raise RuntimeError("unknown column")
+        return full
+
+    calls = _fake_astroquery(monkeypatch, broken)
+    df = B._vizier("B/psr/psr", need=[["PSRJ", "Name"]], Type="x")
+    assert calls[-1][0] == "**" and len(df) == 1  # three narrow attempts, then the full row

@@ -34,13 +34,18 @@ def _pick(df, names):
     return None
 
 
-def _vizier(catalog, row_limit=-1, **constraints):
+# The position columns ``_coords`` reads, in its order, and VizieR's computed J2000 position: asked for with every narrow query, so that a narrow
+# answer gives ``_coords`` the same column a full one would.
+POSITION_COLUMNS = ["RAJ2000", "DEJ2000", "RA_ICRS", "DE_ICRS", "_RA", "_DE", "_RAJ2000", "_DEJ2000"]
+
+
+def _ask_vizier(catalog, columns, row_limit, constraints):
     from astroquery.vizier import Vizier
 
     last = None
     for attempt in range(3):
         try:
-            v = Vizier(columns=["**", "_RAJ2000", "_DEJ2000"], row_limit=row_limit, timeout=180)
+            v = Vizier(columns=columns, row_limit=row_limit, timeout=180)
             tabs = v.query_constraints(catalog=catalog, **constraints) if constraints else v.get_catalogs(catalog)
             return tabs[0].to_pandas() if tabs else pd.DataFrame()
         except Exception as exc:
@@ -48,6 +53,28 @@ def _vizier(catalog, row_limit=-1, **constraints):
             if attempt < 2:
                 time.sleep(2**attempt)
     raise last
+
+
+def _vizier(catalog, row_limit=-1, need=None, **constraints):
+    """A whole VizieR table (2.61.9: no ``row_limit`` that cuts it at an arbitrary place).
+
+    ``need``: the columns the builder reads, as groups of alternative names (``[["ASASSN-V", "ID"], ["Prob"]]``).  Then only those and the
+    position columns are asked for (2.62.1: ASAS-SN II/366 has ~690 000 rows and the builder reads five of its columns); when that answer fails, is
+    empty or lacks a group or a position, the full row (``**``) is asked for instead, so a wrong column name costs a second query, not the list.
+    """
+    full = ["**", "_RAJ2000", "_DEJ2000"]
+    if need:
+        cols = list(dict.fromkeys([c for group in need for c in group] + POSITION_COLUMNS))
+        try:
+            df = _ask_vizier(catalog, cols, row_limit, constraints)
+        except Exception as exc:  # noqa: BLE001
+            print(f"[truth] {catalog} {constraints or ''}: narrow query failed ({type(exc).__name__}); asking for the full row", flush=True)
+        else:
+            has_pos = (_pick(df, ["RAJ2000", "RA_ICRS", "_RA", "_RAJ2000"]) is not None and _pick(df, ["DEJ2000", "DE_ICRS", "_DE", "_DEJ2000"]) is not None)
+            if not df.empty and has_pos and all(_pick(df, group) is not None for group in need):
+                return df
+            print(f"[truth] {catalog} {constraints or ''}: narrow answer incomplete ({len(df)} rows); asking for the full row", flush=True)
+    return _ask_vizier(catalog, full, row_limit, constraints)
 
 
 def _coords(df):
@@ -76,7 +103,7 @@ def _coords(df):
 
 def red_giants(limit):
     # Vrard+ 2025 table4: EV=1 certain RGB, EV=2 candidate AGB.
-    df = _vizier("J/A+A/697/A165/table4")
+    df = _vizier("J/A+A/697/A165/table4", need=[["EV"], ["KIC"]])
     if df.empty:
         return df
     ev = _pick(df, ["EV"])
@@ -108,7 +135,7 @@ def variables(limit):
     ]
     parts = []
     for typ, label in specs:
-        df = _vizier("II/366/catv2021", Type=typ)  # a failed query raises: a class must not go missing without notice (2.61.9)
+        df = _vizier("II/366/catv2021", need=[["ASASSN-V", "ID"], ["Prob"]], Type=typ)  # a failed query raises: a class must not go missing without notice (2.61.9)
         if df.empty:
             raise RuntimeError(f"II/366/catv2021 Type={typ}: empty answer")
         idc = _pick(df, ["ASASSN-V", "ID"])
@@ -133,7 +160,7 @@ def variables(limit):
 
 
 def pulsars(limit):
-    df = _vizier("B/psr/psr")
+    df = _vizier("B/psr/psr", need=[["PSRJ", "Name"]])
     if df.empty:
         return df
     idc = _pick(df, ["PSRJ", "Name"])
@@ -147,7 +174,7 @@ def pulsars(limit):
 
 
 def pns(limit):
-    df = _vizier("V/84/main")
+    df = _vizier("V/84/main", need=[["PNG"]])
     if df.empty:
         return df
     idc = _pick(df, ["PNG"])
@@ -161,7 +188,7 @@ def pns(limit):
 
 
 def supernovae(limit):
-    df = _vizier("B/sn/sncat")
+    df = _vizier("B/sn/sncat", need=[["SN"], ["Type"]])
     if df.empty:
         return df
     idc = _pick(df, ["SN"])
@@ -252,6 +279,21 @@ def verify(directory: Path) -> list[str]:
     return problems
 
 
+def run_mode(event: str, freeze, fixed_dir: Path) -> str:
+    """What the cross-validation workflow does with the truth list (2.62.1).
+
+    ``candidate``: a freeze run (``freeze_truth``) builds the list to commit.  ``true``: the committed list in ``fixed_dir`` is verified and used.
+    ``false``: a manual run before the freeze builds the list now (UNFROZEN).  ``skip``: a push before the freeze does nothing (SKIPPED_UNFROZEN):
+    such a run would ask the archives for whole tables at every merge, and its numbers are UNFROZEN anyway.  The skip ends by itself once
+    ``fixed_dir`` holds a manifest.
+    """
+    if str(freeze).strip().lower() == "true":
+        return "candidate"
+    if (Path(fixed_dir) / MANIFEST).exists():
+        return "true"
+    return "skip" if str(event).strip() == "push" else "false"
+
+
 def main():
     sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "Get_data"))
     p = argparse.ArgumentParser()
@@ -259,7 +301,14 @@ def main():
     p.add_argument("--limit", type=int, default=250)
     p.add_argument("--verify", type=Path, help="check this directory against its manifest and exit (1 on any difference)")
     p.add_argument("--require-complete", action="store_true", help="exit 1 unless every set was built (a list to freeze must be complete)")
+    p.add_argument("--run-mode", action="store_true", help="print the workflow's mode (candidate / true / false / skip) for --event, --freeze, --fixed and exit")
+    p.add_argument("--event", default="")
+    p.add_argument("--freeze", default="")
+    p.add_argument("--fixed", type=Path, default=Path(__file__).resolve().parent / "fixed")
     a = p.parse_args()
+    if a.run_mode:
+        print(run_mode(a.event, a.freeze, a.fixed))
+        return
     if a.verify:
         problems = verify(a.verify)
         print(json.dumps({"directory": str(a.verify), "problems": problems, "list_sha256": None if problems else list_sha256(a.verify)}, indent=2))
