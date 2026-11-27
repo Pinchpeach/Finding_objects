@@ -7,8 +7,14 @@ import sys
 import types
 from pathlib import Path
 
+import unittest
+
 import pandas as pd
-import pytest
+
+try:
+    import pytest
+except ImportError:  # the cross-validation workflow runs ``unittest discover`` without pytest (2.61.7)
+    raise unittest.SkipTest("these tests use pytest fixtures; run them with pytest")
 
 V2 = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(V2 / "Get_data"))
