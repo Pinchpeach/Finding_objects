@@ -77,6 +77,7 @@ def main() -> int:
                                                          missing_by_variant=missing, complete=not excluded), indent=1) + "\n")  # fmt: skip
     rows, strata, control = [], [], None
     meta, present, per_quasar = [], {}, None  # one table each, one column per variant (the labels the numbers come from)
+    long = []  # the same objects, one row per variant with that variant's own coordinates (object ids are renumbered between variants)
     for spec in a.variants:
         name, root = spec.split("=", 1)
         res = S.score_regions(regions, truth, Path(root), a.radius)
@@ -120,6 +121,7 @@ def main() -> int:
         # metadata from the first variant that has the object (a label a later variant adds keeps its coordinates etc.)
         meta.append(oth.drop(columns=["key"]))
         present[name] = set(zip(oth.region.astype(str), oth.object_id.astype(str)))
+        long.append(oth.drop(columns=["key"]).assign(variant=name))
         t = q.reset_index()[["region", "name", "sample", "stratum", "b", "l", "imag", "z", "n_catalogs", "label"]].rename(columns={"label": name})
         per_quasar = t if per_quasar is None else per_quasar.merge(t[["name", name]], on="name", how="outer")
     per_object = pd.concat(meta, ignore_index=True).drop_duplicates(subset=["region", "object_id"], keep="first")
@@ -127,6 +129,9 @@ def main() -> int:
     for c in [v.split("=", 1)[0] for v in a.variants]:
         per_object[c] = [k in present[c] for k in ids]
     per_object.to_csv(a.out / "qso_labelled_not_sample_by_variant.csv.gz", index=False)
+    # for matching by position (association_ambiguity/lowlat_exchange.py): the wide table keeps the first variant's coordinates for an
+    # object id, which after a renumbering belong to another source (Codex review of 2.61.8)
+    pd.concat(long, ignore_index=True).to_csv(a.out / "qso_labelled_not_sample_long.csv.gz", index=False)
     per_quasar.to_csv(a.out / "sample_quasars_by_variant.csv", index=False)
     d = pd.DataFrame(rows)
     d.to_csv(a.out / "ab_variants.csv", index=False)

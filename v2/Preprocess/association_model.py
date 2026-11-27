@@ -318,7 +318,8 @@ def _extra_poserr(catalog: str, row: Mapping[str, Any]) -> float | None:
         # coordinate there).  Fainter "stars" are partly compact galaxies and their centroids are photon-noise limited, and a
         # galaxy centre differs from another survey's by an arcsec: they keep the old 0.6'' (calibration, 2.61.7: a flat 0.1'' split
         # 330 of 108 932 rows of the nine fields from their Legacy Surveys / PS1 object).
-        return 0.1 if typ is not None and int(typ) == 6 and mag is not None and mag < SDSS_BRIGHT_PSF_MAG else DEFAULT_PROFILE.fallback_poserr_arcsec
+        # 0 < mag: SDSS writes -9999 for a missing magnitude, which must not read as a bright source (Codex review of 2.61.8)
+        return 0.1 if typ is not None and int(typ) == 6 and mag is not None and 0.0 < mag < SDSS_BRIGHT_PSF_MAG else DEFAULT_PROFILE.fallback_poserr_arcsec
     if catalog == "VLASS":
         # e_RAJ2000 / e_DEJ2000 of the stored rows peak at 2e-4 and are evidently degrees (0.07'' median): the statistical part is
         # far below the systematic one, which is what is used.

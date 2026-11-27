@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 """False QSO labels gained and lost by an association variant at low latitude, objects matched by position (2.61.7).
 
-    python lowlat_exchange.py --table qso_labelled_not_sample_by_variant.csv.gz --base base --variants same_nearest all --out OUT [--tol 1.0]
+    python lowlat_exchange.py --table qso_labelled_not_sample_long.csv.gz --base base --variants same_nearest all --out OUT [--tol 1.0]
 
 ``lowlat_qso/ab_variants.py`` pairs the objects of two variants by ``object_id@region``.  Object ids are sequential in the order the groups
 are made, so a variant that changes an association renumbers everything after it and that exchange (``false_removed_vs_control``,
 ``false_added_vs_control``, ``removed_per_deg2``) counts renumbering.  Here the QSO-labelled objects that are not the sample quasar
-of a region (the table ``ab_variants.py`` writes, one row per object id, one boolean column per variant) are matched between two variants by
-position within a region: mutual nearest anchors within ``--tol`` arcsec.  Per variant against the base: objects kept, lost (QSO in the base,
+of a region (the long table ``ab_variants.py`` writes: one row per variant and object, with that variant's own coordinates) are matched
+between two variants by position within a region: mutual nearest anchors within ``--tol`` arcsec.  The wide table
+(``qso_labelled_not_sample_by_variant.csv.gz``, one row per object id) is refused: it keeps the first variant's coordinates for an id, which
+after a renumbering belong to another source (Codex review of 2.61.8; the 2.61.8 tables made from it are not valid).  Per variant against the base: objects kept, lost (QSO in the base,
 no QSO object at that position in the variant), gained (the reverse), with the PS1 i < 19.5 and the >= 2 catalogues counts of each.
 """
 
@@ -43,8 +45,11 @@ def match(a: pd.DataFrame, b: pd.DataFrame, tol_arcsec: float):
 def exchange(t: pd.DataFrame, base: str, variant: str, tol: float) -> dict:
     kept = lost = gained = 0
     lost_i195 = gained_i195 = lost_multi = gained_multi = 0
+    if "variant" not in t.columns:
+        raise ValueError("lowlat_exchange needs the long table (qso_labelled_not_sample_long.csv.gz, one row per variant and object): "
+                         "the wide table holds one variant's coordinates per object id")  # fmt: skip
     for _, g in t.groupby("region"):
-        a, b = g[g[base].astype(bool)].reset_index(drop=True), g[g[variant].astype(bool)].reset_index(drop=True)
+        a, b = g[g.variant == base].reset_index(drop=True), g[g.variant == variant].reset_index(drop=True)
         ia, ib = match(a, b, tol)
         kept += len(ia)
         la = a.drop(index=ia)

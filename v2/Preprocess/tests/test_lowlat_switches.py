@@ -337,6 +337,8 @@ def test_object_table_keeps_metadata_of_labels_a_later_variant_adds(tmp_path):
     o = pd.read_csv(out / "qso_labelled_not_sample_by_variant.csv.gz").set_index("object_id")
     assert o.loc["O2", "ra"] == pytest.approx(150.0 + 30 * a) and o.loc["O2", "n_catalogs"] == 2
     assert not o.loc["O2", "base"] and o.loc["O2", "later"]
+    lg = pd.read_csv(out / "qso_labelled_not_sample_long.csv.gz")  # one row per variant and object, that variant's coordinates (2.61.8 review)
+    assert list(lg.variant) == ["later"] and lg.ra.iloc[0] == pytest.approx(150.0 + 30 * a)
 
 
 def test_depth_split_uses_the_common_regions(tmp_path):

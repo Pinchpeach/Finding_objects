@@ -99,6 +99,7 @@ def test_profiles_change_only_the_listed_catalogues(monkeypatch):
     assert am.infer_poserr_arcsec("SDSS DR18 PhotoObj", {"type": 6, "psfMag_r": 21.5}) == 0.6  # faint "star": not covered by the literature value
     assert am.infer_poserr_arcsec("SDSS DR18 PhotoObj", {"type": 3, "psfMag_r": 18.5}) == 0.6  # galaxy keeps the old value
     assert am.infer_poserr_arcsec("SDSS DR18 PhotoObj", {"type": 6}) == 0.6  # no magnitude: unchanged
+    assert am.infer_poserr_arcsec("SDSS DR18 PhotoObj", {"type": 6, "psfMag_r": -9999}) == 0.6  # SDSS missing-value code is no magnitude
     assert am.infer_poserr_arcsec("VLASS", {"dec": 30.0}) == 0.5 and am.infer_poserr_arcsec("VLASS", {"dec": -35.0}) == 1.0
     assert abs(am.infer_poserr_arcsec("LoTSS DR2", {"e_RAJ2000": 0.3, "e_DEJ2000": 0.1}) - (0.3**2 + 0.2**2) ** 0.5) < 1e-12
     assert am.infer_poserr_arcsec("LAMOST DR catalog", {}) == 0.6  # no literature value found: unchanged

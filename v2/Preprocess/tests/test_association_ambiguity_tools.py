@@ -38,6 +38,12 @@ def test_exchange_counts_new_and_lost_joins_by_outcome():
     assert (ex["newly_joined"], ex["new_correct"], ex["new_false"], ex["new_unknown"]) == (2, 1, 0, 1)
     assert (ex["unjoined_now"], ex["lost_false"], ex["lost_correct"]) == (1, 1, 0)
     assert ex["net_correct"] == 1 and ex["net_false"] == -1  # a false link was dropped, a correct one gained
+    # a row joined in both runs whose outcome changes counts in the net (Codex review of 2.61.8)
+    base2 = pd.DataFrame(dict(catalog="GALEX AIS", field_row=["a", "b", "c"], joined=[True, True, False], outcome=["false", "correct", "missed"]))
+    var2 = pd.DataFrame(dict(catalog="GALEX AIS", field_row=["a", "b", "c"], joined=[True, True, True], outcome=["unknown", "false", "correct"]))
+    ex2 = cv.exchange(base2, var2, "GALEX AIS")
+    assert (ex2["switched"], ex2["switched_from_false"], ex2["switched_to_false"], ex2["switched_from_correct"]) == (2, 1, 1, 1)
+    assert (ex2["net_correct"], ex2["net_false"], ex2["net_unknown"]) == (0, 0, 1)  # +1 correct (c) -1 correct (b); false a -> unknown, b -> false
     lo, hi = cv.wilson(0, 100)
     assert lo == 0.0 or abs(lo) < 1e-9
     assert 3.0 < hi < 4.5
@@ -64,3 +70,22 @@ def test_ambiguous_row_flags_distance_and_same_object():
     assert r.clear_distance and not r.clear_nsep  # 0.05'' against 0.60'': clear in distance, the likelihood ratio of the nsep is not
     assert r.same_object  # c12_nsep < 1
     assert not r.nearest_not_best
+
+
+def test_lowlat_exchange_matches_each_variant_on_its_own_coordinates():
+    """Codex review of 2.61.8: after a renumbering the same object id is another source; the match uses each variant's positions."""
+    le = load("lowlat_exchange")
+    a = 1 / 3600
+    t = pd.DataFrame(dict(region="r1", variant=["base", "base", "v", "v"], object_id=["O2", "O3", "O2", "O3"], ra=[150.0 + 30 * a, 150.0 + 90 * a, 150.0 + 60 * a, 150.0 + 90 * a],
+                          dec=2.0, ps1_i=[19.0, 21.0, 20.0, 21.0], n_catalogs=[2, 3, 2, 3]))  # fmt: skip
+    ex = le.exchange(t, "base", "v", 1.0)
+    assert (ex["kept"], ex["lost"], ex["gained"]) == (1, 1, 1)  # O3 kept; base O2 (+30'') lost, variant O2 (+60'') gained: not "kept" by id
+    assert (ex["lost_i_lt_195"], ex["gained_i_lt_195"]) == (1, 0)
+    wide = pd.DataFrame(dict(region="r1", object_id=["O2"], ra=[150.0], dec=[2.0], base=[True], v=[True]))
+    try:
+        le.exchange(wide, "base", "v", 1.0)
+    except ValueError as e:
+        assert "long table" in str(e)
+    else:
+        raise AssertionError("the wide table must be refused")
+

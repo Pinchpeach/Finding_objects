@@ -9,8 +9,9 @@
   rates.csv       per variant and catalogue (AllWISE, 2MASS, GALEX): rows with an expected counterpart, joined, false rate of the known
                   joins, missed rate of the unjoined rows (pooled over the fields, Wilson interval)
   exchange.csv    against the first variant (the baseline), row by row: rows that joined and did not before, by what the join is
-                  (correct / false / unknown), and rows that joined before and no longer do (by the outcome they had); the net change
-                  of correct and of false links.  A false link added is the cost, a missed counterpart found the gain.
+                  (correct / false / unknown), rows that joined before and no longer do (by the outcome they had), rows joined in both
+                  whose outcome changed (``switched_*``), and the net change of correct, false and unknown links over all paired rows.
+                  A false link added is the cost, a missed counterpart found the gain.
   paired.csv      the paired change of the false rate (percentage points) and of the missed rate, with a field-bootstrap 95 % interval
                   (the fields are the unit of independence; the same fields in both variants)
   structure.csv   objects, merged objects (two truth sources more than 1'' / 2'' apart), truth sources with an extra one-catalogue
@@ -91,8 +92,14 @@ def exchange(rb: pd.DataFrame, rv: pd.DataFrame, cat: str) -> dict:
     out = dict(newly_joined=len(new), new_correct=int((new.outcome_v == "correct").sum()), new_false=int((new.outcome_v == "false").sum()),
                new_unknown=int((new.outcome_v == "unknown").sum()), unjoined_now=len(lost), lost_correct=int((lost.outcome_b == "correct").sum()),
                lost_false=int((lost.outcome_b == "false").sum()), lost_unknown=int((lost.outcome_b == "unknown").sum()))  # fmt: skip
-    out["net_correct"] = out["new_correct"] - out["lost_correct"]
-    out["net_false"] = out["new_false"] - out["lost_false"]
+    # rows joined in both runs whose outcome changed (joined to another object): left out until the Codex review of 2.61.8, so the
+    # net counts were not the real net change (GALEX same_nearest: false 80 -> 79 in rates.csv, net_false 0 here)
+    both = m[m.joined_b & m.joined_v & (m.outcome_b != m.outcome_v)]
+    out.update(switched=len(both), switched_to_correct=int((both.outcome_v == "correct").sum()), switched_to_false=int((both.outcome_v == "false").sum()),
+               switched_from_correct=int((both.outcome_b == "correct").sum()), switched_from_false=int((both.outcome_b == "false").sum()))  # fmt: skip
+    # net change over every paired row: (joined with this outcome in the variant) - (in the base)
+    for k in ("correct", "false", "unknown"):
+        out[f"net_{k}"] = int(((m.outcome_v == k) & m.joined_v).sum() - ((m.outcome_b == k) & m.joined_b).sum())
     return out
 
 
