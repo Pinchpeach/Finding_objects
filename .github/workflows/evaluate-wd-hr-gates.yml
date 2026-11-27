@@ -6,6 +6,7 @@ on:
     paths:
       - v2/Classifier/branches/star.py
       - v2/Classifier/evaluate_wd_hr_gates.py
+      - v2/Classifier/collect_star_gaia.py  # the crossmatch step of this job (2.61.6 review)
       - .github/workflows/evaluate-wd-hr-gates.yml
 
 concurrency:

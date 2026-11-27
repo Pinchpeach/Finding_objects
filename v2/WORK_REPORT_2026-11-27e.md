@@ -64,3 +64,16 @@ astroquery.exceptions.TableParseError: Failed to parse VIZIER result!           
 
 - 코드: `Get_data/throttle.py`(`_truncated_votable`, `last_host`, `distrust_last_mirror`, 순환 루프의 잘림·끊김 처리, 독스트링), `Classifier/collect_star_gaia.py`(`_batch_rows`, `_unreadable_answer`, 배치 크기 조정).
 - 시험: `Preprocess/tests/test_vizier_mirrors.py`(+6), `Classifier/tests/test_collect_star_gaia.py`(8).
+
+## 9. 병합 전 검토 (2.61.6)
+
+검토 세션의 질문 세 개를 코드로 확인했고 하나를 고쳤다(시험 499 → 500).
+
+1. **잘림 판정이 정상 응답을 실패로 오판하지 않는가.** `_truncated_votable`은 상태 200이고 VOTable(Content-Type에 `votable`이 있거나 본문 앞 2,000바이트에 `<VOTABLE`)인데 끝 2,048바이트에 `</VOTABLE>`가 없을 때만 참이다. 이 판정은 `_with_mirrors`의 VizieR 미러 호스트(`VIZIER_HOSTS`) 요청에만 걸린다. 그 밖의 요청(Data Lab, MAST, LS 뷰어의 `stream=True` FITS, SkyServer 등)은 판정 전에 그대로 지나간다.
+   - VizieR 요청은 astroquery의 `/viz-bin/votable`(VOTable; BINARY·BINARY2 직렬화여도 XML 뿌리와 끝 태그가 있음)이다. 이 저장소의 수집기 중 VizieR에 TSV·FITS·JSON을 요청하는 것은 없다(`-out.form`은 throttle이 `mini`를 지울 때만 나온다).
+   - 전송 gzip은 `requests`가 풀어 `content`가 평문이다. 행 0개 응답과 오류 INFO만 있는 응답도 `</VOTABLE>`로 끝난다(빈 원뿔·오류는 기존 `_tableless_votable`/`_answer_error`가 다룬다).
+   - 끝 태그 뒤에 2 KB 넘는 꼬리가 붙는 VizieR 응답은 본 적이 없다. 생기면 정상 미러가 600 s씩 밀릴 수 있으나, 모든 미러가 그렇게 판정되면 오류로 끝나므로 조용히 틀리지는 않는다.
+2. **실패 기억의 공유.** 잘림은 기존의 연결 거부·시간 초과와 같은 길로 기록된다(`_remember(host, False)` → `archive_cache.note_source`, `V2_CACHE_DIR` 아래 파일). 그래서 같은 기계의 다른 프로세스에서도 그 미러가 MIRROR_STICKY_S 동안 뒤로 간다. 그 미러가 나중에 잘 답하면 기억이 지워진다. 의도된 동작이고 2.60.0부터의 시간 초과 처리와 같다. 세트 C의 60개 작업은 각기 다른 GitHub 러너에서 돌아 캐시를 공유하지 않으므로 서로 영향을 주지 않는다.
+3. **고침: 실패한 요청 뒤의 `distrust_last_mirror`.** `last_host`는 성공한 응답에서만 기록되었다. 그래서 한 요청이 모든 미러에서 실패(모두 잘림, 모두 거부)하면 `collect_star_gaia`가 부르는 `distrust_last_mirror()`가 **이전 배치에 잘 답한 미러**를 600 s 뒤로 밀었다. 이제 VizieR 요청을 시작할 때 `last_host`를 지우므로, 실패한 요청 뒤에는 미러를 지목하지 않는다(None). 시험 `test_a_request_that_fails_everywhere_leaves_no_mirror_to_distrust`(옛 코드에서 실패).
+4. **확인 계획**: 병합 뒤 `Evaluate WD HR-locus gates`(main push로 자동 실행: 경로 조건에 `collect_star_gaia.py`가 없으면 수동 실행)와, 실사용 영역 하나(NGC 4522, 저장된 이전 수집과 같은 반경)의 수집 행 수 비교를 GitHub Actions에서 돌린다.
+

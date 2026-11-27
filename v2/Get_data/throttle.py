@@ -471,6 +471,9 @@ def _with_mirrors(send):
                 raise
             _log(parts.hostname, resp.status_code, t0)
             return resp
+        # 2.61.6 review: forget the last answer's mirror before asking, so that after a request that fails on every mirror
+        # ``distrust_last_mirror`` names no mirror instead of one that answered an earlier request well
+        _local.last_host = None
         catalog = _catalog_of(str(url), kwargs.get("data"))
         hosts = _vizier_order(parts.hostname, catalog)
         read = kwargs.get("timeout")

@@ -719,3 +719,19 @@ def test_a_caller_that_could_not_read_an_answer_distrusts_its_mirror():
     seen.clear()
     req(None, "GET", "https://vizier.cds.unistra.fr/x")
     assert "vizier.cds.unistra.fr" not in seen[0]  # the retry starts at another mirror
+
+
+def test_a_request_that_fails_everywhere_leaves_no_mirror_to_distrust():
+    """2.61.6 review: after a request that every mirror cut off, the caller's distrust must not fall on the mirror that
+    answered the previous request well."""
+    import requests
+
+    seen = []
+    good = throttle._with_mirrors(_body_send({}, seen))
+    good(None, "GET", "https://vizier.cds.unistra.fr/x")
+    assert throttle.last_host() == "vizier.cds.unistra.fr"
+    bad = throttle._with_mirrors(_body_send({h: VOTABLE[:60] for h in throttle.VIZIER_HOSTS}, seen))
+    with pytest.raises(requests.exceptions.ChunkedEncodingError):
+        bad(None, "GET", "https://vizier.cds.unistra.fr/viz-bin/votable?-source=I/355/gaiadr3")
+    assert throttle.last_host() is None and throttle.distrust_last_mirror() is None
+
