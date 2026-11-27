@@ -55,6 +55,8 @@ import pandas as pd
 MATCH_ARCSEC = 2.0
 MISSING = "REGION_MISSING"  # label of a truth object whose region has no compact record
 # per_region columns (a run where no region has a record still has them, so the density and coverage code can run)
+# qso_other_objects columns (a run without such objects still has them)
+OTHER_COLS = ["region", "stratum", "kind", "object_id", "ra", "dec", "ps1_i", "p_qso", "p_qso_evidence", "basis", "n_catalogs"]
 REGION_COLS = ["name", "stratum", "kind", "status", "archives_status", "archives_missing", "objects", "qso_labelled",
                "qso_other", "objects_i_lt_195", "qso_other_i_lt_195", "truth_in_cone", "area_deg2"]  # fmt: skip
 CLASSES = ("STAR", "GALAXY", "QSO")
@@ -141,6 +143,17 @@ def _coverage_module():
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     return mod
+
+
+def common_regions(regions: pd.DataFrame, specs) -> tuple[pd.DataFrame, list, dict]:
+    """The regions every variant root has a record for (``specs``: [(name, root)]), the regions left out and, per variant, the
+    ones it lacks.  Comparisons between variants (ab_variants.py, by_depth.py) use only the common set (2.61.3 review)."""
+    missing = {nm: sorted(n for n in regions.name if not (Path(root) / n / "objects.csv.gz").exists()) for nm, root in specs}
+    excluded = sorted(set().union(*missing.values())) if missing else []
+    if excluded:
+        print(f"INCOMPLETE: {len(excluded)} region(s) lack a record in at least one variant and are left out of every variant: "
+              + ", ".join(excluded))  # fmt: skip
+    return regions[~regions.name.isin(excluded)], excluded, missing
 
 
 def region_archives(o: pd.DataFrame, region_dir: Path) -> tuple[str, str]:
@@ -383,7 +396,7 @@ def score_regions(regions: pd.DataFrame, truth: pd.DataFrame, root: Path, radius
                              objects_i_lt_195=int(np.sum(all_i < 19.5)), qso_other_i_lt_195=int(np.sum(qi < 19.5)),
                              truth_in_cone=len(inside), area_deg2=math.pi * (radius_arcmin / 60.0) ** 2))  # fmt: skip
     return dict(per_truth=pd.DataFrame(rows), per_region=pd.DataFrame(reg_rows).reindex(columns=REGION_COLS), unique_quasars=uq,
-                qso_other=pd.DataFrame(other_rows))
+                qso_other=pd.DataFrame(other_rows).reindex(columns=OTHER_COLS))
 
 
 def _bin_table(df: pd.DataFrame, col: str, bins, label: str, absval=False) -> list[dict]:

@@ -237,3 +237,61 @@ Reproduce: `ab_variants.py --variants base=ROOT ... --regions fields_lowlat_conf
 (each variant's `ROOT` is the compact output of the offline re-classification of the saved raw files with `V2_LOWLAT_QSO=<switches>`),
 then `adoption_check.py --calibration DIR1 --confirmation DIR2 --highlat-identical yes --out DIR3`; the identity at high latitude:
 `highlat_identity.py --raw RAWDIR... --out DIR`.
+
+### Review before merge (2.61.3)
+
+Checked against the code, the committed tables and the git history; the measurement was not re-run.  Three code changes come out of it
+(`Preprocess/lowlat_qso.py`, `05_likelihood_vectors.py`, `Classifier/unknown_reason.py`, tests 460 -> 463); with every switch off
+nothing changes (no new column, the same labels).
+
+1. **How surveys are counted.**  The switches counted distinct catalogue *names*.  Four pairs of names are one survey's products of the
+   same measurement, and now count once (`SURVEY_OF`): Gaia DR3 + its SOS variability tables, ZTF light curves + ZTF periodic
+   variables, DESI spectra + their FastSpecFit fits, and the Siena Galaxy Atlas (built from Legacy Surveys imaging) + Legacy Surveys.
+   WISE cannot be counted twice: only AllWISE is collected, and the W1/W2 forced photometry of a Legacy Surveys row belongs to that
+   row.  The Gaia DSC probabilities are columns of the Gaia row.  Pan-STARRS1, Legacy Surveys and SDSS imaging (different
+   telescopes, the same optical bands) still count separately, deliberately: the switches ask for independent *detections* (a
+   deblending fragment or a pipeline artefact has none), not for independent wavelengths.  An SDSS spectrum and SDSS imaging are
+   different measurements and count separately.  The committed tables were made with name counting; they can differ only for
+   objects carrying one of the four pairs.  The blind runs drop spectra, SOS rows are RR Lyrae, Cepheids and long-period variables,
+   ZTF periodic rows are periodic variables and SGA rows are large galaxies, so no such pair is expected among the QSO labels.  This
+   was not re-measured, because the raw files are not in the repository.  An offline replay should confirm it before any default
+   is changed.
+2. **What a held-back object becomes.**  It was `UNKNOWN` with status `LOW_CONFIDENCE` and best candidate `QSO`, and its
+   `unknown_reason` read "QSO or GALAXY: probabilities overlap (0.72 vs ...)", which did not say why.  Now, while a label switch is
+   on, it also keeps the reading `secondary_class = QSO`, `secondary_class_reason = LOWLAT_QSO_HELD` (where it has no other reading),
+   and the new column `lowlat_qso_hold` says why, for example "QSO label withheld at |b| = 13.8 < 20 deg (V2_LOWLAT_QSO): measured by
+   1 survey, 2 needed".  `unknown_reason`, and through it the summary file, shows that text.  `run_archives_status` is about archives
+   and is not used for this.  `wise_second` and `wise_footprint` remove evidence instead of holding the label, so such an object
+   ends with what its other evidence says, often `NO_EVIDENCE` with the AllWISE-only reason.  That reason does not name the switch.
+3. **Order of pre-registration and collection.**  The region list was locked in `8a941ef` (2026-11-27 12:45:59 UTC) and the
+   predictions and adoption criteria in `8b108c2` (13:15:51 UTC).  `PREDICTIONS_CONFIRM.md` is unchanged since (empty diff from
+   `8b108c2` to the work branch head).  When the confirmation regions were collected is not recorded in the repository: they were
+   collected in the work session's container and the raw files were not committed.  So the order rests on the work session's
+   statement; its log or raw-folder times would settle it.  A later confirmation run should write its start time into its results.
+4. **"removed (paired)".**  This is the density of the control (base) false labels that the variant no longer has.  It is a subset
+   of the control's labels, so its region bootstrap draws the same regions for both (`ab_variants.py`).  It is defined in the
+   table header above and in the work report.  It equals base minus variant: 159.15 - 73.67 = 85.49 deg^-2 for `surveys2`.
+5. **Intervals.**  All densities have a region bootstrap (4,000 resamples of whole cones, area-weighted; `ab_variants.boot_density`),
+   not a Poisson interval.  This matters because ten cones hold 56 % of the calibration labels.
+6. **|b| >= 20 deg unchanged, and the boundary.**  This is now structural, not only measured.  Every switch tests the object's own
+   |b| against `V2_LOWLAT_QSO_ABSB`: the label holds use the object position, the two WISE switches the AllWISE row position.
+   `wise_footprint` did not do this.  It removed the Stern evidence within 30 deg of the Galactic Centre at any latitude, for example
+   at l = 5 deg, b = 25 deg.  The five fields measured at |b| = 42-72 deg are far from the Centre and could not show it.  It now acts
+   only below the limit, and a test covers it.  A region that straddles 20 deg is split object by object.
+7. **Not measured: spectroscopic quasars.**  `surveys2` / `surveys3` also hold back a label decided by a spectroscopic catalogue
+   class, because that is evidence too, when the object has fewer surveys.  Spectroscopic targets normally have imaging rows as
+   well, but the blind runs drop spectra, so this was not measured.  Exempting a spectroscopic class should be considered before
+   any default is changed.
+8. **Code review (Codex) of the comparison tool.**  `ab_variants.py` now scores every variant on one common set of regions: a
+   region without a record in any variant is left out of all of them and listed in `coverage.json` (INCOMPLETE).  Before, its
+   quasars stayed in the recall denominator and counted as lost against the control while the density left the region out.  A
+   variant with no QSO label outside the sample now gives zero counts instead of an error.  The committed tables are unchanged:
+   both sets have a record for every region, and every variant has false labels.
+9. **Code review (Codex), second round.**  (a) A held QSO on a resolved source that the BGS galaxy test accepts became a
+   confident GALAXY: the hold made the label count as "not settled", which opens the BGS galaxy override.  The hold is now kept apart
+   from that gate, so such an object abstains (UNKNOWN, with the held QSO reading) as every other held QSO does.  Recall and false
+   density are the same either way, since GALAXY and UNKNOWN both count as "not QSO", so the committed numbers do not move.
+   (b) The per-object table kept the metadata only of the control's objects; a label added by a later variant now keeps its own.
+   No committed variant added labels.  (c) `by_depth.py` uses the same common region set as `ab_variants.py`
+   (`score_lowlat_qso.common_regions`).
+

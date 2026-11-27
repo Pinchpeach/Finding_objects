@@ -11,11 +11,16 @@
                          cluster in a few regions, so the Poisson interval is too narrow: 30 of 170 sit in one cone)
   non-quasars            how many of the 19 known stars and galaxies are labelled QSO
   exchange               false objects removed and sample quasars lost against the first variant (the control)
+
+Every variant is scored on the same regions (2.61.3 review): a region without a record in any variant's root is left out of all of
+them (recall, density and the paired exchange alike), listed in ``coverage.json`` and announced as INCOMPLETE, so an interrupted run
+cannot look like quasars lost or a smaller false density.
 """
 
 from __future__ import annotations
 
 import argparse
+import json
 import math
 import sys
 from pathlib import Path
@@ -66,8 +71,12 @@ def main() -> int:
     regions, truth = pd.read_csv(a.regions), pd.read_csv(a.truth)
     if a.only:
         regions = regions[regions.name.isin(a.only.split(","))]
+    # one common set of regions: a region missing from any variant is left out of every variant
+    regions, excluded, missing = S.common_regions(regions, [v.split("=", 1) for v in a.variants])
+    (a.out / "coverage.json").write_text(json.dumps(dict(regions_compared=int(len(regions)), regions_excluded=excluded,
+                                                         missing_by_variant=missing, complete=not excluded), indent=1) + "\n")  # fmt: skip
     rows, strata, control = [], [], None
-    per_object, per_quasar = None, None  # one table each, one column per variant (the labels the numbers come from)
+    meta, present, per_quasar = [], {}, None  # one table each, one column per variant (the labels the numbers come from)
     for spec in a.variants:
         name, root = spec.split("=", 1)
         res = S.score_regions(regions, truth, Path(root), a.radius)
@@ -108,13 +117,15 @@ def main() -> int:
             est, l, h = boot_density(rr, "removed")
             r.update(removed_per_deg2=round(est, 2), removed_lo=round(l, 2), removed_hi=round(h, 2))
         rows.append(r)
-        o = oth.drop(columns=["key"]).assign(**{name: True})
-        key = ["region", "object_id"]
-        per_object = o if per_object is None else per_object.merge(o[key + [name]], on=key, how="outer")
+        # metadata from the first variant that has the object (a label a later variant adds keeps its coordinates etc.)
+        meta.append(oth.drop(columns=["key"]))
+        present[name] = set(zip(oth.region.astype(str), oth.object_id.astype(str)))
         t = q.reset_index()[["region", "name", "sample", "stratum", "b", "l", "imag", "z", "n_catalogs", "label"]].rename(columns={"label": name})
         per_quasar = t if per_quasar is None else per_quasar.merge(t[["name", name]], on="name", how="outer")
+    per_object = pd.concat(meta, ignore_index=True).drop_duplicates(subset=["region", "object_id"], keep="first")
+    ids = list(zip(per_object.region.astype(str), per_object.object_id.astype(str)))
     for c in [v.split("=", 1)[0] for v in a.variants]:
-        per_object[c] = per_object[c].where(per_object[c].notna(), False).astype(bool)
+        per_object[c] = [k in present[c] for k in ids]
     per_object.to_csv(a.out / "qso_labelled_not_sample_by_variant.csv.gz", index=False)
     per_quasar.to_csv(a.out / "sample_quasars_by_variant.csv", index=False)
     d = pd.DataFrame(rows)
