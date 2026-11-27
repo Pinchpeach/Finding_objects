@@ -1,0 +1,4 @@
+variant,truth_matched,fixed,broken,mcnemar_p,pairs,label_changed,to_QSO,from_QSO,only_base,only_variant
+same_nearest,30477,2,3,1.0,167021,107,0,1,654,23
+all,30475,2,3,1.0,166973,114,0,1,702,49
+best,30470,3,4,1.0,166139,322,1,0,1536,39

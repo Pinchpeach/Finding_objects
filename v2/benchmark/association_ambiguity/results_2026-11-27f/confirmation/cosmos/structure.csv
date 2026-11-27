@@ -1,0 +1,5 @@
+variant,fields,objects,merged_gt1,merged_gt2,top_level_objects,truth_sources,truth_with_fragments,extra_fragment_objects
+base,17,167754,38,5,163862,23468,1417,1493
+same_nearest,17,167123,36,5,163808,23468,1352,1393
+all,17,167101,36,5,163793,23468,1354,1391
+best,17,166257,41,7,163592,23468,1247,1265

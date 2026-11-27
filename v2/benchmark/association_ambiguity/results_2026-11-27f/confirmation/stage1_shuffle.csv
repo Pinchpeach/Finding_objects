@@ -1,0 +1,13 @@
+run,detections,objects_ref,objects_new,objects_only_ref,objects_only_new,status_changed,seed
+conf_all_deep_cosmos_14,12059,9616,9616,0,0,0,1
+conf_all_deep_cosmos_14,12059,9616,9616,0,0,0,2
+conf_all_deep_cosmos_14,12059,9616,9616,0,0,0,3
+conf_all_deep_cosmos_23,13439,10764,10764,0,0,0,1
+conf_all_deep_cosmos_23,13439,10764,10764,0,0,0,2
+conf_all_deep_cosmos_23,13439,10764,10764,0,0,0,3
+conf_sn_deep_cosmos_14,12059,9615,9615,0,0,0,1
+conf_sn_deep_cosmos_14,12059,9615,9615,0,0,0,2
+conf_sn_deep_cosmos_14,12059,9615,9615,0,0,0,3
+conf_sn_deep_cosmos_23,13439,10765,10765,0,0,0,1
+conf_sn_deep_cosmos_23,13439,10765,10765,0,0,0,2
+conf_sn_deep_cosmos_23,13439,10765,10765,0,0,0,3

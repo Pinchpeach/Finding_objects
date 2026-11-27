@@ -326,6 +326,13 @@ the class, which is why the exemption is reasonable in itself, but **here it als
 the survey count *is* wrong** (see the review note at the end of this section).
 The 34 are what the LAMOST DR5 catalogue, SDSS and DESI hold in these cones: the 293 sample quasars come mostly from LAMOST DR10.
 
+*Re-measured with the ambiguity fix (2.61.8, `benchmark/association_ambiguity/`).*  The five held objects (3 of 14 in the calibration cones, 2 of 18 in the confirmation
+cones) were LAMOST rows that `ambiguous_new` had split from their photometric objects.  With `V2_ASSOC_AMBIG=same,nearest` (and with `all`) 0 of 32 are held by `surveys2` or
+`surveys3`, with or without `spectro_keep`; `spectra` alone also holds none in the calibration cones but in the confirmation cones loses one spectroscopic QSO in the base
+run (18 -> 17) and holds one at `surveys3`, so it is not proposed alone (`results_2026-11-27f/spectro_held_summary.csv`).  Not measured: the removed false density and the
+sample-quasar loss of `surveys2`/`surveys3` together with the ambiguity switches (more joins mean more surveys per object, so the removal can shrink); the decision table
+(`results_2026-11-27c/decision_table.csv`) stays as measured with the default association.
+
 **8.4 Faint quasars.**  The cost of a switch is the share of real quasars the base labels QSO and the switch stops labelling.
 
 | measurement | surveys2 | surveys3 | wise_second |
