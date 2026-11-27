@@ -18,6 +18,9 @@ Gaia row pass the cut), and that the AllWISE colour rules are applied where the 
                         survey" stars are no contaminant) only where the Assef et al. (2018) R90 rule is defined: |b| > 10 deg and
                         more than 30 deg from the Galactic Centre
   wise_second           WISE-AGN-001 and WISE-AGN-R90-001 need another survey than AllWISE at |b| < ``V2_LOWLAT_QSO_ABSB``
+  spectro_keep          (2.61.5) an object whose pipeline spectral class is QSO (a SPC-SDSS-003, SPC-DESI-003 or SPC-LAMOST-003
+                        reading, raw score >= 0.5) is never held back by ``surveys2`` / ``surveys3`` / ``pm``: a spectrum is
+                        a direct measurement of the class, and a blind benchmark (no spectra) is not affected by this switch
 
 ``V2_LOWLAT_QSO_ABSB`` (default 20): the latitude below which the switches act.  Nothing changes at |b| >= this value or where a
 position is missing (every switch tests the object's own |b|; ``wise_footprint`` too, 2.61.3 review).  The literature behind the
@@ -44,7 +47,7 @@ import os
 import numpy as np
 import pandas as pd
 
-OPTIONS = ("surveys2", "surveys3", "pm", "wise_footprint", "wise_second")
+OPTIONS = ("surveys2", "surveys3", "pm", "wise_footprint", "wise_second", "spectro_keep")
 # catalogues that identify or annotate a source, not measure it (01_source_association.ANNOTATION_CATALOGS)
 ANNOTATION = frozenset({"NED", "SIMBAD", "Roma-BZCAT", "Suh 2021 AGB Catalog", "HASH PN Catalog", "Acker PN Spectroscopy",
                         "ATNF Pulsar Catalog", "Galaxy Zoo DESI"})  # fmt: skip
@@ -126,6 +129,18 @@ def log10_fpm0(df: pd.DataFrame) -> np.ndarray:
         q = (a / sx) ** 2 - 2 * rho * a * d / (sx * sy) + (d / sy) ** 2
         ln = -np.log(2 * np.pi * sx * sy * np.sqrt(1 - rho**2)) - q / (2 * (1 - rho**2))
     return ln / math.log(10.0)
+
+
+def spectro_keep() -> bool:
+    """Spectroscopically classified QSOs are exempt from the label switches (``spectro_keep``)."""
+    return "spectro_keep" in options()
+
+
+def exempt_spectroscopic(details: list[str], spectroscopic_qso) -> list[str]:
+    """``details`` of :func:`hold_details` with the spectroscopically classified QSOs (bool per object) left out when ``spectro_keep``."""
+    if not spectro_keep():
+        return details
+    return ["" if s else d for d, s in zip(details, spectroscopic_qso)]
 
 
 def label_switches_on() -> bool:

@@ -1,0 +1,37 @@
+population,cones,ps1_i,objects,surveys_1,surveys_2,surveys_3,surveys_4plus,surveys_0,share_ge2,share_ge3
+all objects,all,<19,55837,4568,11099,12228,27940,2,0.9182,0.7194
+all objects,all,19-20,34041,4014,19458,8174,2395,0,0.8821,0.3105
+all objects,all,20-21,49321,22930,20028,5524,839,0,0.5351,0.129
+all objects,all,21-22,67110,51896,12605,2395,214,0,0.2267,0.0389
+all objects,all,>=22,2682,2308,324,46,4,0,0.1394,0.0186
+all objects,all,no PS1,63180,59429,3408,321,22,0,0.0594,0.0054
+all objects,LS cones,<19,4456,411,205,558,3280,2,0.9073,0.8613
+all objects,LS cones,19-20,2792,444,291,1038,1019,0,0.841,0.7367
+all objects,LS cones,20-21,4452,1036,1257,1516,643,0,0.7673,0.485
+all objects,LS cones,21-22,7699,2206,3497,1787,209,0,0.7135,0.2593
+all objects,LS cones,>=22,356,167,155,30,4,0,0.5309,0.0955
+all objects,LS cones,no PS1,17089,15307,1580,193,9,0,0.1043,0.0118
+all objects,no-LS cones,<19,51381,4157,10894,11670,24660,0,0.9191,0.7071
+all objects,no-LS cones,19-20,31249,3570,19167,7136,1376,0,0.8858,0.2724
+all objects,no-LS cones,20-21,44869,21894,18771,4008,196,0,0.512,0.0937
+all objects,no-LS cones,21-22,59411,49690,9108,608,5,0,0.1636,0.0103
+all objects,no-LS cones,>=22,2326,2141,169,16,0,0,0.0795,0.0069
+all objects,no-LS cones,no PS1,46091,44122,1828,128,13,0,0.0427,0.0031
+labelled QSO,all,<19,167,11,4,32,120,0,0.9341,0.9102
+labelled QSO,all,19-20,68,1,6,32,29,0,0.9853,0.8971
+labelled QSO,all,20-21,20,1,6,6,7,0,0.95,0.65
+labelled QSO,all,21-22,42,0,18,19,5,0,1.0,0.5714
+labelled QSO,all,>=22,5,0,2,3,0,0,1.0,0.6
+labelled QSO,all,no PS1,224,158,60,6,0,0,0.2946,0.0268
+labelled QSO,LS cones,<19,35,3,2,2,28,0,0.9143,0.8571
+labelled QSO,LS cones,19-20,9,1,1,1,6,0,0.8889,0.7778
+labelled QSO,LS cones,20-21,9,0,1,2,6,0,1.0,0.8889
+labelled QSO,LS cones,21-22,22,0,4,13,5,0,1.0,0.8182
+labelled QSO,LS cones,>=22,5,0,2,3,0,0,1.0,0.6
+labelled QSO,LS cones,no PS1,174,120,49,5,0,0,0.3103,0.0287
+labelled QSO,no-LS cones,<19,132,8,2,30,92,0,0.9394,0.9242
+labelled QSO,no-LS cones,19-20,59,0,5,31,23,0,1.0,0.9153
+labelled QSO,no-LS cones,20-21,11,1,5,4,1,0,0.9091,0.4545
+labelled QSO,no-LS cones,21-22,20,0,14,6,0,0,1.0,0.3
+labelled QSO,no-LS cones,>=22,0,0,0,0,0,0,,
+labelled QSO,no-LS cones,no PS1,50,38,11,1,0,0,0.24,0.02
