@@ -770,3 +770,26 @@ def test_a_body_broken_in_transfer_is_reported_even_when_the_other_mirrors_refus
     with pytest.raises(requests.exceptions.ChunkedEncodingError, match=rf"in transfer \({broken}\)"):
         req(None, "GET", "https://vizier.cds.unistra.fr/viz-bin/votable?-source=I/355/gaiadr3")
     assert len(seen) == len(throttle.VIZIER_HOSTS)
+
+
+@pytest.mark.parametrize("status", [503, 404])
+def test_a_cut_answer_outranks_the_error_status_of_the_last_mirror(status):
+    """Codex review of 4d216f9: CfA cuts the table off, every other mirror (the last one too) answers an error status;
+    the request ends in the truncation error, not in the last mirror's error response."""
+    import requests
+
+    seen = []
+    behaviour = {h: BodyResp(b"Service Unavailable", code=status, ctype="text/html") for h in throttle.VIZIER_HOSTS}
+    behaviour["vizier.cfa.harvard.edu"] = VOTABLE[:60]
+    req = throttle._with_mirrors(_body_send(behaviour, seen))
+    with pytest.raises(requests.exceptions.ChunkedEncodingError, match="before </VOTABLE>"):
+        req(None, "GET", "https://vizier.cds.unistra.fr/viz-bin/votable?-source=I/355/gaiadr3")
+    assert len(seen) == len(throttle.VIZIER_HOSTS)
+
+
+def test_the_last_mirror_error_status_is_still_returned_when_no_mirror_cut_the_table():
+    seen = []
+    behaviour = {h: BodyResp(b"Service Unavailable", code=503, ctype="text/html") for h in throttle.VIZIER_HOSTS}
+    req = throttle._with_mirrors(_body_send(behaviour, seen))
+    resp = req(None, "GET", "https://vizier.cds.unistra.fr/viz-bin/votable?-source=I/355/gaiadr3")
+    assert resp.status_code == 503 and len(seen) == len(throttle.VIZIER_HOSTS)

@@ -529,7 +529,9 @@ def _with_mirrors(send):
                 _remember(host, False)
             elif reason is None:
                 _remember(host, True)  # it answered
-            if resp.status_code in RETRY_STATUS and i < len(hosts) - 1:
+            # the last mirror's error status is returned as the answer, unless an earlier mirror cut the table off: that
+            # signal outranks it (Codex review of 4d216f9: CfA cut, the others 503 -> a 503, and the batch was never halved)
+            if resp.status_code in RETRY_STATUS and (i < len(hosts) - 1 or cut is not None):
                 _unreachable[host] = time.monotonic() + MIRROR_STICKY_S  # failing: tried last for a while
                 last = resp
                 continue
