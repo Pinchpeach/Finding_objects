@@ -103,6 +103,10 @@ def reason(row) -> str | None:
         )
         return "conflicting evidence: " + ", ".join(strong) if strong else "conflicting evidence"
     if status == "LOW_CONFIDENCE":
+        # a QSO reading held back by the low-latitude switches (2.61.3, Preprocess/lowlat_qso.py) says why
+        held = row.get("lowlat_qso_hold")
+        if isinstance(held, str) and held.strip():
+            return held.strip()
         p = {c: _num(row, f"p_{c.lower()}") for c in ("STAR", "GALAXY", "QSO")}
         p = {c: v for c, v in p.items() if v is not None}
         if len(p) >= 2:

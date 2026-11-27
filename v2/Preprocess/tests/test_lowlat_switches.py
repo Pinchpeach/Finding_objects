@@ -185,3 +185,66 @@ def test_region_bootstrap_density():
     assert hi - lo > 40.0
     # deterministic
     assert AB.boot_density(reg, "all") == (est, lo, hi)
+
+
+def test_catalogues_of_one_survey_count_once():
+    """2.61.3 review: a survey's catalogues of the same measurement are one survey (Gaia + its SOS tables, the two ZTF tables,
+    DESI spectra + FastSpecFit, SGA-2020 from Legacy Surveys imaging); different telescopes in the same bands count apart."""
+    cats = pd.Series([
+        "Gaia DR3|Gaia DR3 variability SOS",
+        "ZTF light curves|ZTF periodic variables",
+        "DESI DR1 spectroscopy|DESI DR1 FastSpecFit",
+        "DESI Legacy Surveys DR10|SGA-2020",
+        "Pan-STARRS1 DR2 MeanObject|DESI Legacy Surveys DR10|SDSS DR18 PhotoObj",
+        "SDSS DR18 PhotoObj|SDSS DR18 spectroscopy",
+        "AllWISE|DESI Legacy Surveys DR10|NED",
+    ])  # fmt: skip
+    assert LL.n_surveys(cats).tolist() == [1, 1, 1, 1, 3, 2, 2]
+
+
+def test_footprint_switch_leaves_high_latitude_near_the_centre_alone(monkeypatch):
+    """2.61.3 review: wise_footprint tested only the R90 footprint, so it acted within 30 deg of the Galactic Centre at any
+    latitude; every switch now acts only below V2_LOWLAT_QSO_ABSB."""
+    monkeypatch.setenv("V2_LOWLAT_QSO", "wise_footprint")
+    row = pd.Series(dict(catalogs="AllWISE|DESI Legacy Surveys DR10"))
+    high_near_centre = eq(5.0, 25.0)  # |b| = 25 >= 20, 25.5 deg from the Centre
+    assert float(LL.galactic_centre_distance(*high_near_centre)) < 30.0
+    assert LL.wise_rule_allowed("WISE-AGN-001", row, *high_near_centre)
+    assert not LL.wise_rule_allowed("WISE-AGN-001", row, *eq(5.0, 15.0))  # the same direction below 20 deg
+    monkeypatch.setenv("V2_LOWLAT_QSO_ABSB", "30")
+    assert not LL.wise_rule_allowed("WISE-AGN-001", row, *high_near_centre)  # inside the range when the range is wider
+
+
+def test_held_back_qso_is_visible_with_its_reason(tmp_path, monkeypatch):
+    """2.61.3 review: an object the switches hold back is UNKNOWN (LOW_CONFIDENCE) with best candidate QSO, keeps a QSO reading
+    (LOWLAT_QSO_HELD) and says why in lowlat_qso_hold, which unknown_reason shows; without a switch nothing is added."""
+    import json
+
+    spec = importlib.util.spec_from_file_location("s5_lowlat_hold", ROOT / "05_likelihood_vectors.py")
+    s5 = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(s5)
+    spec = importlib.util.spec_from_file_location("unknown_reason_lowlat", ROOT.parent / "Classifier" / "unknown_reason.py")
+    ur = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(ur)
+    ev = [{"rule_id": "LS-GBM-001", "class": "QSO", "score": 0.97, "raw_score": 0.97, "kind": "direct_probability"},
+          {"rule_id": "WISE-AGN-001", "class": "EXTRAGALACTIC", "score": 0.95, "raw_score": 0.95, "kind": "binary_evidence"},
+          {"rule_id": "DSC-001", "class": "QSO", "score": 0.95, "raw_score": 0.95, "kind": "direct_probability"}]  # fmt: skip
+    d = pd.DataFrame({"object_id": ["ONE", "TWO", "GAIA"], "ra": [150.10, 150.11, 150.12], "dec": [2.20, 2.21, 2.22],
+                      "catalogs": ["DESI Legacy Surveys DR10", "DESI Legacy Surveys DR10|AllWISE", "Gaia DR3|Gaia DR3 variability SOS"],
+                      "std_mag__ls_r": [19.0] * 3, "evidence_json": [json.dumps(ev)] * 3})  # fmt: skip
+    d.to_csv(tmp_path / "e.csv", index=False)
+    monkeypatch.setenv("V2_LOWLAT_QSO_ABSB", "90")  # a high-latitude field, so the sky priors let the evidence say QSO
+    s5.run(tmp_path / "e.csv", tmp_path / "off.csv")
+    off = pd.read_csv(tmp_path / "off.csv", keep_default_na=False).set_index("object_id")
+    assert off.primary_class.tolist() == ["QSO"] * 3 and LL.HOLD_COLUMN not in off
+    monkeypatch.setenv("V2_LOWLAT_QSO", "surveys2")
+    s5.run(tmp_path / "e.csv", tmp_path / "on.csv")
+    on = pd.read_csv(tmp_path / "on.csv", keep_default_na=False).set_index("object_id")
+    for oid in ("ONE", "GAIA"):  # one survey each (Gaia + its SOS tables count once)
+        r = on.loc[oid]
+        assert (r.primary_class, r.classification_status, r.best_candidate_class) == ("UNKNOWN", "LOW_CONFIDENCE", "QSO")
+        assert (r.secondary_class, r.secondary_class_reason) == ("QSO", LL.HELD_REASON)
+        assert r[LL.HOLD_COLUMN].startswith("QSO label withheld at |b| = ") and "measured by 1 survey, 2 needed" in r[LL.HOLD_COLUMN]
+        assert ur.reason(r.to_dict()) == r[LL.HOLD_COLUMN]
+    two = on.loc["TWO"]
+    assert two.primary_class == "QSO" and two[LL.HOLD_COLUMN] == "" and two.secondary_class == ""
