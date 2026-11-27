@@ -317,10 +317,13 @@ this release on `ab_variants.py` runs should be accompanied by the collection st
 `collect_spectra.py` asked the SDSS DR18, DESI DR1 and LAMOST DR5 spectroscopy collectors for the 290 quasar cones (LAMOST rows in 199
 cones, 931 rows; SDSS 10 cones, 13 rows; DESI 15 cones, 65 rows; the DESI footprint holds 36 of the 290), merged the files with the saved
 blind raw files and classified again.  34 objects have a spectral class QSO (SPC-SDSS-003, SPC-DESI-003 or SPC-LAMOST-003 at raw score
->= 0.5); the base labels 32 of them QSO.  **`surveys2` and `surveys3` each hold back 5 of those 32 (16 %, 95 % 7-32 %)**: the 5 have one
-survey, the LAMOST row alone, with no counterpart in any imaging catalogue.  The new switch `spectro_keep` exempts an object with a
-spectral class QSO from `surveys2` / `surveys3` / `pm`: with it 0 of 32 are held (`results_2026-11-27c/spectro/`).  What a spectrum says
-about the class is a direct measurement, not a colour inference: this is why the exemption is offered, not because the count is wrong.
+>= 0.5); the base labels 32 of them QSO.  **`surveys2` and `surveys3` each hold back 5 of those 32 (16 %, 95 % 7-32 %)**: the 5 are
+objects made of the LAMOST row alone.  *(Corrected in review: they are not quasars without an imaging counterpart.)*  Each lies 0.00-0.02"
+from the sample quasar, where the blind run has an object of 2-5 catalogues (`per_truth.csv` of 2.61.2 / 2.61.3), but Stage 1 left the
+LAMOST row apart as `ambiguous_new`, so one quasar became 2-4 objects.  The new switch `spectro_keep` exempts an object with a spectral class
+QSO from `surveys2` / `surveys3` / `pm`: with it 0 of 32 are held (`results_2026-11-27c/spectro/`).  A spectrum is a direct measurement of
+the class, which is why the exemption is reasonable in itself, but **here it also hides a Stage 1 association defect, and in these 5 cases
+the survey count *is* wrong** (see the review note at the end of this section).
 The 34 are what the LAMOST DR5 catalogue, SDSS and DESI hold in these cones: the 293 sample quasars come mostly from LAMOST DR10.
 
 **8.4 Faint quasars.**  The cost of a switch is the share of real quasars the base labels QSO and the switch stops labelling.
@@ -349,7 +352,7 @@ That cap is the share of the quasars that has enough surveys at all:
 | | >= 22 | 8.0 % | 0.7 % |
 | objects of the plane, cones with Legacy Surveys | 21-22 | 71.4 % | 25.9 % |
 | SDSS sky benchmark, spectroscopic quasars (SDSS imaging counted) | r >= 22 | 100 % | 96.8 % |
-| DESI external benchmark, spectroscopic quasars | r >= 22 | 90.7 % | 66.9 % |
+| DESI external benchmark, spectroscopic quasars | r >= 22 | 85.8 % | 55.4 % |
 
 (`faint_cost.py`, `survey_distribution.py`, `benchmark_cost.py`.)  **Outside Legacy Surveys the plane's imaging is Pan-STARRS1, AllWISE,
 Gaia and 2MASS: at i >= 21 only 1 % of the objects have 3 surveys, so `surveys3` there can label nothing fainter than i ~ 21 QSO**
@@ -385,3 +388,30 @@ measurement on them is not made.  The one object of set B that the 2.61.0 bright
 files as well and is not investigated.  COSMOS has more surveys per object than the plane (Section 8.4 gives the plane's counts); the
 Chandra type 1 truth misses non-X-ray quasars; the spectra come from the DR5 LAMOST catalogue, not DR10; SIMBAD / NED types (the other
 catalogue labels) were not collected for the 290 cones.
+
+**8.7 Review before merge (2.61.5).**  Checked against the code and the committed tables; nothing in the measurement changed.
+(1) *Why Stage 1 split the 5 quasars.*  A detection is `ambiguous_new` when its second-best candidate group scores at least 0.67 times the
+best (`AMBIG_SCORE_RATIO`, `01_source_association.py`).  `LAMOST DR catalog` has no `SurveyProfile` and its collector writes no position
+error, so it falls back to `DEFAULT_PROFILE` (0.6"); a match at 0.02" then does not outscore candidates a few tenths of an arcsecond away by
+the needed factor 1.5.  Those candidates are partly other fragments of the same quasar (an AllWISE-only object, for example).  The direct
+target match that settles a DESI spectrum (`TARGET_SPECTRA`, 0.3") covers DESI only, not LAMOST or SDSS.  In 2 of the 5 cones
+(lq3_026, lqc2_031) the 2-catalogue object of the quasar is labelled STAR and only the LAMOST fragment says QSO.
+(2) *`spectro_keep` is a stopgap for that defect.*  Once Stage 1 merges such rows (a LAMOST/SDSS position error, or the target match
+extended to them), the spectral class sits on the multi-survey object and `surveys2` alone no longer holds it; `spectro_keep` then
+matters only for spectra that really have no imaging counterpart.  Section 8.3 should be measured again after that fix.  The defect is
+not specific to low latitude or to spectra: any detection with a broad default error next to a split object can start a duplicate.
+(3) *"0 lost" is "0 among what the base labels".*  The COSMOS result (0 of 123) says that the switches remove no QSO label the base
+gives to a type 1 AGN; the base gives none to the 90 type 1 AGN with 1-2 surveys, so the cost for such quasars is not measured, not
+shown to be zero.  At low latitude the base does label 2-survey objects (outside Legacy Surveys at PS1 i 21-22, 14 of its 20 QSO labels
+have exactly 2 surveys): `surveys2` keeps them and `surveys3` holds them; whether they are quasars is not known there (no truth).
+(4) *Benchmark survey counts.*  `benchmark_cost.py` counts catalogue files, one per survey; the four feature sets hold no pair that
+`SURVEY_OF` merges, so the count equals `n_surveys`.  But `sdss_sky` has only 6 surveys (Gaia, Pan-STARRS1, Legacy Surveys, AllWISE, 2MASS,
+GALEX; no ZTF, radio, X-ray or SDSS imaging), so its "fewer than 3: 12.6 %" is an upper bound for a pipeline run; the "+ SDSS imaging"
+column (0.42 %) is the closer figure.
+(5) *Collection time.*  The 13:15:59 UTC start is a file time in the work session's container, not something the repository records.
+(6) *Code review (Codex): the benchmark magnitude.*  `benchmark_cost.py` meant Pan-STARRS1 r first and Legacy Surveys r only where PS1 has
+none, but it read the files in name order (`desi_legacy` before `panstarrs1`) and never replaced the LS value.  Fixed and the table and
+`decision_table.csv` regenerated: only the DESI sets at r >= 22 move (external: fewer than 2 / 3 surveys 9.3 / 33 % -> 14.2 / 44.6 %;
+fusion 11.1 / 36 % -> 17.0 / 46.0 %; the DESI ceiling of the decision table 0.907 / 0.669 -> 0.858 / 0.554), `sdss_sky` uses the SDSS r and
+is unchanged.
+

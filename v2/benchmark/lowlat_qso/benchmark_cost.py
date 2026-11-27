@@ -41,7 +41,8 @@ def survey_table(truth: pd.DataFrame, folder: Path, pattern: str) -> pd.DataFram
     """Per truth object: the number of catalogue files with a row, and a magnitude from PS1 / Legacy Surveys."""
     ids = truth.benchmark_id.astype(str)
     n = pd.Series(0, index=ids, dtype=int)
-    mag = pd.Series(np.nan, index=ids, dtype=float)
+    ps1 = pd.Series(np.nan, index=ids, dtype=float)
+    ls = pd.Series(np.nan, index=ids, dtype=float)
     names = []
     for f in sorted(folder.glob(pattern)):
         d = pd.read_csv(f, low_memory=False)
@@ -54,15 +55,17 @@ def survey_table(truth: pd.DataFrame, folder: Path, pattern: str) -> pd.DataFram
         names.append(f.name.split("_trd")[0])
         if "rMeanPSFMag" in d:
             s = d.drop_duplicates("benchmark_id").set_index("benchmark_id").rMeanPSFMag
-            m = pd.to_numeric(s, errors="coerce")
-            fill = m.reindex(mag.index)
-            mag = mag.where(mag.notna(), fill.where(fill > 0))
+            m = pd.to_numeric(s, errors="coerce").reindex(ps1.index)
+            ps1 = ps1.where(ps1.notna(), m.where(m > 0))
         if "flux_r" in d and "desi_legacy" in f.name:
             s = d.drop_duplicates("benchmark_id").set_index("benchmark_id").flux_r
             fr = pd.to_numeric(s, errors="coerce")
             with np.errstate(divide="ignore", invalid="ignore"):
                 lm = 22.5 - 2.5 * np.log10(fr.where(fr > 0))
-            mag = mag.where(mag.notna(), lm.reindex(mag.index))
+            ls = ls.where(ls.notna(), lm.reindex(ls.index))
+    # Pan-STARRS1 r first, Legacy Surveys r where PS1 has none (the files are read in name order, desi_legacy before panstarrs1,
+    # so the two are kept apart and combined here; Codex review of 2.61.5)
+    mag = ps1.where(ps1.notna(), ls)
     out = pd.DataFrame({"benchmark_id": ids.to_numpy(), "n_catalogues": n.to_numpy(), "mag_cat": mag.to_numpy()})
     out.attrs["catalogues"] = names
     return out
