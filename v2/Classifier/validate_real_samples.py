@@ -212,6 +212,11 @@ def candidate_snapshot(frame, ra, dec, radius):
     return out
 
 
+# Snapshot keys whose bare column is shared by several catalogues (Preprocess/02_integrate_objects.SHARED_FIELDS, 2.61.4): read
+# Gaia's namespaced value, keep the key.
+SNAPSHOT_SOURCE = {"pmra": "gaia_dr3__pmra", "pmdec": "gaia_dr3__pmdec"}
+
+
 def science_snapshot(row):
     cols = [
         "ra",
@@ -252,8 +257,9 @@ def science_snapshot(row):
     ]
     result = {}
     for c in cols:
-        if c in row.index and pd.notna(row[c]):
-            v = row[c]
+        src = SNAPSHOT_SOURCE.get(c, c)
+        if src in row.index and pd.notna(row[src]):
+            v = row[src]
             result[c] = v.item() if hasattr(v, "item") else v
     for c in row.index:
         low = str(c).lower()

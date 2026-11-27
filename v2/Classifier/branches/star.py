@@ -20,8 +20,9 @@ def _num(row, key):
 
 
 def _gaia_num(row, key):
-    v = _num(row, "gaia_dr3__" + key)
-    return v if v is not None else _num(row, key)
+    # Gaia's own namespaced column only (2.61.4).  The bare ``pmra`` / ``pmdec`` of an object without a Gaia row used to be SIMBAD's
+    # (or any other catalogue's): Stage 2 no longer writes bare names that two catalogues share, and this reader never wanted them.
+    return _num(row, "gaia_dr3__" + key)
 
 
 def _text(row, key):
@@ -138,8 +139,8 @@ def _wd_hr_signal(row, gate=None):
     if None in (p, pe, g, color) or p <= 0 or pe <= 0 or p / pe <= cfg["min_parallax_over_error"]:
         return None
     if "strong_parallax_over_error" in cfg and p / pe < cfg["strong_parallax_over_error"]:
-        # Gaia's own namespaced motion first: SIMBAD also supplies bare
-        # pmra / pmdec (2.22.0 review).
+        # Gaia's own namespaced motion only: SIMBAD also supplies pmra / pmdec
+        # (2.22.0 review; bare columns shared by catalogues are gone, 2.61.4).
         pmra, epmra, pmdec, epmdec = (_gaia_num(row, k) for k in ("pmra", "pmra_error", "pmdec", "pmdec_error"))
         if None in (pmra, epmra, pmdec, epmdec) or epmra <= 0 or epmdec <= 0:
             return None

@@ -92,7 +92,7 @@
 
 ## 3. 통합과 특징 (`02_integrate_objects.py`, `units.py`, `03_extract_features.py`)
 
-- **통합**: 그룹 하나를 한 행으로 만들고, 모든 원래 열을 `카탈로그__열` 이름으로 보존합니다.
+- **통합**: 그룹 하나를 한 행으로 만들고, 모든 원래 열을 `카탈로그__열` 이름으로 보존합니다. 한 카탈로그에만 있는 열은 접두어 없는 이름으로도 한 번 더 둡니다(예: `W1mag`). **둘 이상의 카탈로그가 같은 이름으로 내는 열(`type`, `Type`, `pmra`, `pmdec`, `objid`, `RAJ2000`, `_r`, `z` 등 80개: `benchmark/shared_columns/shared_columns.csv`)은 접두어 없는 열을 쓰지 않습니다(2.61.4)**: 예전에는 "그룹 안에서 처음 유효한 값"이라 `type`이 Legacy Surveys의 것인지 SDSS의 것인지, `pmra`가 Gaia의 것인지 SIMBAD의 것인지 행 순서에 달려 있었고 읽는 쪽이 알 수 없었습니다. 읽는 코드는 모두 `카탈로그__열`을 읽습니다. `V2_KEEP_SHARED_BARE=1`이면 예전 열을 다시 씁니다.
 - **단위 통일**: 등급은 AB, 플럭스는 mJy, 분광 적색편이는 하나의 열로 맞춥니다.
 - **특징**:
   - 색(PS1, Legacy Surveys g−r, r−z, z−W1, W1−W2 등).

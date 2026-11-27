@@ -118,7 +118,11 @@ def test_same_named_fields_do_not_cross_catalogs(tmp_path):
     _load("01_source_association").run(raw, a)
     _load("02_integrate_objects").run(a, raw, i)
     integrated = pd.read_csv(i)
-    assert len(integrated) == 1 and integrated.loc[0, "type"] == "PSF"  # legacy bare name: first wins
+    assert len(integrated) == 1
+    # 2.61.4: a name two catalogues share has no bare column (it used to be "first wins"); each value is under its namespace
+    assert "type" not in integrated.columns
+    assert integrated.loc[0, "desi_legacy_surveys_dr10__type"] == "PSF"
+    assert integrated.loc[0, "sdss_dr18_photoobj__type"] == 3
     _load("03_extract_features").run(i, RULES, f)
     _load("04_build_evidence").run(f, RULES, e)
     ev = json.loads(pd.read_csv(e).loc[0, "evidence_json"])
@@ -458,3 +462,52 @@ def test_units_drop_missing_value_sentinels():
     assert h["std_mag__ps1_r"].isna()[0] and h["std_mag__ps1_r"][1] == 20.5 and h["std_magerr__ps1_r"].isna()[0]
     assert h["std_mag__sdss_u"].isna()[0] and abs(h["std_mag__sdss_u"][1] - 20.96) < 1e-9
     assert abs(h["std_mag__wise_w1"][1] - 17.699) < 1e-9
+
+
+def _two_catalogue_raw(tmp_path, extra_ls=None, extra_sdss=None):
+    raw = tmp_path / "raw"
+    raw.mkdir()
+    base = {"ra": 150.0, "dec": 2.0}
+    pd.DataFrame([{**base, "catalog": "DESI Legacy Surveys DR10", "catalog_object_id": "ls1", "object_name": "ls1",
+                   "type": "PSF", "ls_only_field": 1.5, **(extra_ls or {})}]).to_csv(raw / "desi_legacy_t.csv", index=False)  # fmt: skip
+    pd.DataFrame([{**base, "catalog": "SDSS DR18 PhotoObj", "catalog_object_id": "1237", "object_name": "s1",
+                   "type": 3, "clean": 1, **(extra_sdss or {})}]).to_csv(raw / "sdss_dr18_t.csv", index=False)  # fmt: skip
+    a, i = tmp_path / "a.csv", tmp_path / "i.csv"
+    _load("01_source_association").run(raw, a)
+    return raw, a, i
+
+
+def test_bare_columns_of_shared_names_are_not_written(tmp_path):
+    """2.61.4: ``type`` is in two catalogues: namespaced only.  A field of one catalogue keeps its bare convenience column."""
+    raw, a, i = _two_catalogue_raw(tmp_path)
+    _load("02_integrate_objects").run(a, raw, i)
+    d = pd.read_csv(i)
+    assert "type" not in d.columns
+    assert d.loc[0, "desi_legacy_surveys_dr10__type"] == "PSF" and d.loc[0, "sdss_dr18_photoobj__type"] == 3
+    assert d.loc[0, "clean"] == 1 and d.loc[0, "ls_only_field"] == 1.5  # one catalogue each: bare name kept
+
+
+def test_a_name_new_to_the_static_list_is_found_in_the_raw_headers(tmp_path):
+    """A collector added later that reuses a name is caught the first time it runs: the headers of the run decide."""
+    raw, a, i = _two_catalogue_raw(tmp_path, extra_ls={"brand_new_field": 1.0}, extra_sdss={"brand_new_field": 2.0})
+    _load("02_integrate_objects").run(a, raw, i)
+    d = pd.read_csv(i)
+    assert "brand_new_field" not in d.columns
+    assert d.loc[0, "desi_legacy_surveys_dr10__brand_new_field"] == 1.0 and d.loc[0, "sdss_dr18_photoobj__brand_new_field"] == 2.0
+
+
+def test_keep_shared_bare_restores_the_old_columns(tmp_path, monkeypatch):
+    monkeypatch.setenv("V2_KEEP_SHARED_BARE", "1")
+    raw, a, i = _two_catalogue_raw(tmp_path)
+    _load("02_integrate_objects").run(a, raw, i)
+    d = pd.read_csv(i)
+    assert d.loc[0, "type"] == "PSF"  # the first valid value, as before 2.61.4
+    assert d.loc[0, "sdss_dr18_photoobj__type"] == 3
+
+
+def test_object_level_entity_kind_and_epoch_survive(tmp_path):
+    """``entity_kind`` and ``ref_epoch`` are in the shared list as raw fields, but Stage 2 writes its own object-level values."""
+    raw, a, i = _two_catalogue_raw(tmp_path)
+    _load("02_integrate_objects").run(a, raw, i)
+    d = pd.read_csv(i)
+    assert "entity_kind" in d.columns and "ref_epoch" in d.columns and "ra" in d.columns
