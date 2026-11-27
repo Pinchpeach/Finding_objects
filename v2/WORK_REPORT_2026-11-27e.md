@@ -89,4 +89,17 @@ astroquery.exceptions.TableParseError: Failed to parse VIZIER result!           
    - 표 내용도 비교했다. 두 실행 모두 읽은 수집기 표는 `DataFrame.equals`로 같았다(NGC 4522 26개, COSMOS 26개, 은하면 21개). 예외는 Pan-STARRS 하나다. 행 수는 같지만 NGC 4522에서 0.4″ 떨어진 PS1 천체 하나가 다른 objID로 왔다(MAST API 경로, VizieR 아님). COSMOS·은하면의 Pan-STARRS는 행 순서만 달랐다.
    - 은하면 NED의 차이는 main 쪽 실패다(`ExpatError`, NED의 XML 응답). NED는 `ned.ipac.caltech.edu`라 잘림 판정이 걸리지 않는다.
    - 시간 차는 러너 차이 수준이다. COSMOS는 1–7단계도 PR 쪽이 함께 느렸다(5.5 대 7.8 s 등).
+8. **CI의 WD 워크플로(오늘의 CDS 장애).** PR의 세 WD 워크플로(`Evaluate WD HR-locus gates`, `Validate WD Subtype DA DB`, `Validate STAR WD Classifier`)는 6eddefa·b51d74b·dfb87e7에서 모두 "Crossmatch … to Gaia" 단계에서 실패했다. main에서도 같은 단계가 오늘 실패했다(run 46031822845, 18:18 UTC, 이 PR의 동기). 원인을 보려고 WD HR의 교차대조 단계에 미러별 요청 로그(`V2_HTTP_LOG=1`, 요청·결과 불변)를 켰다(dfb87e7, run 46061788161). 결과:
 
+   | 미러 | 500개 위치 요청의 결과 (8번) |
+   |---|---|
+   | 스트라스부르 | 404, 1 s (모든 요청; 실사용 수집의 작은 원뿔도 404) |
+   | CfA | 504, 매번 60.2 s(게이트웨이 시간 제한; 작은 원뿔은 같은 시각 3–4 s에 200) |
+   | NAOJ / IUCAA | 연결 시간 초과 10 s |
+   | China-VO | 연결 오류 0.2 s |
+   | IDIA | 300 s 읽기 시간 초과 3번, 504 3번, 60 s 뒤 끊김 1번, **200 한 번(453 s)** |
+
+   - CDS XMatch는 연결 시간 초과다. 첫 배치(500개)는 넷째 시도에서 IDIA가 453 s 만에 주었다. 둘째 배치는 4번 모두 실패해 오류로 끝났다.
+   - 잘림은 한 번도 나오지 않았다. 이 PR이 고친 경로가 아니라 **모든 미러가 500개 위치 요청을 끝내지 못한** 장애다. 이전 코드도 같은 4번을 시도하고 같은 오류로 끝난다.
+   - 이 PR의 판단(시도 수, 미러 순서, 잘림 우선)은 이 실패를 바꾸지 못하고 더 나쁘게 하지도 않는다.
+   - **다음 과제 후보**(제안만): CfA의 60 s 504는 크기 신호로 보인다(같은 시각 작은 요청은 성공). 시간 초과·504도 "읽을 수 없는 응답"처럼 배치를 줄이는 근거로 쓰면 CfA가 작은 배치로 답할 수 있다. 다만 진짜 장애일 때 실패까지 걸리는 시간이 늘고(최대 12번 시도 × 약 7분), CfA가 몇 개 위치까지 60 s 안에 답하는지는 재 보지 않았다. 검토 세션이 판단할 일이다.
