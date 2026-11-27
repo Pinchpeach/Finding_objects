@@ -666,7 +666,7 @@ RUWE_BINARY = 1.4  # Lindegren et al. (2018); Belokurov et al. (2020)
 def star_tags(row):
     tags = []
     p = _parallax(row)
-    pmra, pmdec = _num(row, "gaia_dr3__pmra", "pmra"), _num(row, "gaia_dr3__pmdec", "pmdec")
+    pmra, pmdec = _num(row, "gaia_dr3__pmra"), _num(row, "gaia_dr3__pmdec")  # Gaia only (2.61.4: no bare pmra shared with SIMBAD)
     if p is not None and pmra is not None and pmdec is not None:
         vt = 4.74047 * math.hypot(pmra, pmdec) / p[0]
         for pop, lo, hi in POPULATION_VT:

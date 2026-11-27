@@ -727,3 +727,20 @@ def test_2_53_giant_spectral_type_scale():
     assert dwarf["luminosity_class"] == "V" and dwarf["spectral_type"].startswith("K")
     assert giant["luminosity_class"] == "III" and giant["spectral_type"].startswith("G")
     assert "van Belle" in giant["basis"]
+
+
+def test_bare_proper_motion_of_another_catalogue_is_not_gaias():
+    """2.61.4: SIMBAD also publishes ``pmra`` / ``pmdec``; Stage 2 no longer writes a bare column and the readers never use one."""
+    sc = _sc()
+    base = {
+        "primary_class": "STAR",
+        "gaia_dr3__bp_rp": 0.82,
+        "gaia_dr3__teff_gspphot": 5770,
+        "gaia_dr3__parallax": 10.0,
+        "gaia_dr3__parallax_error": 0.05,
+        "gaia_dr3__phot_g_mean_mag": 9.6,
+    }
+    bare = sc.classify(dict(base, pmra=84.0, pmdec=112.0))  # V_T would be 66 km/s: thick disc, if it were Gaia's
+    assert bare["tags"] == []
+    gaia = sc.classify(dict(base, **{"gaia_dr3__pmra": 84.0, "gaia_dr3__pmdec": 112.0}))
+    assert [t["tag"] for t in gaia["tags"]] == ["THICK_DISC"]

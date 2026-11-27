@@ -199,3 +199,25 @@ def test_2_53_error_aware_wd_locus():
     assert 0.25 < prob < 0.75 and m._wd_hr_signal(near) is None
     # a colour error widens the probability towards 0.5
     assert abs(m.wd_locus_probability(5.0, 1.0, 12.6, 0.0, 0.3) - 0.5) < abs(prob - 0.5)
+
+
+def test_2_61_4_gaia_motion_in_stage2_and_single_catalogue_tables():
+    """2.61.4 review: the proper-motion branch of the HR gate reads Gaia's motion.  In a Stage-2 row (it has ``catalogs``) only
+    the namespaced Gaia column counts (a bare pmra could be SIMBAD's); a single-catalogue Gaia table (collect_star_gaia.py,
+    evaluate_wd_hr_gates.py) keeps its bare Gaia names and must still reach the motion branch."""
+    import importlib.util
+    from pathlib import Path
+
+    p = Path(__file__).resolve().parents[1] / "branches" / "star.py"
+    s = importlib.util.spec_from_file_location("star_wd_pm", p)
+    m = importlib.util.module_from_spec(s)
+    s.loader.exec_module(m)
+    # parallax S/N 3 (between 1 and 4): the default gate needs a significant proper motion; M_G = 18 + 5 log10(3/100) = 10.4
+    base = {"parallax": 3.0, "parallax_error": 1.0, "phot_g_mean_mag": 18.0, "bp_rp": 0.0}
+    motion = {"pmra": 30.0, "pmra_error": 1.0, "pmdec": 40.0, "pmdec_error": 1.0}
+    assert m._wd_hr_signal(dict(base, **motion)) is True  # single-catalogue Gaia table: bare names are Gaia's
+    stage2_gaia = dict(base, catalogs="Gaia DR3", **{f"gaia_dr3__{k}": v for k, v in motion.items()})
+    assert m._wd_hr_signal(stage2_gaia) is True
+    stage2_other = dict(base, catalogs="SIMBAD", **motion)  # a bare pmra in a Stage-2 row is not Gaia's
+    assert m._wd_hr_signal(stage2_other) is None
+

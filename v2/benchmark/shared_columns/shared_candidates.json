@@ -1,0 +1,387 @@
+{
+ "B_MJD": [
+  "desi_spectroscopy",
+  "erosita"
+ ],
+ "DCMaj": [
+  "lotss",
+  "vlass"
+ ],
+ "DCMin": [
+  "lotss",
+  "vlass"
+ ],
+ "DCPA": [
+  "lotss",
+  "vlass"
+ ],
+ "DEICRS": [
+  "chandra",
+  "desi_spectroscopy"
+ ],
+ "DEJ2000": [
+  "allwise",
+  "first",
+  "galex",
+  "lamost_spectroscopy",
+  "lotss",
+  "nvss",
+  "tgss",
+  "twomass",
+  "vlass",
+  "ztf_periodic"
+ ],
+ "DE_ICRS": [
+  "erosita",
+  "xmm"
+ ],
+ "Field": [
+  "first",
+  "nvss"
+ ],
+ "Fpeak": [
+  "first",
+  "vlass"
+ ],
+ "Fr": [
+  "desi_spectroscopy",
+  "galex"
+ ],
+ "GLAT": [
+  "chandra",
+  "erosita",
+  "galex",
+  "twomass"
+ ],
+ "GLON": [
+  "chandra",
+  "erosita",
+  "galex",
+  "twomass"
+ ],
+ "Hmag": [
+  "allwise",
+  "twomass"
+ ],
+ "ID": [
+  "allwise",
+  "ztf_periodic"
+ ],
+ "Islrms": [
+  "lotss",
+  "vlass"
+ ],
+ "Jmag": [
+  "allwise",
+  "twomass"
+ ],
+ "Kmag": [
+  "allwise",
+  "twomass"
+ ],
+ "MJD": [
+  "desi_spectroscopy",
+  "erosita",
+  "lamost_spectroscopy"
+ ],
+ "Maj": [
+  "first",
+  "lotss",
+  "tgss",
+  "vlass"
+ ],
+ "Min": [
+  "first",
+  "lotss",
+  "tgss",
+  "vlass"
+ ],
+ "Mosaic": [
+  "lotss",
+  "tgss"
+ ],
+ "Name": [
+  "desi_spectroscopy",
+  "galex"
+ ],
+ "Nd": [
+  "galex",
+  "xmm"
+ ],
+ "Nr": [
+  "galex",
+  "ztf_periodic"
+ ],
+ "Obs": [
+  "desi_spectroscopy",
+  "galex"
+ ],
+ "PA": [
+  "chandra",
+  "first",
+  "lotss",
+  "nvss",
+  "tgss",
+  "vlass"
+ ],
+ "RAICRS": [
+  "chandra",
+  "desi_spectroscopy"
+ ],
+ "RAJ2000": [
+  "allwise",
+  "first",
+  "galex",
+  "lamost_spectroscopy",
+  "lotss",
+  "nvss",
+  "tgss",
+  "twomass",
+  "vlass",
+  "ztf_periodic"
+ ],
+ "RA_ICRS": [
+  "erosita",
+  "xmm"
+ ],
+ "SCode": [
+  "lotss",
+  "vlass"
+ ],
+ "Source": [
+  "lotss",
+  "xmm"
+ ],
+ "Speak": [
+  "lotss",
+  "tgss"
+ ],
+ "Type": [
+  "desi_spectroscopy",
+  "ned",
+  "ztf_periodic"
+ ],
+ "_DEJ2000": [
+  "first",
+  "nvss"
+ ],
+ "_RAJ2000": [
+  "first",
+  "nvss"
+ ],
+ "_r": [
+  "allwise",
+  "chandra",
+  "desi_spectroscopy",
+  "erosita",
+  "first",
+  "galex",
+  "lamost_spectroscopy",
+  "lotss",
+  "nvss",
+  "tgss",
+  "twomass",
+  "vlass",
+  "xmm"
+ ],
+ "b_MJD": [
+  "desi_spectroscopy",
+  "erosita"
+ ],
+ "ePos": [
+  "mystix_mpcm",
+  "xmm"
+ ],
+ "e_DCMaj": [
+  "lotss",
+  "vlass"
+ ],
+ "e_DCMin": [
+  "lotss",
+  "vlass"
+ ],
+ "e_DCPA": [
+  "lotss",
+  "vlass"
+ ],
+ "e_DEJ2000": [
+  "lotss",
+  "nvss",
+  "tgss",
+  "vlass"
+ ],
+ "e_Hmag": [
+  "allwise",
+  "twomass"
+ ],
+ "e_Jmag": [
+  "allwise",
+  "twomass"
+ ],
+ "e_Kmag": [
+  "allwise",
+  "twomass"
+ ],
+ "e_Maj": [
+  "lotss",
+  "tgss",
+  "vlass"
+ ],
+ "e_Min": [
+  "lotss",
+  "tgss",
+  "vlass"
+ ],
+ "e_PA": [
+  "lotss",
+  "nvss",
+  "tgss",
+  "vlass"
+ ],
+ "e_RAJ2000": [
+  "lotss",
+  "nvss",
+  "tgss",
+  "vlass"
+ ],
+ "e_Speak": [
+  "lotss",
+  "tgss"
+ ],
+ "e_z": [
+  "desi_spectroscopy",
+  "lamost_spectroscopy"
+ ],
+ "entity_kind": [
+  "gaia_dr3",
+  "gaia_dr3_variability_sos_vizier",
+  "galaxy_zoo_desi",
+  "sga2020"
+ ],
+ "fPA": [
+  "first",
+  "galex"
+ ],
+ "line_ha_ew": [
+  "desi_fastspec",
+  "sdss_spectroscopy"
+ ],
+ "line_ha_ew_err": [
+  "desi_fastspec",
+  "sdss_spectroscopy"
+ ],
+ "line_ha_flux": [
+  "desi_fastspec",
+  "sdss_spectroscopy"
+ ],
+ "line_ha_flux_err": [
+  "desi_fastspec",
+  "sdss_spectroscopy"
+ ],
+ "line_hb_flux": [
+  "desi_fastspec",
+  "sdss_spectroscopy"
+ ],
+ "line_hb_flux_err": [
+  "desi_fastspec",
+  "sdss_spectroscopy"
+ ],
+ "line_nii6584_ew": [
+  "desi_fastspec",
+  "sdss_spectroscopy"
+ ],
+ "line_nii6584_flux": [
+  "desi_fastspec",
+  "sdss_spectroscopy"
+ ],
+ "line_nii6584_flux_err": [
+  "desi_fastspec",
+  "sdss_spectroscopy"
+ ],
+ "line_oiii5007_flux": [
+  "desi_fastspec",
+  "sdss_spectroscopy"
+ ],
+ "line_oiii5007_flux_err": [
+  "desi_fastspec",
+  "sdss_spectroscopy"
+ ],
+ "line_source": [
+  "desi_fastspec",
+  "sdss_spectroscopy"
+ ],
+ "mjd": [
+  "sdss_dr18",
+  "sdss_spectroscopy"
+ ],
+ "objID": [
+  "panstarrs1",
+  "sdss_spectroscopy"
+ ],
+ "objid": [
+  "desi_legacy",
+  "galex",
+  "sdss_dr18"
+ ],
+ "pmDE": [
+  "allwise",
+  "desi_spectroscopy"
+ ],
+ "pmRA": [
+  "allwise",
+  "desi_spectroscopy"
+ ],
+ "pmdec": [
+  "gaia_dr3",
+  "simbad"
+ ],
+ "pmra": [
+  "gaia_dr3",
+  "simbad"
+ ],
+ "poserr_arcsec": [
+  "gaia_dr3_variability_sos_vizier",
+  "galaxy_zoo_desi",
+  "sga2020"
+ ],
+ "psf_fwhm_arcsec": [
+  "gaia_dr3",
+  "gaia_dr3_variability_sos_vizier"
+ ],
+ "query_radius_arcmin": [
+  "gaia_dr3",
+  "gaia_dr3_variability_sos_vizier",
+  "galaxy_zoo_desi",
+  "sga2020"
+ ],
+ "r1": [
+  "chandra",
+  "first"
+ ],
+ "recno": [
+  "chandra",
+  "erosita",
+  "first",
+  "lamost_spectroscopy",
+  "lotss",
+  "nvss",
+  "tgss",
+  "vlass",
+  "xmm"
+ ],
+ "ref_epoch": [
+  "desi_legacy",
+  "gaia_dr3",
+  "gaia_dr3_variability_sos_vizier"
+ ],
+ "type": [
+  "desi_legacy",
+  "sdss_dr18"
+ ],
+ "z": [
+  "desi_fastspec",
+  "desi_spectroscopy",
+  "lamost_spectroscopy",
+  "sdss_spectroscopy"
+ ]
+}

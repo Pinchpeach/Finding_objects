@@ -90,7 +90,10 @@ class CatalogFields:
     input carries that namespace for the rule's catalog, only the namespaced
     value is used, so a same-named field from another survey (e.g. DESI Legacy
     ``type`` vs SDSS PhotoObj ``type``) can never stand in for it.  Inputs
-    without the namespace (legacy wide tables) fall back to bare names.
+    without the namespace (legacy wide tables, the benchmark's one-catalogue
+    tables) fall back to bare names; Stage 2 writes no bare name that two
+    catalogues share (2.61.4), so a table with Stage 2's namespaces never
+    hands one catalogue's value to a rule about another.
     """
 
     def __init__(self, row, prefix, namespaced):

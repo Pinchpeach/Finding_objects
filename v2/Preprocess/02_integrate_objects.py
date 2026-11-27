@@ -116,6 +116,43 @@ def flag_large_galaxy_hosts(rows):
         r["host_large_galaxy"], r["host_elliptical_radius"] = best
 
 
+# Raw fields that two or more collectors write under the same name (2.61.4).  Every raw field is kept under its catalogue's
+# namespace (``<catalog>__<field>``).  The bare name used to be "the first valid value of any catalogue", so a bare ``type`` was
+# the Legacy Surveys or the SDSS value, a bare ``pmra`` Gaia's or SIMBAD's, ``RAJ2000`` that of any of 7 catalogues: which one
+# depended on the row order of the group, and nothing could tell a reader where a value came from.  The bare columns of these
+# names are therefore not written; every reader takes the namespaced column of the catalogue it is about
+# (WORK_REPORT_2026-11-27c.md, benchmark/shared_columns/shared_columns.csv).  Names that exist in one catalogue only
+# (``W1mag``, ``iMeanPSFMag`` ...) keep their bare convenience column.  ``V2_KEEP_SHARED_BARE=1`` writes the old columns again.
+SHARED_FIELDS = frozenset(
+    (
+        'B_MJD', 'DCMaj', 'DCMin', 'DCPA', 'DEICRS', 'DEJ2000', 'DE_ICRS', 'Field', 'Fpeak', 'Fr', 'GLAT', 'GLON',
+        'Hmag', 'ID', 'Islrms', 'Jmag', 'Kmag', 'MJD', 'Maj', 'Min', 'Mosaic', 'Name', 'Nd', 'Nr', 'Obs', 'PA',
+        'RAICRS', 'RAJ2000', 'RA_ICRS', 'SCode', 'Source', 'Speak', 'Type', '_DEJ2000', '_RAJ2000', '_r', 'b_MJD',
+        'ePos', 'e_DCMaj', 'e_DCMin', 'e_DCPA', 'e_DEJ2000', 'e_Hmag', 'e_Jmag', 'e_Kmag', 'e_Maj', 'e_Min', 'e_PA',
+        'e_RAJ2000', 'e_Speak', 'e_z', 'entity_kind', 'fPA', 'line_ha_ew', 'line_ha_ew_err', 'line_ha_flux',
+        'line_ha_flux_err', 'line_hb_flux', 'line_hb_flux_err', 'line_nii6584_ew', 'line_nii6584_flux',
+        'line_nii6584_flux_err', 'line_oiii5007_flux', 'line_oiii5007_flux_err', 'line_source', 'mjd', 'objID',
+        'objid', 'pmDE', 'pmRA', 'pmdec', 'pmra', 'poserr_arcsec', 'psf_fwhm_arcsec', 'query_radius_arcmin', 'r1',
+        'recno', 'ref_epoch', 'type', 'z',
+    )
+)
+KEEP_SHARED_BARE = os.environ.get("V2_KEEP_SHARED_BARE", "0") == "1"
+
+
+def shared_fields(assoc, raw_dir):
+    """SHARED_FIELDS plus every field name that the raw files of two different catalogues of this run have in common (a new
+    collector that reuses a name is caught the first time it runs)."""
+    seen = {}
+    for fn, cat in assoc[["input_file", "catalog"]].drop_duplicates().itertuples(index=False):
+        try:
+            cols = pd.read_csv(Path(raw_dir) / fn, nrows=0).columns
+        except (OSError, ValueError):
+            continue
+        for c in cols:
+            seen.setdefault(c, set()).add(str(cat))
+    return SHARED_FIELDS | {c for c, cats in seen.items() if len(cats) >= 2}
+
+
 def _float(v):
     try:
         x = float(v)
@@ -133,6 +170,7 @@ def _first_valid_value(values):
 
 def run(associations, raw_dir, out):
     assoc = pd.read_csv(associations, dtype={"catalog_object_id": "string"}, low_memory=False)
+    shared = set() if KEEP_SHARED_BARE else shared_fields(assoc, raw_dir)
     # Plain dict records: per-row pandas Series construction dominated runtime.
     raw_cache = {}
     groups = {}
@@ -220,13 +258,15 @@ def run(associations, raw_dir, out):
                     continue
                 # Every field is kept under its catalog namespace so rules can
                 # read the value of the catalog they are about.  The bare name
-                # is a legacy first-valid convenience shared by many catalogs
-                # (e.g. ``type`` exists in both SDSS PhotoObj and DESI Legacy).
+                # is a first-valid convenience for fields that only one catalog
+                # has; a name that two or more catalogs share (``type`` in SDSS
+                # PhotoObj and DESI Legacy, ``pmra`` in Gaia and SIMBAD ...) has
+                # no bare column since 2.61.4: SHARED_FIELDS.
                 rec[f"{pre}__{col}"] = val
                 # First valid value wins.  This also covers the astrometry,
                 # spectral-class and DSC fields, which a former second pass
                 # re-copied under the same condition (it never changed a value).
-                if col not in object_keys and (col not in rec or pd.isna(rec[col])):
+                if col not in object_keys and col not in shared and (col not in rec or pd.isna(rec[col])):
                     rec[col] = val
         rec["catalogs"] = "|".join(sorted(set(catalogs)))
         if _WISE_FROM_LS:

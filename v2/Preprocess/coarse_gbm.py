@@ -50,7 +50,9 @@ def _num(f, *names):
 
 def features(f: pd.DataFrame) -> pd.DataFrame:
     """Measured quantities from a Stage-3 / Stage-4 table (survey-prefixed
-    columns first, raw benchmark names as fall-back)."""
+    columns first, raw benchmark names as fall-back).  The fall-back is for the benchmark tables, which hold one catalogue each,
+    so a bare name is unambiguous there; Stage 2 no longer writes the bare names that several catalogues share (2.61.4), so a
+    production table cannot hand another catalogue's ``pmra`` or ``type`` to a fall-back."""
     x = pd.DataFrame(index=f.index)
     x["plx_snr"] = _num(f, "gaia_dr3__parallax", "parallax") / _num(f, "gaia_dr3__parallax_error", "parallax_error")
     x["pm_snr"] = np.hypot(_num(f, "gaia_dr3__pmra", "pmra") / _num(f, "gaia_dr3__pmra_error", "pmra_error"),

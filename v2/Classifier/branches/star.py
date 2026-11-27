@@ -20,8 +20,14 @@ def _num(row, key):
 
 
 def _gaia_num(row, key):
+    # Gaia's own namespaced column (2.61.4).  In a Stage-2 table (it has ``catalogs``) the bare ``pmra`` / ``pmdec`` of an object
+    # without a Gaia row used to be SIMBAD's (or any other catalogue's), so only the namespaced value counts there.  A
+    # single-catalogue Gaia table (collect_star_gaia.py, read by evaluate_wd_hr_gates.py) has no ``catalogs`` and holds Gaia's
+    # fields under their bare names, so those are Gaia's (2.61.4 review).
     v = _num(row, "gaia_dr3__" + key)
-    return v if v is not None else _num(row, key)
+    if v is not None or "catalogs" in row:
+        return v
+    return _num(row, key)
 
 
 def _text(row, key):
@@ -138,8 +144,8 @@ def _wd_hr_signal(row, gate=None):
     if None in (p, pe, g, color) or p <= 0 or pe <= 0 or p / pe <= cfg["min_parallax_over_error"]:
         return None
     if "strong_parallax_over_error" in cfg and p / pe < cfg["strong_parallax_over_error"]:
-        # Gaia's own namespaced motion first: SIMBAD also supplies bare
-        # pmra / pmdec (2.22.0 review).
+        # Gaia's own namespaced motion only: SIMBAD also supplies pmra / pmdec
+        # (2.22.0 review; bare columns shared by catalogues are gone, 2.61.4).
         pmra, epmra, pmdec, epmdec = (_gaia_num(row, k) for k in ("pmra", "pmra_error", "pmdec", "pmdec_error"))
         if None in (pmra, epmra, pmdec, epmdec) or epmra <= 0 or epmdec <= 0:
             return None
