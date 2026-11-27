@@ -13,7 +13,11 @@ sets of truth ids (`../validation/reproducibility/sample_states.csv`), so two ru
   specified").  A query that fails raises; a class never goes missing silently.
 * **The list is a committed file** `fixed/` with `truth_manifest.json` (SHA-256 of every file and of the id set of every class).  The workflow checks the
   directory against its manifest (`build_independent_truth_sets.py --verify fixed`) and does not query VizieR for the truth.
-* **Until `fixed/` is committed** the workflow builds the same deterministic list itself and marks the run UNFROZEN in its report.
+* **Until `fixed/` is committed** a manual run builds the same deterministic list itself and marks the run UNFROZEN in its report; a **push** run does
+  nothing and says `SKIPPED_UNFROZEN` (2.62.1: it would ask the archives for whole tables at every merge for numbers that cannot be compared).  The skip
+  ends by itself once `fixed/truth_manifest.json` exists (`build_independent_truth_sets.py --run-mode`).
+* **Queries ask for the columns the builder reads** (identifier, class, quality, position; 2.62.1), and fall back to the full row when that answer fails
+  or lacks one of them.
 
 ## Freezing (once, and again only when a truth catalogue should change)
 

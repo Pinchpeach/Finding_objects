@@ -70,24 +70,32 @@ jobs:
         id: truth
         env:
           FREEZE: ${{ inputs.freeze_truth }}
+          EVENT: ${{ github.event_name }}
+          V2_HTTP_LOG: "1"  # one line per VizieR mirror request: which mirror served the truth tables (2.62.1)
         run: |
           set -euo pipefail
           work=v2/Classifier/truth/work
           mkdir -p "$work"
-          if [ "$FREEZE" = "true" ]; then
-            python -u v2/Classifier/truth/build_independent_truth_sets.py --out-dir "$work" --limit 250 --require-complete
-            echo "frozen=candidate" >> "$GITHUB_OUTPUT"
-          elif [ -f v2/Classifier/truth/fixed/truth_manifest.json ]; then
-            python v2/Classifier/truth/build_independent_truth_sets.py --verify v2/Classifier/truth/fixed
-            cp v2/Classifier/truth/fixed/* "$work"/
-            echo "frozen=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "::warning::v2/Classifier/truth/fixed is not committed: the truth list is built now (deterministic, the same list a freeze run makes); the run is marked UNFROZEN"
-            python -u v2/Classifier/truth/build_independent_truth_sets.py --out-dir "$work" --limit 250
-            echo "frozen=false" >> "$GITHUB_OUTPUT"
-          fi
+          builder=v2/Classifier/truth/build_independent_truth_sets.py
+          mode="$(python "$builder" --run-mode --event "$EVENT" --freeze "$FREEZE" --fixed v2/Classifier/truth/fixed)"
+          echo "frozen=$mode" >> "$GITHUB_OUTPUT"
+          case "$mode" in
+            candidate)
+              python -u "$builder" --out-dir "$work" --limit 250 --require-complete ;;
+            true)
+              python "$builder" --verify v2/Classifier/truth/fixed
+              cp v2/Classifier/truth/fixed/* "$work"/ ;;
+            false)
+              echo "::warning::v2/Classifier/truth/fixed is not committed: the truth list is built now (deterministic, the same list a freeze run makes); the run is marked UNFROZEN"
+              python -u "$builder" --out-dir "$work" --limit 250 ;;
+            skip)
+              # 2.62.1: before the freeze a push run would ask the archives for whole tables at every merge for UNFROZEN numbers; it does nothing
+              msg="SKIPPED_UNFROZEN: no validation ran (a push before v2/Classifier/truth/fixed is committed). Freeze with a manual freeze_truth run; a manual run without it validates on an UNFROZEN list."
+              echo "::warning::$msg"
+              { echo "### SKIPPED_UNFROZEN"; echo; echo "$msg"; } >> "$GITHUB_STEP_SUMMARY" ;;
+          esac
       - uses: actions/upload-artifact@v4
-        if: ${{ !inputs.freeze_truth }}
+        if: ${{ !inputs.freeze_truth && steps.truth.outputs.frozen != 'skip' }}
         with:
           name: independent-truth-sets
           path: v2/Classifier/truth/work/
@@ -101,7 +109,7 @@ jobs:
 
   validate-shard:
     needs: prepare
-    if: ${{ !inputs.freeze_truth }}
+    if: ${{ !inputs.freeze_truth && needs.prepare.outputs.frozen != 'skip' }}
     strategy:
       fail-fast: false
       max-parallel: 9
