@@ -4,12 +4,24 @@
 These truth sets are for evaluation/calibration only.  If a truth catalogue is
 also available as production evidence, `excluded_evidence_catalog` records that
 it must be masked during evaluation to prevent leakage.
+
+2.61.9: the build is deterministic.  Every query asks for the whole table (no ``row_limit`` that cuts it at an arbitrary place), and a class keeps
+the ``limit`` rows with the smallest SHA-256("<seed>|<truth_id>") (``deterministic.bottom_k``), so the list does not depend on the order in which an
+archive answers.  A manifest (``truth_manifest.json``) records the SHA-256 of every file and of the id set of every class; ``--verify DIR`` checks a
+directory against it.  The list the workflow validates is the committed one in ``v2/Classifier/truth/fixed`` (made by ``--freeze``).
 """
 
 from __future__ import annotations
-import argparse, json, time
+import argparse, datetime, importlib.util, json, sys, time
 from pathlib import Path
 import pandas as pd
+
+_spec = importlib.util.spec_from_file_location("truth_deterministic", Path(__file__).resolve().parent / "deterministic.py")
+D = importlib.util.module_from_spec(_spec)
+sys.modules["truth_deterministic"] = D
+_spec.loader.exec_module(D)
+MANIFEST = "truth_manifest.json"
+SCHEMA = 1
 
 
 def _pick(df, names):
@@ -22,7 +34,7 @@ def _pick(df, names):
     return None
 
 
-def _vizier(catalog, row_limit=1000, **constraints):
+def _vizier(catalog, row_limit=-1, **constraints):
     from astroquery.vizier import Vizier
 
     last = None
@@ -64,7 +76,7 @@ def _coords(df):
 
 def red_giants(limit):
     # Vrard+ 2025 table4: EV=1 certain RGB, EV=2 candidate AGB.
-    df = _vizier("J/A+A/697/A165/table4", row_limit=max(limit * 10, 5000))
+    df = _vizier("J/A+A/697/A165/table4")
     if df.empty:
         return df
     ev = _pick(df, ["EV"])
@@ -82,7 +94,7 @@ def red_giants(limit):
     out = out.dropna(subset=["truth_class", "ra", "dec"])
     out["truth_source"] = "Vrard+2025 Kepler RGB/AGB"
     out["excluded_evidence_catalog"] = ""
-    return out.groupby("truth_class", group_keys=False).head(limit)
+    return D.bottom_k(out, limit)
 
 
 def variables(limit):
@@ -96,12 +108,9 @@ def variables(limit):
     ]
     parts = []
     for typ, label in specs:
-        try:
-            df = _vizier("II/366/catv2021", row_limit=limit, Type=typ)
-        except Exception:
-            continue
+        df = _vizier("II/366/catv2021", Type=typ)  # a failed query raises: a class must not go missing without notice (2.61.9)
         if df.empty:
-            continue
+            raise RuntimeError(f"II/366/catv2021 Type={typ}: empty answer")
         idc = _pick(df, ["ASASSN-V", "ID"])
         ra, dec = _coords(df)
         p = _pick(df, ["Prob"])
@@ -118,11 +127,13 @@ def variables(limit):
         part["truth_source"] = "ASAS-SN Variable Stars II/366"
         part["excluded_evidence_catalog"] = ""
         parts.append(part)
-    return pd.concat(parts, ignore_index=True).dropna(subset=["ra", "dec"]) if parts else pd.DataFrame()
+    if not parts:
+        return pd.DataFrame()
+    return D.bottom_k(pd.concat(parts, ignore_index=True).dropna(subset=["ra", "dec"]), limit)
 
 
 def pulsars(limit):
-    df = _vizier("B/psr/psr", row_limit=limit)
+    df = _vizier("B/psr/psr")
     if df.empty:
         return df
     idc = _pick(df, ["PSRJ", "Name"])
@@ -132,11 +143,11 @@ def pulsars(limit):
     )
     out["truth_source"] = "ATNF B/psr"
     out["excluded_evidence_catalog"] = "ATNF Pulsar Catalog"
-    return out.dropna(subset=["ra", "dec"])
+    return D.bottom_k(out.dropna(subset=["ra", "dec"]), limit)
 
 
 def pns(limit):
-    df = _vizier("V/84/main", row_limit=limit)
+    df = _vizier("V/84/main")
     if df.empty:
         return df
     idc = _pick(df, ["PNG"])
@@ -146,11 +157,11 @@ def pns(limit):
     )
     out["truth_source"] = "Acker V/84 PN catalogue"
     out["excluded_evidence_catalog"] = "Acker PN Spectroscopy"
-    return out.dropna(subset=["ra", "dec"])
+    return D.bottom_k(out.dropna(subset=["ra", "dec"]), limit)
 
 
 def supernovae(limit):
-    df = _vizier("B/sn/sncat", row_limit=max(limit * 5, 1250))
+    df = _vizier("B/sn/sncat")
     if df.empty:
         return df
     idc = _pick(df, ["SN"])
@@ -168,13 +179,14 @@ def supernovae(limit):
     )
     out["truth_source"] = "Asiago B/sn"
     out["excluded_evidence_catalog"] = "Asiago Supernova Catalog"
-    return out.dropna(subset=["ra", "dec"]).head(limit)
+    return D.bottom_k(out.dropna(subset=["ra", "dec"]), limit)
 
 
 def build(out_dir: Path, limit: int):
+    """Write one CSV per set, the summary and the manifest; return the summary rows."""
     out_dir.mkdir(parents=True, exist_ok=True)
     builders = {"rgb_agb": red_giants, "variables": variables, "pulsars": pulsars, "pn": pns, "sn": supernovae}
-    summary = []
+    summary, sets = [], {}
     for name, fn in builders.items():
         try:
             df = fn(limit)
@@ -182,7 +194,13 @@ def build(out_dir: Path, limit: int):
         except Exception as exc:
             df = pd.DataFrame()
             status = f"error:{type(exc).__name__}:{exc}"
-        df.to_csv(out_dir / f"{name}_truth.csv", index=False)
+        f = out_dir / f"{name}_truth.csv"
+        df.to_csv(f, index=False)
+        classes = {}
+        if not df.empty:
+            for (axis, cls), g in df.groupby(["truth_axis", "truth_class"]):
+                classes[f"{axis}|{cls}"] = {"rows": len(g), "ids_sha256": D.ids_sha256(g["truth_id"])}
+        sets[name] = {"file": f.name, "sha256": D.file_sha256(f), "rows": len(df), "status": status, "classes": classes}
         summary.append(
             {
                 "set": name,
@@ -196,21 +214,64 @@ def build(out_dir: Path, limit: int):
         "# Independent per-axis truth sets\n\nGenerated truth sets carry `excluded_evidence_catalog` so evaluation code can mask same-catalog evidence and avoid circular validation. Candidate AGB labels from Vrard+2025 remain candidates and must not be described as spectroscopic certainty.\n",
         encoding="utf-8",
     )
+    manifest = {"schema": SCHEMA, "seed": D.SEED, "limit": limit, "built_utc": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "sets": sets}
+    (out_dir / MANIFEST).write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return summary
 
 
+def list_sha256(directory: Path) -> str:
+    """One hash of the whole list: the SHA-256 of the sorted "file:sha256" lines of its manifest."""
+    m = json.loads((directory / MANIFEST).read_text(encoding="utf-8"))
+    return D.ids_sha256(f"{v['file']}:{v['sha256']}" for v in m["sets"].values())
+
+
+def verify(directory: Path) -> list[str]:
+    """Differences between a directory and its manifest (empty = the list is exactly what was frozen)."""
+    mf = directory / MANIFEST
+    if not mf.exists():
+        return [f"{MANIFEST} is missing in {directory}"]
+    m = json.loads(mf.read_text(encoding="utf-8"))
+    problems = []
+    for name, e in m["sets"].items():
+        f = directory / e["file"]
+        if e.get("status") != "ok" or not e.get("rows"):
+            problems.append(f"{name}: the manifest records status {e.get('status')!r} with {e.get('rows')} rows")
+            continue  # an empty file has no columns to read
+        if not f.exists():
+            problems.append(f"{e['file']} is missing")
+            continue
+        if D.file_sha256(f) != e["sha256"]:
+            problems.append(f"{e['file']}: SHA-256 differs from the manifest")
+            continue
+        df = pd.read_csv(f)
+        for key, c in e["classes"].items():
+            axis, cls = key.split("|")
+            g = df[(df.truth_axis == axis) & (df.truth_class == cls)]
+            if len(g) != c["rows"] or D.ids_sha256(g["truth_id"]) != c["ids_sha256"]:
+                problems.append(f"{e['file']}: class {key} differs from the manifest")
+    return problems
+
+
 def main():
-    import sys
-
     sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "Get_data"))
-    import throttle
-
-    throttle.install()  # 3-5 s before every archive request (2.33.0)
     p = argparse.ArgumentParser()
     p.add_argument("--out-dir", type=Path, default=Path(__file__).resolve().parent / "generated")
     p.add_argument("--limit", type=int, default=250)
+    p.add_argument("--verify", type=Path, help="check this directory against its manifest and exit (1 on any difference)")
+    p.add_argument("--require-complete", action="store_true", help="exit 1 unless every set was built (a list to freeze must be complete)")
     a = p.parse_args()
-    print(json.dumps(build(a.out_dir, a.limit), indent=2))
+    if a.verify:
+        problems = verify(a.verify)
+        print(json.dumps({"directory": str(a.verify), "problems": problems, "list_sha256": None if problems else list_sha256(a.verify)}, indent=2))
+        raise SystemExit(1 if problems else 0)
+    import throttle
+
+    throttle.install()  # 3-5 s before every archive request (2.33.0)
+    summary = build(a.out_dir, a.limit)
+    print(json.dumps(summary, indent=2))
+    bad = [x for x in summary if x["status"] != "ok" or not x["rows"]]
+    if a.require_complete and bad:
+        raise SystemExit(f"incomplete truth list, not to be frozen: {bad}")
 
 
 if __name__ == "__main__":

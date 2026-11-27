@@ -1,0 +1,10 @@
+truth_class,exact_min,exact_max,classified_min,classified_max,commits_with_archive_error,commits
+AGB,0.0,0.0,0.0,0.52,1,25
+CEPHEID,0.888,0.932,0.944,0.964,1,25
+LPV,0.616,0.668,0.708,0.768,2,25
+MIRA,0.896,0.948,0.992,1.0,2,25
+PN,0.0,0.892,0.0,0.932,7,25
+PULSAR,0.0,0.0,0.004,0.016,3,25
+RGB,0.0,0.0,0.0,1.0,0,25
+RR_LYRAE,0.804,0.828,0.94,0.96,2,25
+SN,0.008,0.008,0.008,0.008,1,25
