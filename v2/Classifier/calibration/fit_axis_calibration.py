@@ -15,6 +15,11 @@ Two methods (2.15.0):
 Input columns: axis, truth_class, predicted_class, raw_score.  A class model is
 written only when both positive and negative support are adequate.  Rows whose
 truth source overlaps the evidence source may be excluded with `leakage=1`.
+
+2.61.9: the fit is no longer part of the automatic commit of the cross-validation workflow.  Its coefficients are a deterministic function of the
+predictions file (checked: a refit of the predictions of four bot commits reproduces their ``models.json``), so a change of the coefficients is a change of the
+truth list or of an archive.  A refit is an explicit run (``refit_calibration``) and the result is committed by hand with a version number;
+``--fitted-on-json`` stamps the provenance (SHA-256 of the truth list and of the predictions, the run status, the commit) into the file as ``fitted_on``.
 """
 
 from __future__ import annotations
@@ -71,7 +76,7 @@ def rule_precision(df: pd.DataFrame) -> dict:
     return out
 
 
-def fit(inp: Path, out: Path):
+def fit(inp: Path, out: Path, fitted_on: dict | None = None):
     from sklearn.linear_model import LogisticRegression
 
     df = pd.read_csv(inp)
@@ -106,6 +111,8 @@ def fit(inp: Path, out: Path):
         "axes": {},
         "rules": rules,
     }
+    if fitted_on:
+        result["fitted_on"] = fitted_on
     for axis, g in df.groupby("axis"):
         classes = sorted(set(g["truth_class"].dropna().astype(str)) | set(g["predicted_class"].dropna().astype(str)))
         result["axes"][axis] = {}
@@ -144,8 +151,9 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--input", type=Path, required=True)
     p.add_argument("--out", type=Path, required=True)
+    p.add_argument("--fitted-on-json", type=Path, help="a JSON object stored as `fitted_on` (the provenance of this fit)")
     a = p.parse_args()
-    fit(a.input, a.out)
+    fit(a.input, a.out, json.loads(a.fitted_on_json.read_text(encoding="utf-8")) if a.fitted_on_json else None)
 
 
 if __name__ == "__main__":

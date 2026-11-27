@@ -179,7 +179,7 @@ def test_ps1_rows_on_a_small_galaxy_are_grouped_under_it():
 def test_single_survey_rows_in_a_bright_star_halo_are_grouped_under_the_star():
     import pandas as pd
 
-    import host_groups
+    host_groups = _load("host_groups")  # by path like the others: "import host_groups" only worked when the working directory was v2 (2.61.9)
 
     star = dict(object_id="S", designation="Gaia DR3 1", ra=150.0, dec=2.0, primary_class="STAR",
                 gaia_dr3__phot_g_mean_mag=11.0, catalogs="DESI Legacy Surveys DR10|Gaia DR3|Pan-STARRS1 DR2 MeanObject")

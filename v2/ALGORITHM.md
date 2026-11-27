@@ -262,6 +262,7 @@ SIMBAD 유형은 SIMBAD `otypedef` 계층(`Classifier/reference/simbad_otypedef.
   - `AGREEMENT_TARGET_SET`: 그 클래스만 모은 정답 세트 안의 일치율. 오염원이 없으므로 정밀도가 아니며, 실제 하늘에서는 더 낮을 수 있습니다(검토 6.3).
 - 20행 이상일 때만 쓰고, Wilson 95 % 하한을 함께 둡니다.
 - 점수가 있는 판정은 Platt 보정을 씁니다.
+- **계수의 출처(2.61.9)**: `calibration/models.json`은 독립 정답 검증의 예측 파일에서 결정적으로 나오는 값이다(8개 봇 커밋에서 재적합이 커밋된 파일을 그대로 재현함). 이 계수는 `*_reliability` 출력 열에만 쓰이고 주 라벨·`high_confidence`에는 쓰이지 않는다. 교차 검증 워크플로는 더 이상 `models.json`을 자동 커밋하지 않는다. 재적합은 명시 실행(`refit_calibration`)이고, 결과는 `fitted_on`(정답 목록·예측 파일의 SHA-256, 실행 상태)과 함께 사람이 판 번호를 올려 커밋한다. 아카이브 오류가 있던 실행은 DEGRADED로 표시되고 수치를 덮어쓰지 않는다. 정답 목록은 `Classifier/truth/fixed`의 고정 파일이다(`Classifier/truth/README.md`).
 
 교차 검증(무작위 독립 정답, 클래스당 250개):
 
