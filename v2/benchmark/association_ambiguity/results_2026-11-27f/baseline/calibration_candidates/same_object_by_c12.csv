@@ -1,0 +1,31 @@
+group,c12_sep,rows,same_truth,best_right,best_wrong,same_truth_pct
+resolving,0-0.05,57,57,57,0,100.0
+resolving,0.05-0.1,40,40,40,0,100.0
+resolving,0.1-0.2,58,57,57,0,98.3
+resolving,0.2-0.3,34,34,34,0,100.0
+resolving,0.3-0.5,64,64,64,0,100.0
+resolving,0.5-0.8,141,88,131,0,62.4
+resolving,0.8-1.2,65,16,52,0,24.6
+resolving,1.2-2.0,17,0,7,0,0.0
+resolving,2.0-99,4,0,2,0,0.0
+resolving,nsep 0-0.5,230,227,229,0,98.7
+resolving,nsep 0.5-1,85,44,76,0,51.8
+resolving,nsep 1-2,44,24,41,0,54.5
+resolving,nsep 2-3,72,50,68,0,69.4
+resolving,nsep 3-5,38,11,25,0,28.9
+resolving,nsep 5-99,11,0,5,0,0.0
+low-res,0-0.05,3,3,3,0,100.0
+low-res,0.05-0.1,5,5,5,0,100.0
+low-res,0.1-0.2,10,10,10,0,100.0
+low-res,0.2-0.3,8,6,7,0,75.0
+low-res,0.3-0.5,13,11,10,1,84.6
+low-res,0.5-0.8,64,27,50,0,42.2
+low-res,0.8-1.2,57,3,34,0,5.3
+low-res,1.2-2.0,83,3,64,0,3.6
+low-res,2.0-99,47,0,27,5,0.0
+low-res,nsep 0-0.5,31,27,28,0,87.1
+low-res,nsep 0.5-1,15,6,7,1,40.0
+low-res,nsep 1-2,29,16,23,0,55.2
+low-res,nsep 2-3,57,12,46,1,21.1
+low-res,nsep 3-5,79,4,50,2,5.1
+low-res,nsep 5-99,79,3,56,2,3.8

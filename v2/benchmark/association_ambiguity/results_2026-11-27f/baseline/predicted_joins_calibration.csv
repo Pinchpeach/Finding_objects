@@ -1,0 +1,17 @@
+rule,group,ambiguous_rows,joined,joined_with_truth,right,wrong,unknown,joined_pct,wrong_pct_of_known
+same,resolving,547,202,189,188,0,14,36.9,0.0
+same,AllWISE,143,1,1,1,0,0,0.7,0.0
+same,GALEX AIS,149,24,24,23,0,1,16.1,0.0
+same,2MASS PSC,4,1,1,1,0,0,25.0,0.0
+nearest,resolving,547,139,132,132,0,7,25.4,0.0
+nearest,AllWISE,143,21,21,20,0,1,14.7,0.0
+nearest,GALEX AIS,149,2,2,1,0,1,1.3,0.0
+nearest,2MASS PSC,4,2,1,1,0,1,50.0,0.0
+same+nearest,resolving,547,316,298,297,0,19,57.8,0.0
+same+nearest,AllWISE,143,22,22,21,0,1,15.4,0.0
+same+nearest,GALEX AIS,149,26,26,24,0,2,17.4,0.0
+same+nearest,2MASS PSC,4,3,2,2,0,1,75.0,0.0
+best,resolving,547,547,480,444,0,103,100.0,0.0
+best,AllWISE,143,143,142,111,0,32,100.0,0.0
+best,GALEX AIS,149,149,145,97,6,46,100.0,5.8
+best,2MASS PSC,4,4,3,2,0,2,100.0,0.0

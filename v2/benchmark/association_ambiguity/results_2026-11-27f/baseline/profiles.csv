@@ -1,0 +1,23 @@
+catalog,rows,has_profile,profile_poserr,profile_psf,profile_max_radius,median_poserr_of_rows,p10_poserr,p90_poserr,ambiguous,ambiguous_pct
+Pan-STARRS1 DR2 MeanObject,312734,True,0.12,1.2,4.0,0.018,0.0012,0.135,52,0.02
+DESI Legacy Surveys DR10,255244,True,0.6,1.2,4.0,0.6,0.0257,0.6,747,0.29
+Gaia DR3,113943,True,0.1,0.18,5.0,0.0003,0.0,0.0019,1,0.0
+AllWISE,62800,True,0.5,6.1,8.0,0.5,0.5,0.5,1273,2.03
+SDSS DR18 PhotoObj,60674,False,0.6,,5.0,0.6,0.6,0.6,1250,2.06
+2MASS PSC,37451,True,0.25,2.5,6.0,0.09,0.06,0.27,141,0.38
+GALEX AIS,7144,True,0.8,5.3,8.0,0.8,0.8,0.8,550,7.7
+Chandra CSC 2.0,1378,True,0.6,0.5,5.0,0.4349,0.346,0.9034,39,2.83
+LAMOST DR catalog,931,False,0.6,,5.0,0.6,0.6,0.6,27,2.9
+XMM 4XMM-DR13,746,True,1.5,6.0,10.0,1.0163,0.4111,2.0052,87,11.66
+Galaxy Zoo DESI,466,False,0.6,,5.0,0.1,0.1,0.1,0,0.0
+VLASS,384,False,0.6,,5.0,0.0,0.0,0.6,2,0.52
+NVSS,222,True,3.0,45.0,30.0,3.35,0.6,8.79,66,29.73
+SGA-2020,155,True,1.0,,5.0,1.0,1.0,1.0,9,5.81
+ZTF periodic variables,129,True,0.15,2.0,3.0,0.15,0.15,0.15,0,0.0
+eROSITA eRASS1,90,True,4.5,30.0,20.0,4.5472,2.0452,5.8481,23,25.56
+TGSS ADR1,70,True,2.0,25.0,25.0,2.1,2.0,2.6,22,31.43
+FIRST,67,True,1.0,5.4,8.0,1.0,1.0,1.0,8,11.94
+DESI DR1 spectroscopy,65,True,0.1,,5.0,0.1,0.1,0.1,0,0.0
+Gaia DR3 variability SOS,20,False,0.6,,5.0,0.1,0.1,0.1,1,5.0
+SDSS DR18 spectroscopy,13,False,0.6,,5.0,0.6,0.6,0.6,0,0.0
+LoTSS DR2,8,False,0.6,,5.0,0.385,0.06,0.995,0,0.0

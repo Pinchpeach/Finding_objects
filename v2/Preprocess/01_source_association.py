@@ -10,6 +10,7 @@ from pathlib import Path
 import pandas as pd
 
 from association_model import (
+    AMBIG_FIX,
     annotation_physical_type,
     assess_pair,
     phot_magnitudes,
@@ -27,6 +28,10 @@ from association_model import (
 )
 
 AMBIG_SCORE_RATIO = 0.67
+# Diagnostics of the decision (V2_ASSOC_DIAG=1; off by default, nothing else reads them): for every detection the best
+# two accepted candidates (score, separation, normalised separation, catalogues and members of the group), and whether
+# the groups of the two candidates are one object themselves (their anchors agree within the pair's sigma).
+_DIAG = os.environ.get("V2_ASSOC_DIAG", "0") == "1"
 # DESI redshifts are measured at the imaging position of a Legacy Surveys
 # target (TARGET_RA/DEC; Myers et al. 2023, AJ 165, 50), so a spectrum is a
 # measurement of an LS source rather than an independent detection.  Spectra
@@ -36,8 +41,24 @@ AMBIG_SCORE_RATIO = 0.67
 # would be (LS DR10 south re-numbers the DR9 objects DESI targeted).  Before
 # 2.28.0 a shredded galaxy's own fragments made the spectrum ambiguous and it
 # became an evidence-less object (fields RA 250 and RA 20).
-TARGET_SPECTRA = ("DESI DR1 spectroscopy", "DESI DR1 FastSpecFit")
+DESI_SPECTRA = ("DESI DR1 spectroscopy", "DESI DR1 FastSpecFit")
+TARGET_SPECTRA = DESI_SPECTRA
 TARGET_IMAGING = "DESI Legacy Surveys DR10"
+# 2.61.7 (V2_ASSOC_AMBIG=spectra, off by default): LAMOST and SDSS spectra are targets as well.  LAMOST gives the coordinates of
+# the input-catalogue source (Gaia, Pan-STARRS, SDSS, UCAC4; "Right ascension from input catalog", LAMOST DR10 catalogue table), so
+# a LAMOST row is the measurement of an imaging source, not a detection of its own, like a DESI row.  For these spectra the
+# target is the position of an imaging row of the group (any of IMAGING_TARGETS), not only a Legacy Surveys one: at low
+# latitude 91 % of the quasars have no Legacy Surveys row.  SDSS spectra: the position is the SDSS target's; same treatment.
+SPECTRA_EXTRA = ("LAMOST DR catalog", "SDSS DR18 spectroscopy")
+IMAGING_TARGETS = ("DESI Legacy Surveys DR10", "Pan-STARRS1 DR2 MeanObject", "SDSS DR18 PhotoObj", "Gaia DR3")
+if "spectra" in AMBIG_FIX:
+    TARGET_SPECTRA = DESI_SPECTRA + SPECTRA_EXTRA
+# 2.61.7 (V2_ASSOC_AMBIG=same / nearest): when the two best candidates of a detection are one object (their anchors lie within
+# SAME_OBJECT_ARCSEC), or the nearest one is NEAREST_RATIO times nearer than the next and within NEAREST_SEP_ARCSEC, the detection
+# joins instead of becoming a new object.  The values are set on the calibration fields (association_ambiguity/README.md).
+SAME_OBJECT_ARCSEC = float(os.environ.get("V2_ASSOC_SAME_ARCSEC", "0.3"))
+NEAREST_SEP_ARCSEC = float(os.environ.get("V2_ASSOC_NEAREST_SEP", "0.3"))
+NEAREST_RATIO = float(os.environ.get("V2_ASSOC_NEAREST_RATIO", "3"))
 # Literature annotation catalogues (2.47.0).  NED, SIMBAD and the compiled
 # object catalogues give identifications of a source measured elsewhere, not
 # detections of their own: NED holds separate entries for the optical, IR,
@@ -282,7 +303,8 @@ def _target_sep(group, det):
     """Distance to the group's Legacy Surveys member(s), the imaging target of
     a DESI spectrum; the group anchor is often another survey's detection
     (field RA 20: anchor 0.71" away, LS target 0.02")."""
-    return min((sep_arcsec(ra, dec, det["ra"], det["dec"]) for ra, dec in group["targets"]), default=math.inf)
+    targets = group["targets"] if det["catalog"] in DESI_SPECTRA else group.get("targets_imaging", ())
+    return min((sep_arcsec(ra, dec, det["ra"], det["dec"]) for ra, dec in targets), default=math.inf)
 
 
 def _anchor_key(det):
@@ -338,6 +360,60 @@ EMPTY_COLUMNS = [
     "object_ra",
     "object_dec",
 ]
+
+
+def _diag_fields(candidates, groups) -> dict:
+    """The first two accepted candidates of a detection as columns (V2_ASSOC_DIAG=1)."""
+    out = {}
+    for k, c in enumerate(candidates[:2], 1):
+        score, nsep, gi, res = c
+        g = groups[gi]
+        out.update(
+            {
+                f"diag_c{k}_object": g["id"],
+                f"diag_c{k}_score": score,
+                f"diag_c{k}_sep": res.get("separation_arcsec"),
+                f"diag_c{k}_nsep": res.get("normalized_separation"),
+                f"diag_c{k}_sigma": res.get("combined_sigma_arcsec"),
+                f"diag_c{k}_catalogs": "|".join(sorted(g["catalogs"])),
+                f"diag_c{k}_members": g["members"],
+            }
+        )
+    if candidates:  # every accepted candidate: object, separation, normalised separation, score ('|'-joined, best score first)
+        out["diag_all_object"] = "|".join(groups[c[2]]["id"] for c in candidates)
+        out["diag_all_sep"] = "|".join(f"{c[3].get('separation_arcsec') or 0.0:.4f}" for c in candidates)
+        out["diag_all_nsep"] = "|".join(f"{c[3].get('normalized_separation') or 0.0:.3f}" for c in candidates)
+        out["diag_all_score"] = "|".join(f"{c[0]:.4f}" for c in candidates)
+    if len(candidates) > 1:
+        a, b = groups[candidates[0][2]]["anchor"], groups[candidates[1][2]]["anchor"]
+        pair = assess_pair(a, b, None)
+        out["diag_c12_sep"] = pair["separation_arcsec"]
+        out["diag_c12_nsep"] = pair["normalized_separation"]
+    return out
+
+
+def _resolve_ambiguity(candidates, groups):
+    """V2_ASSOC_AMBIG ``best`` / ``same`` / ``nearest``: (still ambiguous, candidates, how it was resolved).
+
+    best     never ambiguous: the best-scoring candidate is taken, as in Marrese et al. 2017, 2019 (the highest score among the
+             good neighbours, no test against the second) and NWAY's match_flag 1 (a close second only gets match_flag 2).
+    same     the anchors of the two best candidates are within SAME_OBJECT_ARCSEC: they are fragments of one object, so either
+             is the right one; the best-scoring is taken.
+    nearest  the nearest candidate is within NEAREST_SEP_ARCSEC and the next is NEAREST_RATIO times further: it is taken.
+    """
+    if "best" in AMBIG_FIX:
+        return False, candidates, "best"
+    if "same" in AMBIG_FIX:
+        pair = assess_pair(groups[candidates[0][2]]["anchor"], groups[candidates[1][2]]["anchor"], None)
+        if (pair["separation_arcsec"] or 0.0) < SAME_OBJECT_ARCSEC:
+            return False, candidates, "same_object"
+    if "nearest" in AMBIG_FIX:
+        seps = [(c[3].get("separation_arcsec") or 0.0, k) for k, c in enumerate(candidates)]
+        seps.sort()
+        (s1, k1), (s2, _) = seps[0], seps[1]
+        if s1 < NEAREST_SEP_ARCSEC and s2 >= NEAREST_RATIO * max(s1, 1e-3):
+            return False, [candidates[k1]] + [c for k, c in enumerate(candidates) if k != k1], "nearest_clear"
+    return True, candidates, ""
 
 
 def run(raw_dir: Path, out: Path):
@@ -461,6 +537,9 @@ def run(raw_dir: Path, out: Path):
             best["association_method"] = "annotation_most_probable"
             candidates = [(candidates[0][0], candidates[0][1], candidates[0][2], best)] + candidates[1:]
             ambiguous = False
+        resolution = ""
+        if ambiguous and AMBIG_FIX:
+            ambiguous, candidates, resolution = _resolve_ambiguity(candidates, groups)
 
         if candidates and not ambiguous:
             _, _, gi, match = candidates[0]
@@ -474,6 +553,8 @@ def run(raw_dir: Path, out: Path):
             group["members"] += 1
             if det["catalog"] == TARGET_IMAGING:
                 group["targets"].append((det["ra"], det["dec"]))
+            if "spectra" in AMBIG_FIX and det["catalog"] in IMAGING_TARGETS:
+                group["targets_imaging"].append((det["ra"], det["dec"]))
             group["aliases"].update(det.get("association_aliases") or ())
             for alias in det.get("association_aliases") or ():
                 alias_groups.setdefault(alias, set()).add(gi)
@@ -494,6 +575,7 @@ def run(raw_dir: Path, out: Path):
                     "entity_kind": det["entity_kind"],
                     "aliases": set(det.get("association_aliases") or ()),
                     "targets": [(det["ra"], det["dec"])] if det["catalog"] == TARGET_IMAGING else [],
+                    "targets_imaging": [(det["ra"], det["dec"])] if det["catalog"] in IMAGING_TARGETS else [],
                 }
             )
             place(len(groups) - 1)
@@ -531,6 +613,9 @@ def run(raw_dir: Path, out: Path):
                 "ambiguous_new" if ambiguous else ("event_new" if det["entity_kind"] == "transient_event" else "new")
             )
 
+        diag = _diag_fields(candidates, groups) if _DIAG else {}
+        if AMBIG_FIX:  # how an ambiguity was resolved ('' = it was none or stayed one); only with a V2_ASSOC_AMBIG switch
+            diag["ambiguity_resolution"] = resolution
         # Sum of the likelihood ratios of every accepted candidate (Fleuren et al. 2012 denominator); the posterior
         # measurements read it, nothing else does.  A candidate without a ratio (shared identifier) counts as 0.
         lr_sum = sum(float(c[3].get("likelihood_ratio") or 0.0) for c in candidates)
@@ -558,6 +643,7 @@ def run(raw_dir: Path, out: Path):
                 "likelihood_ratio": match.get("likelihood_ratio") if status == "matched" else None,
                 "lr_sum_candidates": lr_sum,
                 "phot_weight": match.get("phot_weight", 1.0),
+                **diag,
             }
         )
 

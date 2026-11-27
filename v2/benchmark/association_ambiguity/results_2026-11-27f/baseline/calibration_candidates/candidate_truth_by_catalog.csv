@@ -1,0 +1,10 @@
+catalog,ambiguous_with_truth,best_right,nearest_right,nearest_wrong,any_right,both_top2_same_truth,nearest_is_best,best_right_pct,nearest_right_pct,nearest_wrong_pct,any_right_pct,both_top2_same_truth_pct,nearest_is_best_pct
+2MASS PSC,3,2,3,0,3,2,0,66.7,100.0,0.0,100.0,66.7,0.0
+AllWISE,142,111,107,1,135,31,132,78.2,75.4,0.7,95.1,21.8,93.0
+DESI Legacy Surveys DR10,212,184,186,0,192,136,198,86.8,87.7,0.0,90.6,64.2,93.4
+GALEX AIS,145,97,97,4,142,35,110,66.9,66.9,2.8,97.9,24.1,75.9
+Pan-STARRS1 DR2 MeanObject,1,1,1,0,1,1,1,100.0,100.0,0.0,100.0,100.0,100.0
+SDSS DR18 PhotoObj,264,256,257,0,264,216,227,97.0,97.3,0.0,100.0,81.8,86.0
+SGA-2020,3,3,3,0,3,3,3,100.0,100.0,0.0,100.0,100.0,100.0
+all resolving,480,444,447,0,460,356,429,92.5,93.1,0.0,95.8,74.2,89.4
+all low-res,290,210,207,5,280,68,242,72.4,71.4,1.7,96.6,23.4,83.4

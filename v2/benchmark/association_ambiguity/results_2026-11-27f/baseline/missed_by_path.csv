@@ -1,0 +1,4 @@
+catalog,rows_with_expected_counterpart,missed,missed_via_ambiguous,missed_via_new,ambiguous_new,ambiguous_that_were_missed,ambiguous_rightly_alone,missed_via_ambiguous_pct,ambiguous_missed_pct
+2MASS PSC,1079,16,6,10,6,6,0,37.5,100.0
+AllWISE,11590,1536,392,1144,402,392,10,25.5,97.5
+GALEX AIS,2998,616,312,304,318,312,6,50.6,98.1
