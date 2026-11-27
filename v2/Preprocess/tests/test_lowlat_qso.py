@@ -161,6 +161,8 @@ def test_empty_region_and_missing_region(tmp_path):
     assert rs.loc[("all", "all"), "n"] == 1 and rs.loc[("all", "all incl. no object"), "n"] == 2
     assert rs.xs("coverage").n.iloc[0] == 1
     assert S.MISSING not in set(tabs["missed"].label)
+    lab = tabs["labels"].set_index("bbin")
+    assert lab.loc["[10.0, 15.0)", S.MISSING] == 1 and lab.loc["[10.0, 15.0)", "NO_OBJECT"] == 1  # binned by its own |b|
     dens = tabs["qso_density"].set_index("stratum").loc["all"]
     assert dens.regions == 2 and dens.qso_labelled_other == 0
 

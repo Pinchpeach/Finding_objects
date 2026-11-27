@@ -460,7 +460,7 @@ def summarise(res: dict) -> dict[str, pd.DataFrame]:
         n, k = len(g), int((g.label == "QSO").sum())
         a, b = wilson(k, n)
         rows.append(dict(by="AllWISE R90 sky", bin="inside" if flag else "outside", n=n, qso=k, recall=round(k / n, 4), lo=round(a, 4), hi=round(b, 4)))
-    lab = (q_all.assign(bbin=pd.cut(q.b.abs(), [0, 5, 10, 15, 20.0001], right=False).astype(str))
+    lab = (q_all.assign(bbin=pd.cut(q_all.b.abs(), [0, 5, 10, 15, 20.0001], right=False).astype(str))
             .groupby(["bbin", "label"]).size().unstack(fill_value=0))  # fmt: skip
     missed = q[q.label != "QSO"]
     causes = (missed.assign(bbin=pd.cut(missed.b.abs(), [0, 5, 10, 15, 20.0001], right=False).astype(str))
