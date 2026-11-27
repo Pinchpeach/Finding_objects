@@ -226,7 +226,7 @@ def load(raw: Path):
             )
     # The row that is kept of two rows with the same identifier (or the same position when there is none) must not
     # depend on the order of the file: put the rows in the order of the association first (2.61.0)
-    if _TIE_ORDER == "brightness":
+    if _TIE_ORDER != "file":
         rows.sort(key=_order_key)
     kept = []
     for row in rows:
@@ -303,17 +303,18 @@ def _anchor_key(det):
 # to rank the anchors; Fleuren et al. 2012: sigma = 0.655 FWHM / SNR), then position, the catalogue's own identifier and
 # only then the row.  The literature (Budavari & Basu 2016; Marrese et al. 2017, 2019) decides competing detections by
 # score, not by order and gives no rule for the order; the brightness order is this project's choice (see
-# LITERATURE_ASSOCIATION_ORDER_2026-11-25.md).  V2_ASSOC_TIE_ORDER=file restores the order of 2.60.x.
+# LITERATURE_ASSOCIATION_ORDER_2026-11-25.md).  V2_ASSOC_TIE_ORDER=file restores the order of 2.60.x; =position drops the brightness
+# (position, identifier, row) and is there to measure what the brightness adds.
 _TIE_ORDER = os.environ.get("V2_ASSOC_TIE_ORDER", "brightness")
-if _TIE_ORDER not in ("brightness", "file"):
-    raise ValueError(f"V2_ASSOC_TIE_ORDER={_TIE_ORDER!r}: expected 'brightness' or 'file'")
+if _TIE_ORDER not in ("brightness", "position", "file"):
+    raise ValueError(f"V2_ASSOC_TIE_ORDER={_TIE_ORDER!r}: expected 'brightness', 'position' or 'file'")
 
 
 def _order_key(d):
     head = (d.get("catalog") in ANNOTATION_CATALOGS, d.get("catalog") in TARGET_SPECTRA, *_anchor_key(d), str(d.get("catalog")))
     if _TIE_ORDER == "file":
         return (*head, str(d.get("detection_id")))
-    mag = d.get("_tie_mag")
+    mag = d.get("_tie_mag") if _TIE_ORDER == "brightness" else None  # "position": the same without the brightness
     return (
         *head,
         mag if mag is not None else math.inf,

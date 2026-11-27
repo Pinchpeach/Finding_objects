@@ -1,0 +1,10 @@
+catalog,half,rows,joined,missed,missed_ambiguous,missed_blocked,blocked_row_closer_to_truth,blocked_closer_pct_of_missed,missed_no_candidate,missed_pct_of_rows
+AllWISE,calibration,6651,4485,871,221,20,5,0.57,630,13.1
+AllWISE,test,5007,3444,665,171,8,5,0.75,486,13.28
+AllWISE,all,11658,7929,1536,392,28,10,0.65,1116,13.18
+2MASS PSC,calibration,813,796,10,4,1,0,0.0,5,1.23
+2MASS PSC,test,613,602,6,2,1,1,16.67,3,0.98
+2MASS PSC,all,1426,1398,16,6,2,1,6.25,8,1.12
+GALEX AIS,calibration,1919,1476,347,183,4,2,0.58,160,18.08
+GALEX AIS,test,1434,1117,269,129,1,0,0.0,140,18.76
+GALEX AIS,all,3353,2593,616,312,5,2,0.32,300,18.37

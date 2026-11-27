@@ -98,6 +98,17 @@ def test_synthetic_tied_rows_give_the_same_objects_in_any_order(tmp_path, seed):
     assert (r.loc[n.index] == n).all()
 
 
+@pytest.mark.parametrize("seed", [1, 2])
+def test_position_order_is_order_independent_too(tmp_path, monkeypatch, seed):
+    """V2_ASSOC_TIE_ORDER=position (no brightness key, for the ablation) does not use the row either."""
+    monkeypatch.setenv("V2_ASSOC_TIE_ORDER", "position")
+    res, _, _ = _compare(_synthetic_raw(tmp_path), tmp_path, seed)
+    assert res["objects_only_ref"] == res["objects_only_new"] == 0, res
+    (tmp_path / "field").mkdir()
+    res, _, _ = _compare(RAW, tmp_path / "field", seed)
+    assert res["objects_only_ref"] == res["objects_only_new"] == 0, res
+
+
 @pytest.mark.parametrize("seed", [1, 2, 3])
 def test_committed_field_gives_the_same_objects_in_any_order(tmp_path, seed):
     res, _, _ = _compare(RAW, tmp_path, seed)

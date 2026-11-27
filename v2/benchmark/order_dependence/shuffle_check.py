@@ -160,9 +160,10 @@ def label_diff(ref_c: pd.DataFrame, new_c: pd.DataFrame, ref_a, new_a) -> dict:
     """Labels of the objects that exist (same members) in both runs."""
     mr = {frozenset(v): k for k, v in compositions(ref_a).items()}
     mn = {frozenset(v): k for k, v in compositions(new_a).items()}
-    common = [c for c in mr if c in mn]
     r = ref_c.set_index("object_id")
     n = new_c.set_index("object_id")
+    # an object can be in the association and not in the classified table (e.g. a catalogue-only entry): skip those
+    common = [c for c in mr if c in mn and mr[c] in r.index and mn[c] in n.index]
     idr = [mr[c] for c in common]
     idn = [mn[c] for c in common]
     out = dict(objects_common=len(common))
