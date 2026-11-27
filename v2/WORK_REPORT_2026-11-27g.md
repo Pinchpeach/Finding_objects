@@ -153,6 +153,7 @@
 2. **`PUSH_PREFER=ours`의 범위.** 이 워크플로의 "Commit validation products" 단계에만 걸린다. 같은 스크립트를 쓰는 다른 워크플로 42곳은 변수를 주지 않으므로 기본 동작(`-X` 없음)이 그대로다.
    - 이 단계의 커밋에는 이 실행이 통째로 다시 쓰는 세 경로만 들어 있다(`independent_truth/`, `REAL_SAMPLE_VALIDATION.md`, `real_sample_validation.csv`). rebase는 이 커밋만 다시 얹으므로 `-X theirs`가 고르는 충돌도 이 파일들뿐이다.
    - 같은 ref의 실행은 줄을 서고(`cancel-in-progress: false`) 시작 순서대로 끝나므로, 충돌에서 이기는 것은 나중 트리거의 산출물이다.
+   - **Codex 검토로 바꿈**: 처음 판의 `git pull --rebase -X theirs`는 충돌한 hunk만 이 실행 쪽으로 고르고, 충돌하지 않은 다른 실행의 hunk는 남겼다. 그래서 통째로 다시 쓴 보고서가 두 실행의 섞임이 될 수 있었다(시험으로 재현). 이제 `PUSH_PREFER=ours`는 rebase를 하지 않는다. 매 시도 원격 가지에서 시작해, 이 실행의 커밋이 건드린 파일의 **전체 내용**을 되쓰고(지운 파일은 지움) 같은 메시지로 다시 커밋한다. 커밋이 건드리지 않은 파일은 원격 내용 그대로다(시험 2개 추가).
 3. **커버리지 허용치 0.05.** 근거가 약하다는 데 동의한다. 동결 뒤 CDS가 정상인 날 기준선을 3번 재고, 클래스별 분류 비율의 변동폭을 보고 정하는 것을 권한다(예: 관측 최대 폭의 2배). 지금 값은 기준선 파일에 함께 기록되므로(`tolerance`) 바꿀 때 코드를 고치지 않아도 된다.
 4. **동결 전 실행의 부담.** `truth/fixed/`가 커밋될 때까지는 경로 조건에 맞는 main push마다 UNFROZEN 실행이 표 전체를 질의한다(ASAS-SN II/366 유형별, Asiago B/sn/sncat 등; 예전에는 `row_limit=250`). `prepare`의 제한은 60분이다. CDS 장애가 길면 이 단계가 시간 초과로 끝날 수 있으니 동결(§7의 ①)을 먼저 하는 편이 낫다.
 5. **`real_sample_validation`**은 OK/DEGRADED 판정에 들어가지 않는다(§6에 적힘). 2.61.4 재생성에서 바뀐 것도 SIMBAD 접속 오류 문구뿐이었다. 그 수집 오류도 DEGRADED에 넣을지는 다음 과제 후보다.

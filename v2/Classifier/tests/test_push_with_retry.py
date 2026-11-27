@@ -48,3 +48,42 @@ def test_prefer_ours_resolves_the_conflict_of_two_runs_that_rewrote_the_same_fil
     r = subprocess.run(["bash", str(SCRIPT), "main"], cwd=b, env={**ENV, "PUSH_PREFER": "ours"}, capture_output=True, text=True)
     assert r.returncode == 0, r.stderr
     assert git(remote, "show", "main:models.json") == "from this run\n"
+
+
+def test_prefer_ours_writes_this_runs_complete_files_not_a_mixture_of_hunks(tmp_path):
+    """Codex review of 2.62.0: ``-X theirs`` kept the other run's non-conflicting hunks, so a regenerated report mixed two runs."""
+    remote, a, b = _repos(tmp_path)
+    rows = lambda vals: "".join(f"r{i},{v}\n" for i, v in enumerate(vals))  # noqa: E731
+    (a / "report.csv").write_text(rows([1] * 10))
+    git(a, "add", "-A")
+    git(a, "commit", "-q", "-m", "report")
+    git(a, "push", "-q", "origin", "HEAD:main")
+    git(b, "pull", "-q", "origin", "main")
+    (a / "report.csv").write_text(rows([2] + [1] * 8 + [2]))  # the other run: first and last row (the last is far from this run's changes)
+    (a / "other.txt").write_text("from the other run\n")  # a file this run does not touch
+    git(a, "commit", "-q", "-am", "other run")
+    git(a, "push", "-q", "origin", "HEAD:main")
+    mine = rows([3, 3] + [1] * 8)  # this run regenerated the whole file: its last row is 1
+    (b / "report.csv").write_text(mine)
+    git(b, "commit", "-q", "-am", "this run")
+    r = subprocess.run(["bash", str(SCRIPT), "main"], cwd=b, env={**ENV, "PUSH_PREFER": "ours"}, capture_output=True, text=True)
+    assert r.returncode == 0, r.stderr
+    assert git(remote, "show", "main:report.csv") == mine  # this run's file, not its first rows with the other run's last row
+    assert git(remote, "show", "main:other.txt") == "from the other run\n"  # untouched files keep the remote's content
+    assert git(remote, "log", "-1", "--format=%s", "main").strip() == "this run"
+
+
+def test_prefer_ours_also_replays_a_deletion(tmp_path):
+    remote, a, b = _repos(tmp_path)
+    (a / "other.txt").write_text("from the other run\n")
+    git(a, "commit", "-q", "-am", "other run")
+    git(a, "push", "-q", "origin", "HEAD:main")
+    git(b, "rm", "-q", "models.json")
+    (b / "new.csv").write_text("n,1\n")
+    git(b, "add", "-A")
+    git(b, "commit", "-q", "-m", "this run")
+    r = subprocess.run(["bash", str(SCRIPT), "main"], cwd=b, env={**ENV, "PUSH_PREFER": "ours"}, capture_output=True, text=True)
+    assert r.returncode == 0, r.stderr
+    files = set(git(remote, "ls-tree", "--name-only", "main").split())
+    assert files == {"other.txt", "new.csv"} and git(remote, "show", "main:other.txt") == "from the other run\n"
+
