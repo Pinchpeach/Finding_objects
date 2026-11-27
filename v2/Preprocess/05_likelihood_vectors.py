@@ -405,6 +405,14 @@ def _decisive_motion(items):
     return False
 
 
+def _spectroscopic_qso(items):
+    """Pipeline spectral class QSO at this position (SPC-SDSS-003, SPC-DESI-003, SPC-LAMOST-003)."""
+    return any(
+        str(e.get("rule_id", "")).startswith("SPC-") and e.get("class") == "QSO" and float(e.get("raw_score", 0) or 0) >= 0.5
+        for e in items
+    )
+
+
 def _spectroscopic(items):
     """Pipeline spectral class of this position (SPC-* rules, e.g. SDSS
     CLASS with ZWARNING == 0; Bolton et al. 2012, AJ 144, 144).  A spectrum
@@ -685,6 +693,8 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     # Low-latitude limits on the QSO label (2.61.3, lowlat_qso.py; V2_LOWLAT_QSO, off by default): held back like a faint QSO
     # (kept apart from `faint`: a held QSO must abstain, not open the BGS galaxy override that an unsettled label opens)
     lowlat_hold = LOWLAT.hold_details(df)
+    if LOWLAT.spectro_keep():  # 2.61.5: a spectral class QSO is not held back (V2_LOWLAT_QSO=spectro_keep)
+        lowlat_hold = LOWLAT.exempt_spectroscopic(lowlat_hold, [_spectroscopic_qso(items) for items in item_lists])
     ll_held = np.array([bool(x) for x in lowlat_hold], dtype=bool)
     # Bright clean 2MASS point sources (2.41.0, nir_star.py): where the
     # evidence is absent or conflicting with STAR among it, the sky counts

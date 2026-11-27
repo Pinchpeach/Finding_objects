@@ -1,0 +1,6 @@
+variant,quasars,recall_qso,recall,recall_lo,recall_hi,false_all_n,false_all_per_deg2,false_all_lo,false_all_hi,false_i_lt_195_n,false_i_lt_195_per_deg2,false_i_lt_195_lo,false_i_lt_195_hi,false_multi_survey_n,false_multi_survey_per_deg2,false_multi_survey_lo,false_multi_survey_hi,false_multi_survey_i_lt_195_n,false_multi_survey_i_lt_195_per_deg2,false_multi_survey_i_lt_195_lo,false_multi_survey_i_lt_195_hi,nonquasars_labelled_qso,quasars_lost_vs_control,false_removed_vs_control,false_added_vs_control,removed_per_deg2,removed_lo,removed_hi
+base,143,95,0.6643,0.5835,0.7365,175,159.15,90.04,241.92,13,11.82,5.46,19.1,81,73.67,44.56,108.23,9,8.19,3.64,13.64,0/0,0,0,0,,,
+surveys2,143,95,0.6643,0.5835,0.7365,81,73.67,44.56,108.23,9,8.19,3.64,13.64,81,73.67,44.56,108.23,9,8.19,3.64,13.64,0/0,0,94,0,85.49,41.84,140.97
+surveys3,143,95,0.6643,0.5835,0.7365,35,31.83,17.28,50.02,7,6.37,1.82,11.82,35,31.83,17.28,50.02,7,6.37,1.82,11.82,0/0,0,140,0,127.32,66.39,202.83
+wise_second,143,95,0.6643,0.5835,0.7365,142,129.14,63.66,208.29,9,8.19,3.64,13.64,81,73.67,44.56,108.23,9,8.19,3.64,13.64,0/0,0,33,0,30.01,18.19,42.74
+surveys2_wise_second_wise_footprint,143,91,0.6364,0.5549,0.7107,81,73.67,44.56,108.23,9,8.19,3.64,13.64,81,73.67,44.56,108.23,9,8.19,3.64,13.64,0/0,4,94,0,85.49,41.84,140.97

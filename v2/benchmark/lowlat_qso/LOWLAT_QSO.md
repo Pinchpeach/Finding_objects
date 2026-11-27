@@ -295,3 +295,93 @@ nothing changes (no new column, the same labels).
    No committed variant added labels.  (c) `by_depth.py` uses the same common region set as `ab_variants.py`
    (`score_lowlat_qso.common_regions`).
 
+
+## 8. What the survey-count switches cost faint and spectroscopic quasars (2.61.5)
+
+Tables: `results_2026-11-27c/` (`decision_table.csv` first).  The default stays off.
+
+**8.1 The tables of Section 7 hold with the reviewed counting.**  The 169 calibration and 140 confirmation regions were classified again
+offline with the 2.61.3 code (one survey per survey, not per catalogue).  Every row of `ab_variants.csv` (recall, false density, paired
+removed density, quasars lost) and every object of `qso_labelled_not_sample_by_variant.csv.gz` and `sample_quasars_by_variant.csv` is
+identical for `base`, `surveys2`, `surveys3`, `wise_second` and `surveys2 + wise_second + wise_footprint`
+(`results_2026-11-27c/recheck_main_version/`).  The merges of the Gaia SOS tables, ZTF, DESI fits and SGA did not change a hold in these
+regions.  (`pm` and `wise_footprint` do not depend on the counting and were not run again.)
+
+**8.2 When the confirmation regions were collected.**  Prediction commit 8b108c2: 2026-11-27 13:15:51 UTC.  Collection script written
+13:15:59 UTC, first region log created 13:16:02, last region finished 14:08:24 (all 140 regions in 52 min, three at a time), variants
+classified from the saved files 14:09-14:33.  So the collection began 8 s after the commit; the repository itself carries only the commit
+time (the collection times above are file times of the scratch folder), and the time the commit was pushed is not recorded.  From
+this release on `ab_variants.py` runs should be accompanied by the collection start and end times in their notes.
+
+**8.3 Spectroscopically classified QSOs.**  The blind runs have no spectra, so the switches could not touch them; in use they can.
+`collect_spectra.py` asked the SDSS DR18, DESI DR1 and LAMOST DR5 spectroscopy collectors for the 290 quasar cones (LAMOST rows in 199
+cones, 931 rows; SDSS 10 cones, 13 rows; DESI 15 cones, 65 rows; the DESI footprint holds 36 of the 290), merged the files with the saved
+blind raw files and classified again.  34 objects have a spectral class QSO (SPC-SDSS-003, SPC-DESI-003 or SPC-LAMOST-003 at raw score
+>= 0.5); the base labels 32 of them QSO.  **`surveys2` and `surveys3` each hold back 5 of those 32 (16 %, 95 % 7-32 %)**: the 5 have one
+survey, the LAMOST row alone, with no counterpart in any imaging catalogue.  The new switch `spectro_keep` exempts an object with a
+spectral class QSO from `surveys2` / `surveys3` / `pm`: with it 0 of 32 are held (`results_2026-11-27c/spectro/`).  What a spectrum says
+about the class is a direct measurement, not a colour inference: this is why the exemption is offered, not because the count is wrong.
+The 34 are what the LAMOST DR5 catalogue, SDSS and DESI hold in these cones: the 293 sample quasars come mostly from LAMOST DR10.
+
+**8.4 Faint quasars.**  The cost of a switch is the share of real quasars the base labels QSO and the switch stops labelling.
+
+| measurement | surveys2 | surveys3 | wise_second |
+|---|---|---|---|
+| deep COSMOS (26 fields, 327 Chandra type 1 AGN, 231 spectroscopic; latitude limit lifted): base-labelled type 1 AGN lost | 0 / 123 (95 % <= 3.0 %) | 0 / 123 | 0 / 123 |
+| ... r < 22 | 0 / 97 (<= 3.8 %) | 0 / 97 | 0 / 97 |
+| ... 22 <= r < 24 | 0 / 26 (<= 12.9 %) | 0 / 26 | 0 / 26 |
+| spectroscopic type 1 AGN lost | 0 / 107 | 0 / 107 | 0 / 107 |
+| QSO labels at r >= 24 in the fields (all objects) | 25 -> 4 | 25 -> 1 | 25 -> 25 |
+
+COSMOS says the base does not give a QSO label to a type 1 AGN with 1 or 2 surveys even where it is deep: of the 90 such AGN none is
+labelled (95 % upper limit 4.1 %); the 123 it does label have 3 or more surveys (4 with exactly 3).  A switch cannot remove a correct
+label the base does not give, so the loss measured here is 0; what a switch can do is **cap what the base could learn to label**.
+That cap is the share of the quasars that has enough surveys at all:
+
+| quasars with at least N surveys | i or r bin | N = 2 | N = 3 |
+|---|---|---|---|
+| COSMOS type 1 AGN | r < 22 | 100 % | 100 % |
+| | 22-23 | 94.9 % | 84.6 % (67.9 % without Legacy Surveys) |
+| | 23-24 | 88.5 % | 54.1 % (21.3 %) |
+| | >= 24 | 83.3 % | 27.8 % (5.6 %) |
+| objects of the plane, cones without Legacy Surveys (PS1 i) | 20-21 | 51.2 % | 9.4 % |
+| | 21-22 | 16.4 % | 1.0 % |
+| | >= 22 | 8.0 % | 0.7 % |
+| objects of the plane, cones with Legacy Surveys | 21-22 | 71.4 % | 25.9 % |
+| SDSS sky benchmark, spectroscopic quasars (SDSS imaging counted) | r >= 22 | 100 % | 96.8 % |
+| DESI external benchmark, spectroscopic quasars | r >= 22 | 90.7 % | 66.9 % |
+
+(`faint_cost.py`, `survey_distribution.py`, `benchmark_cost.py`.)  **Outside Legacy Surveys the plane's imaging is Pan-STARRS1, AllWISE,
+Gaia and 2MASS: at i >= 21 only 1 % of the objects have 3 surveys, so `surveys3` there can label nothing fainter than i ~ 21 QSO**
+(the base labels 0 of 2,326 objects at i >= 22 and 20 at 21-22 there, 14 of them with exactly 2 surveys, which `surveys3` would hold).
+`surveys2` leaves 16 % of the objects at i 21-22, 8 % beyond.  This is a ceiling, not a loss: the objects are all objects, not quasars, and
+quasars are brighter in WISE than the average object.  The estimate that re-weights the COSMOS loss (`reweight.py`) is 0 because the COSMOS
+loss is 0; it is shown for completeness and does not say more than "the base labels no type 1 AGN with 1 or 2 surveys".
+
+**8.5 What the review of the earlier tables asked.**
+(1) *Independent surveys* (`lowlat_qso.n_surveys`): one per survey.  Different telescopes in the same bands count separately
+(Pan-STARRS1, Legacy Surveys, SDSS imaging), as do GALEX, 2MASS, AllWISE, ZTF, each radio and X-ray survey and each spectrograph;
+the Gaia DR3 tables (astrometry, photometry, SOS variability) and the Gaia DSC probabilities are one survey; ZTF's two tables, DESI spectra
+and their FastSpecFit fits, and SGA-2020 with Legacy Surveys are one each.  AllWISE is the only WISE catalogue collected (unWISE and
+CatWISE are not), so no WISE data is counted twice; a catalogue of the same WISE photometry added later must be mapped to
+`AllWISE` in `SURVEY_OF`.  Annotation catalogues (NED, SIMBAD, BZCAT, Suh AGB, HASH/Acker PN, ATNF, Galaxy Zoo DESI) are not surveys.
+The W1/W2 forced photometry in a Legacy Surveys row is that row's, so Legacy Surveys + AllWISE count as two surveys although both carry WISE flux.
+(2) *A held-back object* ends as `primary_class = UNKNOWN`, `classification_status = LOW_CONFIDENCE`, `best_candidate_class = QSO`,
+`secondary_class = QSO` with `secondary_class_reason = LOWLAT_QSO_HELD` (unless another reading already stands there) and the text of
+`lowlat_qso_hold` (also shown as `unknown_reason`), e.g. "QSO label withheld at |b| = 13.8 < 20 deg (V2_LOWLAT_QSO): measured by 1 survey,
+2 needed" (`spectro/example_held_objects_lq2_012_surveys2.csv`).  Never STAR: nothing says it is a star.
+(3) *Paired removed density* (`removed_per_deg2`): the labels of the control (`base`) that are not on a sample quasar and that the variant
+does not give QSO, per deg^2 of the cones, with the region bootstrap below; the same objects, so the difference of two densities would
+overstate the interval.
+(4) *Intervals*: the false densities and the paired removed densities are region bootstraps (4,000 resamples of the regions with
+replacement, seed 1, 2.5 and 97.5 percentiles of the resampled sum over the sum of the cone areas), not Poisson intervals; recall and
+the loss fractions are Wilson 95 %.
+(5) *|b| = 20 deg*: the test is `|b| < 20` of the object's own position (strictly), not of the cone.  Of the 290 quasar cones one straddles
+the limit (lqc3_014, centre b = -19.98: 734 objects, 587 below 20 deg, 147 above; both QSO labels are below, `surveys3` holds one of
+them); the others lie wholly on one side.  `V2_LOWLAT_QSO_ABSB` moves the limit.
+
+**8.6 Not done, and limits.**  The sets A and B raw data live on the `validation-data` branch only, which this work does not touch: the
+measurement on them is not made.  The one object of set B that the 2.61.0 brightness order made worse (bngp_162p01) needs those raw
+files as well and is not investigated.  COSMOS has more surveys per object than the plane (Section 8.4 gives the plane's counts); the
+Chandra type 1 truth misses non-X-ray quasars; the spectra come from the DR5 LAMOST catalogue, not DR10; SIMBAD / NED types (the other
+catalogue labels) were not collected for the 290 cones.

@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
     inputs:
       experiment: {description: "results folder under v2/benchmark/experiments", default: "wise_from_ls"}
-      variants: {description: "space-separated variants (base phot cand both old lsw nominp minp minp_lsw cgbm cfusion unified legacy ucosmos gbmobs gbmdet snr3 fraghc fragm15hc halo1 tieorderfile tieorderposition llsurveys2 llsurveys3 llwise2 llsurveys2wise2 fw-<file> off-<rules>)", default: "base lsw"}
+      variants: {description: "space-separated variants (base phot cand both old lsw nominp minp minp_lsw cgbm cfusion unified legacy ucosmos gbmobs gbmdet snr3 fraghc fragm15hc halo1 tieorderfile tieorderposition llsurveys2 llsurveys3 llwise2 llsurveys2wise2 llsurveys2spectro llsurveys3spectro fw-<file> off-<rules>)", default: "base lsw"}
       fieldset: {description: "b = independent set B (truth from validation-data), deep = COSMOS deep fields (COSMOS2020 truth), all", default: "b"}
   # Dispatch only (since 2.48.1): the former push trigger on a trigger file
   # re-ran the whole experiment whenever the work branch was reset to main.
@@ -238,6 +238,8 @@ jobs:
               llsurveys3) export V2_LOWLAT_QSO=surveys3;;   # ... 3 surveys
               llwise2) export V2_LOWLAT_QSO=wise_second;;   # AllWISE colour rules need another survey
               llsurveys2wise2) export V2_LOWLAT_QSO=surveys2,wise_second;;
+              llsurveys2spectro) export V2_LOWLAT_QSO=surveys2,spectro_keep;;  # 2.61.5: a spectral class QSO is never held back
+              llsurveys3spectro) export V2_LOWLAT_QSO=surveys3,spectro_keep;;
               nominp) export V2_ASSOC_MAX_NSEP=0;;
               minp) export V2_ASSOC_MAX_NSEP=1;;
               minp_lsw) export V2_ASSOC_MAX_NSEP=1 V2_WISE_FROM_LS=1;;

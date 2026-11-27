@@ -1,0 +1,6 @@
+variant,removed_per_deg2_confirmation,false_per_deg2_before_after,false_per_deg2_LS_cones,false_per_deg2_noLS_cones,bright_lost_confirmation,bright_lost_calibration,cosmos_lost_all,cosmos_lost_r<22,cosmos_lost_22-24,ceiling_cosmos_type1_r22-23,ceiling_cosmos_type1_r23-24,ceiling_noLS_cones_i20-21,ceiling_noLS_cones_i21-22,ceiling_sdss_sky_r>=22,ceiling_desi_r>=22,spectroscopic_held
+surveys2,85 [42-141],159 -> 74,811 -> 335,57 -> 33,0/143,0/150,0/123,0/97,0/26,0.949,0.885,0.512,0.164,1.0,0.907,5/32
+surveys3,127 [66-203],159 -> 32,811 -> 134,57 -> 16,0/143,0/150,0/123,0/97,0/26,0.846,0.541,0.094,0.01,0.968,0.669,5/32
+wise_second,30 [18-43],159 -> 129,811 -> 737,57 -> 34,0/143,0/150,,,,,,,,,,
+surveys2+spectro_keep,85 [42-141],159 -> 74,811 -> 335,57 -> 33,0/143,0/150,0/123,0/97,0/26,0.949,0.885,0.512,0.164,1.0,0.907,0/32
+surveys3+spectro_keep,127 [66-203],159 -> 32,811 -> 134,57 -> 16,0/143,0/150,0/123,0/97,0/26,0.846,0.541,0.094,0.01,0.968,0.669,0/32

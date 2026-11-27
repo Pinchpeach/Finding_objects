@@ -352,3 +352,37 @@ def test_depth_split_uses_the_common_regions(tmp_path):
     assert "INCOMPLETE" in run.stdout
     d = pd.read_csv(tmp_path / "depth.csv")
     assert int(d.regions.sum()) == 1 and int(d.quasars.sum()) == 1
+
+
+def _stage5():
+    spec = importlib.util.spec_from_file_location("pre_05_spectro", ROOT / "05_likelihood_vectors.py")
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    return m
+
+
+def test_spectro_keep_is_an_option_and_does_nothing_alone(monkeypatch):
+    monkeypatch.setenv("V2_LOWLAT_QSO", "surveys2,spectro_keep")
+    assert LL.options() == frozenset({"surveys2", "spectro_keep"}) and LL.spectro_keep()
+    monkeypatch.setenv("V2_LOWLAT_QSO", "spectro_keep")
+    ra, dec = eq(200.0, 8.0)
+    df = frame([dict(ra=ra, dec=dec, catalogs="AllWISE")])
+    assert not LL.label_switches_on() and not LL.qso_forbidden(df).any()
+
+
+def test_exempt_spectroscopic_leaves_only_the_others_held(monkeypatch):
+    details = ["held: 1 survey", "held: 1 survey", ""]
+    monkeypatch.setenv("V2_LOWLAT_QSO", "surveys2")
+    assert LL.exempt_spectroscopic(details, [True, False, False]) == details  # switch off: unchanged
+    monkeypatch.setenv("V2_LOWLAT_QSO", "surveys2,spectro_keep")
+    assert LL.exempt_spectroscopic(details, [True, False, False]) == ["", "held: 1 survey", ""]
+
+
+def test_a_spectral_class_qso_is_a_spectroscopic_qso():
+    s5 = _stage5()
+    spc_qso = {"rule_id": "SPC-LAMOST-003", "class": "QSO", "raw_score": 0.9}
+    assert s5._spectroscopic_qso([spc_qso])
+    assert not s5._spectroscopic_qso([{**spc_qso, "raw_score": 0.3}])  # below the 0.5 the pipeline treats as a reading
+    assert not s5._spectroscopic_qso([{"rule_id": "SPC-SDSS-002", "class": "GALAXY", "raw_score": 1.0}])  # a spectral galaxy
+    assert not s5._spectroscopic_qso([{"rule_id": "WISE-AGN-001", "class": "EXTRAGALACTIC", "raw_score": 1.0}])
+    assert not s5._spectroscopic_qso([])
