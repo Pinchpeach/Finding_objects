@@ -1,0 +1,8 @@
+,selection,n,share
+0,"all with AllWISE W1,W2",106,1.0
+1,W1-W2 >= 0.8 (Stern 2012),85,0.802
+2,K&L14 Class I colours,66,0.623
+3,K&L14 Class II colours,77,0.726
+4,K&L14 Class I or II colours,77,0.726
+5,  ... and bright in W1 (AGB cut),0,0.0
+6,K&L14 AGN-candidate colour-magnitude,101,0.953

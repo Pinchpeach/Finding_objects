@@ -1,0 +1,5 @@
+,group,n,share
+0,with a Gaia DR3 row,33,0.194
+1,  log10 fPM0 < -4 (fails the Fu et al. 2021 cut),0,0.0
+2,  parallax S/N > 3,0,0.0
+3,  DSC quasar probability > 0.5,20,0.606

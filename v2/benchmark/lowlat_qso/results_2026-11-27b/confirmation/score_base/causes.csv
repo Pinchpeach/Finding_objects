@@ -1,0 +1,12 @@
+bbin,cause,label,n
+"[10.0, 15.0)",abstained,UNKNOWN,1
+"[10.0, 15.0)",evidence,STAR,2
+"[10.0, 15.0)",position_prior,STAR,2
+"[10.0, 15.0)",qso_magnitude,STAR,4
+"[15.0, 20.0)",evidence,STAR,2
+"[15.0, 20.0)",position_prior,STAR,3
+"[15.0, 20.0)",qso_magnitude,STAR,1
+"[5.0, 10.0)",abstained,UNKNOWN,2
+"[5.0, 10.0)",evidence,STAR,4
+"[5.0, 10.0)",position_prior,STAR,10
+"[5.0, 10.0)",qso_magnitude,STAR,17

@@ -54,6 +54,9 @@ _fp_s.loader.exec_module(FAINT)
 _ah_s = _tio_u.spec_from_file_location("v2_agn_host", Path(__file__).resolve().parent / "agn_host.py")
 AGN_HOST = _tio_u.module_from_spec(_ah_s)
 _ah_s.loader.exec_module(AGN_HOST)
+_ll_s = _tio_u.spec_from_file_location("v2_lowlat_qso", Path(__file__).resolve().parent / "lowlat_qso.py")
+LOWLAT = _tio_u.module_from_spec(_ll_s)
+_ll_s.loader.exec_module(LOWLAT)
 _cg_s = _tio_u.spec_from_file_location("v2_coarse_gbm", Path(__file__).resolve().parent / "coarse_gbm.py")
 COARSE_GBM = _tio_u.module_from_spec(_cg_s)
 _cg_s.loader.exec_module(COARSE_GBM)
@@ -679,6 +682,10 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     qveto = qf / qmag  # literature cuts failed (VETO each), evidence rather than a prior
     qso_min = QSO_OPT.desi_threshold(df) if "c3b" in opts else np.zeros(len(df))
     faint = QSO_OPT.r_mag(df) > 22 if "c8" in opts else np.zeros(len(df), bool)
+    # Low-latitude limits on the QSO label (2.61.3, lowlat_qso.py; V2_LOWLAT_QSO, off by default): held back like a faint QSO
+    # (kept apart from `faint`: a held QSO must abstain, not open the BGS galaxy override that an unsettled label opens)
+    lowlat_hold = LOWLAT.hold_details(df)
+    ll_held = np.array([bool(x) for x in lowlat_hold], dtype=bool)
     # Bright clean 2MASS point sources (2.41.0, nir_star.py): where the
     # evidence is absent or conflicting with STAR among it, the sky counts
     # decide (stars outnumber galaxies >= 25:1 and quasars >= 10^4:1 at
@@ -719,8 +726,8 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     basis = []
     best_candidates = []
     best_candidate_scores = []
-    for q, (_, used, star_conflict, conflict, in_host, moving), qmin, qfaint, nir_i, nir_pi, bgs_i, member_i, gstar_i, wgal_i, faint_i in zip(
-        Q, rows, qso_min, faint, nir, nir_p, bgs, member, gaia_star, wise_gal, faint_prior
+    for q, (_, used, star_conflict, conflict, in_host, moving), qmin, qfaint, ll_i, nir_i, nir_pi, bgs_i, member_i, gstar_i, wgal_i, faint_i in zip(
+        Q, rows, qso_min, faint, ll_held, nir, nir_p, bgs, member, gaia_star, wise_gal, faint_prior
     ):
         order = np.argsort(-q)
         conf = float(q[order[0]])
@@ -780,7 +787,7 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
         elif conflict and (not model or conf < CONFLICT_RESOLVED_P):
             label = "UNKNOWN"
             status = "CONFLICT"
-        elif conf < min_conf or margin < min_margin or (top == "QSO" and (conf < qmin or qfaint)):
+        elif conf < min_conf or margin < min_margin or (top == "QSO" and (conf < qmin or qfaint or ll_i)):
             label = "UNKNOWN"
             status = "LOW_CONFIDENCE"
         else:
@@ -838,7 +845,7 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
                 or (len(strong) > 1 and (not model or c < CONFLICT_RESOLVED_P))
                 or c < min_conf
                 or m < min_margin
-                or (top_m == "QSO" and (c < qso_min[i] or faint[i]))
+                or (top_m == "QSO" and (c < qso_min[i] or faint[i] or ll_held[i]))
             )
             without_catalog[i] = "UNKNOWN" if gated else top_m
     literature = literature_only(item_lists, basis)
@@ -910,6 +917,10 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     sec, why = AGN_HOST.secondary(df, labels, item_lists)
     # Faint quasar candidates (2.57.0, qso_options.faint_candidates): next to a label that is not QSO
     sec, why = QSO_OPT.faint_candidates(df, labels, np.asarray(result_columns["p_qso"], dtype=float), sec, why)
+    # QSO readings the low-latitude switches held back (2.61.3 review): visible as a reading with its reason, not only as UNKNOWN
+    if LOWLAT.label_switches_on():
+        sec, why, held = LOWLAT.held_readings(lowlat_hold, labels, statuses, best_candidates, sec, why)
+        result_columns[LOWLAT.HOLD_COLUMN] = held
     result_columns["secondary_class"] = sec
     result_columns["secondary_class_reason"] = why
     df = pd.concat([df, pd.DataFrame(result_columns, index=df.index)], axis=1)

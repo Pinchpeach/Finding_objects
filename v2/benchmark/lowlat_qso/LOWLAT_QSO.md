@@ -167,3 +167,131 @@ Checked against the committed tables (`results_2026-11-27/`) and the code; nothi
    (`degraded`; the score log prints `DEGRADED`).  A run where no region has a record writes its tables and coverage with the
    density marked unavailable (NaN) instead of stopping.  The 2026-11-27 run predates this: its records were compacted without those
    columns, and Section 3 states the collection outcome (Legacy Surveys timed out in 4 regions, asked again, answered with 0 rows).
+
+## 7. Limiting the false QSO labels (2.61.3)
+
+**What was done.**  (1) The 170 objects of the calibration regions that are labelled QSO but are not a sample quasar were taken apart
+(`dissect_false_qso.py`, `results_2026-11-27b/dissection/`): 28 % rest on Legacy Surveys alone and 16 % on AllWISE alone (77 of 170 on
+one catalogue), 22 % on AllWISE plus one other, 33 % on two or more surveys; one cone holds 30 of them and ten cones 56 %.  Of the 106
+with W1, W2: 80 % have W1-W2 >= 0.8, 73 % lie in the Koenig & Leisawitz (2014) Class I/II colour region (so colours alone do not
+separate them from young stellar objects), 95 % in their AGN colour-magnitude region.  All 33 with a Gaia row pass the Fu et al.
+(2021, Sec. 5.3) proper-motion cut, none has parallax S/N > 3, and 20 of 33 have a Gaia DSC quasar probability above 0.5: the
+astrometry removes nothing among them.  (2) The literature (`../../LITERATURE_LOWLAT_QSO_2026-11-27.md`) says: every quasar selection
+uses two surveys or more; the Stern et al. (2012) reliability is for high latitude; Assef et al. (2018) R90 is defined only for
+|b| > 10 deg and > 30 deg from the Galactic Centre; Gaia's own classification is 24 % pure over the sky.  (3) Switches in
+`Preprocess/lowlat_qso.py` (`V2_LOWLAT_QSO`, off by default, act only at |b| < 20 deg) were tried on the 169 calibration regions;
+(4) the survivors were scored once on 140 new regions drawn by the same rule from the pool that remains
+(`fields_lowlat_confirm.csv`, SHA-256 `8638a9df...` written to `PREDICTIONS_CONFIRM.md` with the predictions and the adoption
+criteria **before** the first of them was collected; collected blind from this session's container on 2026-11-27).
+
+**Result** (`results_2026-11-27b/`; false = labelled QSO, not a sample quasar; density per deg^2 of the cones with a region-bootstrap
+95 % interval; "removed" = the paired density of control labels the switch takes away):
+
+| variant | set | sample quasars labelled QSO | false QSO density | with PS1 i < 19.5 | quasars lost | removed (paired) |
+|---|---|---|---|---|---|---|
+| base | calibration | 86 / 150 (57 %) | 144 [90-211] | 19.5 | - | - |
+| base | confirmation | 95 / 143 (66 %; 5-10 deg 45 %, 10-15 78 %, 15-20 86 %) | 159 [90-242] | 11.8 | - | - |
+| `surveys2` | calibration | 86 | 79 [53-109] | 13.6 | 0 | 65 [32-108] |
+| `surveys2` | confirmation | 95 | 74 [45-108] | 8.2 | 0 | 85 [42-141] |
+| `surveys3` | calibration | 86 | 36.5 [25-48] | 10.2 | 0 | 108 [61-170] |
+| `surveys3` | confirmation | 95 | 31.8 [17-50] | 6.4 | 0 | 127 [66-203] |
+| `wise_second` | calibration | 86 | 121 [68-188] | 14.4 | 0 | 24 [14-34] |
+| `wise_second` | confirmation | 95 | 129 [64-208] | 8.2 | 0 | 30 [18-43] |
+| `pm` | both | unchanged | unchanged | | 0 | 0 |
+| `surveys2` + `wise_second` + `wise_footprint` | confirmation | 91 | 74 [45-108] | 8.2 | 4 | 85 [42-141] |
+
+Predictions (`results_2026-11-27b/predictions.csv`): 19 of 20 held.  **Failed:** prediction 7 for `surveys3` (false labels with
+PS1 i < 19.5 "stay above the high-latitude quasar density of 5-8 deg^-2, about 10"): observed 6.4 deg^-2 (7 objects, interval 1.8-11.8),
+which is not distinguishable from that density.  Adoption criteria (`adoption.csv`; the default stays off): `surveys2`, `surveys3` and
+`wise_second` are offered as options (paired removed-density interval above 0, 0 of 143 quasars lost, labels at |b| >= 20 deg
+identical in 5 fields at |b| = 42-72 deg / 32,866 objects, `highlat_identity.csv`; a 6th, a 1' Galactic-plane field, is below the limit and has no QSO label either way); `pm` removes nothing (criterion a fails); `wise_footprint` loses sample
+quasars (2 of 150, 4 of 143, all at 5-10 deg) and is not offered.  The 26 of 130,577 objects that differ between the collection-time
+output and the offline re-run are cone-edge objects (SGA components, Gaia/AllWISE singletons), none labelled QSO.
+
+**By depth** (`by_depth.py`, `results_2026-11-27b/*/by_ls_coverage.csv`; the review in Section 6 shows that the all-depth density is not by itself a sign
+of false labels, because the high-latitude quasar density to r < 23 is ~300 deg^-2).  Cones with a Legacy Surveys DR10 object
+(confirmation: 19 cones, 0.149 deg^2, 14 % of the area, 69 % of the base labels not on a sample quasar) against the others:
+
+| confirmation set | cones | base | `surveys2` | `surveys3` | `wise_second` |
+|---|---|---|---|---|---|
+| with LS (deg^-2, objects) | 19 | 811 (121) | 335 (50) | 134 (20) | 737 (110) |
+| without LS (PS1 + AllWISE depth) | 121 | 57 (54) | 33 (31) | 16 (15) | 34 (32) |
+
+In the LS cones the base density is 2.7 times the total quasar density, so at least ~60 % of those labels are false (as in Section 6);
+`surveys2` removes 59 % of them and leaves a density equal to the total quasar density, `surveys3` leaves less than that.
+**`surveys2` alone therefore does not clear the LS depth**; the cones without LS have no quasar density to compare with at their depth.
+
+**Limits.**  (a) Every sample quasar has at least 3 catalogues (the sample is selected through PS1, AllWISE and Gaia): 46 of the 181
+quasars labelled QSO have exactly 3, none has 2, and all 9 sample quasars with 2 were already unlabelled; so "0 quasars lost" is a
+statement about bright, well-observed quasars.  What `surveys2` / `surveys3` cost faint real quasars that have only two or three
+catalogues cannot be measured here.  (b) There is no purity: "false" means "not a sample quasar", and the 140 / 169 cones have no
+non-quasar truth beyond the 19 stars and galaxies of the calibration list (none of them was labelled QSO, base or variant; the confirmation draw has none).  (c) The recall is
+an upper bound for the bright PS1 + AllWISE-selected sample; LAMOST-type stars in the truth are bright.  (d) Gaia comes from the
+VizieR DR3 copy (no variability flags) until the ESA archive is back (2026-12-02).  (e) The switches change labels, so the locked
+set C scoring applies if one is turned on: its low-latitude pool `cpln` has only spectroscopic stars as truth, so it can show at
+most whether a star stops being labelled QSO, and it cannot show what the switches cost quasars or galaxies behind the plane.
+(f) 5 of the 140 confirmation regions had SDSS SkyServer error pages that the collector retried successfully; one lost its VLASS
+rows to a parse error (radio only; `confirmation/score_base/coverage.json`: 140 of 140 regions recorded, 0 without a key archive).
+
+Reproduce: `ab_variants.py --variants base=ROOT ... --regions fields_lowlat_confirm.csv --truth lowlat_truth.csv.gz --out DIR`
+(each variant's `ROOT` is the compact output of the offline re-classification of the saved raw files with `V2_LOWLAT_QSO=<switches>`),
+then `adoption_check.py --calibration DIR1 --confirmation DIR2 --highlat-identical yes --out DIR3`; the identity at high latitude:
+`highlat_identity.py --raw RAWDIR... --out DIR`.
+
+### Review before merge (2.61.3)
+
+Checked against the code, the committed tables and the git history; the measurement was not re-run.  Three code changes come out of it
+(`Preprocess/lowlat_qso.py`, `05_likelihood_vectors.py`, `Classifier/unknown_reason.py`, tests 460 -> 463); with every switch off
+nothing changes (no new column, the same labels).
+
+1. **How surveys are counted.**  The switches counted distinct catalogue *names*.  Four pairs of names are one survey's products of the
+   same measurement, and now count once (`SURVEY_OF`): Gaia DR3 + its SOS variability tables, ZTF light curves + ZTF periodic
+   variables, DESI spectra + their FastSpecFit fits, and the Siena Galaxy Atlas (built from Legacy Surveys imaging) + Legacy Surveys.
+   WISE cannot be counted twice: only AllWISE is collected, and the W1/W2 forced photometry of a Legacy Surveys row belongs to that
+   row.  The Gaia DSC probabilities are columns of the Gaia row.  Pan-STARRS1, Legacy Surveys and SDSS imaging (different
+   telescopes, the same optical bands) still count separately, deliberately: the switches ask for independent *detections* (a
+   deblending fragment or a pipeline artefact has none), not for independent wavelengths.  An SDSS spectrum and SDSS imaging are
+   different measurements and count separately.  The committed tables were made with name counting; they can differ only for
+   objects carrying one of the four pairs.  The blind runs drop spectra, SOS rows are RR Lyrae, Cepheids and long-period variables,
+   ZTF periodic rows are periodic variables and SGA rows are large galaxies, so no such pair is expected among the QSO labels.  This
+   was not re-measured, because the raw files are not in the repository.  An offline replay should confirm it before any default
+   is changed.
+2. **What a held-back object becomes.**  It was `UNKNOWN` with status `LOW_CONFIDENCE` and best candidate `QSO`, and its
+   `unknown_reason` read "QSO or GALAXY: probabilities overlap (0.72 vs ...)", which did not say why.  Now, while a label switch is
+   on, it also keeps the reading `secondary_class = QSO`, `secondary_class_reason = LOWLAT_QSO_HELD` (where it has no other reading),
+   and the new column `lowlat_qso_hold` says why, for example "QSO label withheld at |b| = 13.8 < 20 deg (V2_LOWLAT_QSO): measured by
+   1 survey, 2 needed".  `unknown_reason`, and through it the summary file, shows that text.  `run_archives_status` is about archives
+   and is not used for this.  `wise_second` and `wise_footprint` remove evidence instead of holding the label, so such an object
+   ends with what its other evidence says, often `NO_EVIDENCE` with the AllWISE-only reason.  That reason does not name the switch.
+3. **Order of pre-registration and collection.**  The region list was locked in `8a941ef` (2026-11-27 12:45:59 UTC) and the
+   predictions and adoption criteria in `8b108c2` (13:15:51 UTC).  `PREDICTIONS_CONFIRM.md` is unchanged since (empty diff from
+   `8b108c2` to the work branch head).  When the confirmation regions were collected is not recorded in the repository: they were
+   collected in the work session's container and the raw files were not committed.  So the order rests on the work session's
+   statement; its log or raw-folder times would settle it.  A later confirmation run should write its start time into its results.
+4. **"removed (paired)".**  This is the density of the control (base) false labels that the variant no longer has.  It is a subset
+   of the control's labels, so its region bootstrap draws the same regions for both (`ab_variants.py`).  It is defined in the
+   table header above and in the work report.  It equals base minus variant: 159.15 - 73.67 = 85.49 deg^-2 for `surveys2`.
+5. **Intervals.**  All densities have a region bootstrap (4,000 resamples of whole cones, area-weighted; `ab_variants.boot_density`),
+   not a Poisson interval.  This matters because ten cones hold 56 % of the calibration labels.
+6. **|b| >= 20 deg unchanged, and the boundary.**  This is now structural, not only measured.  Every switch tests the object's own
+   |b| against `V2_LOWLAT_QSO_ABSB`: the label holds use the object position, the two WISE switches the AllWISE row position.
+   `wise_footprint` did not do this.  It removed the Stern evidence within 30 deg of the Galactic Centre at any latitude, for example
+   at l = 5 deg, b = 25 deg.  The five fields measured at |b| = 42-72 deg are far from the Centre and could not show it.  It now acts
+   only below the limit, and a test covers it.  A region that straddles 20 deg is split object by object.
+7. **Not measured: spectroscopic quasars.**  `surveys2` / `surveys3` also hold back a label decided by a spectroscopic catalogue
+   class, because that is evidence too, when the object has fewer surveys.  Spectroscopic targets normally have imaging rows as
+   well, but the blind runs drop spectra, so this was not measured.  Exempting a spectroscopic class should be considered before
+   any default is changed.
+8. **Code review (Codex) of the comparison tool.**  `ab_variants.py` now scores every variant on one common set of regions: a
+   region without a record in any variant is left out of all of them and listed in `coverage.json` (INCOMPLETE).  Before, its
+   quasars stayed in the recall denominator and counted as lost against the control while the density left the region out.  A
+   variant with no QSO label outside the sample now gives zero counts instead of an error.  The committed tables are unchanged:
+   both sets have a record for every region, and every variant has false labels.
+9. **Code review (Codex), second round.**  (a) A held QSO on a resolved source that the BGS galaxy test accepts became a
+   confident GALAXY: the hold made the label count as "not settled", which opens the BGS galaxy override.  The hold is now kept apart
+   from that gate, so such an object abstains (UNKNOWN, with the held QSO reading) as every other held QSO does.  Recall and false
+   density are the same either way, since GALAXY and UNKNOWN both count as "not QSO", so the committed numbers do not move.
+   (b) The per-object table kept the metadata only of the control's objects; a label added by a later variant now keeps its own.
+   No committed variant added labels.  (c) `by_depth.py` uses the same common region set as `ab_variants.py`
+   (`score_lowlat_qso.common_regions`).
+

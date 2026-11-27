@@ -1,0 +1,7 @@
+field,switches,objects_without,objects_with,objects_common,primary_class_differs,classification_status_differs,classification_basis_differs,p_star_max_abs_change,p_galaxy_max_abs_change,p_qso_max_abs_change,qso_labels_without,qso_labels_with,objects_below_limit,median_abs_b
+deep_cosmos_3,"surveys3,pm,wise_second,wise_footprint",9112,9112,9112,0,0,0,0.0,0.0,0.0,8,8,0,42.1
+deep_cosmos_14,"surveys3,pm,wise_second,wise_footprint",9640,9640,9640,0,0,0,0.0,0.0,0.0,7,7,0,42.6
+deep_cosmos_21,"surveys3,pm,wise_second,wise_footprint",9941,9941,9941,0,0,0,0.0,0.0,0.0,9,9,0,42.7
+ngc,"surveys3,pm,wise_second,wise_footprint",603,603,603,0,0,0,0.0,0.0,0.0,0,0,0,71.6
+cosmos,"surveys3,pm,wise_second,wise_footprint",3570,3570,3570,0,0,0,0.0,0.0,0.0,16,16,0,42.1
+plane,"surveys3,pm,wise_second,wise_footprint",597,597,597,0,0,0,0.0,0.0,0.0,0,0,597,1.8
