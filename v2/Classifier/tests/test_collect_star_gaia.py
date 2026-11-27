@@ -134,7 +134,7 @@ def test_a_batch_at_the_smallest_size_that_still_fails_raises(fallback, monkeypa
     FakeVizier.scenario = {h: "bad" for h in throttle.VIZIER_HOSTS}
     with pytest.raises(ValueError, match="no element found"):
         fallback._vizier_fallback(_truth(5), 2.0)
-    assert len(FakeVizier.calls) == fallback.VIZIER_RETRIES_SMALL  # every attempt made, then the error is the caller's
+    assert len(FakeVizier.calls) == fallback.VIZIER_RETRIES  # every attempt made, then the error is the caller's
 
 
 def test_the_output_does_not_depend_on_how_the_answer_was_delivered(fallback):
@@ -159,7 +159,37 @@ def test_a_failure_that_is_not_about_the_answer_does_not_halve_the_batch(fallbac
     monkeypatch.setattr(FakeVizier, "query_region", refused)
     with pytest.raises(requests.exceptions.ConnectionError):
         fallback._vizier_fallback(_truth(8), 2.0)
-    assert [n for n, _ in FakeVizier.calls] == [8] * fallback.VIZIER_RETRIES  # two attempts at 8 positions, no halving
+    assert [n for n, _ in FakeVizier.calls] == [8] * fallback.VIZIER_RETRIES  # four attempts at 8 positions, no halving
+
+
+def test_an_outage_gets_the_four_attempts_of_the_code_before_2_61_6(fallback, monkeypatch):
+    """CI run 46055319902: VizieR answered 404, then timed out; two attempts ended the crossmatch, four had not."""
+    import requests
+
+    monkeypatch.setattr(fallback, "MIN_SPLIT", 2)
+    real, failures = FakeVizier.query_region, []
+
+    def flaky(self, coords, radius=None, catalog=None, cache=True):
+        if len(failures) < fallback.VIZIER_RETRIES - 1:
+            failures.append(len(coords))
+            raise requests.exceptions.ReadTimeout("read timeout=300")
+        return real(self, coords, radius=radius, catalog=catalog, cache=cache)
+
+    monkeypatch.setattr(FakeVizier, "query_region", flaky)
+    out = fallback._vizier_fallback(_truth(8), 2.0)
+    assert sorted(out.benchmark_id) == [f"B{i:04d}" for i in range(8)]
+    assert failures == [8, 8, 8] and [n for n, _ in FakeVizier.calls] == [8]  # answered at the fourth attempt, not halved
+
+
+def test_a_halvable_batch_is_halved_after_two_unreadable_answers(fallback, monkeypatch):
+    monkeypatch.setattr(fallback, "MIN_SPLIT", 2)
+    FakeVizier.scenario = {h: {"n>": 3, "what": "bad"} for h in throttle.VIZIER_HOSTS}  # more than 3 positions: unreadable
+    out = fallback._vizier_fallback(_truth(8), 2.0)
+    assert sorted(out.benchmark_id) == [f"B{i:04d}" for i in range(8)]
+    hosts = [h for _, h in FakeVizier.calls]
+    # 8 (two mirrors, unreadable) -> 4 + 4 (still unreadable at the first) -> 2 + 2 + 2 + 2, each answered
+    assert [n for n, _ in FakeVizier.calls] == [8, 8, 4, 4, 2, 2, 2, 2]
+    assert hosts[0] != hosts[1] and "cache" not in hosts  # the retry asks another mirror, over the network
 
 
 def test_the_smaller_size_found_by_halving_is_kept_for_the_following_batches(fallback, monkeypatch):

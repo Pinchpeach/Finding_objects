@@ -8,8 +8,8 @@ import numpy as np
 import pandas as pd
 
 
-VIZIER_RETRIES = 2  # attempts at a batch size before the batch is halved
-VIZIER_RETRIES_SMALL = 4  # attempts at the smallest size (MIN_SPLIT), where there is nothing left to halve
+VIZIER_RETRIES = 4  # attempts at a batch before its error is raised (a refused connection, an error status, a timeout: as before 2.61.6)
+VIZIER_RETRIES_UNREADABLE = 2  # attempts whose answer could not be read before a batch larger than MIN_SPLIT is halved
 RETRY_SLEEP_S = 15.0  # backoff after a failed attempt, on top of the 3-5 s pause before every request (throttle)
 MIN_SPLIT = 50  # the batch is halved down to this many positions
 # VizieR cones are centred on the catalogue's J2000 positions, which for
@@ -33,36 +33,38 @@ def _unreadable_answer(e: Exception) -> bool:
     )
 
 
-def _batch_rows(v, chunk: pd.DataFrame, radius_arcsec: float, cct, throttle, attempts: int) -> pd.DataFrame | None:
+def _batch_rows(v, chunk: pd.DataFrame, radius_arcsec: float, cct, throttle, halvable: bool) -> pd.DataFrame | None:
     """Gaia DR3 rows of the VizieR copy around the positions of ``chunk``, in the XMatch layout (None: no row).
 
     One attempt is one multi-target request, which ``throttle`` already sends to the VizieR mirrors in turn when one
     refuses, times out, answers an error status or cuts the VOTable off.  An attempt that still fails (the answer could
     not be read: ``TableParseError`` of a body that is complete but wrong, a failure of every mirror) marks the mirror
     of the last answer as failing (``throttle.distrust_last_mirror``), so the next attempt goes to another mirror, not
-    to the one that just failed (until 2.61.6 a retry asked the same preferred mirror four times).  After ``attempts``
-    failures the last exception is raised."""
+    to the one that just failed (until 2.61.6 a retry asked the same preferred mirror four times).  After
+    ``VIZIER_RETRIES`` failures the last exception is raised; a ``halvable`` batch (larger than MIN_SPLIT) gives up
+    after ``VIZIER_RETRIES_UNREADABLE`` unreadable answers, so that the caller halves it.  An outage (every mirror
+    refuses, times out or answers an error status) keeps the four attempts of the code before 2.61.6: it says nothing
+    about the size, and fewer attempts would only end the crossmatch sooner (2.61.6 review, CI run 46055319902)."""
     import time
 
     from astropy.coordinates import SkyCoord
     import astropy.units as u
 
     coords = SkyCoord(chunk.ra.to_numpy(float) * u.deg, chunk.dec.to_numpy(float) * u.deg)
-    failure = None
-    for attempt in range(attempts):
+    unreadable = 0
+    for attempt in range(VIZIER_RETRIES):
         try:
             # astroquery caches an answer before it parses it: a retry with the cache would read the same unreadable body
             # again and never reach ``throttle`` (Codex review of 2.61.6), so retries go to the network
             res = v.query_region(coords, radius=(radius_arcsec + EPOCH_MARGIN_ARCSEC) * u.arcsec, catalog="I/355/gaiadr3", cache=attempt == 0)
             break
         except Exception as e:  # noqa: BLE001 - transient transfer / parse / server errors
-            failure = e
             mirror = throttle.distrust_last_mirror()
-            print(f"[collect_star_gaia] VizieR batch of {len(chunk)} (mirror {mirror}): {e!r}; attempt {attempt + 1}/{attempts}", flush=True)
-            if attempt < attempts - 1:
-                time.sleep(RETRY_SLEEP_S * (attempt + 1))
-    else:
-        raise failure
+            print(f"[collect_star_gaia] VizieR batch of {len(chunk)} (mirror {mirror}): {e!r}; attempt {attempt + 1}/{VIZIER_RETRIES}", flush=True)
+            unreadable += _unreadable_answer(e)
+            if attempt == VIZIER_RETRIES - 1 or (halvable and unreadable >= VIZIER_RETRIES_UNREADABLE):
+                raise
+            time.sleep(RETRY_SLEEP_S * (attempt + 1))
     if not len(res):
         return None
     part = cct.from_vizier_batch(res[0].to_pandas(), chunk)
@@ -104,7 +106,7 @@ def _vizier_fallback(truth: pd.DataFrame, radius_arcsec: float) -> pd.DataFrame:
         chunk = t.iloc[i : i + size]
         small = len(chunk) <= MIN_SPLIT
         try:
-            part = _batch_rows(v, chunk, radius_arcsec, cct, throttle, VIZIER_RETRIES_SMALL if small else VIZIER_RETRIES)
+            part = _batch_rows(v, chunk, radius_arcsec, cct, throttle, halvable=not small)
         except Exception as e:  # noqa: BLE001
             if small or not _unreadable_answer(e):
                 raise

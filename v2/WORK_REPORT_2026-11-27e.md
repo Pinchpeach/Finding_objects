@@ -32,7 +32,7 @@ astroquery.exceptions.TableParseError: Failed to parse VIZIER result!           
 
 **왜 배치를 반으로 줄이나, 그리고 언제**: 이 컨테이너에서도 500개 위치 요청은 CfA가 "Connection reset by peer"로 끊었다(응답이 길어서다). 같은 요청을 아무리 다시 해도 같은 크기의 답이 같은 곳에서 끊긴다. 그래서 읽을 수 없는 응답이 시도 2번 나오면 크기를 줄이고(최소 50), 성공한 크기를 나머지 배치에도 쓴다(500으로 되돌아가 같은 실패를 반복하지 않도록). 처음부터 작게 하는 안은 요청 수가 5배(100개씩이면 10,000개 위치에 100번 × 3–5 s 쉼)라 정상 경로의 시간을 늘리므로 버렸다. 연결 거부·504 같은 "도달" 실패에는 줄이지 않는다(크기와 무관하고, 미러가 되살아나면 같은 크기가 맞다). 결과는 배치 분할과 무관하다: 교차대조는 위치마다 가장 가까운 행을 남긴다(`sort_values(["benchmark_id", "_sep_arcsec"]).drop_duplicates`).
 
-**시도 횟수**: 크기마다 2번(예전 4번), 최소 크기에서 4번. 줄여도 같은 오류가 이어지면 최소 크기에서 4번 더 한 뒤 오류를 올린다. 총 시도 수는 읽을 수 없는 응답이 끝까지 이어질 때 늘고(500→250→125→62가 각 2번, 최소 크기 50에서 4번 = 12번), 도달 실패일 때는 4번에서 2번으로 줄었다.
+**시도 횟수**(9절 5번에서 고침): 배치마다 최대 4번(예전과 같음). 다만 최소 크기보다 큰 배치는 읽을 수 없는 응답이 2번 나오면 그 자리에서 멈추고 반으로 줄인다. 줄여도 같은 오류가 이어지면 최소 크기(50)에서 4번 한 뒤 오류를 올린다. 총 시도 수는 읽을 수 없는 응답이 끝까지 이어질 때 늘고(500→250→125→62가 각 2번, 최소 크기 50에서 4번 = 12번), 도달 실패(연결 거부·오류 상태·시간 초과)일 때는 예전처럼 4번이다.
 
 **하지 않은 것**: XMatch에 시간 제한을 두지 않았다(큰 업로드가 정당하게 오래 걸릴 수 있어 정상 경로를 깰 수 있다; 이번 실패의 원인도 아니고 비용은 연결 시간 초과 한 번). 워크플로 파일도 건드리지 않았다.
 
@@ -67,7 +67,7 @@ astroquery.exceptions.TableParseError: Failed to parse VIZIER result!           
 
 ## 9. 병합 전 검토 (2.61.6)
 
-검토 세션의 질문 세 개를 코드로 확인했고 하나를 고쳤다(시험 499 → 500).
+검토 세션의 질문 세 개를 코드로 확인했고, 검토·CI에서 나온 것을 고쳤다(시험 499 → 503).
 
 1. **잘림 판정이 정상 응답을 실패로 오판하지 않는가.** `_truncated_votable`은 상태 200이고 VOTable(Content-Type에 `votable`이 있거나 본문 앞 2,000바이트에 `<VOTABLE`)인데 끝 2,048바이트에 `</VOTABLE>`가 없을 때만 참이다. 이 판정은 `_with_mirrors`의 VizieR 미러 호스트(`VIZIER_HOSTS`) 요청에만 걸린다. 그 밖의 요청(Data Lab, MAST, LS 뷰어의 `stream=True` FITS, SkyServer 등)은 판정 전에 그대로 지나간다.
    - VizieR 요청은 astroquery의 `/viz-bin/votable`(VOTable; BINARY·BINARY2 직렬화여도 XML 뿌리와 끝 태그가 있음)이다. 이 저장소의 수집기 중 VizieR에 TSV·FITS·JSON을 요청하는 것은 없다(`-out.form`은 throttle이 `mini`를 지울 때만 나온다).
@@ -75,6 +75,18 @@ astroquery.exceptions.TableParseError: Failed to parse VIZIER result!           
    - 끝 태그 뒤에 2 KB 넘는 꼬리가 붙는 VizieR 응답은 본 적이 없다. 생기면 정상 미러가 600 s씩 밀릴 수 있으나, 모든 미러가 그렇게 판정되면 오류로 끝나므로 조용히 틀리지는 않는다.
 2. **실패 기억의 공유.** 잘림은 기존의 연결 거부·시간 초과와 같은 길로 기록된다(`_remember(host, False)` → `archive_cache.note_source`, `V2_CACHE_DIR` 아래 파일). 그래서 같은 기계의 다른 프로세스에서도 그 미러가 MIRROR_STICKY_S 동안 뒤로 간다. 그 미러가 나중에 잘 답하면 기억이 지워진다. 의도된 동작이고 2.60.0부터의 시간 초과 처리와 같다. 세트 C의 60개 작업은 각기 다른 GitHub 러너에서 돌아 캐시를 공유하지 않으므로 서로 영향을 주지 않는다.
 3. **고침: 실패한 요청 뒤의 `distrust_last_mirror`.** `last_host`는 성공한 응답에서만 기록되었다. 그래서 한 요청이 모든 미러에서 실패(모두 잘림, 모두 거부)하면 `collect_star_gaia`가 부르는 `distrust_last_mirror()`가 **이전 배치에 잘 답한 미러**를 600 s 뒤로 밀었다. 이제 VizieR 요청을 시작할 때 `last_host`를 지우므로, 실패한 요청 뒤에는 미러를 지목하지 않는다(None). 시험 `test_a_request_that_fails_everywhere_leaves_no_mirror_to_distrust`(옛 코드에서 실패).
-5. **코드 검토(Codex) 반영.** ① 한 미러가 잘린 VOTable을 주고 나머지 미러가 연결을 거부·시간 초과하면 마지막 예외(`ConnectionError`)가 잘림 신호를 덮었다. 그러면 `collect_star_gaia`가 "읽을 수 없는 응답"으로 보지 않아 배치를 줄이지 못했다. 이제 어떤 미러든 잘린 답을 주었고 온전한 답을 준 미러가 없으면, 뒤의 연결 오류나 빈 답보다 잘림 오류(`ChunkedEncodingError`)가 우선한다. ② astroquery는 응답을 파싱 전에 캐시하므로(`query_region(cache=True)` 기본값), 파싱에 실패한 완전한 본문을 재시도마다 캐시에서 다시 읽고 `throttle`에 가지 않았다. 이제 재시도(둘째 시도부터)는 `cache=False`로 네트워크에 간다. 시험 2개(옛 코드에서 실패; 가짜 Vizier에 astroquery의 캐시 동작을 넣음), 전체 501개.
-4. **확인 계획**: 병합 뒤 `Evaluate WD HR-locus gates`(main push로 자동 실행: 경로 조건에 `collect_star_gaia.py`가 없으면 수동 실행)와, 실사용 영역 하나(NGC 4522, 저장된 이전 수집과 같은 반경)의 수집 행 수 비교를 GitHub Actions에서 돌린다.
+4. **코드 검토(Codex) 반영.** ① 한 미러가 잘린 VOTable을 주고 나머지 미러가 연결을 거부·시간 초과하면 마지막 예외(`ConnectionError`)가 잘림 신호를 덮었다. 그러면 `collect_star_gaia`가 "읽을 수 없는 응답"으로 보지 않아 배치를 줄이지 못했다. 이제 어떤 미러든 잘린 답을 주었고 온전한 답을 준 미러가 없으면, 뒤의 연결 오류나 빈 답보다 잘림 오류(`ChunkedEncodingError`)가 우선한다. ② astroquery는 응답을 파싱 전에 캐시하므로(`query_region(cache=True)` 기본값), 파싱에 실패한 완전한 본문을 재시도마다 캐시에서 다시 읽고 `throttle`에 가지 않았다. 이제 재시도(둘째 시도부터)는 `cache=False`로 네트워크에 간다. 시험 2개(옛 코드에서 실패; 가짜 Vizier에 astroquery의 캐시 동작을 넣음), 전체 501개.
+5. **고침: 도달 실패의 재시도 수(CI).** 처음 판은 크기마다 2번만 시도해서(예전 4번), 모든 미러가 막힌 장애에서는 예전보다 빨리 멈췄다. 이 PR의 `Validate WD Subtype DA DB` 실행(run 46055319902, 70f7b03)이 바로 그렇게 끝났다: CDS XMatch 연결 시간 초과 → VizieR 스트라스부르 404 → IDIA 읽기 시간 초과(300 s) → "2번 중 2번" 실패. 크기와 무관한 실패이니 예전처럼 4번 시도해야 맞다. 이제 시도는 배치마다 최대 4번이고, 최소 크기보다 큰 배치만 **읽을 수 없는 응답이 2번** 나오면 멈추고 반으로 줄인다(`_batch_rows(..., halvable)`, `VIZIER_RETRIES = 4`, `VIZIER_RETRIES_UNREADABLE = 2`). 시험 2개: 세 번 시간 초과한 뒤 넷째 시도에서 받는 배치는 줄지 않고 끝까지 받는다(이전 판에서 실패); 읽을 수 없는 응답 2번이면 반으로 준다(8 → 4 → 2, 각 크기에서 다른 미러 두 곳). 전체 503개.
+6. **확인 계획**: 병합 뒤 `Evaluate WD HR-locus gates`(main push로 자동 실행: 경로 조건에 `collect_star_gaia.py`가 없으면 수동 실행)와, 실사용 영역 하나(NGC 4522, 저장된 이전 수집과 같은 반경)의 수집 행 수 비교를 GitHub Actions에서 돌린다.
+7. **실사용 수집 비교(병합 전, 같은 시각).** `v2_practical_probe.yml`을 main(5602935, run 46055402893)과 이 브랜치(70f7b03, run 46055407720)에서 같은 시각에 돌렸다(NGC 4522 2′, COSMOS 2′, 은하면 l = 30° b = −2° 1′; 원자료는 `validation-data`의 `practical_probe/<run>/`). 70f7b03은 미러 층의 잘림 판정을 모두 담고, 뒤 커밋은 잘린 답이 있을 때의 오류 순서와 `collect_star_gaia`만 바꾼다.
+
+   | 영역 | 수집기 | 행 수 main / PR | 다른 수집기 | Gaia DR3 행 | 수집 단계 시간 main / PR |
+   |---|---|---|---|---|---|
+   | NGC 4522 | 30 / 30 | 1,128 / 1,128 | 없음 | 13 / 13 | 143 / 142 s |
+   | COSMOS | 30 / 30 | 6,453 / 6,453 | 없음 | 18 / 18 | 76 / 88 s |
+   | 은하면 | 30 / 30 | 1,155 / 1,250 | NED(main `error` 0행, PR `ok` 95행) | 349 / 349 | 57 / 62 s |
+
+   - 표 내용도 비교했다. 두 실행 모두 읽은 수집기 표는 `DataFrame.equals`로 같았다(NGC 4522 26개, COSMOS 26개, 은하면 21개). 예외는 Pan-STARRS 하나다. 행 수는 같지만 NGC 4522에서 0.4″ 떨어진 PS1 천체 하나가 다른 objID로 왔다(MAST API 경로, VizieR 아님). COSMOS·은하면의 Pan-STARRS는 행 순서만 달랐다.
+   - 은하면 NED의 차이는 main 쪽 실패다(`ExpatError`, NED의 XML 응답). NED는 `ned.ipac.caltech.edu`라 잘림 판정이 걸리지 않는다.
+   - 시간 차는 러너 차이 수준이다. COSMOS는 1–7단계도 PR 쪽이 함께 느렸다(5.5 대 7.8 s 등).
 
