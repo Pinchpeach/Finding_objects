@@ -1,0 +1,6 @@
+tie_order,comparison,detections,objects_ref,objects_new,objects_only_ref,objects_only_new,detections_in_changed_objects,status_changed,objects_common,primary_class_changed,secondary_class_changed,high_confidence_changed
+file,NGC 4522 12': TAP rows vs viewer rows,26079,17993,18017,198,222,387,204,17779,0,0,0
+brightness,NGC 4522 12': TAP rows vs viewer rows,26079,17936,17936,0,0,0,0,17920,0,0,0
+file -> brightness,"NGC 4522 2': original order, 2.60.x vs 2.61.0",800,610,609,17,16,31,14,587,0,0,0
+file -> brightness,"COSMOS 2': original order, 2.60.x vs 2.61.0",5981,3572,3572,346,346,687,342,3224,0,0,0
+file -> brightness,"Galactic plane 1': original order, 2.60.x vs 2.61.0",1043,597,597,0,0,0,0,597,0,0,0
