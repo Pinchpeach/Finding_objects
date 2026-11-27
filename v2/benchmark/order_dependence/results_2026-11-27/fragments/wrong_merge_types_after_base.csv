@@ -1,0 +1,7 @@
+variant,split,role,same,no_truth,star_or_agn,neighbour,close_pair,parent_no_truth,grouped,actual_wrong,upper_bound_wrong,pipeline_star_or_qso_under_galaxy
+after_base,calibration,bright_star_halo,4,627,0,2,0,6,639,2,8,0
+after_base,calibration,fragment,671,486,4,15,0,31,1207,19,50,78
+after_base,calibration,ps1_duplicate,286,177,0,2,0,2,467,2,4,58
+after_base,test,bright_star_halo,7,295,0,0,0,0,302,0,0,0
+after_base,test,fragment,454,330,4,18,0,19,825,22,41,54
+after_base,test,ps1_duplicate,202,89,0,0,0,1,292,0,1,44

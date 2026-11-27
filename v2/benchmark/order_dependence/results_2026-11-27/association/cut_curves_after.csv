@@ -1,0 +1,217 @@
+variant,half,catalog,k,joined,correct,false,false_pct,recall_pct,shifted_false_pct
+after_orig,calibration,AllWISE,0.5,2595,2459,51,2.03,46.82,0.59
+after_orig,calibration,AllWISE,0.75,3319,3146,56,1.75,59.9,1.52
+after_orig,calibration,AllWISE,1.0,3786,3573,57,1.57,68.03,2.56
+after_orig,calibration,AllWISE,1.25,4084,3832,59,1.52,72.96,3.98
+after_orig,calibration,AllWISE,1.5,4299,3980,70,1.73,75.78,5.95
+after_orig,calibration,AllWISE,1.75,4485,4104,81,1.94,78.14,7.74
+after_orig,calibration,AllWISE,2.0,4485,4104,81,1.94,78.14,7.74
+after_orig,calibration,AllWISE,2.25,4485,4104,81,1.94,78.14,7.74
+after_orig,calibration,AllWISE,2.5,4485,4104,81,1.94,78.14,7.74
+after_orig,calibration,AllWISE,2.75,4485,4104,81,1.94,78.14,7.74
+after_orig,calibration,AllWISE,3.0,4485,4104,81,1.94,78.14,7.74
+after_orig,calibration,AllWISE,3.25,4485,4104,81,1.94,78.14,7.74
+after_orig,calibration,AllWISE,3.5,4485,4104,81,1.94,78.14,7.74
+after_orig,calibration,AllWISE,3.75,4485,4104,81,1.94,78.14,7.74
+after_orig,calibration,AllWISE,4.0,4485,4104,81,1.94,78.14,7.74
+after_orig,calibration,AllWISE,4.25,4485,4104,81,1.94,78.14,7.74
+after_orig,calibration,AllWISE,4.5,4485,4104,81,1.94,78.14,7.74
+after_orig,calibration,AllWISE,4.75,4485,4104,81,1.94,78.14,7.74
+after_orig,calibration,AllWISE,5.0,4485,4104,81,1.94,78.14,7.74
+after_orig,calibration,AllWISE,5.25,4485,4104,81,1.94,78.14,7.74
+after_orig,calibration,AllWISE,5.5,4485,4104,81,1.94,78.14,7.74
+after_orig,calibration,AllWISE,5.75,4485,4104,81,1.94,78.14,7.74
+after_orig,calibration,AllWISE,6.0,4485,4104,81,1.94,78.14,7.74
+after_orig,calibration,AllWISE,inf,4485,4104,81,1.94,78.14,7.74
+after_orig,calibration,2MASS PSC,0.5,537,421,1,0.24,64.18,0.25
+after_orig,calibration,2MASS PSC,0.75,654,519,1,0.19,79.12,0.37
+after_orig,calibration,2MASS PSC,1.0,712,570,1,0.18,86.89,0.86
+after_orig,calibration,2MASS PSC,1.25,751,605,1,0.17,92.23,1.11
+after_orig,calibration,2MASS PSC,1.5,771,621,1,0.16,94.66,1.23
+after_orig,calibration,2MASS PSC,1.75,783,631,1,0.16,96.19,2.09
+after_orig,calibration,2MASS PSC,2.0,790,636,1,0.16,96.95,2.34
+after_orig,calibration,2MASS PSC,2.25,793,639,1,0.16,97.41,2.83
+after_orig,calibration,2MASS PSC,2.5,796,642,1,0.16,97.87,3.2
+after_orig,calibration,2MASS PSC,2.75,796,642,1,0.16,97.87,3.2
+after_orig,calibration,2MASS PSC,3.0,796,642,1,0.16,97.87,3.2
+after_orig,calibration,2MASS PSC,3.25,796,642,1,0.16,97.87,3.2
+after_orig,calibration,2MASS PSC,3.5,796,642,1,0.16,97.87,3.2
+after_orig,calibration,2MASS PSC,3.75,796,642,1,0.16,97.87,3.2
+after_orig,calibration,2MASS PSC,4.0,796,642,1,0.16,97.87,3.2
+after_orig,calibration,2MASS PSC,4.25,796,642,1,0.16,97.87,3.2
+after_orig,calibration,2MASS PSC,4.5,796,642,1,0.16,97.87,3.2
+after_orig,calibration,2MASS PSC,4.75,796,642,1,0.16,97.87,3.2
+after_orig,calibration,2MASS PSC,5.0,796,642,1,0.16,97.87,3.2
+after_orig,calibration,2MASS PSC,5.25,796,642,1,0.16,97.87,3.2
+after_orig,calibration,2MASS PSC,5.5,796,642,1,0.16,97.87,3.2
+after_orig,calibration,2MASS PSC,5.75,796,642,1,0.16,97.87,3.2
+after_orig,calibration,2MASS PSC,6.0,796,642,1,0.16,97.87,3.2
+after_orig,calibration,2MASS PSC,inf,796,642,1,0.16,97.87,3.2
+after_orig,calibration,GALEX AIS,0.5,144,89,5,5.32,5.68,1.51
+after_orig,calibration,GALEX AIS,0.75,341,217,9,3.98,13.85,3.49
+after_orig,calibration,GALEX AIS,1.0,545,362,17,4.49,23.1,5.73
+after_orig,calibration,GALEX AIS,1.25,715,468,26,5.26,29.87,8.7
+after_orig,calibration,GALEX AIS,1.5,895,589,41,6.51,37.59,12.3
+after_orig,calibration,GALEX AIS,1.75,1037,679,47,6.47,43.33,16.57
+after_orig,calibration,GALEX AIS,2.0,1156,752,51,6.35,47.99,21.47
+after_orig,calibration,GALEX AIS,2.25,1224,791,52,6.17,50.48,24.28
+after_orig,calibration,GALEX AIS,2.5,1276,828,54,6.12,52.84,25.38
+after_orig,calibration,GALEX AIS,2.75,1319,857,56,6.13,54.69,26.11
+after_orig,calibration,GALEX AIS,3.0,1357,879,57,6.09,56.09,26.68
+after_orig,calibration,GALEX AIS,3.25,1379,899,57,5.96,57.37,27.62
+after_orig,calibration,GALEX AIS,3.5,1419,925,59,6.0,59.03,28.56
+after_orig,calibration,GALEX AIS,3.75,1437,940,59,5.91,59.99,29.08
+after_orig,calibration,GALEX AIS,4.0,1445,944,60,5.98,60.24,29.86
+after_orig,calibration,GALEX AIS,4.25,1452,948,61,6.05,60.5,30.48
+after_orig,calibration,GALEX AIS,4.5,1462,956,62,6.09,61.01,31.11
+after_orig,calibration,GALEX AIS,4.75,1476,962,64,6.24,61.39,31.94
+after_orig,calibration,GALEX AIS,5.0,1476,962,64,6.24,61.39,31.94
+after_orig,calibration,GALEX AIS,5.25,1476,962,64,6.24,61.39,31.94
+after_orig,calibration,GALEX AIS,5.5,1476,962,64,6.24,61.39,31.94
+after_orig,calibration,GALEX AIS,5.75,1476,962,64,6.24,61.39,31.94
+after_orig,calibration,GALEX AIS,6.0,1476,962,64,6.24,61.39,31.94
+after_orig,calibration,GALEX AIS,inf,1476,962,64,6.24,61.39,31.94
+after_orig,test,AllWISE,0.5,1978,1882,36,1.88,46.6,0.82
+after_orig,test,AllWISE,0.75,2512,2398,41,1.68,59.37,1.76
+after_orig,test,AllWISE,1.0,2877,2736,44,1.58,67.74,2.74
+after_orig,test,AllWISE,1.25,3104,2927,49,1.65,72.47,4.03
+after_orig,test,AllWISE,1.5,3313,3085,58,1.85,76.38,5.87
+after_orig,test,AllWISE,1.75,3444,3178,74,2.28,78.68,7.47
+after_orig,test,AllWISE,2.0,3444,3178,74,2.28,78.68,7.47
+after_orig,test,AllWISE,2.25,3444,3178,74,2.28,78.68,7.47
+after_orig,test,AllWISE,2.5,3444,3178,74,2.28,78.68,7.47
+after_orig,test,AllWISE,2.75,3444,3178,74,2.28,78.68,7.47
+after_orig,test,AllWISE,3.0,3444,3178,74,2.28,78.68,7.47
+after_orig,test,AllWISE,3.25,3444,3178,74,2.28,78.68,7.47
+after_orig,test,AllWISE,3.5,3444,3178,74,2.28,78.68,7.47
+after_orig,test,AllWISE,3.75,3444,3178,74,2.28,78.68,7.47
+after_orig,test,AllWISE,4.0,3444,3178,74,2.28,78.68,7.47
+after_orig,test,AllWISE,4.25,3444,3178,74,2.28,78.68,7.47
+after_orig,test,AllWISE,4.5,3444,3178,74,2.28,78.68,7.47
+after_orig,test,AllWISE,4.75,3444,3178,74,2.28,78.68,7.47
+after_orig,test,AllWISE,5.0,3444,3178,74,2.28,78.68,7.47
+after_orig,test,AllWISE,5.25,3444,3178,74,2.28,78.68,7.47
+after_orig,test,AllWISE,5.5,3444,3178,74,2.28,78.68,7.47
+after_orig,test,AllWISE,5.75,3444,3178,74,2.28,78.68,7.47
+after_orig,test,AllWISE,6.0,3444,3178,74,2.28,78.68,7.47
+after_orig,test,AllWISE,inf,3444,3178,74,2.28,78.68,7.47
+after_orig,test,2MASS PSC,0.5,408,270,0,0.0,64.75,0.0
+after_orig,test,2MASS PSC,0.75,492,326,0,0.0,78.18,0.33
+after_orig,test,2MASS PSC,1.0,532,354,0,0.0,84.89,0.49
+after_orig,test,2MASS PSC,1.25,555,370,0,0.0,88.73,0.65
+after_orig,test,2MASS PSC,1.5,576,388,0,0.0,93.05,1.79
+after_orig,test,2MASS PSC,1.75,591,399,0,0.0,95.68,1.96
+after_orig,test,2MASS PSC,2.0,594,402,0,0.0,96.4,2.28
+after_orig,test,2MASS PSC,2.25,597,404,0,0.0,96.88,2.77
+after_orig,test,2MASS PSC,2.5,602,408,0,0.0,97.84,4.24
+after_orig,test,2MASS PSC,2.75,602,408,0,0.0,97.84,4.24
+after_orig,test,2MASS PSC,3.0,602,408,0,0.0,97.84,4.24
+after_orig,test,2MASS PSC,3.25,602,408,0,0.0,97.84,4.24
+after_orig,test,2MASS PSC,3.5,602,408,0,0.0,97.84,4.24
+after_orig,test,2MASS PSC,3.75,602,408,0,0.0,97.84,4.24
+after_orig,test,2MASS PSC,4.0,602,408,0,0.0,97.84,4.24
+after_orig,test,2MASS PSC,4.25,602,408,0,0.0,97.84,4.24
+after_orig,test,2MASS PSC,4.5,602,408,0,0.0,97.84,4.24
+after_orig,test,2MASS PSC,4.75,602,408,0,0.0,97.84,4.24
+after_orig,test,2MASS PSC,5.0,602,408,0,0.0,97.84,4.24
+after_orig,test,2MASS PSC,5.25,602,408,0,0.0,97.84,4.24
+after_orig,test,2MASS PSC,5.5,602,408,0,0.0,97.84,4.24
+after_orig,test,2MASS PSC,5.75,602,408,0,0.0,97.84,4.24
+after_orig,test,2MASS PSC,6.0,602,408,0,0.0,97.84,4.24
+after_orig,test,2MASS PSC,inf,602,408,0,0.0,97.84,4.24
+after_orig,test,GALEX AIS,0.5,117,88,3,3.3,6.81,0.91
+after_orig,test,GALEX AIS,0.75,254,193,5,2.53,14.94,3.0
+after_orig,test,GALEX AIS,1.0,403,298,9,2.93,23.07,5.79
+after_orig,test,GALEX AIS,1.25,544,399,15,3.62,30.88,9.14
+after_orig,test,GALEX AIS,1.5,657,470,25,5.05,36.38,11.85
+after_orig,test,GALEX AIS,1.75,766,545,35,6.03,42.18,15.41
+after_orig,test,GALEX AIS,2.0,851,602,43,6.67,46.59,17.78
+after_orig,test,GALEX AIS,2.25,914,650,45,6.47,50.31,19.74
+after_orig,test,GALEX AIS,2.5,950,677,47,6.49,52.4,21.06
+after_orig,test,GALEX AIS,2.75,987,707,47,6.23,54.72,21.9
+after_orig,test,GALEX AIS,3.0,1004,720,48,6.25,55.73,22.52
+after_orig,test,GALEX AIS,3.25,1028,740,48,6.09,57.28,23.29
+after_orig,test,GALEX AIS,3.5,1045,753,50,6.23,58.28,24.06
+after_orig,test,GALEX AIS,3.75,1062,766,51,6.24,59.29,25.31
+after_orig,test,GALEX AIS,4.0,1081,780,52,6.25,60.37,25.8
+after_orig,test,GALEX AIS,4.25,1096,794,52,6.15,61.46,26.85
+after_orig,test,GALEX AIS,4.5,1109,802,54,6.31,62.07,27.55
+after_orig,test,GALEX AIS,4.75,1117,806,54,6.28,62.38,27.96
+after_orig,test,GALEX AIS,5.0,1117,806,54,6.28,62.38,27.96
+after_orig,test,GALEX AIS,5.25,1117,806,54,6.28,62.38,27.96
+after_orig,test,GALEX AIS,5.5,1117,806,54,6.28,62.38,27.96
+after_orig,test,GALEX AIS,5.75,1117,806,54,6.28,62.38,27.96
+after_orig,test,GALEX AIS,6.0,1117,806,54,6.28,62.38,27.96
+after_orig,test,GALEX AIS,inf,1117,806,54,6.28,62.38,27.96
+after_orig,all,AllWISE,0.5,4573,4341,87,1.96,46.72,0.69
+after_orig,all,AllWISE,0.75,5831,5544,97,1.72,59.67,1.62
+after_orig,all,AllWISE,1.0,6663,6309,101,1.58,67.9,2.63
+after_orig,all,AllWISE,1.25,7188,6759,108,1.57,72.75,4.01
+after_orig,all,AllWISE,1.5,7612,7065,128,1.78,76.04,5.92
+after_orig,all,AllWISE,1.75,7929,7282,155,2.08,78.38,7.63
+after_orig,all,AllWISE,2.0,7929,7282,155,2.08,78.38,7.63
+after_orig,all,AllWISE,2.25,7929,7282,155,2.08,78.38,7.63
+after_orig,all,AllWISE,2.5,7929,7282,155,2.08,78.38,7.63
+after_orig,all,AllWISE,2.75,7929,7282,155,2.08,78.38,7.63
+after_orig,all,AllWISE,3.0,7929,7282,155,2.08,78.38,7.63
+after_orig,all,AllWISE,3.25,7929,7282,155,2.08,78.38,7.63
+after_orig,all,AllWISE,3.5,7929,7282,155,2.08,78.38,7.63
+after_orig,all,AllWISE,3.75,7929,7282,155,2.08,78.38,7.63
+after_orig,all,AllWISE,4.0,7929,7282,155,2.08,78.38,7.63
+after_orig,all,AllWISE,4.25,7929,7282,155,2.08,78.38,7.63
+after_orig,all,AllWISE,4.5,7929,7282,155,2.08,78.38,7.63
+after_orig,all,AllWISE,4.75,7929,7282,155,2.08,78.38,7.63
+after_orig,all,AllWISE,5.0,7929,7282,155,2.08,78.38,7.63
+after_orig,all,AllWISE,5.25,7929,7282,155,2.08,78.38,7.63
+after_orig,all,AllWISE,5.5,7929,7282,155,2.08,78.38,7.63
+after_orig,all,AllWISE,5.75,7929,7282,155,2.08,78.38,7.63
+after_orig,all,AllWISE,6.0,7929,7282,155,2.08,78.38,7.63
+after_orig,all,AllWISE,inf,7929,7282,155,2.08,78.38,7.63
+after_orig,all,2MASS PSC,0.5,945,691,1,0.14,64.4,0.14
+after_orig,all,2MASS PSC,0.75,1146,845,1,0.12,78.75,0.35
+after_orig,all,2MASS PSC,1.0,1244,924,1,0.11,86.11,0.7
+after_orig,all,2MASS PSC,1.25,1306,975,1,0.1,90.87,0.91
+after_orig,all,2MASS PSC,1.5,1347,1009,1,0.1,94.04,1.47
+after_orig,all,2MASS PSC,1.75,1374,1030,1,0.1,95.99,2.03
+after_orig,all,2MASS PSC,2.0,1384,1038,1,0.1,96.74,2.31
+after_orig,all,2MASS PSC,2.25,1390,1043,1,0.1,97.2,2.81
+after_orig,all,2MASS PSC,2.5,1398,1050,1,0.1,97.86,3.65
+after_orig,all,2MASS PSC,2.75,1398,1050,1,0.1,97.86,3.65
+after_orig,all,2MASS PSC,3.0,1398,1050,1,0.1,97.86,3.65
+after_orig,all,2MASS PSC,3.25,1398,1050,1,0.1,97.86,3.65
+after_orig,all,2MASS PSC,3.5,1398,1050,1,0.1,97.86,3.65
+after_orig,all,2MASS PSC,3.75,1398,1050,1,0.1,97.86,3.65
+after_orig,all,2MASS PSC,4.0,1398,1050,1,0.1,97.86,3.65
+after_orig,all,2MASS PSC,4.25,1398,1050,1,0.1,97.86,3.65
+after_orig,all,2MASS PSC,4.5,1398,1050,1,0.1,97.86,3.65
+after_orig,all,2MASS PSC,4.75,1398,1050,1,0.1,97.86,3.65
+after_orig,all,2MASS PSC,5.0,1398,1050,1,0.1,97.86,3.65
+after_orig,all,2MASS PSC,5.25,1398,1050,1,0.1,97.86,3.65
+after_orig,all,2MASS PSC,5.5,1398,1050,1,0.1,97.86,3.65
+after_orig,all,2MASS PSC,5.75,1398,1050,1,0.1,97.86,3.65
+after_orig,all,2MASS PSC,6.0,1398,1050,1,0.1,97.86,3.65
+after_orig,all,2MASS PSC,inf,1398,1050,1,0.1,97.86,3.65
+after_orig,all,GALEX AIS,0.5,261,177,8,4.32,6.19,1.25
+after_orig,all,GALEX AIS,0.75,595,410,14,3.3,14.34,3.28
+after_orig,all,GALEX AIS,1.0,948,660,26,3.79,23.08,5.76
+after_orig,all,GALEX AIS,1.25,1259,867,41,4.52,30.33,8.89
+after_orig,all,GALEX AIS,1.5,1552,1059,66,5.87,37.04,12.11
+after_orig,all,GALEX AIS,1.75,1803,1224,82,6.28,42.81,16.08
+after_orig,all,GALEX AIS,2.0,2007,1354,94,6.49,47.36,19.89
+after_orig,all,GALEX AIS,2.25,2138,1441,97,6.31,50.4,22.34
+after_orig,all,GALEX AIS,2.5,2226,1505,101,6.29,52.64,23.53
+after_orig,all,GALEX AIS,2.75,2306,1564,103,6.18,54.7,24.31
+after_orig,all,GALEX AIS,3.0,2361,1599,105,6.16,55.93,24.9
+after_orig,all,GALEX AIS,3.25,2407,1639,105,6.02,57.33,25.77
+after_orig,all,GALEX AIS,3.5,2464,1678,109,6.1,58.69,26.63
+after_orig,all,GALEX AIS,3.75,2499,1706,110,6.06,59.67,27.47
+after_orig,all,GALEX AIS,4.0,2526,1724,112,6.1,60.3,28.12
+after_orig,all,GALEX AIS,4.25,2548,1742,113,6.09,60.93,28.93
+after_orig,all,GALEX AIS,4.5,2571,1758,116,6.19,61.49,29.59
+after_orig,all,GALEX AIS,4.75,2593,1768,118,6.26,61.84,30.24
+after_orig,all,GALEX AIS,5.0,2593,1768,118,6.26,61.84,30.24
+after_orig,all,GALEX AIS,5.25,2593,1768,118,6.26,61.84,30.24
+after_orig,all,GALEX AIS,5.5,2593,1768,118,6.26,61.84,30.24
+after_orig,all,GALEX AIS,5.75,2593,1768,118,6.26,61.84,30.24
+after_orig,all,GALEX AIS,6.0,2593,1768,118,6.26,61.84,30.24
+after_orig,all,GALEX AIS,inf,2593,1768,118,6.26,61.84,30.24

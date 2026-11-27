@@ -23,6 +23,7 @@ from association_model import (
     sep_arcsec,
     num,
     profile_for,
+    tie_magnitude,
 )
 
 AMBIG_SCORE_RATIO = 0.67
@@ -194,13 +195,12 @@ def load(raw: Path):
                 if cid and cid.lower() not in {"nan", "none"}
                 else (cat, "sky", round(ra, 7), round(dec, 7))
             )
-            if key in seen:
-                skipped += 1
-                continue
-            seen.add(key)
             prof = profile_for(cat, r)
             rows.append(
                 {
+                    "_dedup": key,  # private keys (leading underscore) are not written to source_association.csv
+                    "_cid": cid,
+                    "_tie_mag": tie_magnitude(cat, r),
                     "detection_id": f"{path.stem}:{i}",
                     "input_file": path.name,
                     "catalog": cat,
@@ -224,7 +224,18 @@ def load(raw: Path):
                     "source_row": int(i),
                 }
             )
-    return rows, skipped
+    # The row that is kept of two rows with the same identifier (or the same position when there is none) must not
+    # depend on the order of the file: put the rows in the order of the association first (2.61.0)
+    if _TIE_ORDER != "file":
+        rows.sort(key=_order_key)
+    kept = []
+    for row in rows:
+        if row["_dedup"] in seen:
+            skipped += 1
+            continue
+        seen.add(row["_dedup"])
+        kept.append(row)
+    return kept, skipped
 
 
 # Chance coincidence (2.48.0; V2_ASSOC_CANDIDATE_DENSITY=0 restores the old rule).  The
@@ -281,6 +292,39 @@ def _anchor_key(det):
     return (0 if gaia and has_motion else 1 if has_motion else 2, float(det.get("poserr_arcsec") or 99.0))
 
 
+# Order of the detections (2.61.0).  The groups are built one detection at a time, the most precise anchors first, and
+# a detection joins the group that is there when its turn comes; detections that agree on every key below are
+# therefore decided by what comes last in the key.  Until 2.60.x that was the row of the input file, so the same
+# detections in another order (a Legacy Surveys viewer answer against its TAP answer, a shuffled file) gave another
+# set of objects: 1.1 % of the objects of the 26 deep COSMOS fields differ between two orders (WORK_REPORT_2026-11-25g.md).
+# Many catalogues carry one assumed position error for every row (AllWISE, SDSS, GALEX, SGA, the 0.6'' floor of the
+# resolved Legacy Surveys models: 63 % of the LS rows of a deep field), so the tie is the rule, not the exception.
+# Now the last keys are the brightness (a brighter detection has the better centroid, the reason for the position error
+# to rank the anchors; Fleuren et al. 2012: sigma = 0.655 FWHM / SNR), then position, the catalogue's own identifier and
+# only then the row.  The literature (Budavari & Basu 2016; Marrese et al. 2017, 2019) decides competing detections by
+# score, not by order and gives no rule for the order; the brightness order is this project's choice (see
+# LITERATURE_ASSOCIATION_ORDER_2026-11-25.md).  V2_ASSOC_TIE_ORDER=file restores the order of 2.60.x; =position drops the brightness
+# (position, identifier, row) and is there to measure what the brightness adds.
+_TIE_ORDER = os.environ.get("V2_ASSOC_TIE_ORDER", "brightness")
+if _TIE_ORDER not in ("brightness", "position", "file"):
+    raise ValueError(f"V2_ASSOC_TIE_ORDER={_TIE_ORDER!r}: expected 'brightness', 'position' or 'file'")
+
+
+def _order_key(d):
+    head = (d.get("catalog") in ANNOTATION_CATALOGS, d.get("catalog") in TARGET_SPECTRA, *_anchor_key(d), str(d.get("catalog")))
+    if _TIE_ORDER == "file":
+        return (*head, str(d.get("detection_id")))
+    mag = d.get("_tie_mag") if _TIE_ORDER == "brightness" else None  # "position": the same without the brightness
+    return (
+        *head,
+        mag if mag is not None else math.inf,
+        d["ra"],
+        d["dec"],
+        str(d.get("_cid") or ""),
+        str(d.get("detection_id")),
+    )
+
+
 EMPTY_COLUMNS = [
     "object_id",
     "catalog",
@@ -301,15 +345,7 @@ def run(raw_dir: Path, out: Path):
     # Build groups from the best astrometric anchors first.  This prevents a
     # coarse IRAS/low-resolution row from becoming the coordinate anchor merely
     # because its filename sorts earlier.
-    detections.sort(
-        key=lambda d: (
-            d.get("catalog") in ANNOTATION_CATALOGS,
-            d.get("catalog") in TARGET_SPECTRA,
-            *_anchor_key(d),
-            str(d.get("catalog")),
-            str(d.get("detection_id")),
-        )
-    )
+    detections.sort(key=_order_key)
     groups, records = [], []
     use_phot = phot_prior_enabled()
     epochs = [float(d["ref_epoch"]) for d in detections if d.get("ref_epoch") is not None]
@@ -501,7 +537,7 @@ def run(raw_dir: Path, out: Path):
         confidence = match.get("association_posterior", match.get("association_score"))
         records.append(
             {
-                **{k: v for k, v in det.items() if k != "phot"},
+                **{k: v for k, v in det.items() if k != "phot" and not k.startswith("_")},
                 "association_aliases": "|".join(sorted(det.get("association_aliases") or ())),
                 "object_id": oid,
                 "association_status": status,

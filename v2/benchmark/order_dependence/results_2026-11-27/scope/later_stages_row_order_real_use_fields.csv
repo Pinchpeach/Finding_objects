@@ -1,0 +1,7 @@
+objects_ref,objects_new,objects_common,columns_changed,primary_class_changed,secondary_class_changed,high_confidence_changed,parent_object_id_changed,component_role_changed,field,seed
+604,604,604,"{""field_prior_star"": 604, ""field_prior_galaxy"": 604, ""field_prior_qso"": 604}",0,0,0,0,0,NGC 4522 2',1
+604,604,604,"{""field_prior_star"": 604, ""field_prior_galaxy"": 604, ""field_prior_qso"": 604}",0,0,0,0,0,NGC 4522 2',2
+3570,3570,3570,"{""field_prior_star"": 3570, ""field_prior_galaxy"": 3570, ""field_prior_qso"": 3570}",0,0,0,0,0,COSMOS 2',1
+3570,3570,3570,"{""field_prior_star"": 3570, ""field_prior_galaxy"": 3570, ""field_prior_qso"": 3570}",0,0,0,0,0,COSMOS 2',2
+597,597,597,{},0,0,0,0,0,Galactic plane 1',1
+597,597,597,"{""field_prior_star"": 597, ""field_prior_galaxy"": 597, ""field_prior_qso"": 597}",0,0,0,0,0,Galactic plane 1',2

@@ -1,0 +1,145 @@
+detections,objects_ref,objects_new,objects_only_ref,objects_only_new,detections_in_changed_objects,status_changed,by_catalog,seed,only,field,catalog_file
+12059,9662,9662,0,0,0,0,{},1,sga2020,deep_cosmos_14,sga2020
+12059,9662,9662,0,0,0,0,{},2,sga2020,deep_cosmos_14,sga2020
+12059,9662,9662,0,0,0,0,{},1,first,deep_cosmos_14,first
+12059,9662,9662,0,0,0,0,{},2,first,deep_cosmos_14,first
+12059,9662,9662,0,0,0,0,{},1,galex,deep_cosmos_14,galex
+12059,9662,9662,0,0,0,0,{},2,galex,deep_cosmos_14,galex
+12059,9662,9662,0,0,0,0,{},1,panstarrs1,deep_cosmos_14,panstarrs1
+12059,9662,9662,0,0,0,0,{},2,panstarrs1,deep_cosmos_14,panstarrs1
+12059,9662,9658,114,110,205,114,"{""AllWISE"": 22, ""Chandra CSC 2.0"": 3, ""DESI Legacy Surveys DR10"": 96, ""GALEX AIS"": 4, ""Pan-STARRS1 DR2 MeanObject"": 52, ""SDSS DR18 PhotoObj"": 26, ""XMM 4XMM-DR13"": 2}",1,desi_legacy,deep_cosmos_14,desi_legacy
+12059,9662,9657,120,115,214,119,"{""AllWISE"": 30, ""Chandra CSC 2.0"": 4, ""DESI Legacy Surveys DR10"": 104, ""GALEX AIS"": 4, ""Pan-STARRS1 DR2 MeanObject"": 46, ""SDSS DR18 PhotoObj"": 24, ""XMM 4XMM-DR13"": 2}",2,desi_legacy,deep_cosmos_14,desi_legacy
+12059,9662,9662,0,0,0,0,{},1,galaxy_zoo,deep_cosmos_14,galaxy_zoo
+12059,9662,9662,0,0,0,0,{},2,galaxy_zoo,deep_cosmos_14,galaxy_zoo
+12059,9662,9662,0,0,0,0,{},1,twomass,deep_cosmos_14,twomass
+12059,9662,9662,0,0,0,0,{},2,twomass,deep_cosmos_14,twomass
+12059,9662,9662,0,0,0,0,{},1,chandra,deep_cosmos_14,chandra
+12059,9662,9662,0,0,0,0,{},2,chandra,deep_cosmos_14,chandra
+12059,9662,9662,0,0,0,0,{},1,xmm,deep_cosmos_14,xmm
+12059,9662,9662,0,0,0,0,{},2,xmm,deep_cosmos_14,xmm
+12059,9662,9662,0,0,0,0,{},1,allwise,deep_cosmos_14,allwise
+12059,9662,9662,0,0,0,0,{},2,allwise,deep_cosmos_14,allwise
+12059,9662,9662,0,0,0,0,{},1,gaia,deep_cosmos_14,gaia
+12059,9662,9662,0,0,0,0,{},2,gaia,deep_cosmos_14,gaia
+12059,9662,9662,0,0,0,0,{},1,sdss,deep_cosmos_14,sdss
+12059,9662,9662,0,0,0,0,{},2,sdss,deep_cosmos_14,sdss
+12364,9884,9884,0,0,0,0,{},1,sga2020,deep_cosmos_5,sga2020
+12364,9884,9884,0,0,0,0,{},2,sga2020,deep_cosmos_5,sga2020
+12364,9884,9884,0,0,0,0,{},1,first,deep_cosmos_5,first
+12364,9884,9884,0,0,0,0,{},2,first,deep_cosmos_5,first
+12364,9884,9884,0,0,0,0,{},1,galex,deep_cosmos_5,galex
+12364,9884,9884,0,0,0,0,{},2,galex,deep_cosmos_5,galex
+12364,9884,9884,0,0,0,0,{},1,panstarrs1,deep_cosmos_5,panstarrs1
+12364,9884,9884,0,0,0,0,{},2,panstarrs1,deep_cosmos_5,panstarrs1
+12364,9884,9881,115,112,213,115,"{""2MASS PSC"": 1, ""AllWISE"": 38, ""Chandra CSC 2.0"": 2, ""DESI Legacy Surveys DR10"": 99, ""GALEX AIS"": 2, ""Gaia DR3"": 1, ""Galaxy Zoo DESI"": 2, ""Pan-STARRS1 DR2 MeanObject"": 39, ""SDSS DR18 PhotoObj"": 27, ""XMM 4XMM-DR13"": 2}",1,desi_legacy,deep_cosmos_5,desi_legacy
+12364,9884,9890,98,104,195,98,"{""2MASS PSC"": 2, ""AllWISE"": 34, ""Chandra CSC 2.0"": 1, ""DESI Legacy Surveys DR10"": 90, ""GALEX AIS"": 3, ""Gaia DR3"": 2, ""Galaxy Zoo DESI"": 1, ""Pan-STARRS1 DR2 MeanObject"": 37, ""SDSS DR18 PhotoObj"": 23, ""XMM 4XMM-DR13"": 2}",2,desi_legacy,deep_cosmos_5,desi_legacy
+12364,9884,9884,0,0,0,0,{},1,galaxy_zoo,deep_cosmos_5,galaxy_zoo
+12364,9884,9884,0,0,0,0,{},2,galaxy_zoo,deep_cosmos_5,galaxy_zoo
+12364,9884,9884,0,0,0,0,{},1,twomass,deep_cosmos_5,twomass
+12364,9884,9884,0,0,0,0,{},2,twomass,deep_cosmos_5,twomass
+12364,9884,9884,0,0,0,0,{},1,chandra,deep_cosmos_5,chandra
+12364,9884,9884,0,0,0,0,{},2,chandra,deep_cosmos_5,chandra
+12364,9884,9884,0,0,0,0,{},1,xmm,deep_cosmos_5,xmm
+12364,9884,9884,0,0,0,0,{},2,xmm,deep_cosmos_5,xmm
+12364,9884,9884,0,0,0,0,{},1,allwise,deep_cosmos_5,allwise
+12364,9884,9884,0,0,0,0,{},2,allwise,deep_cosmos_5,allwise
+12364,9884,9884,0,0,0,0,{},1,gaia,deep_cosmos_5,gaia
+12364,9884,9884,0,0,0,0,{},2,gaia,deep_cosmos_5,gaia
+12364,9884,9883,3,2,9,1,"{""2MASS PSC"": 1, ""AllWISE"": 1, ""DESI Legacy Surveys DR10"": 1, ""GALEX AIS"": 1, ""Gaia DR3"": 1, ""Pan-STARRS1 DR2 MeanObject"": 2, ""SDSS DR18 PhotoObj"": 2}",1,sdss,deep_cosmos_5,sdss
+12364,9884,9884,0,0,0,0,{},2,sdss,deep_cosmos_5,sdss
+12788,10348,10348,0,0,0,0,{},1,sga2020,deep_cosmos_25,sga2020
+12788,10348,10348,0,0,0,0,{},2,sga2020,deep_cosmos_25,sga2020
+12788,10348,10348,0,0,0,0,{},1,first,deep_cosmos_25,first
+12788,10348,10348,0,0,0,0,{},2,first,deep_cosmos_25,first
+12788,10348,10348,0,0,0,0,{},1,galex,deep_cosmos_25,galex
+12788,10348,10348,0,0,0,0,{},2,galex,deep_cosmos_25,galex
+12788,10348,10348,0,0,0,0,{},1,panstarrs1,deep_cosmos_25,panstarrs1
+12788,10348,10348,0,0,0,0,{},2,panstarrs1,deep_cosmos_25,panstarrs1
+12788,10348,10344,82,78,144,84,"{""AllWISE"": 15, ""Chandra CSC 2.0"": 1, ""DESI Legacy Surveys DR10"": 66, ""GALEX AIS"": 2, ""Galaxy Zoo DESI"": 1, ""Pan-STARRS1 DR2 MeanObject"": 36, ""SDSS DR18 PhotoObj"": 23}",1,desi_legacy,deep_cosmos_25,desi_legacy
+12788,10348,10353,87,92,164,93,"{""AllWISE"": 20, ""Chandra CSC 2.0"": 3, ""DESI Legacy Surveys DR10"": 76, ""GALEX AIS"": 4, ""Pan-STARRS1 DR2 MeanObject"": 39, ""SDSS DR18 PhotoObj"": 22}",2,desi_legacy,deep_cosmos_25,desi_legacy
+12788,10348,10348,0,0,0,0,{},1,galaxy_zoo,deep_cosmos_25,galaxy_zoo
+12788,10348,10348,0,0,0,0,{},2,galaxy_zoo,deep_cosmos_25,galaxy_zoo
+12788,10348,10348,0,0,0,0,{},1,twomass,deep_cosmos_25,twomass
+12788,10348,10348,0,0,0,0,{},2,twomass,deep_cosmos_25,twomass
+12788,10348,10348,0,0,0,0,{},1,chandra,deep_cosmos_25,chandra
+12788,10348,10348,0,0,0,0,{},2,chandra,deep_cosmos_25,chandra
+12788,10348,10348,0,0,0,0,{},1,xmm,deep_cosmos_25,xmm
+12788,10348,10348,0,0,0,0,{},2,xmm,deep_cosmos_25,xmm
+12788,10348,10348,0,0,0,0,{},1,allwise,deep_cosmos_25,allwise
+12788,10348,10348,0,0,0,0,{},2,allwise,deep_cosmos_25,allwise
+12788,10348,10348,0,0,0,0,{},1,gaia,deep_cosmos_25,gaia
+12788,10348,10348,0,0,0,0,{},2,gaia,deep_cosmos_25,gaia
+12788,10348,10348,0,0,0,0,{},1,sdss,deep_cosmos_25,sdss
+12788,10348,10348,0,0,0,0,{},2,sdss,deep_cosmos_25,sdss
+12127,9618,9618,0,0,0,0,{},1,sga2020,deep_cosmos_20,sga2020
+12127,9618,9618,0,0,0,0,{},2,sga2020,deep_cosmos_20,sga2020
+12127,9618,9618,0,0,0,0,{},1,first,deep_cosmos_20,first
+12127,9618,9618,0,0,0,0,{},2,first,deep_cosmos_20,first
+12127,9618,9618,0,0,0,0,{},1,galex,deep_cosmos_20,galex
+12127,9618,9618,0,0,0,0,{},2,galex,deep_cosmos_20,galex
+12127,9618,9618,0,0,0,0,{},1,panstarrs1,deep_cosmos_20,panstarrs1
+12127,9618,9618,0,0,0,0,{},2,panstarrs1,deep_cosmos_20,panstarrs1
+12127,9618,9608,126,116,217,130,"{""AllWISE"": 21, ""DESI Legacy Surveys DR10"": 100, ""GALEX AIS"": 11, ""Gaia DR3"": 3, ""Galaxy Zoo DESI"": 2, ""NVSS"": 1, ""Pan-STARRS1 DR2 MeanObject"": 47, ""SDSS DR18 PhotoObj"": 32}",1,desi_legacy,deep_cosmos_20,desi_legacy
+12127,9618,9620,122,124,236,128,"{""2MASS PSC"": 3, ""AllWISE"": 28, ""DESI Legacy Surveys DR10"": 104, ""GALEX AIS"": 6, ""Gaia DR3"": 7, ""Galaxy Zoo DESI"": 4, ""NVSS"": 1, ""Pan-STARRS1 DR2 MeanObject"": 50, ""SDSS DR18 PhotoObj"": 32, ""SGA-2020"": 1}",2,desi_legacy,deep_cosmos_20,desi_legacy
+12127,9618,9618,0,0,0,0,{},1,galaxy_zoo,deep_cosmos_20,galaxy_zoo
+12127,9618,9618,0,0,0,0,{},2,galaxy_zoo,deep_cosmos_20,galaxy_zoo
+12127,9618,9618,0,0,0,0,{},1,twomass,deep_cosmos_20,twomass
+12127,9618,9618,0,0,0,0,{},2,twomass,deep_cosmos_20,twomass
+12127,9618,9618,0,0,0,0,{},1,chandra,deep_cosmos_20,chandra
+12127,9618,9618,0,0,0,0,{},2,chandra,deep_cosmos_20,chandra
+12127,9618,9618,0,0,0,0,{},1,xmm,deep_cosmos_20,xmm
+12127,9618,9618,0,0,0,0,{},2,xmm,deep_cosmos_20,xmm
+12127,9618,9618,0,0,0,0,{},1,allwise,deep_cosmos_20,allwise
+12127,9618,9618,0,0,0,0,{},2,allwise,deep_cosmos_20,allwise
+12127,9618,9618,0,0,0,0,{},1,gaia,deep_cosmos_20,gaia
+12127,9618,9618,0,0,0,0,{},2,gaia,deep_cosmos_20,gaia
+12127,9618,9618,2,2,4,2,"{""DESI Legacy Surveys DR10"": 1, ""Pan-STARRS1 DR2 MeanObject"": 1, ""SDSS DR18 PhotoObj"": 2}",1,sdss,deep_cosmos_20,sdss
+12127,9618,9617,2,1,2,1,"{""AllWISE"": 1, ""SDSS DR18 PhotoObj"": 1}",2,sdss,deep_cosmos_20,sdss
+12019,9934,9934,0,0,0,0,{},1,sga2020,deep_cosmos_1,sga2020
+12019,9934,9934,0,0,0,0,{},2,sga2020,deep_cosmos_1,sga2020
+12019,9934,9934,0,0,0,0,{},1,first,deep_cosmos_1,first
+12019,9934,9934,0,0,0,0,{},2,first,deep_cosmos_1,first
+12019,9934,9934,0,0,0,0,{},1,galex,deep_cosmos_1,galex
+12019,9934,9934,0,0,0,0,{},2,galex,deep_cosmos_1,galex
+12019,9934,9934,0,0,0,0,{},1,panstarrs1,deep_cosmos_1,panstarrs1
+12019,9934,9934,0,0,0,0,{},2,panstarrs1,deep_cosmos_1,panstarrs1
+12019,9934,9936,78,80,136,82,"{""AllWISE"": 21, ""Chandra CSC 2.0"": 1, ""DESI Legacy Surveys DR10"": 70, ""Pan-STARRS1 DR2 MeanObject"": 27, ""SDSS DR18 PhotoObj"": 17}",1,desi_legacy,deep_cosmos_1,desi_legacy
+12019,9934,9928,69,63,116,72,"{""AllWISE"": 14, ""DESI Legacy Surveys DR10"": 56, ""GALEX AIS"": 3, ""Pan-STARRS1 DR2 MeanObject"": 25, ""SDSS DR18 PhotoObj"": 18}",2,desi_legacy,deep_cosmos_1,desi_legacy
+12019,9934,9934,0,0,0,0,{},1,galaxy_zoo,deep_cosmos_1,galaxy_zoo
+12019,9934,9934,0,0,0,0,{},2,galaxy_zoo,deep_cosmos_1,galaxy_zoo
+12019,9934,9934,0,0,0,0,{},1,twomass,deep_cosmos_1,twomass
+12019,9934,9934,0,0,0,0,{},2,twomass,deep_cosmos_1,twomass
+12019,9934,9934,0,0,0,0,{},1,chandra,deep_cosmos_1,chandra
+12019,9934,9934,0,0,0,0,{},2,chandra,deep_cosmos_1,chandra
+12019,9934,9934,0,0,0,0,{},1,xmm,deep_cosmos_1,xmm
+12019,9934,9934,0,0,0,0,{},2,xmm,deep_cosmos_1,xmm
+12019,9934,9934,0,0,0,0,{},1,allwise,deep_cosmos_1,allwise
+12019,9934,9934,0,0,0,0,{},2,allwise,deep_cosmos_1,allwise
+12019,9934,9934,0,0,0,0,{},1,gaia,deep_cosmos_1,gaia
+12019,9934,9934,0,0,0,0,{},2,gaia,deep_cosmos_1,gaia
+12019,9934,9934,0,0,0,0,{},1,sdss,deep_cosmos_1,sdss
+12019,9934,9934,0,0,0,0,{},2,sdss,deep_cosmos_1,sdss
+12700,9777,9777,0,0,0,0,{},1,sga2020,deep_cosmos_9,sga2020
+12700,9777,9777,0,0,0,0,{},2,sga2020,deep_cosmos_9,sga2020
+12700,9777,9777,0,0,0,0,{},1,first,deep_cosmos_9,first
+12700,9777,9777,0,0,0,0,{},2,first,deep_cosmos_9,first
+12700,9777,9778,2,3,4,1,"{""GALEX AIS"": 2, ""SDSS DR18 PhotoObj"": 1, ""XMM 4XMM-DR13"": 1}",1,galex,deep_cosmos_9,galex
+12700,9777,9778,2,3,4,1,"{""GALEX AIS"": 2, ""SDSS DR18 PhotoObj"": 1, ""XMM 4XMM-DR13"": 1}",2,galex,deep_cosmos_9,galex
+12700,9777,9777,0,0,0,0,{},1,panstarrs1,deep_cosmos_9,panstarrs1
+12700,9777,9777,0,0,0,0,{},2,panstarrs1,deep_cosmos_9,panstarrs1
+12700,9777,9781,150,154,284,168,"{""AllWISE"": 30, ""Chandra CSC 2.0"": 3, ""DESI Legacy Surveys DR10"": 126, ""GALEX AIS"": 14, ""Gaia DR3"": 1, ""Galaxy Zoo DESI"": 1, ""Pan-STARRS1 DR2 MeanObject"": 58, ""SDSS DR18 PhotoObj"": 49, ""XMM 4XMM-DR13"": 2}",1,desi_legacy,deep_cosmos_9,desi_legacy
+12700,9777,9774,164,161,307,175,"{""2MASS PSC"": 1, ""AllWISE"": 35, ""Chandra CSC 2.0"": 5, ""DESI Legacy Surveys DR10"": 136, ""GALEX AIS"": 10, ""Gaia DR3"": 1, ""Galaxy Zoo DESI"": 1, ""Pan-STARRS1 DR2 MeanObject"": 64, ""SDSS DR18 PhotoObj"": 51, ""XMM 4XMM-DR13"": 3}",2,desi_legacy,deep_cosmos_9,desi_legacy
+12700,9777,9777,0,0,0,0,{},1,galaxy_zoo,deep_cosmos_9,galaxy_zoo
+12700,9777,9777,0,0,0,0,{},2,galaxy_zoo,deep_cosmos_9,galaxy_zoo
+12700,9777,9777,0,0,0,0,{},1,twomass,deep_cosmos_9,twomass
+12700,9777,9777,0,0,0,0,{},2,twomass,deep_cosmos_9,twomass
+12700,9777,9777,0,0,0,0,{},1,chandra,deep_cosmos_9,chandra
+12700,9777,9777,0,0,0,0,{},2,chandra,deep_cosmos_9,chandra
+12700,9777,9777,0,0,0,0,{},1,xmm,deep_cosmos_9,xmm
+12700,9777,9777,0,0,0,0,{},2,xmm,deep_cosmos_9,xmm
+12700,9777,9777,0,0,0,0,{},1,allwise,deep_cosmos_9,allwise
+12700,9777,9777,0,0,0,0,{},2,allwise,deep_cosmos_9,allwise
+12700,9777,9777,0,0,0,0,{},1,gaia,deep_cosmos_9,gaia
+12700,9777,9777,0,0,0,0,{},2,gaia,deep_cosmos_9,gaia
+12700,9777,9777,7,7,23,2,"{""2MASS PSC"": 2, ""AllWISE"": 2, ""Chandra CSC 2.0"": 1, ""DESI Legacy Surveys DR10"": 5, ""GALEX AIS"": 1, ""Gaia DR3"": 2, ""Pan-STARRS1 DR2 MeanObject"": 5, ""SDSS DR18 PhotoObj"": 5}",1,sdss,deep_cosmos_9,sdss
+12700,9777,9778,4,5,9,1,"{""AllWISE"": 1, ""DESI Legacy Surveys DR10"": 3, ""Pan-STARRS1 DR2 MeanObject"": 2, ""SDSS DR18 PhotoObj"": 3}",2,sdss,deep_cosmos_9,sdss

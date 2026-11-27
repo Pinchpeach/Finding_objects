@@ -128,6 +128,37 @@ def _first(row: Mapping[str, Any], keys: tuple[str, ...]) -> float | None:
     return None
 
 
+# Brightness of a detection, used only to order detections of one catalogue whose position errors are the same (2.61.0,
+# 01_source_association._order_key): one band per catalogue, as a magnitude.  A Legacy Surveys flux is in nanomaggies
+# (m = 22.5 - 2.5 log10 flux, Dey et al. 2019); a catalogue without a row here (SGA, Galaxy Zoo, X-ray, radio, ...)
+# has no brightness and keeps its detections in the order of position and identifier.
+TIE_BAND = {
+    "DESI Legacy Surveys DR10": ("flux_r", "nmgy"),
+    "Pan-STARRS1 DR2 MeanObject": ("rMeanPSFMag", "mag"),
+    "SDSS DR18 PhotoObj": ("modelMag_r", "mag"),
+    "AllWISE": ("W1mag", "mag"),
+    "2MASS PSC": ("Kmag", "mag"),
+    "GALEX AIS": ("NUVmag", "mag"),
+    "Gaia DR3": ("phot_g_mean_mag", "mag"),
+}
+
+
+def tie_magnitude(catalog: str, row: Mapping[str, Any]) -> float | None:
+    """Magnitude of a detection in the band of ``TIE_BAND`` (smaller = brighter), None when the catalogue has no band
+    or the value is missing, not finite, a flux <= 0 or an archive's missing-value code (SDSS -9999)."""
+    band = TIE_BAND.get(catalog)
+    if band is None:
+        return None
+    value = _first(row, (band[0],))
+    if value is None:
+        return None
+    if band[1] == "nmgy":
+        if value <= 0:
+            return None
+        value = 22.5 - 2.5 * math.log10(value)
+    return value if -30.0 < value < 60.0 else None
+
+
 # Object types that only say in which band something was detected (NED
 # IrS/UvS/XrayS/RadioS/VisS, SIMBAD IR/X/Rad/UV/...): NED keeps such entries
 # apart from the object until a cross-identification is made (Mazzarella et
