@@ -125,16 +125,15 @@ AMBIG_FIX = parse_ambig(os.environ.get("V2_ASSOC_AMBIG", ""))
 # Catalogues that have no entry in PROFILES and so are assumed to have 0.6'' position errors (DEFAULT_PROFILE).  Used only with
 # ``profiles``; the evidence for every number is in LITERATURE_ASSOCIATION_AMBIGUITY_2026-11-27.md.
 #   SDSS imaging: 45 mas rms per coordinate for r < ~20 point sources and ~100 mas at the survey limit, photon-statistics
-#     limited (Pier et al. 2003, AJ 125, 1559): 0.1''.  The stored rows have no raErr/decErr, so this is a fixed value for point
-#     sources; a galaxy (type 3) keeps the resolved-source floor the Legacy Surveys rows use (LS_RESOLVED_FLOOR_ARCSEC), because
-#     its model centre differs from another survey's at the arcsec level (see infer_poserr_arcsec).
+#     limited (Pier et al. 2003, AJ 125, 1559): 0.1'' for point sources brighter than r = 20 (the stored rows have no raErr/decErr),
+#     the old 0.6'' for everything else (see _extra_poserr).  Plus the imaging epoch from the row's ``mjd`` (infer_epoch).
 #   VLASS Epoch 1 Quick Look: 0.5'' for Dec > -20 deg, ~1'' further south (Gordon et al. 2021, ApJS 255, 30; NRAO users guide).
 #   LoTSS DR2: 0.2'' astrometric accuracy (0.5'' at S/N 5); the catalogue errors are statistical only (Shimwell et al. 2022).
 EXTRA_PROFILES = {
-    "SDSS DR18 PhotoObj": SurveyProfile(None, 0.1, None, 5.0),
     "VLASS": SurveyProfile(None, 0.5, None, 5.0),
     "LoTSS DR2": SurveyProfile(None, 0.3, None, 5.0),
 }
+SDSS_BRIGHT_PSF_MAG = 20.0  # psfMag_r of the point sources the 45 mas rms of Pier et al. 2003 holds for
 VLASS_SYSTEMATIC_ARCSEC = (0.5, 1.0)  # Dec >= -20 deg, further south
 LOTSS_SYSTEMATIC_ARCSEC = 0.2
 
@@ -302,6 +301,10 @@ def infer_epoch(catalog: str, row: Mapping[str, Any]) -> float | None:
     if explicit is not None and 1800.0 < explicit < 2200.0:
         return explicit
     mjd = _first(row, ("obs_mjd", "mjd_obs", "observation_mjd", "epochmean"))
+    if mjd is None and "profiles" in AMBIG_FIX and catalog == "SDSS DR18 PhotoObj":
+        # SDSS imaging epochs span 2000-2009; with a 0.1'' sigma (below) a star's proper motion since then (0.5'' in 10 yr at
+        # 50 mas/yr) must be propagated or the star leaves its group.  ``mjd`` is the observation date of the imaging.
+        mjd = _first(row, ("mjd",))
     if mjd is not None and 10000 < mjd < 100000:
         return 2000.0 + (mjd - 51544.5) / 365.25
     return profile_for(catalog, row).ref_epoch
@@ -310,9 +313,12 @@ def infer_epoch(catalog: str, row: Mapping[str, Any]) -> float | None:
 def _extra_poserr(catalog: str, row: Mapping[str, Any]) -> float | None:
     """Position errors of the catalogues in EXTRA_PROFILES (``profiles``; see the comment there)."""
     if catalog == "SDSS DR18 PhotoObj":
-        typ = _first(row, ("type",))
-        # type 6 = star (point source); 3 = galaxy, anything else is not a clean point source
-        return 0.1 if typ is not None and int(typ) == 6 else max(0.1, LS_RESOLVED_FLOOR_ARCSEC)
+        typ, mag = _first(row, ("type",)), _first(row, ("psfmag_r",))
+        # 0.1'' only where the literature value holds: a point source (type 6) brighter than r ~ 20 (Pier et al. 2003: 45 mas rms per
+        # coordinate there).  Fainter "stars" are partly compact galaxies and their centroids are photon-noise limited, and a
+        # galaxy centre differs from another survey's by an arcsec: they keep the old 0.6'' (calibration, 2.61.7: a flat 0.1'' split
+        # 330 of 108 932 rows of the nine fields from their Legacy Surveys / PS1 object).
+        return 0.1 if typ is not None and int(typ) == 6 and mag is not None and mag < SDSS_BRIGHT_PSF_MAG else DEFAULT_PROFILE.fallback_poserr_arcsec
     if catalog == "VLASS":
         # e_RAJ2000 / e_DEJ2000 of the stored rows peak at 2e-4 and are evidently degrees (0.07'' median): the statistical part is
         # far below the systematic one, which is what is used.

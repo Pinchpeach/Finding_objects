@@ -14,7 +14,7 @@ table also supports.  Nothing of the low-latitude confirmation cones was read ex
 
 | rule | value | calibration evidence (COSMOS2020 truth, fields 1-9) |
 |---|---|---|
-| `same`: two best candidates are one object | anchors of the two candidate groups closer than **0.3''** | resolving rows: 189 of 191 pairs share one truth source (98.9 %; 0.3-0.5'': 64 of 64, 0.5-0.8'': 62 %); AllWISE/GALEX rows: 24 of 26 (92 %) |
+| `same`: two best candidates are one object | anchors of the two candidate groups closer than **0.3''** | resolving rows: 188 of 189 pairs share one truth source (99.5 %; 0.3-0.5'': 64 of 64, 0.5-0.8'': 62 %); AllWISE/GALEX rows: 24 of 26 (92 %) |
 | `nearest`: the nearest candidate is clear | nearest **< 0.3''** and the next at least **3 times** further | resolving rows 132 joins, 0 wrong (Wilson upper 2.8 %); AllWISE 21 joins, 20 right, 0 wrong, 1 unknown |
 | `best` | reference only: the best-scoring candidate always | GALEX: 6 wrong of 103 known (5.8 %) |
 
@@ -60,3 +60,21 @@ Ambiguous rows that would join instead of anchoring a new object, and what the j
 * shuffle differences 0.
 
 If false links rise the variant is not proposed and the exchange table (links gained against false links added) is the result.
+
+**Correction (second commit, before any variant was run):** the first version of the `same` row of the threshold table said "189 of 191 pairs (98.9 %)"; the table `same_object_by_c12.csv` of the calibration run gives 188 of 189 (99.5 %).  Only that quoted evidence changed, not a threshold or a prediction.
+
+## Addendum (calibration fields only, before any confirmation set was run): `profiles` was revised twice
+
+Prediction 4 named the risk that a tighter SDSS sigma turns SDSS rows into new objects.  It happened and was measured on fields 1-9
+(Stage 1, then the COSMOS2020 association truth and the fragment count of the full pipeline):
+
+| version | SDSS rule | new objects (base 85 271) | matched (base 22 753) | extra one-catalogue objects next to a truth source (base 867) |
+|---|---|---|---|---|
+| v1 (commit 18d42c4) | every type 6 row 0.1'', galaxies 0.6'', no epoch | 85 366 (+95) | 22 693 | 889 (+22) |
+| v2 | v1 + the imaging epoch from `mjd` | 85 331 (+60) | 22 739 | not run |
+| v3 (final) | 0.1'' only for type 6 with psfMag_r < 20 (the range of the 45 mas of Pier et al. 2003), epoch from `mjd`; everything else 0.6'' | 85 274 (+3) | 22 775 | see the report |
+
+The 330 SDSS rows v1 split from their Legacy Surveys / PS1 object lie 0.55'' (median) from it: faint type 6 "stars" are partly compact
+galaxies and their centroids are photon-noise limited, which the 45 mas figure does not cover.  v3 is the version under test from here on; the
+confirmation fields are run with v3 only.  The low-latitude `a_all` run that was in progress when v2 and v3 were written was deleted and
+restarted from scratch with v3.
