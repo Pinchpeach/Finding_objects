@@ -352,7 +352,7 @@ That cap is the share of the quasars that has enough surveys at all:
 | | >= 22 | 8.0 % | 0.7 % |
 | objects of the plane, cones with Legacy Surveys | 21-22 | 71.4 % | 25.9 % |
 | SDSS sky benchmark, spectroscopic quasars (SDSS imaging counted) | r >= 22 | 100 % | 96.8 % |
-| DESI external benchmark, spectroscopic quasars | r >= 22 | 90.7 % | 66.9 % |
+| DESI external benchmark, spectroscopic quasars | r >= 22 | 85.8 % | 55.4 % |
 
 (`faint_cost.py`, `survey_distribution.py`, `benchmark_cost.py`.)  **Outside Legacy Surveys the plane's imaging is Pan-STARRS1, AllWISE,
 Gaia and 2MASS: at i >= 21 only 1 % of the objects have 3 surveys, so `surveys3` there can label nothing fainter than i ~ 21 QSO**
@@ -409,4 +409,9 @@ have exactly 2 surveys): `surveys2` keeps them and `surveys3` holds them; whethe
 GALEX; no ZTF, radio, X-ray or SDSS imaging), so its "fewer than 3: 12.6 %" is an upper bound for a pipeline run; the "+ SDSS imaging"
 column (0.42 %) is the closer figure.
 (5) *Collection time.*  The 13:15:59 UTC start is a file time in the work session's container, not something the repository records.
+(6) *Code review (Codex): the benchmark magnitude.*  `benchmark_cost.py` meant Pan-STARRS1 r first and Legacy Surveys r only where PS1 has
+none, but it read the files in name order (`desi_legacy` before `panstarrs1`) and never replaced the LS value.  Fixed and the table and
+`decision_table.csv` regenerated: only the DESI sets at r >= 22 move (external: fewer than 2 / 3 surveys 9.3 / 33 % -> 14.2 / 44.6 %;
+fusion 11.1 / 36 % -> 17.0 / 46.0 %; the DESI ceiling of the decision table 0.907 / 0.669 -> 0.858 / 0.554), `sdss_sky` uses the SDSS r and
+is unchanged.
 

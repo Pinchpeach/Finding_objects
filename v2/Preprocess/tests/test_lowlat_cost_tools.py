@@ -89,3 +89,18 @@ def test_spectro_held_counts_only_what_the_base_labels_qso(tmp_path):
     o = pd.read_csv(out)
     assert list(o.object_id) == ["O1"] and o.n_surveys.iloc[0] == 1 and o.label_v.iloc[0] == "UNKNOWN"
     assert "of 1 labelled QSO by the base, 1 are not" in run.stdout
+
+
+def test_benchmark_magnitude_prefers_ps1_over_legacy_surveys(tmp_path):
+    """Codex review of 2.61.5: Pan-STARRS1 r first, Legacy Surveys r only where PS1 has none (the files are read in name order,
+    desi_legacy before panstarrs1)."""
+    truth = pd.DataFrame(dict(benchmark_id=["a", "b", "c"]))
+    pd.DataFrame(dict(benchmark_id=["a", "b"], catalog_object_id=["l1", "l2"], flux_r=[10 ** ((22.5 - 23.0) / 2.5), 10 ** ((22.5 - 21.0) / 2.5)])
+                 ).to_csv(tmp_path / "desi_legacy_trd.csv.gz", index=False)  # fmt: skip
+    pd.DataFrame(dict(benchmark_id=["a", "c"], catalog_object_id=["p1", "p3"], rMeanPSFMag=[21.5, -999.0])).to_csv(
+        tmp_path / "panstarrs1_trd.csv.gz", index=False)
+    s = BC.survey_table(truth, tmp_path, "*_trd.csv.gz").set_index("benchmark_id")
+    assert s.loc["a", "mag_cat"] == pytest.approx(21.5)  # PS1 wins over LS (23.0)
+    assert s.loc["b", "mag_cat"] == pytest.approx(21.0)  # LS where PS1 has no row
+    assert np.isnan(s.loc["c", "mag_cat"])  # PS1 -999 is no magnitude, no LS row
+    assert s.n_catalogues.tolist() == [2, 1, 1]
