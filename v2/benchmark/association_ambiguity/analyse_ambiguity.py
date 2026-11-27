@@ -72,6 +72,9 @@ def load(stage1: Path) -> pd.DataFrame:
     return pd.concat(parts, ignore_index=True)
 
 
+FLAG_COLUMNS = ["nearest_sep", "second_sep", "nearest_nsep", "second_nsep", "clear_distance", "clear_nsep", "same_object", "nearest_not_best"]
+
+
 def flags(d: pd.DataFrame) -> pd.DataFrame:
     """Per ambiguous detection: the distances and the clear / same-object flags."""
     amb = d[d.association_status == "ambiguous_new"].copy()
@@ -86,7 +89,8 @@ def flags(d: pd.DataFrame) -> pd.DataFrame:
                          clear_nsep=bool(n1 <= 1.0 and n2 > 3.0) if len(sep) > 1 else False,
                          same_object=bool(getattr(r, "diag_c12_nsep", math.inf) < 1.0),
                          nearest_not_best=bool(o[0] != 0)))  # fmt: skip
-    return pd.concat([amb.reset_index(drop=True), pd.DataFrame(rows)], axis=1)
+    # the columns also when nothing is ambiguous (V2_ASSOC_AMBIG=best resolves every case), so that tables() writes zeros (Codex review of 2.61.8)
+    return pd.concat([amb.reset_index(drop=True), pd.DataFrame(rows, columns=FLAG_COLUMNS)], axis=1)
 
 
 def tables(d: pd.DataFrame, out: Path) -> None:
@@ -100,13 +104,13 @@ def tables(d: pd.DataFrame, out: Path) -> None:
     t = pd.concat([total, a], axis=1).fillna(0).reset_index()
     t["ambiguous_pct"] = (100 * t.ambiguous / t.detections).round(2)
     for c in ("clear_distance", "clear_nsep", "same_object", "nearest_not_best"):
-        t[c + "_pct_of_ambiguous"] = (100 * t[c] / t.ambiguous.where(t.ambiguous > 0)).round(1)
+        t[c + "_pct_of_ambiguous"] = (100 * t[c].astype(float) / t.ambiguous.astype(float).where(t.ambiguous > 0)).round(1)
     t.to_csv(out / "ambiguous_by_catalog.csv", index=False)
     # all catalogues of a set together
     s = (t.groupby("set")[["detections", "ambiguous", "clear_distance", "clear_nsep", "same_object", "nearest_not_best"]].sum().reset_index())
     s["ambiguous_pct"] = (100 * s.ambiguous / s.detections).round(2)
     for c in ("clear_distance", "clear_nsep", "same_object"):
-        s[c + "_pct_of_ambiguous"] = (100 * s[c] / s.ambiguous).round(1)
+        s[c + "_pct_of_ambiguous"] = (100 * s[c].astype(float) / s.ambiguous.astype(float).where(s.ambiguous > 0)).round(1)
     s.to_csv(out / "ambiguous_by_set.csv", index=False)
     # by local density
     d["density_class"] = pd.cut(d.density, DENSITY_EDGES, labels=DENSITY_NAMES, right=False)

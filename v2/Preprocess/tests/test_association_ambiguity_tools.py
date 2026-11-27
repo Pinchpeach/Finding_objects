@@ -70,6 +70,8 @@ def test_ambiguous_row_flags_distance_and_same_object():
     assert r.clear_distance and not r.clear_nsep  # 0.05'' against 0.60'': clear in distance, the likelihood ratio of the nsep is not
     assert r.same_object  # c12_nsep < 1
     assert not r.nearest_not_best
+    none = an.flags(d[d.association_status == "matched"])  # nothing ambiguous left (``best``): the columns are still there
+    assert len(none) == 0 and {"clear_distance", "clear_nsep", "same_object", "nearest_not_best"} <= set(none.columns)
 
 
 def test_lowlat_exchange_matches_each_variant_on_its_own_coordinates():
@@ -88,4 +90,14 @@ def test_lowlat_exchange_matches_each_variant_on_its_own_coordinates():
         assert "long table" in str(e)
     else:
         raise AssertionError("the wide table must be refused")
+
+
+def test_ambiguity_tables_are_written_when_nothing_is_ambiguous(tmp_path):
+    """Codex review of 2.61.8: with every ambiguity resolved the tables hold zeros instead of raising."""
+    an = load("analyse_ambiguity")
+    d = pd.DataFrame(dict(association_status=["matched", "new"], object_id=["o1", "o2"], catalog="AllWISE", candidate_count=[1, 0], set="s",
+                          region="r", density=[10.0, 20.0], poserr_arcsec=[0.5, 0.5]))  # fmt: skip
+    an.tables(d, tmp_path)
+    s = pd.read_csv(tmp_path / "ambiguous_by_set.csv")
+    assert int(s.ambiguous.iloc[0]) == 0 and int(s.detections.iloc[0]) == 2
 
