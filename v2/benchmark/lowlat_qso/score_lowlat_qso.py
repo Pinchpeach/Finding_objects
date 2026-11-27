@@ -372,8 +372,15 @@ def coverage(res: dict) -> dict:
                 complete=n_miss == 0)  # fmt: skip
 
 
+# per_truth columns the summary reads; the object columns exist only when some quasar had a counterpart (e.g. not in a
+# run whose regions all came back empty), so they are added as missing values before grouping.
+SUMMARY_COLS = ["region", "name", "sample", "cls", "b", "ebv", "imag", "z", "label", "basis", "status", "cause", "std_ebv",
+                "has_ls", "has_wise", "has_ps1", "r90"]  # fmt: skip
+
+
 def summarise(res: dict) -> dict[str, pd.DataFrame]:
     T = res["per_truth"]
+    T = T.reindex(columns=list(dict.fromkeys([*T.columns, *SUMMARY_COLS])))
     q_all = T[T.cls == "qso"].copy()
     q = q_all[q_all.label != MISSING].copy()  # a quasar of a region without a record is not a miss: it was not measured
     have = q[q.label != "NO_OBJECT"].copy()

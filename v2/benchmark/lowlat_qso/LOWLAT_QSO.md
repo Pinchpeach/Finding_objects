@@ -159,4 +159,5 @@ Checked against the committed tables (`results_2026-11-27/`) and the code; nothi
    aborted the whole scoring; the compact record is now completed with the missing columns and its quasar scores as `NO_OBJECT`.
    A region without a record used to drop its quasars from every denominator silently; they are now `REGION_MISSING` in
    `per_truth.csv`, still in no denominator (they were not measured), counted in a `coverage` row of `recall_summary.csv` and in
-   `coverage.json` (copied into the workflow's `run.json`), and the score log prints `INCOMPLETE` with the missing regions.
+   `coverage.json` (copied into the workflow's `run.json`), and the score log prints `INCOMPLETE` with the missing regions.  A run where no quasar has a counterpart (every region
+   empty) no longer stops at the summary: the per-object columns are added as missing values before grouping.

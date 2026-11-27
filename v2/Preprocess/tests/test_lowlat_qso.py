@@ -163,6 +163,22 @@ def test_empty_region_and_missing_region(tmp_path):
     assert dens.regions == 2 and dens.qso_labelled_other == 0
 
 
+def test_summary_when_no_quasar_has_an_object(tmp_path):
+    """Every scored region empty: the per-object columns never appear, the summary still runs (all NO_OBJECT)."""
+    truth = pd.DataFrame(dict(sample=["huo"], name=["q1"], ra=[150.0], dec=[2.0], l=[100.0], b=[-12.0], z=[1.0], imag=[18.0],
+                              ebv=[0.1], cls=["qso"], also_in=[""]))  # fmt: skip
+    regions = pd.DataFrame(dict(name=["r1"], stratum=["b10-15"], kind=["qso"], ra=[150.0], dec=[2.0]))
+    (tmp_path / "r1").mkdir()
+    pd.DataFrame(columns=["object_id", "ra", "dec", "catalogs", "primary_class"]).to_csv(tmp_path / "r1" / "objects.csv.gz",
+                                                                                        index=False)  # fmt: skip
+    res = S.score_regions(regions, truth, tmp_path, radius_arcmin=3.0)
+    assert "has_ls" not in res["per_truth"]
+    tabs = S.summarise(res)
+    rs = tabs["recall_summary"].set_index(["by", "bin"])
+    assert rs.loc[("all", "all"), "n"] == 0 and rs.loc[("all", "all incl. no object"), "n"] == 1
+    assert S.coverage(res)["complete"]
+
+
 def test_region_draw_is_deterministic_and_non_overlapping():
     rng = np.random.default_rng(3)
     n = 800
