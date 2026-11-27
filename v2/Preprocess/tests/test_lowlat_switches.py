@@ -249,6 +249,23 @@ def test_held_back_qso_is_visible_with_its_reason(tmp_path, monkeypatch):
         assert ur.reason(r.to_dict()) == r[LL.HOLD_COLUMN]
     two = on.loc["TWO"]
     assert two.primary_class == "QSO" and two[LL.HOLD_COLUMN] == "" and two.secondary_class == ""
+    # Codex review of 2.61.3: a resolved source that the BGS galaxy test accepts must still abstain when its QSO is held
+    # (the hold must not make a settled QSO label "unsettled" and so open the BGS galaxy override)
+    sure = ev + [{"rule_id": "LS-CKNN-001", "class": "QSO", "score": 0.95, "raw_score": 0.95, "kind": "continuous_score"},
+                 {"rule_id": "LS-MORPH-002", "class": "POINT_SOURCE", "score": 0.9, "raw_score": 0.9, "kind": "binary_evidence"},
+                 {"rule_id": "WISE-AGN-R90-001", "class": "EXTRAGALACTIC", "score": 0.9, "raw_score": 0.9, "kind": "binary_evidence"}]  # fmt: skip
+    d2 = pd.DataFrame({"object_id": ["SURE"], "ra": [150.10], "dec": [2.20], "catalogs": ["DESI Legacy Surveys DR10"],
+                       "std_mag__ls_r": [19.0], "evidence_json": [json.dumps(sure)]})  # fmt: skip
+    d2.to_csv(tmp_path / "e2.csv", index=False)
+    monkeypatch.setattr(s5.BGS, "galaxy_test", lambda frame: np.ones(len(frame), bool))
+    monkeypatch.delenv("V2_LOWLAT_QSO")
+    s5.run(tmp_path / "e2.csv", tmp_path / "bgs_off.csv")
+    r = pd.read_csv(tmp_path / "bgs_off.csv", keep_default_na=False).iloc[0]
+    assert r.primary_class == "QSO" and r.primary_confidence >= s5.BGS_KEEP_P  # settled: the BGS override does not apply
+    monkeypatch.setenv("V2_LOWLAT_QSO", "surveys2")
+    s5.run(tmp_path / "e2.csv", tmp_path / "bgs_on.csv")
+    r = pd.read_csv(tmp_path / "bgs_on.csv", keep_default_na=False).iloc[0]
+    assert (r.primary_class, r.classification_status, r.secondary_class_reason) == ("UNKNOWN", "LOW_CONFIDENCE", LL.HELD_REASON)
 
 
 def _ab_fixture(tmp_path, labels_by_variant, missing=()):
@@ -293,3 +310,45 @@ def test_variants_without_false_labels(tmp_path):
     assert cov["complete"] and cov["regions_compared"] == 2
     assert d.loc["base", "false_all_n"] == 0 and d.loc["base", "recall_qso"] == 1 and d.loc["switch", "recall_qso"] == 2
     assert d.loc["switch", "quasars_lost_vs_control"] == 0
+
+
+def test_object_table_keeps_metadata_of_labels_a_later_variant_adds(tmp_path):
+    """Codex review of 2.61.3: an object only a later variant labels QSO keeps its coordinates and catalogue count."""
+    import subprocess
+
+    truth = pd.DataFrame(dict(sample=["huo"], name=["q1"], ra=[150.0], dec=[2.0], l=[100.0], b=[-12.0], z=[1.0], imag=[18.0],
+                              ebv=[0.1], cls=["qso"], also_in=[""]))  # fmt: skip
+    regions = pd.DataFrame(dict(name=["r1"], stratum=["b10-15"], kind=["qso"], ra=[150.0], dec=[2.0]))
+    truth.to_csv(tmp_path / "truth.csv", index=False)
+    regions.to_csv(tmp_path / "regions.csv", index=False)
+    a = 1 / 3600
+    for v, extra in (("base", "STAR"), ("later", "QSO")):  # the neighbour at 30'' is QSO only in the later variant
+        d = tmp_path / v / "r1"
+        d.mkdir(parents=True)
+        pd.DataFrame([dict(object_id="O1", ra=150.0, dec=2.0, catalogs="A|B|C", primary_class="QSO", parent_object_id=np.nan),
+                      dict(object_id="O2", ra=150.0 + 30 * a, dec=2.0, catalogs="A|B", primary_class=extra, parent_object_id=np.nan)]
+                     ).to_csv(d / "objects.csv.gz", index=False)  # fmt: skip
+    out = tmp_path / "out"
+    script = ROOT.parent / "benchmark" / "lowlat_qso" / "ab_variants.py"
+    run = subprocess.run([sys.executable, str(script), "--variants", f"base={tmp_path / 'base'}", f"later={tmp_path / 'later'}",
+                          "--regions", str(tmp_path / "regions.csv"), "--truth", str(tmp_path / "truth.csv"), "--out", str(out)],
+                         capture_output=True, text=True)  # fmt: skip
+    assert run.returncode == 0, run.stderr
+    o = pd.read_csv(out / "qso_labelled_not_sample_by_variant.csv.gz").set_index("object_id")
+    assert o.loc["O2", "ra"] == pytest.approx(150.0 + 30 * a) and o.loc["O2", "n_catalogs"] == 2
+    assert not o.loc["O2", "base"] and o.loc["O2", "later"]
+
+
+def test_depth_split_uses_the_common_regions(tmp_path):
+    """Codex review of 2.61.3: by_depth.py leaves a region out of every variant when one variant lacks its record."""
+    import subprocess
+
+    _ab_fixture(tmp_path, {"base": ("QSO", "QSO"), "switch": ("QSO", "QSO")}, missing={("switch", "r2")})
+    script = ROOT.parent / "benchmark" / "lowlat_qso" / "by_depth.py"
+    run = subprocess.run([sys.executable, str(script), "--variants", f"base={tmp_path / 'base'}", f"switch={tmp_path / 'switch'}",
+                          "--regions", str(tmp_path / "regions.csv"), "--truth", str(tmp_path / "truth.csv"),
+                          "--out", str(tmp_path / "depth.csv")], capture_output=True, text=True)  # fmt: skip
+    assert run.returncode == 0, run.stderr
+    assert "INCOMPLETE" in run.stdout
+    d = pd.read_csv(tmp_path / "depth.csv")
+    assert int(d.regions.sum()) == 1 and int(d.quasars.sum()) == 1

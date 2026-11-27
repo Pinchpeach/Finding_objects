@@ -145,6 +145,17 @@ def _coverage_module():
     return mod
 
 
+def common_regions(regions: pd.DataFrame, specs) -> tuple[pd.DataFrame, list, dict]:
+    """The regions every variant root has a record for (``specs``: [(name, root)]), the regions left out and, per variant, the
+    ones it lacks.  Comparisons between variants (ab_variants.py, by_depth.py) use only the common set (2.61.3 review)."""
+    missing = {nm: sorted(n for n in regions.name if not (Path(root) / n / "objects.csv.gz").exists()) for nm, root in specs}
+    excluded = sorted(set().union(*missing.values())) if missing else []
+    if excluded:
+        print(f"INCOMPLETE: {len(excluded)} region(s) lack a record in at least one variant and are left out of every variant: "
+              + ", ".join(excluded))  # fmt: skip
+    return regions[~regions.name.isin(excluded)], excluded, missing
+
+
 def region_archives(o: pd.DataFrame, region_dir: Path) -> tuple[str, str]:
     """(status, missing) of a region's collection, as ``catalog_coverage`` writes them into every result row
     (``run_archives_status``: complete / key_archives_missing / archives_missing / degraded / unknown).  A region without

@@ -7,7 +7,8 @@ The review of 2.61.2 (LOWLAT_QSO.md, Section 6) showed that the density of label
 sign of false labels: where Legacy Surveys reaches r ~ 23.5 the high-latitude quasar density to r < 23 is ~300 deg^-2, outside it
 (PS1 + AllWISE depth) there is no quasar density to compare with.  A cone counts as "LS" when the control variant (the first)
 has at least one object whose catalogues include DESI Legacy Surveys DR10.  One row per (cone group), columns: quasars, quasars
-labelled QSO by the control, and per variant the labels not on a sample quasar (objects and per deg^2).
+labelled QSO by the control, and per variant the labels not on a sample quasar (objects and per deg^2).  Only the regions every
+variant has a record for are compared (score_lowlat_qso.common_regions; a missing one is announced as INCOMPLETE, 2.61.3 review).
 """
 
 from __future__ import annotations
@@ -35,6 +36,7 @@ def main() -> int:
     a = ap.parse_args()
     regions = pd.read_csv(a.regions)
     regions = regions[regions.kind == "qso"]
+    regions, _, _ = S.common_regions(regions, [v.split("=", 1) for v in a.variants])
     truth = pd.read_csv(a.truth)
     area = math.pi * (a.radius / 60.0) ** 2
     control_root = Path(a.variants[0].split("=", 1)[1])

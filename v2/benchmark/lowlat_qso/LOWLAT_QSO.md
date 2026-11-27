@@ -287,4 +287,11 @@ nothing changes (no new column, the same labels).
    quasars stayed in the recall denominator and counted as lost against the control while the density left the region out.  A
    variant with no QSO label outside the sample now gives zero counts instead of an error.  The committed tables are unchanged:
    both sets have a record for every region, and every variant has false labels.
+9. **Code review (Codex), second round.**  (a) A held QSO on a resolved source that the BGS galaxy test accepts became a
+   confident GALAXY: the hold made the label count as "not settled", which opens the BGS galaxy override.  The hold is now kept apart
+   from that gate, so such an object abstains (UNKNOWN, with the held QSO reading) as every other held QSO does.  Recall and false
+   density are the same either way, since GALAXY and UNKNOWN both count as "not QSO", so the committed numbers do not move.
+   (b) The per-object table kept the metadata only of the control's objects; a label added by a later variant now keeps its own.
+   No committed variant added labels.  (c) `by_depth.py` uses the same common region set as `ab_variants.py`
+   (`score_lowlat_qso.common_regions`).
 
