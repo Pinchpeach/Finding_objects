@@ -219,7 +219,12 @@ def cmd_later(a) -> int:
 
     def patched(path, name):
         mod = orig_load(path, name)
-        if not hasattr(mod, "run") or "01_source_association" in str(path) or "high_confidence" in str(path):
+        if "01_source_association" in str(path):
+            # the pipeline loads its own Stage 1 module: disable that one, so the prepared (permuted) association is
+            # what Stage 2 reads (2.61.0 review, Codex: patching a separately loaded module left Stage 1 to rewrite it)
+            mod.run = lambda raw, o: None
+            return mod
+        if not hasattr(mod, "run") or "high_confidence" in str(path):
             return mod
         real = mod.run
 
@@ -227,6 +232,8 @@ def cmd_later(a) -> int:
             work = state["work"]
             before = {p: p.stat().st_mtime_ns for p in work.glob("*.csv")}
             res = real(*args, **kw)
+            if not state.get("permute"):
+                return res
             rng = np.random.default_rng(state["seed"])
             for p in work.glob("*.csv"):
                 if p.name == "source_association.csv" or (p in before and p.stat().st_mtime_ns == before[p]):
@@ -248,17 +255,9 @@ def cmd_later(a) -> int:
             d = pd.read_csv(ref_assoc, dtype=str, keep_default_na=False, low_memory=False)
             d.iloc[np.random.default_rng(seed).permutation(len(d))].to_csv(work / "source_association.csv", index=False)
         state.update(work=work, seed=seed)
-        if seed is None:  # reference: no permutation
-            P._load = orig_load
-        else:
-            P._load = patched
-        # Stage 1 is skipped by pointing it at the stored association
-        s1_run = s1.run
-        s1.run = lambda raw, o: None
-        try:
-            P.run(work, raw_dir=base_raw, ra=a.ra, dec=a.dec, radius=a.radius)
-        finally:
-            s1.run = s1_run
+        P._load = patched  # Stage 1 is skipped in every run: Stage 2 reads the stored association (reference: as is)
+        state["permute"] = seed is not None
+        P.run(work, raw_dir=base_raw, ra=a.ra, dec=a.dec, radius=a.radius)
         if seed is not None:
             r = later_diff(pd.read_csv(out / "ref" / "classified_objects.csv", low_memory=False),
                            pd.read_csv(work / "classified_objects.csv", low_memory=False))  # fmt: skip
