@@ -1,0 +1,147 @@
+name: Low-latitude quasar recall (measurement)
+
+# Recall of the QSO label on spectroscopically confirmed quasars behind the Galactic plane (Huo et al. 2025, Fu et al. 2022),
+# v2/benchmark/lowlat_qso/LOWLAT_QSO.md.  169 regions of radius 3' drawn by a fixed rule
+# (benchmark/lowlat_qso/select_fields_lowlat.py, SHA-256 of fields_lowlat.csv locked below), collected blind (spectroscopic
+# and literature catalogues dropped), classified, compacted per region, scored once by score_lowlat_qso.py.
+# Measurement only: nothing in the classifier reads these results.  Manual.
+on:
+  workflow_dispatch:
+    inputs:
+      note: {description: "why this run", default: "low-latitude QSO recall"}
+concurrency:
+  group: lowlat-qso-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  LOCK_SHA256: 8b0f52e28ea3819fd6a9ea97ab922c305acd2a404c5dcc8df9981337a7e4d0d7
+
+jobs:
+  lock:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.m.outputs.matrix }}
+      version: ${{ steps.m.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: m
+        run: |
+          echo "$LOCK_SHA256  v2/benchmark/lowlat_qso/fields_lowlat.csv" | sha256sum -c - || { echo "fields_lowlat.csv differs from the locked list"; exit 1; }
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import csv, json
+          rows = [dict(name=r["name"], ra=r["ra"], dec=r["dec"]) for r in csv.DictReader(open("v2/benchmark/lowlat_qso/fields_lowlat.csv"))]
+          print("matrix=" + json.dumps({"f": rows}))
+          print("version=" + open("v2/VERSION").read().strip())
+          PY
+  health:
+    needs: lock
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas numpy scipy requests astropy astroquery pyvo
+      - run: python -u .github/scripts/archive_health.py
+  field:
+    needs: [lock, health]
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix: ${{ fromJSON(needs.lock.outputs.matrix) }}
+    env:
+      NAME: ${{ matrix.f.name }}
+      RA: ${{ matrix.f.ra }}
+      DEC: ${{ matrix.f.dec }}
+      R: "3"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas numpy scipy requests astropy astroquery pyvo
+      - name: Collect and classify blind
+        env:
+          V2_SKIP_COLLECTORS: blind
+        run: |
+          d=$((RANDOM % 90)); echo "start delay $d s"; sleep $d
+          python -u v2/pipeline.py --ra $RA --dec $DEC --radius $R --work /tmp/field
+      - name: Ask a failed Legacy Surveys archive again once
+        continue-on-error: true
+        run: python -u .github/scripts/retry_failed_archive.py /tmp/field $RA $DEC $R --only desi_legacy --wait 120
+      - name: Blind run on the safe subset and compact record
+        run: |
+          raw=$(ls -d /tmp/field/raw/*/ | head -1)
+          mkdir -p /tmp/blindraw
+          for f in "$raw"*.csv; do
+            case "$(basename "$f")" in
+              lamost_spectroscopy_*|sdss_spectroscopy_*|desi_spectroscopy_*|desi_fastspec_*|simbad_*|ned_*|bzcat_*|pn_spectroscopy_*|hash_pn_*|asas_sn_supernova_*|asiago_supernova_*|agb_suh2021_*|atnf_pulsar_*|galaxy_clusters_*) ;;
+              *) cp "$f" /tmp/blindraw/;;
+            esac
+          done
+          python -u v2/pipeline.py --raw-dir /tmp/blindraw --ra $RA --dec $DEC --radius $R --work /tmp/blind
+          out=/tmp/ll/$NAME; mkdir -p $out/raw
+          python -u v2/benchmark/lowlat_qso/score_lowlat_qso.py compact --work /tmp/blind --out $out
+          cp /tmp/blindraw/*.csv $out/raw/
+          cp /tmp/field/raw/*/collection_summary_*.csv $out/collection_summary.csv || true
+      - name: Gaia source of this region (tap = ESA archive, vizier_fallback = VizieR copy)
+        continue-on-error: true
+        run: |
+          python - <<'PY'
+          import glob, os
+          import pandas as pd
+          files = sorted(glob.glob("/tmp/field/raw/*/gaia_dr3_ra*.csv"))
+          s = "none"
+          if files:
+              st = pd.read_csv(files[0], usecols=lambda c: c == "gaia_base_query_status", dtype=str, keep_default_na=False)
+              s = "tap" if st.shape[1] == 0 else (str(st.iloc[0, 0]) if len(st) else "empty")
+          open(f"/tmp/ll/{os.environ['NAME']}/gaia_source.txt", "w").write(s + "\n")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ll-${{ matrix.f.name }}
+          path: /tmp/ll/
+          retention-days: 90
+          if-no-files-found: ignore
+  score:
+    needs: [lock, health, field]
+    if: ${{ !cancelled() && needs.lock.result == 'success' && needs.health.result == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas numpy scipy astropy
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: ll-*
+          path: /tmp/ll
+          merge-multiple: true
+      - name: Score
+        env:
+          V: ${{ needs.lock.outputs.version }}
+          NOTE: ${{ github.event.inputs.note }}
+        run: |
+          out=v2/benchmark/lowlat_qso/results_$V; mkdir -p $out
+          python -u v2/benchmark/lowlat_qso/score_lowlat_qso.py score --root /tmp/ll \
+            --regions v2/benchmark/lowlat_qso/fields_lowlat.csv --truth v2/benchmark/lowlat_qso/lowlat_truth.csv.gz \
+            --radius 3 --out $out | tee $out/score.log
+          python - <<PY
+          import collections, glob, json, os, datetime
+          src = collections.Counter((open(f).read().strip() or "empty") for f in glob.glob("/tmp/ll/*/gaia_source.txt"))
+          json.dump({"version": os.environ["V"], "commit": "${{ github.sha }}", "regions": len(glob.glob("/tmp/ll/*/objects.csv.gz")),
+                     "regions_locked": 169, "list_sha256": os.environ["LOCK_SHA256"], "gaia_source_regions": dict(src),
+                     "date": datetime.date.today().isoformat(), "note": os.environ["NOTE"],
+                     "coverage": json.load(open("$out/coverage.json"))}, open("$out/run.json", "w"), indent=1)
+          PY
+      - name: Commit
+        if: github.ref_name != 'main'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add v2/benchmark/lowlat_qso
+          git commit -m "Low-latitude quasar recall: ${{ needs.lock.outputs.version }}" || exit 0
+          bash .github/scripts/push_with_retry.sh "${{ github.ref_name }}"

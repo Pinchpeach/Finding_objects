@@ -1,0 +1,26 @@
+{
+ "version": "2.61.0",
+ "commit": "e857c19930c4d85dc2e93ff4d2f6bb5ef9b19c2f",
+ "fields_scored": 60,
+ "fields_locked": 60,
+ "list_sha256": "21c42406ce3700ce7c271f2773a81297484e4f7543a821aaa05cf521f378b7e4",
+ "date": "2026-11-27",
+ "note": "release scoring 2.61.0 (Stage 1 row-order independence; first coarse change since 2.60.4); Gaia from the VizieR DR3 copy while the ESA archive is down until 2026-12-02",
+ "gaia_release": "DR3",
+ "gaia_source_regions": {
+  "vizier_fallback": 60
+ },
+ "ls_source_regions": {
+  "tap": 44,
+  "empty": 14,
+  "viewer_fallback": 2
+ },
+ "core_failed_regions": {
+  "gaia_dr3": 0,
+  "desi_legacy": 0,
+  "panstarrs1": 0,
+  "allwise": 0,
+  "twomass": 0
+ },
+ "regions_with_summary": 60
+}
