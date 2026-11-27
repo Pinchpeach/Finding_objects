@@ -11,11 +11,16 @@
                          cluster in a few regions, so the Poisson interval is too narrow: 30 of 170 sit in one cone)
   non-quasars            how many of the 19 known stars and galaxies are labelled QSO
   exchange               false objects removed and sample quasars lost against the first variant (the control)
+
+Every variant is scored on the same regions (2.61.3 review): a region without a record in any variant's root is left out of all of
+them (recall, density and the paired exchange alike), listed in ``coverage.json`` and announced as INCOMPLETE, so an interrupted run
+cannot look like quasars lost or a smaller false density.
 """
 
 from __future__ import annotations
 
 import argparse
+import json
 import math
 import sys
 from pathlib import Path
@@ -66,6 +71,16 @@ def main() -> int:
     regions, truth = pd.read_csv(a.regions), pd.read_csv(a.truth)
     if a.only:
         regions = regions[regions.name.isin(a.only.split(","))]
+    # one common set of regions: a region missing from any variant is left out of every variant
+    specs = [v.split("=", 1) for v in a.variants]
+    missing = {nm: sorted(n for n in regions.name if not (Path(root) / n / "objects.csv.gz").exists()) for nm, root in specs}
+    excluded = sorted(set().union(*missing.values()))
+    if excluded:
+        print(f"INCOMPLETE: {len(excluded)} region(s) lack a record in at least one variant and are left out of every variant: "
+              + ", ".join(excluded))  # fmt: skip
+        regions = regions[~regions.name.isin(excluded)]
+    (a.out / "coverage.json").write_text(json.dumps(dict(regions_compared=int(len(regions)), regions_excluded=excluded,
+                                                         missing_by_variant=missing, complete=not excluded), indent=1) + "\n")  # fmt: skip
     rows, strata, control = [], [], None
     per_object, per_quasar = None, None  # one table each, one column per variant (the labels the numbers come from)
     for spec in a.variants:

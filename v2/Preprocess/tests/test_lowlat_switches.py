@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import math
 import sys
 from pathlib import Path
@@ -248,3 +249,47 @@ def test_held_back_qso_is_visible_with_its_reason(tmp_path, monkeypatch):
         assert ur.reason(r.to_dict()) == r[LL.HOLD_COLUMN]
     two = on.loc["TWO"]
     assert two.primary_class == "QSO" and two[LL.HOLD_COLUMN] == "" and two.secondary_class == ""
+
+
+def _ab_fixture(tmp_path, labels_by_variant, missing=()):
+    """Regions r1, r2 (one sample quasar each) and one root per variant with the given QSO labels of the quasars' objects."""
+    import subprocess
+
+    truth = pd.DataFrame(dict(sample=["huo", "huo"], name=["q1", "q2"], ra=[150.0, 160.0], dec=[2.0, 2.0], l=[100.0] * 2,
+                              b=[-12.0] * 2, z=[1.0] * 2, imag=[18.0] * 2, ebv=[0.1] * 2, cls=["qso"] * 2, also_in=[""] * 2))  # fmt: skip
+    regions = pd.DataFrame(dict(name=["r1", "r2"], stratum=["b10-15"] * 2, kind=["qso"] * 2, ra=[150.0, 160.0], dec=[2.0, 2.0]))
+    truth.to_csv(tmp_path / "truth.csv", index=False)
+    regions.to_csv(tmp_path / "regions.csv", index=False)
+    specs = []
+    for v, labs in labels_by_variant.items():
+        for reg, ra, lab in (("r1", 150.0, labs[0]), ("r2", 160.0, labs[1])):
+            if (v, reg) in missing:
+                continue
+            d = tmp_path / v / reg
+            d.mkdir(parents=True)
+            pd.DataFrame([dict(object_id=f"O_{reg}", ra=ra, dec=2.0, catalogs="A|B|C", primary_class=lab, parent_object_id=np.nan,
+                               classification_basis="evidence", classification_status="CLASSIFIED")]).to_csv(d / "objects.csv.gz", index=False)  # fmt: skip
+        specs.append(f"{v}={tmp_path / v}")
+    script = ROOT.parent / "benchmark" / "lowlat_qso" / "ab_variants.py"
+    out = tmp_path / "out"
+    run = subprocess.run([sys.executable, str(script), "--variants", *specs, "--regions", str(tmp_path / "regions.csv"),
+                          "--truth", str(tmp_path / "truth.csv"), "--out", str(out)], capture_output=True, text=True)  # fmt: skip
+    assert run.returncode == 0, run.stderr
+    return pd.read_csv(out / "ab_variants.csv").set_index("variant"), json.loads((out / "coverage.json").read_text()), run.stdout
+
+
+def test_variants_are_compared_on_the_same_regions(tmp_path):
+    """2.61.3 review: a region missing from one variant is left out of every variant (not counted as quasars lost)."""
+    d, cov, log = _ab_fixture(tmp_path, {"base": ("QSO", "QSO"), "switch": ("QSO", "QSO")}, missing={("switch", "r2")})
+    assert cov["regions_excluded"] == ["r2"] and cov["regions_compared"] == 1 and not cov["complete"]
+    assert "INCOMPLETE" in log
+    assert d.loc["base", "quasars"] == d.loc["switch", "quasars"] == 1
+    assert d.loc["switch", "quasars_lost_vs_control"] == 0
+
+
+def test_variants_without_false_labels(tmp_path):
+    """2.61.3 review: no QSO label outside the sample gives zero counts, not an error."""
+    d, cov, _ = _ab_fixture(tmp_path, {"base": ("QSO", "STAR"), "switch": ("QSO", "QSO")})
+    assert cov["complete"] and cov["regions_compared"] == 2
+    assert d.loc["base", "false_all_n"] == 0 and d.loc["base", "recall_qso"] == 1 and d.loc["switch", "recall_qso"] == 2
+    assert d.loc["switch", "quasars_lost_vs_control"] == 0

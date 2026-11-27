@@ -55,6 +55,8 @@ import pandas as pd
 MATCH_ARCSEC = 2.0
 MISSING = "REGION_MISSING"  # label of a truth object whose region has no compact record
 # per_region columns (a run where no region has a record still has them, so the density and coverage code can run)
+# qso_other_objects columns (a run without such objects still has them)
+OTHER_COLS = ["region", "stratum", "kind", "object_id", "ra", "dec", "ps1_i", "p_qso", "p_qso_evidence", "basis", "n_catalogs"]
 REGION_COLS = ["name", "stratum", "kind", "status", "archives_status", "archives_missing", "objects", "qso_labelled",
                "qso_other", "objects_i_lt_195", "qso_other_i_lt_195", "truth_in_cone", "area_deg2"]  # fmt: skip
 CLASSES = ("STAR", "GALAXY", "QSO")
@@ -383,7 +385,7 @@ def score_regions(regions: pd.DataFrame, truth: pd.DataFrame, root: Path, radius
                              objects_i_lt_195=int(np.sum(all_i < 19.5)), qso_other_i_lt_195=int(np.sum(qi < 19.5)),
                              truth_in_cone=len(inside), area_deg2=math.pi * (radius_arcmin / 60.0) ** 2))  # fmt: skip
     return dict(per_truth=pd.DataFrame(rows), per_region=pd.DataFrame(reg_rows).reindex(columns=REGION_COLS), unique_quasars=uq,
-                qso_other=pd.DataFrame(other_rows))
+                qso_other=pd.DataFrame(other_rows).reindex(columns=OTHER_COLS))
 
 
 def _bin_table(df: pd.DataFrame, col: str, bins, label: str, absval=False) -> list[dict]:

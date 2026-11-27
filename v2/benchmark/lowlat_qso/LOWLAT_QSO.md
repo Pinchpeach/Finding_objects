@@ -282,4 +282,9 @@ nothing changes (no new column, the same labels).
    class, because that is evidence too, when the object has fewer surveys.  Spectroscopic targets normally have imaging rows as
    well, but the blind runs drop spectra, so this was not measured.  Exempting a spectroscopic class should be considered before
    any default is changed.
+8. **Code review (Codex) of the comparison tool.**  `ab_variants.py` now scores every variant on one common set of regions: a
+   region without a record in any variant is left out of all of them and listed in `coverage.json` (INCOMPLETE).  Before, its
+   quasars stayed in the recall denominator and counted as lost against the control while the density left the region out.  A
+   variant with no QSO label outside the sample now gives zero counts instead of an error.  The committed tables are unchanged:
+   both sets have a record for every region, and every variant has false labels.
 
