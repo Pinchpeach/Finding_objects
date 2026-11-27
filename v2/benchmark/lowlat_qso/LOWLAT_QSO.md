@@ -1,4 +1,4 @@
-# Low-latitude quasar recall (2.61.1, measurement only)
+# Low-latitude quasar recall (2.61.2, measurement only)
 
 **Question.** The locked set C scored on 2026-11-25 had a low-latitude pool (`cpln`, 11 regions, 879 truth objects) that
 was all stars, so nothing measures what the classifier does with a galaxy or a quasar behind the Galactic plane.  This
@@ -77,8 +77,10 @@ what the priors *cost in recall*; what removing them would cost in false QSO lab
 **False-positive scale.**  In the 150 cones (1.18 deg^2), 170 objects other than the sample quasars were labelled QSO (144 +- 11
 deg^-2; 197 +- 25 at 10-15 deg, 293 +- 31 at 15-20 deg), 23 of them with PS1 i < 19.5 (19.5 +- 4.1 deg^-2).  The quasar surface
 density at i < 19 to 19.3 is about 5-8 deg^-2 at high latitude (Richards et al. 2006, Table 2: N(<i) = 5.3 at i = 18.98, 7.9 at
-i = 19.2; 0.3 < z < 2.2) and the known low-latitude quasars are < 1 deg^-2 (Huo et al. 2025, Sec. V.1), so most of these labels
-are false: at least 60-70 % even if every real quasar of that depth were labelled QSO, and more with extinction.  100 of the 170
+i = 19.2; 0.3 < z < 2.2) and the known low-latitude quasars are < 1 deg^-2 (Huo et al. 2025, Sec. V.1), so most of these 23
+labels are false: at least 60-70 % even if every real quasar of that depth were labelled QSO, and more with extinction.  The
+all-depth 144 deg^-2 is not by itself a sign of false labels (the high-latitude density to r < 23 is ~300 deg^-2); split by
+depth it is (Section 6, item 1).  100 of the 170
 objects have no PS1 magnitude and 77 are single-survey rows (48 Legacy Surveys-only, 28 AllWISE-only): the QSO label rests on one survey.  The priors that cost recall at low latitude exist because of this (`05_likelihood_vectors.py`: a field at
 l = 182 deg, b = +2 deg had 616 "QSO" among G ~ 20 stars).
 
@@ -95,6 +97,8 @@ l = 182 deg, b = +2 deg had 616 "QSO" among G ~ 20 stars).
 - Purity cannot be measured: 19 non-quasars.  The density comparison is a plausibility check with a literature density that is for
   high latitude, SDSS-selected quasars.
 - Gaia is the VizieR copy (no variability flags): re-run when the ESA archive is back.
+- **These 169 regions are now a development set** (Section 6, item 5): a prior or rule tuned on these numbers must be checked
+  on a new draw locked before collection.
 
 ## 5. Reproduce
 
@@ -107,3 +111,46 @@ python score_lowlat_qso.py score --root ROOT --regions fields_lowlat.csv --truth
 ```
 or run the workflow `Low-latitude quasar recall (measurement)` (169 region jobs + score job, results committed to
 `v2/benchmark/lowlat_qso/results_<VERSION>/` on a non-main branch).
+
+## 6. Review before merge (2.61.2)
+
+Checked against the committed tables (`results_2026-11-27/`) and the code; nothing in the measurement was re-run or changed.
+
+1. **The false-QSO density depends on the depth of the region.**  The all-depth 144 +- 11 deg^-2 is below the high-latitude
+   quasar density to r < 23 (Palanque-Delabrouille et al. 2016, Tables 5 and 7: 296-311 deg^-2; DESI selects > 200 deg^-2 at
+   16.5 < r < 23, Chaussidon et al. 2023; `v2/LITERATURE_FAINT_QSO_2026-11-23.md`), so on its own it does not show false labels.
+   Split by whether the region has Legacy Surveys DR10 data (the sample quasar has an LS row; r reaches ~23.5 there):
+
+   | regions (quasar-centred) | area deg^2 | QSO labels other than the sample quasar | deg^-2 | median per region |
+   |---|---|---|---|---|
+   | inside LS DR10 (14) | 0.110 | 88 | **800 +- 85** | 3 (= 382 deg^-2) |
+   | outside (136, PS1 + AllWISE depth) | 1.068 | 82 | 77 +- 9 | 0 |
+
+   The 14 LS regions are at |b| = 13-20 deg with E(B-V) = 0.02-0.13, where extinction lowers the real count.  800 deg^-2 is
+   2.6-2.7 times the total quasar density to r < 23 at high latitude, so **at least ~60 % of the QSO labels in LS regions are
+   false** (still >= 50 % if the true density to r ~ 23.5 were 400 deg^-2, an extrapolation of the same luminosity function), even
+   if every real quasar there were labelled QSO.  All 14 sample quasars in these regions were labelled QSO: there the priors do not
+   cost recall and do not stop the false labels either.  Outside LS, 77 deg^-2 at PS1/AllWISE depth cannot be judged without a
+   quasar density at the same depth (21 of the 82 have PS1 i < 19.5, the part covered by the 60-70 % statement above).
+2. **Where the 77 single-survey QSO labels are** (`n_catalogs == 1` in `qso_other_objects.csv`, joined to the LS presence of the
+   region): 49 in 11 of the 14 LS regions, **36 of them in three** (lq2_012 at l = 195, b = +13.8: 18; lq3_016 at l = 21, b = -16.8:
+   10; lq3_036 at l = 50, b = -18.0: 8); 28 in 21 regions without LS (lq3_003: 4, lq3_006: 3, the rest 1-2).  By |b|: 0-5 deg 0,
+   5-10 deg 3, 10-15 deg 28, 15-20 deg 46.  The LS-only labels are a few crowded LS regions, not a uniform rate.
+3. **Why an AllWISE-only row can be labelled QSO** although WISE colours alone are not evidence (2.44.0).  2.44.0 made only the
+   continuous features `WISE-COLOR-001` support-only (`SUPPORT_ONLY_RULES`, `05_likelihood_vectors.py`).  The two cut rules on
+   AllWISE, `WISE-AGN-001` (Stern et al. 2012: W1 - W2 >= 0.8, W2 <= 15.05, S/N >= 10) and `WISE-AGN-R90-001` (Assef et al. 2018),
+   emit EXTRAGALACTIC evidence, which the fusion spreads over GALAXY and QSO (`GROUPS`), and the support colours then tip it to
+   QSO.  They are the only rules that read an AllWISE row (`classification_rules.csv`), so each of the 28 AllWISE-only labels (all
+   170 labels have `classification_basis == evidence`, none comes from the sparse priors) had one of them.  R90 is gated by its sky (|b| > 10 deg, > 30 deg from the Galactic Centre) and by the near-infrared point-source
+   test; **the Stern rule has no latitude gate** (`04_build_evidence.py`, `WISE-AGN-001` branch), although
+   `LITERATURE_REVIEW_2026-10.md` (WISE-AGN-001 row) recommended down-weighting it at |b| < 10 deg because young stars, AGB stars
+   and planetary nebulae also have W1 - W2 > 0.8 there.  Here 25 of the 28 single-survey labels outside LS regions are at |b| = 10-20
+   deg, so a |b| < 10 deg gate alone would move at most 3: the open question is the single-survey row, not only the latitude.  Not changed (measurement only).
+4. **Upper bound.**  Stated in Section 1 ("Why the recall is an upper bound": both samples were selected from PS1 + AllWISE
+   colours, i < 20) and Section 4; the summary line of the CHANGELOG carries it too.
+5. **Overlap with the locked set C and development-set status.**  The 169 centres against `v2/benchmark/fields_c.csv` (60 regions,
+   radius 12'): the nearest pair is 0.52 deg (31') apart, more than 12' + 3', so no cone overlaps a set C region and set C stays
+   unseen (one centre is within 1 deg of a set C region, 22 within 5 deg).  The 169 regions themselves are now **seen**: a position
+   or QSO magnitude prior, a Stern latitude gate or a single-survey rule tuned on these numbers makes them a development set, and
+   a claim about low-latitude QSO recall after such a change needs a new draw (quasars of the two samples not drawn here, or
+   another spectroscopic sample) whose list is locked before collection, as this one was.

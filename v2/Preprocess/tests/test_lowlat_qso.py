@@ -1,4 +1,4 @@
-"""Low-latitude quasar recall measurement (2.61.1): the scoring, the causes of a miss, the region draw."""
+"""Low-latitude quasar recall measurement (2.61.2): the scoring, the causes of a miss, the region draw."""
 
 from __future__ import annotations
 

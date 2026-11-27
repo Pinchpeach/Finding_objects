@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The regions of the low-latitude quasar recall measurement, drawn by a rule fixed before any data is collected (2.61.1).
+"""The regions of the low-latitude quasar recall measurement, drawn by a rule fixed before any data is collected (2.61.2).
 
     python select_fields_lowlat.py --truth lowlat_truth.csv.gz --out fields_lowlat.csv
 

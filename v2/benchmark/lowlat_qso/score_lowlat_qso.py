@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Recall of the QSO label on spectroscopically confirmed quasars behind the Galactic plane (2.61.1).  Measurement only.
+"""Recall of the QSO label on spectroscopically confirmed quasars behind the Galactic plane (2.61.2).  Measurement only.
 
     python score_lowlat_qso.py compact --work DIR --out DIR
     python score_lowlat_qso.py score --fields DIR/<name>/objects.csv.gz ... --regions fields_lowlat.csv \\
