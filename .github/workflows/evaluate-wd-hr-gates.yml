@@ -40,6 +40,10 @@ jobs:
           print(d.star_truth_class.value_counts().to_string())
           PY
       - name: Crossmatch truth sets to Gaia DR3
+        env:
+          # one line per VizieR mirror request (host, status or exception, seconds): when the crossmatch falls back to
+          # VizieR and fails, the log shows what each mirror did, not only the last one (2.61.6 review)
+          V2_HTTP_LOG: "1"
         run: |
           python v2/Classifier/collect_star_gaia.py --truth v2/Classifier/star_truth.csv --out /tmp/sdss_star.csv
           python v2/Classifier/collect_star_gaia.py --truth v2/Classifier/lamost_star_external_truth.csv --out /tmp/lamost_star.csv
