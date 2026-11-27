@@ -8,7 +8,10 @@ import numpy as np
 import pandas as pd
 
 
-VIZIER_RETRIES = 4
+VIZIER_RETRIES = 2  # attempts at a batch size before the batch is halved
+VIZIER_RETRIES_SMALL = 4  # attempts at the smallest size (MIN_SPLIT), where there is nothing left to halve
+RETRY_SLEEP_S = 15.0  # backoff after a failed attempt, on top of the 3-5 s pause before every request (throttle)
+MIN_SPLIT = 50  # the batch is halved down to this many positions
 # VizieR cones are centred on the catalogue's J2000 positions, which for
 # Gaia DR3 are propagated from epoch 2016.0 by the proper motion; CDS XMatch
 # matches the epoch-2016 RA_ICRS / DE_ICRS.  The fallback queries this much
@@ -16,6 +19,59 @@ VIZIER_RETRIES = 4
 # run() keeps the XMatch meaning (a white dwarf moving 0.5"/yr is 8" apart
 # between the two epochs; 59 of 290 LAMOST WD matches move > 1").
 EPOCH_MARGIN_ARCSEC = 10.0
+
+
+def _unreadable_answer(e: Exception) -> bool:
+    """The failure is about the answer, not about reaching a mirror: its body was cut off (a connection reset
+    during the transfer, a VOTable that stops half way) or the parser rejected it.  A long answer is what a mirror
+    cuts off, so a smaller batch is the remedy; a refused connection or an error status is not about the size."""
+    import requests
+
+    text = f"{type(e).__name__} {e}"
+    return isinstance(e, (requests.exceptions.ChunkedEncodingError, requests.exceptions.ContentDecodingError, ValueError, SyntaxError)) or any(
+        k in text for k in ("TableParseError", "no element found", "cut off", "ChunkedEncodingError", "IncompleteRead")
+    )
+
+
+def _batch_rows(v, chunk: pd.DataFrame, radius_arcsec: float, cct, throttle, attempts: int) -> pd.DataFrame | None:
+    """Gaia DR3 rows of the VizieR copy around the positions of ``chunk``, in the XMatch layout (None: no row).
+
+    One attempt is one multi-target request, which ``throttle`` already sends to the VizieR mirrors in turn when one
+    refuses, times out, answers an error status or cuts the VOTable off.  An attempt that still fails (the answer could
+    not be read: ``TableParseError`` of a body that is complete but wrong, a failure of every mirror) marks the mirror
+    of the last answer as failing (``throttle.distrust_last_mirror``), so the next attempt goes to another mirror, not
+    to the one that just failed (until 2.61.6 a retry asked the same preferred mirror four times).  After ``attempts``
+    failures the last exception is raised."""
+    import time
+
+    from astropy.coordinates import SkyCoord
+    import astropy.units as u
+
+    coords = SkyCoord(chunk.ra.to_numpy(float) * u.deg, chunk.dec.to_numpy(float) * u.deg)
+    failure = None
+    for attempt in range(attempts):
+        try:
+            res = v.query_region(coords, radius=(radius_arcsec + EPOCH_MARGIN_ARCSEC) * u.arcsec, catalog="I/355/gaiadr3")
+            break
+        except Exception as e:  # noqa: BLE001 - transient transfer / parse / server errors
+            failure = e
+            mirror = throttle.distrust_last_mirror()
+            print(f"[collect_star_gaia] VizieR batch of {len(chunk)} (mirror {mirror}): {e!r}; attempt {attempt + 1}/{attempts}", flush=True)
+            if attempt < attempts - 1:
+                time.sleep(RETRY_SLEEP_S * (attempt + 1))
+    else:
+        raise failure
+    if not len(res):
+        return None
+    part = cct.from_vizier_batch(res[0].to_pandas(), chunk)
+    if {"RA_ICRS", "DE_ICRS"} <= set(part.columns):  # epoch 2016.0, as CDS XMatch
+        part["angDist"] = cct.sep_arcsec(
+            part.truth_ra.to_numpy(float),
+            part.truth_dec.to_numpy(float),
+            pd.to_numeric(part.RA_ICRS, errors="coerce").to_numpy(),
+            pd.to_numeric(part.DE_ICRS, errors="coerce").to_numpy(),
+        )
+    return part
 
 
 def _vizier_fallback(truth: pd.DataFrame, radius_arcsec: float) -> pd.DataFrame:
@@ -31,40 +87,32 @@ def _vizier_fallback(truth: pd.DataFrame, radius_arcsec: float) -> pd.DataFrame:
     cct = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(cct)
     from astroquery.vizier import Vizier
-    from astropy.coordinates import SkyCoord
-    import astropy.units as u
-    import time
 
-    # cct.vizier_multi's batches (500 positions, the XMatch layout through
-    # cct.from_vizier_batch), each retried: one answer cut off in transfer
-    # (ChunkedEncodingError, 2026-11-14) otherwise ended a 30-minute crossmatch.
+    # cct.vizier_multi's batches (500 positions, the XMatch layout through cct.from_vizier_batch), each retried over
+    # the mirrors (_batch_rows).  An answer cut off in transfer (ChunkedEncodingError, 2026-11-14; a VOTable cut off,
+    # CI run 2026-11-27, and a connection reset by CfA for every 500-position batch from this container) ended a
+    # 30-minute crossmatch: when the answer cannot be read the batch is halved, and the smaller size is kept for the
+    # rest (the result does not depend on how the positions are batched: each truth object keeps its nearest row).
     v = Vizier(columns=["**"], row_limit=-1)
     v.TIMEOUT = 300
     t = truth[["benchmark_id", "ra", "dec"]]
     parts = []
-    for i in range(0, len(t), cct.VIZIER_BATCH):
-        chunk = t.iloc[i : i + cct.VIZIER_BATCH]
-        coords = SkyCoord(chunk.ra.to_numpy(float) * u.deg, chunk.dec.to_numpy(float) * u.deg)
-        for attempt in range(VIZIER_RETRIES):
-            try:
-                res = v.query_region(coords, radius=(radius_arcsec + EPOCH_MARGIN_ARCSEC) * u.arcsec, catalog="I/355/gaiadr3")
-                break
-            except Exception as e:  # noqa: BLE001 - transient transfer / server errors
-                if attempt == VIZIER_RETRIES - 1:
-                    raise
-                print(f"[collect_star_gaia] VizieR batch at {i}: {e!r}; retry {attempt + 1}", flush=True)
-                time.sleep(15 * (attempt + 1))
-        if len(res):
-            part = cct.from_vizier_batch(res[0].to_pandas(), chunk)
-            if {"RA_ICRS", "DE_ICRS"} <= set(part.columns):  # epoch 2016.0, as CDS XMatch
-                part["angDist"] = cct.sep_arcsec(
-                    part.truth_ra.to_numpy(float),
-                    part.truth_dec.to_numpy(float),
-                    pd.to_numeric(part.RA_ICRS, errors="coerce").to_numpy(),
-                    pd.to_numeric(part.DE_ICRS, errors="coerce").to_numpy(),
-                )
+    size, i = cct.VIZIER_BATCH, 0
+    while i < len(t):
+        chunk = t.iloc[i : i + size]
+        small = len(chunk) <= MIN_SPLIT
+        try:
+            part = _batch_rows(v, chunk, radius_arcsec, cct, throttle, VIZIER_RETRIES_SMALL if small else VIZIER_RETRIES)
+        except Exception as e:  # noqa: BLE001
+            if small or not _unreadable_answer(e):
+                raise
+            size = max(MIN_SPLIT, len(chunk) // 2)
+            print(f"[collect_star_gaia] VizieR answers of {len(chunk)} positions are unreadable: batches of {size} from here on", flush=True)
+            continue
+        if part is not None and len(part):
             parts.append(part)
-        print(f"[collect_star_gaia] VizieR batch {i + len(chunk)}/{len(t)}", flush=True)
+        i += len(chunk)
+        print(f"[collect_star_gaia] VizieR batch {i}/{len(t)}", flush=True)
     return pd.concat(parts, ignore_index=True) if parts else pd.DataFrame(columns=["benchmark_id", "angDist"])
 
 
