@@ -749,3 +749,24 @@ def test_a_cut_answer_is_reported_even_when_the_other_mirrors_refuse():
         req(None, "GET", "https://vizier.cds.unistra.fr/viz-bin/votable?-source=I/355/gaiadr3")
     assert len(seen) == len(throttle.VIZIER_HOSTS)
 
+
+
+@pytest.mark.parametrize("broken", ["ChunkedEncodingError", "ContentDecodingError"])
+def test_a_body_broken_in_transfer_is_reported_even_when_the_other_mirrors_refuse(broken):
+    """Codex review of b51d74b: CfA's body breaks off in transfer, every later mirror refuses or times out; the
+    request ends in the truncation error, not in the last connection error, so the caller halves the batch."""
+    import requests
+
+    seen = []
+    errors = {h: requests.exceptions.ConnectionError("refused") for h in throttle.VIZIER_HOSTS}
+    errors["vizier.cfa.harvard.edu"] = getattr(requests.exceptions, broken)("IncompleteRead(1024 bytes read)")
+    errors[throttle.VIZIER_HOSTS[-1]] = requests.exceptions.ReadTimeout("read timeout=300")
+
+    def send(self, method, url, *a, **k):
+        seen.append(url)
+        raise next(e for h, e in errors.items() if h in url)
+
+    req = throttle._with_mirrors(send)
+    with pytest.raises(requests.exceptions.ChunkedEncodingError, match=rf"in transfer \({broken}\)"):
+        req(None, "GET", "https://vizier.cds.unistra.fr/viz-bin/votable?-source=I/355/gaiadr3")
+    assert len(seen) == len(throttle.VIZIER_HOSTS)

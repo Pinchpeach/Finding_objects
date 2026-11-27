@@ -485,7 +485,7 @@ def _with_mirrors(send):
         # empty cone.  When no mirror gives data they end in an error (the collector reports it) instead of being
         # returned as a table-less answer, which astroquery reads as "no rows" (the 2026-11-07 kind of silence).
         lacked = None
-        cut = None  # the last answer that stopped before </VOTABLE> (2.61.6)
+        cut = None  # the last answer that stopped before </VOTABLE> or broke off in transfer (2.61.6)
         retried: set = set()  # mirrors asked again after a database error of their own
         for i, host in enumerate(hosts):
             if i:
@@ -507,6 +507,8 @@ def _with_mirrors(send):
                 _unreachable[host] = time.monotonic() + MIRROR_STICKY_S
                 _remember(host, False)
                 last = exc
+                if isinstance(exc, (requests.exceptions.ChunkedEncodingError, requests.exceptions.ContentDecodingError)):
+                    cut = exc  # the body broke off in transfer: the same "too long" signal as a cut VOTable (Codex, 2.61.6)
                 continue
             if _truncated_votable(resp):  # 200, but the table stops half way: a failure of this mirror (2.61.6)
                 _log(host, f"{resp.status_code} truncated", t0)
@@ -593,10 +595,12 @@ def _with_mirrors(send):
             # A mirror served the table but cut it off, and no mirror gave it whole (the others cut it too, refused, timed
             # out, lacked it or answered table-less): the request is too long for the mirrors, not absent.  That signal
             # outranks a later connection error or an empty answer, so a caller can ask again in smaller pieces
-            # (Codex review of 2.61.6: CfA cut, the other five refused -> ConnectionError, and the batch was never halved).
+            # (Codex review of 2.61.6: CfA cut, the other five refused -> ConnectionError, and the batch was never halved;
+            # the same for a body that broke off in transfer, ChunkedEncodingError / ContentDecodingError, on review of b51d74b).
+            how = f"in transfer ({type(cut).__name__})" if isinstance(cut, Exception) else "before </VOTABLE>"
             raise requests.exceptions.ChunkedEncodingError(
-                f"VizieR: a mirror cut off a VOTable before </VOTABLE> and no mirror gave it whole ({catalog or 'the table'})"
-            )
+                f"VizieR: a mirror cut off a VOTable {how} and no mirror gave it whole ({catalog or 'the table'})"
+            ) from (cut if isinstance(cut, Exception) else None)
         if empty is not None:
             return empty  # a table-less answer without an error that no mirror contradicted (2.47.0)
         if lacked is not None:
