@@ -68,6 +68,7 @@
 | 2.51.0 | 60 (58 with truth) | 3,150 | 99.62 % (99.34–99.86) | 93.95 % (79.33–99.47) | first look, 2026-11-12, archive health check passed. See the reading notes below the table. |
 | 2.52.0 | 60 (59 with truth) | 3,170 | 99.65 % (99.40–99.86) | 94.03 % (81.87–99.45) | 2026-11-14, commit `16cfdc3`. Third attempt: the first two (11-13, 11-14) stopped at the archive gate when Legacy Surveys timed out. No core collector failed this time. See the reading notes. |
 | 2.60.4 | 60 (59 with truth) | 3,162 | 99.65 % (99.40–99.86) | 94.02 % (81.87–99.45) | 2026-11-25, commit `a1dc84f`, run 45590188973. Coarse code of 2.60.2 / 2.60.3. Second attempt: the first (run 45583226997, same day) stopped at the archive gate when the Data Lab TAP answered 502 in 40 regions. No core collector failed this time. Gaia: ESA archive in 57 regions, VizieR DR3 copy in 3. First look with the pool split. See the reading notes. |
+| 2.61.0 | 60 (59 with truth) | 3,170 | 99.65 % (99.40–99.86) | 94.03 % (81.87–99.45) | 2026-11-27, commit `e857c19`, run 45989734347. Stage 1 row-order independence (2.61.0), the first coarse change since 2.60.4. Gaia: VizieR DR3 copy in all 60 regions (the ESA archive is down from 2026-11-25 to 12-02). Legacy Surveys: Data Lab TAP in 44 regions, empty answer in 14, viewer copy in 2. No core collector failed. See the reading notes. |
 
 **Reading the 2.51.0 score**
 - **Composition:** the truth mix is about 95.5 % stars. The majority-class baseline is 95.46 %.
@@ -106,7 +107,25 @@
   - **csth** is the only pool with a galaxy-rich truth (93 galaxies). There the pipeline is 2.2 points above Gaia DSC on the objects DSC covers, but on 218 objects the interval is wide. Its 2 errors are both galaxies, and at least one of them was labelled QSO, though the pool's truth has no QSO (QSO precision 0 % there).
   - **clam** holds 65 % of the objects and all 7 QSOs, so it dominates the all-region number.
 - **Collection conditions** (`run.json`, 2.60.4): no core collector failed (gaia_dr3, desi_legacy, panstarrs1, allwise, twomass: 0 regions each). Gaia DR3 came from the ESA archive in 57 regions and from the VizieR copy in 3 (cpln_310p53, clam_317p12, clam_283p35: in these three the collector's ESA query failed or ran past its time budget, and it fell back to the copy. This was before the archive's announced shutdown at 11:00 UTC.). The copy changed 6 of 26,024 coarse labels in the deep COSMOS comparison (`WORK_REPORT_2026-11-24.md`).
-- **Fragments:** truth objects with single-catalogue fragments nearby fell from 744 to 555. This is the fragment folding of 2.54.0; it does not enter the accuracy.
+- **Fragments:** truth objects with single-catalogue fragments nearby fell from 744 to 555. It does not enter the accuracy. *(Corrected in 2.61.1: this note first put the fall down to the fragment folding of 2.54.0. That folding acts on `objects_summary.csv` and the app, while this count reads every row of `classified_objects.csv`, grouped rows included, so it cannot be the cause. The 2.61.0 reading below gives what is known.)*
 - **Unmatched truth:** 1.86 % (2.52.0: 1.61 %).
 - **Blind input for the Gaia DR4 comparison:** the `craw-<region>` artifacts of run 45590188973 (90 days, until about 2027-02-23). The first attempt's artifacts lack Legacy Surveys in 40 regions and are not used.
 - **2.53.0–2.60.3 are not scored separately.** This is the first look since 2.52.0, so it covers every coarse-class change made in between (the r-undetected path of 2.55.0 among them) together, not one by one.
+
+**Reading the 2.61.0 score (2026-11-27)**
+- **Why now:** 2.61.0 made Stage 1 association independent of the input row order (`WORK_REPORT_2026-11-25g.md`). The order can change which rows join an object, so it can change the coarse label; it is the first coarse change since 2.60.4.
+- **Same as 2.52.0 and 2.60.4 within the noise:** 11 errors in 3,170 objects, stars 5, galaxies 5, QSO 1 (class totals 3,019 / 144 / 7). Accuracy and balanced accuracy agree with 2.60.4 to 0.01 point.
+- **Baselines:** majority class 95.24 %. On the 97.8 % with Gaia DSC, DSC scores 99.52 % and the pipeline 99.81 %.
+- **By pool** (`summary_by_pool.csv`):
+
+  | Pool | Regions with truth | Objects (STAR / GALAXY / QSO) | Accuracy (95 % CI) | Balanced accuracy | Majority class | DSC / pipeline on DSC (coverage) |
+  |---|---|---|---|---|---|---|
+  | clam | 30 | 2,073 (2,015 / 51 / 7) | 99.61 % (99.31–99.86) | 93.21 % | 97.20 % | 99.51 / 99.76 % (98.5 %) |
+  | cpln | 11 | 879 (879 / 0 / 0) | 99.89 % (99.61–100) | – | 100 % | 100 / 100 % (99.2 %) |
+  | csth | 18 | 218 (125 / 93 / 0) | 99.08 % (97.22–100) | 98.92 % | 57.34 % | 97.30 / 99.46 % (84.9 %) |
+
+  cpln and csth are identical to 2.60.4. clam scored 8 more objects (7 stars, 1 galaxy) at the same accuracy.
+- **Collection conditions** (`run.json`): no core collector failed. Gaia DR3 came from the VizieR copy in all 60 regions (2.60.4: 3), because the ESA archive is down until 12-02; on the deep COSMOS fields the copy changed 6 of 26,024 coarse labels (`WORK_REPORT_2026-11-24.md`). Legacy Surveys answered from the Data Lab TAP in 44 regions, with no rows in 14 (outside the footprint or empty), and from the viewer copy in 2 (`ls_source_regions`, recorded since 2.60.10).
+- **Fragments 555 → 742** (`truth_with_fragments`, every row within the match radius, grouped rows included). The set B A/B of the same commit (`experiments/assoc_order_2_61_0/`, 78 regions with truth, 3,427 objects) **rules out the new order as the cause**: it lowers the count rather than raising it (base 881 against 910 with the old file order and 913 with position order; top-level only 198 against 217 and 220). The deep COSMOS fields showed the same direction (1,532 → 1,217, `WORK_REPORT_2026-11-25g.md`). The 2.61.0 look instead matches 2.52.0 on every input-dependent column: objects 3,170 (2.52.0: 3,170), unmatched truth 1.61 % (1.61 %), DSC coverage 97.8 % (97.8 %), fragments 742 (744). 2.60.4 is the outlier on all of them (3,162, 1.86 %, 98.0 %, 555). So the likeliest cause is that day's collection: the Data Lab TAP answered 502 that morning, and the per-region Legacy Surveys source was not yet recorded. Fewer Legacy Surveys rows would mean fewer LS-only fragments and fewer matched truth objects, which is what 2.60.4 shows. This is not proven: per-object records are not kept (rule 2).
+- **New column:** `truth_with_fragments_top` = 245 (2.60.11: top-level objects only, so grouping shows in it). There is no earlier set C value to compare it with.
+- **The README / overview row keeps 2.60.4** (the score of the documented program 2.60.2) until the next release documents 2.61.x.

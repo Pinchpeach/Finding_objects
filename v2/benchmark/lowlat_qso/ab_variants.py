@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The recall / false-QSO-density trade of the low-latitude switches, one row per variant (2.61.2).
+"""The recall / false-QSO-density trade of the low-latitude switches, one row per variant (2.61.3).
 
     python ab_variants.py --variants base=ROOT1 surveys2=ROOT2 ... --regions fields_lowlat.csv --truth lowlat_truth.csv.gz --out DIR
 

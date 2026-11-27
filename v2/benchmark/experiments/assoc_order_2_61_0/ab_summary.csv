@@ -1,0 +1,6 @@
+variant,n,acc,unknown,fixed,broken,truth_with_fragments,truth_with_fragments_top,top_level_objects_in_fields,recall_STAR,recall_GALAXY,recall_QSO,n_fields,bal_acc,acc_lo,acc_hi,bal_lo,bal_hi,precision_STAR,precision_GALAXY,precision_QSO,baseline_majority,baseline_dsc,ours_on_dsc,dsc_coverage,unmatched_truth_pct,mcnemar_p,only_variant_right,only_base_right,w1_changed,w1_median_abs_diff
+base,3427,99.066,10,0,0,881,198,1169075,99.75,96.24,96.0,78,97.33,98.65,99.42,95.09,98.86,99.64,99.49,84.21,STAR 80.71,97.67,99.67,88.9,2.0,,,,,
+fraghc,3427,99.066,10,0,0,881,197,1168300,99.75,96.24,96.0,78,97.33,98.65,99.42,95.09,98.86,99.64,99.49,84.21,STAR 80.71,97.67,99.67,88.9,2.0,1.0,0.0,0.0,0.0,0.0
+fragm15hc,3427,99.095,10,1,0,881,193,1167071,99.75,96.4,96.0,78,97.38,98.69,99.44,95.22,98.86,99.67,99.49,84.21,STAR 80.71,97.67,99.67,88.9,2.0,1.0,1.0,0.0,0.0,0.0
+tieorderfile,3427,99.095,10,1,0,910,217,1169091,99.75,96.4,96.0,78,97.38,98.69,99.44,95.1,98.93,99.64,99.49,85.71,STAR 80.71,97.67,99.67,88.9,2.0,1.0,1.0,0.0,0.0,0.0
+tieorderposition,3427,99.095,10,1,0,913,220,1169076,99.75,96.4,96.0,78,97.38,98.69,99.44,95.1,98.93,99.64,99.49,85.71,STAR 80.71,97.67,99.67,88.9,1.97,1.0,1.0,0.0,0.0,0.0

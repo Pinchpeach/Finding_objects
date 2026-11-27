@@ -1,0 +1,16 @@
+{
+ "regions": 140,
+ "regions_missing": 0,
+ "quasars": 143,
+ "quasars_not_scored": 0,
+ "missing_regions": [],
+ "complete": true,
+ "archive_status_regions": {
+  "complete": 139,
+  "archives_missing": 1
+ },
+ "regions_key_archive_missing": 0,
+ "quasars_in_those_regions": 0,
+ "key_archive_missing": {},
+ "degraded": false
+}

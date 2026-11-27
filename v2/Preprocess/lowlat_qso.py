@@ -1,7 +1,7 @@
-"""Switches that limit the QSO label at low Galactic latitude (2.61.2).  Every switch is off by default.
+"""Switches that limit the QSO label at low Galactic latitude (2.61.3).  Every switch is off by default.
 
 At |b| < 20 deg most of what the classifier calls QSO is not a quasar (benchmark/lowlat_qso/LOWLAT_QSO.md: 170 objects that are
-not sample quasars in 1.18 deg^2, 144 deg^-2, against 5-8 deg^-2 quasars expected to i ~ 19.3 at high latitude).  The 2.61.1
+not sample quasars in 1.18 deg^2, 144 deg^-2, against 5-8 deg^-2 quasars expected to i ~ 19.3 at high latitude).  The 2.61.3
 dissection (WORK_REPORT_2026-11-27b.md, LITERATURE_LOWLAT_QSO_2026-11-27.md) found that 45 % of them rest on one survey (Legacy
 Surveys colours alone 28 %, AllWISE colours alone 16 %), that the Gaia proper motion is no help for the faint ones (all 33 with a
 Gaia row pass the cut), and that the AllWISE colour rules are applied where the literature built them only for high latitude.

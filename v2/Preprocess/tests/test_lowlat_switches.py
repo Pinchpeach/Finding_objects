@@ -1,4 +1,4 @@
-"""The low-latitude QSO switches (2.61.2, ``Preprocess/lowlat_qso.py``): off by default, act only below ``V2_LOWLAT_QSO_ABSB``."""
+"""The low-latitude QSO switches (2.61.3, ``Preprocess/lowlat_qso.py``): off by default, act only below ``V2_LOWLAT_QSO_ABSB``."""
 
 from __future__ import annotations
 

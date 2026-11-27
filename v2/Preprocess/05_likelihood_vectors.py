@@ -682,7 +682,7 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     qveto = qf / qmag  # literature cuts failed (VETO each), evidence rather than a prior
     qso_min = QSO_OPT.desi_threshold(df) if "c3b" in opts else np.zeros(len(df))
     faint = QSO_OPT.r_mag(df) > 22 if "c8" in opts else np.zeros(len(df), bool)
-    # Low-latitude limits on the QSO label (2.61.2, lowlat_qso.py; V2_LOWLAT_QSO, off by default): held back like a faint QSO
+    # Low-latitude limits on the QSO label (2.61.3, lowlat_qso.py; V2_LOWLAT_QSO, off by default): held back like a faint QSO
     faint = faint | LOWLAT.qso_forbidden(df)
     # Bright clean 2MASS point sources (2.41.0, nir_star.py): where the
     # evidence is absent or conflicting with STAR among it, the sky counts

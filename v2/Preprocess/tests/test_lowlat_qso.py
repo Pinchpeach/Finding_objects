@@ -1,4 +1,4 @@
-"""Low-latitude quasar recall measurement (2.61.1): the scoring, the causes of a miss, the region draw."""
+"""Low-latitude quasar recall measurement (2.61.2): the scoring, the causes of a miss, the region draw."""
 
 from __future__ import annotations
 
@@ -132,6 +132,103 @@ def test_scoring_counts_labels_causes_and_density(tmp_path):
     dens = tabs["qso_density"].iloc[0]
     assert dens.qso_labelled_other == 1  # O5 only (O1 and O4 are matched to truth objects)
     assert tabs["contaminants"].label.tolist() == ["QSO"]
+
+
+def test_empty_region_and_missing_region(tmp_path):
+    """A region without detections (the pipeline's empty-result schema) scores its quasar as NO_OBJECT; a region without a
+    record keeps its quasar out of every recall denominator and marks the run incomplete."""
+    truth = pd.DataFrame(
+        dict(sample=["huo", "huo", "huo"], name=["q1", "q2", "q3"], ra=[150.0, 160.0, 170.0], dec=[2.0] * 3, l=[100.0] * 3,
+             b=[-12.0] * 3, z=[1.0] * 3, imag=[18.0] * 3, ebv=[0.1] * 3, cls=["qso"] * 3, also_in=[""] * 3)
+    )  # fmt: skip
+    regions = pd.DataFrame(dict(name=["r1", "r2", "r3"], stratum=["b10-15"] * 3, kind=["qso"] * 3, ra=[150.0, 160.0, 170.0],
+                                dec=[2.0] * 3))  # fmt: skip
+    _write_region(tmp_path, "r1", [dict(object_id="O1", ra=150.0, dec=2.0, primary_class="QSO")])
+    (tmp_path / "r2").mkdir()
+    pd.DataFrame(columns=["object_id", "designation", "ra", "dec", "catalogs", "primary_class", "primary_confidence",
+                          "classification_status"]).to_csv(tmp_path / "r2" / "objects.csv.gz", index=False)  # fmt: skip
+    res = S.score_regions(regions, truth, tmp_path, radius_arcmin=3.0)  # r3 has no record
+    T = res["per_truth"].set_index("name")
+    assert T.loc["q1", "label"] == "QSO"
+    assert T.loc["q2", "label"] == "NO_OBJECT" and T.loc["q2", "cause"] == "no_object"
+    assert T.loc["q3", "label"] == S.MISSING and T.loc["q3", "cause"] == "region_missing"
+    cov = S.coverage(res)
+    assert {k: cov[k] for k in ("regions", "regions_missing", "quasars", "quasars_not_scored", "missing_regions", "complete")} == \
+        dict(regions=3, regions_missing=1, quasars=3, quasars_not_scored=1, missing_regions=["r3"], complete=False)
+    assert cov["archive_status_regions"] == {"unknown": 2} and not cov["degraded"]  # no archive record in these fixtures
+    tabs = S.summarise(res)
+    rs = tabs["recall_summary"].set_index(["by", "bin"])
+    assert rs.loc[("all", "all"), "n"] == 1 and rs.loc[("all", "all incl. no object"), "n"] == 2
+    assert rs.xs("coverage").n.iloc[0] == 1
+    assert S.MISSING not in set(tabs["missed"].label)
+    lab = tabs["labels"].set_index("bbin")
+    assert lab.loc["[10.0, 15.0)", S.MISSING] == 1 and lab.loc["[10.0, 15.0)", "NO_OBJECT"] == 1  # binned by its own |b|
+    dens = tabs["qso_density"].set_index("stratum").loc["all"]
+    assert dens.regions == 2 and dens.qso_labelled_other == 0
+
+
+def test_summary_when_no_quasar_has_an_object(tmp_path):
+    """Every scored region empty: the per-object columns never appear, the summary still runs (all NO_OBJECT)."""
+    truth = pd.DataFrame(dict(sample=["huo"], name=["q1"], ra=[150.0], dec=[2.0], l=[100.0], b=[-12.0], z=[1.0], imag=[18.0],
+                              ebv=[0.1], cls=["qso"], also_in=[""]))  # fmt: skip
+    regions = pd.DataFrame(dict(name=["r1"], stratum=["b10-15"], kind=["qso"], ra=[150.0], dec=[2.0]))
+    (tmp_path / "r1").mkdir()
+    pd.DataFrame(columns=["object_id", "ra", "dec", "catalogs", "primary_class"]).to_csv(tmp_path / "r1" / "objects.csv.gz",
+                                                                                        index=False)  # fmt: skip
+    res = S.score_regions(regions, truth, tmp_path, radius_arcmin=3.0)
+    assert "has_ls" not in res["per_truth"]
+    tabs = S.summarise(res)
+    rs = tabs["recall_summary"].set_index(["by", "bin"])
+    assert rs.loc[("all", "all"), "n"] == 0 and rs.loc[("all", "all incl. no object"), "n"] == 1
+    assert S.coverage(res)["complete"]
+
+
+def test_regions_that_lost_a_key_archive_are_reported(tmp_path):
+    """A failed key archive (a query error or time-out, not an empty answer) marks the run DEGRADED: from the pipeline's
+    run_archives_status column, or from the copied collection summary for a region without rows."""
+    truth = pd.DataFrame(
+        dict(sample=["huo"] * 3, name=["q1", "q2", "q3"], ra=[150.0, 160.0, 170.0], dec=[2.0] * 3, l=[100.0] * 3,
+             b=[-12.0] * 3, z=[1.0] * 3, imag=[18.0] * 3, ebv=[0.1] * 3, cls=["qso"] * 3, also_in=[""] * 3)
+    )  # fmt: skip
+    regions = pd.DataFrame(dict(name=["r1", "r2", "r3"], stratum=["b10-15"] * 3, kind=["qso"] * 3, ra=[150.0, 160.0, 170.0],
+                                dec=[2.0] * 3))  # fmt: skip
+    _write_region(tmp_path, "r1", [dict(object_id="O1", ra=150.0, dec=2.0, primary_class="QSO",
+                                        run_archives_status="complete", run_archives_missing="")])  # fmt: skip
+    _write_region(tmp_path, "r2", [dict(object_id="O2", ra=160.0, dec=2.0, primary_class="STAR",
+                                        run_archives_status="key_archives_missing",
+                                        run_archives_missing="panstarrs1:timeout")])  # fmt: skip
+    (tmp_path / "r3").mkdir()
+    pd.DataFrame(columns=["object_id", "ra", "dec", "catalogs", "primary_class", "run_archives_status"]).to_csv(
+        tmp_path / "r3" / "objects.csv.gz", index=False)
+    pd.DataFrame(dict(collector=["gaia_dr3", "allwise", "desi_legacy", "lotss"], status=["ok", "timeout", "empty", "error"])).to_csv(
+        tmp_path / "r3" / "collection_summary.csv", index=False)  # fmt: skip
+    res = S.score_regions(regions, truth, tmp_path, radius_arcmin=3.0)
+    R = res["per_region"].set_index("name")
+    assert R.loc["r1", "archives_status"] == "complete"
+    assert R.loc["r2", "archives_status"] == "key_archives_missing"
+    assert R.loc["r3", "archives_status"] == "key_archives_missing"  # allwise timed out; an empty LS answer is not a failure
+    assert R.loc["r3", "archives_missing"] == "allwise:timeout|lotss:error"
+    cov = S.coverage(res)
+    assert cov["complete"] and cov["degraded"]
+    assert cov["regions_key_archive_missing"] == 2 and cov["quasars_in_those_regions"] == 2
+    assert cov["key_archive_missing"] == {"r2": "panstarrs1:timeout", "r3": "allwise:timeout|lotss:error"}
+    rs = S.summarise(res)["recall_summary"]
+    assert rs[rs.by == "coverage"].n.tolist() == [0, 2]
+
+
+def test_run_where_no_region_has_a_record(tmp_path):
+    """Every region missing: the summary and coverage still come out (density unavailable, run INCOMPLETE)."""
+    truth = pd.DataFrame(dict(sample=["huo"], name=["q1"], ra=[150.0], dec=[2.0], l=[100.0], b=[-12.0], z=[1.0], imag=[18.0],
+                              ebv=[0.1], cls=["qso"], also_in=[""]))  # fmt: skip
+    regions = pd.DataFrame(dict(name=["r1"], stratum=["b10-15"], kind=["qso"], ra=[150.0], dec=[2.0]))
+    res = S.score_regions(regions, truth, tmp_path, radius_arcmin=3.0)
+    tabs = S.summarise(res)
+    dens = tabs["qso_density"].set_index("stratum").loc["all"]
+    assert dens.regions == 0 and math.isnan(dens.per_deg2)
+    cov = S.coverage(res)
+    assert not cov["complete"] and cov["quasars_not_scored"] == 1 and not cov["degraded"]
+    rs = tabs["recall_summary"].set_index(["by", "bin"])
+    assert rs.loc[("all", "all incl. no object"), "n"] == 0
 
 
 def test_region_draw_is_deterministic_and_non_overlapping():

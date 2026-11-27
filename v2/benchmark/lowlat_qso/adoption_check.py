@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The pre-registered predictions and adoption criteria of PREDICTIONS_CONFIRM.md, checked against the confirmation regions (2.61.2).
+"""The pre-registered predictions and adoption criteria of PREDICTIONS_CONFIRM.md, checked against the confirmation regions (2.61.3).
 
     python adoption_check.py --calibration DIR_CAL --confirmation DIR_CONF --highlat-identical yes --out DIR
 

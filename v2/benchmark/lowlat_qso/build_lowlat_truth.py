@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The compact truth table of the low-latitude quasar recall measurement (2.61.1).
+"""The compact truth table of the low-latitude quasar recall measurement (2.61.2).
 
     python build_lowlat_truth.py --out lowlat_truth.csv.gz [--huo FILE.fits[.gz]] [--fu-votable FILE.xml]
 

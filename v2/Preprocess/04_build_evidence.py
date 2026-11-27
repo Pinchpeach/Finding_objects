@@ -28,7 +28,7 @@ def _import_local(name):
 
 _V2 = Path(__file__).resolve().parents[1]
 TABLE_IO = _load("v2_table_io", _V2 / "Preprocess" / "table_io.py")
-LOWLAT = _load("v2_lowlat_qso_s4", _V2 / "Preprocess" / "lowlat_qso.py")  # low-latitude QSO switches (2.61.2, off by default)
+LOWLAT = _load("v2_lowlat_qso_s4", _V2 / "Preprocess" / "lowlat_qso.py")  # low-latitude QSO switches (2.61.3, off by default)
 GA = _load("v2_gaia_assumptions", _V2 / "Preprocess" / "gaia_assumptions.py")  # Gaia release constants (2.60.6)
 OTYPES = _load("v2_simbad_otypes_s4", _V2 / "Classifier" / "simbad_otypes.py")
 # SIMBAD-TYPE-001 through the otype hierarchy (2.22.0; the old exact-code map

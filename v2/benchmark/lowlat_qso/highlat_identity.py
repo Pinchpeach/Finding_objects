@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The low-latitude switches change nothing at |b| >= 20 deg: the same raw files classified with and without them (2.61.2).
+"""The low-latitude switches change nothing at |b| >= 20 deg: the same raw files classified with and without them (2.61.3).
 
     python highlat_identity.py --raw RAW_DIR [RAW_DIR ...] --out DIR [--switches surveys3,pm,wise_second,wise_footprint]
 

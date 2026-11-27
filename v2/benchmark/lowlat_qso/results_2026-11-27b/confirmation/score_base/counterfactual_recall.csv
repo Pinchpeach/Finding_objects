@@ -1,0 +1,21 @@
+scenario,group,n,qso,recall,lo,hi
+as run,all,143,95,0.6643,0.5835,0.7365
+as run,|b| 5-10,60,27,0.45,0.3309,0.5751
+as run,|b| 10-15,41,32,0.7805,0.6329,0.88
+as run,|b| 15-20.0001,42,36,0.8571,0.7216,0.9328
+cf_no_position,all,143,114,0.7972,0.7239,0.8549
+cf_no_position,|b| 5-10,60,41,0.6833,0.5577,0.7869
+cf_no_position,|b| 10-15,41,36,0.878,0.7446,0.9468
+cf_no_position,|b| 15-20.0001,42,37,0.881,0.75,0.9481
+cf_no_qso_magnitude,all,143,117,0.8182,0.7469,0.8728
+cf_no_qso_magnitude,|b| 5-10,60,44,0.7333,0.6099,0.8287
+cf_no_qso_magnitude,|b| 10-15,41,36,0.878,0.7446,0.9468
+cf_no_qso_magnitude,|b| 15-20.0001,42,37,0.881,0.75,0.9481
+cf_no_position_no_qso_magnitude,all,143,132,0.9231,0.8675,0.9565
+cf_no_position_no_qso_magnitude,|b| 5-10,60,54,0.9,0.7985,0.9534
+cf_no_position_no_qso_magnitude,|b| 10-15,41,38,0.9268,0.8057,0.9748
+cf_no_position_no_qso_magnitude,|b| 15-20.0001,42,40,0.9524,0.8421,0.9868
+cf_evidence_only,all,143,132,0.9231,0.8675,0.9565
+cf_evidence_only,|b| 5-10,60,54,0.9,0.7985,0.9534
+cf_evidence_only,|b| 10-15,41,38,0.9268,0.8057,0.9748
+cf_evidence_only,|b| 15-20.0001,42,40,0.9524,0.8421,0.9868

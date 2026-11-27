@@ -233,7 +233,7 @@ jobs:
               # 2.61.0: the order of detections with the same position error is the input row (2.60.x) instead of brightness
               tieorderfile) export V2_ASSOC_TIE_ORDER=file;;
               tieorderposition) export V2_ASSOC_TIE_ORDER=position;;  # no brightness key: what the brightness adds
-              # 2.61.2: low-latitude QSO switches (|b| < 20 deg only, off by default; Preprocess/lowlat_qso.py)
+              # 2.61.3: low-latitude QSO switches (|b| < 20 deg only, off by default; Preprocess/lowlat_qso.py)
               llsurveys2) export V2_LOWLAT_QSO=surveys2;;   # QSO label needs 2 surveys
               llsurveys3) export V2_LOWLAT_QSO=surveys3;;   # ... 3 surveys
               llwise2) export V2_LOWLAT_QSO=wise_second;;   # AllWISE colour rules need another survey

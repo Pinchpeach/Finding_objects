@@ -134,7 +134,8 @@ jobs:
           src = collections.Counter((open(f).read().strip() or "empty") for f in glob.glob("/tmp/ll/*/gaia_source.txt"))
           json.dump({"version": os.environ["V"], "commit": "${{ github.sha }}", "regions": len(glob.glob("/tmp/ll/*/objects.csv.gz")),
                      "regions_locked": 169, "list_sha256": os.environ["LOCK_SHA256"], "gaia_source_regions": dict(src),
-                     "date": datetime.date.today().isoformat(), "note": os.environ["NOTE"]}, open("$out/run.json", "w"), indent=1)
+                     "date": datetime.date.today().isoformat(), "note": os.environ["NOTE"],
+                     "coverage": json.load(open("$out/coverage.json"))}, open("$out/run.json", "w"), indent=1)
           PY
       - name: Commit
         if: github.ref_name != 'main'

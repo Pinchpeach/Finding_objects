@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Recall of the QSO label on spectroscopically confirmed quasars behind the Galactic plane (2.61.1).  Measurement only.
+"""Recall of the QSO label on spectroscopically confirmed quasars behind the Galactic plane (2.61.2).  Measurement only.
 
     python score_lowlat_qso.py compact --work DIR --out DIR
     python score_lowlat_qso.py score --fields DIR/<name>/objects.csv.gz ... --regions fields_lowlat.csv \\
@@ -22,6 +22,10 @@ regions of ``fields_lowlat.csv`` and the truth table of ``build_lowlat_truth.py`
                             or both (labels set by a rule or an abstention are kept; the confidence gates are ignored): what
                             a prior costs in recall, not a recommendation: the cost in false QSO labels is not measured here
   regions.csv               one row per region: objects, QSO-labelled objects, truth quasars in the cone, archive status
+  coverage.json             regions and quasars scored against the list; a run with a missing region is marked INCOMPLETE
+                            (its quasars are REGION_MISSING in per_truth.csv and in no recall denominator)
+                            and one where a region was classified without a key archive (run_archives_status of the
+                            pipeline, or the copied collection summary for a region without rows) is marked DEGRADED
 
 Causes of a miss, first match wins:
   no_object          no object within ``MATCH_ARCSEC`` of the quasar (not detected in any catalogue, or not resolved)
@@ -49,6 +53,10 @@ import numpy as np
 import pandas as pd
 
 MATCH_ARCSEC = 2.0
+MISSING = "REGION_MISSING"  # label of a truth object whose region has no compact record
+# per_region columns (a run where no region has a record still has them, so the density and coverage code can run)
+REGION_COLS = ["name", "stratum", "kind", "status", "archives_status", "archives_missing", "objects", "qso_labelled",
+               "qso_other", "objects_i_lt_195", "qso_other_i_lt_195", "truth_in_cone", "area_deg2"]  # fmt: skip
 CLASSES = ("STAR", "GALAXY", "QSO")
 KEEP = [
     "object_id", "ra", "dec", "catalogs", "std_ebv", "primary_class", "primary_confidence", "primary_margin",
@@ -56,7 +64,7 @@ KEEP = [
     "parent_object_id", "component_role", "high_confidence", "evidence_count", "evidence_conflict",
     "p_star", "p_galaxy", "p_qso", "p_star_training_prior", "p_galaxy_training_prior", "p_qso_training_prior",
     "prior_gaia_density", "prior_position", "prior_qso_magnitude", "prior_qso_veto", "prior_faint_star",
-    "prior_faint_galaxy", "prior_layer",
+    "prior_faint_galaxy", "prior_layer", "run_archives_status", "run_archives_missing",
 ]  # fmt: skip
 B_BINS = [(0, 5), (5, 10), (10, 15), (15, 20.0001)]
 EBV_BINS = [(0, 0.1), (0.1, 0.2), (0.2, 0.3), (0.3, 99)]
@@ -123,6 +131,37 @@ def compact(work: Path, out: Path) -> None:
             if p.is_file() and p.stat().st_size < 5_000_000:
                 (out / p.name).write_bytes(p.read_bytes())
                 break
+
+
+def _coverage_module():
+    """``v2/catalog_coverage.py`` (which archives are key, which statuses are failures), loaded by path."""
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("v2_catalog_coverage", Path(__file__).resolve().parents[2] / "catalog_coverage.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def region_archives(o: pd.DataFrame, region_dir: Path) -> tuple[str, str]:
+    """(status, missing) of a region's collection, as ``catalog_coverage`` writes them into every result row
+    (``run_archives_status``: complete / key_archives_missing / archives_missing / degraded / unknown).  A region without
+    rows (no detections) has no value there; then the copied collection summary is read: a failed query (error,
+    timeout) is a failure, an empty answer or an archive outside its footprint is not."""
+    st = o["run_archives_status"].dropna().astype(str) if "run_archives_status" in o else pd.Series(dtype=str)
+    if len(st):
+        miss = o["run_archives_missing"].dropna().astype(str) if "run_archives_missing" in o else pd.Series(dtype=str)
+        return st.iloc[0], (miss.iloc[0] if len(miss) else "")
+    files = sorted(Path(region_dir).glob("collection_summary*.csv"))
+    if not files:
+        return "unknown", ""
+    cc = _coverage_module()
+    d = pd.read_csv(files[0], keep_default_na=False)
+    failed = d[d.status.isin(cc.FAILED)]
+    key = [c for c in failed.collector if cc.IMPACT.get(c, (c, "", False))[2]]
+    other = [c for c in failed.collector if c not in key]
+    status = cc.KEY_MISSING if key else (cc.OTHER_MISSING if other else cc.COMPLETE)
+    return status, "|".join(f"{c}:{t}" for c, t in zip(failed.collector, failed.status))
 
 
 def _unit(P: np.ndarray) -> np.ndarray:
@@ -274,9 +313,19 @@ def score_regions(regions: pd.DataFrame, truth: pd.DataFrame, root: Path, radius
     for r in regions.itertuples():
         f = root / r.name / "objects.csv.gz"
         if not f.exists():
+            # A region that was not collected or not compacted: its truth objects are listed as REGION_MISSING and kept
+            # out of every recall denominator, and the coverage is reported (summarise, main) so an incomplete run is
+            # not read as a measurement of the locked list.
+            s_m = _sep_arcsec(t_all.ra, t_all.dec, r.ra, r.dec) / 60.0
+            for t in t_all[s_m <= radius_arcmin].itertuples():
+                rows.append(dict(region=r.name, stratum=r.stratum, sample=t.sample, name=t.name, cls=t.cls, ra=t.ra,
+                                 dec=t.dec, b=t.b, l=t.l, ebv=t.ebv, imag=t.imag, z=t.z, label=MISSING, object_id="",
+                                 basis="", status="", cause="region_missing" if t.cls == "qso" else ""))  # fmt: skip
             reg_rows.append(dict(name=r.name, stratum=r.stratum, kind=r.kind, status="missing", objects=0))
             continue
         o = pd.read_csv(f, low_memory=False)
+        # a region without detections has the pipeline's empty-result schema (no grouping or probability columns)
+        o = o.reindex(columns=list(dict.fromkeys([*o.columns, *KEEP, "rules_QSO", "rules_all"])))
         by_id = o.set_index("object_id")
         s_c = _sep_arcsec(t_all.ra, t_all.dec, r.ra, r.dec) / 60.0
         inside = t_all[s_c <= radius_arcmin]
@@ -327,11 +376,13 @@ def score_regions(regions: pd.DataFrame, truth: pd.DataFrame, root: Path, radius
                                    ps1_i=qi[k], p_qso=obj.get("p_qso"), p_qso_evidence=obj.get("p_qso_training_prior"),
                                    basis=obj.get("classification_basis"), n_catalogs=str(obj.get("catalogs", "")).count("|") + 1))  # fmt: skip
         all_i = ps1_mags(root / r.name / "raw", top_level[in_cone].ra.to_numpy(float), top_level[in_cone].dec.to_numpy(float))
-        reg_rows.append(dict(name=r.name, stratum=r.stratum, kind=r.kind, status="ok", objects=int(in_cone.sum()),
+        a_status, a_missing = region_archives(o, root / r.name)
+        reg_rows.append(dict(name=r.name, stratum=r.stratum, kind=r.kind, status="ok", archives_status=a_status,
+                             archives_missing=a_missing, objects=int(in_cone.sum()),
                              qso_labelled=int((top_level[in_cone].primary_class == "QSO").sum()), qso_other=int(within.sum()),
                              objects_i_lt_195=int(np.sum(all_i < 19.5)), qso_other_i_lt_195=int(np.sum(qi < 19.5)),
                              truth_in_cone=len(inside), area_deg2=math.pi * (radius_arcmin / 60.0) ** 2))  # fmt: skip
-    return dict(per_truth=pd.DataFrame(rows), per_region=pd.DataFrame(reg_rows), unique_quasars=uq,
+    return dict(per_truth=pd.DataFrame(rows), per_region=pd.DataFrame(reg_rows).reindex(columns=REGION_COLS), unique_quasars=uq,
                 qso_other=pd.DataFrame(other_rows))
 
 
@@ -348,9 +399,36 @@ def _bin_table(df: pd.DataFrame, col: str, bins, label: str, absval=False) -> li
     return out
 
 
+def coverage(res: dict) -> dict:
+    """Regions and truth quasars scored against those of the list; ``complete`` is False when a region has no record."""
+    R, T = res["per_region"], res["per_truth"]
+    q = T[T.cls == "qso"] if len(T) else T
+    miss_q = int((q.label == MISSING).sum()) if len(q) else 0
+    n_miss = int((R.status == "missing").sum()) if len(R) else 0
+    # regions classified without a key archive (Gaia, PS1, Legacy Surveys, AllWISE: a failed query, not an empty answer)
+    ast = R["archives_status"] if "archives_status" in R else pd.Series([""] * len(R), index=R.index)
+    key_bad = R[(R.status == "ok") & (ast == "key_archives_missing")]
+    key_q = int(q.region.isin(set(key_bad.name)).sum()) if len(q) and "region" in q else 0
+    return dict(regions=len(R), regions_missing=n_miss, quasars=len(q), quasars_not_scored=miss_q,
+                missing_regions=sorted(R.loc[R.status == "missing", "name"].tolist()) if n_miss else [],
+                complete=n_miss == 0,
+                archive_status_regions={str(k): int(v) for k, v in ast[R.status == "ok"].value_counts().items()},
+                regions_key_archive_missing=len(key_bad), quasars_in_those_regions=key_q,
+                key_archive_missing={str(n): str(m) for n, m in zip(key_bad.name, key_bad.get("archives_missing", []))},
+                degraded=len(key_bad) > 0)  # fmt: skip
+
+
+# per_truth columns the summary reads; the object columns exist only when some quasar had a counterpart (e.g. not in a
+# run whose regions all came back empty), so they are added as missing values before grouping.
+SUMMARY_COLS = ["region", "name", "sample", "cls", "b", "ebv", "imag", "z", "label", "basis", "status", "cause", "std_ebv",
+                "has_ls", "has_wise", "has_ps1", "r90"]  # fmt: skip
+
+
 def summarise(res: dict) -> dict[str, pd.DataFrame]:
     T = res["per_truth"]
-    q = T[T.cls == "qso"].copy()
+    T = T.reindex(columns=list(dict.fromkeys([*T.columns, *SUMMARY_COLS])))
+    q_all = T[T.cls == "qso"].copy()
+    q = q_all[q_all.label != MISSING].copy()  # a quasar of a region without a record is not a miss: it was not measured
     have = q[q.label != "NO_OBJECT"].copy()
     have["ebv_use"] = have.ebv.where(have.ebv.notna(), have.get("std_ebv"))
     rows = []
@@ -360,6 +438,11 @@ def summarise(res: dict) -> dict[str, pd.DataFrame]:
     n2, k2 = len(q), int((q.label == "QSO").sum())
     a2, b2 = wilson(k2, n2)
     rows.append(dict(by="all", bin="all incl. no object", n=n2, qso=k2, recall=round(k2 / n2, 4) if n2 else math.nan, lo=round(a2, 4), hi=round(b2, 4)))
+    cov = coverage(res)
+    rows.append(dict(by="coverage", bin="quasars in regions without a record (not in any n)", n=cov["quasars_not_scored"],
+                     qso=math.nan, recall=math.nan, lo=math.nan, hi=math.nan))  # fmt: skip
+    rows.append(dict(by="coverage", bin="quasars in regions that lost a key archive (in the n above)",
+                     n=cov["quasars_in_those_regions"], qso=math.nan, recall=math.nan, lo=math.nan, hi=math.nan))  # fmt: skip
     rows += _bin_table(have, "b", B_BINS, "|b| (deg)", absval=True)
     rows += _bin_table(have, "ebv_use", EBV_BINS, "E(B-V)")
     rows += _bin_table(have, "imag", I_BINS, "PS1 i")
@@ -377,7 +460,7 @@ def summarise(res: dict) -> dict[str, pd.DataFrame]:
         n, k = len(g), int((g.label == "QSO").sum())
         a, b = wilson(k, n)
         rows.append(dict(by="AllWISE R90 sky", bin="inside" if flag else "outside", n=n, qso=k, recall=round(k / n, 4), lo=round(a, 4), hi=round(b, 4)))
-    lab = (q.assign(bbin=pd.cut(q.b.abs(), [0, 5, 10, 15, 20.0001], right=False).astype(str))
+    lab = (q_all.assign(bbin=pd.cut(q_all.b.abs(), [0, 5, 10, 15, 20.0001], right=False).astype(str))
             .groupby(["bbin", "label"]).size().unstack(fill_value=0))  # fmt: skip
     missed = q[q.label != "QSO"]
     causes = (missed.assign(bbin=pd.cut(missed.b.abs(), [0, 5, 10, 15, 20.0001], right=False).astype(str))
@@ -393,10 +476,15 @@ def summarise(res: dict) -> dict[str, pd.DataFrame]:
                          per_deg2_i_lt_195_err=round(math.sqrt(max(n_b, 1)) / area, 2)))  # fmt: skip
     g = ok[ok.kind == "qso"]
     area, n_o, n_b = g.area_deg2.sum(), int(g.qso_other.sum()), int(g.qso_other_i_lt_195.sum())
-    dens.append(dict(stratum="all", regions=len(g), area_deg2=round(area, 4), objects_i_lt_195=int(g.objects_i_lt_195.sum()),
-                     qso_labelled_other=n_o, per_deg2=round(n_o / area, 2), per_deg2_err=round(math.sqrt(max(n_o, 1)) / area, 2),
-                     qso_labelled_other_i_lt_195=n_b, per_deg2_i_lt_195=round(n_b / area, 2),
-                     per_deg2_i_lt_195_err=round(math.sqrt(max(n_b, 1)) / area, 2)))  # fmt: skip
+    if not len(g) or not area > 0:  # no quasar region was scored: the density is unavailable, not zero
+        dens.append(dict(stratum="all", regions=0, area_deg2=0.0, objects_i_lt_195=0, qso_labelled_other=0,
+                         per_deg2=math.nan, per_deg2_err=math.nan, qso_labelled_other_i_lt_195=0,
+                         per_deg2_i_lt_195=math.nan, per_deg2_i_lt_195_err=math.nan))  # fmt: skip
+    else:
+        dens.append(dict(stratum="all", regions=len(g), area_deg2=round(area, 4), objects_i_lt_195=int(g.objects_i_lt_195.sum()),
+                         qso_labelled_other=n_o, per_deg2=round(n_o / area, 2), per_deg2_err=round(math.sqrt(max(n_o, 1)) / area, 2),
+                         qso_labelled_other_i_lt_195=n_b, per_deg2_i_lt_195=round(n_b / area, 2),
+                         per_deg2_i_lt_195_err=round(math.sqrt(max(n_b, 1)) / area, 2)))  # fmt: skip
     cf_rows = []
     for scen in ["label", *SCENARIOS]:
         for name_, g in [("all", have)] + [(f"|b| {lo:g}-{hi:g}", have[(have.b.abs() >= lo) & (have.b.abs() < hi)]) for lo, hi in B_BINS]:
@@ -435,6 +523,15 @@ def main() -> int:
     tabs = summarise(res)
     for k, v in tabs.items():
         v.to_csv(a.out / f"{k}.csv", index=False)
+    cov = coverage(res)
+    (a.out / "coverage.json").write_text(json.dumps(cov, indent=1) + "\n")
+    if not cov["complete"]:
+        print(f"INCOMPLETE: {cov['regions_missing']} of {cov['regions']} regions have no record "
+              f"({cov['quasars_not_scored']} of {cov['quasars']} quasars not scored): {', '.join(cov['missing_regions'])}")  # fmt: skip
+    if cov["degraded"]:
+        print(f"DEGRADED: {cov['regions_key_archive_missing']} regions were classified without a key archive "
+              f"({cov['quasars_in_those_regions']} quasars): "
+              + ", ".join(f"{n} ({m})" for n, m in cov["key_archive_missing"].items()))  # fmt: skip
     with pd.option_context("display.width", 250, "display.max_columns", 30, "display.max_rows", 200):
         print(tabs["recall_summary"].to_string(index=False))
         print(tabs["causes"].to_string(index=False))

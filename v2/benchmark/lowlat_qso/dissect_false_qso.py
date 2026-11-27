@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""What the objects labelled QSO are that are not a sample quasar (2.61.2; calibration sample of the low-latitude measurement).
+"""What the objects labelled QSO are that are not a sample quasar (2.61.3; calibration sample of the low-latitude measurement).
 
     python dissect_false_qso.py --others results_2026-11-27/qso_other_objects.csv --work ROOT --out DIR
 

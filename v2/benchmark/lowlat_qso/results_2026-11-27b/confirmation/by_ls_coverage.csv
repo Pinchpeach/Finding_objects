@@ -1,0 +1,3 @@
+ls_region,regions,area_deg2,quasars,base_quasars_qso,base_false,base_false_per_deg2,surveys2_quasars_qso,surveys2_false,surveys2_false_per_deg2,surveys3_quasars_qso,surveys3_false,surveys3_false_per_deg2,wise_second_quasars_qso,wise_second_false,wise_second_false_per_deg2
+True,19,0.1492,20,18,121,811.0,18,50,335.1,18,20,134.0,18,110,737.3
+False,121,0.9503,123,77,54,56.8,77,31,32.6,77,15,15.8,77,32,33.7
