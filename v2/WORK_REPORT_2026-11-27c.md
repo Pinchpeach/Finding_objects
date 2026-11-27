@@ -92,3 +92,15 @@
 ## 9. 산출물
 
 코드: `Preprocess/02_integrate_objects.py`(`SHARED_FIELDS`, `shared_fields`, `V2_KEEP_SHARED_BARE`), `Classifier/branches/star.py`, `Classifier/subclass.py`, `Classifier/validate_real_samples.py`(+ 독스트링 `04_build_evidence.py`, `coarse_gbm.py`). 시험: `test_shared_columns.py`, `test_pipeline_smoke.py`, `test_subclass.py`. 표·도구: `benchmark/shared_columns/{shared_columns.csv, shared_candidates.json, build_table.py, equivalence.py, README.md, results_2026-11-27/}`.
+
+## 10. 병합 전 검토 (2.61.4)
+
+검토 세션의 질문 네 개를 코드·커밋된 표로 확인했고 하나는 직접 다시 쟀다. 코드는 바꾸지 않았다(문서만).
+
+1. **동일성 비교가 1차 분류 열만 본 것인가.** 아니다. `equivalence.py`의 `compare`는 전/후 `classified_objects.csv`에 **함께 있는 모든 열**을 객체마다 비교한다. 그 파일에는 `subclass`·`subclass_tags`·`subclass_status`·`secondary_class`·`high_confidence`와 축 열(`physical_*`·`variability_*` 등)이 모두 들어 있다(`pipeline.EMPTY_RESULT_COLUMNS`에도 subclass 셋). 320개 입력에서 달라진 열은 `rule_feature_coverage` 하나다(`other_differences_summary.csv`). 다만 (1) `star.py`와 (2) `star_tags`의 고침은 **SIMBAD 행이 있고 Gaia 행이 없는 별**에서만 작용한다. 저위도 309개와 깊은 COSMOS 8개는 블라인드 실행(SIMBAD 없음)이라 이 경우를 시험하지 못했고, 실제로 시험한 것은 실사용 3곳(객체 4,770개)뿐이다. 그래서 저장소의 NGC 4522 원자료(SIMBAD 포함, 0.5′)로 옛 코드(main 2ce3ba2)와 새 코드를 직접 다시 돌렸다: 객체 82개, 열 1,578 → 1,518. 접두어 없는 `pmra`가 있는 객체는 2개였고 둘 다 Gaia 값이 있었다(SIMBAD만의 고유운동을 Gaia로 읽은 객체 0). 공통 열은 `rule_feature_coverage` 말고는 모두 같다. 결론: 측정한 범위에서 옛 오류가 결과를 바꾼 객체는 0이다. SIMBAD 별이 많은 실사용 영역에서의 크기는 아래 4의 재생성 결과로 확인한다.
+2. **(4) `ls_psf` 0 → NaN인데 확률 변화 0.0.** `coarse_gbm`은 `V2_COARSE_MODEL=gbm`일 때만 쓰인다(`05_likelihood_vectors.py`: `if COARSE_MODEL == "gbm"`, 기본값 `fusion`). 기본 실행의 확률은 이 특징을 읽지 않으므로 0.0이 맞다. LS 밖 저위도 영역의 객체가 많아도 기본 경로에는 영향이 없다. `gbm` 모드에서는 LS 행이 없는 객체의 `ls_psf`가 이제 NaN(모름)이다. 이 모드의 결과는 다시 재지 않았다(기본이 아님).
+3. **출력 열 제거는 사용자에게 보이는 변화.** `classified_objects.csv` 등 전체 기록 표에서 공용 이름 80개의 접두어 없는 열이 사라진다(입력당 19–63개). 접두어 열(`<카탈로그>__<이름>`)에는 같은 값이 그대로 있고, `V2_KEEP_SHARED_BARE=1`이면 옛 열이 돌아온다. CHANGELOG 행 맨 앞에 이 점을 적었다. 앱은 고정된 표시 열(`qt_models.TABLE_COLUMNS`: designation, class, subclass, p_* 등)만 쓰고 그중 공용 이름은 없다. 내보내기(`_export`)는 불러온 표를 그대로 쓰므로 그 열이 없을 뿐 오류는 없다. 앱 통합 시험 `test_gui_runs_pipeline_and_shows_results`가 실제 파이프라인을 화면(오프스크린)으로 돌려 결과를 보인다(통과). README·개요 PDF는 공용 이름을 언급하지 않는다. 열 수(833–2,513)는 문서화된 프로그램 2.60.2의 수치라 다음 릴리스 문서 때 바꾼다.
+4. **`real_sample_validation.csv`를 다시 만들지 않은 것.** 이 파일은 `v2_scientific_cross_validation.yml`이 main에 대한 push 때 만들어 커밋한다. 그 워크플로의 경로 조건에 `02_integrate_objects.py`와 `validate_real_samples.py`가 들어 있어, **이 병합이 재생성을 자동으로 일으킨다**(살아 있는 아카이브 사용). 그 사이 커밋된 파일은 옛 코드의 산출물로 남는다. 재생성 커밋의 차이(실제 표본의 `subclass`·태그)가 SIMBAD 고유운동 문제의 실사용 크기이므로 병합 뒤 확인한다.
+
+**번호**: PATCH(2.61.4)를 유지한다. 측정한 모든 입력에서 분류·하위 분류·태그 결과가 같고, 바뀌는 것은 출처가 모호하던 편의 열의 제거(정리)다. 출력 형식이 바뀌는 점은 CHANGELOG 첫머리와 위 3에 적었다. 재생성된 검증표에서 하위 분류가 달라지면 그때 다음 기록에서 크기를 보고한다.
+
