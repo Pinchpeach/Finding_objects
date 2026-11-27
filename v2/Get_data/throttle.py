@@ -44,6 +44,15 @@ IDIA answered: 8-13 requests and 85-110 s for the four tables of ``agb_suh2021``
 (mirror, catalogue) is now remembered for V2_CATALOG_MEMORY_S (86,400 s; the holdings of a mirror change
 slowly) in ``archive_cache`` and the mirror is tried last for that catalogue.  Only the order changes.
 
+A cut-off answer (2.61.6).  A mirror can answer HTTP 200 with a VOTable that stops before its closing tag (a
+gateway cut a long answer: the 500-position Gaia batches of ``Classifier/collect_star_gaia.py``, run 46031822845 of
+2026-11-27, astropy: "1027:862: no element found"), or break the connection during the body (``ChunkedEncodingError``).
+Neither was a failure here: the 200 made the mirror the preferred one and the same cut answer came back on every
+retry, four times, and ended the crossmatch.  Both are now a failure of that mirror for that request: the next mirror is
+asked, the mirror is tried last for MIRROR_STICKY_S, and a request that every mirror cuts off raises
+``ChunkedEncodingError`` instead of returning half a table.  ``distrust_last_mirror()`` lets a caller whose parser
+rejected an answer (a body that is complete but wrong) do the same, so that its own retry starts at another mirror.
+
 Connect timeout (2.44.0): a VizieR request waits at most CONNECT_TIMEOUT_S
 for the TCP connection (the read timeout the client asked for is kept).  On
 2026-10-30 the Strasbourg server stopped accepting connections; each request
@@ -409,6 +418,42 @@ def _tableless_votable(resp) -> bool:
     return "<TABLE" not in text.upper()
 
 
+def _truncated_votable(resp) -> bool:
+    """A 200 answer that is a VOTable but ends before its closing ``</VOTABLE>``: cut off in transfer."""
+    if getattr(resp, "status_code", None) != 200:
+        return False
+    try:
+        body = resp.content
+        if not isinstance(body, (bytes, bytearray)):
+            body = (resp.text or "").encode("utf-8", "replace")
+    except Exception:
+        return False
+    if not body:
+        return False
+    head = str(getattr(resp, "headers", {}).get("Content-Type", "")).lower()
+    if "votable" not in head and b"<VOTABLE" not in bytes(body[:2000]).upper():
+        return False  # not a VOTable (JSON, text, HTML): nothing to say about its end
+    return b"</VOTABLE>" not in bytes(body[-2048:]).upper()
+
+
+def last_host() -> str | None:
+    """The VizieR mirror that gave this thread's last answer (None before the first)."""
+    return getattr(_local, "last_host", None)
+
+
+def distrust_last_mirror() -> str | None:
+    """Treat the last answer of this thread as a failure of its mirror (a caller that could not read it): the mirror is
+    tried last for MIRROR_STICKY_S, here and in the other processes, so the caller's retry starts at another one.
+    Returns the mirror (None when there was none)."""
+    host = last_host()
+    if host:
+        _unreachable[host] = time.monotonic() + MIRROR_STICKY_S
+        _remember(host, False)
+        if _preferred["host"] == host:
+            _preferred.update(host=None, until=0.0)
+    return host
+
+
 def _with_mirrors(send):
     """requests.Session.request that fails over between VizieR mirrors."""
     from urllib.parse import urlsplit, urlunsplit
@@ -426,6 +471,9 @@ def _with_mirrors(send):
                 raise
             _log(parts.hostname, resp.status_code, t0)
             return resp
+        # 2.61.6 review: forget the last answer's mirror before asking, so that after a request that fails on every mirror
+        # ``distrust_last_mirror`` names no mirror instead of one that answered an earlier request well
+        _local.last_host = None
         catalog = _catalog_of(str(url), kwargs.get("data"))
         hosts = _vizier_order(parts.hostname, catalog)
         read = kwargs.get("timeout")
@@ -437,6 +485,7 @@ def _with_mirrors(send):
         # empty cone.  When no mirror gives data they end in an error (the collector reports it) instead of being
         # returned as a table-less answer, which astroquery reads as "no rows" (the 2026-11-07 kind of silence).
         lacked = None
+        cut = None  # the last answer that stopped before </VOTABLE> or broke off in transfer (2.61.6)
         retried: set = set()  # mirrors asked again after a database error of their own
         for i, host in enumerate(hosts):
             if i:
@@ -448,7 +497,9 @@ def _with_mirrors(send):
             except (
                 requests.exceptions.ConnectionError,
                 requests.exceptions.Timeout,
-            ) as exc:  # refused, DNS, connect/read timeout
+                requests.exceptions.ChunkedEncodingError,  # the body was cut off in transfer (2.61.6)
+                requests.exceptions.ContentDecodingError,
+            ) as exc:  # refused, DNS, connect/read timeout, broken body
                 _log(host, type(exc).__name__, t0)
                 # not connected, or no answer in the 10 s of the client (IUCAA, 2026-11-24: every request, 6 in a
                 # search): the mirror is tried last for MIRROR_STICKY_S, in this process (2.60.2: a timeout too; 2.54.0
@@ -456,6 +507,16 @@ def _with_mirrors(send):
                 _unreachable[host] = time.monotonic() + MIRROR_STICKY_S
                 _remember(host, False)
                 last = exc
+                if isinstance(exc, (requests.exceptions.ChunkedEncodingError, requests.exceptions.ContentDecodingError)):
+                    cut = exc  # the body broke off in transfer: the same "too long" signal as a cut VOTable (Codex, 2.61.6)
+                continue
+            if _truncated_votable(resp):  # 200, but the table stops half way: a failure of this mirror (2.61.6)
+                _log(host, f"{resp.status_code} truncated", t0)
+                _unreachable[host] = time.monotonic() + MIRROR_STICKY_S
+                _remember(host, False)
+                if _preferred["host"] == host:
+                    _preferred.update(host=None, until=0.0)
+                cut = last = resp
                 continue
             tableless = _tableless_votable(resp)
             reason = _answer_error(resp) if tableless else None
@@ -468,7 +529,9 @@ def _with_mirrors(send):
                 _remember(host, False)
             elif reason is None:
                 _remember(host, True)  # it answered
-            if resp.status_code in RETRY_STATUS and i < len(hosts) - 1:
+            # the last mirror's error status is returned as the answer, unless an earlier mirror cut the table off: that
+            # signal outranks it (Codex review of 4d216f9: CfA cut, the others 503 -> a 503, and the batch was never halved)
+            if resp.status_code in RETRY_STATUS and (i < len(hosts) - 1 or cut is not None):
                 _unreachable[host] = time.monotonic() + MIRROR_STICKY_S  # failing: tried last for a while
                 last = resp
                 continue
@@ -528,7 +591,18 @@ def _with_mirrors(send):
                 _preferred.update(host=host, until=time.monotonic() + MIRROR_STICKY_S)
             elif _preferred["host"]:
                 _preferred.update(host=None, until=0.0)
+            _local.last_host = host
             return resp
+        if cut is not None:
+            # A mirror served the table but cut it off, and no mirror gave it whole (the others cut it too, refused, timed
+            # out, lacked it or answered table-less): the request is too long for the mirrors, not absent.  That signal
+            # outranks a later connection error or an empty answer, so a caller can ask again in smaller pieces
+            # (Codex review of 2.61.6: CfA cut, the other five refused -> ConnectionError, and the batch was never halved;
+            # the same for a body that broke off in transfer, ChunkedEncodingError / ContentDecodingError, on review of b51d74b).
+            how = f"in transfer ({type(cut).__name__})" if isinstance(cut, Exception) else "before </VOTABLE>"
+            raise requests.exceptions.ChunkedEncodingError(
+                f"VizieR: a mirror cut off a VOTable {how} and no mirror gave it whole ({catalog or 'the table'})"
+            ) from (cut if isinstance(cut, Exception) else None)
         if empty is not None:
             return empty  # a table-less answer without an error that no mirror contradicted (2.47.0)
         if lacked is not None:
