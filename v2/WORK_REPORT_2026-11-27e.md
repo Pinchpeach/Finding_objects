@@ -7,7 +7,7 @@
 - **원인 셋**: ① 미러 층(`throttle._with_mirrors`)이 **HTTP 200이지만 `</VOTABLE>` 앞에서 끊긴 VOTable**을 성공으로 쳤다 → 그 미러가 "응답한 미러"로 기억되어(`_preferred`) 재시도마다 같은 미러가 같은 잘린 답을 되돌려줬다. ② 전송 도중 끊긴 본문(`ChunkedEncodingError`, 로그의 "Connection reset by peer")은 미러 순환이 잡는 예외(`ConnectionError`, `Timeout`)에 들지 않아 순환 없이 위로 올라갔다. ③ `_vizier_fallback`의 재시도(4번, 15–60 s 쉬고)는 주석("mirror failover")과 달리 매번 같은 미러에 갔고, 배치 500개 위치가 미러가 자르는 크기라서 같은 요청을 반복했다.
 - **고침**: (a) 미러 층이 잘린 VOTable과 끊긴 본문을 그 미러의 실패로 판정해 다음 미러로 간다(그 미러는 뒤로 밀린다; 모든 미러가 자르면 반쪽 표를 돌려주지 않고 `ChunkedEncodingError`). (b) `throttle.distrust_last_mirror()`: 응답은 왔지만 호출자가 못 읽은 경우(astroquery `TableParseError`) 그 미러를 실패로 표시해 재시도가 다른 미러로 간다. (c) `_vizier_fallback`: 시도 사이에 이 미러 표시를 하고, **읽을 수 없는 응답**(끊김·파싱 실패)이 2번 나오면 배치를 반으로 줄여(500 → 250 → … 최소 50) 줄인 크기를 나머지 배치에도 쓴다. 연결 거부·오류 상태 같은 "크기와 상관없는" 실패는 줄이지 않고 같은 크기로 다시 한다.
 - **쉬는 규칙 유지**: 미러를 도는 요청과 새 시도마다 `throttle`의 3–5 s 쉼이 붙는다(요청 단위). 재시도 사이 15·n s 백오프는 그대로.
-- **시험 14개 추가**(전체 498개 통과). **결과 불변**: 같은 100개 위치의 VizieR 응답(실제 데이터, 캐시에 있던 것)으로 이전 코드와 이번 코드가 낸 교차대조 표가 같고(95행, 234열, `DataFrame.equals`), `evaluate_wd_hr_gates.py` 결과 JSON도 바이트 단위로 같다.
+- **시험 14개 추가**(병합 뒤 전체 499개 통과). **결과 불변**: 같은 100개 위치의 VizieR 응답(실제 데이터, 캐시에 있던 것)으로 이전 코드와 이번 코드가 낸 교차대조 표가 같고(95행, 234열, `DataFrame.equals`), `evaluate_wd_hr_gates.py` 결과 JSON도 바이트 단위로 같다.
 - **한계**: 이 컨테이너에서는 VizieR 미러가 지금 쓸 수 없는 상태(CfA 60 s 뒤 504, IDIA 301 s ProxyError, NAOJ·IUCAA 읽기 시간 초과, 스트라스부르 404)라 500개 위치 실데이터 전체를 다시 받아 보지는 못했다. 잘림 재현은 시험(미러 층 위의 가짜 VizieR)으로 했다. 실제 워크플로가 이번 수정으로 통과하는지는 CI에서 확인해야 한다(7절).
 
 ## 2. 실패 로그가 말해 준 것
@@ -47,7 +47,7 @@ astroquery.exceptions.TableParseError: Failed to parse VIZIER result!           
 
 - **같은 100개 위치, 실제 VizieR 응답**(`star_truth.csv` 앞 100행; 이 컨테이너에서 받아 천문 캐시에 있는 응답): 이전 코드(main 572d4b2)와 이번 코드가 낸 교차대조 표가 `DataFrame.equals`로 같다(95행 × 234열, 전부 `WHITE_DWARF`). 같은 입력에 `evaluate_wd_hr_gates.py`를 돌려 낸 JSON도 **바이트 단위로 같다**(예: 광대역 관문 정밀도 1.0, 재현율 0.884; `plx4_or_pm10_p75` 사용 가능 82, 표시 80, 정밀도 1.0, 재현율 0.842).
 - 정상 경로의 코드는 같은 요청·같은 후처리다: 배치 크기(`VIZIER_BATCH = 500`)에서 시작해 실패가 없으면 줄이지 않는다.
-- 시험 498개 통과(이 변경 전 484개; 새 시험 14개).
+- 시험 14개 추가, 병합 뒤 전체 499개 통과.
 
 ## 6. 영향
 
