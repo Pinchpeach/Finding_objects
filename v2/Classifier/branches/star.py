@@ -20,9 +20,14 @@ def _num(row, key):
 
 
 def _gaia_num(row, key):
-    # Gaia's own namespaced column only (2.61.4).  The bare ``pmra`` / ``pmdec`` of an object without a Gaia row used to be SIMBAD's
-    # (or any other catalogue's): Stage 2 no longer writes bare names that two catalogues share, and this reader never wanted them.
-    return _num(row, "gaia_dr3__" + key)
+    # Gaia's own namespaced column (2.61.4).  In a Stage-2 table (it has ``catalogs``) the bare ``pmra`` / ``pmdec`` of an object
+    # without a Gaia row used to be SIMBAD's (or any other catalogue's), so only the namespaced value counts there.  A
+    # single-catalogue Gaia table (collect_star_gaia.py, read by evaluate_wd_hr_gates.py) has no ``catalogs`` and holds Gaia's
+    # fields under their bare names, so those are Gaia's (2.61.4 review).
+    v = _num(row, "gaia_dr3__" + key)
+    if v is not None or "catalogs" in row:
+        return v
+    return _num(row, key)
 
 
 def _text(row, key):

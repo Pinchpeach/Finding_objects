@@ -102,5 +102,7 @@
 3. **출력 열 제거는 사용자에게 보이는 변화.** `classified_objects.csv` 등 전체 기록 표에서 공용 이름 80개의 접두어 없는 열이 사라진다(입력당 19–63개). 접두어 열(`<카탈로그>__<이름>`)에는 같은 값이 그대로 있고, `V2_KEEP_SHARED_BARE=1`이면 옛 열이 돌아온다. CHANGELOG 행 맨 앞에 이 점을 적었다. 앱은 고정된 표시 열(`qt_models.TABLE_COLUMNS`: designation, class, subclass, p_* 등)만 쓰고 그중 공용 이름은 없다. 내보내기(`_export`)는 불러온 표를 그대로 쓰므로 그 열이 없을 뿐 오류는 없다. 앱 통합 시험 `test_gui_runs_pipeline_and_shows_results`가 실제 파이프라인을 화면(오프스크린)으로 돌려 결과를 보인다(통과). README·개요 PDF는 공용 이름을 언급하지 않는다. 열 수(833–2,513)는 문서화된 프로그램 2.60.2의 수치라 다음 릴리스 문서 때 바꾼다.
 4. **`real_sample_validation.csv`를 다시 만들지 않은 것.** 이 파일은 `v2_scientific_cross_validation.yml`이 main에 대한 push 때 만들어 커밋한다. 그 워크플로의 경로 조건에 `02_integrate_objects.py`와 `validate_real_samples.py`가 들어 있어, **이 병합이 재생성을 자동으로 일으킨다**(살아 있는 아카이브 사용). 그 사이 커밋된 파일은 옛 코드의 산출물로 남는다. 재생성 커밋의 차이(실제 표본의 `subclass`·태그)가 SIMBAD 고유운동 문제의 실사용 크기이므로 병합 뒤 확인한다.
 
+5. **코드 검토(Codex) 반영.** `star.py`의 `_gaia_num`이 `gaia_dr3__` 열만 읽게 되자, 단일 카탈로그 Gaia 표(`collect_star_gaia.py`가 만들고 `evaluate_wd_hr_gates.py`가 같은 `_wd_hr_signal`로 평가)에서 고유운동이 맨 이름(`pmra` 등)이라 시차 S/N 1–4의 고유운동 보조 관문이 늘 기권했다. 그러면 관문 비교 벤치마크가 조용히 틀어진다. 이제 `catalogs`가 없는 표(Stage 2 표가 아닌 단일 카탈로그 표)에서는 맨 이름을 Gaia의 것으로 읽는다. Stage 2 표에서는 여전히 접두어 열만 읽으므로 SIMBAD의 `pmra`가 끼어들 수 없다. 시험 1개 추가(옛 코드에서 실패). `subclass.star_tags`는 Stage 2 표에서만 불려 그대로 둔다.
+
 **번호**: PATCH(2.61.4)를 유지한다. 측정한 모든 입력에서 분류·하위 분류·태그 결과가 같고, 바뀌는 것은 출처가 모호하던 편의 열의 제거(정리)다. 출력 형식이 바뀌는 점은 CHANGELOG 첫머리와 위 3에 적었다. 재생성된 검증표에서 하위 분류가 달라지면 그때 다음 기록에서 크기를 보고한다.
 
