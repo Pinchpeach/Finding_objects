@@ -63,7 +63,7 @@
       },
       "LPV": {
         "coef": 3.180947475290747,
-        "intercept": -0.9985499308574857,
+        "intercept": -0.9985499308574854,
         "method": "platt",
         "n": 221,
         "negative": 65,
@@ -103,8 +103,8 @@
         "truth_independent": true
       },
       "RR_LYRAE": {
-        "coef": 1.365928432103151,
-        "intercept": -1.8134801615794467,
+        "coef": 1.3659284321031508,
+        "intercept": -1.8134801615794465,
         "method": "platt",
         "n": 221,
         "negative": 189,

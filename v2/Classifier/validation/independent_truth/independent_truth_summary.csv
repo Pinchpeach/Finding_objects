@@ -2,7 +2,7 @@ axis,truth_class,n,classified,coverage,exact_accuracy_all,accuracy_when_classifi
 compact,PULSAR,250,4,0.016,0.0,0.0,0.016,1.0
 phenomenon,PN,250,233,0.932,0.892,0.9570815450643777,0.892,0.9570815450643777
 phenomenon,SN,250,2,0.008,0.008,1.0,0.008,1.0
-physical,AGB,250,106,0.424,0.0,0.0,0.424,1.0
+physical,AGB,250,105,0.42,0.0,0.0,0.42,1.0
 physical,RGB,203,105,0.5172413793103449,0.0,0.0,0.5172413793103449,1.0
 variability,CEPHEID,250,240,0.96,0.9,0.9375,0.9,0.9375
 variability,LPV,250,186,0.744,0.652,0.8763440860215054,0.652,0.8763440860215054
