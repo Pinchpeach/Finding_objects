@@ -38,13 +38,18 @@ class FakeVizier:
 
     scenario: dict = {}
     calls: list = []
+    cached: dict = {}  # astroquery caches a body before parsing it and serves it again to an identical cached request
 
     def __init__(self, columns=None, row_limit=None):
         self.TIMEOUT = None
 
-    def query_region(self, coords, radius=None, catalog=None):
+    def query_region(self, coords, radius=None, catalog=None, cache=True):
         n = len(coords)
         seen = []
+        key = (n, float(coords[0].ra.deg))
+        if cache and key in FakeVizier.cached:
+            FakeVizier.calls.append((n, "cache"))
+            return self._read(FakeVizier.cached[key], n)
 
         def send(self, method, url, *a, **k):
             seen.append(url)
@@ -56,7 +61,13 @@ class FakeVizier:
 
         resp = throttle._with_mirrors(send)(None, "GET", "https://vizier.cds.unistra.fr/viz-bin/votable?-source=I/355/gaiadr3")
         FakeVizier.calls.append((n, throttle.last_host()))
-        if b"<!--bad-->" in resp.content:
+        if cache:
+            FakeVizier.cached[key] = resp.content
+        return self._read(resp.content, n)
+
+    @staticmethod
+    def _read(content, n):
+        if b"<!--bad-->" in content:
             raise ValueError("1027:862: no element found")  # TableParseError of astroquery
         d = pd.DataFrame({"_q": range(1, n + 1), "Source": range(n), "RA_ICRS": [10.0 + i for i in range(n)],
                           "DE_ICRS": [20.0] * n, "Plx": [1.0] * n})  # fmt: skip
@@ -71,7 +82,7 @@ def fallback(monkeypatch, tmp_path):
     monkeypatch.setattr(throttle, "install", lambda: None)  # no global patch of requests in the test process
     throttle._preferred.update(host=None, until=0.0)
     throttle._unreachable.clear()
-    FakeVizier.scenario, FakeVizier.calls = {}, []
+    FakeVizier.scenario, FakeVizier.calls, FakeVizier.cached = {}, [], {}
     pkg, vz = types.ModuleType("astroquery"), types.ModuleType("astroquery.vizier")
     vz.Vizier = FakeVizier
     monkeypatch.setitem(sys.modules, "astroquery", pkg)
@@ -141,7 +152,7 @@ def test_a_failure_that_is_not_about_the_answer_does_not_halve_the_batch(fallbac
 
     monkeypatch.setattr(fallback, "MIN_SPLIT", 2)
 
-    def refused(self, coords, radius=None, catalog=None):
+    def refused(self, coords, radius=None, catalog=None, cache=True):
         FakeVizier.calls.append((len(coords), None))
         raise requests.exceptions.ConnectionError("refused")
 

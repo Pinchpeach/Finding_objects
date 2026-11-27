@@ -735,3 +735,17 @@ def test_a_request_that_fails_everywhere_leaves_no_mirror_to_distrust():
         bad(None, "GET", "https://vizier.cds.unistra.fr/viz-bin/votable?-source=I/355/gaiadr3")
     assert throttle.last_host() is None and throttle.distrust_last_mirror() is None
 
+
+def test_a_cut_answer_is_reported_even_when_the_other_mirrors_refuse():
+    """Codex review of 2.61.6: one mirror cuts the table off, every other refuses; the request ends in the truncation
+    error (the caller can ask in smaller pieces), not in the last connection error."""
+    import requests
+
+    seen = []
+    behaviour = {h: requests.exceptions.ConnectionError for h in throttle.VIZIER_HOSTS}
+    behaviour["vizier.cfa.harvard.edu"] = VOTABLE[:60]
+    req = throttle._with_mirrors(_body_send(behaviour, seen))
+    with pytest.raises(requests.exceptions.ChunkedEncodingError, match="cut off"):
+        req(None, "GET", "https://vizier.cds.unistra.fr/viz-bin/votable?-source=I/355/gaiadr3")
+    assert len(seen) == len(throttle.VIZIER_HOSTS)
+

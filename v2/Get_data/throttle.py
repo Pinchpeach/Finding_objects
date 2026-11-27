@@ -589,6 +589,14 @@ def _with_mirrors(send):
                 _preferred.update(host=None, until=0.0)
             _local.last_host = host
             return resp
+        if cut is not None:
+            # A mirror served the table but cut it off, and no mirror gave it whole (the others cut it too, refused, timed
+            # out, lacked it or answered table-less): the request is too long for the mirrors, not absent.  That signal
+            # outranks a later connection error or an empty answer, so a caller can ask again in smaller pieces
+            # (Codex review of 2.61.6: CfA cut, the other five refused -> ConnectionError, and the batch was never halved).
+            raise requests.exceptions.ChunkedEncodingError(
+                f"VizieR: a mirror cut off a VOTable before </VOTABLE> and no mirror gave it whole ({catalog or 'the table'})"
+            )
         if empty is not None:
             return empty  # a table-less answer without an error that no mirror contradicted (2.47.0)
         if lacked is not None:
@@ -596,10 +604,6 @@ def _with_mirrors(send):
             raise RuntimeError(f"VizieR: no mirror gave {catalog or 'the table'}: {why[:160]}")
         if isinstance(last, Exception):
             raise last
-        if cut is not None and last is cut:  # every mirror cut the answer off: never hand half a table to the parser
-            raise requests.exceptions.ChunkedEncodingError(
-                f"VizieR: every mirror answered a VOTable cut off before </VOTABLE> ({catalog or 'the table'})"
-            )
         return last
 
     request.__wrapped__ = send

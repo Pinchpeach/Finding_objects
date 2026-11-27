@@ -51,7 +51,9 @@ def _batch_rows(v, chunk: pd.DataFrame, radius_arcsec: float, cct, throttle, att
     failure = None
     for attempt in range(attempts):
         try:
-            res = v.query_region(coords, radius=(radius_arcsec + EPOCH_MARGIN_ARCSEC) * u.arcsec, catalog="I/355/gaiadr3")
+            # astroquery caches an answer before it parses it: a retry with the cache would read the same unreadable body
+            # again and never reach ``throttle`` (Codex review of 2.61.6), so retries go to the network
+            res = v.query_region(coords, radius=(radius_arcsec + EPOCH_MARGIN_ARCSEC) * u.arcsec, catalog="I/355/gaiadr3", cache=attempt == 0)
             break
         except Exception as e:  # noqa: BLE001 - transient transfer / parse / server errors
             failure = e
