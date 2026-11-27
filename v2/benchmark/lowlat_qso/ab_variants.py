@@ -85,14 +85,23 @@ def main() -> int:
             kk = int((g.label == "QSO").sum())
             l2, h2 = S.wilson(kk, len(g))
             strata.append(dict(variant=name, stratum=s, n=len(g), qso=kk, recall=round(kk / len(g), 4), lo=round(l2, 4), hi=round(h2, 4)))
+        oth = res["qso_other"][res["qso_other"].stratum != "contaminant"].copy()
+        oth["key"] = oth.object_id.astype(str) + "@" + oth.region
+        now = set(oth.key)
         if control is None:
-            control = (set(q.index[q.label == "QSO"]), set(res["qso_other"][res["qso_other"].stratum != "contaminant"].object_id.astype(str) + "@" + res["qso_other"][res["qso_other"].stratum != "contaminant"].region))
+            control = (set(q.index[q.label == "QSO"]), set(oth.key), oth)
         lost = len(control[0] - set(q.index[q.label == "QSO"]))
-        oth = res["qso_other"][res["qso_other"].stratum != "contaminant"]
-        now = set(oth.object_id.astype(str) + "@" + oth.region)
         r["quasars_lost_vs_control"] = lost
         r["false_removed_vs_control"] = len(control[1] - now)
         r["false_added_vs_control"] = len(now - control[1])
+        # the objects a switch removes are a subset of the control's: a paired bootstrap over the regions of the removed density
+        if control is not None and name != a.variants[0].split("=", 1)[0]:
+            ctl = control[2]
+            removed = ctl[~ctl.key.isin(now)].groupby("region").size()
+            rr = reg[["name", "area_deg2"]].copy()
+            rr["removed"] = rr.name.map(removed).fillna(0)
+            est, l, h = boot_density(rr, "removed")
+            r.update(removed_per_deg2=round(est, 2), removed_lo=round(l, 2), removed_hi=round(h, 2))
         rows.append(r)
     d = pd.DataFrame(rows)
     d.to_csv(a.out / "ab_variants.csv", index=False)
