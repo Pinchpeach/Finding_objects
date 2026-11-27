@@ -42,8 +42,16 @@ def aggregate(shards: Path, truth_dir: Path, out: Path, frozen: bool, source_com
     val = _load(CLS / "validate_independent_truth_sets.py", "agg_validate")
     bld = _load(CLS / "truth" / "build_independent_truth_sets.py", "agg_build")
     base = json.loads(baseline.read_text(encoding="utf-8")) if baseline and baseline.exists() else None
+    list_sha = bld.list_sha256(truth_dir)
+    mismatch = None
+    if base is not None and base.get("truth_list_sha256") != list_sha:
+        # a baseline measured on another truth list (left in truth/fixed/ after a refreeze) says nothing about this one: it is not used, as if
+        # there were none, and the status names it so that a new baseline is committed (Codex review of 2.62.0)
+        mismatch = {"baseline_truth_list_sha256": base.get("truth_list_sha256"), "truth_list_sha256": list_sha}
+        base = None
     status = val.run_status(rows, base)
-    status["truth_list_sha256"] = bld.list_sha256(truth_dir)
+    status["baseline_mismatch"] = mismatch
+    status["truth_list_sha256"] = list_sha
     status["truth_list_frozen"] = bool(frozen)
     status["source_commit"] = source_commit
     out.mkdir(parents=True, exist_ok=True)

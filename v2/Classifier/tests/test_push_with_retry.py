@@ -87,3 +87,30 @@ def test_prefer_ours_also_replays_a_deletion(tmp_path):
     files = set(git(remote, "ls-tree", "--name-only", "main").split())
     assert files == {"other.txt", "new.csv"} and git(remote, "show", "main:other.txt") == "from the other run\n"
 
+
+
+def test_prefer_ours_with_push_paths_also_writes_back_products_unchanged_against_the_trigger(tmp_path):
+    """Codex review of 2.62.0: this run's summary came out as in its trigger commit, another run had pushed a different one; without the
+    path list the remote summary stayed next to this run's predictions."""
+    remote, a, b = _repos(tmp_path)
+    (a / "val").mkdir()
+    (a / "val" / "predictions.csv").write_text("p,1\n")
+    (a / "val" / "summary.csv").write_text("s,1\n")
+    git(a, "add", "-A")
+    git(a, "commit", "-q", "-m", "trigger")
+    git(a, "push", "-q", "origin", "HEAD:main")
+    git(b, "pull", "-q", "origin", "main")
+    (a / "val" / "predictions.csv").write_text("p,2\n")
+    (a / "val" / "summary.csv").write_text("s,2\n")
+    (a / "val" / "stale.csv").write_text("only the other run wrote this\n")
+    git(a, "add", "-A")
+    git(a, "commit", "-q", "-m", "other run")
+    git(a, "push", "-q", "origin", "HEAD:main")
+    (b / "val" / "predictions.csv").write_text("p,3\n")  # this run: new predictions, the same summary as its trigger commit
+    git(b, "commit", "-q", "-am", "this run")
+    env = {**ENV, "PUSH_PREFER": "ours", "PUSH_PATHS": "val"}
+    r = subprocess.run(["bash", str(SCRIPT), "main"], cwd=b, env=env, capture_output=True, text=True)
+    assert r.returncode == 0, r.stderr
+    assert git(remote, "show", "main:val/predictions.csv") == "p,3\n" and git(remote, "show", "main:val/summary.csv") == "s,1\n"
+    assert "val/stale.csv" not in git(remote, "ls-tree", "-r", "--name-only", "main")  # the owned path is exactly this run's
+    assert git(remote, "show", "main:models.json") == "base\n"  # outside the owned paths: the remote's content

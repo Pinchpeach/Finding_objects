@@ -126,13 +126,41 @@ def test_the_baseline_is_written_from_a_run_and_read_back_by_the_next_one(tmp_pa
     sh.mkdir(parents=True)
     pd.DataFrame(_rows_with_coverage(100, 93)).to_csv(sh / "independent_truth_predictions.csv", index=False)
     out = tmp_path / "out"
-    assert A.aggregate(tmp_path / "shards", truth, out, True)["status"] == "OK"
+    first = A.aggregate(tmp_path / "shards", truth, out, True)
+    assert first["status"] == "OK"
     rows = pd.read_csv(out / "independent_truth_predictions.csv")
     cov = V.coverage_by_class(rows)
     assert cov == {"variability|RR_LYRAE": 0.93}
-    (tmp_path / "base.json").write_text(json.dumps({"tolerance": 0.05, "classes": cov}))
+    # as --write-baseline writes it: with the hash of the list it was measured on (a baseline of another list is not used)
+    (tmp_path / "base.json").write_text(json.dumps({"tolerance": 0.05, "truth_list_sha256": first["truth_list_sha256"], "classes": cov}))
     assert A.aggregate(tmp_path / "shards", truth, tmp_path / "out2", True, baseline=tmp_path / "base.json")["status"] == "OK"
     pd.DataFrame(_rows_with_coverage(100, 40)).to_csv(sh / "independent_truth_predictions.csv", index=False)
     st = A.aggregate(tmp_path / "shards", truth, tmp_path / "out3", True, baseline=tmp_path / "base.json")
     assert st["status"] == "DEGRADED" and st["coverage_drops"][0]["observed"] == 0.4
     assert "coverage below the baseline" in (tmp_path / "out3" / "INDEPENDENT_TRUTH_VALIDATION.md").read_text()
+
+
+def test_a_partial_answer_of_a_collector_is_an_archive_error(tmp_path, monkeypatch):
+    """Codex review of 2.62.0: agb_suh2021 / asas_sn_supernova return the rows of the tables that answered and mark the failed one in
+    ``*_query_status``; that row must be retried and make the run DEGRADED, not pass as ``ok``."""
+    frame = pd.DataFrame({"ra": [1.0], "dec": [2.0], "agb_query_status": ["error:J/ApJS/256/43/table2"]})
+    assert V.partial_failure(frame) == "error:J/ApJS/256/43/table2"
+    assert V.partial_failure(pd.DataFrame({"ra": [1.0], "ps1_query_status": ["vizier_fallback"]})) == ""  # an alternative source is not a failure
+    assert V.partial_failure(pd.DataFrame({"ra": [1.0]})) == ""
+
+    class Fake:
+        @staticmethod
+        def fetch(ra, dec, radius, **kw):
+            return frame
+
+        @staticmethod
+        def save(df, path):
+            pass
+
+    monkeypatch.setattr(V, "load_module", lambda path, name: Fake)
+    row = pd.Series(dict(truth_axis="physical", truth_class="AGB", truth_id="A1", ra=1.0, dec=2.0))
+    logs = V.collect(row, tmp_path, 2.0)
+    agb = [e for e in logs if e["collector"] == "agb_suh2021"][0]
+    assert agb["status"] == "error_partial" and agb["rows"] == 1
+    st = V.run_status([_row(1, cls="AGB", collectors=logs)])
+    assert st["status"] == "DEGRADED" and st["errors_by_collector"].get("agb_suh2021") == 1

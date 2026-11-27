@@ -65,3 +65,19 @@ def test_the_provenance_of_a_refit_names_the_list_the_predictions_and_the_run(tm
     st = A.aggregate(tmp_path / "shards", truth, tmp_path / "out", frozen=True, source_commit="abc")
     f = A.fitted_on(st, tmp_path / "out" / "independent_truth_predictions.csv", "4242")
     assert f["truth_list_sha256"] == st["truth_list_sha256"] and f["run_status"] == "OK" and f["run_id"] == "4242" and len(f["predictions_sha256"]) == 64
+
+
+def test_a_baseline_of_another_truth_list_is_not_used(tmp_path):
+    """Codex review of 2.62.0: after a refreeze the old baseline must not mark a healthy run DEGRADED (or hide a drop)."""
+    truth = _truth_dir(tmp_path)
+    _shard(tmp_path, "pn", [_row(1), {**_row(2), "classified": False, "predicted_class": "UNKNOWN", "match": False}])  # coverage 0.5
+    other = tmp_path / "baseline_other.json"
+    other.write_text(json.dumps({"tolerance": 0.05, "truth_list_sha256": "0" * 64, "classes": {"phenomenon|PN": 1.0}}))
+    st = A.aggregate(tmp_path / "shards", truth, tmp_path / "out", frozen=True, baseline=other)
+    assert st["status"] == "OK" and st["coverage_drops"] == [] and st["coverage_baseline"] is False
+    assert st["baseline_mismatch"]["baseline_truth_list_sha256"] == "0" * 64
+    same = tmp_path / "baseline_same.json"
+    same.write_text(json.dumps({"tolerance": 0.05, "truth_list_sha256": st["truth_list_sha256"], "classes": {"phenomenon|PN": 1.0}}))
+    st2 = A.aggregate(tmp_path / "shards", truth, tmp_path / "out2", frozen=True, baseline=same)
+    assert st2["status"] == "DEGRADED" and st2["coverage_drops"] and st2["baseline_mismatch"] is None
+

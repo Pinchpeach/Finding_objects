@@ -55,6 +55,19 @@ def run_cmd(args):
         raise RuntimeError("command failed: " + " ".join(map(str, args)) + "\n" + p.stderr[-3000:])
 
 
+def partial_failure(frame) -> str:
+    """The failed sub-queries a collector reports in a ``*_query_status`` column while returning the rows of the others
+    (``agb_suh2021`` ``agb_query_status``, ``asas_sn_supernova`` ``sn_query_status``: ``error:<table>``); '' when none failed.
+
+    Such a frame is not empty, so without this check it was logged ``ok`` and escaped the retry and the OK / DEGRADED gate (Codex review of 2.62.0).
+    """
+    bad = set()
+    for c in getattr(frame, "columns", ()):
+        if str(c).endswith("_query_status"):
+            bad |= {str(v) for v in frame[c].astype(str) if str(v).strip().lower().startswith("error")}
+    return ",".join(sorted(bad))
+
+
 def collect(row, raw, radius):
     logs = []
     names = COLLECTORS.get((str(row.truth_axis), str(row.truth_class)), ())
@@ -64,7 +77,11 @@ def collect(row, raw, radius):
             kwargs = {"kinds": SOS_KIND[str(row.truth_class)]} if name == "gaia_dr3_variability_sos_vizier" else {}
             frame = mod.fetch(float(row.ra), float(row.dec), radius, **kwargs)
             mod.save(frame, raw / f"{name}.csv")
-            logs.append({"collector": name, "status": "ok" if len(frame) else "empty", "rows": len(frame)})
+            partial = partial_failure(frame)
+            if partial:  # rows came back but a sub-query failed: an archive error like any other (archive_errors counts status error*)
+                logs.append({"collector": name, "status": "error_partial", "rows": len(frame), "error": partial})
+            else:
+                logs.append({"collector": name, "status": "ok" if len(frame) else "empty", "rows": len(frame)})
         except Exception as exc:
             logs.append({"collector": name, "status": "error", "rows": 0, "error": repr(exc)})
     return logs

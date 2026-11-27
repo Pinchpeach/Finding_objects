@@ -202,7 +202,9 @@ jobs:
           git add v2/Classifier/validation/independent_truth v2/Classifier/validation/REAL_SAMPLE_VALIDATION.md v2/Classifier/validation/real_sample_validation.csv
           if ! git diff --cached --quiet; then
             git commit -m "Update sharded scientific validation products"
-            PUSH_PREFER=ours bash .github/scripts/push_with_retry.sh "${{ github.ref_name }}"
+            # every product of this run, also those that came out as in the trigger commit, replaces the remote's (push_with_retry.sh)
+            PUSH_PREFER=ours PUSH_PATHS="v2/Classifier/validation/independent_truth v2/Classifier/validation/REAL_SAMPLE_VALIDATION.md v2/Classifier/validation/real_sample_validation.csv" \
+              bash .github/scripts/push_with_retry.sh "${{ github.ref_name }}"
           fi
       - name: DEGRADED run - products are uploaded, not committed
         if: ${{ steps.merge.outputs.state != 'OK' && !inputs.commit_degraded }}
