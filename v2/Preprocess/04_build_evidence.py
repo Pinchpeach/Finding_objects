@@ -28,6 +28,7 @@ def _import_local(name):
 
 _V2 = Path(__file__).resolve().parents[1]
 TABLE_IO = _load("v2_table_io", _V2 / "Preprocess" / "table_io.py")
+LOWLAT = _load("v2_lowlat_qso_s4", _V2 / "Preprocess" / "lowlat_qso.py")  # low-latitude QSO switches (2.61.2, off by default)
 GA = _load("v2_gaia_assumptions", _V2 / "Preprocess" / "gaia_assumptions.py")  # Gaia release constants (2.60.6)
 OTYPES = _load("v2_simbad_otypes_s4", _V2 / "Classifier" / "simbad_otypes.py")
 # SIMBAD-TYPE-001 through the otype hierarchy (2.22.0; the old exact-code map
@@ -479,7 +480,7 @@ def evaluate(rule, row, namespaced=frozenset()):
         # 68, of them 65 quasars) with the same accuracy.
         w1, w2, s1, s2 = (num(src, x) for x in ("W1mag", "W2mag", "snr1", "snr2"))
         ra, dec = num(src, "RAJ2000"), num(src, "DEJ2000")
-        if None not in (w1, w2, s1, s2) and s1 >= 3 and s2 > R90_MIN_SNR2 and w1 > 8 and w2 > 7 and _r90_sky(ra, dec) and not row.get(NIR_POINT):
+        if None not in (w1, w2, s1, s2) and s1 >= 3 and s2 > R90_MIN_SNR2 and w1 > 8 and w2 > 7 and _r90_sky(ra, dec) and not row.get(NIR_POINT) and LOWLAT.wise_rule_allowed(rid, row, ra, dec):
             cut = 0.650 if w2 <= 13.86 else 0.650 * math.exp(0.153 * (w2 - 13.86) ** 2)
             color = w1 - w2
             if color > cut:
@@ -544,7 +545,8 @@ def evaluate(rule, row, namespaced=frozenset()):
                 )
     elif rid == "WISE-AGN-001":
         w1, w2, s1, s2 = (num(src, x) for x in ("W1mag", "W2mag", "snr1", "snr2"))
-        if None not in (w1, w2, s1, s2) and w1 - w2 >= 0.8 and w2 <= 15.05 and s1 >= 10 and s2 >= 10:
+        ra, dec = num(src, "RAJ2000"), num(src, "DEJ2000")
+        if None not in (w1, w2, s1, s2) and w1 - w2 >= 0.8 and w2 <= 15.05 and s1 >= 10 and s2 >= 10 and LOWLAT.wise_rule_allowed(rid, row, ra, dec):
             hit(
                 "EXTRAGALACTIC",
                 0.95,

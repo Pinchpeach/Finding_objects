@@ -54,6 +54,9 @@ _fp_s.loader.exec_module(FAINT)
 _ah_s = _tio_u.spec_from_file_location("v2_agn_host", Path(__file__).resolve().parent / "agn_host.py")
 AGN_HOST = _tio_u.module_from_spec(_ah_s)
 _ah_s.loader.exec_module(AGN_HOST)
+_ll_s = _tio_u.spec_from_file_location("v2_lowlat_qso", Path(__file__).resolve().parent / "lowlat_qso.py")
+LOWLAT = _tio_u.module_from_spec(_ll_s)
+_ll_s.loader.exec_module(LOWLAT)
 _cg_s = _tio_u.spec_from_file_location("v2_coarse_gbm", Path(__file__).resolve().parent / "coarse_gbm.py")
 COARSE_GBM = _tio_u.module_from_spec(_cg_s)
 _cg_s.loader.exec_module(COARSE_GBM)
@@ -679,6 +682,8 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     qveto = qf / qmag  # literature cuts failed (VETO each), evidence rather than a prior
     qso_min = QSO_OPT.desi_threshold(df) if "c3b" in opts else np.zeros(len(df))
     faint = QSO_OPT.r_mag(df) > 22 if "c8" in opts else np.zeros(len(df), bool)
+    # Low-latitude limits on the QSO label (2.61.2, lowlat_qso.py; V2_LOWLAT_QSO, off by default): held back like a faint QSO
+    faint = faint | LOWLAT.qso_forbidden(df)
     # Bright clean 2MASS point sources (2.41.0, nir_star.py): where the
     # evidence is absent or conflicting with STAR among it, the sky counts
     # decide (stars outnumber galaxies >= 25:1 and quasars >= 10^4:1 at

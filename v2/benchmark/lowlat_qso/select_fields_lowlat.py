@@ -46,8 +46,18 @@ def _sep_arcmin(ra1, dec1, ra2, dec2) -> np.ndarray:
     return np.degrees(np.arccos(np.clip(c, -1, 1))) * 60.0
 
 
-def select(d: pd.DataFrame) -> pd.DataFrame:
+def select(d: pd.DataFrame, exclude: pd.DataFrame | None = None, prefix: str = "lq", quota: dict | None = None,
+           contaminants: bool = True) -> pd.DataFrame:
+    """The regions of the rule.  ``exclude``: the regions of an earlier draw (columns ra, dec): their cones and everything
+    within 2 R of them are left out, so a second draw from the same two samples does not overlap the first (the confirmation
+    set of 2.61.2: same rule, the pool that remains)."""
+    quota = QUOTA if quota is None else quota
     q = d[(d.cls == "qso") & (d.also_in.fillna("") != "huo")].copy()
+    if exclude is not None and len(exclude):
+        far = np.ones(len(q), bool)
+        for e in exclude.itertuples():
+            far &= _sep_arcmin(q.ra.to_numpy(), q.dec.to_numpy(), e.ra, e.dec) > 2 * R_ARCMIN
+        q = q[far]
     q["stratum"] = np.digitize(q.b.abs(), B_EDGES) - 1
     q["lbin"] = np.digitize(q.l, L_EDGES) - 1
     q["ebin"] = np.where(q.ebv.isna(), 3, np.digitize(q.ebv.fillna(0), EBV_EDGES) - 1)
@@ -62,19 +72,19 @@ def select(d: pd.DataFrame) -> pd.DataFrame:
         cells = {c: g.sort_values("k").itertuples() for c, g in q[q.stratum == s].groupby("cell")}
         queues = {c: list(it) for c, it in cells.items()}
         n = 0
-        while n < QUOTA[s] and any(queues.values()):
+        while n < quota.get(s, 0) and any(queues.values()):
             for c in sorted(queues):
                 while queues[c]:
                     row = queues[c].pop(0)
                     if free(row):
-                        picked.append(dict(name=f"lq{s}_{n:03d}", stratum=f"b{int(B_EDGES[s])}-{int(B_EDGES[s + 1])}",
+                        picked.append(dict(name=f"{prefix}{s}_{n:03d}", stratum=f"b{int(B_EDGES[s])}-{int(B_EDGES[s + 1])}",
                                            kind="qso", center_name=row.name, center_sample=row.sample, ra=row.ra,
                                            dec=row.dec, l=row.l, b=row.b, ebv=row.ebv, imag=row.imag, z=row.z))  # fmt: skip
                         n += 1
                         break
-                if n >= QUOTA[s]:
+                if n >= quota.get(s, 0):
                     break
-    c = d[d.cls.isin(["star", "galaxy"])].copy()
+    c = d[d.cls.isin(["star", "galaxy"])].copy() if contaminants else d.iloc[0:0].copy()
     c["k"] = c.name.map(_key)
     for j, row in enumerate(c.sort_values("k").itertuples()):
         if free(row):
@@ -88,8 +98,12 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--truth", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
+    ap.add_argument("--exclude", type=Path, help="regions of an earlier draw: a second draw from the pool that remains (confirmation set)")
+    ap.add_argument("--prefix", default="lq")
+    ap.add_argument("--quota", help="b0,b1,b2,b3 per stratum (default 20,50,40,40)")
     a = ap.parse_args()
-    f = select(pd.read_csv(a.truth))
+    quota = None if not a.quota else dict(enumerate(int(x) for x in a.quota.split(",")))
+    f = select(pd.read_csv(a.truth), pd.read_csv(a.exclude) if a.exclude else None, a.prefix, quota, contaminants=not a.exclude)
     f["ra"], f["dec"] = f.ra.round(5), f.dec.round(5)
     f.to_csv(a.out, index=False)
     print(f.groupby(["stratum", "kind"]).size().to_string())
