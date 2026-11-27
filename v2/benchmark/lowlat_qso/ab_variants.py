@@ -67,6 +67,7 @@ def main() -> int:
     if a.only:
         regions = regions[regions.name.isin(a.only.split(","))]
     rows, strata, control = [], [], None
+    per_object, per_quasar = None, None  # one table each, one column per variant (the labels the numbers come from)
     for spec in a.variants:
         name, root = spec.split("=", 1)
         res = S.score_regions(regions, truth, Path(root), a.radius)
@@ -84,13 +85,17 @@ def main() -> int:
         for s, g in q.groupby("stratum"):
             kk = int((g.label == "QSO").sum())
             l2, h2 = S.wilson(kk, len(g))
-            strata.append(dict(variant=name, stratum=s, n=len(g), qso=kk, recall=round(kk / len(g), 4), lo=round(l2, 4), hi=round(h2, 4)))
+            sr = regions[(regions.stratum == s) & regions.name.isin(reg.name)]
+            area = float(reg[reg.name.isin(sr.name)].area_deg2.sum())
+            nfalse = int(len(res["qso_other"][(res["qso_other"].stratum == s)]))
+            strata.append(dict(variant=name, stratum=s, n=len(g), qso=kk, recall=round(kk / len(g), 4), lo=round(l2, 4), hi=round(h2, 4),
+                               regions=len(sr), area_deg2=round(area, 4), false_n=nfalse, false_per_deg2=round(nfalse / area, 2) if area else float("nan")))  # fmt: skip
         oth = res["qso_other"][res["qso_other"].stratum != "contaminant"].copy()
         oth["key"] = oth.object_id.astype(str) + "@" + oth.region
         now = set(oth.key)
         if control is None:
-            control = (set(q.index[q.label == "QSO"]), set(oth.key), oth)
-        lost = len(control[0] - set(q.index[q.label == "QSO"]))
+            control = (set(q.name[q.label == "QSO"]), set(oth.key), oth)
+        lost = len(control[0] - set(q.name[q.label == "QSO"]))  # per quasar (a cone can hold several)
         r["quasars_lost_vs_control"] = lost
         r["false_removed_vs_control"] = len(control[1] - now)
         r["false_added_vs_control"] = len(now - control[1])
@@ -103,6 +108,15 @@ def main() -> int:
             est, l, h = boot_density(rr, "removed")
             r.update(removed_per_deg2=round(est, 2), removed_lo=round(l, 2), removed_hi=round(h, 2))
         rows.append(r)
+        o = oth.drop(columns=["key"]).assign(**{name: True})
+        key = ["region", "object_id"]
+        per_object = o if per_object is None else per_object.merge(o[key + [name]], on=key, how="outer")
+        t = q.reset_index()[["region", "name", "sample", "stratum", "b", "l", "imag", "z", "n_catalogs", "label"]].rename(columns={"label": name})
+        per_quasar = t if per_quasar is None else per_quasar.merge(t[["name", name]], on="name", how="outer")
+    for c in [v.split("=", 1)[0] for v in a.variants]:
+        per_object[c] = per_object[c].where(per_object[c].notna(), False).astype(bool)
+    per_object.to_csv(a.out / "qso_labelled_not_sample_by_variant.csv.gz", index=False)
+    per_quasar.to_csv(a.out / "sample_quasars_by_variant.csv", index=False)
     d = pd.DataFrame(rows)
     d.to_csv(a.out / "ab_variants.csv", index=False)
     pd.DataFrame(strata).to_csv(a.out / "ab_variants_by_stratum.csv", index=False)

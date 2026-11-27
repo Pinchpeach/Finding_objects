@@ -1,0 +1,21 @@
+id,what,predicted,observed,holds
+1,base recall b5-10,46%,45.0% (27/60; 95 % 33%-58%),yes
+1,base recall b10-15,78%,78.0% (32/41; 95 % 63%-88%),yes
+1,base recall b15-20,75%,85.7% (36/42; 95 % 72%-93%),yes
+1,base recall overall,55%-70%,66.4% (95/143; 95 % 58%-74%),yes
+2,base false QSO density (per deg^2),156 (90-250),159.2 (bootstrap 90-242; n = 175),yes
+2,share of false labels on one survey,45 % (35%-55%),53.7%,yes
+3,surveys2: sample quasars lost (of 143),<= 2,0,yes
+3,surveys2: share of false labels removed,30%-60%,"53.7% (94 of 175; paired 85.5 deg^-2, 41.8-141.0)",yes
+4,surveys3: sample quasars lost (of 143),<= 3,0,yes
+4,surveys3: share of false labels removed,60%-85%,"80.0% (140 of 175; paired 127.3 deg^-2, 66.4-202.8)",yes
+5,pm: sample quasars lost (of 143),<= 2,0,yes
+5,pm: labels changed,<= 2,"0 false, 0 quasars",yes
+6,wise_second: sample quasars lost (of 143),<= 0,0,yes
+6,wise_second: share of false labels removed,8%-25%,"18.9% (33 of 175; paired 30.0 deg^-2, 18.2-42.7)",yes
+7,base: false labels with PS1 i < 19.5 (per deg^2),> 8,11.8 (n = 13),yes
+7,surveys2: false labels with PS1 i < 19.5 (per deg^2),> 8,8.2 (n = 9),yes
+7,surveys3: false labels with PS1 i < 19.5 (per deg^2),> 8 (about 10),6.4 (n = 7),NO
+7,wise_second: false labels with PS1 i < 19.5 (per deg^2),> 8,8.2 (n = 9),yes
+7,surveys2_wise_second_wise_footprint: false labels with PS1 i < 19.5 (per deg^2),> 8,8.2 (n = 9),yes
+8,all switches inert at |b| >= 20 deg,identical,identical,yes

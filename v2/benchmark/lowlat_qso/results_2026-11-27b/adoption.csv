@@ -1,0 +1,6 @@
+candidate,quasars_lost,removed_per_deg2,removed_lo,removed_hi,a_interval_above_0,b_lost_at_most_3,c_highlat_identical,adopted_as_option
+surveys2,0,85.49,41.84,140.97,yes,yes,yes,yes
+surveys3,0,127.32,66.39,202.83,yes,yes,yes,yes
+pm,0,0.0,0.0,0.0,NO,yes,yes,NO
+wise_second,0,30.01,18.19,42.74,yes,yes,yes,yes
+surveys2_wise_second_wise_footprint,4,85.49,41.84,140.97,yes,NO,yes,NO

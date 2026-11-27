@@ -107,3 +107,60 @@ python score_lowlat_qso.py score --root ROOT --regions fields_lowlat.csv --truth
 ```
 or run the workflow `Low-latitude quasar recall (measurement)` (169 region jobs + score job, results committed to
 `v2/benchmark/lowlat_qso/results_<VERSION>/` on a non-main branch).
+
+## 6. Limiting the false QSO labels (2.61.2)
+
+**What was done.**  (1) The 170 objects of the calibration regions that are labelled QSO but are not a sample quasar were taken apart
+(`dissect_false_qso.py`, `results_2026-11-27b/dissection/`): 28 % rest on Legacy Surveys alone and 16 % on AllWISE alone (77 of 170 on
+one catalogue), 22 % on AllWISE plus one other, 33 % on two or more surveys; one cone holds 30 of them and ten cones 56 %.  Of the 106
+with W1, W2: 80 % have W1-W2 >= 0.8, 73 % lie in the Koenig & Leisawitz (2014) Class I/II colour region (so colours alone do not
+separate them from young stellar objects), 95 % in their AGN colour-magnitude region.  All 33 with a Gaia row pass the Fu et al.
+(2021, Sec. 5.3) proper-motion cut, none has parallax S/N > 3, and 20 of 33 have a Gaia DSC quasar probability above 0.5: the
+astrometry removes nothing among them.  (2) The literature (`../../LITERATURE_LOWLAT_QSO_2026-11-27.md`) says: every quasar selection
+uses two surveys or more; the Stern et al. (2012) reliability is for high latitude; Assef et al. (2018) R90 is defined only for
+|b| > 10 deg and > 30 deg from the Galactic Centre; Gaia's own classification is 24 % pure over the sky.  (3) Switches in
+`Preprocess/lowlat_qso.py` (`V2_LOWLAT_QSO`, off by default, act only at |b| < 20 deg) were tried on the 169 calibration regions;
+(4) the survivors were scored once on 140 new regions drawn by the same rule from the pool that remains
+(`fields_lowlat_confirm.csv`, SHA-256 `8638a9df...` written to `PREDICTIONS_CONFIRM.md` with the predictions and the adoption
+criteria **before** the first of them was collected; collected blind from this session's container on 2026-11-27).
+
+**Result** (`results_2026-11-27b/`; false = labelled QSO, not a sample quasar; density per deg^2 of the cones with a region-bootstrap
+95 % interval; "removed" = the paired density of control labels the switch takes away):
+
+| variant | set | sample quasars labelled QSO | false QSO density | with PS1 i < 19.5 | quasars lost | removed (paired) |
+|---|---|---|---|---|---|---|
+| base | calibration | 86 / 150 (57 %) | 144 [90-211] | 19.5 | - | - |
+| base | confirmation | 95 / 143 (66 %; 5-10 deg 45 %, 10-15 78 %, 15-20 86 %) | 159 [90-242] | 11.8 | - | - |
+| `surveys2` | calibration | 86 | 79 [53-109] | 13.6 | 0 | 65 [32-108] |
+| `surveys2` | confirmation | 95 | 74 [45-108] | 8.2 | 0 | 85 [42-141] |
+| `surveys3` | calibration | 86 | 36.5 [25-48] | 10.2 | 0 | 108 [61-170] |
+| `surveys3` | confirmation | 95 | 31.8 [17-50] | 6.4 | 0 | 127 [66-203] |
+| `wise_second` | calibration | 86 | 121 [68-188] | 14.4 | 0 | 24 [14-34] |
+| `wise_second` | confirmation | 95 | 129 [64-208] | 8.2 | 0 | 30 [18-43] |
+| `pm` | both | unchanged | unchanged | | 0 | 0 |
+| `surveys2` + `wise_second` + `wise_footprint` | confirmation | 91 | 74 [45-108] | 8.2 | 4 | 85 [42-141] |
+
+Predictions (`results_2026-11-27b/predictions.csv`): 19 of 20 held.  **Failed:** prediction 7 for `surveys3` (false labels with
+PS1 i < 19.5 "stay above the high-latitude quasar density of 5-8 deg^-2, about 10"): observed 6.4 deg^-2 (7 objects, interval 1.8-11.8),
+which is not distinguishable from that density.  Adoption criteria (`adoption.csv`; the default stays off): `surveys2`, `surveys3` and
+`wise_second` are offered as options (paired removed-density interval above 0, 0 of 143 quasars lost, labels at |b| >= 20 deg
+identical in 5 fields at |b| = 42-72 deg / 32,866 objects, `highlat_identity.csv`; a 6th, a 1' Galactic-plane field, is below the limit and has no QSO label either way); `pm` removes nothing (criterion a fails); `wise_footprint` loses sample
+quasars (2 of 150, 4 of 143, all at 5-10 deg) and is not offered.  The 26 of 130,577 objects that differ between the collection-time
+output and the offline re-run are cone-edge objects (SGA components, Gaia/AllWISE singletons), none labelled QSO.
+
+**Limits.**  (a) Every sample quasar has at least 3 catalogues (the sample is selected through PS1, AllWISE and Gaia): 46 of the 181
+quasars labelled QSO have exactly 3, none has 2, and all 9 sample quasars with 2 were already unlabelled; so "0 quasars lost" is a
+statement about bright, well-observed quasars.  What `surveys2` / `surveys3` cost faint real quasars that have only two or three
+catalogues cannot be measured here.  (b) There is no purity: "false" means "not a sample quasar", and the 140 / 169 cones have no
+non-quasar truth beyond the 19 stars and galaxies of the calibration list (none of them was labelled QSO, base or variant; the confirmation draw has none).  (c) The recall is
+an upper bound for the bright PS1 + AllWISE-selected sample; LAMOST-type stars in the truth are bright.  (d) Gaia comes from the
+VizieR DR3 copy (no variability flags) until the ESA archive is back (2026-12-02).  (e) The switches change labels, so the locked
+set C scoring applies if one is turned on: its low-latitude pool `cpln` has only spectroscopic stars as truth, so it can show at
+most whether a star stops being labelled QSO, and it cannot show what the switches cost quasars or galaxies behind the plane.
+(f) 5 of the 140 confirmation regions had SDSS SkyServer error pages that the collector retried successfully; one lost its VLASS
+rows to a parse error (radio only).
+
+Reproduce: `ab_variants.py --variants base=ROOT ... --regions fields_lowlat_confirm.csv --truth lowlat_truth.csv.gz --out DIR`
+(each variant's `ROOT` is the compact output of the offline re-classification of the saved raw files with `V2_LOWLAT_QSO=<switches>`),
+then `adoption_check.py --calibration DIR1 --confirmation DIR2 --highlat-identical yes --out DIR3`; the identity at high latitude:
+`highlat_identity.py --raw RAWDIR... --out DIR`.
