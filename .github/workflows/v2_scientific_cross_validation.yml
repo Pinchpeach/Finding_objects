@@ -1,7 +1,24 @@
 name: v2 scientific cross validation
 
+# 2.61.9 (WORK_REPORT_2026-11-27g.md): the truth list is a committed, hash-checked file (v2/Classifier/truth/fixed), not "the first rows an archive
+# answers"; a run that met an archive error is DEGRADED and commits nothing; the calibration (models.json) is no longer committed by this workflow:
+# a refit is an explicit run (refit_calibration) whose result is an artifact for a human to commit with a version number.
+
 on:
   workflow_dispatch:
+    inputs:
+      freeze_truth:
+        description: 'Build the deterministic truth list and upload it as the artifact frozen-truth-candidate (commit it by hand to v2/Classifier/truth/fixed); validates nothing'
+        type: boolean
+        default: false
+      refit_calibration:
+        description: 'Refit the per-axis calibration and upload it as the artifact calibration-refit; nothing is committed'
+        type: boolean
+        default: false
+      commit_degraded:
+        description: 'Commit the validation products although the run is DEGRADED (archive errors); normally they are only uploaded'
+        type: boolean
+        default: false
   push:
     branches: [main]
     paths:
@@ -25,12 +42,16 @@ concurrency:
   group: v2-scientific-cross-validation-${{ github.ref }}
   # The independent runs can take hours. Preserve a started validation run so
   # a documentation or harness-only follow-up cannot erase its evidence.
+  # Runs of one ref are queued, not parallel, but a queued run checks out ITS trigger commit, so it does not contain the bot commit of the run before
+  # it: the commit step therefore lets this run's regenerated products win a conflict (PUSH_PREFER=ours).
   cancel-in-progress: false
 
 jobs:
   prepare:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
+    outputs:
+      frozen: ${{ steps.truth.outputs.frozen }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -38,21 +59,49 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install pandas numpy astropy astroquery requests scikit-learn
+      - run: pip install pandas numpy astropy astroquery requests scikit-learn pytest
       - name: Compile validation harness
         run: python -m py_compile v2/Classifier/validate_independent_truth_sets.py v2/Classifier/validate_real_samples.py
       - name: Unit tests
-        run: python -m unittest discover -s v2/Classifier/tests -v
-      - name: Build truth sets once
-        run: python -u v2/Classifier/truth/build_independent_truth_sets.py --out-dir v2/Classifier/truth/generated --limit 250
+        # pytest, not `unittest discover`: discover collects only the TestCase classes (6 of the 79 tests of v2/Classifier/tests) and silently skips the
+        # function-style tests (WORK_REPORT_2026-11-27g.md, table of what CI runs).
+        run: python -m pytest -q v2/Classifier/tests
+      - name: Truth list (verified when frozen, built deterministically otherwise)
+        id: truth
+        env:
+          FREEZE: ${{ inputs.freeze_truth }}
+        run: |
+          set -euo pipefail
+          work=v2/Classifier/truth/work
+          mkdir -p "$work"
+          if [ "$FREEZE" = "true" ]; then
+            python -u v2/Classifier/truth/build_independent_truth_sets.py --out-dir "$work" --limit 250 --require-complete
+            echo "frozen=candidate" >> "$GITHUB_OUTPUT"
+          elif [ -f v2/Classifier/truth/fixed/truth_manifest.json ]; then
+            python v2/Classifier/truth/build_independent_truth_sets.py --verify v2/Classifier/truth/fixed
+            cp v2/Classifier/truth/fixed/* "$work"/
+            echo "frozen=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::v2/Classifier/truth/fixed is not committed: the truth list is built now (deterministic, the same list a freeze run makes); the run is marked UNFROZEN"
+            python -u v2/Classifier/truth/build_independent_truth_sets.py --out-dir "$work" --limit 250
+            echo "frozen=false" >> "$GITHUB_OUTPUT"
+          fi
       - uses: actions/upload-artifact@v4
+        if: ${{ !inputs.freeze_truth }}
         with:
           name: independent-truth-sets
-          path: v2/Classifier/truth/generated/
+          path: v2/Classifier/truth/work/
           retention-days: 7
+      - uses: actions/upload-artifact@v4
+        if: ${{ inputs.freeze_truth }}
+        with:
+          name: frozen-truth-candidate
+          path: v2/Classifier/truth/work/
+          retention-days: 30
 
   validate-shard:
     needs: prepare
+    if: ${{ !inputs.freeze_truth }}
     strategy:
       fail-fast: false
       max-parallel: 9
@@ -80,9 +129,10 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: independent-truth-sets
-          path: v2/Classifier/truth/generated
+          path: v2/Classifier/truth/work
       - name: Validate shard
-        run: python -u v2/Classifier/validate_independent_truth_sets.py --truth-dir v2/Classifier/truth/generated --out-dir v2/Classifier/validation/shards/${{ matrix.key }} --per-class 250 --axis ${{ matrix.axis }} --truth-class ${{ matrix.class }} --max-workers 6
+        # a row that met an archive error is evaluated once more (--retry-errors); what still failed is reported in validation_status.json
+        run: python -u v2/Classifier/validate_independent_truth_sets.py --truth-dir v2/Classifier/truth/work --out-dir v2/Classifier/validation/shards/${{ matrix.key }} --per-class 250 --axis ${{ matrix.axis }} --truth-class ${{ matrix.class }} --max-workers 6 --retry-errors 1
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -91,10 +141,10 @@ jobs:
           retention-days: 7
 
   aggregate:
-    needs: validate-shard
-    if: always() && needs.validate-shard.result == 'success'
+    needs: [prepare, validate-shard]
+    if: always() && needs.validate-shard.result == 'success' && !inputs.freeze_truth
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
         with:
@@ -107,31 +157,65 @@ jobs:
         with:
           pattern: truth-shard-*
           path: v2/Classifier/validation/shards
-      - name: Merge shard predictions
+      - uses: actions/download-artifact@v4
+        with:
+          name: independent-truth-sets
+          path: v2/Classifier/truth/work
+      - name: Merge shard predictions and decide OK / DEGRADED
+        id: merge
+        env:
+          FROZEN: ${{ needs.prepare.outputs.frozen }}
         run: |
-          python - <<'PY'
-          from pathlib import Path
-          import importlib.util, pandas as pd
-          root=Path("v2/Classifier/validation")
-          files=list((root/"shards").glob("**/independent_truth_predictions.csv"))
-          if not files:
-              raise SystemExit("no shard predictions")
-          rows=pd.concat([pd.read_csv(p) for p in files],ignore_index=True)
-          spec=importlib.util.spec_from_file_location("val","v2/Classifier/validate_independent_truth_sets.py")
-          m=importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
-          m.write_report(rows,root/"independent_truth")
-          print(rows.groupby(["axis","truth_class"])[["classified","match"]].mean())
-          PY
-      - name: Fit supported per-axis probability calibrators
-        run: python -u v2/Classifier/calibration/fit_axis_calibration.py --input v2/Classifier/validation/independent_truth/independent_truth_predictions.csv --out v2/Classifier/calibration/models.json
+          set -euo pipefail
+          python v2/Classifier/aggregate_independent_truth.py --shards v2/Classifier/validation/shards --truth-dir v2/Classifier/truth/work \
+            --out v2/Classifier/validation/independent_truth --frozen "$FROZEN" --fitted-on-out "$RUNNER_TEMP/fitted_on.json" \
+            --baseline v2/Classifier/truth/fixed/baseline_coverage.json --write-baseline "$RUNNER_TEMP/baseline_coverage_candidate.json" 2> "$RUNNER_TEMP/status.txt" | tee -a "$GITHUB_OUTPUT"
+          mkdir -p baseline-candidate && cp "$RUNNER_TEMP/baseline_coverage_candidate.json" baseline-candidate/
+          { echo '### Cross validation'; echo '```json'; cat "$RUNNER_TEMP/status.txt"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: baseline-coverage-candidate
+          path: baseline-candidate/
+          retention-days: 30
+      - name: Refit the supported per-axis calibrators (explicit run only; the result is an artifact, nothing is committed)
+        if: ${{ inputs.refit_calibration }}
+        run: |
+          set -euo pipefail
+          cp v2/Classifier/calibration/models.json "$RUNNER_TEMP/models_refit.json"   # keeps the rules measured by other jobs (external_source)
+          python -u v2/Classifier/calibration/fit_axis_calibration.py --input v2/Classifier/validation/independent_truth/independent_truth_predictions.csv --out "$RUNNER_TEMP/models_refit.json" --fitted-on-json "$RUNNER_TEMP/fitted_on.json"
+          mkdir -p calibration-refit
+          cp "$RUNNER_TEMP/models_refit.json" calibration-refit/models.json
+          git diff --no-index --stat v2/Classifier/calibration/models.json calibration-refit/models.json | tee -a "$GITHUB_STEP_SUMMARY" || true
+      - uses: actions/upload-artifact@v4
+        if: ${{ inputs.refit_calibration }}
+        with:
+          name: calibration-refit
+          path: calibration-refit/
+          retention-days: 30
       - name: Run named-source blind validation
         run: python -u v2/Classifier/validate_real_samples.py --out-dir v2/Classifier/validation --max-workers 4
-      - name: Commit validation products
+      - name: Commit validation products (only an OK run; models.json is never committed here)
+        if: ${{ steps.merge.outputs.state == 'OK' || inputs.commit_degraded }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add v2/Classifier/validation/independent_truth v2/Classifier/validation/REAL_SAMPLE_VALIDATION.md v2/Classifier/validation/real_sample_validation.csv v2/Classifier/calibration/models.json
+          git add v2/Classifier/validation/independent_truth v2/Classifier/validation/REAL_SAMPLE_VALIDATION.md v2/Classifier/validation/real_sample_validation.csv
           if ! git diff --cached --quiet; then
             git commit -m "Update sharded scientific validation products"
-            bash .github/scripts/push_with_retry.sh "${{ github.ref_name }}"
+            # every product of this run, also those that came out as in the trigger commit, replaces the remote's (push_with_retry.sh)
+            PUSH_PREFER=ours PUSH_PATHS="v2/Classifier/validation/independent_truth v2/Classifier/validation/REAL_SAMPLE_VALIDATION.md v2/Classifier/validation/real_sample_validation.csv" \
+              bash .github/scripts/push_with_retry.sh "${{ github.ref_name }}"
           fi
+      - name: DEGRADED run - products are uploaded, not committed
+        if: ${{ steps.merge.outputs.state != 'OK' && !inputs.commit_degraded }}
+        run: |
+          echo "::warning::DEGRADED run (archive errors after the retry) - the products are in the artifact degraded-validation-products and the committed numbers are untouched"
+      - uses: actions/upload-artifact@v4
+        if: ${{ steps.merge.outputs.state != 'OK' && !inputs.commit_degraded }}
+        with:
+          name: degraded-validation-products
+          path: |
+            v2/Classifier/validation/independent_truth
+            v2/Classifier/validation/REAL_SAMPLE_VALIDATION.md
+            v2/Classifier/validation/real_sample_validation.csv
+          retention-days: 14
