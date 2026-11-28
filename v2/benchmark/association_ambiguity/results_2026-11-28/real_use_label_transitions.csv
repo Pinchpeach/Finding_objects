@@ -2,6 +2,7 @@ field,combo,base_label,label,n
 cosmos,density_typed,UNKNOWN,GALAXY,30
 cosmos,density_typed_surveys2,UNKNOWN,GALAXY,30
 cosmos,density_typed_surveys2_litkeep,UNKNOWN,GALAXY,30
+cosmos,fixed_sns2,QSO,UNKNOWN,16
 cosmos,surveys2,QSO,UNKNOWN,16
 cosmos,density_typed_surveys2,QSO,UNKNOWN,12
 cosmos,density_typed,GALAXY,UNKNOWN,7
@@ -15,4 +16,5 @@ cosmos,density_typed,UNKNOWN,QSO,1
 cosmos,density_typed_surveys2,STAR,UNKNOWN,1
 cosmos,density_typed_surveys2_litkeep,QSO,UNKNOWN,1
 cosmos,density_typed_surveys2_litkeep,STAR,UNKNOWN,1
+cosmos,fixed_sns2,UNKNOWN,GALAXY,1
 cosmos,surveys2_litkeep,QSO,UNKNOWN,1
