@@ -19,19 +19,33 @@ declare -A ENVS=(
   [floored]="V2_ASSOC_AMBIG= V2_ASSOC_ORDER_KEY=floored"
 )
 VARIANTS="base file position same nearest same_nearest floored"
+# A bare `wait` returns 0 whatever its children did (Codex review of 2.62.10): every child's pid is waited for by itself, and a failure ends the run as failed
+# (a partial baseline compared with complete variants gives spurious deltas).
+PIDS=()
+wait_all() {
+  local p failed=0
+  for p in "${PIDS[@]}"; do wait "$p" || failed=1; done
+  PIDS=()
+  if [ "$failed" -ne 0 ]; then
+    echo "a background job failed: see the logs in $O" >&2
+    python3 "$HERE/../run_info.py" end --out "$O/summary" --status failed
+    exit 1
+  fi
+}
 two() { # run the variants two at a time: two SUFFIX EXTRA_ARGS
-  local n=0
   for v in $VARIANTS; do
     python3 run_variant.py --fields-root "$R" --out "$O/$v$1" $2 --env ${ENVS[$v]} > "$O/$v$1.log" 2>&1 &
-    n=$((n+1)); if [ $((n % 2)) -eq 0 ]; then wait; fi
+    PIDS+=($!)
+    if [ "${#PIDS[@]}" -eq 2 ]; then wait_all; fi
   done
-  wait
+  wait_all
 }
 two "" ""
 two "_shift" "--shift"
 for v in $VARIANTS; do
   python3 measure_association.py --truth-flux "$T" --assoc-dir "$O/$v" --shifted-dir "$O/${v}_shift" --variant "$v" --out "$O/meas_$v" > "$O/meas_$v.log" 2>&1 &
+  PIDS+=($!)
 done
-wait
+wait_all
 python3 summarize_native_error_variants.py --root "$O" --out "$O/summary" --variants $VARIANTS --cats AllWISE "2MASS PSC" "GALEX AIS" --stem right_object
 python3 "$HERE/../run_info.py" end --out "$O/summary" --status ok

@@ -38,13 +38,22 @@ HEADLINE = ("right_object", "wrong_object", "unidentified", "shared", "displaced
 COUNTS = ("rows", "no_expected", "matched", "correct", "false", "unknown", "missed", "rightly_alone", "alone_identified", "alone_wrong", "alone_unidentified", "shared", "displaced", "shift_rows", "shift_false", "shift_any")
 
 
+SHIFT = ("shift_rows", "shift_false", "shift_any")  # only when the shifted-catalogue copy was measured
+
+
 def field_table(root: Path, variant: str) -> pd.DataFrame:
+    """Per field and catalogue the counts of ``measure_association.py``.  A count the measurement does not have is NOT read as 0 (Codex review of 2.62.10): a measurement
+    made before ``alone_*`` / ``shared`` / ``displaced`` existed would report no fragments and turn right_object into the anchor-dependent ``correct``.  A missing
+    required count stops the tool with the name of the folder to re-measure; the shift counts, which exist only with a shifted copy, stay missing (NaN)."""
     recs = json.loads((root / f"meas_{variant}" / f"per_field_{variant}.json").read_text())
     rows = []
     for r in recs:
         for c in CATS:
             if c in r:
-                rows.append({"variant": variant, "field": r["field"], "catalog": c, **{k: r[c].get(k, 0) for k in COUNTS}})
+                missing = [k for k in COUNTS if k not in r[c] and k not in SHIFT]
+                if missing:
+                    raise SystemExit(f"meas_{variant} {r['field']} {c}: the measurement has no {', '.join(missing)}; re-run measure_association.py (2.62.10) on this variant")
+                rows.append({"variant": variant, "field": r["field"], "catalog": c, **{k: r[c].get(k, float("nan")) for k in COUNTS}})
     return pd.DataFrame(rows)
 
 
@@ -56,7 +65,7 @@ def split_fields(fields: list[str], split_csv: Path) -> dict[str, list[str]]:
 
 
 def totals(t: pd.DataFrame) -> pd.DataFrame:
-    g = t.groupby(["variant", "catalog"])[list(COUNTS)].sum().reset_index()
+    g = t.groupby(["variant", "catalog"])[list(COUNTS)].sum(min_count=1).reset_index()  # min_count: a count missing in every field stays missing
     g["with_expected"] = g.rows - g.no_expected
     # the anchor independent reading (review of 2.62.7): the row sits in an object that holds an acceptable counterpart, joined (correct) or as the anchor (alone_identified)
     g["right_object"] = g.correct + g.alone_identified

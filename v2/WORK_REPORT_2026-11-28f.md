@@ -191,4 +191,8 @@ main의 최종 정의(`right_object`·`wrong_object`·`unidentified`)와 내가 
   - **`shared`/`displaced`의 앵커 불변 합성 시험**: 원래 시험 2개는 붙기/떨어지기(구성 변화)에서 값이 바뀌는 것을 보였을 뿐, "구성이 같고 앵커만 다른" 경우가 없었다. 위의 새 시험이 그 경우이고, 그 경우에서 불변이 아니었으므로 고쳤다.
   - **문서 오류 6건**: `NEXT_RELEASE_DOCS.md` 11–16번(768칸, 플레이트 142, LS-GBM 149,769 / 95.6 %, 520개 목록, 세트 C 60 영역, 28,194)에 모두 있다. 17·18번의 앵커 무관 수치에는 잠정 표시를 붙였다.
 - **참조 천체 목록(요청 1)**: git 이력에서 2.46.1 목록(85f88537)을 바이트 그대로 되살릴 수 있다. 두 목록은 행 수(14,108)와 코드별 개수가 같고 1,686행의 천체가 다르다. 검증 계획 520개는 2.46.1 목록에 모두 있고 지금 목록에는 466개만 있다. 소비자는 `validate_reference_objects.py`(plan 모드는 목록에서 뽑고, run 모드는 plan.csv 좌표를 쓴다), `build-reference-objects.yml`(매니페스트 확인), `truth_manifest.py`(매니페스트), `doc_claims_check.py`, `server_fill_dependence.py`(연구), `overview_content.py`(개수만)다. 되살리기는 매니페스트 갱신과 함께 **다음 PR(2.62.11)로 따로** 한다. 이 PR의 `doc_claims` 결과는 지금 목록 기준이라 섞지 않는다.
+- **Codex 검토(P2 2건, 받아들여 고침)**:
+  1. `right_object_recount.py`가 옛 측정 JSON에 없는 셈(`alone_*`, `shared`, `displaced`, `shift_any`)을 `0`으로 읽었다. 그러면 옛 측정은 조각 0, `right_object` = `correct`로 보이고, 옛 측정과 새 측정을 섞으면 가짜 차이가 생긴다. 이제 필요한 셈이 없으면 그 폴더를 다시 재라고 하며 멈춘다. 이동 셈(`shift_*`)은 이동 사본을 쟀을 때만 있으므로 결측으로 두고, 합계도 결측으로 남긴다(`min_count=1`).
+  2. `run_right_object_variants.sh`의 맨 `wait`는 자식의 실패와 무관하게 0을 돌려준다. 그래서 기준 실행의 일부 영역이 실패해도 `--status ok`로 끝나, 부분 기준선과 완전한 변형을 비교할 수 있었다. 이제 자식마다 pid로 기다리고, 하나라도 실패하면 run_info를 failed로 쓰고 멈춘다.
+  - 시험 2개를 더했다(옛 코드에서는 실패한다).
 

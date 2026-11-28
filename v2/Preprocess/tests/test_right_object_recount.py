@@ -100,3 +100,31 @@ def test_the_headline_readings_are_the_ones_metrics_md_marks_as_independent_of_t
     for name in ("correct", "missed", "rightly_alone", "shifted_false_pct"):
         assert name in rows and "아니오" not in rows[name][2][:6], f"{name} should be marked as anchor dependent"
         assert rows[name][3].replace("*", "").startswith("아니오"), f"{name} must not be marked for variant comparison"
+
+
+def test_a_measurement_without_the_new_counts_is_refused_not_read_as_zero(tmp_path):
+    """Codex review of 2.62.10: a per-field JSON made before alone_* / shared / displaced existed must not give right_object = correct and zero fragments."""
+    import json
+
+    import pytest
+
+    (tmp_path / "meas_old").mkdir()
+    old = [{"field": "deep_cosmos_1", "AllWISE": {"rows": 10, "no_expected": 1, "matched": 5, "correct": 4, "false": 1, "unknown": 0, "missed": 2, "rightly_alone": 2}}]
+    (tmp_path / "meas_old" / "per_field_old.json").write_text(json.dumps(old))
+    with pytest.raises(SystemExit, match="re-run measure_association"):
+        RR.field_table(tmp_path, "old")
+    new = [{"field": "deep_cosmos_1", "AllWISE": {k: 1 for k in RR.COUNTS if k not in RR.SHIFT}}]  # no shifted copy measured
+    (tmp_path / "meas_new").mkdir()
+    (tmp_path / "meas_new" / "per_field_new.json").write_text(json.dumps(new))
+    t = RR.field_table(tmp_path, "new")
+    assert t.shift_any.isna().all() and RR.totals(t).shift_any.isna().all()  # missing, not 0
+
+
+def test_the_runner_waits_for_every_background_job_by_its_pid():
+    """Codex review of 2.62.10: a bare `wait` returns 0 whatever the children did."""
+    import re
+
+    text = (Path(__file__).resolve().parents[2] / "benchmark" / "association_truth" / "run_right_object_variants.sh").read_text()
+    code = [l.split("#")[0] for l in text.splitlines()]
+    assert not any(re.fullmatch(r"\s*wait\s*;?\s*", l) or re.search(r"then wait;", l) for l in code), "a bare wait"
+    assert any('wait "$p"' in l for l in code) and sum("PIDS+=($!)" in l for l in code) == 2
