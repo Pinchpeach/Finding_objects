@@ -14,6 +14,7 @@ declare -A ENVS=(
 )
 VARIANTS="base allwise allwise_order allwise_sigma floored"
 for S in real cal conf; do
+  mkdir -p "$O/$S"
   for sh in "" "_shift"; do
     n=0
     for v in $VARIANTS; do

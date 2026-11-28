@@ -1,0 +1,3 @@
+field,ra,dec,r,cls_b,cls_v,catalogs_b,catalogs_v,object_b,object_v,changed,n_catalogs_b,n_catalogs_v
+ngc,188.40135911216424,9.178495276302767,19.52011634976776,STAR,UNKNOWN,DESI Legacy Surveys DR10|Gaia DR3|Pan-STARRS1 DR2 MeanObject,DESI Legacy Surveys DR10,OBJ000006,OBJ000596,True,3,1
+plane,283.794259,-2.105282,,UNKNOWN,STAR,AllWISE|NED,2MASS PSC|AllWISE|NED,OBJ000596,OBJ000480,True,2,3

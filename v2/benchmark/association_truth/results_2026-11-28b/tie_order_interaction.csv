@@ -1,0 +1,16 @@
+variant,field,objects,differ_file_vs_brightness,differ_position_vs_brightness,differ_file_vs_position
+base,cosmos,3572,346,13,341
+base,ngc,609,16,20,5
+base,plane,597,0,0,0
+allwise,cosmos,3572,346,13,341
+allwise,ngc,608,16,20,5
+allwise,plane,597,0,0,0
+allwise_order,cosmos,3572,346,13,341
+allwise_order,ngc,608,16,20,5
+allwise_order,plane,597,0,0,0
+allwise_sigma,cosmos,3572,346,13,341
+allwise_sigma,ngc,609,16,20,5
+allwise_sigma,plane,597,0,0,0
+floored,cosmos,3571,350,22,343
+floored,ngc,617,18,22,14
+floored,plane,597,2,4,2

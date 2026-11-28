@@ -11,6 +11,9 @@
 * ``allwise_rows_joined``                        AllWISE rows of the real run that joined an object anchored by another catalogue (the joins the variant makes);
 * ``shifted_false`` / ``shifted_false_pct``      shifted rows of one catalogue that joined an object anchored by an UNshifted catalogue (``measure_association.py``'s definition,
                                                   the 2.49.0 test): chance joins, since the shifted catalogue has no counterpart left; per catalogue and for all three;
+* ``shifted_any_pct``                            shifted rows whose object holds ANY row of an unshifted catalogue (2.62.7).  The definition above depends on who anchors: a shifted AllWISE
+                                                  row that anchors its object and collects optical rows is a chance join too, but is not counted.  An order key that moves AllWISE rows behind
+                                                  the optical rows (``floored``) turns those into "joined to an unshifted-anchored object" and the rate jumps without any more chance joins;
 * ``objects_differing_from_base`` / ``fields_identical_to_base``   member sets that differ (object ids are not comparable between runs).
 
 The per-field change of ``objects`` and of ``anchored_by_AllWISE`` is summarised by its median and its 5 / 95 percentiles over the fields (``d_objects_*``).
@@ -37,6 +40,7 @@ def partition(a: pd.DataFrame) -> set:
 def one(root: Path, s: str, v: str, base: str, fields: list[str]) -> dict:
     n_obj = n_aw = joined = differ = same = 0
     sh = {c: [0, 0] for c in SHIFTED}
+    sh_any = {c: 0 for c in SHIFTED}
     d_obj, d_aw = [], []
     for f in fields:
         x = pd.read_csv(root / s / v / f / "source_association.csv", low_memory=False)
@@ -46,10 +50,12 @@ def one(root: Path, s: str, v: str, base: str, fields: list[str]) -> dict:
         w = x[x.catalog == "AllWISE"]
         joined += int(((w.association_status == "matched") & (w.object_anchor_catalog != "AllWISE")).sum())
         y = pd.read_csv(root / s / f"{v}_shift" / f / "source_association.csv", low_memory=False)
+        unshifted_objects = set(y.object_id[~y.catalog.isin(SHIFTED)])
         for c in SHIFTED:
             d = y[y.catalog == c]
             sh[c][0] += len(d)
             sh[c][1] += int(((d.association_status == "matched") & ~d.object_anchor_catalog.isin(SHIFTED)).sum())
+            sh_any[c] += int(d.object_id.isin(unshifted_objects).sum())
         if v != base:
             b = pd.read_csv(root / s / base / f / "source_association.csv", low_memory=False)
             ob = b.groupby("object_id").object_anchor_catalog.first()
@@ -64,12 +70,14 @@ def one(root: Path, s: str, v: str, base: str, fields: list[str]) -> dict:
         q = lambda a, p: float(np.percentile(a, p)) if a else float("nan")  # noqa: E731
         rec.update(d_objects_median=q(d_obj, 50), d_objects_p5=q(d_obj, 5), d_objects_p95=q(d_obj, 95), d_anchored_by_AllWISE_median=q(d_aw, 50),
                    d_anchored_by_AllWISE_p5=q(d_aw, 5), d_anchored_by_AllWISE_p95=q(d_aw, 95))  # fmt: skip
-    tot_r = tot_f = 0
+    tot_r = tot_f = tot_a = 0
     for c, (r, k) in sh.items():
         rec[f"shift_rows_{c.split()[0]}"], rec[f"shift_false_{c.split()[0]}"] = r, k
         rec[f"shifted_false_pct_{c.split()[0]}"] = round(100 * k / r, 2) if r else float("nan")
-        tot_r, tot_f = tot_r + r, tot_f + k
+        rec[f"shifted_any_pct_{c.split()[0]}"] = round(100 * sh_any[c] / r, 2) if r else float("nan")
+        tot_r, tot_f, tot_a = tot_r + r, tot_f + k, tot_a + sh_any[c]
     rec["shifted_false_pct_all"] = round(100 * tot_f / tot_r, 2) if tot_r else float("nan")
+    rec["shifted_any_pct_all"] = round(100 * tot_a / tot_r, 2) if tot_r else float("nan")
     return rec
 
 
@@ -89,7 +97,7 @@ def main() -> int:
         for v in a.variants:
             rows.append(one(a.root, s, v, base, fields))
     t = pd.DataFrame(rows)
-    for col in ("objects", "anchored_by_AllWISE", "allwise_rows_joined", "shifted_false_pct_AllWISE", "shifted_false_pct_all"):
+    for col in ("objects", "anchored_by_AllWISE", "allwise_rows_joined", "shifted_false_pct_AllWISE", "shifted_false_pct_all", "shifted_any_pct_AllWISE", "shifted_any_pct_all"):
         t[f"d_{col}"] = t[col] - t.groupby("set")[col].transform("first")
     t["d_anchored_by_AllWISE_pct"] = (100 * t.d_anchored_by_AllWISE / t.groupby("set").anchored_by_AllWISE.transform("first")).round(2)
     t.to_csv(a.out / "outside_cosmos.csv", index=False)

@@ -1,0 +1,7 @@
+half,variant,rows,d_correct,d_correct_pct,d_rightly_alone,d_right_object,d_right_object_pct,d_missed,d_false,d_shifted_false_pct_anchored_definition,d_chance_joins_anchor_independent_pp,d_chance_joins_rows
+all,allwise_order,11658,378,5.19,-336,42,0.44,-51,8,0.68,0.629999999999999,73.0
+all,floored,11658,2233,30.66,-2104,129,1.36,-147,8,10.79,-2.0700000000000003,-241.0
+calibration,allwise_order,6651,212,5.17,-192,20,0.37,-28,7,0.59,,
+calibration,floored,6651,1316,32.07,-1247,69,1.28,-66,7,10.59,,
+test,allwise_order,5007,166,5.22,-144,22,0.54,-23,1,0.82,,
+test,floored,5007,917,28.85,-857,60,1.47,-81,1,11.06,,
