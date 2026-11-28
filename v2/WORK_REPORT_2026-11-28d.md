@@ -255,4 +255,15 @@
   - 두 워크플로의 기본을 "커밋본 검증"으로 바꾸는 것을 승인했다.
   - 분할 키는 B 권장(구현은 사용자 결정 뒤)이다.
   - `floored`는 묶음 MINOR에 넣지 않고 따로 잰다.
+- **Codex 검토(P2 5건, 모두 받아들여 고침)**:
+  1. **`right_object` 지표**(`summarize_native_error_variants.py`, `measure_association.py`):
+     - 무엇이 문제였나: `rightly_alone`은 "다른 객체가 짝을 갖고 있지 않은" 안 붙은 행이다. 그 행 자신의 객체도 정답 id가 없을 때까지 포함한다. 같은 행이 정답 id 없는 객체에 붙으면 `unknown`이 되므로, 앵커만 바뀌어도(구성이 같아도) `correct + rightly_alone`이 움직인다.
+     - 고침: `measure_field`가 `rightly_alone`을 `alone_identified`(자기 객체가 짝을 가짐)와 `alone_unidentified`(어느 객체도 짝을 갖지 않음)로 나눈다. `rightly_alone`은 합으로 그대로 두었다.
+     - 지표는 `right_object = correct + alone_identified`, `unidentified = unknown + alone_unidentified`다. 둘 다 앵커에 무관하다.
+     - 나누기 전의 측정 출력이면 `right_object`를 NaN으로 쓰고 재측정하라고 알린다. 시험 `test_right_object_metric.py`는 같은 구성에서 앵커만 다른 두 경우를 넣는다. 옛 합은 움직이고 새 지표는 같다.
+     - **그래서 5.3절의 `right_object` 수치(+42 / +0.44 %, `floored` +129)는 잠정값이다.** 작업 세션이 고친 `measure_association.py`로 다시 재야 한다(26개 영역의 측정 출력은 이 세션에 없다). "+5.2 %의 대부분이 재라벨"이라는 방향은 `rightly_alone` −336 / `correct` +378에서 나오므로 그대로다.
+  2. **`v2_deep_cosmos_literature.yml`**: 수집기가 실패하면(`ok=false`, 종료 코드 1) Pack 단계가 건너뛰어져 부분 결과가 사라졌다. Pack을 `always()`로 돌리고, 폴더가 있을 때만 복사한다.
+  3. **`run_variant.py`**: `--field-glob '*'`가 `collection_state.json` 같은 최상위 파일까지 영역으로 잡았다. `raw/` 폴더가 있는 디렉터리만 영역으로 본다.
+  4. **`analyse_deep_cosmos_literature.py`**: QSO id를 넘기지 않아 `qso_objects_*`가 늘 0이었다. 이 오프라인 분석에는 분류된 기준 실행이 없으므로 측정이 아니라는 뜻으로 빈칸을 쓴다.
+  5. **`test_truth_manifest.py`**: 결정성 시험이 커밋된 매니페스트와 전체를 비교해, 짝 특징 파일의 SHA-256까지 요구했다. 그래서 설계가 허용하는 특징 갱신(`recollect-ps1-features`, `augment-ls-columns`)이 시험을 깨뜨렸다. 이제 짝 폴더는 기본 `verify`처럼 파일 이름으로 비교한다.
 

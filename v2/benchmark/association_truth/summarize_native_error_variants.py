@@ -20,6 +20,7 @@ import sys
 import argparse
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 CATS = ("AllWISE", "GALEX AIS")
@@ -46,10 +47,20 @@ def main() -> int:
     fm = pd.concat([pd.read_csv(a.root / f"meas_{v}" / f"false_missed_{v}.csv") for v in a.variants])
     fm = fm[fm.catalog.isin(a.cats)]
     keep = ["variant", "half", "catalog", "rows", "with_expected", "matched", "correct", "false", "unknown", "missed", "rightly_alone", "false_pct_of_matched_known", "false_wilson", "missed_pct_of_expected", "shifted_false_pct"]  # fmt: skip
-    fm = fm[keep]
-    fm["right_object"] = fm.correct + fm.rightly_alone  # 2.62.7: a row that anchors its object, and the object holds its counterpart, is "rightly alone", not "correct": the sum does not depend on who anchors
+    split = {"alone_identified", "alone_unidentified"} <= set(fm.columns)
+    fm = fm[keep + (["alone_identified", "alone_unidentified"] if split else [])]
+    # 2.62.7: the row sits in the object that holds its counterpart, whoever anchors: joined and right (correct) or anchoring an object that holds it
+    # (alone_identified).  Review (Codex): rightly_alone also counts rows whose counterpart no object holds, which turn "unknown" when joined, so the first
+    # version (correct + rightly_alone) moved with the anchor.  Outputs of measure_association.py before the split have no alone_identified: NaN, re-measure.
+    if split:
+        fm["right_object"] = fm.correct + fm.alone_identified
+        fm["unidentified"] = fm.unknown + fm.alone_unidentified
+    else:
+        print("measure_association outputs without alone_identified / alone_unidentified: right_object is not computed (re-run measure_association.py)", file=sys.stderr)
+        fm["right_object"] = np.nan
+        fm["unidentified"] = np.nan
     base = fm[fm.variant == "base"].set_index(["half", "catalog"])
-    for col in ("matched", "correct", "false", "missed", "right_object", "false_pct_of_matched_known", "missed_pct_of_expected", "shifted_false_pct"):
+    for col in ("matched", "correct", "false", "missed", "right_object", "unidentified", "false_pct_of_matched_known", "missed_pct_of_expected", "shifted_false_pct"):
         fm[f"d_{col}"] = [round(r[col] - base.loc[(r.half, r.catalog), col], 2) for _, r in fm.iterrows()]
     fm.sort_values(["catalog", "half", "variant"]).to_csv(a.out / f"{a.stem}_false_missed.csv", index=False)
 

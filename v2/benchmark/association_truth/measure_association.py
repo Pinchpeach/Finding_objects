@@ -217,7 +217,7 @@ def measure_field(assoc: pd.DataFrame, truth: pd.DataFrame, shifted_from: pd.Dat
         dom, acc = expected_counterparts(d, truth, full_sky, col, fwhm)
         matched = (d.association_status == "matched").to_numpy()
         rec = dict(rows=len(d), matched=int(matched.sum()), no_expected=0, correct=0, false=0, unknown=0, missed=0, rightly_alone=0,
-                   s_correct=0, s_false=0, s_missed=0)  # fmt: skip
+                   alone_identified=0, alone_unidentified=0, s_correct=0, s_false=0, s_missed=0)  # fmt: skip
         for (_, r), dm, ac, m in zip(d.iterrows(), dom, acc, matched):
             if dm < 0:
                 # no truth source with a positive flux within reach: there is nothing to join, so a join is false
@@ -257,6 +257,10 @@ def measure_field(assoc: pd.DataFrame, truth: pd.DataFrame, shifted_from: pd.Dat
                 else:
                     outcome = "rightly_alone"
                     rec["rightly_alone"] += 1
+                    # 2.62.7 review (Codex): "rightly alone" also covers a row whose counterpart NO object holds (its own object has no truth id).  Joined to
+                    # an object without truth id the same row is "unknown", so correct + rightly_alone moves with the anchor.  The two cases are kept apart:
+                    # right_object = correct + alone_identified, unidentified = unknown + alone_unidentified, both independent of who anchors.
+                    rec["alone_identified" if own in holders else "alone_unidentified"] += 1
                 if {o for o in by_truth.get(dm, ()) if o != own}:
                     rec["s_missed"] += 1
             dra = (truth.ra.iat[dm] - r.ra) * np.cos(np.radians(r.dec)) * 3600.0
@@ -397,7 +401,8 @@ def pool(rows: list[dict], split: pd.DataFrame, label: str) -> pd.DataFrame:
             expected = tot["rows"] - tot["no_expected"]
             rec = dict(variant=label, half=half, catalog=cat, fields=len(f), rows=tot["rows"], with_expected=expected,
                        matched=tot["matched"], correct=tot["correct"], false=tot["false"], unknown=tot["unknown"],
-                       missed=tot["missed"], rightly_alone=tot["rightly_alone"])  # fmt: skip
+                       missed=tot["missed"], rightly_alone=tot["rightly_alone"], alone_identified=tot.get("alone_identified", 0),
+                       alone_unidentified=tot.get("alone_unidentified", 0))  # fmt: skip
             rec["false_pct_of_matched_known"] = round(100 * tot["false"] / decided_m, 2) if decided_m else np.nan
             lo, hi = wilson(tot["false"], decided_m)
             rec["false_wilson"] = f"{lo:.1f}-{hi:.1f}"
