@@ -105,8 +105,26 @@ def bootstrap(per: pd.DataFrame, base: str, variant: str, cat: str, n: int = 200
     return out
 
 
+def check_coverage(per: pd.DataFrame, base_name: str) -> None:
+    """Every variant must hold the same (field, catalogue) pairs as the base (Codex review of 2.62.10): a variant whose measurement lacks a field would be summed over fewer
+    fields than the base while the tables report the same ``fields`` for both, and the field bootstrap would carry NaN for it.  Stop instead, naming the pairs."""
+    if base_name not in set(per.variant):
+        raise SystemExit(f"the base variant {base_name!r} is not among the variants read: {', '.join(sorted(set(per.variant)))}")
+    pairs = {v: set(zip(g.field, g.catalog)) for v, g in per.groupby("variant")}
+    want = pairs[base_name]
+    bad = []
+    for v, have in sorted(pairs.items()):
+        if v == base_name or have == want:
+            continue
+        lack, extra = sorted(want - have), sorted(have - want)
+        bad.append(f"{v}: " + "; ".join(x for x in (("lacks " + ", ".join(f"{f}/{c}" for f, c in lack)) if lack else "", ("has besides " + ", ".join(f"{f}/{c}" for f, c in extra)) if extra else "") if x))
+    if bad:
+        raise SystemExit(f"the variants do not cover the same fields and catalogues as {base_name!r} (re-measure them, or give only complete variants):\n  " + "\n  ".join(bad))
+
+
 def compute(per: pd.DataFrame, splits: dict[str, list[str]], base_name: str) -> tuple[pd.DataFrame, pd.DataFrame]:
     """(counts, deltas) of every split; ``per`` is the concatenation of ``field_table`` of the variants."""
+    check_coverage(per, base_name)
     counts, deltas = [], []
     for sname, fields in splits.items():
         p = per[per.field.isin(fields)]
@@ -119,7 +137,8 @@ def compute(per: pd.DataFrame, splits: dict[str, list[str]], base_name: str) -> 
             b = base.loc[r.catalog]
             d = dict(variant=r.variant, split=sname, catalog=r.catalog, fields=len(fields), with_expected=int(r.with_expected))
             for k in ("matched", "correct", "false", "unknown", "missed", "rightly_alone", "alone_identified", "right_object", "wrong_object", "unidentified", "shared", "displaced", "shift_false", "shift_any"):
-                d[f"d_{k}"] = int(r[k] - b[k])
+                x = r[k] - b[k]
+                d[f"d_{k}"] = int(x) if pd.notna(x) else np.nan  # the shift counts are missing (NaN) without a shifted copy (Codex review of 2.62.10)
             # the change in correct that is only a row moving from "anchors an object that holds its counterpart" to "joined to it": -d_alone_identified / d_correct
             d["relabel_share_of_d_correct_pct"] = round(100 * (-d["d_alone_identified"]) / d["d_correct"], 1) if d["d_correct"] else np.nan
             for k in ("right_object_pct", "missed_pct", "false_pct_of_matched_known", "shifted_false_pct", "shifted_any_pct"):

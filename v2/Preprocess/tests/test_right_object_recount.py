@@ -128,3 +128,27 @@ def test_the_runner_waits_for_every_background_job_by_its_pid():
     code = [l.split("#")[0] for l in text.splitlines()]
     assert not any(re.fullmatch(r"\s*wait\s*;?\s*", l) or re.search(r"then wait;", l) for l in code), "a bare wait"
     assert any('wait "$p"' in l for l in code) and sum("PIDS+=($!)" in l for l in code) == 2
+
+
+def test_without_a_shifted_copy_the_shift_deltas_stay_missing_and_the_rest_is_computed():
+    """Codex review of 2.62.10: the NaN shift counts of a measurement without --shifted-dir must not stop the delta table (int(NaN))."""
+    import math
+
+    base, v = rows("base"), rows("v", correct=+1, missed=-1, matched=+1)
+    for t in (base, v):
+        t[["shift_rows", "shift_false", "shift_any"]] = float("nan")
+    _, d = RR.compute(pd.concat([base, v], ignore_index=True), {"all26": FIELDS}, "base")
+    r = d.set_index("split").loc["all26"]
+    assert r.d_right_object == 2 and math.isnan(r.d_shift_false) and math.isnan(r.d_shift_any) and math.isnan(r.d_shifted_any_pct)
+
+
+def test_variants_that_do_not_cover_the_same_fields_are_refused():
+    """Codex review of 2.62.10: a variant missing a field would be summed over 25 fields against the base's 26 under the same "fields" count."""
+    import pytest
+
+    v = rows("v")
+    per = pd.concat([rows("base"), v[v.field != "deep_cosmos_7"]], ignore_index=True)
+    with pytest.raises(SystemExit, match="v: lacks deep_cosmos_7/AllWISE"):
+        RR.compute(per, {"all26": FIELDS}, "base")
+    with pytest.raises(SystemExit, match="base variant 'base' is not among"):
+        RR.compute(rows("v"), {"all26": FIELDS}, "base")
