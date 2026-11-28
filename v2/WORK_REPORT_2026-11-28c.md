@@ -1,6 +1,6 @@
 # 작업 보고서 2026-11-28c — 무효 수치 재측정, 세 스위치를 함께 켠 행, run_info.json, 조각 규칙·순서 규칙의 고침/깨짐 재채점
 
-버전 제안 **2.62.6 (PATCH)**: 코드는 측정 도구(`run_info.py`와 연결, `rescore_labels.py`, `real_use_counts.py`)와 채점 열 추가(`regroup.score_accuracy`: 기존 열은 그대로)뿐이고, 파이프라인의 분류 결과는 바뀌지 않는다. 번호는 main 2.62.3 위에 이어 붙인 것이다(타 2.62.4, 파 2.62.5, 하 2.62.6).
+버전 제안 **2.62.7 (PATCH)** → 병합: **2.62.6 (PATCH)**(main에서 타·파·하는 PR #98로 한꺼번에 2.62.4, CI 경로 필터 제거가 2.62.5였다. 끝의 '병합 전 검토' 참조): 코드는 측정 도구(`run_info.py`와 연결, `rescore_labels.py`, `real_use_counts.py`)와 채점 열 추가(`regroup.score_accuracy`: 기존 열은 그대로)뿐이고, 파이프라인의 분류 결과는 바뀌지 않는다. (작업 가지의 번호는 main 2.62.3 위에 이어 붙인 것이었다: 타 2.62.4, 파 2.62.5, 하 2.62.6.)
 
 ## 0. 내가 이해한 요청
 
@@ -144,3 +144,51 @@ main은 d7252f7(차·카, PR #96)과 0fae3c7(PR #97, 2.62.3)로 가 있었다. �
 ## 10. 파일
 
 `benchmark/run_info.py`, `benchmark/run_info_pending.txt`, `Preprocess/tests/test_run_info.py`(11), `Preprocess/tests/test_regroup_scoring.py`(5); `benchmark/association_truth/`: `regroup.py`(열 추가), `rescore_labels.py`, `results_2026-11-28/`(`rescored_labels.csv`, 재생 요약); `benchmark/lowlat_qso/`: `faint_cost.py`, `decision_table_combos.py`, `real_use_counts.py`, `LOWLAT_QSO.md` §9, `results_2026-11-28/`(결정표, 입력, 연관 입력, 실행 기록); `benchmark/position_errors/results_2026-11-27h/compare`·`summary`(교체).
+
+## 병합 전 검토 (2.62.6으로 병합)
+
+- **반영 방식**: 작업 가지(6db5a49)는 0fae3c7 위에 다시 세워져 있어 main(2.62.5)의 조상이 아니다. 타·파·하 9개 커밋은 PR #98로 이미 main에 있으므로 새 커밋만 cherry-pick했다: abe67876(run_info), 65d50331(a, 보고서 i), 16476b1a(하 재측정), 7b51d2f2·ac26e662(b·d). 받지 않은 것은 두 가지다.
+  - e81da64c(번호 치환): main은 타·파·하를 2.62.4 하나로 병합했으므로 2.62.4–6 표기가 틀린다.
+  - 6db5a497(2.62.7의 VERSION·CHANGELOG): 이 판에서 2.62.6으로 다시 썼다.
+- **충돌 해결**:
+  - `CHANGELOG.md`: main을 따랐다. 병합된 2.62.4 행은 고쳐 쓰지 않고 정정은 2.62.6 행에 적었다.
+  - `ALGORITHM.md`·보고서 b: main 문장(Codex의 `typed_close` 수정 포함)에 새 수치를 넣고 처음 값을 괄호에 남겼다.
+  - `LOWLAT_QSO.md` §9: 작업 가지 문장을 따르되, main에만 있던 보정 169개의 위치 교환(77 / 0, 6 / 0, 75 / 0)을 살렸다.
+  - `ci_test_inventory.csv`: 도구로 다시 만들었다.
+  - 작업 가지의 표기 2.62.7은 2.62.6으로, `lit_keep`(2.62.6)은 2.62.4로 고쳤다.
+- **셋째 후보 도구**: 작업 가지에는 `association_ambiguity/third_candidate.py`가 없다. 이 도구는 #98(차 보완)로 main에 들어왔다. 그래서 main 위에서 `test_run_info.py`가 이 도구를 "연결도 목록도 아님"으로 잡았다. `run_info`에 연결했고, 워커의 설정 `V2_ASSOC_AMBIG=same,nearest`를 `env`로 넘긴다.
+- **`run_info.py`의 결함**: 다른 실행을 링크로 모은 입력 폴더가 빈 목록으로 기록되었다. `regroup_new_order/run_info.json`의 `--runs`(`d_new26`)가 n_files 0, SHA-256 = 빈 문자열의 해시로 남아 있다.
+  - 원인: `Path.rglob`이 심볼릭 링크 디렉터리 안으로 내려가지 않는다.
+  - 고침: `os.walk(followlinks=True)`로 바꾸고, 이미 지난 실제 경로는 다시 들어가지 않게 해 링크 순환을 막았다. 시험을 더했고, 옛 코드에서는 실패한다.
+  - 이미 커밋된 그 기록의 입력 해시는 무효다(원자료는 작업 세션 스크래치패드에 있어 다시 계산할 수 없다). 다른 기록에는 빈 입력과 없는 입력이 없다.
+  - 또 하나: 저장소 안(`v2/`)에 결과를 쓰는 도구는 자기 출력 때문에 늘 `dirty: true`(파일 1개)로 기록되었다. 그러면 "코드가 커밋과 다르다"는 이 표시의 뜻이 없어진다. 그래서 자기 출력과 기록은 상태 검사에서 빼게 고쳤다(시험 추가). 다시 만든 결정표의 기록은 `dirty: false`다.
+- **Codex 검토(P2 2건)**:
+  - `run_stage1.py`는 워커가 호출한 셸의 `V2_*`를 지우고 `--env`를 적용해 도는데, 기록에는 호출한 셸의 환경을 썼다. 그래서 `--env V2_POSERR_UNITS=fixed`로 돈 결과가 legacy로 기록될 수 있었다. 이제 워커 환경을 만드는 `worker_env()`를 함께 쓰고 `replace_env`로 기록한다.
+  - `faint_cost classify`·`run_stage1`·`run_pe`는 이미 있는 출력을 건너뛰고 이어서 돈다. 그런데 기록은 지금의 커밋과 설정을 모든 출력에 돌렸다. 이제 `run_info.reuse_info`가 이번에 계산한 것과 넘겨받은 것(최대 500개 이름)을 적는다. 넘겨받은 것의 출처도 적는데, 이 폴더의 앞 기록이 있으면 그 기록이고(설정이 다르면 `previous`에 남는다) 없으면 "unknown"이다.
+  - 시험 2개를 더했다.
+- **결정표 재현**: main의 `decision_table_combos.py`로 커밋된 입력에서 다시 만들면 커밋된 34개 열이 셀 단위로 같다.
+  - main의 도구는 2.61.8 검토에서 더한 열 4개(`assoc_new_joins_false_*`, `same,nearest`가 더한 연결의 틀린 몫 상한)를 더 쓴다. 그 입력 `exchange.csv`가 이 결과 폴더에 없어서 처음에는 표가 만들어지지 않았다(작업 가지의 도구는 그 열이 없는 판이었다).
+  - `exchange.csv`를 2.61.8 결과(`association_ambiguity/results_2026-11-27f`, `same_nearest` 행)에서 그대로 복사했다.
+  - 세 스위치 행에는 자기 연관의 교환 표가 없는데, 도구가 `same_nearest`의 값을 넣고 있었다. 그 행은 빈칸으로 두게 고쳤다(시험 추가).
+  - 결정표는 그 도구로 다시 만들었다(38열).
+- **(a) 확인**: 보고서 i 결과표(`compare/anchor_changes.csv`, `summary/label_changes.csv`)가 보고 수치와 같다.
+  - 앵커가 넘어간 객체 118 = 구성 변화 86 + 같은 구성 32, VLASS → PS1 62.
+  - 이동 중앙값 0.445″ / 평균 1.52″ / 최대 20.7″.
+  - 1차 라벨 27 = 단편 흡수 22 + 클래스 변화 5.
+  - 179개 영역의 원 산출물은 이 세션에 없어 도구를 다시 돌리지는 못했다.
+- **(d) 독립 재현**: 이 세션의 깊은 COSMOS 26개 영역 파이프라인 출력(2026-11-24, 2.61.0 전의 옛 순서)에 `regroup.py`(`replay_base`, `m15hc`)와 `rescore_labels.py`를 돌렸다. 재생이 그룹화를 254,419/254,419 객체로 재현했다.
+
+  | 읽기 | 보정 깨짐 / 고침 (p) | 시험 |
+  |---|---|---|
+  | `pick` | 1 / 10 (0.0117) | 1 / 9 (0.0215) |
+  | `exists` | 0 / 6 (0.031) | 0 / 1 (1.0) |
+  | `every` | 0 / 5 (0.063) | 0 / 1 (1.0) |
+
+  - `pick`은 2.60.11의 "+10 −1 / +9 −1"을, `exists`·`every`는 이 보고서 §6.2의 값을 그대로 재현한다.
+  - 정답 천체 수는 35,892 / 26,077로 반쪽마다 2개 적다.
+  - 2.61.0 순서 비교(§6.3)는 새 순서 실행이 이 세션에 없어 다시 재지 않았다.
+- **하 재측정과 `typed_close`**: 작업 가지에는 #98의 Codex 수정(`typed_close`가 앵커가 아니라 같은 카탈로그의 typed 행끼리 잰다)이 없다. 그래서 "문헌 측정은 legacy·fixed 기본에서 전 열 같음"은 옛 규칙에 대한 말이다. 보고서 b의 병합 전 검토가 이미 그 수치를 옛 규칙의 값으로 표시했다.
+- **(d)의 정정 처리**: 병합된 보고서는 본문을 고쳐 쓰지 않았다. `WORK_REPORT_2026-11-25f.md`(2.60.11), `25g.md`(2.61.0), `27_setc_ab.md`(4번 `m15hc` 판단) 끝에 정정 절을 붙였다. `LOCKED_TEST_SET_C.md`·`README.md`·개요 PDF·덱은 이 `pick` 수치를 인용하지 않는다. PDF·덱은 v2.60.2로 2.60.11보다 앞선다. 다음 릴리스 문서에서 지킬 것은 새 목록 `document/NEXT_RELEASE_DOCS.md`(3번)에 넣었다.
+- **`CLAUDE.md`**: 제안한 한 줄을 작업 메모에 넣었다(측정 도구는 `run_info.json`을 남긴다, 미연결 목록, 시험).
+- **다음 과제(검토 세션)**: 2.61.0 순서 변경의 보정 −36은 앵커가 0.5″ 고리 밖으로 나간 위치 효과다. 새 순서가 객체 위치를 정답에서 멀리 두는지, 정답 대비 위치 잔차 분포(옛 순서 대 새 순서)를 잰다.
+

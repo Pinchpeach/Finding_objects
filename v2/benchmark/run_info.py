@@ -58,8 +58,17 @@ def _git(*args: str) -> str:
         return ""
 
 
-def git_info() -> dict:
-    status = _git("status", "--porcelain", "--", ".")
+def git_info(exclude=()) -> dict:
+    """``exclude``: the outputs of the run itself (its result directory or file and the record).  A tool that writes its results inside v2/ (a committed
+    results folder) would otherwise always be ``dirty`` by its own output, and the flag would no longer say that the CODE differed from the commit (review of 2.62.6)."""
+    spec = ["."]
+    for e in exclude:
+        try:
+            rel = Path(e).resolve().relative_to(V2.resolve())
+        except ValueError:
+            continue  # outside v2/: not in the status anyway
+        spec.append(f":(exclude){rel.as_posix()}")
+    status = _git("status", "--porcelain", "--", *spec)
     return dict(commit=_git("rev-parse", "HEAD") or None, branch=_git("rev-parse", "--abbrev-ref", "HEAD") or None, dirty=bool(status), dirty_files=len([x for x in status.splitlines() if x]))
 
 
@@ -107,12 +116,28 @@ def sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 
+def _walk_files(root: Path) -> list[Path]:
+    """Every file under ``root``, FOLLOWING symbolic links to directories.  ``Path.rglob`` does not descend into a symlinked directory (Python < 3.13 and the
+    default after), so a results folder made of links to the runs it reuses (``d_new26`` of 2.62.6) hashed as an empty listing (n_files 0, the SHA-256 of
+    nothing; review of 2.62.6).  A directory already visited (same real path) is not entered again, so a link loop ends."""
+    seen, out = set(), []
+    for d, dirs, files in os.walk(root, followlinks=True):
+        real = os.path.realpath(d)
+        if real in seen:
+            dirs[:] = []
+            continue
+        seen.add(real)
+        dirs.sort()
+        out.extend(Path(d) / f for f in files if (Path(d) / f).is_file())
+    return out
+
+
 def describe_input(item, content: bool = False) -> dict:
     p = Path(item)
     if p.is_file():
         return dict(path=str(p), kind="file", sha256=sha256_file(p), size=p.stat().st_size)
     if p.is_dir():
-        files = sorted(x for x in p.rglob("*") if x.is_file())
+        files = sorted(_walk_files(p))
         h = hashlib.sha256()
         for x in files:
             h.update(f"{x.relative_to(p).as_posix()}|{x.stat().st_size}".encode())
@@ -130,6 +155,16 @@ def target(out) -> Path:
     return p / "run_info.json"
 
 
+def reuse_info(out, computed, reused) -> dict:
+    """For a tool that resumes: what this run computed and what it took over from an earlier run in the same directory (Codex review of 2.62.6).  Call it BEFORE
+    the first ``write`` of the run.  The earlier record, if there is one, is kept under ``previous`` by ``write`` when its setting differs; without one, the
+    provenance of the reused parts is unknown and the record says so (the commit and settings of this record then apply to ``computed`` only)."""
+    reused = sorted(str(x) for x in reused)
+    had = target(out).exists()
+    prov = "none reused" if not reused else ("the earlier record of this directory" if had else "unknown: no earlier record")
+    return dict(computed=len(list(computed)), reused=len(reused), reused_items=reused[:500], reused_provenance=prov)
+
+
 def start() -> str:
     return now()
 
@@ -141,7 +176,7 @@ def write(out, inputs=(), t0: str | None = None, status: str = "ok", note: str =
     path = target(out)
     path.parent.mkdir(parents=True, exist_ok=True)
     full_env = {k: str(v) for k, v in (env or {}).items()} if replace_env else {**os.environ, **{k: str(v) for k, v in (env or {}).items()}}
-    info = dict(schema=SCHEMA, **git_info(), env={k: full_env[k] for k in sorted(full_env) if k.startswith("V2_") or k in ENV_EXTRA},
+    info = dict(schema=SCHEMA, **git_info(exclude=[Path(out), path]), env={k: full_env[k] for k in sorted(full_env) if k.startswith("V2_") or k in ENV_EXTRA},
                 effective=effective if effective is not None else effective_switches(full_env), started_utc=t0 or now(),
                 finished_utc=None if status == "running" else now(), status=status, inputs=[describe_input(i, content) for i in inputs],
                 argv=sys.argv, python=platform.python_version(), note=note)  # fmt: skip

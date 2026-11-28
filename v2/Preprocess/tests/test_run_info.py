@@ -76,6 +76,64 @@ def test_a_directory_input_changes_its_hash_when_a_file_changes(tmp_path):
     assert RI.describe_input(tmp_path / "nothing")["kind"] == "missing"
 
 
+def test_a_directory_of_links_to_the_runs_it_reuses_is_hashed_through_the_links(tmp_path):
+    """Review of 2.62.6: ``regroup_new_order`` reused earlier runs through a folder of symlinks and was recorded with n_files 0 (the hash of nothing)."""
+    real = tmp_path / "runs" / "field_1"
+    real.mkdir(parents=True)
+    (real / "classified_objects.csv").write_text("object_id\nOBJ1\n")
+    links = tmp_path / "links"
+    links.mkdir()
+    (links / "field_1").symlink_to(real, target_is_directory=True)
+    direct, linked = RI.describe_input(tmp_path / "runs"), RI.describe_input(links)
+    assert linked["n_files"] == direct["n_files"] == 1
+    assert linked["sha256"] == direct["sha256"] != hashlib.sha256(b"").hexdigest()
+    (real / "classified_objects.csv").write_text("object_id\nOBJ2 changed\n")
+    assert RI.describe_input(links)["sha256"] != linked["sha256"]
+    (real / "loop").symlink_to(real, target_is_directory=True)  # a link loop ends
+    assert RI.describe_input(links)["n_files"] == 1
+
+
+def test_the_outputs_of_the_run_itself_do_not_make_it_dirty():
+    """Review of 2.62.6: a tool writing into a committed results folder recorded dirty (1 file: its own output), so the flag no longer said the code differed."""
+    out = V2 / "benchmark" / "_run_info_test_output"
+    out.mkdir(exist_ok=True)
+    try:
+        (out / "table.csv").write_text("a\n1\n")
+        before = RI.git_info()["dirty_files"]
+        assert RI.git_info(exclude=[out])["dirty_files"] == before - 1
+        assert RI.git_info(exclude=[out / "table.csv"])["dirty_files"] == before - 1
+        assert RI.git_info(exclude=["/somewhere/outside"])["dirty_files"] == before
+    finally:
+        for f in out.iterdir():
+            f.unlink()
+        out.rmdir()
+
+
+def test_a_resumed_run_says_what_it_computed_and_what_it_took_over(tmp_path):
+    """Codex review of 2.62.6: faint_cost classify and run_stage1 skip outputs that exist, so a record must not credit them to this run."""
+    out = tmp_path / "run_x"
+    assert RI.reuse_info(out, ["f1", "f2"], [])["reused_provenance"] == "none reused"
+    r = RI.reuse_info(out, ["f2"], ["f1"])
+    assert (r["computed"], r["reused"], r["reused_items"], r["reused_provenance"]) == (1, 1, ["f1"], "unknown: no earlier record")
+    RI.write(out, [], status="ok")
+    assert RI.reuse_info(out, ["f2"], ["f1"])["reused_provenance"] == "the earlier record of this directory"
+
+
+def test_run_stage1_records_the_environment_of_its_workers_not_the_callers_shell(tmp_path, monkeypatch):
+    """Codex review of 2.62.6: the workers drop the caller's V2_* variables and apply --env; the record was the caller's shell."""
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("run_stage1_t", V2 / "benchmark" / "association_ambiguity" / "run_stage1.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    monkeypatch.setenv("V2_ASSOC_AMBIG", "best")  # in the caller's shell, dropped by the workers
+    env = mod.worker_env({"V2_POSERR_UNITS": "fixed"})
+    assert env["V2_POSERR_UNITS"] == "fixed" and "V2_ASSOC_AMBIG" not in env and env["PYTHONHASHSEED"] == "0"
+    rec = read(RI.write(tmp_path / "out", [], env=env, replace_env=True).parent)
+    assert rec["env"].get("V2_POSERR_UNITS") == "fixed" and "V2_ASSOC_AMBIG" not in rec["env"]
+    assert rec["effective"]["POSERR_UNITS"] == "fixed" and rec["effective"]["AMBIG_FIX"] == []
+
+
 def test_a_file_result_gets_a_sibling_record_and_a_directory_its_own(tmp_path):
     assert RI.target(tmp_path / "table.csv") == tmp_path / "table.run_info.json"
     assert RI.target(tmp_path / "table.csv.gz") == tmp_path / "table.run_info.json"

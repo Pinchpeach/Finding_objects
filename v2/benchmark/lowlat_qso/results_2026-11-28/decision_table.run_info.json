@@ -1,12 +1,10 @@
 {
   "schema": 1,
-  "commit": "7b51d2f2fe4faf228199a92253af9ec1dc7ce9d9",
-  "branch": "ccr-68f28268-l0opfu",
-  "dirty": true,
-  "dirty_files": 8,
-  "env": {
-    "PYTHONHASHSEED": "0"
-  },
+  "commit": "94c1049147da602700d1861d27bbd962442e5b65",
+  "branch": "claude/code-review-7ox8zn",
+  "dirty": false,
+  "dirty_files": 0,
+  "env": {},
   "effective": {
     "POSERR_UNITS": "legacy",
     "AMBIG_FIX": [],
@@ -15,8 +13,8 @@
     "LOWLAT_QSO": [],
     "LOWLAT_QSO_ABSB": 20.0
   },
-  "started_utc": "2026-11-28T02:27:55Z",
-  "finished_utc": "2026-11-28T02:27:55Z",
+  "started_utc": "2026-11-28T02:48:38Z",
+  "finished_utc": "2026-11-28T02:48:39Z",
   "status": "ok",
   "inputs": [
     {
@@ -29,8 +27,8 @@
     {
       "path": "results_2026-11-28/assoc",
       "kind": "directory",
-      "sha256": "19f115c66ea02a2d13c285d02640e61058f3a53f937d64990addc77988d42ace",
-      "n_files": 4,
+      "sha256": "b79ae1629a19b0e0befacf4cfb5001c4a16da9714a51cbdaad1e547350b8415c",
+      "n_files": 6,
       "hashed": "relative path, size"
     }
   ],
@@ -44,5 +42,27 @@
     "results_2026-11-28/decision_table.csv"
   ],
   "python": "3.13.18",
-  "note": ""
+  "note": "",
+  "previous": [
+    {
+      "commit": "7b51d2f2fe4faf228199a92253af9ec1dc7ce9d9",
+      "dirty": true,
+      "env": {
+        "PYTHONHASHSEED": "0"
+      },
+      "effective": {
+        "POSERR_UNITS": "legacy",
+        "AMBIG_FIX": [],
+        "POSERR_NATIVE": [],
+        "ANNOT_ASSOC": [],
+        "LOWLAT_QSO": [],
+        "LOWLAT_QSO_ABSB": 20.0
+      },
+      "started_utc": "2026-11-28T02:27:55Z",
+      "finished_utc": "2026-11-28T02:27:55Z",
+      "status": "ok",
+      "note": ""
+    }
+  ],
+  "mixed": true
 }

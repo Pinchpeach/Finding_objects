@@ -90,7 +90,7 @@ def main() -> int:
                               median_competitor_ratio=round(float(d.loc[d.competitor, "best_competitor_ratio"].median()), 3) if d.competitor.any() else float("nan"))])  # fmt: skip
     summ.to_csv(a.out / "summary.csv", index=False)
     print(summ.T.to_string(header=False))
-    RI.write_args(a, t0=t0)
+    RI.write_args(a, ("root", "fields"), t0=t0, env={"V2_ASSOC_AMBIG": "same,nearest"})  # the workers' setting (_load_stage1)
     return 0
 
 

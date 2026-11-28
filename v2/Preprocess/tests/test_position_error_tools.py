@@ -89,6 +89,17 @@ def test_mcnemar_and_recount_helpers():
     assert RF.mcnemar(14, 3) == pytest.approx(0.01273, abs=1e-4)
 
 
+def test_the_new_join_bound_is_left_empty_for_an_association_without_its_own_exchange_table(tmp_path):
+    """2.62.6 review: the three-switch row (fixed_same_nearest) got the same_nearest numbers; it has no exchange table of its own."""
+    for half in ("calibration", "confirmation"):
+        d = tmp_path / half / "cosmos"
+        d.mkdir(parents=True)
+        pd.DataFrame([dict(variant="same_nearest", catalog=c, new_false=0, new_correct=10) for c in ("AllWISE", "2MASS PSC", "GALEX AIS")]).to_csv(d / "exchange.csv", index=False)
+    assert DT.new_join_bound(tmp_path, "base") == {}
+    assert DT.new_join_bound(tmp_path, "fixed_same_nearest") == {}
+    assert DT.new_join_bound(tmp_path, "same_nearest")["assoc_new_joins_false_all"].startswith("0/60 ")
+
+
 def test_decision_table_held_counts_the_spectroscopic_qso_the_switch_leaves_out(tmp_path):
     for part, rows in (("b", [("QSO", "QSO", "STAR"), ("QSO", "STAR", "STAR")]), ("d", [("QSO", "QSO", "QSO"), ("STAR", "STAR", "STAR")])):
         pd.DataFrame(rows, columns=["label_base", "label_surveys2", "label_surveys2_keep"]).to_csv(tmp_path / f"held_{part}_base.csv", index=False)

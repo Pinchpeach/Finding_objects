@@ -138,7 +138,10 @@ def new_join_bound(assoc_dir: Path, assoc: str) -> dict:
         k = n = 0
         for half in ("calibration", "confirmation"):
             e = pd.read_csv(assoc_dir / half / "cosmos" / "exchange.csv")
-            r = e[(e.variant == "same_nearest") & (e.catalog == cat)].iloc[0]
+            sel = e[(e.variant == assoc) & (e.catalog == cat)]
+            if sel.empty:  # 2.62.6 review: no exchange table for this association (fixed_same_nearest): leave the cells empty, not the same_nearest numbers
+                return {}
+            r = sel.iloc[0]
             k += int(r.new_false)
             n += int(r.new_correct + r.new_false)
         tk, tn = tk + k, tn + n
