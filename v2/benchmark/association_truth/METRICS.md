@@ -8,7 +8,7 @@
 
 * 참조 집합 R: HSC i < 25인 COSMOS2020 원천(Weaver et al. 2022). 해상 카탈로그(Legacy Surveys, PS1, SDSS, Gaia, SGA, Galaxy Zoo)의 행은 R의 원천만 볼 수 있다.
 * 행의 정답 id: 해상 카탈로그의 행이 0.6″ 안의 가장 가까운 R 원천을 갖는다(없으면 미식별).
-* 객체의 정답 id 집합 T(O): 객체의 해상 행들의 id; 해상 행이 없으면 앵커 위치에서 0.6″ 안의 가장 가까운 R 원천.
+* 객체의 정답 id 집합 T(O): 객체의 해상 행들의 id다. 해상 행의 id가 없으면 **고정 규칙으로 고른 구성원 하나**의 위치에서 0.6″ 안의 가장 가까운 R 원천을 쓴다. 규칙은 해상 행 먼저, 그다음 PSF가 좁은 순(2MASS 2.5″, GALEX 5.3″, AllWISE 6.1″), 그다음 그 밖의 카탈로그이고, 같은 순위는 detection id 순이다. 2.62.10 검토 전에는 **앵커 위치**를 썼다. 그래서 앵커만 바뀌는 저해상도 객체(`floored`에서 AllWISE → GALEX)에서 T(O)가 바뀌었고, 아래의 "앵커에 의존하지 않는" 지표도 그 객체들에서는 움직였다(`test_right_object_metric.py`, 앵커만 다른 두 경우).
 * 기대 짝(저해상도 행: AllWISE IRAC ch1 / 2MASS Ks / GALEX u 플럭스): 3 FWHM 안의 원천마다 가중치 w = F exp(−r²/2s²), s = FWHM/2.355; 허용 집합 A(d) = w ≥ 0.25 max w인 원천들(블렌드). 양의 플럭스 원천이 없으면 기대 짝 없음(`no_expected`).
 * 저해상도 행이 3개 카탈로그(AllWISE, 2MASS PSC, GALEX AIS)이고 그 행들만 센다.
 
@@ -43,7 +43,7 @@
 
 * **`right_object`는 조각을 못 본다.** 안 붙은 AllWISE 행의 객체는 앵커 위치가 정답 원천 0.6″ 안이면 이미 `identified`다. 같은 원천을 광학 객체도 가지면 그 행은 조각인데 `right_object`는 둘을 다 맞다고 센다. 조각은 `shared`로, 엉뚱한 객체에 있는 것은 `displaced`로 센다. **한 변형의 연관 효과를 말하려면 `right_object`, `wrong_object`, `unidentified`, `shared`, `displaced` 다섯 개를 함께 낸다.**
 * `unidentified`가 크다(AllWISE 11 %, GALEX 36 %): 행의 객체에 정답 id가 없는 경우(해상 행이 R의 원천에 닿지 않거나 정답 쪽 원천이 어두운 경우)로, 변형 사이에서 이 몫이 늘면 `right_object`가 줄어든다. 늘었다는 것이 틀렸다는 뜻은 아니다.
-* `shared`·`displaced`는 `T(O)`가 해상 행의 id를 쓰고 해상 행이 없는 객체만 앵커 위치의 가장 가까운 R 원천(0.6″)을 쓰는 규칙에 기댄다. 그 규칙이 바뀌면 값도 바뀐다.
+* `right_object`·`wrong_object`·`unidentified`·`shared`·`displaced`는 `T(O)`의 규칙에 기댄다. 해상 행이 없는 객체의 대체 위치는 2.62.10부터 앵커가 아니라 고정 규칙으로 고른 구성원이다(1절). **5절의 수치는 고치기 전 도구(앵커 위치)로 쟀다.** 그래서 저해상도 객체의 앵커를 바꾸는 변형(`floored`, `allwise_order`, 2.61.0의 순서)에서는 값이 달라질 수 있어 다시 잰다.
 
 ## 3. 라벨 정확도의 읽기 (`regroup.score_accuracy`, `rescore_labels.py`; COSMOS2020 STAR / GALAXY, F814W < 24.5)
 
@@ -65,7 +65,7 @@
 4. 같은 정답(COSMOS2020)에 대한 비교만 한다. 정답 자체의 위치·플럭스 오차는 변형 사이의 차이에는 대부분 상쇄되지만 절대값의 근거는 아니다.
 5. 새 지표는 이 문서에 정의와 "앵커/고른 객체에 속는가"를 먼저 적은 뒤 쓴다.
 
-## 5. 정의가 바뀌면 같은 변형이 어떻게 달라 보이는가 (깊은 COSMOS 26개 영역 실측, `results_2026-11-28d/`, AllWISE 기본값 대비)
+## 5. 정의가 바뀌면 같은 변형이 어떻게 달라 보이는가 (깊은 COSMOS 26개 영역 실측, `results_2026-11-28d/`, AllWISE 기본값 대비; **잠정**: 2.62.10 검토 전의 T(O) 대체 규칙(앵커 위치)으로 잰 값, 1절)
 
 | 변형 | 옛 읽기 | 앵커 무관 읽기 | 무슨 일인가 |
 |---|---|---|---|

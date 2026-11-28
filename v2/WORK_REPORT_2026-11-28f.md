@@ -167,3 +167,28 @@ main의 최종 정의(`right_object`·`wrong_object`·`unidentified`)와 내가 
 * 문서·표: `benchmark/association_truth/{METRICS.md, PREDICTIONS_RIGHT_OBJECT_2026-11-28.md, results_2026-11-28d/}`, `benchmark/doc_claims/{README.md, doc_claims_table.md, doc_claims_check.csv, run_info.json}`
 * 시험: `Preprocess/tests/{test_right_object_recount.py, test_shared_displaced_metric.py, test_doc_claims_check.py}`, `Classifier/validation/reproducibility/ci_test_inventory.csv`
 * 정정: `ALGORITHM.md`(3곳), `benchmark/build_sdss_sky_truth.py`(머리 주석), `document/NEXT_RELEASE_DOCS.md`(10–18번)
+
+## 병합 전 검토 (2.62.10으로 병합)
+
+- **반영 방식**: ac5c49c는 main 51b7de5(2.62.9)를 일반 병합한 가지라 그대로 받고 검토 커밋을 얹었다(main 대비 35개 파일 +2,117 / −12, 삭제 없음).
+- **앵커 무관이라는 주장의 구멍 — 고쳤다**:
+  - `measure_field`는 해상 행의 정답 id가 없는 객체의 T(O)를 **앵커 위치**(`object_ra/object_dec`)에서 0.6″ 안의 R 원천으로 정했다. 그래서 구성이 같아도 앵커만 바뀌는 저해상도 객체(AllWISE·GALEX·2MASS 행만 있는 객체)에서는 T(O)가 바뀌었고, `right_object`·`wrong_object`·`unidentified`·`shared`·`displaced`가 모두 움직였다.
+  - 합성 시험: 객체 {AllWISE, GALEX}, 정답 원천이 GALEX 행 0.1″·AllWISE 행 0.9″에 있다. AllWISE가 앵커이면 AllWISE 행은 `alone_unidentified`, GALEX가 앵커이면 `correct`다.
+  - `floored`는 바로 이런 객체의 앵커를 AllWISE(하한 1.02″)에서 GALEX(0.88″)로 바꾼다. 그 변형의 `unidentified` +256, `displaced` +173, `right_object` −179가 이 기제와 맞는다(확인은 재측정으로).
+  - 고침: 해상 행의 id가 없는 객체는 **고정 규칙으로 고른 구성원 하나**의 위치를 쓴다. 규칙은 해상 행 먼저, 그다음 PSF가 좁은 순(2MASS 2.5″ → GALEX 5.3″ → AllWISE 6.1″), 그다음 그 밖이고, 같은 순위는 detection id 순이다. 이 규칙은 앵커에도 순서 키에도 의존하지 않는다.
+  - 시험 `test_an_object_without_a_resolving_row_reads_the_same_whoever_anchors_it`는 옛 코드에서 실패하고 고친 코드에서 통과한다. 기존 `shared`/`displaced` 시험 2개와 재집계 시험 9개도 통과한다.
+  - `METRICS.md` 1절의 T(O) 정의를 고치고 5절에 "잠정"을 붙였다.
+- **그래서 이 보고서의 앵커 무관 수치는 잠정값이다.** 작업 세션이 고친 `measure_association.py`로 다시 재야 한다(측정 출력은 이 세션에 없다). 대상은 이렇다.
+  - `floored`의 `right_object` −179 / `displaced` +173 / `unidentified` +256: 영향이 가장 클 것으로 본다.
+  - 2.61.0 순서의 +31 / `shared` 841 → 432.
+  - `same,nearest`의 AllWISE 0 / GALEX +32.
+  - AllWISE `eeMaj`의 −21.
+  - `same,nearest`는 주로 조각을 합치는 규칙이라 해상 행이 있는 객체의 변화가 대부분이다. 그래서 덜 바뀔 것으로 예상한다(예측이지 측정이 아니다).
+- **검토 세션의 질문**:
+  - **`METRICS.md` 시험이 "불변이 아닌 지표로 변형을 비교하는 도구"를 막는가**: 일부만 막는다. `test_the_headline_readings_are_the_ones_metrics_md_marks_as_independent_of_the_anchor`는 `right_object_recount.py`의 `HEADLINE` 목록이 문서에서 앵커 무관으로 표시된 지표인지만 본다.
+    - 다른 도구는 여전히 옛 지표로 변형을 비교하고, 시험이 그것을 막지 않는다: `compare_variants.py`, `decision_table_combos.py`(결정표의 `assoc_*_false_missed_pct` 열 = `false_pct_of_matched_known`·`missed_pct`), `outside_cosmos_summary.py`, `summarize_native_error_variants.py`(`d_correct`, `d_missed`).
+    - 특히 **묶음 MINOR의 결정표 연관 열이 앵커 의존 지표**다. 결정표를 `right_object`·`shared`·`displaced`(고친 정의)로 바꾸는 것을 작업 세션 과제로 제안한다.
+  - **`shared`/`displaced`의 앵커 불변 합성 시험**: 원래 시험 2개는 붙기/떨어지기(구성 변화)에서 값이 바뀌는 것을 보였을 뿐, "구성이 같고 앵커만 다른" 경우가 없었다. 위의 새 시험이 그 경우이고, 그 경우에서 불변이 아니었으므로 고쳤다.
+  - **문서 오류 6건**: `NEXT_RELEASE_DOCS.md` 11–16번(768칸, 플레이트 142, LS-GBM 149,769 / 95.6 %, 520개 목록, 세트 C 60 영역, 28,194)에 모두 있다. 17·18번의 앵커 무관 수치에는 잠정 표시를 붙였다.
+- **참조 천체 목록(요청 1)**: git 이력에서 2.46.1 목록(85f88537)을 바이트 그대로 되살릴 수 있다. 두 목록은 행 수(14,108)와 코드별 개수가 같고 1,686행의 천체가 다르다. 검증 계획 520개는 2.46.1 목록에 모두 있고 지금 목록에는 466개만 있다. 소비자는 `validate_reference_objects.py`(plan 모드는 목록에서 뽑고, run 모드는 plan.csv 좌표를 쓴다), `build-reference-objects.yml`(매니페스트 확인), `truth_manifest.py`(매니페스트), `doc_claims_check.py`, `server_fill_dependence.py`(연구), `overview_content.py`(개수만)다. 되살리기는 매니페스트 갱신과 함께 **다음 PR(2.62.11)로 따로** 한다. 이 PR의 `doc_claims` 결과는 지금 목록 기준이라 섞지 않는다.
+

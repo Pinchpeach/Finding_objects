@@ -189,13 +189,21 @@ def measure_field(assoc: pd.DataFrame, truth: pd.DataFrame, shifted_from: pd.Dat
     for oid, g in obj:
         ids = set(int(x) for x in g.truth_id[(g.catalog.isin(RESOLVING)) & (g.truth_id >= 0)])
         T[oid] = ids
-    anchors = a.drop_duplicates("object_id").set_index("object_id")[["object_ra", "object_dec"]]
     empty = [oid for oid, ids in T.items() if not ids]
     if empty:
-        i, _ = ref_sky.nearest(
-            anchors.loc[empty, "object_ra"].to_numpy(float), anchors.loc[empty, "object_dec"].to_numpy(float), ID_RADIUS
+        # An object without a resolving truth id takes the R source within ID_RADIUS of ONE of its members, chosen by a fixed rule that does not depend on who
+        # anchors the object (2.62.10 review): resolving rows first, then the sharpest PSF (2MASS 2.5'', GALEX 5.3'', AllWISE 6.1''), then any other catalogue;
+        # ties by detection id.  It was the anchor position (object_ra / object_dec), so an order rule that changes only the anchor of a low-resolution object
+        # (AllWISE -> GALEX under V2_ASSOC_ORDER_KEY=floored) changed T(O) and with it right_object, shared and displaced (test_right_object_metric.py).
+        rank = {c: 0 for c in RESOLVING} | {c: 1 + k for k, c in enumerate(sorted(LOWRES, key=lambda c: LOWRES[c][1]))}
+        pick = (
+            a[a.object_id.isin(empty)]
+            .assign(_rank=lambda x: x.catalog.map(rank).fillna(9), _det=lambda x: x.detection_id.astype(str))
+            .sort_values(["object_id", "_rank", "_det"])
+            .drop_duplicates("object_id")
         )
-        for oid, k in zip(empty, i):
+        i, _ = ref_sky.nearest(pick.ra.to_numpy(float), pick.dec.to_numpy(float), ID_RADIUS)
+        for oid, k in zip(pick.object_id, i):
             if k >= 0:
                 T[oid] = {int(ref_ids[k])}
     by_truth: dict[int, set] = {}

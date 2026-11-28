@@ -70,3 +70,5 @@ python v2/benchmark/association_truth/right_object_tables.py --recount RES > tab
 | E5 | 순위 floored > same_nearest > base > file ≈ position | base ≈ same_nearest > file ≈ position > **floored** |
 
 모든 예측이 같은 방향으로 틀렸다: 나는 새 정의가 옛 정의를 수십 행 보정할 뿐이라고 보았는데, 단독 AllWISE 객체가 이미 "정답을 가진 객체"로 읽힌다는 사실(`T(O)`의 앵커 위치 규칙)이 `correct`의 이득 대부분을 재라벨로 바꾸었다. 옛 숫자를 이미 본 뒤에 쓴 예측(맹검이 아님)조차 틀렸다.
+
+**2.62.10 review.** These tables were made before the review changed the truth id of an object without a resolving row. That id now comes from a member chosen by a fixed rule, not from the anchor position (`METRICS.md` section 1). So the anchor-independent readings here are provisional for variants that change the anchor of low-resolution-only objects (`floored` above all), and are to be re-measured with the fixed `measure_association.py`.
