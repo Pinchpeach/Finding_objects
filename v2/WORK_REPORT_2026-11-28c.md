@@ -16,7 +16,7 @@
 
 ## 2. 새 main 위로 재정렬 (타·파·하)
 
-main은 d7252f7(차·카, PR #96)과 0fae3c7(PR #97, 2.62.3)로 가 있었다. 검토 세션이 차·카를 squash로 병합하면서 코드를 일부 손봤다(카의 기본값 legacy, `combos_table.py`의 `exchange_vs_base`, `compare_by_members.py`, 셋째 후보 도구 제거). 내 브랜치에서 아직 병합되지 않은 것은 타·파·하의 커밋 9개였다. 이전처럼 **새 main 위에 이 9개만 cherry-pick**했다(차·카 커밋은 이미 병합되어 중복). 충돌은 `VERSION`·`CHANGELOG.md`(번호를 2.62.4–6으로 올려 해결)와 `ALGORITHM.md`(병합본의 위치 오차 단위 항목은 검토 세션 것을 따랐다)뿐이었다. 새 파일의 번호 표기(2.63.1–3)는 한 번에 치환했다. 시험 586개 통과 확인 후 `--force-with-lease`로 푸시했다(병합된 PR 뒤에 같은 이름의 브랜치를 새 main에서 다시 세우는 경우; 앞선 푸시 해시를 lease로 지정). 백업 브랜치는 로컬에만 있다.
+main은 d7252f7(차·카, PR #96)과 0fae3c7(PR #97, 2.62.3)로 가 있었다. 검토 세션이 차·카를 squash로 병합하면서 코드를 일부 손봤다(카의 기본값 legacy, `combos_table.py`의 `exchange_vs_base`, `compare_by_members.py`). 이 문장은 처음에 "셋째 후보 도구 제거"도 검토 세션이 한 것처럼 적었으나 틀렸다(2.62.7 정정): `third_candidate.py`는 #98(차 보완)로 main에 있었고, 내가 01:25에 한 force push로 내 가지에서 빠졌던 것이다(#98에 들어간 차 보완 커밋 bd38b01·655eea1이 그때 가지에서 떨어졌다). 검토 세션이 지운 것이 아니다. 내 브랜치에서 아직 병합되지 않은 것은 타·파·하의 커밋 9개였다. 이전처럼 **새 main 위에 이 9개만 cherry-pick**했다(차·카 커밋은 이미 병합되어 중복). 충돌은 `VERSION`·`CHANGELOG.md`(번호를 2.62.4–6으로 올려 해결)와 `ALGORITHM.md`(병합본의 위치 오차 단위 항목은 검토 세션 것을 따랐다)뿐이었다. 새 파일의 번호 표기(2.63.1–3)는 한 번에 치환했다. 시험 586개 통과 확인 후 `--force-with-lease`로 푸시했다(병합된 PR 뒤에 같은 이름의 브랜치를 새 main에서 다시 세우는 경우; 앞선 푸시 해시를 lease로 지정). 백업 브랜치는 로컬에만 있다.
 
 ## 3. (a) 고친 도구로 다시 잰 수치
 
@@ -156,7 +156,7 @@ main은 d7252f7(차·카, PR #96)과 0fae3c7(PR #97, 2.62.3)로 가 있었다. �
   - `LOWLAT_QSO.md` §9: 작업 가지 문장을 따르되, main에만 있던 보정 169개의 위치 교환(77 / 0, 6 / 0, 75 / 0)을 살렸다.
   - `ci_test_inventory.csv`: 도구로 다시 만들었다.
   - 작업 가지의 표기 2.62.7은 2.62.6으로, `lit_keep`(2.62.6)은 2.62.4로 고쳤다.
-- **셋째 후보 도구**: 작업 가지에는 `association_ambiguity/third_candidate.py`가 없다. 이 도구는 #98(차 보완)로 main에 들어왔다. 그래서 main 위에서 `test_run_info.py`가 이 도구를 "연결도 목록도 아님"으로 잡았다. `run_info`에 연결했고, 워커의 설정 `V2_ASSOC_AMBIG=same,nearest`를 `env`로 넘긴다.
+- **셋째 후보 도구**: 작업 가지에는 `association_ambiguity/third_candidate.py`가 없었다(내 01:25 force push로 #98의 차 보완 커밋이 가지에서 떨어졌을 때 함께 빠졌다; 검토 세션이 지운 것이 아니다). 이 도구는 #98(차 보완)로 main에 들어왔다. 그래서 main 위에서 `test_run_info.py`가 이 도구를 "연결도 목록도 아님"으로 잡았다. `run_info`에 연결했고, 워커의 설정 `V2_ASSOC_AMBIG=same,nearest`를 `env`로 넘긴다.
 - **`run_info.py`의 결함**: 다른 실행을 링크로 모은 입력 폴더가 빈 목록으로 기록되었다. `regroup_new_order/run_info.json`의 `--runs`(`d_new26`)가 n_files 0, SHA-256 = 빈 문자열의 해시로 남아 있다.
   - 원인: `Path.rglob`이 심볼릭 링크 디렉터리 안으로 내려가지 않는다.
   - 고침: `os.walk(followlinks=True)`로 바꾸고, 이미 지난 실제 경로는 다시 들어가지 않게 해 링크 순환을 막았다. 시험을 더했고, 옛 코드에서는 실패한다.

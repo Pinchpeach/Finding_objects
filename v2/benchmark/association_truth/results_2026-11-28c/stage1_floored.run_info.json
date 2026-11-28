@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "commit": "cf94773ca56d5f3e83f86dd4eac223d2e8f0f28f",
+  "branch": "ccr-68f28268-l0opfu",
+  "dirty": true,
+  "dirty_files": 12,
+  "env": {
+    "PYTHONHASHSEED": "0",
+    "V2_ASSOC_ORDER_KEY": "floored",
+    "V2_CACHE": "0",
+    "V2_POSERR_NATIVE": ""
+  },
+  "effective": {
+    "POSERR_UNITS": "legacy",
+    "AMBIG_FIX": [],
+    "POSERR_NATIVE": [],
+    "ANNOT_ASSOC": [],
+    "LOWLAT_QSO": [],
+    "LOWLAT_QSO_ABSB": 20.0
+  },
+  "started_utc": "2026-11-28T03:05:40Z",
+  "finished_utc": "2026-11-28T03:07:29Z",
+  "status": "ok",
+  "inputs": [
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/s1/raw",
+      "kind": "directory",
+      "sha256": "00a047f1bcffa09d527e558b47f1c0e0e7ed938db9b11700ff707a6bb3d37ffe",
+      "n_files": 636,
+      "hashed": "relative path, size"
+    }
+  ],
+  "argv": [
+    "run_variant.py",
+    "--fields-root",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/s1/raw",
+    "--out",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ok26/floored",
+    "--env",
+    "V2_POSERR_NATIVE=",
+    "V2_ASSOC_ORDER_KEY=floored"
+  ],
+  "python": "3.13.18",
+  "note": ""
+}

@@ -24,8 +24,8 @@
     {
       "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_new26",
       "kind": "directory",
-      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "n_files": 0,
+      "sha256": "545e4b0b0fa096d2e9a101e03794eac4c1a1e73388c660df7dfaa21f15e25202",
+      "n_files": 78,
       "hashed": "relative path, size"
     },
     {
@@ -50,7 +50,7 @@
     "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_new"
   ],
   "python": "3.13.18",
-  "note": "",
+  "note": "inputs recomputed 2026-11-28 with run_info.py of 2.62.6 (follows symbolic links): the first record hashed d_new26, a folder of links to the stage-1 runs, as an empty list (n_files 0). The raw data are in the author's scratch only.",
   "previous": [
     {
       "commit": "abe6787684e3246a39fa6f4eec92cecb8cd96bf4",
