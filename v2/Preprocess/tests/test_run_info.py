@@ -93,6 +93,22 @@ def test_a_directory_of_links_to_the_runs_it_reuses_is_hashed_through_the_links(
     assert RI.describe_input(links)["n_files"] == 1
 
 
+def test_the_outputs_of_the_run_itself_do_not_make_it_dirty():
+    """Review of 2.62.6: a tool writing into a committed results folder recorded dirty (1 file: its own output), so the flag no longer said the code differed."""
+    out = V2 / "benchmark" / "_run_info_test_output"
+    out.mkdir(exist_ok=True)
+    try:
+        (out / "table.csv").write_text("a\n1\n")
+        before = RI.git_info()["dirty_files"]
+        assert RI.git_info(exclude=[out])["dirty_files"] == before - 1
+        assert RI.git_info(exclude=[out / "table.csv"])["dirty_files"] == before - 1
+        assert RI.git_info(exclude=["/somewhere/outside"])["dirty_files"] == before
+    finally:
+        for f in out.iterdir():
+            f.unlink()
+        out.rmdir()
+
+
 def test_a_file_result_gets_a_sibling_record_and_a_directory_its_own(tmp_path):
     assert RI.target(tmp_path / "table.csv") == tmp_path / "table.run_info.json"
     assert RI.target(tmp_path / "table.csv.gz") == tmp_path / "table.run_info.json"

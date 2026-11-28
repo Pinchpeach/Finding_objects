@@ -58,8 +58,17 @@ def _git(*args: str) -> str:
         return ""
 
 
-def git_info() -> dict:
-    status = _git("status", "--porcelain", "--", ".")
+def git_info(exclude=()) -> dict:
+    """``exclude``: the outputs of the run itself (its result directory or file and the record).  A tool that writes its results inside v2/ (a committed
+    results folder) would otherwise always be ``dirty`` by its own output, and the flag would no longer say that the CODE differed from the commit (review of 2.62.6)."""
+    spec = ["."]
+    for e in exclude:
+        try:
+            rel = Path(e).resolve().relative_to(V2.resolve())
+        except ValueError:
+            continue  # outside v2/: not in the status anyway
+        spec.append(f":(exclude){rel.as_posix()}")
+    status = _git("status", "--porcelain", "--", *spec)
     return dict(commit=_git("rev-parse", "HEAD") or None, branch=_git("rev-parse", "--abbrev-ref", "HEAD") or None, dirty=bool(status), dirty_files=len([x for x in status.splitlines() if x]))
 
 
@@ -157,7 +166,7 @@ def write(out, inputs=(), t0: str | None = None, status: str = "ok", note: str =
     path = target(out)
     path.parent.mkdir(parents=True, exist_ok=True)
     full_env = {k: str(v) for k, v in (env or {}).items()} if replace_env else {**os.environ, **{k: str(v) for k, v in (env or {}).items()}}
-    info = dict(schema=SCHEMA, **git_info(), env={k: full_env[k] for k in sorted(full_env) if k.startswith("V2_") or k in ENV_EXTRA},
+    info = dict(schema=SCHEMA, **git_info(exclude=[Path(out), path]), env={k: full_env[k] for k in sorted(full_env) if k.startswith("V2_") or k in ENV_EXTRA},
                 effective=effective if effective is not None else effective_switches(full_env), started_utc=t0 or now(),
                 finished_utc=None if status == "running" else now(), status=status, inputs=[describe_input(i, content) for i in inputs],
                 argv=sys.argv, python=platform.python_version(), note=note)  # fmt: skip
