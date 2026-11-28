@@ -103,14 +103,22 @@ def cosmos_truth_classes(truth: pd.DataFrame) -> pd.DataFrame:
     return t
 
 
-def score_accuracy(out: pd.DataFrame, truth: pd.DataFrame, lim: float = 1.5) -> pd.DataFrame:
+def score_accuracy(out: pd.DataFrame, truth: pd.DataFrame, lim: float = 1.5, near: float = 0.5) -> pd.DataFrame:
     """The label of every truth source as ``score_independent_fields.field_matches`` reads it: the counterpart is the
     object with the most catalogues within ``lim``'' (nearest on ties); an object grouped under a parent takes the
-    parent's class.  Unmatched truth sources have no label."""
+    parent's class.  Unmatched truth sources have no label.
+
+    Two more readings of the same truth source that do not depend on WHICH object is picked (2.62.7, the review of 2.60.11 / 2.61.0: a rule that removes fragments
+    changes which object is "the" counterpart, so the pick-one reading counts a change of the pick as a fixed or broken label):
+      ``exists_near``  an object within ``near``'' (grouped objects take the class of their parent) has the truth class
+      ``all_near``     at least one object within ``near``'' and every one of them has the truth class (no wrong-class competitor)
+    ``n_near`` counts the objects within ``near``'' and ``classes_near`` lists their classes."""
     t = cosmos_truth_classes(truth).reset_index(drop=True)
     nc = out.catalogs.fillna("").str.count(r"\|").add(1).to_numpy()
     sky = M.Sky(out.ra.to_numpy(float), out.dec.to_numpy(float))
     host = out.set_index("object_id").primary_class
+    own = out.primary_class.to_numpy(dtype=object)
+    eff = np.array([host.get(p) if isinstance(p, str) and p else own[k] for k, p in enumerate(out.parent_object_id.to_numpy(dtype=object))], dtype=object)
     pred, nobj = [], []
     for ii, sep in sky.within(t.ra.to_numpy(float), t.dec.to_numpy(float), lim):
         if not len(ii):
@@ -118,12 +126,19 @@ def score_accuracy(out: pd.DataFrame, truth: pd.DataFrame, lim: float = 1.5) -> 
             nobj.append(0)
             continue
         j = ii[np.lexsort((sep, -nc[ii]))[0]]
-        par = out.parent_object_id.iat[j]
-        pred.append(host.get(par) if isinstance(par, str) and par else out.primary_class.iat[j])
+        pred.append(eff[j])
         nobj.append(len(ii))
     t["pred"] = pred
     t["n_objects"] = nobj
-    return t[["ra", "dec", "truth", "pred", "n_objects"]]
+    exists, every, n_near, classes = [], [], [], []
+    for truth_class, (ii, _) in zip(t.truth.to_numpy(dtype=object), sky.within(t.ra.to_numpy(float), t.dec.to_numpy(float), near)):
+        cls = [eff[k] for k in ii]
+        n_near.append(len(cls))
+        exists.append(any(c == truth_class for c in cls))
+        every.append(bool(cls) and all(c == truth_class for c in cls))
+        classes.append("|".join(sorted({str(c) for c in cls})))
+    t["n_near"], t["exists_near"], t["all_near"], t["classes_near"] = n_near, exists, every, classes
+    return t[["ra", "dec", "truth", "pred", "n_objects", "n_near", "exists_near", "all_near", "classes_near"]]
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info

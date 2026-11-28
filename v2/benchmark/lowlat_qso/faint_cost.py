@@ -65,6 +65,9 @@ ENV = {  # variant -> environment
     "same_nearest": {"V2_ASSOC_AMBIG": "same,nearest", "V2_POSERR_UNITS": "legacy"},
     "same_nearest_surveys2": {"V2_ASSOC_AMBIG": "same,nearest", "V2_LOWLAT_QSO": "surveys2", "V2_POSERR_UNITS": "legacy"},
     "same_nearest_surveys3": {"V2_ASSOC_AMBIG": "same,nearest", "V2_LOWLAT_QSO": "surveys3", "V2_POSERR_UNITS": "legacy"},
+    # 2.62.7: the three switches together (the order of 2026-11-28, task b): the fixed units, the association rules and the survey-count switch; fixed had not been
+    # measured together with the other two
+    "fixed_same_nearest_surveys2": {"V2_POSERR_UNITS": "fixed", "V2_ASSOC_AMBIG": "same,nearest", "V2_LOWLAT_QSO": "surveys2"},
 }
 LIMIT_OFF = {"V2_LOWLAT_QSO_ABSB": "90"}  # the switches act at every latitude
 
