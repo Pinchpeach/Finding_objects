@@ -56,6 +56,9 @@ def aggregate(shards: Path, truth_dir: Path, out: Path, frozen: bool, source_com
     status["source_commit"] = source_commit
     out.mkdir(parents=True, exist_ok=True)
     val.write_report(rows, out, status)
+    times = val.collector_times(rows)  # per class and collector, from the seconds in the logs (2.62.12); none for logs written before
+    if len(times):
+        times.to_csv(out / "collector_times.csv", index=False)
     (out / "validation_status.json").write_text(json.dumps(status, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return status
 

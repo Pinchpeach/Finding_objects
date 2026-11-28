@@ -81,3 +81,20 @@ def test_a_baseline_of_another_truth_list_is_not_used(tmp_path):
     st2 = A.aggregate(tmp_path / "shards", truth, tmp_path / "out2", frozen=True, baseline=same)
     assert st2["status"] == "DEGRADED" and st2["coverage_drops"] and st2["baseline_mismatch"] is None
 
+
+
+def test_the_seconds_of_every_collector_are_summed_per_class_and_old_logs_are_left_out(tmp_path):
+    """2.62.12: which collector sets the time of a shard (the PULSAR shard took 55 of the 60 minutes of the 2026-11-28 baseline)."""
+    V = _load(CLS / "validate_independent_truth_sets.py", "agg_validate_times")
+    rows = []
+    for i, (a, b) in enumerate([(1.0, 30.0), (2.0, 50.0), (3.0, 10.0)]):
+        logs = [{"collector": "gaia_dr3", "status": "ok", "rows": 1, "seconds": a}, {"collector": "chandra", "status": "empty", "rows": 0, "seconds": b}]
+        rows.append({**_row(i), "collectors": json.dumps(logs)})
+    rows.append(_row(9))  # a log of before 2.62.12: no seconds
+    t = V.collector_times(pd.DataFrame(rows)).set_index("collector")
+    assert list(t.index) == ["chandra", "gaia_dr3"]  # the slowest first
+    assert t.loc["chandra", "objects"] == 3 and t.loc["chandra", "total_s"] == 90.0 and t.loc["chandra", "median_s"] == 30.0 and t.loc["chandra", "max_s"] == 50.0
+    _shard(tmp_path, "pn", rows)
+    out = tmp_path / "out"
+    A.aggregate(tmp_path / "shards", _truth_dir(tmp_path), out, frozen=True, source_commit="abc")
+    assert (out / "collector_times.csv").exists() and len(pd.read_csv(out / "collector_times.csv")) == 2
