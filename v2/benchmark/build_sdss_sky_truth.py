@@ -2,8 +2,9 @@
 """Sky-spread SDSS spectroscopic benchmark (2.52.0).
 
 The 2.x SDSS benchmark (truth_data/ground_truth.csv, build_truth_sets.py)
-took the first spectra in specObjID order: 9,999 objects from 142 plates, the
-3,333 galaxies from only 7 plates, no |b| < 20 deg object.  The scientific
+took the first spectra in specObjID order: 9,999 objects from 84 plates (the per-class
+plate counts of the review, 51 + 7 + 84, add up to 142 but the plates overlap; see
+benchmark/doc_claims/), the 3,333 galaxies from only 7 plates, no |b| < 20 deg object.  The scientific
 review (SCIENTIFIC_REVIEW_2026-11-11.md 3.1, items 6.7-6.8) asked for a
 benchmark drawn over the whole spectroscopic footprint, low latitude
 included, with a spatial train / calibration / test split.
