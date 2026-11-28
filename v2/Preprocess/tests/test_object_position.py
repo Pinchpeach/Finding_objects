@@ -67,16 +67,27 @@ def test_a_radio_row_with_a_legacy_unit_error_does_not_win():
 
 
 def test_ties_are_broken_by_the_catalogue_priority_not_the_row_order():
-    rows = [det("Pan-STARRS1 DR2 MeanObject", 1.0, 1.0, 0.05, 1.2, did="p"), det("DESI Legacy Surveys DR10", 1.0001, 1.0, 0.05, 1.2, did="l")]
+    rows = [det("SDSS DR18 PhotoObj", 1.0, 1.0, 0.05, 1.2, did="p"), det("DESI Legacy Surveys DR10", 1.0001, 1.0, 0.05, 1.2, did="l")]
     for order in (rows, rows[::-1]):
         assert OP.best_positions(frame(*order)).loc["OBJ1"].source == "DESI Legacy Surveys DR10"  # both 0.2'': Legacy Surveys ranks first
 
 
-def test_a_tie_of_the_floor_is_decided_by_the_measured_error():
-    """Legacy Surveys and Pan-STARRS1 both read 0.2'' under the PSF / 6 floor; the one whose own measured error is smaller wins, whatever the catalogue priority."""
-    rows = [det("Pan-STARRS1 DR2 MeanObject", 1.0, 1.0, 0.05, 1.2, did="p"), det("DESI Legacy Surveys DR10", 1.0001, 1.0, 0.1, 1.2, did="l")]
+def test_pan_starrs1_does_not_beat_legacy_surveys_on_its_scatter_statistic():
+    """raMeanErr of Pan-STARRS1 is the scatter of single-epoch RAs (0.03'' median); on the COSMOS fields the Legacy Surveys row of the same object is far closer to the truth (1.9 % against
+    17.1 % beyond 0.5'').  The catalogue floor of 0.6'' puts the Legacy Surveys row (0.6'' for an unresolved-model error) first by the tie rule."""
+    rows = [det("Pan-STARRS1 DR2 MeanObject", 1.0, 1.0, 0.03, 1.2, did="p"), det("DESI Legacy Surveys DR10", 1.0001, 1.0, 0.6, 1.2, did="l")]
     for order in (rows, rows[::-1]):
-        assert OP.best_positions(frame(*order)).loc["OBJ1"].source == "Pan-STARRS1 DR2 MeanObject"
+        b = OP.best_positions(frame(*order)).loc["OBJ1"]
+        assert b.source == "DESI Legacy Surveys DR10" and b.sigma == pytest.approx(0.6)
+    only = OP.best_positions(frame(rows[0])).loc["OBJ1"]  # Pan-STARRS1 alone is still printed (its floor only ranks)
+    assert only.source == "Pan-STARRS1 DR2 MeanObject" and only.sigma == pytest.approx(0.6)
+
+
+def test_a_tie_of_the_floor_is_decided_by_the_measured_error():
+    """Legacy Surveys and SDSS both read 0.2'' under the PSF / 6 floor; the one whose own measured error is smaller wins, whatever the catalogue priority."""
+    rows = [det("SDSS DR18 PhotoObj", 1.0, 1.0, 0.05, 1.2, did="p"), det("DESI Legacy Surveys DR10", 1.0001, 1.0, 0.1, 1.2, did="l")]
+    for order in (rows, rows[::-1]):
+        assert OP.best_positions(frame(*order)).loc["OBJ1"].source == "SDSS DR18 PhotoObj"
 
 
 def test_the_result_does_not_depend_on_the_row_order():

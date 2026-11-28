@@ -6,13 +6,13 @@ by the unfloored position error, while the association itself (and the match rad
 (WORK_REPORT_2026-11-28d.md, 5.6).
 
 ``V2_OBJECT_POSITION`` (default ``anchor`` = nothing changes; ``best``) replaces only the printed ``ra`` / ``dec`` of the FINAL tables by the position of the member with the
-smallest effective error (the rule SIMBAD uses for its basic data: the most accurate measurement; Wenger et al. 2000, A&AS 143, 9, 3.2.2).  It is applied once, at the very end of
+smallest ranked error (the rule SIMBAD uses for its basic data: the most accurate measurement; Wenger et al. 2000, A&AS 143, 9, 3.2.2).  It is applied once, at the very end of
 ``pipeline.py``: stages 1-7, the host and cluster groups, the designations (names come from catalogue identifiers, not from coordinates), ``separation_arcmin`` and the cone cut all
 run on the anchor position, so the labels, the probabilities and the object set are those of the default run by construction.  With ``best`` the table gets six more columns:
 
     ra_anchor, dec_anchor       the position the pipeline worked with (the anchor's)
     position_source             the catalogue of the member whose position is printed
-    position_sigma_arcsec       its effective error (without the proper-motion term)
+    position_sigma_arcsec       its error as ranked (the effective error without the proper-motion term, with the catalogue floors of POSITION_FLOOR)
     position_epoch              its reference epoch (Gaia DR3 2016.0; None where the catalogue gives none).  Positions of different epochs are not mixed: one member's position
                                 at that member's epoch, and no proper-motion propagation to a common epoch (the anchor has the same limit)
     position_shift_arcsec       the distance between the two positions
@@ -50,6 +50,13 @@ TIE_PRIORITY = (
 )
 
 
+# A catalogue-level floor of the error used ONLY to choose the printed position (the association keeps its own errors).  Pan-STARRS1 DR2 ``raMeanErr`` is the scatter of the single-epoch RAs
+# of the mean position, not an error of the position (benchmark/position_errors/UNITS.md); read as one it gives 0.03'' (median), and the objects Pan-STARRS1 anchors lie beyond 0.5'' of
+# their COSMOS2020 source in 17.1 % of the cases against 1.9 % for the Legacy Surveys row of the same object (26 deep COSMOS fields; by magnitude i > 22: 29 %, i > 24: 85 %).  The floor is the
+# 0.6'' of the association's default for a catalogue of unknown accuracy (``DEFAULT_PROFILE``), the one value tried: it puts the Legacy Surveys row (also 0.6'') ahead by the tie rule.
+POSITION_FLOOR = {"Pan-STARRS1 DR2 MeanObject": 0.6}
+
+
 def mode() -> str:
     """The switch: '' / ``anchor`` (default) or ``best``; anything else is an error (like the other V2_* switches)."""
     raw = os.environ.get(ENV, "").strip().lower()
@@ -79,15 +86,25 @@ def effective_sigma(a: pd.DataFrame) -> np.ndarray:
     return np.where(use_psf, np.maximum(pos, psf / 6.0), pos)
 
 
+def position_sigma(a: pd.DataFrame) -> np.ndarray:
+    """The error that ranks the members for the printed position: ``effective_sigma`` with the catalogue floors of ``POSITION_FLOOR``."""
+    sigma = effective_sigma(a)
+    for cat, floor in POSITION_FLOOR.items():
+        sigma = np.where((a["catalog"] == cat).to_numpy(), np.maximum(sigma, floor), sigma)
+    return sigma
+
+
 def best_positions(assoc: pd.DataFrame) -> pd.DataFrame:
     """One row per ``object_id``: ra, dec, source, sigma, epoch of the member with the smallest effective error (``assoc`` = the table of Stage 1)."""
     a = assoc[["object_id", "catalog", "ra", "dec"]].copy()
     a["detection_id"] = assoc["detection_id"].astype(str) if "detection_id" in assoc else ""
     a["epoch"] = pd.to_numeric(assoc["ref_epoch"], errors="coerce") if "ref_epoch" in assoc else np.nan
     a["ra"], a["dec"] = pd.to_numeric(a["ra"], errors="coerce"), pd.to_numeric(a["dec"], errors="coerce")
-    a["sigma"] = effective_sigma(assoc)
+    a["sigma"] = position_sigma(assoc)
     # a tie of the effective error is mostly a tie of the FLOOR (PSF / 6: Legacy Surveys, Pan-STARRS1 and SDSS all give 0.2'' for a 1.2'' PSF): the measured error under the floor decides
     a["measured"] = pd.to_numeric(assoc["poserr_arcsec"], errors="coerce").fillna(99.0)
+    for cat, floor in POSITION_FLOOR.items():  # the catalogue floor holds for the tie key too (a scatter statistic must not win the tie either)
+        a["measured"] = np.where((a["catalog"] == cat).to_numpy(), np.maximum(a["measured"], floor), a["measured"])
     rank = {c: i for i, c in enumerate(TIE_PRIORITY)}
     a["rank"] = a["catalog"].map(rank).fillna(len(TIE_PRIORITY)).astype(int)
     a = a[np.isfinite(a["ra"]) & np.isfinite(a["dec"])]
