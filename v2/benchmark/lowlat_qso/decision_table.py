@@ -18,6 +18,8 @@ per number that decides it, each read from a table the other scripts of this fol
 
 from __future__ import annotations
 
+import sys
+
 import argparse
 import math
 from pathlib import Path
@@ -29,12 +31,17 @@ def frac(k, n) -> str:
     return f"{int(k)}/{int(n)}"
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--results", type=Path, required=True)
     ap.add_argument("--earlier", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
     a = ap.parse_args()
+    t0 = RI.start()
     R, E = a.results, a.earlier
     conf = pd.read_csv(R / "recheck_main_version" / "confirmation_ab_variants.csv").set_index("variant")
     cal = pd.read_csv(R / "recheck_main_version" / "calibration_ab_variants.csv").set_index("variant")
@@ -76,6 +83,7 @@ def main() -> int:
     d.to_csv(a.out, index=False)
     with pd.option_context("display.width", 280, "display.max_columns", 40, "display.max_colwidth", 40):
         print(d.T.to_string())
+    RI.write_args(a, t0=t0)
     return 0
 
 

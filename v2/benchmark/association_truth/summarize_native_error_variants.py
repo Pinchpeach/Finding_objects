@@ -15,6 +15,8 @@ Reproduce the runs: ``run_native_error_variants.sh``.
 
 from __future__ import annotations
 
+import sys
+
 import argparse
 from pathlib import Path
 
@@ -27,12 +29,17 @@ def partition(a: pd.DataFrame) -> set:
     return {tuple(sorted(g)) for _, g in a.groupby("object_id").detection_id}
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--root", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--variants", nargs="+", default=["base", "allwise", "allwise_raw", "galex"])
     a = ap.parse_args()
+    t0 = RI.start()
     a.out.mkdir(parents=True, exist_ok=True)
     fm = pd.concat([pd.read_csv(a.root / f"meas_{v}" / f"false_missed_{v}.csv") for v in a.variants])
     fm = fm[fm.catalog.isin(CATS)]
@@ -63,6 +70,7 @@ def main() -> int:
     pd.DataFrame(rows).to_csv(a.out / "native_error_structure.csv", index=False)
     print(pd.DataFrame(rows).to_string(index=False))
     print(fm[fm.half == "all"].drop(columns=["unknown", "with_expected", "false_wilson"]).sort_values(["catalog", "variant"]).to_string(index=False))
+    RI.write_args(a, ('root',), t0=t0)
     return 0
 
 

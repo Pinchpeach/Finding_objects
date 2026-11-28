@@ -23,6 +23,8 @@ the ceiling: the share of the objects of that i bin (all objects of the cones) t
 
 from __future__ import annotations
 
+import sys
+
 import argparse
 import math
 from pathlib import Path
@@ -61,12 +63,17 @@ def q_table(cross: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--cosmos", type=Path, required=True)
     ap.add_argument("--dist", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
     a = ap.parse_args()
+    t0 = RI.start()
     a.out.mkdir(parents=True, exist_ok=True)
     cross = pd.read_csv(a.cosmos / "type1_ps1_i_by_surveys.csv")
     q = q_table(cross)
@@ -103,6 +110,7 @@ def main() -> int:
     r.to_csv(a.out / "estimated_loss.csv", index=False)
     with pd.option_context("display.width", 250, "display.max_columns", 30, "display.max_rows", 200):
         print(r.to_string(index=False))
+    RI.write_args(a, t0=t0)
     return 0
 
 

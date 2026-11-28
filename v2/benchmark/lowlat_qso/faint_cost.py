@@ -69,6 +69,10 @@ ENV = {  # variant -> environment
 LIMIT_OFF = {"V2_LOWLAT_QSO_ABSB": "90"}  # the switches act at every latitude
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def wilson(k, n):
     return FQ.wilson(k, n)
 
@@ -77,8 +81,21 @@ def rname(lo, hi) -> str:
     return f"{'<' if lo == -np.inf else ''}{'' if lo == -np.inf else f'{lo:g}-'}{hi:g}" if hi != np.inf else f">={lo:g}"
 
 
+def variant_env(v: str) -> dict:
+    """The environment the pipelines of variant ``v`` run in (the V2_* variables of the caller's shell are dropped except the cache ones)."""
+    env = {k: x for k, x in os.environ.items() if not k.startswith("V2_") or k in ("V2_CACHE", "V2_CACHE_DIR")}
+    env.update({"PYTHONHASHSEED": "0", "V2_CACHE": "0"})
+    env.update(ENV[v])
+    if v != "base":
+        env.update(LIMIT_OFF)
+    return env
+
+
 def classify(deep: Path, fields_file: Path, variants: list[str], jobs: int, work_root: Path) -> None:
     fields = FQ.load_fields(fields_file)
+    t0 = RI.start()
+    for v in variants:  # run_info.json per variant: the environment the pipelines of that directory run in, and what the code reads in it
+        RI.write(deep / f"run_{v}", [fields_file], t0=t0, status="running", env=variant_env(v), replace_env=True, note=f"faint_cost classify, variant {v}")
 
     def one(args):
         v, f = args
@@ -88,11 +105,7 @@ def classify(deep: Path, fields_file: Path, variants: list[str], jobs: int, work
             return
         work = work_root / v / f
         shutil.rmtree(work, ignore_errors=True)
-        env = {k: x for k, x in os.environ.items() if not k.startswith("V2_") or k in ("V2_CACHE", "V2_CACHE_DIR")}
-        env.update({"PYTHONHASHSEED": "0", "V2_CACHE": "0"})
-        env.update(ENV[v])
-        if v != "base":
-            env.update(LIMIT_OFF)
+        env = variant_env(v)
         cmd = [sys.executable, str(V2 / "pipeline.py"), "--raw-dir", str(FQ.raw_dir(deep, f)), "--ra", str(ra), "--dec", str(dec),
                "--radius", str(FQ.RADIUS_ARCMIN), "--work", str(work)]  # fmt: skip
         subprocess.run(cmd, env=env, check=True, timeout=3600, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -102,8 +115,15 @@ def classify(deep: Path, fields_file: Path, variants: list[str], jobs: int, work
         shutil.rmtree(work, ignore_errors=True)
         print(f"[{v}] {f}: {len(d)} objects", flush=True)
 
-    with ThreadPoolExecutor(max(1, jobs)) as ex:
-        list(ex.map(one, [(v, f) for v in variants for f in fields]))
+    try:
+        with ThreadPoolExecutor(max(1, jobs)) as ex:
+            list(ex.map(one, [(v, f) for v in variants for f in fields]))
+    except BaseException:
+        for v in variants:
+            RI.write(deep / f"run_{v}", [fields_file], t0=t0, status="failed", env=variant_env(v), replace_env=True, note=f"faint_cost classify, variant {v}")
+        raise
+    for v in variants:
+        RI.write(deep / f"run_{v}", [fields_file], t0=t0, status="ok", env=variant_env(v), replace_env=True, note=f"faint_cost classify, variant {v}")
 
 
 def load(deep: Path, variant: str) -> pd.DataFrame:
@@ -236,6 +256,7 @@ def main() -> int:
     ap.add_argument("--work", type=Path, default=Path("/tmp/faint_cost_work"))
     ap.add_argument("--out", type=Path)
     a = ap.parse_args()
+    t0 = RI.start()
     variants = a.variants.split(",")
     bad = [v for v in variants if v not in ENV]
     if bad:
@@ -246,6 +267,7 @@ def main() -> int:
         if not a.out:
             raise SystemExit("--out is needed for tables")
         tables(a.deep, a.fields_file, variants, a.out)
+        RI.write_args(a, ("deep", "fields_file"), t0=t0, note="faint_cost tables of " + ",".join(variants))
     return 0
 
 

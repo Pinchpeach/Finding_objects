@@ -140,12 +140,18 @@ def tables(d: pd.DataFrame, out: Path) -> None:
         print(pd.DataFrame(rows).sort_values("rows", ascending=False).to_string(index=False))
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--stage1", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
     a = ap.parse_args()
+    t0 = RI.start()
     tables(load(a.stage1), a.out)
+    RI.write_args(a, t0=t0)
     return 0
 
 

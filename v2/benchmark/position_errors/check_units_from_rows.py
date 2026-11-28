@@ -85,11 +85,16 @@ def scan(roots: list[Path]) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     return pd.DataFrame(rows).sort_values(["changed", "rows"], ascending=False), pd.DataFrame(ev), pd.DataFrame(list(regions.values()))
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--roots", type=Path, nargs="+", required=True)
     ap.add_argument("--out", type=Path, required=True)
     a = ap.parse_args()
+    t0 = RI.start()
     a.out.mkdir(parents=True, exist_ok=True)
     rows, ev, regs = scan(a.roots)
     regs.to_csv(a.out / "regions_changed.csv", index=False)
@@ -102,6 +107,7 @@ def main() -> int:
     print("catalogues with changed rows:", sorted(changed))
     print(f"regions with at least one changed row: {len(regs)} (rest are identical by construction)")
     print(regs.groupby('set')[['vlass', 'nvss', 'other']].agg(['count', 'sum']).to_string())
+    RI.write_args(a, ('roots',), t0=t0)
     return 0
 
 

@@ -12,6 +12,8 @@ exist in only one run (an object created or removed by a different association).
 
 from __future__ import annotations
 
+import sys
+
 import argparse
 import math
 from pathlib import Path
@@ -54,6 +56,10 @@ def one(base: Path, var: Path, field: str, tol: float) -> pd.DataFrame:
     return m
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--base", type=Path, required=True)
@@ -62,6 +68,7 @@ def main() -> int:
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--tol", type=float, default=0.2)
     a = ap.parse_args()
+    t0 = RI.start()
     parts, ob, ov = [], [], []
     for f in [x for x in a.fields.split(",") if x]:
         m = one(a.base, a.variant, f, a.tol)
@@ -87,6 +94,7 @@ def main() -> int:
     pd.crosstab(m.cls_b, m.cls_v).to_csv(a.out / "label_transitions.csv")
     print(t.to_string(index=False))
     print(pd.crosstab(m.cls_b, m.cls_v).to_string())
+    RI.write_args(a, ('base', 'variant'), t0=t0)
     return 0
 
 

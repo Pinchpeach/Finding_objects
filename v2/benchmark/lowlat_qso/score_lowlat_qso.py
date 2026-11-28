@@ -44,6 +44,8 @@ Causes of a miss, first match wins:
 
 from __future__ import annotations
 
+import sys
+
 import argparse
 import json
 import math
@@ -514,6 +516,10 @@ def summarise(res: dict) -> dict[str, pd.DataFrame]:
                 counterfactual_recall=pd.DataFrame(cf_rows), qso_other_objects=res["qso_other"])  # fmt: skip
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -527,6 +533,7 @@ def main() -> int:
     s.add_argument("--radius", type=float, default=3.0, help="arcmin, as the regions were collected")
     s.add_argument("--out", type=Path, required=True)
     a = ap.parse_args()
+    t0 = RI.start()
     if a.cmd == "compact":
         compact(a.work, a.out)
         return 0
@@ -549,6 +556,7 @@ def main() -> int:
         print(tabs["recall_summary"].to_string(index=False))
         print(tabs["causes"].to_string(index=False))
         print(tabs["qso_density"].to_string(index=False))
+    RI.write_args(a, t0=t0)
     return 0
 
 

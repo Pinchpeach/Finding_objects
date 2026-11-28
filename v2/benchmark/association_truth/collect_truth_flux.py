@@ -35,6 +35,10 @@ COLUMNS = ["RAJ2000", "DEJ2000", "HSCimagAuto", "ACSF814Wmag", "ACSmuClass", "lp
            "FUVISTAKs", "FCFHTu", "FGALEXNUV", "FGALEXFUV"]  # fmt: skip
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--out", type=Path, required=True)
@@ -43,6 +47,7 @@ def main() -> int:
         "--radius", type=float, default=6.35, help="cone radius in arcmin (6.35 = the field's 6' + 3 FWHM of AllWISE)"
     )
     a = ap.parse_args()
+    t0 = RI.start()
     a.out.mkdir(parents=True, exist_ok=True)
     for r in pd.read_csv(a.fields_file).itertuples():
         dst = a.out / f"{r.name}.csv.gz"
@@ -55,6 +60,7 @@ def main() -> int:
         df = tl[0].to_pandas()
         df.to_csv(dst, index=False)
         print(r.name, len(df), flush=True)
+    RI.write_args(a, t0=t0)
     return 0
 
 

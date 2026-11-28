@@ -75,11 +75,16 @@ def table(d: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--sets", nargs="+", required=True, help="ROOT:fields.csv")
     ap.add_argument("--out", type=Path, required=True)
     a = ap.parse_args()
+    t0 = RI.start()
     a.out.mkdir(parents=True, exist_ok=True)
     parts = []
     for spec in a.sets:
@@ -93,6 +98,7 @@ def main() -> int:
     t.to_csv(a.out / "survey_distribution.csv", index=False)
     with pd.option_context("display.width", 250, "display.max_columns", 30, "display.max_rows", 200):
         print(t[t.cones != "all"].to_string(index=False))
+    RI.write_args(a, t0=t0)
     return 0
 
 

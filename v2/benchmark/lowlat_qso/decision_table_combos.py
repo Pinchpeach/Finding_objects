@@ -22,6 +22,8 @@ Columns (inputs in ``--inputs``):
 
 from __future__ import annotations
 
+import sys
+
 import argparse
 import math
 from pathlib import Path
@@ -140,12 +142,17 @@ def labels(inputs: Path, key: str) -> dict:
     return out
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--inputs", type=Path, required=True)
     ap.add_argument("--assoc", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
     a = ap.parse_args()
+    t0 = RI.start()
     conf = pd.read_csv(a.inputs / "lowlat_confirmation.csv")
     cal = pd.read_csv(a.inputs / "lowlat_calibration.csv")
     loss = pd.read_csv(a.inputs / "type1_loss_by_r.csv")
@@ -165,6 +172,7 @@ def main() -> int:
     print(UNUSED)
     with pd.option_context("display.width", 300, "display.max_columns", 60, "display.max_colwidth", 60):
         print(d.T.to_string())
+    RI.write_args(a, ('inputs', 'assoc'), t0=t0)
     return 0
 
 

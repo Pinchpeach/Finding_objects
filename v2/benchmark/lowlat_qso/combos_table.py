@@ -92,6 +92,10 @@ def build(variants: list[tuple[str, Path]], regions: pd.DataFrame, truth: pd.Dat
     return pd.DataFrame(rows), t, dict(regions_compared=int(len(regions)), excluded=excluded, missing_by_variant=missing)
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--variants", nargs="+", required=True, help="NAME=ROOT, the first is the control")
@@ -101,6 +105,7 @@ def main() -> int:
     ap.add_argument("--tol", type=float, default=1.0)
     ap.add_argument("--out", type=Path, required=True)
     a = ap.parse_args()
+    t0 = RI.start()
     variants = [(v.split("=", 1)[0], Path(v.split("=", 1)[1])) for v in a.variants]
     d, _, cov = build(variants, pd.read_csv(a.regions), pd.read_csv(a.truth), a.radius, a.tol)
     a.out.parent.mkdir(parents=True, exist_ok=True)
@@ -108,6 +113,7 @@ def main() -> int:
     print(cov)
     with pd.option_context("display.width", 280, "display.max_columns", 50):
         print(d.T.to_string())
+    RI.write_args(a, ('variants', 'regions', 'truth'), t0=t0)
     return 0
 
 

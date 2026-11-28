@@ -20,6 +20,8 @@ hosts above; without a network use ``--huo`` / ``--fu-votable`` with the files. 
 
 from __future__ import annotations
 
+import sys
+
 import argparse
 import gzip
 import hashlib
@@ -99,12 +101,17 @@ def read_fu(raw: bytes) -> pd.DataFrame:
     return pd.concat([qso, non], ignore_index=True)
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--huo", type=Path, help="GPQs_LAMOST_DR10.fits[.gz] instead of the download")
     ap.add_argument("--fu-votable", type=Path, help="VizieR J/ApJS/261/32 votable instead of the download")
     a = ap.parse_args()
+    t0 = RI.start()
     huo_raw = a.huo.read_bytes() if a.huo else fetch([HUO_URL])
     fu_raw = a.fu_votable.read_bytes() if a.fu_votable else fetch(FU_URLS)
     print("sha256 huo", hashlib.sha256(huo_raw).hexdigest(), len(huo_raw), "bytes")
@@ -125,6 +132,7 @@ def main() -> int:
     d.to_csv(a.out, index=False)
     print(d.groupby(["sample", "cls"]).size().to_string())
     print("quasars in both samples:", int((d.also_in == "huo").sum()))
+    RI.write_args(a, t0=t0)
     return 0
 
 

@@ -115,6 +115,10 @@ def attach_labels(t: pd.DataFrame, cl: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--raw", type=Path, required=True)
@@ -122,6 +126,7 @@ def main() -> int:
     ap.add_argument("--env", nargs="*", default=[], help="KEY=VALUE environment switches for Stage 1")
     ap.add_argument("--classified", type=Path, help="classified_objects.csv of the same region: keeps the objects inside its cone and adds its labels (matched by position, 0.5'')")
     a = ap.parse_args()
+    t0 = RI.start()
     a.out.mkdir(parents=True, exist_ok=True)
     s1 = load_stage1(dict(kv.split("=", 1) for kv in a.env))
     s1.run(a.raw, a.out / "source_association.csv")
@@ -134,6 +139,7 @@ def main() -> int:
     print(t.reason.value_counts().to_string())
     if "cl_primary_class" in t:
         print(pd.crosstab(t.cl_primary_class, t.reason).to_string())
+    RI.write_args(a, ('raw', 'classified'), t0=t0)
     return 0
 
 
