@@ -44,3 +44,17 @@
 ## 판정 방식
 
 숫자를 연 뒤 위 표를 그대로 두고 맞음/틀림을 보고서에 적는다. 틀린 예측은 지우지 않는다. 범위의 경계(예: 정확히 ±15 %)는 경계를 포함해 맞음으로 센다.
+
+---
+
+## 추가 예측: 검토 세션의 정의로 다시 셀 때 (측정을 다시 돌린 직후, 새 요약을 열기 **전**에 씀)
+
+**상황**: 위 표의 `right_object`는 `correct + rightly_alone`(검토의 Codex 지적: 앵커에 따라 움직인다)이었고, main(2.62.7, #101)은 이를 `correct + alone_identified`(안 붙은 행의 **자기 객체**가 허용 짝을 가짐)로 바꾸었다. 측정은 같은 1단계 출력 위에서 병합된 `measure_association.py`로 다시 돌렸고(`ro26b/`), 새 요약은 아직 열지 않았다. 옛 정의의 결과(위 판정)는 이미 보았다. 그 숫자를 보고 쓰는 예측이므로 **맹검이 아니다**. 구조에서 나오는 기대만 적는다.
+
+| # | 예측 | 이유 |
+|---|---|---|
+| E1 | `same_nearest`·`nearest`·`same`의 Δright_object(확인 17, AllWISE)는 옛 정의와 ±2행 안 (+46), GALEX는 +31 ± 3 | 앵커 순서를 안 바꾸고 `rightly_alone` 변화가 0–2행이었다 |
+| E2 | `file`/`position` 대 기본값의 AllWISE Δright_object는 −52 ± 5 | `missed → rightly_alone`로 바뀐 50행은 LS 행이 AllWISE 앵커 객체에 들어와 자기 객체가 짝을 가지므로(`alone_identified`) 새 정의에서도 센다 |
+| E3 | `floored`의 AllWISE Δright_object는 옛 +129보다 **크다**(+135 ~ +160) | 옛 정의는 `rightly_alone`이던 행이 정답 id 없는 객체에 붙어 `unknown`이 되는 것(+10)과 `false`(+8)를 손실로 셌다. 새 정의는 그것을 `unidentified`에 넣어 손실로 세지 않는다 |
+| E4 | `floored`의 재라벨 몫(Δcorrect 중 −Δalone_identified 비율)은 옛 94 %보다 **낮거나 같다**(≤ 94 %); `alone_identified`가 −2,000 안팎 | `correct`로 올라온 행의 상당수가 이전에 자기 객체가 짝을 갖는 앵커였다 |
+| E5 | 변형 사이의 순위(어느 변형이 AllWISE `right_object`가 높은가: floored > same_nearest > base > file ≈ position)는 옛 정의와 같다 | 정의 변경은 수십 행 규모의 보정이다 |
