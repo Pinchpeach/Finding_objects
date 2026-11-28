@@ -99,6 +99,15 @@ VIZIER_HOSTS = (
     "vizier.idia.ac.za",
 )
 MIRROR_STICKY_S = 600.0
+# Largest multi-target request (positions) a mirror answers within its own time limit (2.62.12, WORK_REPORT_2026-11-28_vizier_batch.md).  CfA's
+# gateway ends a request at 60 s with HTTP 504: the 500-position Gaia DR3 batches of the WD HR-gates run of 2026-11-28 (46108906185) waited 60.3 s
+# there three times before IDIA answered, and every 504 also marked CfA as failing for MIRROR_STICKY_S, for the small cones of the other
+# collectors too.  Probe run 46118073648 (``probe_vizier_batch.py``, I/355/gaiadr3, radius 12", the collector's request): CfA answered 50
+# positions twice (39-40 s), 125 once in two (102.5 s; 504 at 60.1 s), 250 never (504 x2); IDIA answered every size, 50-500, at 3.4-4.6
+# positions per second (500 in 87-151 s), three times CfA's rate even at 50.  So a larger request is not sent to CfA while another mirror can
+# take it (CfA is asked last), and the caller's batch size is left alone: cutting the batches to CfA's 50 would make the crossmatch slower.
+# A mirror not listed takes any size.  Re-measure with the probe (workflow v2_vizier_batch_probe.yml) when a mirror changes.
+VIZIER_MAX_TARGETS = {"vizier.cfa.harvard.edu": 50}
 CONNECT_TIMEOUT_S = 10.0
 # 500 added in 2.44.0: on 2026-10-31 the IDIA mirror, preferred after
 # Strasbourg failed, answered 500 to every query for hours (48 fields lost
@@ -241,6 +250,24 @@ def _lacking(catalog: str | None) -> set:
         }
     except Exception:
         return set()
+
+
+_TARGET_LIST = re.compile(r"-c=<<====(\S+)\n(.*?)\n====\1", re.S)
+
+
+def _targets(data) -> int:
+    """Positions of a VizieR request: the lines of a multi-target list (``-c=<<====AstroqueryList ... ====AstroqueryList``, astroquery), else 1."""
+    if isinstance(data, bytes):
+        data = data.decode(errors="replace")
+    if not isinstance(data, str):
+        return 1
+    m = _TARGET_LIST.search(data)
+    return sum(1 for line in m.group(2).splitlines() if line.strip()) if m else 1
+
+
+def _within_limits(hosts: list[str], targets: int) -> list[str]:
+    """``hosts`` with the mirrors whose VIZIER_MAX_TARGETS is below ``targets`` moved to the end (still asked if the others fail)."""
+    return sorted(hosts, key=lambda h: targets > VIZIER_MAX_TARGETS.get(h, targets))
 
 
 def _vizier_order(host: str, catalog: str | None = None) -> list[str]:
@@ -475,7 +502,7 @@ def _with_mirrors(send):
         # ``distrust_last_mirror`` names no mirror instead of one that answered an earlier request well
         _local.last_host = None
         catalog = _catalog_of(str(url), kwargs.get("data"))
-        hosts = _vizier_order(parts.hostname, catalog)
+        hosts = _within_limits(_vizier_order(parts.hostname, catalog), _targets(kwargs.get("data")))
         read = kwargs.get("timeout")
         read = read[1] if isinstance(read, tuple) else read
         kwargs["timeout"] = (CONNECT_TIMEOUT_S, read)
