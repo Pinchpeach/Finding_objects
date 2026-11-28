@@ -59,3 +59,21 @@ def test_a_blended_row_whose_own_object_holds_a_counterpart_is_right_alone_or_jo
     assert (ra["missed"], ra["alone_identified"]) == (1, 1)  # unjoined: another holder exists, so "missed", but its own object holds a counterpart
     assert rj["correct"] == 1
     assert ra["correct"] + ra["alone_identified"] == rj["correct"] + rj["alone_identified"] == 1
+
+
+def test_an_object_without_a_resolving_row_reads_the_same_whoever_anchors_it():
+    """2.62.10 review: one object {AllWISE, GALEX}, no resolving row, the truth source 0.1'' from the GALEX row and 0.9'' from the AllWISE row.  T(O) came from the
+    ANCHOR position, so the AllWISE row was alone_unidentified when AllWISE anchored and correct when GALEX anchored.  It now comes from a member chosen by a fixed rule."""
+    truth = pd.DataFrame(dict(ra=[150.0], dec=[2.0], HSCimagAuto=[20.0], FIRACCH1=[10.0], FUVISTAKs=[np.nan], FCFHTu=[5.0]))
+    w, g = (150.0 + 0.9 * ARC, 2.0), (150.0 + 0.1 * ARC, 2.0)
+
+    def row(det, cat, status, anchor):
+        r = _row(det, cat, "O1", *(w if cat == "AllWISE" else g), status)
+        r["object_ra"], r["object_dec"] = anchor
+        return r
+
+    by_w = pd.DataFrame([row("w", "AllWISE", "new", w), row("g", "GALEX AIS", "matched", w)])
+    by_g = pd.DataFrame([row("w", "AllWISE", "matched", g), row("g", "GALEX AIS", "new", g)])
+    rw, rg = MA.measure_field(by_w, truth)["AllWISE"], MA.measure_field(by_g, truth)["AllWISE"]
+    readings = lambda r: (r["correct"] + r["alone_identified"], r["false"] + r["alone_wrong"], r["unknown"] + r["alone_unidentified"], r["shared"], r["displaced"])  # noqa: E731
+    assert readings(rw) == readings(rg) == (1, 0, 0, 0, 0)  # right_object 1 both ways (GALEX, the sharper PSF, gives the object its truth id)

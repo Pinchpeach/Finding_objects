@@ -5,7 +5,8 @@
 # Variants: base; allwise (eeMaj in sigma AND order); allwise_order (eeMaj in the order only); allwise_sigma (eeMaj in sigma only); floored (order key = the floored sigma
 # of every catalogue); allwise_floored (eeMaj in sigma, order key floored); allwise_order_floored.
 set -e
-R=$1; T=$2; O=$3; mkdir -p "$O"; HERE="$(cd "$(dirname "$0")" && pwd)"; cd "$HERE"
+# The directory arguments are made absolute BEFORE the cd below: a relative path given from the repository root would otherwise point into this directory (Codex review of 2.62.10).
+R=$(cd "$1" && pwd); T=$(cd "$2" && pwd); mkdir -p "$3"; O=$(cd "$3" && pwd); HERE="$(cd "$(dirname "$0")" && pwd)"; cd "$HERE"
 export PYTHONHASHSEED=0 V2_CACHE=0
 python3 "$HERE/../run_info.py" begin --out "$O/summary" --input "$R" "$T" --note "run_order_key_variants.sh"
 declare -A ENVS=(

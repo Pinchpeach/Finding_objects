@@ -189,13 +189,21 @@ def measure_field(assoc: pd.DataFrame, truth: pd.DataFrame, shifted_from: pd.Dat
     for oid, g in obj:
         ids = set(int(x) for x in g.truth_id[(g.catalog.isin(RESOLVING)) & (g.truth_id >= 0)])
         T[oid] = ids
-    anchors = a.drop_duplicates("object_id").set_index("object_id")[["object_ra", "object_dec"]]
     empty = [oid for oid, ids in T.items() if not ids]
     if empty:
-        i, _ = ref_sky.nearest(
-            anchors.loc[empty, "object_ra"].to_numpy(float), anchors.loc[empty, "object_dec"].to_numpy(float), ID_RADIUS
+        # An object without a resolving truth id takes the R source within ID_RADIUS of ONE of its members, chosen by a fixed rule that does not depend on who
+        # anchors the object (2.62.10 review): resolving rows first, then the sharpest PSF (2MASS 2.5'', GALEX 5.3'', AllWISE 6.1''), then any other catalogue;
+        # ties by detection id.  It was the anchor position (object_ra / object_dec), so an order rule that changes only the anchor of a low-resolution object
+        # (AllWISE -> GALEX under V2_ASSOC_ORDER_KEY=floored) changed T(O) and with it right_object, shared and displaced (test_right_object_metric.py).
+        rank = {c: 0 for c in RESOLVING} | {c: 1 + k for k, c in enumerate(sorted(LOWRES, key=lambda c: LOWRES[c][1]))}
+        pick = (
+            a[a.object_id.isin(empty)]
+            .assign(_rank=lambda x: x.catalog.map(rank).fillna(9), _det=lambda x: x.detection_id.astype(str))
+            .sort_values(["object_id", "_rank", "_det"])
+            .drop_duplicates("object_id")
         )
-        for oid, k in zip(empty, i):
+        i, _ = ref_sky.nearest(pick.ra.to_numpy(float), pick.dec.to_numpy(float), ID_RADIUS)
+        for oid, k in zip(pick.object_id, i):
             if k >= 0:
                 T[oid] = {int(ref_ids[k])}
     by_truth: dict[int, set] = {}
@@ -217,7 +225,7 @@ def measure_field(assoc: pd.DataFrame, truth: pd.DataFrame, shifted_from: pd.Dat
         dom, acc = expected_counterparts(d, truth, full_sky, col, fwhm)
         matched = (d.association_status == "matched").to_numpy()
         rec = dict(rows=len(d), matched=int(matched.sum()), no_expected=0, correct=0, false=0, unknown=0, missed=0, rightly_alone=0,
-                   alone_identified=0, alone_wrong=0, alone_unidentified=0, s_correct=0, s_false=0, s_missed=0)  # fmt: skip
+                   alone_identified=0, alone_wrong=0, alone_unidentified=0, shared=0, displaced=0, s_correct=0, s_false=0, s_missed=0)  # fmt: skip
         for (_, r), dm, ac, m in zip(d.iterrows(), dom, acc, matched):
             if dm < 0:
                 # no truth source with a positive flux within reach: there is nothing to join, so a join is false
@@ -236,6 +244,14 @@ def measure_field(assoc: pd.DataFrame, truth: pd.DataFrame, shifted_from: pd.Dat
             holders = set()  # objects that hold a truth source of the acceptable set (the row's own object included)
             for k in acc_set:
                 holders |= by_truth.get(k, set())
+            # 2.62.7 (task "러"): the two anchor independent readings of WHERE ELSE the counterpart is held, for every row, joined or not (they depend on the membership of the objects only).
+            #   shared    the row's own object holds an acceptable counterpart that another object holds too: one truth source in two objects (a fragment; what same,nearest merges)
+            #   displaced the row's own object holds none, but another object does (the row sits in the wrong object while the right one exists)
+            mine = T.get(own, set()) & acc_set
+            if mine:
+                rec["shared"] += int(any(by_truth.get(k, set()) - {own} for k in mine))
+            else:
+                rec["displaced"] += int(bool(holders - {own}))
             if m:
                 ids = T.get(r.object_id, set())
                 if not ids:
@@ -317,7 +333,8 @@ def measure_field(assoc: pd.DataFrame, truth: pd.DataFrame, shifted_from: pd.Dat
             if not len(d):
                 continue
             m = (d.association_status == "matched") & ~d.object_anchor_catalog.isin(SHIFTED_CATS)
-            out.setdefault(cat, {}).update(shift_rows=int(len(d)), shift_false=int(m.sum()))
+            any_unshifted = d.object_id.isin(set(s.object_id[~s.catalog.isin(SHIFTED_CATS)]))  # the object holds a row of an unshifted catalogue, whoever anchors it (METRICS.md)
+            out.setdefault(cat, {}).update(shift_rows=int(len(d)), shift_false=int(m.sum()), shift_any=int(any_unshifted.sum()))
             out.setdefault("_shift_nsep", {})[cat] = (
                 int(len(d)),
                 pd.to_numeric(d.normalized_separation[m], errors="coerce").dropna().to_numpy(),
@@ -405,7 +422,7 @@ def pool(rows: list[dict], split: pd.DataFrame, label: str) -> pd.DataFrame:
             rec = dict(variant=label, half=half, catalog=cat, fields=len(f), rows=tot["rows"], with_expected=expected,
                        matched=tot["matched"], correct=tot["correct"], false=tot["false"], unknown=tot["unknown"],
                        missed=tot["missed"], rightly_alone=tot["rightly_alone"], alone_identified=tot.get("alone_identified", 0),
-                       alone_wrong=tot.get("alone_wrong", 0), alone_unidentified=tot.get("alone_unidentified", 0))  # fmt: skip
+                       alone_wrong=tot.get("alone_wrong", 0), alone_unidentified=tot.get("alone_unidentified", 0), shared=tot.get("shared", 0), displaced=tot.get("displaced", 0))  # fmt: skip
             rec["false_pct_of_matched_known"] = round(100 * tot["false"] / decided_m, 2) if decided_m else np.nan
             lo, hi = wilson(tot["false"], decided_m)
             rec["false_wilson"] = f"{lo:.1f}-{hi:.1f}"
@@ -418,6 +435,15 @@ def pool(rows: list[dict], split: pd.DataFrame, label: str) -> pd.DataFrame:
             rec["strict_false_pct"] = round(100 * tot["s_false"] / sd, 2) if sd else np.nan
             if "shift_rows" in tot and tot["shift_rows"]:
                 rec["shifted_false_pct"] = round(100 * tot["shift_false"] / tot["shift_rows"], 2)
+            # 2.62.7 (METRICS.md): columns that do not depend on who anchors an object; appended, the order of the old columns is unchanged
+            # the first right_object of 2.62.7 (correct + rightly_alone) moved with the anchor (Codex review): rightly_alone also holds rows whose OWN object has no truth id, which
+            # are "unknown" when joined.  The anchor independent reading is correct + alone_identified (the row's own object holds an acceptable counterpart), see METRICS.md
+            rec["right_object"] = tot["correct"] + tot.get("alone_identified", 0)
+            rec["wrong_object"] = tot["false"] + tot.get("alone_wrong", 0)
+            rec["unidentified"] = tot["unknown"] + tot.get("alone_unidentified", 0)
+            rec["right_object_pct_of_expected"] = round(100 * rec["right_object"] / expected, 2) if expected else np.nan
+            if "shift_rows" in tot and tot["shift_rows"] and "shift_any" in tot:
+                rec["shifted_any_pct"] = round(100 * tot["shift_any"] / tot["shift_rows"], 2)
             out.append(rec)
     return pd.DataFrame(out)
 

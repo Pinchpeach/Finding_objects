@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "commit": "b06fdf0728fd7e19b786708ddfaa6bba02b3a989",
+  "branch": "ccr-68f28268-l0opfu",
+  "dirty": true,
+  "dirty_files": 4,
+  "env": {},
+  "effective": {
+    "POSERR_UNITS": "legacy",
+    "AMBIG_FIX": [],
+    "POSERR_NATIVE": [],
+    "ANNOT_ASSOC": [],
+    "LOWLAT_QSO": [],
+    "LOWLAT_QSO_ABSB": 20.0
+  },
+  "started_utc": "2026-11-28T04:50:37Z",
+  "finished_utc": "2026-11-28T04:51:25Z",
+  "status": "ok",
+  "inputs": [
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ro26c",
+      "kind": "directory",
+      "sha256": "d231f7c58114e52df40f6a46a62519a601de5e071672723a77426bc16bbb37e8",
+      "n_files": 433,
+      "hashed": "relative path, size"
+    }
+  ],
+  "argv": [
+    "summarize_native_error_variants.py",
+    "--root",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ro26c",
+    "--out",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ro26c/summary",
+    "--variants",
+    "base",
+    "file",
+    "position",
+    "same",
+    "nearest",
+    "same_nearest",
+    "floored",
+    "--cats",
+    "AllWISE",
+    "2MASS PSC",
+    "GALEX AIS",
+    "--stem",
+    "right_object"
+  ],
+  "python": "3.13.18",
+  "note": ""
+}

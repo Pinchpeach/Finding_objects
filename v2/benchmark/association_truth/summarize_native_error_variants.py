@@ -48,6 +48,7 @@ def main() -> int:
     fm = fm[fm.catalog.isin(a.cats)]
     keep = ["variant", "half", "catalog", "rows", "with_expected", "matched", "correct", "false", "unknown", "missed", "rightly_alone", "false_pct_of_matched_known", "false_wilson", "missed_pct_of_expected", "shifted_false_pct"]  # fmt: skip
     split = {"alone_identified", "alone_wrong", "alone_unidentified"} <= set(fm.columns)
+    keep += [c for c in ("shifted_any_pct",) if c in fm]  # 2.62.7 (task "러", METRICS.md): the anchor independent chance-join rate; absent in older measurement folders
     fm = fm[keep + (["alone_identified", "alone_wrong", "alone_unidentified"] if split else [])]
     # 2.62.7: the row sits in the object that holds its counterpart, whoever anchors: joined and right (correct) or anchoring an object that holds it
     # (alone_identified).  Review (Codex): rightly_alone also counts rows whose counterpart no object holds, which turn "unknown" when joined, so the first
@@ -60,7 +61,7 @@ def main() -> int:
         print("measure_association outputs without alone_identified / alone_wrong / alone_unidentified: right_object is not computed (re-run measure_association.py)", file=sys.stderr)
         fm["right_object"] = fm["wrong_object"] = fm["unidentified"] = np.nan
     base = fm[fm.variant == "base"].set_index(["half", "catalog"])
-    for col in ("matched", "correct", "false", "missed", "right_object", "wrong_object", "unidentified", "false_pct_of_matched_known", "missed_pct_of_expected", "shifted_false_pct"):
+    for col in ("matched", "correct", "false", "missed", "rightly_alone", "right_object", "wrong_object", "unidentified", "false_pct_of_matched_known", "missed_pct_of_expected", "shifted_false_pct") + (("shifted_any_pct",) if "shifted_any_pct" in fm else ()):
         fm[f"d_{col}"] = [round(r[col] - base.loc[(r.half, r.catalog), col], 2) for _, r in fm.iterrows()]
     fm.sort_values(["catalog", "half", "variant"]).to_csv(a.out / f"{a.stem}_false_missed.csv", index=False)
 

@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "commit": "b06fdf0728fd7e19b786708ddfaa6bba02b3a989",
+  "branch": "ccr-68f28268-l0opfu",
+  "dirty": true,
+  "dirty_files": 4,
+  "env": {
+    "PYTHONHASHSEED": "0",
+    "V2_CACHE": "0"
+  },
+  "effective": {
+    "POSERR_UNITS": "legacy",
+    "AMBIG_FIX": [],
+    "POSERR_NATIVE": [],
+    "ANNOT_ASSOC": [],
+    "LOWLAT_QSO": [],
+    "LOWLAT_QSO_ABSB": 20.0
+  },
+  "started_utc": "2026-11-28T04:46:19Z",
+  "finished_utc": "2026-11-28T04:50:06Z",
+  "status": "ok",
+  "inputs": [
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/a4/truth_flux_635",
+      "kind": "directory",
+      "sha256": "9d8d88ffadc77011e44e82be5ff6e8af0ccf1683d4b5a0fed349036e14d4daa9",
+      "n_files": 26,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ro26c/base",
+      "kind": "directory",
+      "sha256": "2fb9deff87c9ebe120d889495cb0e58a3c8e2c016d260f10968a1865ebef1100",
+      "n_files": 27,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ro26c/base_shift",
+      "kind": "directory",
+      "sha256": "1e1a30bea26be5206e9abda827eb1af51865f73e4815c1af3c101c864343e515",
+      "n_files": 27,
+      "hashed": "relative path, size"
+    }
+  ],
+  "argv": [
+    "measure_association.py",
+    "--truth-flux",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/a4/truth_flux_635",
+    "--assoc-dir",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ro26c/base",
+    "--shifted-dir",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ro26c/base_shift",
+    "--variant",
+    "base",
+    "--out",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ro26c/meas_base"
+  ],
+  "python": "3.13.18",
+  "note": ""
+}

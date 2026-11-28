@@ -1,0 +1,8 @@
+variant,objects,anchored_by_AllWISE,anchored_by_GALEX,anchored_by_LS,anchored_by_PS1,objects_differing_from_base,fields_identical_to_base,anchored_by_2MASS
+base,253933,3728,759,203998,39640,0,26,28
+file,254534,3728,807,203935,39640,2659,0,28
+position,254539,3728,808,203934,39640,2688,0,28
+same,253263,3719,689,203928,39637,928,0,25
+nearest,253249,3661,731,203741,39639,830,0,24
+same_nearest,252940,3658,694,203731,39637,1258,0,22
+floored,253861,1466,732,206797,38595,2936,0,30
