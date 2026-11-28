@@ -225,3 +225,34 @@
 ## 12. 파일
 
 `.github/workflows/`: `build-reference-objects.yml`, `v2_desi_external_validation.yml`(수정), `v2_deep_cosmos_literature.yml`(새); `benchmark/`: `truth_manifest.py`, `truth_tables_manifest.json`, `build_reference_objects.py`(출력 폴더 우회), `collect_deep_cosmos_literature.py`, `merge_deep_cosmos_literature.py`, `deep_cosmos_literature/`, `split_key/`, `server_fill/`, `association_truth/`(`run_order_key_variants.sh`, `run_order_key_outside.sh`, `outside_cosmos_summary.py`, `tie_order_interaction.py`, `summarize_native_error_variants.py`·`run_variant.py` 확장, `PREDICTIONS_ORDER_KEY_2026-11-28.md`, `results_2026-11-28b/`), `lowlat_qso/`(`faint_cost.py`, `decision_table_combos.py`, `results_2026-11-28b/`), `association_ambiguity/results_2026-11-28/`(고친 `typed_close` 값); `Preprocess/`: `association_model.py`·`01_source_association.py`의 스위치, 시험 3개 파일; 문서: `WORK_REPORT_2026-11-28b.md`(3.1b, 3.2, 8, 병합 전 검토), `ALGORITHM.md`.
+
+## 병합 전 검토 (2.62.7로 병합)
+
+- **반영 방식**: 가지 끝 78e2c97은 main 1981fa2(2.62.6)를 일반 병합한 가지다. main이 조상이므로 그대로 받고 그 위에 검토 커밋을 얹었다. main 대비 diff는 139개 파일 +7,441 / −80이다. 삭제는 작업 세션이 고친 파일 안뿐이고, 2.62.6 검토 수정은 그대로 남아 있다.
+- **확인한 것**:
+  - 시험: 646개 통과(검토 수정 뒤에도 통과, 아래).
+  - 스위치를 모두 끈 Stage 1: 실사용 3개 영역(NGC 4522, COSMOS 2′, 은하면)에서 main 작업 트리와 바이트 단위로 같다. 출력에는 `_order_poserr`가 나가지 않는다(밑줄 키는 쓰지 않는다).
+  - `V2_ASSOC_ORDER_KEY=floored` 섞기 재현성: COSMOS 2′, 시드 1–2에서 객체 차이 0, 상태 변경 0(객체 3,614).
+  - 결정표 10행: 커밋된 입력에서 다시 만들면 앞 9행이 main의 9행 표와 셀 단위로 같다(아래 한 가지만 다름). 10행째(`lit_keep`)는 9행째와 `history`, 실사용 라벨 변화(13 → 2 / 4,757), 실사용 QSO 라벨(0 / 0 / 0 → 0 / 15 / 0)만 다르다.
+  - 워크플로 세 개를 읽었다. `build-reference-objects.yml`은 수동 실행만 남았다. 기본 실행은 매니페스트 확인뿐이고, 재생성은 `v2/reference_objects_regenerated/<run id>/`에만 쓴다. `v2_desi_external_validation.yml`의 기본 실행은 확인한 뒤 커밋본을 평가하고 결과 두 파일만 커밋한다. 재생성은 옆 폴더에 쓴다. `v2_deep_cosmos_literature.yml`은 수동 실행만 있고, validation-data의 `deep_cosmos_lit/<run id>/`에만 저장한다. 블라인드 묶음은 건드리지 않는다.
+- **검토에서 고친 것**:
+  - **속도**: `load()`가 행마다 `infer_poserr_arcsec`·`infer_psf_arcsec`를 순서 키 인자로 한 번 더 계산했다. 스위치를 모두 꺼도 그랬다. 한 번 계산해 넘기게 했다. NGC 4522의 Stage 1은 main 0.86 s, 고치기 전 0.93 s, 고친 뒤 0.84 s다. 출력은 세 영역에서 바이트 동일하다. 시험이 스위치를 실행 중에 바꾸므로 import 때 계산한 플래그는 쓰지 않았다.
+  - **결정표 b의 상한 열**: 이 표는 2.62.6의 "자기 교환 표가 없으면 빈칸" 규칙 전에 만들어져, 세 스위치 행과 `lit_keep` 행에 `same_nearest`의 새 연결 상한이 들어 있었다. 병합된 도구로 다시 만들었다(나머지 셀은 그대로). 기록은 `dirty: false`이고, 작업 세션의 실행은 `previous`에 남아 있다.
+- **검토 세션의 질문에 대한 답**:
+  - **분할 고정 시험**: B(현재 분할을 키별로 저장해 고정)는 설계만 있고 구현되지 않았다. 그래서 "행 순서가 바뀌어도 분할이 그대로인가"를 재는 시험은 없다.
+    - 지금 있는 것은 C(매니페스트)의 시험이다. `test_committed_truth_tables_match_the_manifest`는 커밋된 표가 바뀌면 실패한다. `test_verify_names_a_changed_value_and_a_renumbering`은 값 변경과 번호 다시 매기기를 구별해 알린다.
+    - 이것은 보호(조용히 바뀌는 것을 막음)이지 견고성이 아니다. 분할은 여전히 행 번호 `benchmark_id`의 해시에서 나온다. B를 구현할 때 "목록 순서를 섞고 새 행을 더해도 기존 객체의 분할이 그대로"인 시험을 함께 넣어야 한다.
+  - **2.60.9·2.61.0·2.61.8의 연관 수치가 같은 정의의 영향을 받는가**(한 줄씩):
+    - "거짓 AllWISE 2.08 %"(`false_pct_of_matched_known` = 틀림 / (맞음 + 틀림)): 한 실행의 수준으로는 정의대로다. 분모가 재라벨(`rightly_alone` → `correct`)에 늘어나므로 앵커를 바꾸는 변형 사이의 비교만 영향을 받는다.
+    - "놓침 13.25 %"(`missed_pct_of_expected`): 분모가 기대 짝이고, 재라벨 경로는 놓침 수를 바꾸지 않으므로 영향이 없다. 반면 `missed_pct_of_unjoined`(41.10 % 같은 값)는 분모에 `rightly_alone`이 있어 영향을 받는다.
+    - `same,nearest`의 "새 정답 연결 +46 / +32": 2.61.8 표에서 안 붙은 행 대비 놓침률이 41.10 → 39.93 %로 −1.17 %p다. 이는 46행이 `missed`에서 빠질 때의 값과 맞는다((970 − 46) / (2,361 − 46) = 39.9 %). `rightly_alone`에서 빠졌다면 오히려 올라야 한다. 그래서 대부분 실제 이득으로 보인다. 확정은 `right_object` 재계산으로 한다(검토 세션이 작업 세션에 맡긴다).
+  - **"+5.2 %" 정정**: 병합된 2.62.4 CHANGELOG 행은 고쳐 쓰지 않았다. 정정은 2.62.7 행과 28b 본문의 괄호 주석(작업 세션), `NEXT_RELEASE_DOCS.md` 5번에 있다.
+  - **2.61.0 위치 꼬리**: `WORK_REPORT_2026-11-25g.md` 끝에 "정정 (2.62.7)" 절을 붙였다(4.46 → 4.51 %, 쌍 비교 266 대 169, 앵커 목록별 꼬리).
+  - **문서의 사실 문제**: "플레이트 142 대 84"와 "검증 계획 520개 중 54개가 참조 표에 없음"을 `NEXT_RELEASE_DOCS.md` 7·8번에 올렸다. 원인 조사는 작업 세션에 맡긴다.
+- **문헌 수집 실행 시점**: 지금은 돌리지 않았다. 03:51의 점검에서 SIMBAD Strasbourg는 DALServiceError(Harvard 거울은 정상)였고 VizieR Strasbourg는 404였다. probe → 영역 하나 → 전체 순서로, CDS·NED가 정상이고 정답 동결 커밋과 WD 재실행이 끝난 뒤에 한다.
+- **결정 사항(11절)에 대한 검토 세션의 의견을 따랐다**:
+  - 번호는 PATCH(2.62.7)다.
+  - 두 워크플로의 기본을 "커밋본 검증"으로 바꾸는 것을 승인했다.
+  - 분할 키는 B 권장(구현은 사용자 결정 뒤)이다.
+  - `floored`는 묶음 MINOR에 넣지 않고 따로 잰다.
+
