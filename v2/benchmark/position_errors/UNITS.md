@@ -31,6 +31,24 @@ itself and is the way to close every "none" below (run it where the network allo
 
 Only the two rows in bold had a wrong unit.  Everything else that reaches `infer_poserr_arcsec` is arcsec (or, for Gaia, mas and divided).
 
+## 1b. The units VizieR documents (2026-11-28, `v2_vizier_units.yml` run 46087889093, served by the CfA mirror)
+
+`dump_vizier_units.py` read the `unit` and `description` VizieR stores for every column below.  Strasbourg answered 404; the mirror failover served CfA.
+
+| catalogue | column: unit (description) | agrees with the code |
+|---|---|---|
+| NVSS `VIII/65/nvss` | `e_RAJ2000`: **s** ("Mean error on RA"), `e_DEJ2000`: arcsec ("Mean error on Dec") | **yes, the fix** (RA in seconds of time, Dec in arcsec) |
+| VLASS `J/ApJS/255/30` | no row in the 0.1 deg cone, so no metadata; asked again with a 0.5 deg cone (2.62.3) | open |
+| LoTSS DR2 `J/A+A/659/A1/catalog` | `e_RAJ2000`, `e_DEJ2000`: arcsec ("rms uncertainty on RA (E_RA)") | yes (read as arcsec) |
+| TGSS ADR1 `J/A+A/598/A78/table3` | `e_RAJ2000`, `e_DEJ2000`: arcsec ("Uncertainty on right ascension (1 sigma)") | yes |
+| GALEX `II/335/galex_ais` | `Nerr`, `Ferr`, `Ierr`, `Nperr`, `Fperr`, `Sep`: arcsec | yes |
+| AllWISE `II/328/allwise` | `eeMaj`, `eeMin`, `e_RA_pm`, `e_DE_pm`: arcsec | yes |
+| 2MASS `II/246/out` | `errMaj`, `errMin`: arcsec | yes |
+| Chandra CSC `IX/57/csc2master` | `r0`, `r1`: arcsec ("radius of the 95% confidence level position error ellipse"), `PA`: deg | yes (95 % radius / 2.448) |
+| eRASS1 `J/A+A/682/A34` | `posErr` ("1-sigma positional uncertainty"), `RADEErr`, `e_RA_ICRS`, `E_RA_ICRS`: arcsec | yes |
+| 4XMM `IX/69/xmm4d13s` | `ePos` ("Mean error on position (SC_POSERR)"): arcsec | yes |
+| FIRST `VIII/92/first14` | `Rms`: mJy, `Maj`, `Min`: arcsec (no position-error column) | yes (profile constant) |
+
 ## 2. What the fix is
 
 `association_model.native_radec_errors_arcsec` converts the `e_RAJ2000` / `e_DEJ2000` pair per catalogue: VLASS x 3600; NVSS RA x 15 cos(dec), Dec as is;
