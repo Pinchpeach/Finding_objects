@@ -1,0 +1,84 @@
+{
+  "built_utc": "2026-11-28T04:02:26Z",
+  "limit": 250,
+  "schema": 1,
+  "seed": "independent-truth-v1",
+  "sets": {
+    "pn": {
+      "classes": {
+        "phenomenon|PN": {
+          "ids_sha256": "f1876a5aa7a1cf07f1ec9f34fa002cd9fdae627c0f94962e477ef861834454b6",
+          "rows": 250
+        }
+      },
+      "file": "pn_truth.csv",
+      "rows": 250,
+      "sha256": "e7ceba83cf57b8010af3a9d4c27bce0d4e417cc5ebd09d768ed815e0bbb805f0",
+      "status": "ok"
+    },
+    "pulsars": {
+      "classes": {
+        "compact|PULSAR": {
+          "ids_sha256": "4871fc7d84337a57ca792234bff57e808eb521854d2223e45f2823ae9c5226de",
+          "rows": 250
+        }
+      },
+      "file": "pulsars_truth.csv",
+      "rows": 250,
+      "sha256": "16d8b76e805de5b521a73e8bf5576a9c046b034268db891ed400b1d814981db1",
+      "status": "ok"
+    },
+    "rgb_agb": {
+      "classes": {
+        "physical|AGB": {
+          "ids_sha256": "68ce4d28489abf1acb4add20e628a5de6dbb7a61a5abb4d6e8b2c62bd7eac4b6",
+          "rows": 250
+        },
+        "physical|RGB": {
+          "ids_sha256": "1cde1f0fec05ef466197aa623de8b9510ca70e5a576c8ce7e7009f370980eabd",
+          "rows": 203
+        }
+      },
+      "file": "rgb_agb_truth.csv",
+      "rows": 453,
+      "sha256": "fd55a20d513f244d8e2ca48af030339ab71faba2ac7031ac9e91e4ac839370e1",
+      "status": "ok"
+    },
+    "sn": {
+      "classes": {
+        "phenomenon|SN": {
+          "ids_sha256": "a4d2b0a5761a5821ca000abf108eab2c0b44884bdf7eded474a537948df9c2c7",
+          "rows": 250
+        }
+      },
+      "file": "sn_truth.csv",
+      "rows": 250,
+      "sha256": "61d6c4a894af3dd335dcab5d811a15be91e5e373a2e9a0502970cac1adb81bef",
+      "status": "ok"
+    },
+    "variables": {
+      "classes": {
+        "variability|CEPHEID": {
+          "ids_sha256": "13e454989617fe8987f6da0a6fb53b4c258ab3874055f2d519d7022d0c1f5e1b",
+          "rows": 250
+        },
+        "variability|LPV": {
+          "ids_sha256": "0f736b907f84a1e062058409868c6349fe3018df239a00892b2b05d8b4a715a5",
+          "rows": 250
+        },
+        "variability|MIRA": {
+          "ids_sha256": "8c4974cb85eb85fc16c1eeb50c16c3c3f065b630763e568448c1b039278afd67",
+          "rows": 250
+        },
+        "variability|RR_LYRAE": {
+          "ids_sha256": "426efc7a0c0b5f1bc7d6ce323733c35f79c925158cc6e4f9f0dfa2730a0f8c36",
+          "rows": 250
+        }
+      },
+      "file": "variables_truth.csv",
+      "rows": 1000,
+      "sha256": "a6004f15044130febde7abc163b7bfab0944f3cf7ba91310b55df9084b4e886b",
+      "status": "ok"
+    }
+  }
+}

@@ -22,8 +22,11 @@ sets of truth ids (`../validation/reproducibility/sample_states.csv`), so two ru
 ## Freezing (once, and again only when a truth catalogue should change)
 
 1. Run the workflow by hand with `freeze_truth = true` (builds the list with `--require-complete`, uploads the artifact `frozen-truth-candidate`, validates nothing).
-2. Copy the artifact to `v2/Classifier/truth/fixed/`, check `python build_independent_truth_sets.py --verify v2/Classifier/truth/fixed`, commit with a version bump
-   and a CHANGELOG row that names the new `list_sha256`.
+2. Run `v2 commit frozen truth list` (`.github/workflows/v2_commit_frozen_truth.yml`, 2.62.8) by hand **on a working branch** with the freeze run's id, and
+   with `compare_run_id` set to a second freeze run made at another time. The workflow downloads both artifacts and checks each with `--verify`. It refuses
+   to commit when their `list_sha256` differ, copies only the manifest and its files into `fixed/`, and commits to that branch (never main). The list
+   reaches main through a pull request with a version bump and a CHANGELOG row that names the `list_sha256`. (By hand, the same steps: copy the artifact,
+   `python build_independent_truth_sets.py --verify v2/Classifier/truth/fixed`, commit.)
 3. The next normal run measures the baseline on the frozen list.  A refit of the calibration (`refit_calibration = true`) is a separate, explicit run.
 
 `generated/` is the output of older builds (2.38.0) and is not read any more.

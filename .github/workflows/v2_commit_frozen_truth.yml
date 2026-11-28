@@ -1,0 +1,77 @@
+name: v2 commit frozen truth list (from a freeze_truth run)
+
+# 2.62.8.  Step 2 of v2/Classifier/truth/README.md ("copy the artifact to v2/Classifier/truth/fixed/, --verify, commit") done by a workflow instead of by hand,
+# so that the chain  freeze_truth run -> artifact frozen-truth-candidate -> --verify -> commit  is in the logs.
+#   * Manual only.  Inputs: the run id of a `v2 scientific cross validation` run with freeze_truth = true (and the artifact name).
+#   * compare_run_id (optional): a SECOND freeze run.  The builder is deterministic, so two freeze runs made at different times (possibly served by different
+#     VizieR mirrors) must give the same list: the workflow refuses to commit when their list_sha256 differ.  This tests the claim instead of assuming it.
+#   * Every downloaded list is checked with `build_independent_truth_sets.py --verify` (file SHA-256, the id set of every class, and every set of the manifest
+#     status ok -- what --require-complete demanded when the list was built).
+#   * Only the manifest and the files it lists are copied to v2/Classifier/truth/fixed/.
+#   * The commit goes to the branch the workflow runs on (CLAUDE.md: data-committing workflows push to github.ref_name) and is refused on main: the frozen list
+#     reaches main through a pull request with its version bump.
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "run id of the freeze_truth run whose artifact is committed"
+        required: true
+      compare_run_id:
+        description: "run id of a second freeze_truth run; its list must have the same list_sha256 (empty = no comparison)"
+        default: ""
+      artifact:
+        description: "artifact name"
+        default: "frozen-truth-candidate"
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: commit-frozen-truth-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  commit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Not on main
+        if: ${{ github.ref_name == 'main' }}
+        run: |
+          echo "::error::run this on a working branch: the frozen list reaches main through a pull request"
+          exit 1
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pandas numpy
+      - name: Download the list of the freeze run
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact }}
+          run-id: ${{ inputs.run_id }}
+          github-token: ${{ github.token }}
+          path: /tmp/frozen/a
+      - name: Download the list of the second freeze run
+        if: ${{ inputs.compare_run_id != '' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact }}
+          run-id: ${{ inputs.compare_run_id }}
+          github-token: ${{ github.token }}
+          path: /tmp/frozen/b
+      - name: Verify, compare and copy
+        env:
+          RUN_ID: ${{ inputs.run_id }}
+          COMPARE_RUN_ID: ${{ inputs.compare_run_id }}
+        run: python .github/scripts/commit_frozen_truth.py /tmp/frozen/a ${{ inputs.compare_run_id != '' && '/tmp/frozen/b' || '' }} --into v2/Classifier/truth/fixed
+      - name: Commit
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add v2/Classifier/truth/fixed
+          if git diff --cached --quiet; then echo "the committed list is already this one"; exit 0; fi
+          git commit -m "Frozen truth list from freeze run ${{ inputs.run_id }}${{ inputs.compare_run_id != '' && format(' (same list_sha256 as run {0})', inputs.compare_run_id) || '' }}"
+          bash .github/scripts/push_with_retry.sh "${{ github.ref_name }}"

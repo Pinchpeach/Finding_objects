@@ -1,0 +1,251 @@
+truth_id,ra,dec,truth_axis,truth_class,truth_subtype,truth_source,excluded_evidence_catalog
+1960D,125.07424999999998,20.867944444444444,phenomenon,SN,,Asiago B/sn,Asiago Supernova Catalog
+1962A,196.64816666666664,27.874944444444445,phenomenon,SN,Ia*,Asiago B/sn,Asiago Supernova Catalog
+1963G,184.4539583333333,26.025694444444444,phenomenon,SN,,Asiago B/sn,Asiago Supernova Catalog
+1964H,337.10024999999996,30.289805555555557,phenomenon,SN,II,Asiago B/sn,Asiago Supernova Catalog
+1964O,227.21041666666665,55.46863888888889,phenomenon,SN,,Asiago B/sn,Asiago Supernova Catalog
+1972E,204.96958333333333,-31.66916666666667,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+1978A,202.5683333333333,-21.747777777777777,phenomenon,SN,II pec,Asiago B/sn,Asiago Supernova Catalog
+1982Z,113.90854166666665,-47.279852777777776,phenomenon,SN,,Asiago B/sn,Asiago Supernova Catalog
+1986N,72.15124999999999,-6.322777777777778,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+1989R,59.88562499999999,42.61926666666667,phenomenon,SN,IIn,Asiago B/sn,Asiago Supernova Catalog
+1991bi,200.93304166666664,31.564080555555556,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+1992D,90.249375,-20.369127777777777,phenomenon,SN,IIn,Asiago B/sn,Asiago Supernova Catalog
+1994S,187.84091666666666,29.134497222222222,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+1995H,166.73091666666664,7.1721111111111115,phenomenon,SN,II,Asiago B/sn,Asiago Supernova Catalog
+1995Q,304.12295833333326,-43.40683333333333,phenomenon,SN,II,Asiago B/sn,Asiago Supernova Catalog
+1995S,186.9720833333333,-30.09872222222222,phenomenon,SN,,Asiago B/sn,Asiago Supernova Catalog
+1995af,351.2227083333333,41.403194444444445,phenomenon,SN,,Asiago B/sn,Asiago Supernova Catalog
+1995ax,36.607499999999995,0.8122777777777779,phenomenon,SN,I:,Asiago B/sn,Asiago Supernova Catalog
+1995be,239.5595833333333,19.768472222222222,phenomenon,SN,,Asiago B/sn,Asiago Supernova Catalog
+1996bb,44.27525,-2.7048333333333336,phenomenon,SN,Ia:,Asiago B/sn,Asiago Supernova Catalog
+1996be,33.01179166666667,1.377527777777778,phenomenon,SN,II,Asiago B/sn,Asiago Supernova Catalog
+1996bo,27.09525,11.520861111111111,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+1996ch,179.9072083333333,-9.9095,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+1996cj,206.90754166666662,2.4374722222222225,phenomenon,SN,II,Asiago B/sn,Asiago Supernova Catalog
+1997F,73.80945833333334,-5.862444444444444,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+1997Q,164.2145,-3.976916666666667,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+1997Y,191.3808333333333,54.738055555555555,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+1997ab,147.75166666666667,20.073333333333334,phenomenon,SN,IIn,Asiago B/sn,Asiago Supernova Catalog
+1997bb,187.25299999999996,0.15313888888888888,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+1997bm,173.23804166666665,50.245444444444445,phenomenon,SN,I:,Asiago B/sn,Asiago Supernova Catalog
+1997cc,214.1399583333333,52.39380555555555,phenomenon,SN,,Asiago B/sn,Asiago Supernova Catalog
+1997ce,256.9510833333333,44.023944444444446,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+1997et,125.72387499999999,3.87075,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+1997ff,189.18374999999997,62.21241388888889,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+1998J,142.79366666666667,-4.760138888888889,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+1998Q,203.19324999999998,-31.623194444444444,phenomenon,SN,,Asiago B/sn,Asiago Supernova Catalog
+1998Y,114.23720833333331,35.24333333333333,phenomenon,SN,II,Asiago B/sn,Asiago Supernova Catalog
+1998ad,142.48212499999997,-5.366472222222222,phenomenon,SN,II:,Asiago B/sn,Asiago Supernova Catalog
+1998at,163.72654166666663,-3.736111111111111,phenomenon,SN,II,Asiago B/sn,Asiago Supernova Catalog
+1998bw,293.76320833333324,-52.846138888888895,phenomenon,SN,Ic,Asiago B/sn,Asiago Supernova Catalog
+1998dz,50.242416666666664,-41.089666666666666,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+1998ef,15.861958333333332,32.23677777777778,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+1999bn,179.25166666666664,-11.444,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+1999df,227.23549999999997,52.44808333333333,phenomenon,SN,II,Asiago B/sn,Asiago Supernova Catalog
+1999dl,346.04875,27.118694444444444,phenomenon,SN,,Asiago B/sn,Asiago Supernova Catalog
+1999do,343.3744583333333,31.64525,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+1999ee,334.0416666666666,-36.84436111111111,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+1999fb,339.3911666666666,-0.3416666666666667,phenomenon,SN,?,Asiago B/sn,Asiago Supernova Catalog
+2000M,263.16529166666663,16.39836111111111,phenomenon,SN,II,Asiago B/sn,Asiago Supernova Catalog
+2000cs,245.8843333333333,39.12475,phenomenon,SN,II pec,Asiago B/sn,Asiago Supernova Catalog
+2000dl,25.524041666666665,7.666166666666667,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2000ef,37.04291666666666,-1.1843333333333332,phenomenon,SN,II?,Asiago B/sn,Asiago Supernova Catalog
+2000eg,37.587708333333325,1.0634722222222224,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2000ew,175.24416666666662,11.465499999999999,phenomenon,SN,Ic,Asiago B/sn,Asiago Supernova Catalog
+2000fu,222.80279166666665,-20.43563888888889,phenomenon,SN,,Asiago B/sn,Asiago Supernova Catalog
+2001C,104.90041666666666,59.51711111111111,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2001Z,188.73279166666666,15.56875,phenomenon,SN,II,Asiago B/sn,Asiago Supernova Catalog
+2001aa,262.4904583333333,60.35644444444445,phenomenon,SN,II,Asiago B/sn,Asiago Supernova Catalog
+2001bp,240.53854166666665,36.71888888888889,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2001bu,161.3424583333333,-1.4790277777777778,phenomenon,SN,,Asiago B/sn,Asiago Supernova Catalog
+2001fi,36.661833333333334,0.4375833333333333,phenomenon,SN,,Asiago B/sn,Asiago Supernova Catalog
+2001fn,37.251958333333334,0.7060555555555555,phenomenon,SN,,Asiago B/sn,Asiago Supernova Catalog
+2001hr,69.585625,-1.5659444444444446,phenomenon,SN,,Asiago B/sn,Asiago Supernova Catalog
+2001ik,23.420875,-0.4451111111111111,phenomenon,SN,?,Asiago B/sn,Asiago Supernova Catalog
+2001ir,129.11716666666666,-11.834305555555556,phenomenon,SN,IIn,Asiago B/sn,Asiago Supernova Catalog
+2001ji,37.30283333333333,0.8583333333333333,phenomenon,SN,,Asiago B/sn,Asiago Supernova Catalog
+2002G,196.98024999999998,34.08513888888889,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2002I,200.61183333333332,-2.4178055555555553,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2002K,36.71033333333333,0.7250277777777778,phenomenon,SN,,Asiago B/sn,Asiago Supernova Catalog
+2002X,132.12724999999998,44.25980555555556,phenomenon,SN,,Asiago B/sn,Asiago Supernova Catalog
+2002bd,163.89879166666663,-5.701277777777778,phenomenon,SN,,Asiago B/sn,Asiago Supernova Catalog
+2002dc,189.20779166666665,62.220305555555555,phenomenon,SN,Ia:,Asiago B/sn,Asiago Supernova Catalog
+2002dy,352.09695833333325,-2.804722222222222,phenomenon,SN,II,Asiago B/sn,Asiago Supernova Catalog
+2002ea,32.104499999999994,14.348,phenomenon,SN,IIn,Asiago B/sn,Asiago Supernova Catalog
+2002fi,38.47666666666666,-21.041500000000003,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2002gl,235.85166666666663,7.899444444444444,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2002ja,352.54029166666663,-9.583833333333335,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2002jj,54.87312499999999,-13.115499999999999,phenomenon,SN,Ic,Asiago B/sn,Asiago Supernova Catalog
+2002ka,142.67341666666667,-14.78202777777778,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2002kr,34.39379166666666,-4.896277777777778,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2002ks,34.393874999999994,-5.004277777777777,phenomenon,SN,,Asiago B/sn,Asiago Supernova Catalog
+2003C,10.337124999999999,-1.7150277777777778,phenomenon,SN,II,Asiago B/sn,Asiago Supernova Catalog
+2003am,200.18154166666665,-22.048194444444444,phenomenon,SN,II,Asiago B/sn,Asiago Supernova Catalog
+2003db,144.245125,31.333805555555553,phenomenon,SN,II,Asiago B/sn,Asiago Supernova Catalog
+2003fh,215.39954166666664,52.527138888888885,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2003ga,215.63849999999996,52.38138888888889,phenomenon,SN,II,Asiago B/sn,Asiago Supernova Catalog
+2003gn,338.4653333333333,20.80236111111111,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2003gt,308.2463333333333,9.872027777777777,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2003jm,37.21220833333333,-9.16613888888889,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2003kf,91.14758333333332,-12.628555555555556,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2004P,203.74066666666664,34.04269444444444,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2004br,187.7825,0.6132222222222222,phenomenon,SN,Ia pec,Asiago B/sn,Asiago Supernova Catalog
+2004bu,238.71679166666667,21.119722222222222,phenomenon,SN,Ic,Asiago B/sn,Asiago Supernova Catalog
+2004cp,235.10316666666662,32.86588888888889,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2004ds,30.985458333333327,-23.314055555555555,phenomenon,SN,II P:,Asiago B/sn,Asiago Supernova Catalog
+2004fs,37.833124999999995,-8.822694444444444,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2004fx,77.798625,-9.392111111111111,phenomenon,SN,II,Asiago B/sn,Asiago Supernova Catalog
+2004fz,30.27670833333333,31.878944444444446,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2004gn,188.55041666666665,2.6595555555555555,phenomenon,SN,Ic,Asiago B/sn,Asiago Supernova Catalog
+2004hq,37.57516666666666,-8.373611111111112,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2004ic,310.2002083333333,1.0428333333333335,phenomenon,SN,II,Asiago B/sn,Asiago Supernova Catalog
+2005F,136.22366666666665,13.56563888888889,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2005J,179.61891666666665,10.019222222222224,phenomenon,SN,II,Asiago B/sn,Asiago Supernova Catalog
+2005R,168.7367083333333,33.82658333333334,phenomenon,SN,IIn,Asiago B/sn,Asiago Supernova Catalog
+2005ac,204.98258333333334,0.8708333333333333,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2005ad,37.122708333333335,-1.1388888888888888,phenomenon,SN,II P,Asiago B/sn,Asiago Supernova Catalog
+2005bv,216.03099999999998,26.297305555555557,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2005da,279.44537499999996,17.54313888888889,phenomenon,SN,Ic pec:,Asiago B/sn,Asiago Supernova Catalog
+2005dk,295.09879166666667,-55.20141666666667,phenomenon,SN,II,Asiago B/sn,Asiago Supernova Catalog
+2005dt,350.9096666666666,-19.006805555555555,phenomenon,SN,II,Asiago B/sn,Asiago Supernova Catalog
+2005ek,46.45399999999999,36.76961111111111,phenomenon,SN,Ic:,Asiago B/sn,Asiago Supernova Catalog
+2005gl,12.458416666666665,32.282444444444444,phenomenon,SN,IIn,Asiago B/sn,Asiago Supernova Catalog
+2005hx,3.250541666666666,0.24822222222222223,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2005ki,160.1175833333333,9.202333333333332,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2005mi,335.26104166666664,-0.7481666666666666,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2005mz,49.957833333333326,41.50516666666667,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2005nc,278.13575,26.33961111111111,phenomenon,SN,Ic:,Asiago B/sn,Asiago Supernova Catalog
+2006Q,24.57808333333333,35.36513888888889,phenomenon,SN,II:,Asiago B/sn,Asiago Supernova Catalog
+2006cb,214.1325,39.58775,phenomenon,SN,Ib,Asiago B/sn,Asiago Supernova Catalog
+2006cs,206.3912083333333,35.61016666666667,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2006eh,42.549791666666664,47.05569444444444,phenomenon,SN,IIn,Asiago B/sn,Asiago Supernova Catalog
+2006hd,326.0147916666666,0.7262777777777778,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2006mo,11.660625,36.33272222222222,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2006mp,258.0008333333333,46.55577777777778,phenomenon,SN,Ia:,Asiago B/sn,Asiago Supernova Catalog
+2006mt,14.879666666666663,-0.2565277777777778,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2006my,190.91975,16.387249999999998,phenomenon,SN,II P,Asiago B/sn,Asiago Supernova Catalog
+2006nh,40.21070833333332,0.6587777777777778,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2006nr,89.09795833333334,85.91077777777778,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2006oi,8.971041666666665,0.2584166666666667,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2006om,20.578666666666663,1.0106111111111111,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2006ou,174.3045833333333,15.435361111111112,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2006pu,40.72425,0.8928611111111111,phenomenon,SN,II,Asiago B/sn,Asiago Supernova Catalog
+2006qr,129.50479166666665,-9.81836111111111,phenomenon,SN,II,Asiago B/sn,Asiago Supernova Catalog
+2006rb,353.8545416666666,7.112888888888889,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2006rr,36.36912499999999,7.284027777777777,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2006sk,32.640833333333326,-4.06775,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2006tc,47.00816666666666,0.9434444444444444,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2006tg,31.059041666666662,-4.671861111111111,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2006tk,16.96933333333333,0.4653611111111111,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2006tv,38.892583333333334,-8.572777777777777,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2006ub,36.58891666666667,-8.9055,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2007bj,245.544125,-1.5142777777777778,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2007fo,354.05825,2.158444444444444,phenomenon,SN,Ib:,Asiago B/sn,Asiago Supernova Catalog
+2007ft,191.76541666666662,-41.589444444444446,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2007gn,49.130708333333324,15.461305555555555,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2007go,19.68425,-23.94661111111111,phenomenon,SN,Ib,Asiago B/sn,Asiago Supernova Catalog
+2007hi,257.81445833333333,21.260555555555555,phenomenon,SN,II,Asiago B/sn,Asiago Supernova Catalog
+2007ic,1.491583333333333,1.1030833333333334,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2007ig,23.082541666666664,-7.859944444444444,phenomenon,SN,,Asiago B/sn,Asiago Supernova Catalog
+2007jm,328.9107916666666,-0.17675,phenomenon,SN,II n,Asiago B/sn,Asiago Supernova Catalog
+2007jp,356.1718333333333,-0.03008333333333333,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2007kn,312.03925,-1.015388888888889,phenomenon,SN,II ?,Asiago B/sn,Asiago Supernova Catalog
+2007la,337.47825,1.0585833333333334,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2007lj,322.1747083333333,-0.06725,phenomenon,SN,II,Asiago B/sn,Asiago Supernova Catalog
+2007ln,55.180041666666654,1.0030555555555556,phenomenon,SN,Ia ?,Asiago B/sn,Asiago Supernova Catalog
+2007mt,26.485791666666664,-0.2176388888888889,phenomenon,SN,Ia ?,Asiago B/sn,Asiago Supernova Catalog
+2007my,328.88416666666666,-0.372,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2007nb,351.37525,0.42308333333333337,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2007nx,0.9515,0.3587222222222222,phenomenon,SN,IIn,Asiago B/sn,Asiago Supernova Catalog
+2007or,25.65970833333333,1.0304166666666665,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2007pg,351.95670833333327,0.4574722222222222,phenomenon,SN,II ?,Asiago B/sn,Asiago Supernova Catalog
+2007pn,34.14124999999999,-0.7223611111111111,phenomenon,SN,Ia ?,Asiago B/sn,Asiago Supernova Catalog
+2007rm,35.437875,0.8644722222222222,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2007si,29.96308333333333,1.2164722222222222,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2007tz,37.52979166666666,-8.71925,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2008R,45.973749999999995,-11.994277777777777,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2008W,129.08008333333333,-20.28125,phenomenon,SN,II P,Asiago B/sn,Asiago Supernova Catalog
+2008ac,178.43824999999995,48.42263888888888,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2008by,181.33741666666666,40.946,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2008cs,259.14937499999996,-10.345277777777778,phenomenon,SN,II:,Asiago B/sn,Asiago Supernova Catalog
+2008dm,175.8465,46.083000000000006,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2008dp,177.4535833333333,-38.78391666666666,phenomenon,SN,,Asiago B/sn,Asiago Supernova Catalog
+2008du,344.0493333333333,3.9265,phenomenon,SN,Ic,Asiago B/sn,Asiago Supernova Catalog
+2008dw,210.2344583333333,41.00805555555556,phenomenon,SN,II,Asiago B/sn,Asiago Supernova Catalog
+2008dy,2.6918749999999996,-47.069611111111115,phenomenon,SN,II,Asiago B/sn,Asiago Supernova Catalog
+2008eh,146.45066666666665,-31.17913888888889,phenomenon,SN,,Asiago B/sn,Asiago Supernova Catalog
+2008ep,19.419499999999996,43.64413888888889,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2008gw,69.85920833333334,9.142111111111111,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2008hy,56.28520833333333,76.66541666666667,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2009G,217.90974999999997,-43.41744444444444,phenomenon,SN,II P,Asiago B/sn,Asiago Supernova Catalog
+2009aa,170.92616666666663,-22.270694444444445,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2009ac,32.12545833333333,12.73847222222222,phenomenon,SN,,Asiago B/sn,Asiago Supernova Catalog
+2009cb,194.81604166666662,27.278138888888886,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2009cr,169.52691666666666,12.895305555555556,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2009cu,202.30266666666662,46.72430555555556,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2009cy,145.23099999999997,1.2689722222222222,phenomenon,SN,II P,Asiago B/sn,Asiago Supernova Catalog
+2009dg,173.43720833333333,14.579972222222223,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2009dj,209.64479166666663,31.21452777777778,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2009dn,174.413875,46.953138888888894,phenomenon,SN,,Asiago B/sn,Asiago Supernova Catalog
+2009ea,221.75995833333332,9.960388888888888,phenomenon,SN,,Asiago B/sn,Asiago Supernova Catalog
+2009fe,251.89504166666666,49.833444444444446,phenomenon,SN,II,Asiago B/sn,Asiago Supernova Catalog
+2009fy,351.021375,16.66413888888889,phenomenon,SN,Ia pec,Asiago B/sn,Asiago Supernova Catalog
+2009ga,352.1115833333333,22.413999999999998,phenomenon,SN,II P,Asiago B/sn,Asiago Supernova Catalog
+2009gk,326.1136666666667,14.89925,phenomenon,SN,IIb,Asiago B/sn,Asiago Supernova Catalog
+2009gt,151.02824999999999,31.20813888888889,phenomenon,SN,,Asiago B/sn,Asiago Supernova Catalog
+2009hq,182.6584583333333,16.039194444444448,phenomenon,SN,II P,Asiago B/sn,Asiago Supernova Catalog
+2009hx,342.3030833333333,11.337333333333333,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2009kp,252.46454166666666,55.543277777777774,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2009kw,54.59745833333333,-28.25327777777778,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2009lg,354.70804166666665,28.265055555555556,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2009lx,175.07854166666664,3.0051111111111113,phenomenon,SN,II P,Asiago B/sn,Asiago Supernova Catalog
+2009mk,1.5890416666666667,-41.48327777777778,phenomenon,SN,IIb,Asiago B/sn,Asiago Supernova Catalog
+2009nk,212.74466666666663,6.363305555555555,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2010ao,205.92079166666664,3.900027777777778,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2010dm,182.88879166666666,47.27475,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2010dr,358.0543333333333,47.39513888888889,phenomenon,SN,II L,Asiago B/sn,Asiago Supernova Catalog
+2010gb,234.66579166666662,41.00552777777778,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2010go,192.50066666666666,-7.9166388888888894,phenomenon,SN,,Asiago B/sn,Asiago Supernova Catalog
+2010hr,91.99583333333331,39.26511111111111,phenomenon,SN,,Asiago B/sn,Asiago Supernova Catalog
+2010hy,284.8870416666667,19.407194444444443,phenomenon,SN,Ic,Asiago B/sn,Asiago Supernova Catalog
+2010ii,339.5549166666666,35.49166666666667,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2010iu,10.010333333333332,-56.15830555555556,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2010jz,109.31558333333332,45.38436111111111,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2010kl,171.8228333333333,3.75925,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2010lq,128.17074999999997,-24.046000000000003,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2010lx,71.18570833333332,-22.205305555555555,phenomenon,SN,IIn,Asiago B/sn,Asiago Supernova Catalog
+2011at,142.23983333333334,-14.805722222222222,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2011bh,116.30675,53.06963888888889,phenomenon,SN,Ic,Asiago B/sn,Asiago Supernova Catalog
+2011bk,245.1447916666666,21.202277777777777,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2011cs,182.00449999999995,49.225833333333334,phenomenon,SN,Ic,Asiago B/sn,Asiago Supernova Catalog
+2011ef,352.7375833333333,15.490083333333333,phenomenon,SN,IIb,Asiago B/sn,Asiago Supernova Catalog
+2011eo,250.60466666666662,16.824472222222223,phenomenon,SN,II P,Asiago B/sn,Asiago Supernova Catalog
+2011fh,194.05837499999998,-29.498555555555555,phenomenon,SN,IIn,Asiago B/sn,Asiago Supernova Catalog
+2011fj,303.47983333333326,-1.1561666666666666,phenomenon,SN,II,Asiago B/sn,Asiago Supernova Catalog
+2011ga,340.11424999999997,3.199444444444444,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2011hz,133.14266666666666,55.25394444444444,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2011jz,71.67374999999998,-62.46727777777778,phenomenon,SN,II P,Asiago B/sn,Asiago Supernova Catalog
+2012ab,185.69833333333332,5.606944444444444,phenomenon,SN,II:,Asiago B/sn,Asiago Supernova Catalog
+2012bt,272.05437499999994,-62.39838888888889,phenomenon,SN,Ic,Asiago B/sn,Asiago Supernova Catalog
+2012dg,274.5783333333333,47.698388888888886,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2012er,262.96924999999993,71.83616666666666,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2012go,340.4659583333333,34.968722222222226,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2012hg,106.85666666666665,56.30533333333333,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2012hl,12.574,24.531166666666667,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2012if,169.3762083333333,51.402055555555556,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2013M,209.9861666666666,-37.86372222222222,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2013ab,218.18537499999996,9.88675,phenomenon,SN,II P,Asiago B/sn,Asiago Supernova Catalog
+2013ae,40.4715,43.39966666666667,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2013ce,173.96166666666664,34.28408333333333,phenomenon,SN,II P,Asiago B/sn,Asiago Supernova Catalog
+2013fl,263.4147083333333,50.37375,phenomenon,SN,II P,Asiago B/sn,Asiago Supernova Catalog
+2013fp,83.03020833333332,-7.906611111111111,phenomenon,SN,II P,Asiago B/sn,Asiago Supernova Catalog
+2013ge,158.70191666666665,21.661638888888888,phenomenon,SN,Ic,Asiago B/sn,Asiago Supernova Catalog
+2014T,219.02074999999996,2.3428333333333335,phenomenon,SN,IIn,Asiago B/sn,Asiago Supernova Catalog
+2014U,176.2173333333333,19.454944444444443,phenomenon,SN,II,Asiago B/sn,Asiago Supernova Catalog
+2014V,177.2758333333333,-9.726027777777778,phenomenon,SN,II,Asiago B/sn,Asiago Supernova Catalog
+2014cf,345.4707083333333,14.414027777777779,phenomenon,SN,II P,Asiago B/sn,Asiago Supernova Catalog
+2015H,163.67566666666667,-21.0705,phenomenon,SN,Ia pec,Asiago B/sn,Asiago Supernova Catalog
+2015ab,37.136916666666664,20.285472222222225,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
+2015an,126.06258333333331,-18.774472222222222,phenomenon,SN,II pec,Asiago B/sn,Asiago Supernova Catalog
+2015bk,105.86924999999998,58.217194444444445,phenomenon,SN,Ia,Asiago B/sn,Asiago Supernova Catalog
