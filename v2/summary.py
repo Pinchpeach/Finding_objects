@@ -33,7 +33,6 @@ COLUMNS = [
     "designation",
     "ra",
     "dec",
-    "position_source",  # only with V2_OBJECT_POSITION=best (object_position.py); the other columns of that switch stay in classified_objects.csv
     "separation_arcmin",
     "mag",
     "mag_band",
@@ -96,7 +95,10 @@ def compact(df: pd.DataFrame) -> pd.DataFrame:
             out[c] = pd.to_numeric(out[c], errors="coerce").round(4)
     if "separation_arcmin" in out:
         out["separation_arcmin"] = pd.to_numeric(out["separation_arcmin"], errors="coerce").round(4)
-    return out[[c for c in COLUMNS if c in out]]
+    cols = [c for c in COLUMNS if c in out]
+    if "position_source" in out:  # only with V2_OBJECT_POSITION=best (object_position.py): which catalogue the printed position comes from.  Not in COLUMNS, which the documents count
+        cols.insert(cols.index("dec") + 1, "position_source")
+    return out[cols]
 
 
 def write(df: pd.DataFrame, work: Path) -> dict:
