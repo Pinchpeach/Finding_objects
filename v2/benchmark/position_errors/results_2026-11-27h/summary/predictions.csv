@@ -1,0 +1,9 @@
+quantity,predicted,measured
+catalogues whose position error changes,"VLASS, NVSS only","VLASS, NVSS only (860 000 rows of 22 catalogues, check_units_from_rows.py)"
+objects anchored by a radio row although they hold an optical row,falls 20-60 % (from ~100-140),116 -> 55 (-53 %)
+VLASS rows that change joined / separate,<= 10 (of 384),24 to joined + 2 to separate (of 374)
+NVSS rows that change joined / separate,<= 2,4 to joined + 11 to separate (of 212)
+object count change,within 10,-37 (366964 -> 366927)
+primary-class changes,0-10,"28 (23 fragments absorbed, 5 classified objects changed class)"
+compact_class changes,0-2,0
+extragalactic_class / subclass changes,"0-10, inside the same objects",16 / 46

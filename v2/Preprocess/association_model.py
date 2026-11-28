@@ -122,6 +122,20 @@ def parse_ambig(text: str) -> frozenset:
 
 AMBIG_FIX = parse_ambig(os.environ.get("V2_ASSOC_AMBIG", ""))
 
+# ---------------------------------------------------------------------------------------------------------------------
+# Units of the catalogue position-error columns (2.62.0).  ``infer_poserr_arcsec`` used to read every ``e_RAJ2000`` / ``e_DEJ2000`` pair as
+# arcsec.  The stored rows show it is not (benchmark/position_errors/UNITS.md): VLASS e_RAJ2000 is in DEGREES (identical to its e_RAMdeg
+# column, 2e-5 -> 0.08'' after x3600), so a VLASS row had a position error of ~1e-4'' that only the 0.02'' pair floor held up; NVSS e_RAJ2000 is
+# in SECONDS OF TIME (e_RA x 15 cos(dec) / e_Dec = 0.99 for 47 rows, 0.067 read as arcsec), e_DEJ2000 in arcsec.  TGSS and LoTSS give arcsec.
+#   V2_POSERR_UNITS=fixed   the conversions below
+#   V2_POSERR_UNITS=legacy  (default, 2.62.2) the 2.61.9 reading (every e_RAJ2000 / e_DEJ2000 in arcsec)
+# The default stays legacy until the units VizieR documents for these columns are read (the evidence so far is the stored rows; the ReadMe could
+# not be reached: .github/workflows/v2_vizier_units.yml runs benchmark/position_errors/dump_vizier_units.py).  Making fixed the default changes
+# 28 primary labels of the 179 measured regions (WORK_REPORT_2026-11-27i.md), so it is a MINOR with a set C scoring of its own.
+POSERR_UNITS = os.environ.get("V2_POSERR_UNITS", "legacy").strip().lower()
+if POSERR_UNITS not in ("fixed", "legacy"):
+    raise ValueError(f"V2_POSERR_UNITS: unknown value {POSERR_UNITS!r}; known: 'fixed', 'legacy'")
+
 # Catalogues that have no entry in PROFILES and so are assumed to have 0.6'' position errors (DEFAULT_PROFILE).  Used only with
 # ``profiles``; the evidence for every number is in LITERATURE_ASSOCIATION_AMBIGUITY_2026-11-27.md.
 #   SDSS imaging: 45 mas rms per coordinate for r < ~20 point sources and ~100 mas at the survey limit, photon-statistics
@@ -332,6 +346,28 @@ def _extra_poserr(catalog: str, row: Mapping[str, Any]) -> float | None:
     return None
 
 
+def native_radec_errors_arcsec(catalog: str, row: Mapping[str, Any]) -> tuple[float, float] | None:
+    """(RA, Dec) 1-sigma errors in arcsec from the catalogue's own ``e_RAJ2000`` / ``e_DEJ2000`` columns, in the unit THAT catalogue gives.
+
+    VLASS (Gordon et al. 2021, ApJS 255, 30; CIRADA Quick Look catalogue) writes E_RA / E_DEC in degrees; NVSS (Condon et al. 1998) writes the
+    RA error in seconds of time and the Dec error in arcsec; TGSS ADR1 (Intema et al. 2017: "1-sigma uncertainty in the right ascension in
+    arcseconds") and LoTSS DR2 (Shimwell et al. 2022) in arcsec.  Any other catalogue keeps the arcsec reading it always had.
+    ``legacy`` reads all of them as arcsec.  The RA error is the error along the RA coordinate on the sky (no cos(dec) is applied to the
+    VLASS value: PyBDSF reports it as an angle on the sky; the NVSS seconds are a coordinate difference and get 15 cos(dec)).
+    """
+    a, b = _first(row, ("e_raj2000",)), _first(row, ("e_dej2000",))
+    if a is None or b is None:
+        return None
+    if POSERR_UNITS == "fixed":
+        if catalog == "VLASS":
+            return a * 3600.0, b * 3600.0
+        if catalog == "NVSS":
+            dec = _first(row, ("dec", "dej2000"))
+            cosd = abs(math.cos(math.radians(dec))) if dec is not None else 1.0
+            return a * 15.0 * cosd, b
+    return a, b
+
+
 def infer_poserr_arcsec(catalog: str, row: Mapping[str, Any]) -> float:
     # Chandra CSC: r0 is the major radius of the 95 % confidence ellipse
     # (statistical only); the 1-sigma error is r0/2.448 (2-D Gaussian) and the
@@ -350,11 +386,16 @@ def infer_poserr_arcsec(catalog: str, row: Mapping[str, Any]) -> float:
         if extra is not None:
             return extra
 
-    # Catalog-native RA/Dec error pairs in arcsec.
+    # Catalog-native RA/Dec error pairs in arcsec (AllWISE sigra/sigdec: IPAC explanatory supplement; the e_RAJ2000 pair is converted per
+    # catalogue by native_radec_errors_arcsec).
     for keys in (("sigra", "sigdec"), ("e_raj2000", "e_dej2000"), ("rasig", "desig")):
-        a, b = _first(row, (keys[0],)), _first(row, (keys[1],))
-        if a is not None and b is not None and max(a, b) > 0:
-            return max(a, b)
+        if keys[0] == "e_raj2000":
+            pair = native_radec_errors_arcsec(catalog, row)
+        else:
+            a, b = _first(row, (keys[0],)), _first(row, (keys[1],))
+            pair = (a, b) if a is not None and b is not None else None
+        if pair is not None and max(pair) > 0:
+            return max(pair)
 
     # Gaia DR3 coordinate errors are mas.
     if catalog == "Gaia DR3":
@@ -505,7 +546,7 @@ def assess_pair(a: Mapping[str, Any], b: Mapping[str, Any], density_arcsec2: flo
     posterior = (
         density_l / (density_l + density_arcsec2) if density_arcsec2 is not None and density_arcsec2 > 0 else positional
     )
-    # The same quantity as a likelihood ratio, L = f(r) / rho (Fleuren et al. 2012, MNRAS 423, 2407, eq. 5; Budavari &
+    # The same quantity as a likelihood ratio, L = f(r) / rho (Fleuren et al. 2012, MNRAS 423, 2407, arXiv:1202.3891v2 eq. 5; Budavari &
     # Szalay 2008 Bayes factor): the posterior above is L / (L + 1).  Kept for the posterior measurements
     # (benchmark/association_truth); no decision reads it.
     lr = density_l / density_arcsec2 if density_arcsec2 is not None and density_arcsec2 > 0 else None

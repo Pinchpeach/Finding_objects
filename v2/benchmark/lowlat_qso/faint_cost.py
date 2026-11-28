@@ -59,6 +59,12 @@ ENV = {  # variant -> environment
     "surveys3": {"V2_LOWLAT_QSO": "surveys3"},
     "wise_second": {"V2_LOWLAT_QSO": "wise_second"},
     "surveys2_wise_second": {"V2_LOWLAT_QSO": "surveys2,wise_second"},
+    # 2.61.10: the survey-count switches on top of the association rules of 2.61.8 (V2_ASSOC_AMBIG=same,nearest), see decision_table.py.
+    # V2_POSERR_UNITS=legacy: the base runs of this table were made before the unit fix of the position errors (2.62.0); the combinations
+    # are measured against them with the same reading of the VLASS / NVSS errors, so the only difference is the switches under study.
+    "same_nearest": {"V2_ASSOC_AMBIG": "same,nearest", "V2_POSERR_UNITS": "legacy"},
+    "same_nearest_surveys2": {"V2_ASSOC_AMBIG": "same,nearest", "V2_LOWLAT_QSO": "surveys2", "V2_POSERR_UNITS": "legacy"},
+    "same_nearest_surveys3": {"V2_ASSOC_AMBIG": "same,nearest", "V2_LOWLAT_QSO": "surveys3", "V2_POSERR_UNITS": "legacy"},
 }
 LIMIT_OFF = {"V2_LOWLAT_QSO_ABSB": "90"}  # the switches act at every latitude
 

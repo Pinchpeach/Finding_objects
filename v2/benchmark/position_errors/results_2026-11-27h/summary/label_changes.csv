@@ -1,0 +1,12 @@
+column,objects
+classification_status,32
+detailed_class,12
+extragalactic_class,16
+high_confidence,22
+primary_class,28
+secondary_class,2
+subclass,46
+subclass_code,44
+primary_class: fragment absorbed (UNKNOWN -> class),23
+primary_class: classified object changed class,5
+radio flux column only,48

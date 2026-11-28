@@ -1,0 +1,6 @@
+set,regions,objects_a,objects_b,same_members,changed_a,changed_b,radio_anchored_a,radio_anchored_b,label_changes
+B1,1,609,609,609,0,0,0,0,0
+ll_conf,63,61680,61672,61646,34,26,31,10,31
+ll_run,93,89071,89052,89013,58,39,40,18,51
+raw,22,215604,215594,215566,38,28,45,27,22
+total,179,366964,366927,366834,130,93,116,55,104

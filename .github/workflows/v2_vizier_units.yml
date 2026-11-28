@@ -1,0 +1,32 @@
+name: v2 VizieR units of the position-error columns
+
+# 2.62.2 (WORK_REPORT_2026-11-27i.md): the units of VLASS / NVSS e_RAJ2000 were read from the stored rows only; this run asks VizieR for the unit
+# and description it documents for every position-error column (benchmark/position_errors/dump_vizier_units.py) before V2_POSERR_UNITS=fixed
+# becomes the default.  Manual only; nothing is committed, the table is an artifact and the step summary.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  units:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pandas numpy astropy astroquery requests
+      - name: Units VizieR documents for the position-error columns
+        env:
+          V2_HTTP_LOG: "1"  # which mirror answered
+        run: |
+          python -u v2/benchmark/position_errors/dump_vizier_units.py --out vizier_units.csv
+          { echo '### VizieR units'; echo '```'; cat vizier_units.csv; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vizier-units
+          path: vizier_units.csv
+          retention-days: 30

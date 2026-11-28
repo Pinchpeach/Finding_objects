@@ -322,7 +322,7 @@ def _anchor_key(det):
 # Many catalogues carry one assumed position error for every row (AllWISE, SDSS, GALEX, SGA, the 0.6'' floor of the
 # resolved Legacy Surveys models: 63 % of the LS rows of a deep field), so the tie is the rule, not the exception.
 # Now the last keys are the brightness (a brighter detection has the better centroid, the reason for the position error
-# to rank the anchors; Fleuren et al. 2012: sigma = 0.655 FWHM / SNR), then position, the catalogue's own identifier and
+# to rank the anchors; Fleuren et al. 2012, arXiv:1202.3891v2 eq. 7: sigma = 0.655 FWHM / SNR), then position, the catalogue's own identifier and
 # only then the row.  The literature (Budavari & Basu 2016; Marrese et al. 2017, 2019) decides competing detections by
 # score, not by order and gives no rule for the order; the brightness order is this project's choice (see
 # LITERATURE_ASSOCIATION_ORDER_2026-11-25.md).  V2_ASSOC_TIE_ORDER=file restores the order of 2.60.x; =position drops the brightness
