@@ -442,6 +442,10 @@ def curves(details: pd.DataFrame, shifts: list[dict], split: pd.DataFrame, grid=
     return pd.DataFrame(out)
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--truth-flux", type=Path, required=True, help="DIR/<field>.csv.gz from collect_truth_flux.py")
@@ -450,6 +454,7 @@ def main() -> int:
     ap.add_argument("--variant", default="base")
     ap.add_argument("--out", type=Path, required=True)
     a = ap.parse_args()
+    t0 = RI.start()
     split = pd.read_csv(HERE / "fields_split.csv")
     a.out.mkdir(parents=True, exist_ok=True)
     rows, frag, details, shifts = [], [], [], []
@@ -504,6 +509,7 @@ def main() -> int:
         )
     with pd.option_context("display.width", 250, "display.max_columns", 30):
         print(table)
+    RI.write_args(a, ('truth_flux', 'assoc_dir', 'shifted_dir'), t0=t0)
     return 0
 
 

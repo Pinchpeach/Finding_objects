@@ -20,6 +20,8 @@ primary / axis / subclass label differs, with its radio rows and whether its sig
 
 from __future__ import annotations
 
+import sys
+
 import argparse
 from pathlib import Path
 
@@ -104,6 +106,10 @@ def compare_region(a: tuple, b: tuple) -> dict:
                 anchors_a=radio_anchored_with_optical(assoc_a), anchors_b=radio_anchored_with_optical(assoc_b))  # fmt: skip
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--a", type=Path, required=True, help="the first run (legacy)")
@@ -111,6 +117,7 @@ def main() -> int:
     ap.add_argument("--regions", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
     a = ap.parse_args()
+    t0 = RI.start()
     a.out.mkdir(parents=True, exist_ok=True)
     regs = pd.read_csv(a.regions)
     rows, radio, lab, anc = [], [], [], []
@@ -138,6 +145,7 @@ def main() -> int:
     summ.to_csv(a.out / "summary.csv")
     with pd.option_context("display.width", 250, "display.max_columns", 30):
         print(summ.to_string())
+    RI.write_args(a, ('a', 'b', 'regions'), t0=t0)
     return 0
 
 

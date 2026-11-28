@@ -82,9 +82,9 @@
 
 **전파 행** (`summary/radio_rows.csv`): VLASS 374행 — 광학 등 비전파 검출과 한 객체인 것 151 → 173(분리 → 연결 24, 연결 → 분리 2), NVSS 212행 69 → 62(4 / 11), FIRST 61행 37 → 38, TGSS 69행 12 → 12, LoTSS 8행 4 → 5. 자기 객체의 앵커가 VLASS인 VLASS 행 328 → 246(전파 행만 있는 객체 포함).
 
-**앵커가 넘어간 곳** (객체 86개, 위치 이동 중앙값 / 최대): VLASS → PS1 31개 (0.51″ / 4.04″), VLASS → Gaia 10개 (0.65″ / 1.50″), VLASS → AllWISE 4개 (1.82″ / 4.12″), VLASS → LS 2개, NVSS → VLASS 5개 (9.4″ / 20.7″: 45″ 빔의 위치가 0.5–1″ 정확도 위치로 바뀐다), TGSS → VLASS 1개 (14.4″).
+**앵커가 넘어간 곳** (객체 **118개** = 구성이 바뀐 86 + 구성은 같고 앵커만 바뀐 32; 위치 이동 중앙값 0.45″ / 평균 1.5″ / 최대 20.7″; 2.62.6에 고친 도구로 다시 쟀다, 처음 낸 86개는 구성이 바뀐 객체만 센 것): VLASS → PS1 **62개** (0.37″ / 4.04″), VLASS → Gaia 10개 (0.65″ / 1.50″), VLASS → AllWISE 4개 (1.82″ / 4.12″), VLASS → NVSS 4개 (2.7″ / 10.2″), VLASS → LS 2개 (1.84″ / 1.95″), NVSS → VLASS 5개 (9.4″ / 20.7″: 45″ 빔의 위치가 0.5–1″ 정확도 위치로 바뀐다), TGSS → VLASS 1개 (14.4″), 그 밖(Gaia → PS1 7개 등 연쇄) 17개.
 
-**라벨 열별 변화 객체 수** (`summary/label_changes.csv`): 1차 클래스 28, `detailed_class` 12, `extragalactic_class` 16, `subclass` 46(`subclass_code` 44), `compact_class` **0**, `classification_status` 32, `high_confidence` 22, `secondary_class` 2, 전파 플럭스 열만 바뀐 객체 48. 1차 변화 28 = 단편이 분류된 객체에 흡수 23(UNKNOWN → GALAXY/STAR/QSO, 전파 행만 있던 객체가 광학 객체에 붙음) + 이미 분류된 객체의 클래스 변화 5.
+**라벨 열별 변화 객체 수** (`summary/label_changes.csv`): 1차 클래스 **27**, `detailed_class` 12, `extragalactic_class` 16, `subclass` 45(`subclass_code` 43), `compact_class` **0**, `classification_status` 31, `high_confidence` 21, `secondary_class` 2, 전파 플럭스 열만 바뀐 객체 50. 1차 변화 27 = 단편이 분류된 객체에 흡수 22(UNKNOWN → GALAXY/STAR/QSO, 전파 행만 있던 객체가 광학 객체에 붙음) + 이미 분류된 객체의 클래스 변화 5. (2.62.6에 고친 도구로 다시 쟀다: 처음 낸 값은 1차 28, subclass 46, 상태 32, 고신뢰 22, 전파 플럭스만 48.)
 
 **실사용 3개 영역**: NGC 4522에 NVSS 행 1개의 오차가 바뀌지만 객체·라벨 변화는 0, COSMOS·은하면 영역은 바뀌는 행이 없어 출력이 같다.
 
@@ -136,11 +136,9 @@ python benchmark/position_errors/dump_vizier_units.py   # 네트워크가 되는
   - 작업 규칙 1(문헌·카탈로그 문서 근거 먼저)에 따라 문서를 확인한 뒤 기본값을 바꾼다.
   - 그 전까지 출력은 2.62.1과 같다. 실사용 3개 필드의 Stage 1 출력이 main과 바이트 단위로 같다. `fixed`로 켜면 NGC 4522의 NVSS 1행 오차가 1.40″ → 1.48″가 되고 상태(`ambiguous_new`)와 객체 수(673)는 같다.
 - **확인 수단**: 수동 워크플로 `.github/workflows/v2_vizier_units.yml`가 `dump_vizier_units.py`를 돌려 열마다 VizieR의 `unit`·`description`을 아티팩트와 단계 요약에 남긴다. 이 도구는 이제 `throttle.install()`로 미러를 돌아 스트라스부르 장애에도 답을 얻을 수 있다.
-- **바꾸는 순서**: 문서 단위가 이 보고서의 판정(VLASS 도, NVSS RA 시간 초)과 같으면 `POSERR_UNITS`의 기본값을 `fixed`로 바꾼다. 이 MINOR에서 1차 라벨 28개가 바뀐다(이 보고서의 179개 영역). 세트 C는 검토 세션의 계획대로 다른 라벨 변경 후보(`same,nearest`, `surveys2`)와 묶어 한 번에 채점하므로 그 MINOR 때도 따로 채점하지 않는다.
+- **바꾸는 순서**: 문서 단위가 이 보고서의 판정(VLASS 도, NVSS RA 시간 초)과 같으면 `POSERR_UNITS`의 기본값을 `fixed`로 바꾼다. 이 MINOR에서 1차 라벨 27개가 바뀐다(이 보고서의 179개 영역; 2.62.6 재측정, 처음 값은 28). 세트 C는 검토 세션의 계획대로 다른 라벨 변경 후보(`same,nearest`, `surveys2`)와 묶어 한 번에 채점하므로 그 MINOR 때도 따로 채점하지 않는다.
 - **판 번호**: 작업 세션의 2.62.0(MINOR) 후보를 과제 차(2.61.10 후보)와 함께 2.62.2(PATCH)로 병합했다(main이 이미 2.62.1). 시험 `test_the_default_reading_is_legacy_until_the_documented_units_are_read` 추가.
 - **Codex 검토로 고친 도구(`compare_by_members.py`)**: 앵커 변화와 위치 이동을 **구성이 바뀐 객체에서만** 쟀다. 그래서 구성은 같고 앵커만 전파 행에서 광학 행으로 넘어간 객체(단위 수정의 주된 경우)가 `anchor_changes.csv`와 `per_region.csv`의 `median_shift_arcsec`에서 빠졌다. 이제 구성이 같은 객체도 재고 `kind`(`same_members` / `changed_members`) 열을 단다(시험 추가).
-  - **커밋된 표는 고치기 전 도구의 값이다**: 위 "앵커가 넘어간 곳(객체 86개 …)"과 그 위치 이동 중앙값·최대는 구성이 바뀐 객체만 센 것이라 **적게 잡혀 있다**.
-  - 객체마다 전체 표에서 센 "광학 행을 가진 채 전파가 앵커인 객체 116 → 55"와 라벨 변화(28)는 영향이 없다.
-  - 원 실행 산출물이 이 세션에 없어 다시 재지 못했다. `fixed`를 기본으로 하는 MINOR 전에 다시 재야 한다.
+  - **2.62.6에 고친 도구로 다시 쟀다**(원 실행 산출물 `pe/legacy`, `pe/fixed`가 작업 세션 스크래치패드에 남아 있었다; 결과 `results_2026-11-27h/compare/`, `summary/`를 교체하고 `run_info.json`을 달았다). 앵커가 넘어간 객체 86 → **118**, VLASS → PS1 31 → 62, 위치 이동 중앙값 0.60″ → 0.45″, 1차 라벨 변화 28 → **27**(단편 흡수 23 → 22), `subclass` 46 → 45. 객체마다 전체 표에서 센 "광학 행을 가진 채 전파가 앵커인 객체 116 → 55"는 변하지 않았다(검토 세션의 예상과 달리 라벨 변화가 1개 줄었다: 같은 구성의 객체를 이제 전부 짝지어 비교한다).
 - **문서 단위 확인(2.62.3)**: `v2_vizier_units.yml`(CfA 미러)에서 VizieR 메타데이터를 읽었다. VLASS `e_RAJ2000`·`e_DEJ2000`는 **deg**, NVSS `e_RAJ2000`는 **s**·`e_DEJ2000`는 arcsec로, 이 보고서의 판정과 `fixed` 변환이 맞다. 다른 수집기의 위치 오차 열은 모두 코드가 가정한 단위다(`benchmark/position_errors/UNITS.md` 1b절). 남은 것은 `fixed`를 기본으로 하는 결정(검토 세션)과 그 전의 재측정이다.
 

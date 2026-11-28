@@ -21,6 +21,8 @@ Everything is deterministic: the same inputs give the same file.
 
 from __future__ import annotations
 
+import sys
+
 import argparse
 import hashlib
 from pathlib import Path
@@ -94,6 +96,10 @@ def select(d: pd.DataFrame, exclude: pd.DataFrame | None = None, prefix: str = "
     return pd.DataFrame(picked)
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--truth", type=Path, required=True)
@@ -102,12 +108,14 @@ def main() -> int:
     ap.add_argument("--prefix", default="lq")
     ap.add_argument("--quota", help="b0,b1,b2,b3 per stratum (default 20,50,40,40)")
     a = ap.parse_args()
+    t0 = RI.start()
     quota = None if not a.quota else dict(enumerate(int(x) for x in a.quota.split(",")))
     f = select(pd.read_csv(a.truth), pd.read_csv(a.exclude) if a.exclude else None, a.prefix, quota, contaminants=not a.exclude)
     f["ra"], f["dec"] = f.ra.round(5), f.dec.round(5)
     f.to_csv(a.out, index=False)
     print(f.groupby(["stratum", "kind"]).size().to_string())
     print("regions", len(f), "sha256", hashlib.sha256(a.out.read_bytes()).hexdigest())
+    RI.write_args(a, t0=t0)
     return 0
 
 

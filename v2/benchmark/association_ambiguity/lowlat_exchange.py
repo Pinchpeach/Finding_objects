@@ -15,6 +15,8 @@ no QSO object at that position in the variant), gained (the reverse), with the P
 
 from __future__ import annotations
 
+import sys
+
 import argparse
 import math
 from pathlib import Path
@@ -64,6 +66,10 @@ def exchange(t: pd.DataFrame, base: str, variant: str, tol: float) -> dict:
                 gained_i_lt_195=gained_i195, lost_multi_catalog=lost_multi, gained_multi_catalog=gained_multi)  # fmt: skip
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--table", type=Path, required=True)
@@ -72,11 +78,13 @@ def main() -> int:
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--tol", type=float, default=1.0)
     a = ap.parse_args()
+    t0 = RI.start()
     t = pd.read_csv(a.table, low_memory=False)
     r = pd.DataFrame([exchange(t, a.base, v, a.tol) for v in a.variants])
     a.out.mkdir(parents=True, exist_ok=True)
     r.to_csv(a.out / "lowlat_exchange.csv", index=False)
     print(r.to_string(index=False))
+    RI.write_args(a, t0=t0)
     return 0
 
 

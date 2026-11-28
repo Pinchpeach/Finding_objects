@@ -10,6 +10,8 @@ It exists to turn the "none" evidence entries of ``UNITS.md`` into the documente
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import argparse
 import sys
 
@@ -40,10 +42,15 @@ def describe(table, columns) -> list[dict]:
     return out
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--out", default="vizier_units.csv")
     a = ap.parse_args()
+    t0 = RI.start()
     from pathlib import Path
 
     sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "Get_data"))
@@ -71,6 +78,7 @@ def main() -> int:
     df.to_csv(a.out, index=False)
     with pd.option_context("display.width", 250, "display.max_colwidth", 80):
         print(df.to_string(index=False))
+    RI.write_args(a, t0=t0)
     return 0
 
 

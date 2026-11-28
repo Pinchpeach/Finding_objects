@@ -58,6 +58,10 @@ def boot_density(reg: pd.DataFrame, col: str, n_boot=4000, seed=1):
     return est, float(np.percentile(b, 2.5)), float(np.percentile(b, 97.5))
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--variants", nargs="+", required=True, help="NAME=ROOT, the first is the control")
@@ -67,6 +71,7 @@ def main() -> int:
     ap.add_argument("--only", help="comma list of region names (the calibration or the confirmation set)")
     ap.add_argument("--out", type=Path, required=True)
     a = ap.parse_args()
+    t0 = RI.start()
     a.out.mkdir(parents=True, exist_ok=True)
     regions, truth = pd.read_csv(a.regions), pd.read_csv(a.truth)
     if a.only:
@@ -139,6 +144,7 @@ def main() -> int:
     with pd.option_context("display.width", 260, "display.max_columns", 40):
         print(d.to_string(index=False))
         print(pd.DataFrame(strata).pivot(index="variant", columns="stratum", values="recall").to_string())
+    RI.write_args(a, ('variants', 'regions', 'truth'), t0=t0)
     return 0
 
 

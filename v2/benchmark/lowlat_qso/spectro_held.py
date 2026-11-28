@@ -11,6 +11,8 @@ The summary line says how many of them each variant leaves QSO / holds back.
 
 from __future__ import annotations
 
+import sys
+
 import argparse
 import importlib.util
 import re
@@ -35,12 +37,17 @@ def load(root: Path) -> pd.DataFrame:
     return pd.concat(parts, ignore_index=True)
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--base", type=Path, required=True)
     ap.add_argument("--variants", nargs="+", required=True)
     ap.add_argument("--out", type=Path, required=True)
     a = ap.parse_args()
+    t0 = RI.start()
     b = load(a.base)
     spec = b[b.rules_QSO.fillna("").str.contains(SPEC.pattern, regex=True)].copy()
     spec["n_surveys"] = LL.n_surveys(spec.catalogs)
@@ -57,6 +64,7 @@ def main() -> int:
         name = v.split("=", 1)[0]
         held = spec[(spec.label_base == "QSO") & (spec[f"label_{name}"] != "QSO")]
         print(f"{name}: of {int((spec.label_base == 'QSO').sum())} labelled QSO by the base, {len(held)} are not; surveys of those: {held.n_surveys.tolist()}")
+    RI.write_args(a, t0=t0)
     return 0
 
 

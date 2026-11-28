@@ -4,7 +4,7 @@
     python decision_table_combos.py --inputs results_2026-11-27h/inputs --assoc ../association_ambiguity/results_2026-11-27f --out results_2026-11-27h/decision_table.csv
 
 Rows (the work order of 2026-11-27, task 차): base; surveys2 and surveys3 as they are (reference); surveys2 + spectro_keep; same,nearest; same,nearest + surveys2;
-same,nearest + surveys2 + spectro_keep; same,nearest + surveys3.  ``spectro_keep`` acts only on objects with a spectral class QSO, which the blind low-latitude and
+same,nearest + surveys2 + spectro_keep; same,nearest + surveys3; and (2026-11-28, task b) V2_POSERR_UNITS=fixed + same,nearest + surveys2 (the three together).  ``spectro_keep`` acts only on objects with a spectral class QSO, which the blind low-latitude and
 deep COSMOS runs do not have: those columns of a ``+spectro_keep`` row are those of the same row without it, and the spectroscopic column is the one that tells them apart.
 
 Columns (inputs in ``--inputs``):
@@ -22,6 +22,8 @@ Columns (inputs in ``--inputs``):
 
 from __future__ import annotations
 
+import sys
+
 import argparse
 import math
 from pathlib import Path
@@ -37,6 +39,8 @@ ROWS = [  # name, association, low-latitude / COSMOS variant key, spectroscopic 
     ("same_nearest+surveys2", "same_nearest", "same_nearest_surveys2", "surveys2", False),
     ("same_nearest+surveys2+spectro_keep", "same_nearest", "same_nearest_surveys2", "surveys2_keep", True),
     ("same_nearest+surveys3", "same_nearest", "same_nearest_surveys3", "surveys3", False),
+    # 2.62.6 (order of 2026-11-28, task b): the three switches together; the association columns are those of fixed + same,nearest without the survey-count switch
+    ("fixed+same_nearest+surveys2", "fixed_same_nearest", "fixed_same_nearest_surveys2", "surveys2", False),
 ]
 HISTORY = {
     "base": "no threshold; reference",
@@ -47,6 +51,7 @@ HISTORY = {
     "same_nearest+surveys2": "both choices above; the combination was not measured before this table",
     "same_nearest+surveys2+spectro_keep": "both choices above",
     "same_nearest+surveys3": "both choices above",
+    "fixed+same_nearest+surveys2": "all three choices; V2_POSERR_UNITS=fixed was chosen on the 179 regions of the unit study (no threshold), was never measured together with the other two before this row; the base of every column is the legacy-unit base",
 }
 UNUSED = "the only sample no threshold or switch has been fitted on is set C (LOCKED_TEST_SET_C.md); it has not been run with these combinations"
 
@@ -129,7 +134,10 @@ def new_join_bound(assoc_dir: Path, assoc: str) -> dict:
         k = n = 0
         for half in ("calibration", "confirmation"):
             e = pd.read_csv(assoc_dir / half / "cosmos" / "exchange.csv")
-            r = e[(e.variant == "same_nearest") & (e.catalog == cat)].iloc[0]
+            sel = e[(e.variant == assoc) & (e.catalog == cat)]
+            if sel.empty:  # 2.62.6 review: no exchange table for this association (fixed_same_nearest): leave the cells empty, not the same_nearest numbers
+                return {}
+            r = sel.iloc[0]
             k += int(r.new_false)
             n += int(r.new_correct + r.new_false)
         tk, tn = tk + k, tn + n
@@ -144,7 +152,7 @@ def assoc_cols(assoc_dir: Path, assoc: str) -> dict:
     for half, name in (("calibration", "cal9"), ("confirmation", "conf17")):
         rates = pd.read_csv(assoc_dir / half / "cosmos" / "rates.csv").set_index(["variant", "catalog"])
         st = pd.read_csv(assoc_dir / half / "cosmos" / "structure.csv").set_index("variant")
-        v = "base" if assoc == "base" else "same_nearest"
+        v = assoc  # "base", "same_nearest" or "fixed_same_nearest": the variant names of rates.csv / structure.csv
         for cat in ("AllWISE", "GALEX AIS"):
             r = rates.loc[(v, cat)]
             out[f"assoc_{name}_{cat.split()[0]}_false_missed_pct"] = f"{r.false_pct:.2f} / {r.missed_pct:.1f}"
@@ -168,12 +176,17 @@ def labels(inputs: Path, key: str) -> dict:
     return out
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--inputs", type=Path, required=True)
     ap.add_argument("--assoc", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
     a = ap.parse_args()
+    t0 = RI.start()
     conf = pd.read_csv(a.inputs / "lowlat_confirmation.csv")
     cal = pd.read_csv(a.inputs / "lowlat_calibration.csv")
     loss = pd.read_csv(a.inputs / "type1_loss_by_r.csv")
@@ -193,6 +206,7 @@ def main() -> int:
     print(UNUSED)
     with pd.option_context("display.width", 300, "display.max_columns", 60, "display.max_colwidth", 60):
         print(d.T.to_string())
+    RI.write_args(a, ('inputs', 'assoc'), t0=t0)
     return 0
 
 

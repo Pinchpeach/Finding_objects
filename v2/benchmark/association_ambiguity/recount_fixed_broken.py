@@ -86,6 +86,10 @@ def mcnemar(fixed: int, broken: int) -> float:
     return 1.0 if fixed + broken == 0 else float(binomtest(min(fixed, broken), fixed + broken, 0.5).pvalue)
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--deep", type=Path, nargs="+", required=True)
@@ -96,6 +100,7 @@ def main() -> int:
     ap.add_argument("--radius", type=float, default=0.5)
     ap.add_argument("--out", type=Path, required=True)
     a = ap.parse_args()
+    t0 = RI.start()
     a.out.mkdir(parents=True, exist_ok=True)
     FQ.FIELDS = FQ.load_fields(a.fields)
     rows, lists, parts = [], [], []
@@ -119,6 +124,7 @@ def main() -> int:
     pd.concat(lists).to_csv(a.out / "broken.csv", index=False)
     with pd.option_context("display.width", 250, "display.max_columns", 30):
         print(pd.DataFrame(rows).T.to_string())
+    RI.write_args(a, ('deep', 'names', 'base'), t0=t0)
     return 0
 
 

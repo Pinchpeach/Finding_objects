@@ -70,6 +70,10 @@ def merge(raw_sets: list[str], spectra: Path, out: Path) -> None:
                 shutil.copy(f, dst / f.name)
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("cmd", nargs="?", default="collect", choices=["collect", "merge"])
@@ -80,10 +84,12 @@ def main() -> int:
     ap.add_argument("--jobs", type=int, default=3)
     ap.add_argument("--radius", type=float, default=3.0)
     a = ap.parse_args()
+    t0 = RI.start()
     if a.cmd == "collect":
         collect(a.regions, a.out, a.jobs, a.radius, WANTED)
     else:
         merge(a.raw, a.spectra, a.out)
+    RI.write_args(a, t0=t0)
     return 0
 
 

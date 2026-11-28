@@ -61,6 +61,10 @@ def scan_one(args) -> list[dict]:
     return rows
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--root", type=Path, required=True, help="ROOT/<field>/raw/<tag> (deep COSMOS layout)")
@@ -68,6 +72,7 @@ def main() -> int:
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--jobs", type=int, default=4)
     a = ap.parse_args()
+    t0 = RI.start()
     a.out.mkdir(parents=True, exist_ok=True)
     tmp = a.out / "_stage1"
     tmp.mkdir(exist_ok=True)
@@ -85,6 +90,7 @@ def main() -> int:
                               median_competitor_ratio=round(float(d.loc[d.competitor, "best_competitor_ratio"].median()), 3) if d.competitor.any() else float("nan"))])  # fmt: skip
     summ.to_csv(a.out / "summary.csv", index=False)
     print(summ.T.to_string(header=False))
+    RI.write_args(a, ("root", "fields"), t0=t0, env={"V2_ASSOC_AMBIG": "same,nearest"})  # the workers' setting (_load_stage1)
     return 0
 
 

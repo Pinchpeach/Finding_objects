@@ -10,10 +10,16 @@ the group because no candidate was accepted (``new``) or because a second candid
 
 from __future__ import annotations
 
+import sys
+
 import argparse
 from pathlib import Path
 
 import pandas as pd
+
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
 
 
 def main() -> int:
@@ -21,6 +27,7 @@ def main() -> int:
     ap.add_argument("--rows", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
     a = ap.parse_args()
+    t0 = RI.start()
     d = pd.read_csv(a.rows, low_memory=False)
     d = d[d.outcome.isin(["correct", "false", "unknown", "missed", "rightly_alone"])]
     rows = []
@@ -36,6 +43,7 @@ def main() -> int:
     a.out.mkdir(parents=True, exist_ok=True)
     t.to_csv(a.out / "missed_by_path.csv", index=False)
     print(t.to_string(index=False))
+    RI.write_args(a, t0=t0)
     return 0
 
 

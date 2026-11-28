@@ -11,6 +11,8 @@ switch (``lowlat_qso_hold``), QSO labels among the literature-only objects, and 
 
 from __future__ import annotations
 
+import sys
+
 import argparse
 from pathlib import Path
 
@@ -45,11 +47,16 @@ def pair(a: pd.DataFrame, b: pd.DataFrame, radius=0.5):
     return out
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--runs", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
     a = ap.parse_args()
+    t0 = RI.start()
     a.out.mkdir(parents=True, exist_ok=True)
     rows, changes = [], []
     combos = sorted(p.name[4:] for p in a.runs.glob("run_*"))
@@ -78,6 +85,7 @@ def main() -> int:
     out.to_csv(a.out / "real_use_combos.csv", index=False)
     pd.DataFrame(changes).value_counts().rename("n").reset_index().to_csv(a.out / "real_use_label_transitions.csv", index=False)
     print(out.to_string(index=False))
+    RI.write_args(a, ('runs',), t0=t0)
     return 0
 
 

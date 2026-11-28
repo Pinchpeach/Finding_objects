@@ -82,6 +82,10 @@ def run_one(job: dict, mode: str, out_root: Path, work_root: Path) -> str:
     return "ok"
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--regions", type=Path, required=True)
@@ -92,16 +96,25 @@ def main() -> int:
     ap.add_argument("--jobs", type=int, default=4)
     ap.add_argument("--work", type=Path, default=Path("/tmp/pe_work"))
     a = ap.parse_args()
+    t0 = RI.start()
     roots = {kv.split("=", 1)[0]: Path(kv.split("=", 1)[1]) for kv in a.roots}
     jobs = region_table(pd.read_csv(a.regions), roots, a.cosmos_fields)
     todo = [(j, m) for m in a.modes.split(",") for j in jobs]
     print(f"{len(jobs)} regions x {len(a.modes.split(','))} modes", flush=True)
+    done_before = lambda j, m: (a.out / m / j["set"] / j["region"] / "classified_objects.csv").exists()  # noqa: E731  run_one skips these
+    reuse = {m: RI.reuse_info(a.out / m, [f"{j['set']}/{j['region']}" for j in jobs if not done_before(j, m)], [f"{j['set']}/{j['region']}" for j in jobs if done_before(j, m)])
+             for m in a.modes.split(",")}  # fmt: skip
     done = 0
     with ThreadPoolExecutor(max(1, a.jobs)) as ex:
         for res in ex.map(lambda t: run_one(t[0], t[1], a.out, a.work), todo):
             done += 1
             if done % 20 == 0:
                 print(f"{done}/{len(todo)}", flush=True)
+    for mode in a.modes.split(","):  # the environment of the pipelines of that mode (run_one drops the V2_* variables of the shell)
+        env = {k: v for k, v in os.environ.items() if not k.startswith("V2_") or k in ("V2_CACHE_DIR",)}
+        env.update({"PYTHONHASHSEED": "0", "V2_CACHE": "0", "V2_POSERR_UNITS": mode})
+        RI.write(a.out / mode, [a.regions, a.cosmos_fields, *[kv.split("=", 1)[1] for kv in a.roots]], t0=t0, env=env, replace_env=True, note=f"run_pe, V2_POSERR_UNITS={mode}",
+                 extra=reuse[mode])  # fmt: skip
     return 0
 
 

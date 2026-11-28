@@ -17,6 +17,8 @@ Adoption criteria (for the candidate to be offered as an option; the default sta
 
 from __future__ import annotations
 
+import sys
+
 import argparse
 from pathlib import Path
 
@@ -40,6 +42,10 @@ def load(d: Path):
     return v, s
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--calibration", type=Path, required=True)
@@ -47,6 +53,7 @@ def main() -> int:
     ap.add_argument("--highlat-identical", choices=["yes", "no"], required=True)
     ap.add_argument("--out", type=Path, required=True)
     a = ap.parse_args()
+    t0 = RI.start()
     a.out.mkdir(parents=True, exist_ok=True)
     cal, cal_s = load(a.calibration)
     con, con_s = load(a.confirmation)
@@ -129,6 +136,7 @@ def main() -> int:
         print(pred.to_string(index=False))
         print()
         print(pd.DataFrame(adopt).to_string(index=False))
+    RI.write_args(a, t0=t0)
     return 0
 
 

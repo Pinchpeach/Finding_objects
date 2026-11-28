@@ -13,6 +13,8 @@ al. (2021, Sec. 5.3), and the sky: |b|, E(B-V), the local Gaia density, the regi
 
 from __future__ import annotations
 
+import sys
+
 import argparse
 import json
 import math
@@ -142,12 +144,17 @@ def summaries(d: pd.DataFrame) -> dict[str, pd.DataFrame]:
     return out
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--others", type=Path, required=True)
     ap.add_argument("--work", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
     a = ap.parse_args()
+    t0 = RI.start()
     a.out.mkdir(parents=True, exist_ok=True)
     o = pd.read_csv(a.others)
     d = dissect(o[o.stratum != "contaminant"], a.work)
@@ -156,6 +163,7 @@ def main() -> int:
         for k, v in summaries(d).items():
             v.to_csv(a.out / f"summary_{k}.csv")
             print(f"== {k}\n{v.to_string()}")
+    RI.write_args(a, t0=t0)
     return 0
 
 

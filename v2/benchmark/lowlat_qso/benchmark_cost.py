@@ -20,6 +20,8 @@ spectroscopic quasars is distributed where only catalogue presence, not the clas
 
 from __future__ import annotations
 
+import sys
+
 import argparse
 import math
 from pathlib import Path
@@ -107,11 +109,16 @@ def run(name: str) -> list[dict]:
     return rows
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--sets", default=",".join(SETS))
     a = ap.parse_args()
+    t0 = RI.start()
     a.out.mkdir(parents=True, exist_ok=True)
     rows = []
     for s in a.sets.split(","):
@@ -120,6 +127,7 @@ def main() -> int:
     d.to_csv(a.out / "benchmark_cost.csv", index=False)
     with pd.option_context("display.width", 250, "display.max_columns", 30, "display.max_rows", 300):
         print(d[(d.truth_class == "QSO") & ~d.mag.astype(str).str.startswith("n_cat")].to_string(index=False))
+    RI.write_args(a, t0=t0)
     return 0
 
 

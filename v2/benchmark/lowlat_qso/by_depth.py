@@ -26,6 +26,10 @@ import score_lowlat_qso as S  # noqa: E402
 LS = "DESI Legacy Surveys DR10"
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--variants", nargs="+", required=True, help="NAME=ROOT, the first is the control")
@@ -34,6 +38,7 @@ def main() -> int:
     ap.add_argument("--radius", type=float, default=3.0)
     ap.add_argument("--out", type=Path, required=True)
     a = ap.parse_args()
+    t0 = RI.start()
     regions = pd.read_csv(a.regions)
     regions = regions[regions.kind == "qso"]
     regions, _, _ = S.common_regions(regions, [v.split("=", 1) for v in a.variants])
@@ -66,6 +71,7 @@ def main() -> int:
     d.to_csv(a.out, index=False)
     with pd.option_context("display.width", 250, "display.max_columns", 40):
         print(d.to_string(index=False))
+    RI.write_args(a, t0=t0)
     return 0
 
 
