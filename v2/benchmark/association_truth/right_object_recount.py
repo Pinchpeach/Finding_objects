@@ -38,13 +38,22 @@ HEADLINE = ("right_object", "wrong_object", "unidentified", "shared", "displaced
 COUNTS = ("rows", "no_expected", "matched", "correct", "false", "unknown", "missed", "rightly_alone", "alone_identified", "alone_wrong", "alone_unidentified", "shared", "displaced", "shift_rows", "shift_false", "shift_any")
 
 
+SHIFT = ("shift_rows", "shift_false", "shift_any")  # only when the shifted-catalogue copy was measured
+
+
 def field_table(root: Path, variant: str) -> pd.DataFrame:
+    """Per field and catalogue the counts of ``measure_association.py``.  A count the measurement does not have is NOT read as 0 (Codex review of 2.62.10): a measurement
+    made before ``alone_*`` / ``shared`` / ``displaced`` existed would report no fragments and turn right_object into the anchor-dependent ``correct``.  A missing
+    required count stops the tool with the name of the folder to re-measure; the shift counts, which exist only with a shifted copy, stay missing (NaN)."""
     recs = json.loads((root / f"meas_{variant}" / f"per_field_{variant}.json").read_text())
     rows = []
     for r in recs:
         for c in CATS:
             if c in r:
-                rows.append({"variant": variant, "field": r["field"], "catalog": c, **{k: r[c].get(k, 0) for k in COUNTS}})
+                missing = [k for k in COUNTS if k not in r[c] and k not in SHIFT]
+                if missing:
+                    raise SystemExit(f"meas_{variant} {r['field']} {c}: the measurement has no {', '.join(missing)}; re-run measure_association.py (2.62.10) on this variant")
+                rows.append({"variant": variant, "field": r["field"], "catalog": c, **{k: r[c].get(k, float("nan")) for k in COUNTS}})
     return pd.DataFrame(rows)
 
 
@@ -56,7 +65,7 @@ def split_fields(fields: list[str], split_csv: Path) -> dict[str, list[str]]:
 
 
 def totals(t: pd.DataFrame) -> pd.DataFrame:
-    g = t.groupby(["variant", "catalog"])[list(COUNTS)].sum().reset_index()
+    g = t.groupby(["variant", "catalog"])[list(COUNTS)].sum(min_count=1).reset_index()  # min_count: a count missing in every field stays missing
     g["with_expected"] = g.rows - g.no_expected
     # the anchor independent reading (review of 2.62.7): the row sits in an object that holds an acceptable counterpart, joined (correct) or as the anchor (alone_identified)
     g["right_object"] = g.correct + g.alone_identified
@@ -96,8 +105,37 @@ def bootstrap(per: pd.DataFrame, base: str, variant: str, cat: str, n: int = 200
     return out
 
 
+def check_coverage(per: pd.DataFrame, base_name: str) -> None:
+    """Every variant must hold the same (field, catalogue) pairs as the base (Codex review of 2.62.10): a variant whose measurement lacks a field would be summed over fewer
+    fields than the base while the tables report the same ``fields`` for both, and the field bootstrap would carry NaN for it.  The same holds for the pairs with a shifted
+    control, among the variants that have one.  Stop instead, naming the pairs."""
+    if base_name not in set(per.variant):
+        raise SystemExit(f"the base variant {base_name!r} is not among the variants read: {', '.join(sorted(set(per.variant)))}")
+    pairs = {v: set(zip(g.field, g.catalog)) for v, g in per.groupby("variant")}
+    want = pairs[base_name]
+    bad = []
+    for v, have in sorted(pairs.items()):
+        if v == base_name or have == want:
+            continue
+        lack, extra = sorted(want - have), sorted(have - want)
+        bad.append(f"{v}: " + "; ".join(x for x in (("lacks " + ", ".join(f"{f}/{c}" for f, c in lack)) if lack else "", ("has besides " + ", ".join(f"{f}/{c}" for f, c in extra)) if extra else "") if x))
+    # the shifted control (shift_*) only exists where the shifted copy was measured: a variant without any keeps NaN differences, but every variant that has one must cover the
+    # same (field, catalogue) pairs, or d_shift_any / d_shifted_any_pct would compare different field sets (Codex review of 2.62.10)
+    shifted = {v: set(zip(g.field[g.shift_rows.notna()], g.catalog[g.shift_rows.notna()])) for v, g in per.groupby("variant")}
+    shifted = {v: s for v, s in shifted.items() if s}
+    if shifted:
+        ref = base_name if base_name in shifted else sorted(shifted)[0]
+        for v, have in sorted(shifted.items()):
+            if have != shifted[ref]:
+                lack, extra = sorted(shifted[ref] - have), sorted(have - shifted[ref])
+                bad.append(f"shifted control of {v} (against {ref}): " + "; ".join(x for x in (("lacks " + ", ".join(f"{f}/{c}" for f, c in lack)) if lack else "", ("has besides " + ", ".join(f"{f}/{c}" for f, c in extra)) if extra else "") if x))
+    if bad:
+        raise SystemExit(f"the variants do not cover the same fields and catalogues as {base_name!r} (re-measure them, or give only complete variants):\n  " + "\n  ".join(bad))
+
+
 def compute(per: pd.DataFrame, splits: dict[str, list[str]], base_name: str) -> tuple[pd.DataFrame, pd.DataFrame]:
     """(counts, deltas) of every split; ``per`` is the concatenation of ``field_table`` of the variants."""
+    check_coverage(per, base_name)
     counts, deltas = [], []
     for sname, fields in splits.items():
         p = per[per.field.isin(fields)]
@@ -110,7 +148,8 @@ def compute(per: pd.DataFrame, splits: dict[str, list[str]], base_name: str) -> 
             b = base.loc[r.catalog]
             d = dict(variant=r.variant, split=sname, catalog=r.catalog, fields=len(fields), with_expected=int(r.with_expected))
             for k in ("matched", "correct", "false", "unknown", "missed", "rightly_alone", "alone_identified", "right_object", "wrong_object", "unidentified", "shared", "displaced", "shift_false", "shift_any"):
-                d[f"d_{k}"] = int(r[k] - b[k])
+                x = r[k] - b[k]
+                d[f"d_{k}"] = int(x) if pd.notna(x) else np.nan  # the shift counts are missing (NaN) without a shifted copy (Codex review of 2.62.10)
             # the change in correct that is only a row moving from "anchors an object that holds its counterpart" to "joined to it": -d_alone_identified / d_correct
             d["relabel_share_of_d_correct_pct"] = round(100 * (-d["d_alone_identified"]) / d["d_correct"], 1) if d["d_correct"] else np.nan
             for k in ("right_object_pct", "missed_pct", "false_pct_of_matched_known", "shifted_false_pct", "shifted_any_pct"):

@@ -4,7 +4,8 @@
 # FIELDS_ROOT/<field>/raw/<tag>/*.csv (collect_deep_cosmos.py), TRUTH_FLUX_DIR/<field>.csv.gz (collect_truth_flux.py).  Stage 1 only, once per variant and
 # once more on the shifted-catalogue copy (run_variant.py --shift); then measure_association.py per variant.  Two runs at a time.
 set -e
-R=$1; T=$2; O=$3; mkdir -p "$O"; HERE="$(cd "$(dirname "$0")" && pwd)"; cd "$HERE"
+# The directory arguments are made absolute BEFORE the cd below: a relative path given from the repository root would otherwise point into this directory (Codex review of 2.62.10).
+R=$(cd "$1" && pwd); T=$(cd "$2" && pwd); mkdir -p "$3"; O=$(cd "$3" && pwd); HERE="$(cd "$(dirname "$0")" && pwd)"; cd "$HERE"
 export PYTHONHASHSEED=0 V2_CACHE=0
 # run_variant.py and measure_association.py write run_info.json in every directory they write; this one is for the table directory
 python3 "$HERE/../run_info.py" begin --out "$O/summary" --input "$R" "$T" --note "run_native_error_variants.sh"

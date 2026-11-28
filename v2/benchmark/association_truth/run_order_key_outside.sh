@@ -2,7 +2,8 @@
 # The order-key variants on the real-use fields and the 309 low-latitude cones (no association truth; 2.62.7, task "너" item 3).
 #   run_order_key_outside.sh ROOTS_DIR OUT_DIR       ROOTS_DIR/{real,cal,conf}/<field>/raw/<tag>/*.csv (symlinks are fine)
 set -e
-R=$1; O=$2; mkdir -p "$O"; HERE="$(cd "$(dirname "$0")" && pwd)"; cd "$HERE"
+# The directory arguments are made absolute BEFORE the cd below: a relative path given from the repository root would otherwise point into this directory (Codex review of 2.62.10).
+R=$(cd "$1" && pwd); mkdir -p "$2"; O=$(cd "$2" && pwd); HERE="$(cd "$(dirname "$0")" && pwd)"; cd "$HERE"
 export PYTHONHASHSEED=0 V2_CACHE=0
 python3 "$HERE/../run_info.py" begin --out "$O/summary" --input "$R" --note "run_order_key_outside.sh"
 declare -A ENVS=(

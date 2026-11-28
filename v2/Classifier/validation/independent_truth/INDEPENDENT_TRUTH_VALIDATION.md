@@ -4,14 +4,14 @@ Truth-catalog rows are used only as coordinates/labels. The same catalog is excl
 
 | axis | class | n | classified | coverage | exact all | exact classified | family all | family classified |
 |---|---|---:|---:|---:|---:|---:|---:|---:|
-| compact | PULSAR | 250 | 4 | 1.6% | 0.0% | 0.0% | 1.6% | 100.0% |
-| phenomenon | PN | 250 | 233 | 93.2% | 89.2% | 95.7% | 89.2% | 95.7% |
-| phenomenon | SN | 250 | 2 | 0.8% | 0.8% | 100.0% | 0.8% | 100.0% |
-| physical | AGB | 250 | 104 | 41.6% | 0.0% | 0.0% | 41.6% | 100.0% |
+| compact | PULSAR | 250 | 5 | 2.0% | 0.0% | 0.0% | 2.0% | 100.0% |
+| phenomenon | PN | 250 | 225 | 90.0% | 86.0% | 95.6% | 86.0% | 95.6% |
+| phenomenon | SN | 250 | 3 | 1.2% | 1.2% | 100.0% | 1.2% | 100.0% |
+| physical | AGB | 250 | 107 | 42.8% | 0.0% | 0.0% | 42.8% | 100.0% |
 | physical | RGB | 203 | 105 | 51.7% | 0.0% | 0.0% | 51.7% | 100.0% |
-| variability | CEPHEID | 250 | 240 | 96.0% | 90.0% | 93.8% | 90.0% | 93.8% |
-| variability | LPV | 250 | 186 | 74.4% | 65.2% | 87.6% | 65.2% | 87.6% |
-| variability | MIRA | 250 | 250 | 100.0% | 93.2% | 93.2% | 100.0% | 100.0% |
-| variability | RR_LYRAE | 250 | 238 | 95.2% | 82.4% | 86.6% | 82.4% | 86.6% |
+| variability | CEPHEID | 250 | 241 | 96.4% | 93.2% | 96.7% | 93.2% | 96.7% |
+| variability | LPV | 250 | 184 | 73.6% | 62.8% | 85.3% | 62.8% | 85.3% |
+| variability | MIRA | 250 | 249 | 99.6% | 91.6% | 92.0% | 99.2% | 99.6% |
+| variability | RR_LYRAE | 250 | 246 | 98.4% | 91.2% | 92.7% | 91.2% | 92.7% |
 
 Exact accuracy requires the requested leaf label. Family accuracy additionally credits a Mira truth object classified as the broader Gaia LPV family, and a pulsar classified as a radio pulsar candidate, and an RGB or AGB star classified as a red giant; it is reported separately and never substituted for the exact value. UNKNOWN is abstention. Low coverage is therefore reported separately from errors. Pulsar truth explicitly excludes ATNF evidence, and SN truth excludes Asiago evidence; those rows test whether another evidence family can independently recover the identity.
