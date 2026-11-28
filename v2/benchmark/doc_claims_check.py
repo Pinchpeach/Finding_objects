@@ -160,9 +160,11 @@ def claims() -> list[dict]:
     present = int(plan.merge(ref.assign(_in=1), on=["type", "catalog_name", "name"], how="left")._in.fillna(0).sum())
     add("ref520_design", "520 objects, 52 types, 10 each", "520, 52, 10 each", f"{len(plan)} plan rows, {n_types} types, {int(per.min())}-{int(per.max())} each", "ok" if (len(plan), n_types, int(per.min()), int(per.max())) == (520, 52, 10, 10) else "differs",
         "reference_objects/validation/plan.csv", r"520 literature-confirmed|520 reference objects")
-    add("ref520_in_list", "the 520 validated objects are objects of the published reference list (reference_objects.csv.gz)", "implied (the list is the source of the 520)", f"{present} of {len(plan)} plan objects are in the published list today (520 of 520 in the 2.46.1 list)",
+    add("ref520_in_list", "the 520 validated objects are objects of the published reference list (reference_objects.csv.gz)", "implied (the list is the source of the 520)", f"{present} of {len(plan)} plan objects are in the published list today",
         "ok" if present == len(plan) else "differs", "reference_objects/reference_objects.csv.gz vs validation/plan.csv", r"520 reference objects",
-        "the list was redrawn by the 2.46.2 squash (a6d47e1): the table changed after the plan was drawn from the 2.46.1 table; see the report")
+        # 2.62.7 counted 466 of 520: the 2.46.2 squash (a6d47e1) had redrawn the table after the plan was drawn from the 2.46.1 table; 2.62.11 restored the 2.46.1 table (85f8853) and
+        # pinned it in truth_tables_manifest.json (doc_claims/README.md section 3)
+        "the plan was drawn from the 2.46.1 table, restored in 2.62.11 (2.46.2 had redrawn it: 466 of 520)" if present == len(plan) else "the list was redrawn by the 2.46.2 squash (a6d47e1): the table changed after the plan was drawn from the 2.46.1 table; see the report")
 
     # ---- cited in the README, data committed, NOT recounted in this pass (see the report, section on limits) ----
     for cid, claim, quoted, pat, where in (

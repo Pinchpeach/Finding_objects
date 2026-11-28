@@ -308,10 +308,10 @@
    "builder": "benchmark/build_reference_objects.py",
    "files": [
     {
-     "bytes": 355356,
+     "bytes": 355276,
      "path": "reference_objects/reference_objects.csv.gz",
      "rows": 14108,
-     "sha256": "988dfb4ae38cb4072be2fa2c218d00278176f94e26feb37904a25f83b928c27c"
+     "sha256": "b9cae15bdf05d356ea59681e30b7d00424b650c0470f1fcc159ee4ad117b02e2"
     }
    ],
    "group": "order_dependent",

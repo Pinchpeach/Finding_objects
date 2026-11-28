@@ -33,10 +33,11 @@ def test_sky_benchmark_cells_are_the_grid_not_the_occupied_cells():
     assert r["status"] == "misleading" and "355 occupied" in r["recounted"]
 
 
-def test_reference_validation_scores_recount_exactly_but_the_plan_is_not_inside_the_list():
+def test_reference_validation_scores_recount_exactly_and_the_plan_is_inside_the_restored_list():
+    """2.62.7 found 466 of 520 (the 2.46.2 squash had redrawn the table); 2.62.11 restored the 2.46.1 table the plan was drawn from."""
     c = by_id()
     assert c["ref520_scores"]["status"] == "ok" and c["ref520_design"]["status"] == "ok"
-    assert c["ref520_in_list"]["status"] == "differs" and c["ref520_in_list"]["recounted"].startswith("466 of 520")
+    assert c["ref520_in_list"]["status"] == "ok" and c["ref520_in_list"]["recounted"].startswith("520 of 520")
 
 
 def test_locked_set_c_numbers_recount():

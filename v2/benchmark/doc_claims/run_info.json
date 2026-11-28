@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "commit": "a3067e9b32ad281524bd0da3a2766e94abb0d095",
-  "branch": "ccr-68f28268-l0opfu",
+  "commit": "79dfd4842803fb90cc13f9552cb8e13222e911c2",
+  "branch": "claude/code-review-7ox8zn",
   "dirty": false,
   "dirty_files": 0,
   "env": {},
@@ -13,8 +13,8 @@
     "LOWLAT_QSO": [],
     "LOWLAT_QSO_ABSB": 20.0
   },
-  "started_utc": "2026-11-28T04:37:27Z",
-  "finished_utc": "2026-11-28T04:37:28Z",
+  "started_utc": "2026-11-28T06:39:16Z",
+  "finished_utc": "2026-11-28T06:39:17Z",
   "status": "ok",
   "inputs": [
     {
@@ -61,9 +61,9 @@
     }
   ],
   "argv": [
-    "benchmark/doc_claims_check.py",
+    "v2/benchmark/doc_claims_check.py",
     "--out",
-    "benchmark/doc_claims"
+    "v2/benchmark/doc_claims"
   ],
   "python": "3.13.18",
   "note": "documents are not edited",
@@ -99,6 +99,40 @@
       },
       "started_utc": "2026-11-28T04:37:18Z",
       "finished_utc": "2026-11-28T04:37:19Z",
+      "status": "ok",
+      "note": "documents are not edited"
+    },
+    {
+      "commit": "a3067e9b32ad281524bd0da3a2766e94abb0d095",
+      "dirty": false,
+      "env": {},
+      "effective": {
+        "POSERR_UNITS": "legacy",
+        "AMBIG_FIX": [],
+        "POSERR_NATIVE": [],
+        "ANNOT_ASSOC": [],
+        "LOWLAT_QSO": [],
+        "LOWLAT_QSO_ABSB": 20.0
+      },
+      "started_utc": "2026-11-28T04:37:27Z",
+      "finished_utc": "2026-11-28T04:37:28Z",
+      "status": "ok",
+      "note": "documents are not edited"
+    },
+    {
+      "commit": "d8d9ab8dc89e66144dbdca2676e7517c0cd5ee4d",
+      "dirty": true,
+      "env": {},
+      "effective": {
+        "POSERR_UNITS": "legacy",
+        "AMBIG_FIX": [],
+        "POSERR_NATIVE": [],
+        "ANNOT_ASSOC": [],
+        "LOWLAT_QSO": [],
+        "LOWLAT_QSO_ABSB": 20.0
+      },
+      "started_utc": "2026-11-28T06:35:57Z",
+      "finished_utc": "2026-11-28T06:35:58Z",
       "status": "ok",
       "note": "documents are not edited"
     }

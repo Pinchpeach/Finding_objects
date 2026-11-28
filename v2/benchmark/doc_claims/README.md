@@ -65,3 +65,16 @@
 * 맞다고 적힌 것은 **커밋된 자료 안에서** 다시 센 것이다. `not recountable` 2개(옛 SDSS/DESI 2.52.0 정확도 97.99 / 90.33 %: 2.52.0 분류기가 커밋되어 있지 않다; 독립 블라인드 영역 24,663개: 원자료가 `validation-data` 브랜치에만 있다)는 점검하지 못했다. `not recounted` 3개(`QSO?` 후보 순도 29/119·재현율 47/97, X선 type-1 AGN 33개 중 0, 2.54.0의 2,361 / 3,621)는 자료는 있으나 깊은 영역의 2.54.0 / 2.56.0 분류 출력을 다시 돌려야 해 이번에 하지 않았다.
 * 표는 README 7–9절과 개요·덱의 해당 표를 훑어 고른 30개이고, README 8절의 서술형 수치(예: 0.51–0.81 %, 3–7배)는 포함하지 않았다.
 * ECE는 문서의 0.37 / 0.33 %를 소수 셋째 자리(0.365 / 0.331)로 반올림 안에서 맞는 것으로 적었다.
+
+## 4. 2.62.11: 2.46.1 목록을 되살림 (1.1의 해소)
+
+* **판단**(검토 세션 요청 1: 복원 가능성과 소비자를 확인한 뒤 판단): 되살린다.
+  * 85f8853 뒤로 `reference_objects.csv.gz`와 `REFERENCE_OBJECTS.md`를 바꾼 커밋은 a6d47e1(2.46.2) 하나뿐이다(`git log 85f8853..d8d9ab8 -- v2/reference_objects/reference_objects.csv.gz v2/reference_objects/REFERENCE_OBJECTS.md`). 그래서 두 파일을 85f8853에서 그대로 가져오면 된다.
+  * 내용을 읽는 소비자: `validate_reference_objects.py`(plan 모드만 목록을 읽는다; run·score는 `plan.csv`의 좌표를 쓴다), `doc_claims_check.py`, `server_fill/server_fill_dependence.py`(날짜가 붙은 연구; 아래).
+  * 매니페스트만 보는 곳: `truth_manifest.py`, `build-reference-objects.yml`.
+  * `overview_content.py`는 개수만 쓰는데, 두 목록에서 종류별 개수가 같다.
+  * 그래서 분류 결과와 520개 검증 점수는 바뀌지 않는다.
+* **되살린 것**: 85f8853의 두 파일(gzip SHA-256 `b9cae15b…b02e2`, 355,276 바이트, 14,108행). `python v2/benchmark/truth_manifest.py build`로 매니페스트의 이 표 항목만 바뀌었다(다른 13개 표는 그대로; `verify` 14개 OK).
+* **확인**: `validate_reference_objects.py plan`(종류마다 10개, seed 7)을 되살린 목록에 돌리면 커밋된 `plan.csv`와 **바이트 그대로 같다**. 같은 절차를 2.46.2 목록에 돌리면 520행 중 430행만 같다. 검증 계획이 2.46.1 목록에서 뽑혔다는 1.1의 추적이 이것으로 직접 확인된다.
+* **표의 변화**: `ref520_in_list`가 `differs`(466 of 520)에서 `ok`(520 of 520)로 바뀌었다. 2절의 표는 2.62.7 당시 값 그대로 두었다(병합된 기록). 지금 값은 `doc_claims_table.md`·`doc_claims_check.csv`에 있다.
+* **그대로 둔 것**: `server_fill/results_2026-11-28/reference_footprint.csv`와 `SERVER_FILL_DEPENDENCE_2026-11-28.md` 3절은 2.46.2 목록(RA 1.60–3.26°, 계획 466/520)을 잰 날짜 붙은 결과다. 결과가 그 목록을 잰 것이라는 사실이 바로 그 보고서의 요점이므로 다시 돌리지 않았다.
