@@ -1,0 +1,146 @@
+{
+  "schema": 1,
+  "commit": "7b51d2f2fe4faf228199a92253af9ec1dc7ce9d9",
+  "branch": "ccr-68f28268-l0opfu",
+  "dirty": true,
+  "dirty_files": 4,
+  "env": {},
+  "effective": {
+    "POSERR_UNITS": "legacy",
+    "AMBIG_FIX": [],
+    "POSERR_NATIVE": [],
+    "ANNOT_ASSOC": [],
+    "LOWLAT_QSO": [],
+    "LOWLAT_QSO_ABSB": 20.0
+  },
+  "started_utc": "2026-11-28T02:09:24Z",
+  "finished_utc": "2026-11-28T02:09:26Z",
+  "status": "ok",
+  "inputs": [
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_file/regroup_labels_replay_base.csv.gz",
+      "kind": "file",
+      "sha256": "53802c8a447ffe26ed12649dfcc438aeca09b962597540279b9757a2afb6a50d",
+      "size": 632790
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_file/regroup_labels_hc.csv.gz",
+      "kind": "file",
+      "sha256": "c31bc1ca1f5d722e354c22ba23de078e804337d09d58992fded11b5604c902fc",
+      "size": 632781
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_new/regroup_labels_replay_base.csv.gz",
+      "kind": "file",
+      "sha256": "86e7801b193ab300f6a16c9b0de3fef96e8879e935334bd4d9499ef500cea6fc",
+      "size": 631489
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_new/regroup_labels_hc.csv.gz",
+      "kind": "file",
+      "sha256": "4581cd8cd2241aa7fbdb4e60eca4ee63405197fa9b33dd7a088bb3e5cb65d6cf",
+      "size": 631480
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_file/regroup_labels_replay_base.csv.gz",
+      "kind": "file",
+      "sha256": "53802c8a447ffe26ed12649dfcc438aeca09b962597540279b9757a2afb6a50d",
+      "size": 632790
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_file/regroup_labels_m15hc.csv.gz",
+      "kind": "file",
+      "sha256": "1b44b37c1285ca4c7c8da5438a3e2b9661ce5aed1c346d858aab5c6a5b6be0fa",
+      "size": 632699
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_new/regroup_labels_replay_base.csv.gz",
+      "kind": "file",
+      "sha256": "86e7801b193ab300f6a16c9b0de3fef96e8879e935334bd4d9499ef500cea6fc",
+      "size": 631489
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_new/regroup_labels_m15hc.csv.gz",
+      "kind": "file",
+      "sha256": "cab05ce088bafbec1d642bce3a0cf64dc5b8aa4b43eee644fe892748b2a6a6bb",
+      "size": 631393
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_file/regroup_labels_replay_base.csv.gz",
+      "kind": "file",
+      "sha256": "53802c8a447ffe26ed12649dfcc438aeca09b962597540279b9757a2afb6a50d",
+      "size": 632790
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_file/regroup_labels_m15.csv.gz",
+      "kind": "file",
+      "sha256": "9594a649efe32b97b0ae2c9378884ff3e5cc18ab6b3266e3e8070c95a8032111",
+      "size": 632697
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_new/regroup_labels_replay_base.csv.gz",
+      "kind": "file",
+      "sha256": "86e7801b193ab300f6a16c9b0de3fef96e8879e935334bd4d9499ef500cea6fc",
+      "size": 631489
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_new/regroup_labels_m15.csv.gz",
+      "kind": "file",
+      "sha256": "6274ee3968f69b4bcd061f3ae63f23afa7e59033b2ff41ebec49ff017136e6a7",
+      "size": 631391
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_file/regroup_labels_replay_base.csv.gz",
+      "kind": "file",
+      "sha256": "53802c8a447ffe26ed12649dfcc438aeca09b962597540279b9757a2afb6a50d",
+      "size": 632790
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_file/regroup_labels_m20.csv.gz",
+      "kind": "file",
+      "sha256": "669d0d3330e6d7cf79a4906226d932824b110b72bfc12b76784576c253c50878",
+      "size": 632605
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_new/regroup_labels_replay_base.csv.gz",
+      "kind": "file",
+      "sha256": "86e7801b193ab300f6a16c9b0de3fef96e8879e935334bd4d9499ef500cea6fc",
+      "size": 631489
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_new/regroup_labels_m20.csv.gz",
+      "kind": "file",
+      "sha256": "88f172beec8ef98d2c0349b6f4f02a9897bee0a2c7ff72c5ce91be9d87f58780",
+      "size": 631338
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_file/regroup_labels_replay_base.csv.gz",
+      "kind": "file",
+      "sha256": "53802c8a447ffe26ed12649dfcc438aeca09b962597540279b9757a2afb6a50d",
+      "size": 632790
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_new/regroup_labels_replay_base.csv.gz",
+      "kind": "file",
+      "sha256": "86e7801b193ab300f6a16c9b0de3fef96e8879e935334bd4d9499ef500cea6fc",
+      "size": 631489
+    }
+  ],
+  "argv": [
+    "rescore_labels.py",
+    "--pairs",
+    "old_order_hc=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_file/regroup_labels_replay_base.csv.gz:/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_file/regroup_labels_hc.csv.gz",
+    "new_order_hc=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_new/regroup_labels_replay_base.csv.gz:/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_new/regroup_labels_hc.csv.gz",
+    "old_order_m15hc=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_file/regroup_labels_replay_base.csv.gz:/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_file/regroup_labels_m15hc.csv.gz",
+    "new_order_m15hc=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_new/regroup_labels_replay_base.csv.gz:/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_new/regroup_labels_m15hc.csv.gz",
+    "old_order_m15=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_file/regroup_labels_replay_base.csv.gz:/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_file/regroup_labels_m15.csv.gz",
+    "new_order_m15=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_new/regroup_labels_replay_base.csv.gz:/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_new/regroup_labels_m15.csv.gz",
+    "old_order_m20=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_file/regroup_labels_replay_base.csv.gz:/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_file/regroup_labels_m20.csv.gz",
+    "new_order_m20=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_new/regroup_labels_replay_base.csv.gz:/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_new/regroup_labels_m20.csv.gz",
+    "tie_order_file_to_new=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_file/regroup_labels_replay_base.csv.gz:/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_new/regroup_labels_replay_base.csv.gz",
+    "--out",
+    "results_2026-11-28/rescored_labels.csv"
+  ],
+  "python": "3.13.18",
+  "note": "rescore_labels"
+}

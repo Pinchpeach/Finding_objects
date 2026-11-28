@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "commit": "7b51d2f2fe4faf228199a92253af9ec1dc7ce9d9",
+  "branch": "ccr-68f28268-l0opfu",
+  "dirty": true,
+  "dirty_files": 9,
+  "env": {
+    "PYTHONHASHSEED": "0",
+    "V2_ASSOC_AMBIG": "same,nearest",
+    "V2_CACHE": "0",
+    "V2_LOWLAT_QSO": "surveys2",
+    "V2_POSERR_UNITS": "fixed"
+  },
+  "effective": {
+    "POSERR_UNITS": "fixed",
+    "AMBIG_FIX": [
+      "nearest",
+      "same"
+    ],
+    "POSERR_NATIVE": [],
+    "ANNOT_ASSOC": [],
+    "LOWLAT_QSO": [
+      "surveys2"
+    ],
+    "LOWLAT_QSO_ABSB": 20.0
+  },
+  "started_utc": "2026-11-28T02:29:01Z",
+  "finished_utc": "2026-11-28T02:29:01Z",
+  "status": "ok",
+  "inputs": [
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/c_fixed_same_nearest_surveys2",
+      "kind": "directory",
+      "sha256": "fda90a65021e879ab1610a5412797fcd1abe8835afaee261a01c41f1f5ad5bf9",
+      "n_files": 561,
+      "hashed": "relative path, size"
+    }
+  ],
+  "argv": [
+    "-"
+  ],
+  "python": "3.13.18",
+  "note": "recorded after the fact by the work session from the command that ran it (variant.sh / run_real5.py started before run_info.py was connected to them); environment as passed to the pipelines"
+}

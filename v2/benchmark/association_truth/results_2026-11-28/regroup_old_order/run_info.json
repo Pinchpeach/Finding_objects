@@ -1,0 +1,147 @@
+{
+  "schema": 1,
+  "commit": "7b51d2f2fe4faf228199a92253af9ec1dc7ce9d9",
+  "branch": "ccr-68f28268-l0opfu",
+  "dirty": true,
+  "dirty_files": 2,
+  "env": {
+    "PYTHONHASHSEED": "0",
+    "V2_ASSOC_TIE_ORDER": "file",
+    "V2_CACHE": "0",
+    "V2_FRAG_MIN_ARCSEC": "2.0"
+  },
+  "effective": {
+    "POSERR_UNITS": "legacy",
+    "AMBIG_FIX": [],
+    "POSERR_NATIVE": [],
+    "ANNOT_ASSOC": [],
+    "LOWLAT_QSO": [],
+    "LOWLAT_QSO_ABSB": 20.0
+  },
+  "started_utc": "2026-11-28T02:07:03Z",
+  "finished_utc": "2026-11-28T02:08:14Z",
+  "status": "ok",
+  "inputs": [
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_file26",
+      "kind": "directory",
+      "sha256": "551d30cc8ea4352cdeaf9b23c417c5d06e190a699a5d7c2a6193142257af07d5",
+      "n_files": 314,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/a4/truth_flux_635",
+      "kind": "directory",
+      "sha256": "9d8d88ffadc77011e44e82be5ff6e8af0ccf1683d4b5a0fed349036e14d4daa9",
+      "n_files": 26,
+      "hashed": "relative path, size"
+    }
+  ],
+  "argv": [
+    "regroup.py",
+    "--runs",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_file26",
+    "--truth-flux",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/a4/truth_flux_635",
+    "--variant",
+    "m20",
+    "--env",
+    "V2_FRAG_MIN_ARCSEC=2.0",
+    "V2_ASSOC_TIE_ORDER=file",
+    "--out",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/d_regroup_file"
+  ],
+  "python": "3.13.18",
+  "note": "",
+  "previous": [
+    {
+      "commit": "7b51d2f2fe4faf228199a92253af9ec1dc7ce9d9",
+      "dirty": true,
+      "env": {
+        "PYTHONHASHSEED": "0",
+        "V2_ASSOC_TIE_ORDER": "file",
+        "V2_CACHE": "0"
+      },
+      "effective": {
+        "POSERR_UNITS": "legacy",
+        "AMBIG_FIX": [],
+        "POSERR_NATIVE": [],
+        "ANNOT_ASSOC": [],
+        "LOWLAT_QSO": [],
+        "LOWLAT_QSO_ABSB": 20.0
+      },
+      "started_utc": "2026-11-28T02:02:06Z",
+      "finished_utc": "2026-11-28T02:03:20Z",
+      "status": "ok",
+      "note": ""
+    },
+    {
+      "commit": "7b51d2f2fe4faf228199a92253af9ec1dc7ce9d9",
+      "dirty": true,
+      "env": {
+        "PYTHONHASHSEED": "0",
+        "V2_ASSOC_TIE_ORDER": "file",
+        "V2_CACHE": "0",
+        "V2_FRAG_HOST_CANDIDATE": "1"
+      },
+      "effective": {
+        "POSERR_UNITS": "legacy",
+        "AMBIG_FIX": [],
+        "POSERR_NATIVE": [],
+        "ANNOT_ASSOC": [],
+        "LOWLAT_QSO": [],
+        "LOWLAT_QSO_ABSB": 20.0
+      },
+      "started_utc": "2026-11-28T02:03:20Z",
+      "finished_utc": "2026-11-28T02:04:35Z",
+      "status": "ok",
+      "note": ""
+    },
+    {
+      "commit": "7b51d2f2fe4faf228199a92253af9ec1dc7ce9d9",
+      "dirty": true,
+      "env": {
+        "PYTHONHASHSEED": "0",
+        "V2_ASSOC_TIE_ORDER": "file",
+        "V2_CACHE": "0",
+        "V2_FRAG_HOST_CANDIDATE": "1",
+        "V2_FRAG_MIN_ARCSEC": "1.5"
+      },
+      "effective": {
+        "POSERR_UNITS": "legacy",
+        "AMBIG_FIX": [],
+        "POSERR_NATIVE": [],
+        "ANNOT_ASSOC": [],
+        "LOWLAT_QSO": [],
+        "LOWLAT_QSO_ABSB": 20.0
+      },
+      "started_utc": "2026-11-28T02:04:35Z",
+      "finished_utc": "2026-11-28T02:05:49Z",
+      "status": "ok",
+      "note": ""
+    },
+    {
+      "commit": "7b51d2f2fe4faf228199a92253af9ec1dc7ce9d9",
+      "dirty": true,
+      "env": {
+        "PYTHONHASHSEED": "0",
+        "V2_ASSOC_TIE_ORDER": "file",
+        "V2_CACHE": "0",
+        "V2_FRAG_MIN_ARCSEC": "1.5"
+      },
+      "effective": {
+        "POSERR_UNITS": "legacy",
+        "AMBIG_FIX": [],
+        "POSERR_NATIVE": [],
+        "ANNOT_ASSOC": [],
+        "LOWLAT_QSO": [],
+        "LOWLAT_QSO_ABSB": 20.0
+      },
+      "started_utc": "2026-11-28T02:05:49Z",
+      "finished_utc": "2026-11-28T02:07:02Z",
+      "status": "ok",
+      "note": ""
+    }
+  ],
+  "mixed": true
+}

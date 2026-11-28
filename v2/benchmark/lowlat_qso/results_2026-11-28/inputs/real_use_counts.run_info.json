@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "commit": "7b51d2f2fe4faf228199a92253af9ec1dc7ce9d9",
+  "branch": "ccr-68f28268-l0opfu",
+  "dirty": true,
+  "dirty_files": 8,
+  "env": {
+    "PYTHONHASHSEED": "0"
+  },
+  "effective": {
+    "POSERR_UNITS": "legacy",
+    "AMBIG_FIX": [],
+    "POSERR_NATIVE": [],
+    "ANNOT_ASSOC": [],
+    "LOWLAT_QSO": [],
+    "LOWLAT_QSO_ABSB": 20.0
+  },
+  "started_utc": "2026-11-28T02:22:15Z",
+  "finished_utc": "2026-11-28T02:22:15Z",
+  "status": "ok",
+  "inputs": [
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/real4",
+      "kind": "directory",
+      "sha256": "49c71d1014c7976e0ccfc62be7adcce1c543efd737ab164eb47df8797046896b",
+      "n_files": 25,
+      "hashed": "relative path, size"
+    }
+  ],
+  "argv": [
+    "real_use_counts.py",
+    "--runs",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/real4",
+    "--variants",
+    "base",
+    "surveys2",
+    "fixed_same_nearest_surveys2",
+    "--out",
+    "results_2026-11-28/inputs/real_use_counts.csv"
+  ],
+  "python": "3.13.18",
+  "note": ""
+}

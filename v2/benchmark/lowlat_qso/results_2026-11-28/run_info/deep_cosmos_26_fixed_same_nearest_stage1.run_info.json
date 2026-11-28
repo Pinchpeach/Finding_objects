@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "commit": "abe6787684e3246a39fa6f4eec92cecb8cd96bf4",
+  "branch": "ccr-68f28268-l0opfu",
+  "dirty": true,
+  "dirty_files": 1,
+  "env": {
+    "PYTHONHASHSEED": "0",
+    "V2_ASSOC_AMBIG": "same,nearest",
+    "V2_CACHE": "0",
+    "V2_POSERR_UNITS": "fixed"
+  },
+  "effective": {
+    "POSERR_UNITS": "fixed",
+    "AMBIG_FIX": [
+      "nearest",
+      "same"
+    ],
+    "POSERR_NATIVE": [],
+    "ANNOT_ASSOC": [],
+    "LOWLAT_QSO": [],
+    "LOWLAT_QSO_ABSB": 20.0
+  },
+  "started_utc": "2026-11-28T01:26:30Z",
+  "finished_utc": "2026-11-28T01:28:25Z",
+  "status": "ok",
+  "inputs": [
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/s1/raw",
+      "kind": "directory",
+      "sha256": "00a047f1bcffa09d527e558b47f1c0e0e7ed938db9b11700ff707a6bb3d37ffe",
+      "n_files": 636,
+      "hashed": "relative path, size"
+    }
+  ],
+  "argv": [
+    "/home/user/Finding_objects/v2/benchmark/association_truth/run_variant.py",
+    "--fields-root",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/s1/raw",
+    "--out",
+    "assoc_b/fixed_same_nearest",
+    "--env",
+    "V2_POSERR_UNITS=fixed",
+    "V2_ASSOC_AMBIG=same,nearest"
+  ],
+  "python": "3.13.18",
+  "note": ""
+}

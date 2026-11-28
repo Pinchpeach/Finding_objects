@@ -424,22 +424,27 @@ is unchanged.
 
 ## 9. The survey-count switches together with the association rules (2.61.10)
 
-Measured only, nothing changed by default.  `results_2026-11-27h/decision_table.csv` (assembled by `decision_table_combos.py` from the tables of `combos_table.py`, `spectro_held.py`, `faint_cost.py`
-and `association_ambiguity/label_changes.py`) has one row per combination; every row was run with the 2.61.9 reading of the position errors (`V2_POSERR_UNITS=legacy`, so the only difference between rows is
-the switches).  140 confirmation cones (143 sample quasars), objects that are not sample quasars per deg^2 with a bootstrap over the regions:
+Measured only, nothing changed by default.  `results_2026-11-28/decision_table.csv` (assembled by `decision_table_combos.py` from the tables of `combos_table.py`, `spectro_held.py`, `faint_cost.py`
+and `association_ambiguity/label_changes.py`; inputs in `results_2026-11-28/inputs/`, every directory has a `run_info.json`) has one row per combination.  Eight rows were run with the 2.61.9 reading of
+the position errors (`V2_POSERR_UNITS=legacy`, so the only difference between them is the switches); the ninth, `fixed + same,nearest + surveys2`, is the three switches together
+(`V2_POSERR_UNITS=fixed`, 2.62.7).  `results_2026-11-27h/decision_table.csv` is superseded in 12 cells: the exchange columns (objects lost / gained against the base, matched by position) of the
+rows with `same,nearest` were measured with the wide table that keeps one variant's coordinates per object id (review of 2.62.2, `combos_table.py` fixed); they were 10 / 6 and 96 / 2 (confirmation), 12 / 6
+and 76 / 1 (calibration) and are now those below.  140 confirmation cones (143 sample quasars), objects that are not sample quasars per deg^2 with a bootstrap over the regions:
 
 | row | sample quasars QSO | QSO labels not on a sample quasar | LS cones | cones without LS | lost / gained against the base (matched by position) |
 |---|---|---|---|---|---|
 | base | 95/143 | 159 [90-242] (n=175) | 811 | 57 | |
 | surveys2 | 95/143 | 74 [45-108] (n=81) | 335 | 33 | 94 / 0 |
-| same,nearest | 96/143 | 156 [88-236] (n=171) | 791 | 56 | 10 / 6 |
-| same,nearest + surveys2 | 96/143 | 74 [45-108] (n=81) | 335 | 33 | 96 / 2 |
+| same,nearest | 96/143 | 156 [88-236] (n=171) | 791 | 56 | 4 / 0 |
+| same,nearest + surveys2 | 96/143 | 74 [45-108] (n=81) | 335 | 33 | 94 / 0 |
 | same,nearest + surveys3 | 96/143 | 33 [18-51] (n=36) | 141 | 16 | 139 / 0 |
+| **fixed + same,nearest + surveys2** | 96/143 | 74 [45-108] (n=81) | 335 | 33 | 94 / 0 |
 
-Calibration (169 cones): 170 -> 93 (surveys2), 95 (same,nearest + surveys2); quasars 86 -> 88/150 with same,nearest.  The two switches add up: the association rule gives back a sample quasar or two and does not
-change what the survey rule removes.  Spectroscopic QSO (32 objects of the 15 + 17 cones with spectra): with the default association `surveys2` / `surveys3` hold 5/32 (0/32 with `spectro_keep`), with
-`same,nearest` 0/32 **without** `spectro_keep` (Wilson 95 % upper bound 10.7 %; the 32 are the objects that motivated `spectro_keep`, so they are not an independent check).  Deep COSMOS (26 fields, limit lifted): Chandra
-type 1 AGN 0/123 lost in every row, QSO labels of type 1 AGN 123 -> 124 with `same,nearest`, the candidate flag at 22 <= r < 24 unchanged (purity 0.365, recall 0.468), single-survey QSO labels held 36 / 51 (surveys2 / surveys3), 33 / 49
-with `same,nearest`.  **What `spectro_keep` does not cover**: the 16 QSO labels of the real-use COSMOS field are NED / SIMBAD-only objects with no survey row; `surveys2` / `surveys3` hold all 16 with and without
-`same,nearest`.  History of the data: every sample above was used to pick the thresholds or the switches; the only sample none of them was fitted on is set C, which has not been run with these combinations.
+Calibration (169 cones): 170 -> 93 (surveys2), 95 (same,nearest + surveys2), **93 (fixed + same,nearest + surveys2)**; quasars 86 -> 88/150 with same,nearest, **89/150 with the three together** (lost against the base 0).
+The two switches add up: the association rule gives back a sample quasar or two and does not change what the survey rule removes, and the fixed units add one quasar and take two false labels away on
+the calibration cones and change nothing on the confirmation cones.  Spectroscopic QSO (32 objects of the 15 + 17 cones with spectra): with the default association `surveys2` / `surveys3` hold 5/32 (0/32 with `spectro_keep`), with
+`same,nearest` 0/32 **without** `spectro_keep` (Wilson 95 % upper bound 10.7 %; the 32 are the objects that motivated `spectro_keep`, so they are not an independent check), and 0/32 with the three together.  Deep COSMOS (26 fields, limit lifted): Chandra
+type 1 AGN 0/123 lost in every row including the three together, QSO labels of type 1 AGN 123 -> 124 with `same,nearest`, the candidate flag at 22 <= r < 24 unchanged (purity 0.365, recall 0.468), single-survey QSO labels held 36 / 51 (surveys2 / surveys3), 33 / 49
+with `same,nearest`; primary labels changed 199 of 252,772 pairs with the three together (34 from QSO), 198 with `same,nearest + surveys2`.  **What `spectro_keep` does not cover**: the 16 QSO labels of the real-use COSMOS field are NED / SIMBAD-only objects with no survey row; `surveys2` / `surveys3` hold all 16 with and without
+`same,nearest` and with the three together; `V2_LOWLAT_QSO=lit_keep` (2.62.6) keeps 15 of them (WORK_REPORT_2026-11-28b.md).  History of the data: every sample above was used to pick the thresholds or the switches; the only sample none of them was fitted on is set C, which has not been run with these combinations.
 
