@@ -1,4 +1,4 @@
-# results_2026-11-28: the decision table with the exchange columns re-measured and the three switches together (2.62.7)
+# results_2026-11-28: the decision table with the exchange columns re-measured and the three switches together (2.62.6)
 
 `decision_table.csv` replaces `../results_2026-11-27h/decision_table.csv`: the same columns, one more row (`fixed+same_nearest+surveys2`) and 12 cells different.  The 12 cells are the four exchange columns
 (`lowlat_{conf,cal}_{removed,added}_vs_base_per_deg2`) of the rows `same_nearest`, `same_nearest+surveys2` and `same_nearest+surveys2+spectro_keep`: the 2.62.2 table passed a table with one row per object id
@@ -10,3 +10,10 @@ the old table (checked cell by cell).  The inputs of `inputs/` are those of `../
 
 The three switches together = `V2_POSERR_UNITS=fixed V2_ASSOC_AMBIG=same,nearest V2_LOWLAT_QSO=surveys2` on the 169 + 140 low-latitude cones, the 26 deep COSMOS fields (limit lifted,
 `V2_LOWLAT_QSO_ABSB=90`) and the three real-use fields; the base of every column is the legacy-unit base.  Each directory has a `run_info.json`.
+
+**Review of 2.62.6.** The table was rebuilt on main with main's `decision_table_combos.py`; the 34 columns above came out identical cell by cell.  Main's tool also writes
+`assoc_new_joins_false_{AllWISE,2MASS,GALEX,all}`, the Wilson upper bound on the false share of the joins `same,nearest` adds (review of 2.61.8).  It reads
+`assoc/{calibration,confirmation}/cosmos/exchange.csv`, which the work branch's table did not use.  Those two files are copied unchanged from
+`../../association_ambiguity/results_2026-11-27f` (2.61.8; `same_nearest` rows, the legacy reading of the units).  The `fixed+same_nearest+surveys2` row leaves these four
+cells empty: no exchange table was measured for `fixed_same_nearest`.  Before the review, the tool put the `same_nearest` numbers in that row.
+

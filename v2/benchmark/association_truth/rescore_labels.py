@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Two label tables of ``regroup.py`` compared three ways: fixed and broken truth labels of a variant against its base (2.62.7).
+"""Two label tables of ``regroup.py`` compared three ways: fixed and broken truth labels of a variant against its base (2.62.6).
 
     python rescore_labels.py --pairs NAME=BASE.csv.gz:VARIANT.csv.gz [...] --out OUT.csv [--fields-split fields_split.csv]
 

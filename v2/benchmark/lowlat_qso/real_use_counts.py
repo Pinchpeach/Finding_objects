@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The per-variant counts of the three real-use fields (NGC 4522 2', COSMOS 2', Galactic plane 1') for the decision table (2.62.7).
+"""The per-variant counts of the three real-use fields (NGC 4522 2', COSMOS 2', Galactic plane 1') for the decision table (2.62.6).
 
     python real_use_counts.py --runs DIR --variants base surveys2 ... --out inputs/real_use_counts.csv [--update]
 

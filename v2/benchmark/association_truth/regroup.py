@@ -108,7 +108,7 @@ def score_accuracy(out: pd.DataFrame, truth: pd.DataFrame, lim: float = 1.5, nea
     object with the most catalogues within ``lim``'' (nearest on ties); an object grouped under a parent takes the
     parent's class.  Unmatched truth sources have no label.
 
-    Two more readings of the same truth source that do not depend on WHICH object is picked (2.62.7, the review of 2.60.11 / 2.61.0: a rule that removes fragments
+    Two more readings of the same truth source that do not depend on WHICH object is picked (2.62.6, the review of 2.60.11 / 2.61.0: a rule that removes fragments
     changes which object is "the" counterpart, so the pick-one reading counts a change of the pick as a fixed or broken label):
       ``exists_near``  an object within ``near``'' (grouped objects take the class of their parent) has the truth class
       ``all_near``     at least one object within ``near``'' and every one of them has the truth class (no wrong-class competitor)

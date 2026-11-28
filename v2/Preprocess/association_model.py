@@ -131,7 +131,7 @@ AMBIG_FIX = parse_ambig(os.environ.get("V2_ASSOC_AMBIG", ""))
 #   V2_POSERR_UNITS=legacy  (default, 2.62.2) the 2.61.9 reading (every e_RAJ2000 / e_DEJ2000 in arcsec)
 # The default stays legacy until the units VizieR documents for these columns are read (the evidence so far is the stored rows; the ReadMe could
 # not be reached: .github/workflows/v2_vizier_units.yml runs benchmark/position_errors/dump_vizier_units.py).  Making fixed the default changes
-# 27 primary labels of the 179 measured regions (WORK_REPORT_2026-11-27i.md; 28 before the comparison tool was corrected, 2.62.7), so it is a MINOR with a set C scoring of its own.
+# 27 primary labels of the 179 measured regions (WORK_REPORT_2026-11-27i.md; 28 before the comparison tool was corrected, 2.62.6), so it is a MINOR with a set C scoring of its own.
 POSERR_UNITS = os.environ.get("V2_POSERR_UNITS", "legacy").strip().lower()
 if POSERR_UNITS not in ("fixed", "legacy"):
     raise ValueError(f"V2_POSERR_UNITS: unknown value {POSERR_UNITS!r}; known: 'fixed', 'legacy'")

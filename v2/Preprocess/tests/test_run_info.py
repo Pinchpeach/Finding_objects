@@ -1,4 +1,4 @@
-"""``benchmark/run_info.py``: every result directory says what it was made with (2.62.7).
+"""``benchmark/run_info.py``: every result directory says what it was made with (2.62.6).
 
 The decision table of 2.62.2 could not be shown to have run with ``V2_POSERR_UNITS=legacy`` from its result files.  ``run_info.json`` records the commit, the
 V2_* environment, what the code READS in that environment (defaults included), the UTC times, the status and the SHA-256 of the inputs.
@@ -74,6 +74,23 @@ def test_a_directory_input_changes_its_hash_when_a_file_changes(tmp_path):
     assert RI.describe_input(d)["sha256"] == RI.describe_input(d)["sha256"]
     assert RI.describe_input(d, content=True)["sha256"] != RI.describe_input(d)["sha256"]
     assert RI.describe_input(tmp_path / "nothing")["kind"] == "missing"
+
+
+def test_a_directory_of_links_to_the_runs_it_reuses_is_hashed_through_the_links(tmp_path):
+    """Review of 2.62.6: ``regroup_new_order`` reused earlier runs through a folder of symlinks and was recorded with n_files 0 (the hash of nothing)."""
+    real = tmp_path / "runs" / "field_1"
+    real.mkdir(parents=True)
+    (real / "classified_objects.csv").write_text("object_id\nOBJ1\n")
+    links = tmp_path / "links"
+    links.mkdir()
+    (links / "field_1").symlink_to(real, target_is_directory=True)
+    direct, linked = RI.describe_input(tmp_path / "runs"), RI.describe_input(links)
+    assert linked["n_files"] == direct["n_files"] == 1
+    assert linked["sha256"] == direct["sha256"] != hashlib.sha256(b"").hexdigest()
+    (real / "classified_objects.csv").write_text("object_id\nOBJ2 changed\n")
+    assert RI.describe_input(links)["sha256"] != linked["sha256"]
+    (real / "loop").symlink_to(real, target_is_directory=True)  # a link loop ends
+    assert RI.describe_input(links)["n_files"] == 1
 
 
 def test_a_file_result_gets_a_sibling_record_and_a_directory_its_own(tmp_path):

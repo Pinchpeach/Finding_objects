@@ -39,7 +39,7 @@ ROWS = [  # name, association, low-latitude / COSMOS variant key, spectroscopic 
     ("same_nearest+surveys2", "same_nearest", "same_nearest_surveys2", "surveys2", False),
     ("same_nearest+surveys2+spectro_keep", "same_nearest", "same_nearest_surveys2", "surveys2_keep", True),
     ("same_nearest+surveys3", "same_nearest", "same_nearest_surveys3", "surveys3", False),
-    # 2.62.7 (order of 2026-11-28, task b): the three switches together; the association columns are those of fixed + same,nearest without the survey-count switch
+    # 2.62.6 (order of 2026-11-28, task b): the three switches together; the association columns are those of fixed + same,nearest without the survey-count switch
     ("fixed+same_nearest+surveys2", "fixed_same_nearest", "fixed_same_nearest_surveys2", "surveys2", False),
 ]
 HISTORY = {
@@ -134,7 +134,10 @@ def new_join_bound(assoc_dir: Path, assoc: str) -> dict:
         k = n = 0
         for half in ("calibration", "confirmation"):
             e = pd.read_csv(assoc_dir / half / "cosmos" / "exchange.csv")
-            r = e[(e.variant == "same_nearest") & (e.catalog == cat)].iloc[0]
+            sel = e[(e.variant == assoc) & (e.catalog == cat)]
+            if sel.empty:  # 2.62.6 review: no exchange table for this association (fixed_same_nearest): leave the cells empty, not the same_nearest numbers
+                return {}
+            r = sel.iloc[0]
             k += int(r.new_false)
             n += int(r.new_correct + r.new_false)
         tk, tn = tk + k, tn + n

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""``run_info.json``: what a result directory was made with (2.62.7).
+"""``run_info.json``: what a result directory was made with (2.62.6).
 
 Why: the decision table of 2.62.2 could not be shown to have run with ``V2_POSERR_UNITS=legacy`` from its result files; the switch was in the shell that
 started the runs, nowhere in the outputs.  Every directory a measurement tool writes gets a ``run_info.json`` (a file result gets ``<stem>.run_info.json`` next to it)
@@ -107,12 +107,28 @@ def sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 
+def _walk_files(root: Path) -> list[Path]:
+    """Every file under ``root``, FOLLOWING symbolic links to directories.  ``Path.rglob`` does not descend into a symlinked directory (Python < 3.13 and the
+    default after), so a results folder made of links to the runs it reuses (``d_new26`` of 2.62.6) hashed as an empty listing (n_files 0, the SHA-256 of
+    nothing; review of 2.62.6).  A directory already visited (same real path) is not entered again, so a link loop ends."""
+    seen, out = set(), []
+    for d, dirs, files in os.walk(root, followlinks=True):
+        real = os.path.realpath(d)
+        if real in seen:
+            dirs[:] = []
+            continue
+        seen.add(real)
+        dirs.sort()
+        out.extend(Path(d) / f for f in files if (Path(d) / f).is_file())
+    return out
+
+
 def describe_input(item, content: bool = False) -> dict:
     p = Path(item)
     if p.is_file():
         return dict(path=str(p), kind="file", sha256=sha256_file(p), size=p.stat().st_size)
     if p.is_dir():
-        files = sorted(x for x in p.rglob("*") if x.is_file())
+        files = sorted(_walk_files(p))
         h = hashlib.sha256()
         for x in files:
             h.update(f"{x.relative_to(p).as_posix()}|{x.stat().st_size}".encode())
