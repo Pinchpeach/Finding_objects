@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "commit": "1786aad1690afe04997f684118fd4e727b308885",
+  "branch": "ccr-68f28268-l0opfu",
+  "dirty": true,
+  "dirty_files": 1,
+  "env": {
+    "PYTHONHASHSEED": "0"
+  },
+  "effective": {
+    "POSERR_UNITS": "legacy",
+    "AMBIG_FIX": [],
+    "POSERR_NATIVE": [],
+    "ANNOT_ASSOC": [],
+    "LOWLAT_QSO": [],
+    "LOWLAT_QSO_ABSB": 20.0
+  },
+  "started_utc": "2026-11-28T02:42:35Z",
+  "finished_utc": "2026-11-28T02:42:36Z",
+  "status": "ok",
+  "inputs": [
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/real4",
+      "kind": "directory",
+      "sha256": "b738db93f077de41b8a827f3106bd749685ce1a785a95f6d054199bf16cc6cdb",
+      "n_files": 40,
+      "hashed": "relative path, size"
+    }
+  ],
+  "argv": [
+    "literature_real_use.py",
+    "--runs",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/real4",
+    "--out",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/real4_tables_fixed"
+  ],
+  "python": "3.13.18",
+  "note": "",
+  "previous": [
+    {
+      "commit": "abe6787684e3246a39fa6f4eec92cecb8cd96bf4",
+      "dirty": true,
+      "env": {},
+      "effective": {
+        "POSERR_UNITS": "legacy",
+        "AMBIG_FIX": [],
+        "POSERR_NATIVE": [],
+        "ANNOT_ASSOC": [],
+        "LOWLAT_QSO": [],
+        "LOWLAT_QSO_ABSB": 20.0
+      },
+      "started_utc": "2026-11-28T01:30:37Z",
+      "finished_utc": "2026-11-28T01:30:39Z",
+      "status": "ok",
+      "note": ""
+    }
+  ],
+  "mixed": true
+}
