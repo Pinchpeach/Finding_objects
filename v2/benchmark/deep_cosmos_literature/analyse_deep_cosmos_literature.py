@@ -110,9 +110,11 @@ def main() -> int:
         near.append(dict(field=f, kind="observed", n=len(obs), **dict(zip([f"d{lo:g}-{hi:g}" for lo, hi in zip(BINS[:-1], BINS[1:])], binned(obs)))))
         near.append(dict(field=f, kind="control", n=len(ctrl), **dict(zip([f"d{lo:g}-{hi:g}" for lo, hi in zip(BINS[:-1], BINS[1:])], binned(ctrl)))))
         truth = MA.load_truth(a.truth_flux / f"{f}.csv.gz")
-        qso = set()
+        qso = set()  # literature_variants takes the QSO objects from a classified base run, which this offline study does not have
         for v in a.variants[1:]:
             res, new = LV.compare(b, field_frame(a.runs, v, f), truth, qso)
+            # Codex review of 2.62.7: with no QSO ids the two QSO counts are 0 by construction, not a measurement: written empty
+            res["qso_objects_attached"] = res["qso_objects_total"] = None
             sep = new.separation if len(new) else pd.Series(dtype=float)
             joins.append(dict(field=f, variant=v, **res, joins_beyond_0p6_arcsec=int((sep > 0.6).sum()), joins_beyond_0p6_unknown=int(((sep > 0.6) & (new.verdict_ext == "unknown")).sum()) if len(new) else 0))
         fills.append(fill_rates(a.merged_root, f))

@@ -38,10 +38,13 @@ TABLES = [
     ("desi_external_truth", "benchmark/desi_external/truth.csv", "", "desi_targetid", "truth_class", "validate_catalog_truth.py without --split-all (the regression gate of evaluate-preprocess-coarse.yml, README's DESI test split n = 962, the fusion fit); the validation workflow scores --split all"),
     ("radio_xray_truth", "benchmark/radio_xray_truth/ground_truth.csv", "", "specobjid", "truth_class", "validate_catalog_truth.py (radio / X-ray benchmark)"),
     ("star_truth", "Classifier/star_truth.csv", "star-wd:", "specobjid", "star_truth_class", "train_validate_star_wd.py"),
-    ("lamost_star_external", "Classifier/lamost_star_external_truth.csv", "star-wd:", "external_id", "star_truth_class", "validate_star_wd_external.py (assumed the same hash)"),
+    # Not split by its consumer (Codex review of 2.62.7): validate_star_wd_external.py splits only the SDSS frame (train / calibration) and predicts the WHOLE
+    # external frame, so a split migration of this table would describe a partition that does not exist.  Kept for the coordinate-collision check only.
+    ("lamost_star_external", "Classifier/lamost_star_external_truth.csv", "star-wd:", "external_id", "star_truth_class", "validate_star_wd_external.py (not split: every row is predicted)"),
     ("wd_subtype_truth", "Classifier/wd_subtype_truth.csv", "wd-subtype:", "external_id", "wd_subtype", "train_validate_wd_subtype.py"),
 ]
 NAMES = ("train", "calibration", "test")
+UNSPLIT = {"lamost_star_external"}  # tables whose consumer does not split them: only the coordinate collisions are counted
 
 
 def split_of(keys: pd.Series, salt: str = "") -> np.ndarray:
@@ -71,6 +74,10 @@ def main() -> int:
         d = pd.read_csv(V2 / rel, low_memory=False)
         old = split_of(d.benchmark_id, salt)
         keys = {stable: d[stable], "coordinates": coord_key(d)}
+        if name in UNSPLIT:
+            k = keys["coordinates"]
+            coll.append(dict(table=name, rows=len(d), rows_sharing_a_coordinate_key=int(k.duplicated(keep=False).sum())))
+            continue
         for kname, k in keys.items():
             new = split_of(k, salt)
             ch = int((old != new).sum())

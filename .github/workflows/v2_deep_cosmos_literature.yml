@@ -99,9 +99,18 @@ jobs:
         run: |
           python -u v2/benchmark/collect_deep_cosmos_literature.py collect --out /tmp/lit --set all --fields ${{ matrix.name }}
       - name: Pack
+        # also after a failed collection (Codex review of 2.62.7): the collector writes the rows it got and a state file with ok=false, then exits non-zero;
+        # those are what the store job keeps as an unfinished field
+        if: ${{ always() }}
         run: |
-          mkdir -p out && cp -r /tmp/lit/${{ matrix.name }} out/${{ matrix.name }} && cp /tmp/lit/run_info.json out/${{ matrix.name }}/run_info.json
-          ls -la out/${{ matrix.name }}
+          mkdir -p out
+          if [ -d /tmp/lit/${{ matrix.name }} ]; then
+            cp -r /tmp/lit/${{ matrix.name }} out/${{ matrix.name }}
+            [ -f /tmp/lit/run_info.json ] && cp /tmp/lit/run_info.json out/${{ matrix.name }}/run_info.json
+            ls -la out/${{ matrix.name }}
+          else
+            echo "nothing was written for ${{ matrix.name }}"
+          fi
       - uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:

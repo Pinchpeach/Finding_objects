@@ -19,3 +19,6 @@ nothing to exempt there; that is by construction, not a measurement of safety):
 | spectroscopic QSO held (32) | 0/32 | 0/32 |
 | Chandra type 1 AGN lost (26 deep fields) | 0/123 | 0/123 |
 | primary labels changed, 26 deep fields | 199 (from QSO 34) | 199 (from QSO 34) |
+
+**Review of 2.62.7.** `decision_table.csv` was rebuilt with the merged tool, which carries 2.62.6's rule that a row whose association has no exchange table of its own leaves the four `assoc_new_joins_false_*` cells empty.  The first build put the `same_nearest` numbers in the two rows `fixed+same_nearest+surveys2` and `fixed+same_nearest+surveys2+lit_keep`, because it predates that rule.  Every other cell is unchanged.  The first nine rows are now identical to `../results_2026-11-28/decision_table.csv` cell by cell.  The tenth row differs from the ninth only in `history`, `real_labels_changed` (13 -> 2 of 4,757) and `real_use_qso_labels_ngc_cosmos_plane` (0 / 0 / 0 -> 0 / 15 / 0).
+

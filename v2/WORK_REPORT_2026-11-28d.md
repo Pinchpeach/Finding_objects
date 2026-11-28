@@ -69,7 +69,7 @@
 | `desi_external` 4,795 | `desi_targetid` | 2,642 (55.1 %) | 60.2 % | 2,646 / **0** |
 | `radio_xray_truth` 951 | `specobjid` | 539 (56.7 %) | 62.6 % | 493 / **0** |
 | `star_truth` 1,000 | `specobjid` | 572 (57.2 %) | 60.4 % | 508 / **0** |
-| `lamost_star_external` 1,000 | `external_id` | 578 (57.8 %) | 61.8 % | 489 / **0** |
+| `lamost_star_external` 1,000 | — | (빠짐: 소비 도구가 이 표를 가르지 않는다, 병합 전 검토) | — | — |
 | `wd_subtype_truth` 300 | `external_id` | 178 (59.3 %) | 60.0 % | 122 / **0** |
 
 좌표 해시를 키로 해도 같다(54.8–59.3 %). **재학습이 필요하다**: 새 test의 60 %가 옛 train이라 지금의 융합 가중치·색 참조 집합을 새 test로 재면 누설이다. 선택지 A(키만 바꿈, 56–59 % 이동, 재학습 필요), **B(현재 분할을 안정 키별로 저장해 고정, 0개 이동, 재학습 불필요, 권장)**, C(지금 + 매니페스트, 목록을 일부러 바꾸는 순간엔 보호가 없다). 실행은 사용자 결정이다.
@@ -225,3 +225,50 @@
 ## 12. 파일
 
 `.github/workflows/`: `build-reference-objects.yml`, `v2_desi_external_validation.yml`(수정), `v2_deep_cosmos_literature.yml`(새); `benchmark/`: `truth_manifest.py`, `truth_tables_manifest.json`, `build_reference_objects.py`(출력 폴더 우회), `collect_deep_cosmos_literature.py`, `merge_deep_cosmos_literature.py`, `deep_cosmos_literature/`, `split_key/`, `server_fill/`, `association_truth/`(`run_order_key_variants.sh`, `run_order_key_outside.sh`, `outside_cosmos_summary.py`, `tie_order_interaction.py`, `summarize_native_error_variants.py`·`run_variant.py` 확장, `PREDICTIONS_ORDER_KEY_2026-11-28.md`, `results_2026-11-28b/`), `lowlat_qso/`(`faint_cost.py`, `decision_table_combos.py`, `results_2026-11-28b/`), `association_ambiguity/results_2026-11-28/`(고친 `typed_close` 값); `Preprocess/`: `association_model.py`·`01_source_association.py`의 스위치, 시험 3개 파일; 문서: `WORK_REPORT_2026-11-28b.md`(3.1b, 3.2, 8, 병합 전 검토), `ALGORITHM.md`.
+
+## 병합 전 검토 (2.62.7로 병합)
+
+- **반영 방식**: 가지 끝 78e2c97은 main 1981fa2(2.62.6)를 일반 병합한 가지다. main이 조상이므로 그대로 받고 그 위에 검토 커밋을 얹었다. main 대비 diff는 139개 파일 +7,441 / −80이다. 삭제는 작업 세션이 고친 파일 안뿐이고, 2.62.6 검토 수정은 그대로 남아 있다.
+- **확인한 것**:
+  - 시험: 646개 통과(검토 수정 뒤에도 통과, 아래).
+  - 스위치를 모두 끈 Stage 1: 실사용 3개 영역(NGC 4522, COSMOS 2′, 은하면)에서 main 작업 트리와 바이트 단위로 같다. 출력에는 `_order_poserr`가 나가지 않는다(밑줄 키는 쓰지 않는다).
+  - `V2_ASSOC_ORDER_KEY=floored` 섞기 재현성: COSMOS 2′, 시드 1–2에서 객체 차이 0, 상태 변경 0(객체 3,614).
+  - 결정표 10행: 커밋된 입력에서 다시 만들면 앞 9행이 main의 9행 표와 셀 단위로 같다(아래 한 가지만 다름). 10행째(`lit_keep`)는 9행째와 `history`, 실사용 라벨 변화(13 → 2 / 4,757), 실사용 QSO 라벨(0 / 0 / 0 → 0 / 15 / 0)만 다르다.
+  - 워크플로 세 개를 읽었다. `build-reference-objects.yml`은 수동 실행만 남았다. 기본 실행은 매니페스트 확인뿐이고, 재생성은 `v2/reference_objects_regenerated/<run id>/`에만 쓴다. `v2_desi_external_validation.yml`의 기본 실행은 확인한 뒤 커밋본을 평가하고 결과 두 파일만 커밋한다. 재생성은 옆 폴더에 쓴다. `v2_deep_cosmos_literature.yml`은 수동 실행만 있고, validation-data의 `deep_cosmos_lit/<run id>/`에만 저장한다. 블라인드 묶음은 건드리지 않는다.
+- **검토에서 고친 것**:
+  - **속도**: `load()`가 행마다 `infer_poserr_arcsec`·`infer_psf_arcsec`를 순서 키 인자로 한 번 더 계산했다. 스위치를 모두 꺼도 그랬다. 한 번 계산해 넘기게 했다. NGC 4522의 Stage 1은 main 0.86 s, 고치기 전 0.93 s, 고친 뒤 0.84 s다. 출력은 세 영역에서 바이트 동일하다. 시험이 스위치를 실행 중에 바꾸므로 import 때 계산한 플래그는 쓰지 않았다.
+  - **결정표 b의 상한 열**: 이 표는 2.62.6의 "자기 교환 표가 없으면 빈칸" 규칙 전에 만들어져, 세 스위치 행과 `lit_keep` 행에 `same_nearest`의 새 연결 상한이 들어 있었다. 병합된 도구로 다시 만들었다(나머지 셀은 그대로). 기록은 `dirty: false`이고, 작업 세션의 실행은 `previous`에 남아 있다.
+- **검토 세션의 질문에 대한 답**:
+  - **분할 고정 시험**: B(현재 분할을 키별로 저장해 고정)는 설계만 있고 구현되지 않았다. 그래서 "행 순서가 바뀌어도 분할이 그대로인가"를 재는 시험은 없다.
+    - 지금 있는 것은 C(매니페스트)의 시험이다. `test_committed_truth_tables_match_the_manifest`는 커밋된 표가 바뀌면 실패한다. `test_verify_names_a_changed_value_and_a_renumbering`은 값 변경과 번호 다시 매기기를 구별해 알린다.
+    - 이것은 보호(조용히 바뀌는 것을 막음)이지 견고성이 아니다. 분할은 여전히 행 번호 `benchmark_id`의 해시에서 나온다. B를 구현할 때 "목록 순서를 섞고 새 행을 더해도 기존 객체의 분할이 그대로"인 시험을 함께 넣어야 한다.
+  - **2.60.9·2.61.0·2.61.8의 연관 수치가 같은 정의의 영향을 받는가**(한 줄씩):
+    - "거짓 AllWISE 2.08 %"(`false_pct_of_matched_known` = 틀림 / (맞음 + 틀림)): 한 실행의 수준으로는 정의대로다. 분모가 재라벨(`rightly_alone` → `correct`)에 늘어나므로 앵커를 바꾸는 변형 사이의 비교만 영향을 받는다.
+    - "놓침 13.25 %"(`missed_pct_of_expected`): 분모가 기대 짝이고, 재라벨 경로는 놓침 수를 바꾸지 않으므로 영향이 없다. 반면 `missed_pct_of_unjoined`(41.10 % 같은 값)는 분모에 `rightly_alone`이 있어 영향을 받는다.
+    - `same,nearest`의 "새 정답 연결 +46 / +32": 2.61.8 표에서 안 붙은 행 대비 놓침률이 41.10 → 39.93 %로 −1.17 %p다. 이는 46행이 `missed`에서 빠질 때의 값과 맞는다((970 − 46) / (2,361 − 46) = 39.9 %). `rightly_alone`에서 빠졌다면 오히려 올라야 한다. 그래서 대부분 실제 이득으로 보인다. 확정은 `right_object` 재계산으로 한다(검토 세션이 작업 세션에 맡긴다).
+  - **"+5.2 %" 정정**: 병합된 2.62.4 CHANGELOG 행은 고쳐 쓰지 않았다. 정정은 2.62.7 행과 28b 본문의 괄호 주석(작업 세션), `NEXT_RELEASE_DOCS.md` 5번에 있다.
+  - **2.61.0 위치 꼬리**: `WORK_REPORT_2026-11-25g.md` 끝에 "정정 (2.62.7)" 절을 붙였다(4.46 → 4.51 %, 쌍 비교 266 대 169, 앵커 목록별 꼬리).
+  - **문서의 사실 문제**: "플레이트 142 대 84"와 "검증 계획 520개 중 54개가 참조 표에 없음"을 `NEXT_RELEASE_DOCS.md` 7·8번에 올렸다. 원인 조사는 작업 세션에 맡긴다.
+- **문헌 수집 실행 시점**: 지금은 돌리지 않았다. 03:51의 점검에서 SIMBAD Strasbourg는 DALServiceError(Harvard 거울은 정상)였고 VizieR Strasbourg는 404였다. probe → 영역 하나 → 전체 순서로, CDS·NED가 정상이고 정답 동결 커밋과 WD 재실행이 끝난 뒤에 한다.
+- **결정 사항(11절)에 대한 검토 세션의 의견을 따랐다**:
+  - 번호는 PATCH(2.62.7)다.
+  - 두 워크플로의 기본을 "커밋본 검증"으로 바꾸는 것을 승인했다.
+  - 분할 키는 B 권장(구현은 사용자 결정 뒤)이다.
+  - `floored`는 묶음 MINOR에 넣지 않고 따로 잰다.
+- **Codex 검토(P2 5건, 모두 받아들여 고침)**:
+  1. **`right_object` 지표**(`summarize_native_error_variants.py`, `measure_association.py`):
+     - 무엇이 문제였나: `rightly_alone`은 "다른 객체가 짝을 갖고 있지 않은" 안 붙은 행이다. 그 행 자신의 객체도 정답 id가 없을 때까지 포함한다. 같은 행이 정답 id 없는 객체에 붙으면 `unknown`이 되므로, 앵커만 바뀌어도(구성이 같아도) `correct + rightly_alone`이 움직인다.
+     - 고침: `measure_field`가 `rightly_alone`을 `alone_identified`(자기 객체가 짝을 가짐)와 `alone_unidentified`(어느 객체도 짝을 갖지 않음)로 나눈다. `rightly_alone`은 합으로 그대로 두었다.
+     - 지표는 `right_object = correct + alone_identified`, `unidentified = unknown + alone_unidentified`다. 둘 다 앵커에 무관하다.
+     - 나누기 전의 측정 출력이면 `right_object`를 NaN으로 쓰고 재측정하라고 알린다. 시험 `test_right_object_metric.py`는 같은 구성에서 앵커만 다른 두 경우를 넣는다. 옛 합은 움직이고 새 지표는 같다.
+     - **그래서 5.3절의 `right_object` 수치(+42 / +0.44 %, `floored` +129)는 잠정값이다.** 작업 세션이 고친 `measure_association.py`로 다시 재야 한다(26개 영역의 측정 출력은 이 세션에 없다). "+5.2 %의 대부분이 재라벨"이라는 방향은 `rightly_alone` −336 / `correct` +378에서 나오므로 그대로다.
+  2. **`v2_deep_cosmos_literature.yml`**: 수집기가 실패하면(`ok=false`, 종료 코드 1) Pack 단계가 건너뛰어져 부분 결과가 사라졌다. Pack을 `always()`로 돌리고, 폴더가 있을 때만 복사한다.
+  3. **`run_variant.py`**: `--field-glob '*'`가 `collection_state.json` 같은 최상위 파일까지 영역으로 잡았다. `raw/` 폴더가 있는 디렉터리만 영역으로 본다.
+  4. **`analyse_deep_cosmos_literature.py`**: QSO id를 넘기지 않아 `qso_objects_*`가 늘 0이었다. 이 오프라인 분석에는 분류된 기준 실행이 없으므로 측정이 아니라는 뜻으로 빈칸을 쓴다.
+  5. **`test_truth_manifest.py`**: 결정성 시험이 커밋된 매니페스트와 전체를 비교해, 짝 특징 파일의 SHA-256까지 요구했다. 그래서 설계가 허용하는 특징 갱신(`recollect-ps1-features`, `augment-ls-columns`)이 시험을 깨뜨렸다. 이제 짝 폴더는 기본 `verify`처럼 파일 이름으로 비교한다.
+- **Codex 재검토(P2 2건 더, 받아들여 고침)**:
+  1. **`right_object` 두 번째 구멍**: 섞인(blended) AllWISE 행 문제다. 자기 객체와 다른 객체가 모두 받아들일 수 있는 짝을 가지면, 안 붙은 행은 `missed`(다른 보유 객체가 있으므로)로 세어져 `alone_identified`에 닿지 않았다. 같은 행이 붙으면 `correct`다.
+     - 고침: 안 붙은 행은 이제 missed / alone 판정과 따로, **붙은 행과 같은 시험을 자기 객체에** 적용한다. 자기 객체의 정답 id가 받아들일 수 있는 짝을 포함하면 `alone_identified`, 다른 id만 있으면 `alone_wrong`, id가 없으면 `alone_unidentified`다.
+     - 그래서 `right_object = correct + alone_identified`, `wrong_object = false + alone_wrong`, `unidentified = unknown + alone_unidentified`가 모든 행을 나누고, 앵커만 바뀌면 셋 다 움직이지 않는다. 시험에 섞인 행 경우를 더했다.
+  2. **분할 키 연구의 `lamost_star_external`**: `validate_star_wd_external.py`는 SDSS 표만 가르고 외부 표는 전부 예측한다. 그래서 이 표의 "분할 이동"은 존재하지 않는 분할을 잰 것이다. 표에서 빼고(`UNSPLIT`, 좌표 충돌 점검만 남김) 결과를 다시 만들었다. 나머지 다섯 표의 범위는 바뀌지 않는다(바뀌는 객체 55.1–59.3 %, 새 test 중 옛 train 57.8–62.6 %).
+

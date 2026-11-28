@@ -44,10 +44,20 @@ def test_manifest_and_registry_list_the_same_tables_and_files():
     assert sorted(set(rows)) == list(range(1, 12)), "the 11 rows of the survey table of 2026-11-28 must all be covered"
 
 
+def _paired_by_names(m: dict) -> dict:
+    """The manifest as the default ``verify(paired="names")`` reads it: the paired feature directories by their file names only.  The features are refreshed on
+    purpose by other workflows (``recollect-ps1-features``, ``augment-ls-columns``), so their SHA-256 must not fail the repository's tests (Codex review of 2.62.7)."""
+    m = json.loads(json.dumps(m))
+    for t in m["tables"].values():
+        t["paired"] = [dict(path=d["path"], names=sorted(f["path"] for f in d["files"])) for d in t["paired"]]
+    return m
+
+
 def test_build_is_deterministic_and_has_no_clock():
     a, b = TM.dumps(TM.build()), TM.dumps(TM.build())
     assert a == b
-    assert a == TM.MANIFEST.read_text()  # the file is exactly what `build` writes
+    # the committed file is what `build` writes, up to the content of the paired feature files (their names are compared)
+    assert _paired_by_names(json.loads(a)) == _paired_by_names(json.loads(TM.MANIFEST.read_text()))
 
 
 def test_verify_names_a_changed_value_and_a_renumbering(tmp_path):
