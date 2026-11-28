@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "commit": "843dab9a0d5a7f7bb1c7ffb9be786b0a76fdf0e7",
+  "branch": "ccr-68f28268-l0opfu",
+  "dirty": true,
+  "dirty_files": 1,
+  "env": {},
+  "effective": {
+    "POSERR_UNITS": "legacy",
+    "AMBIG_FIX": [],
+    "POSERR_NATIVE": [],
+    "ANNOT_ASSOC": [],
+    "LOWLAT_QSO": [],
+    "LOWLAT_QSO_ABSB": 20.0
+  },
+  "started_utc": "2026-11-28T08:09:41Z",
+  "finished_utc": "2026-11-28T08:09:42Z",
+  "status": "ok",
+  "inputs": [
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/pos_r",
+      "kind": "directory",
+      "sha256": "9a158640ef76ec437c532e7a31c92edbe6f27e865bdec6f5b22d5035afa35d4b",
+      "n_files": 36,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/a4/truth_flux_635",
+      "kind": "directory",
+      "sha256": "9d8d88ffadc77011e44e82be5ff6e8af0ccf1683d4b5a0fed349036e14d4daa9",
+      "n_files": 26,
+      "hashed": "relative path, size"
+    }
+  ],
+  "argv": [
+    "/home/user/Finding_objects/v2/benchmark/object_position/measure_object_position.py",
+    "--runs",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/pos_r",
+    "--truth-flux",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/a4/truth_flux_635",
+    "--out",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/pos_r",
+    "--stage",
+    "aggregate"
+  ],
+  "python": "3.13.18",
+  "note": "",
+  "previous": [
+    {
+      "commit": "843dab9a0d5a7f7bb1c7ffb9be786b0a76fdf0e7",
+      "dirty": true,
+      "env": {
+        "PYTHONHASHSEED": "0",
+        "V2_CACHE": "0"
+      },
+      "effective": {
+        "POSERR_UNITS": "legacy",
+        "AMBIG_FIX": [],
+        "POSERR_NATIVE": [],
+        "ANNOT_ASSOC": [],
+        "LOWLAT_QSO": [],
+        "LOWLAT_QSO_ABSB": 20.0
+      },
+      "started_utc": "2026-11-28T08:09:23Z",
+      "finished_utc": "2026-11-28T08:09:31Z",
+      "status": "ok",
+      "note": ""
+    }
+  ],
+  "mixed": true
+}

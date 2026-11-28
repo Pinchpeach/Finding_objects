@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "commit": "843dab9a0d5a7f7bb1c7ffb9be786b0a76fdf0e7",
+  "branch": "ccr-68f28268-l0opfu",
+  "dirty": true,
+  "dirty_files": 1,
+  "env": {},
+  "effective": {
+    "POSERR_UNITS": "legacy",
+    "AMBIG_FIX": [],
+    "POSERR_NATIVE": [],
+    "ANNOT_ASSOC": [],
+    "LOWLAT_QSO": [],
+    "LOWLAT_QSO_ABSB": 20.0
+  },
+  "started_utc": "2026-11-28T08:09:44Z",
+  "finished_utc": "2026-11-28T08:09:44Z",
+  "status": "ok",
+  "inputs": [
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/pos_r/labels_anchor.csv.gz",
+      "kind": "file",
+      "sha256": "165d83a6c1a5b06e6a0828b02f9d19c63ff9f3c9623dc4df79833485868296a3",
+      "size": 631476
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/pos_r/labels_best.csv.gz",
+      "kind": "file",
+      "sha256": "b68b008f876350ba29952dc8b915257cbee89b01bb160cb14244bb38d05dec1b",
+      "size": 627291
+    }
+  ],
+  "argv": [
+    "/home/user/Finding_objects/v2/benchmark/object_position/../association_truth/rescore_labels.py",
+    "--pairs",
+    "best_vs_anchor=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/pos_r/labels_anchor.csv.gz:/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/pos_r/labels_best.csv.gz",
+    "--out",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/pos_r/rescore_split_9_17.csv",
+    "--fields-split",
+    "/home/user/Finding_objects/v2/benchmark/object_position/fields_split_9_17.csv"
+  ],
+  "python": "3.13.18",
+  "note": "rescore_labels"
+}

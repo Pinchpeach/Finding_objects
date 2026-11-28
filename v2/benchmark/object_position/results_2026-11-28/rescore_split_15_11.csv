@@ -1,0 +1,13 @@
+comparison,half,reading,truth_sources,correct_base,correct_variant,broken,fixed,net,mcnemar_p,labels_changed,lost_every_object_within_0p5,gained_object_within_0p5
+best_vs_anchor,calibration,pick,35894,34156,34544,11,399,388,0.0,417.0,,
+best_vs_anchor,calibration,exists,35894,32422,34036,21,1635,1614,0.0,,23.0,1648.0
+best_vs_anchor,calibration,every,35894,32391,34005,23,1637,1614,0.0,,,
+best_vs_anchor,calibration,exists_both_near,33562,32401,32404,0,3,3,0.25,,,
+best_vs_anchor,test,pick,26079,24822,25095,7,280,273,0.0,290.0,,
+best_vs_anchor,test,exists,26079,23626,24692,20,1086,1066,0.0,,19.0,1093.0
+best_vs_anchor,test,every,26079,23601,24673,19,1091,1072,0.0,,,
+best_vs_anchor,test,exists_both_near,24453,23607,23606,1,0,-1,1.0,,,
+best_vs_anchor,all,pick,61973,58978,59639,18,679,661,0.0,707.0,,
+best_vs_anchor,all,exists,61973,56048,58728,41,2721,2680,0.0,,42.0,2741.0
+best_vs_anchor,all,every,61973,55992,58678,42,2728,2686,0.0,,,
+best_vs_anchor,all,exists_both_near,58015,56008,56010,1,3,2,0.625,,,
