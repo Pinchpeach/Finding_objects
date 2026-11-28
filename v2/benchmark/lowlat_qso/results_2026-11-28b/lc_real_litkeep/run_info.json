@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "commit": "6e36e52cc2a12e63f7d0743b7621b4ef9777c585",
+  "branch": "ccr-68f28268-l0opfu",
+  "dirty": true,
+  "dirty_files": 1,
+  "env": {
+    "PYTHONHASHSEED": "0",
+    "V2_CACHE": "0"
+  },
+  "effective": {
+    "POSERR_UNITS": "legacy",
+    "AMBIG_FIX": [],
+    "POSERR_NATIVE": [],
+    "ANNOT_ASSOC": [],
+    "LOWLAT_QSO": [],
+    "LOWLAT_QSO_ABSB": 20.0
+  },
+  "started_utc": "2026-11-28T03:13:25Z",
+  "finished_utc": "2026-11-28T03:13:26Z",
+  "status": "ok",
+  "inputs": [
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/real4/run_base",
+      "kind": "directory",
+      "sha256": "04307dffe257799230f338d174fb2c36aee6a6b0ca04e072db05d8690a01232c",
+      "n_files": 3,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/real4/run_fixed_sns2_litkeep",
+      "kind": "directory",
+      "sha256": "ba7700f809c3300834a3ad7ac3f13dcf20bc925e01b51336a38965c42abb2e08",
+      "n_files": 3,
+      "hashed": "relative path, size"
+    }
+  ],
+  "argv": [
+    "../association_ambiguity/label_changes.py",
+    "--base",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/real4/run_base",
+    "--variant",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/real4/run_fixed_sns2_litkeep",
+    "--fields",
+    "ngc,cosmos,plane",
+    "--out",
+    "results_2026-11-28b/lc_real_litkeep"
+  ],
+  "python": "3.13.18",
+  "note": ""
+}

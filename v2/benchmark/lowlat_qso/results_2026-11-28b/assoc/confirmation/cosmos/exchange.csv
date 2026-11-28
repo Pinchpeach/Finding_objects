@@ -1,0 +1,10 @@
+variant,catalog,newly_joined,new_correct,new_false,new_unknown,unjoined_now,lost_correct,lost_false,lost_unknown,net_correct,net_false
+same_nearest,AllWISE,46,46,0,0,0,0,0,0,46,0
+same_nearest,2MASS PSC,3,2,0,1,0,0,0,0,2,0
+same_nearest,GALEX AIS,49,37,0,8,6,5,0,0,32,0
+all,AllWISE,47,47,0,0,6,6,0,0,41,0
+all,2MASS PSC,3,2,0,1,0,0,0,0,2,0
+all,GALEX AIS,48,35,0,8,7,6,0,0,29,0
+best,AllWISE,261,208,5,47,0,0,0,0,208,5
+best,2MASS PSC,4,2,0,1,0,0,0,0,2,0
+best,GALEX AIS,201,111,13,49,2,1,0,0,110,13

@@ -1,0 +1,3 @@
+field,ra,dec,r,cls_b,cls_v,catalogs_b,catalogs_v,object_b,object_v,changed,n_catalogs_b,n_catalogs_v
+cosmos,150.09051,2.24416,,QSO,UNKNOWN,NED|SIMBAD,NED|SIMBAD,OBJ001195,OBJ001193,True,2,2
+cosmos,150.1029788596125,2.2704456922211924,,UNKNOWN,GALAXY,Pan-STARRS1 DR2 MeanObject,DESI Legacy Surveys DR10|GALEX AIS|NED|Pan-STARRS1 DR2 MeanObject|SIMBAD,OBJ000156,OBJ000156,True,1,5

@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "commit": "6e36e52cc2a12e63f7d0743b7621b4ef9777c585",
+  "branch": "ccr-68f28268-l0opfu",
+  "dirty": true,
+  "dirty_files": 1,
+  "env": {
+    "PYTHONHASHSEED": "0",
+    "V2_CACHE": "0"
+  },
+  "effective": {
+    "POSERR_UNITS": "legacy",
+    "AMBIG_FIX": [],
+    "POSERR_NATIVE": [],
+    "ANNOT_ASSOC": [],
+    "LOWLAT_QSO": [],
+    "LOWLAT_QSO_ABSB": 20.0
+  },
+  "started_utc": "2026-11-28T03:11:40Z",
+  "finished_utc": "2026-11-28T03:11:41Z",
+  "status": "ok",
+  "inputs": [
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/b_fixed_sn_base",
+      "kind": "directory",
+      "sha256": "fe1a056703d84d5e9ebf2f0be085f5bfcd1d29e9fd3fd6304e8bb1458f4ac3b5",
+      "n_files": 61,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/b_fixed_sn_surveys2_litkeep",
+      "kind": "directory",
+      "sha256": "88c8ed431661f1cdf31f8f8fa506da9ac5a2acbb3807741118367d4764978823",
+      "n_files": 61,
+      "hashed": "relative path, size"
+    }
+  ],
+  "argv": [
+    "spectro_held.py",
+    "--base",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/b_fixed_sn_base",
+    "--variants",
+    "surveys2=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/b_fixed_sn_surveys2_litkeep",
+    "--out",
+    "results_2026-11-28b/inputs/held_b_fixed_same_nearest_litkeep.csv"
+  ],
+  "python": "3.13.18",
+  "note": ""
+}
