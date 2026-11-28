@@ -136,6 +136,34 @@ POSERR_UNITS = os.environ.get("V2_POSERR_UNITS", "legacy").strip().lower()
 if POSERR_UNITS not in ("fixed", "legacy"):
     raise ValueError(f"V2_POSERR_UNITS: unknown value {POSERR_UNITS!r}; known: 'fixed', 'legacy'")
 
+# ---------------------------------------------------------------------------------------------------------------------
+# Position errors a catalogue states itself (2.63.3; both switches are off by default and change nothing unless given).
+#   V2_POSERR_NATIVE=allwise      AllWISE ``eeMaj`` as the position error.  VizieR II/328 ReadMe: "arcsec eeMaj Semi-major axis of the error ellipse (1)" with
+#                                 note (1) "the parameters of the error ellipse are computed from the 1-sigma in RA and Dec (sigra, sigdec) and the co-sigma
+#                                 sigradec": a 1-sigma semi-axis in arcsec (CfA mirror of the CDS ReadMe, read 2026-11-28).  The PSF/6 floor of
+#                                 ``effective_sigma_arcsec`` (6.1''/6 = 1.02'') stays, so this changes a row only when eeMaj exceeds the floor.
+#   V2_POSERR_NATIVE=allwise_raw  the same, and the PSF/6 floor is dropped for AllWISE rows (sigma = eeMaj, at least 0.02'')
+#   V2_POSERR_NATIVE=galex        GALEX ``Nerr`` (``Ferr`` when the NUV one is missing) as the position error.  VizieR II/335 ReadMe: "arcsec Nerr Position
+#                                 error of the source in the NUV image (nuv_poserr)"; whether it is 1-sigma is not stated in the ReadMe or in Bianchi et al.
+#                                 2017 (arXiv:1704.05903).  The PSF/6 floor (5.3''/6 = 0.88'') stays.
+# Why the floor matters: benchmark/association_ambiguity/PREDICTIONS_LITERATURE_2026-11-28.md and WORK_REPORT_2026-11-28b.md.
+#   V2_ANNOT_ASSOC (NED / SIMBAD rows only; read by 01_source_association): density, typed_close, err.  ``err`` reads SIMBAD ``coo_err_maj`` (mas,
+#   see ``infer_poserr_arcsec``).
+POSERR_NATIVE_OPTIONS = frozenset({"allwise", "allwise_raw", "galex"})
+ANNOT_ASSOC_OPTIONS = frozenset({"density", "typed_close", "err"})
+
+
+def _parse_switch(name: str, options: frozenset[str]) -> frozenset[str]:
+    words = frozenset(w.strip().lower() for w in os.environ.get(name, "").split(",") if w.strip())
+    bad = words - options
+    if bad:
+        raise ValueError(f"{name}: unknown option(s) {sorted(bad)}; known: {sorted(options)}")
+    return words
+
+
+POSERR_NATIVE = _parse_switch("V2_POSERR_NATIVE", POSERR_NATIVE_OPTIONS)
+ANNOT_ASSOC = _parse_switch("V2_ANNOT_ASSOC", ANNOT_ASSOC_OPTIONS)
+
 # Catalogues that have no entry in PROFILES and so are assumed to have 0.6'' position errors (DEFAULT_PROFILE).  Used only with
 # ``profiles``; the evidence for every number is in LITERATURE_ASSOCIATION_AMBIGUITY_2026-11-27.md.
 #   SDSS imaging: 45 mas rms per coordinate for r < ~20 point sources and ~100 mas at the survey limit, photon-statistics
@@ -381,6 +409,23 @@ def infer_poserr_arcsec(catalog: str, row: Mapping[str, Any]) -> float:
     if explicit is not None and explicit > 0:
         return explicit
 
+    if POSERR_NATIVE:
+        if catalog == "AllWISE" and POSERR_NATIVE & {"allwise", "allwise_raw"}:
+            e = _first(row, ("eemaj",))
+            if e is not None and e > 0:
+                return e
+        if catalog == "GALEX AIS" and "galex" in POSERR_NATIVE:
+            e = _first(row, ("nerr",))
+            if e is None or e <= 0:
+                e = _first(row, ("ferr",))
+            if e is not None and e > 0:
+                return e
+    if "err" in ANNOT_ASSOC and catalog == "SIMBAD":
+        # SIMBAD ``basic.coo_err_maj`` is in mas (the stored COSMOS values run 0.024-1050; read as arcsec they would be 1000'').
+        e = _first(row, ("coo_err_maj",))
+        if e is not None and e > 0:
+            return e / 1000.0
+
     if "profiles" in AMBIG_FIX:
         extra = _extra_poserr(catalog, row)
         if extra is not None:
@@ -491,7 +536,7 @@ def effective_sigma_arcsec(det: Mapping[str, Any], target_epoch: float | None = 
     psf = num(det.get("psf_fwhm_arcsec"))
     # PSF/6 is a conservative centroiding floor; it is not interpreted as a
     # formal astrometric uncertainty.
-    if psf is not None:
+    if psf is not None and not (det.get("catalog") == "AllWISE" and "allwise_raw" in POSERR_NATIVE):
         pos = max(pos, psf / 6.0)
     epoch = num(det.get("ref_epoch"))
     if target_epoch is not None and epoch is not None:
