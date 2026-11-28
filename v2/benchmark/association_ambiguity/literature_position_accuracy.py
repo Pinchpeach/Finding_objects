@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""How precise are the NED / SIMBAD positions in a deep field?  Offset of every literature row to the nearest COSMOS2020 source (2.62.6).
+"""How precise are the NED / SIMBAD positions in a deep field?  Offset of every literature row to the nearest COSMOS2020 source (2.62.4).
 
     python literature_position_accuracy.py --raw RAWDIR --truth TRUTH.csv.gz --out OUT
 

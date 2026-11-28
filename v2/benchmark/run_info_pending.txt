@@ -1,4 +1,4 @@
-# Tools with an --out argument that do not yet write run_info.json (benchmark/run_info.py).  Written 2026-11-28 (2.62.7) from the tools of the
+# Tools with an --out argument that do not yet write run_info.json (benchmark/run_info.py).  Written 2026-11-28 (2.62.6) from the tools of the
 # decision-table studies (benchmark/lowlat_qso, association_ambiguity, association_truth, position_errors) being connected: what is left here are the
 # truth-list builders, model training / validation tools and older benchmarks.  A new tool is NOT added to this list: it writes run_info.json
 # (tests/test_run_info.py fails for a tool with --out that is neither connected nor listed here).  Remove a line when its tool is connected.

@@ -1,6 +1,6 @@
 # 작업 보고서 2026-11-28c — 무효 수치 재측정, 세 스위치를 함께 켠 행, run_info.json, 조각 규칙·순서 규칙의 고침/깨짐 재채점
 
-버전 제안 **2.62.7 (PATCH)**: 코드는 측정 도구(`run_info.py`와 연결, `rescore_labels.py`, `real_use_counts.py`)와 채점 열 추가(`regroup.score_accuracy`: 기존 열은 그대로)뿐이고, 파이프라인의 분류 결과는 바뀌지 않는다. 번호는 main 2.62.3 위에 이어 붙인 것이다(타 2.62.4, 파 2.62.5, 하 2.62.6).
+버전 제안 **2.62.6 (PATCH)**: 코드는 측정 도구(`run_info.py`와 연결, `rescore_labels.py`, `real_use_counts.py`)와 채점 열 추가(`regroup.score_accuracy`: 기존 열은 그대로)뿐이고, 파이프라인의 분류 결과는 바뀌지 않는다. 번호는 main 2.62.3 위에 이어 붙인 것이다(타 2.62.4, 파 2.62.5, 하 2.62.6).
 
 ## 0. 내가 이해한 요청
 
@@ -47,7 +47,7 @@ main은 d7252f7(차·카, PR #96)과 0fae3c7(PR #97, 2.62.3)로 가 있었다. �
 | 전파 플럭스 열만 바뀐 객체 | 48 | 50 |
 | 전파가 앵커인 객체(광학 행 보유) | 116 → 55 | 116 → 55 (그대로) |
 
-라벨 변화가 28에서 27로 줄어든 것은 검토 세션의 예상("라벨 변화는 영향 없음")과 다르다: 같은 구성의 객체도 이제 전부 짝지어 비교하므로 짝짓기가 한 개 바뀌었다. 보고서 i, `ALGORITHM.md`, `association_model.py`의 주석을 27로 고쳤고(이미 병합된 CHANGELOG 행은 고쳐 쓰지 않고 2.62.7 행에서 정정을 밝힌다), 결과 폴더 `position_errors/results_2026-11-27h/compare`·`summary`를 새 값으로 교체했다(`run_info.json` 포함).
+라벨 변화가 28에서 27로 줄어든 것은 검토 세션의 예상("라벨 변화는 영향 없음")과 다르다: 같은 구성의 객체도 이제 전부 짝지어 비교하므로 짝짓기가 한 개 바뀌었다. 보고서 i, `ALGORITHM.md`, `association_model.py`의 주석을 27로 고쳤고(이미 병합된 CHANGELOG 행은 고쳐 쓰지 않고 2.62.6 행에서 정정을 밝힌다), 결과 폴더 `position_errors/results_2026-11-27h/compare`·`summary`를 새 값으로 교체했다(`run_info.json` 포함).
 
 ## 4. (b) `fixed` + `same,nearest` + `surveys2`를 함께 켠 행
 

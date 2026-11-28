@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The literature switches on the three real-use fields (NGC 4522, COSMOS 2', Galactic plane): counts and label changes against the base run (2.62.6).
+"""The literature switches on the three real-use fields (NGC 4522, COSMOS 2', Galactic plane): counts and label changes against the base run (2.62.4).
 
     python literature_real_use.py --runs DIR --out OUT
 

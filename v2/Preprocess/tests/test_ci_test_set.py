@@ -49,6 +49,26 @@ def test_the_workflow_runs_from_v2_like_the_local_command():
     assert "working-directory: v2" in step.split("- name:")[0]  # tests such as test_host_groups depend on the working directory
 
 
+def test_every_pull_request_runs_the_tests():
+    """2.62.5: the pull_request trigger has no path filter.  As a required check, a run that a filter skipped never reports and blocks the PR."""
+    lines = WORKFLOW.read_text(encoding="utf-8").splitlines()
+    start = lines.index("on:")
+    block = []
+    for line in lines[start + 1:]:
+        if line and not line.startswith(" "):
+            break
+        block.append(line)
+    pr = [i for i, line in enumerate(block) if line.strip() == "pull_request:"]
+    assert pr, "unit-tests.yml no longer runs on pull_request"
+    after = block[pr[0] + 1:]
+    nested = []
+    for line in after:
+        if line.startswith("  ") and not line.startswith("    "):
+            break
+        nested.append(line.strip())
+    assert not any(s.startswith(("paths", "paths-ignore", "branches")) for s in nested), nested
+
+
 def test_every_tests_folder_of_v2_is_in_that_set():
     """A new folder of tests that nobody adds to CLAUDE.md and the workflow would run nowhere."""
     found = {str(p.parent.relative_to(V2)) for p in V2.rglob("test_*.py") if p.parent.name == "tests" and "__pycache__" not in p.parts}

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fixed / broken labels of an association variant against the base, counted over EVERY truth object that has a matched object (2.61.10).
+"""Fixed / broken labels of an association variant against the base, counted over EVERY truth object that has a matched object (2.62.2).
 
     python recount_fixed_broken.py --deep DIR [DIR ...] --names calibration confirmation --fields fields_all26.csv --base base --variant same_nearest --out OUT
 
@@ -69,7 +69,7 @@ def count_part(deep: Path, base: str, variant: str, fields: list[str], radius: f
                         for j in ww:
                             x = dd.iloc[j]
                             sep = float(np.hypot(*(_xy([x.ra], [x.dec], ra0, dec0)[0] - q[k])))
-                            listing.append(dict(field=f, truth=row.truth, ra=row.ra, dec=row.dec, run=tg, object_id=x.object_id, sep_arcsec=round(sep, 2),
+                            listing.append(dict(field=f, truth=row.truth, ra=row.ra, dec=row.dec, has_ls_r=bool(row.has_r), run=tg, object_id=x.object_id, sep_arcsec=round(sep, 2),
                                                 primary_class=x.primary_class, status=x.classification_status, catalogs=x.catalogs))  # fmt: skip
         g_idx = g.index
         m.loc[g_idx, "n_b"], m.loc[g_idx, "any_b"] = present[(f, "b")]

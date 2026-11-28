@@ -59,13 +59,13 @@ ENV = {  # variant -> environment
     "surveys3": {"V2_LOWLAT_QSO": "surveys3"},
     "wise_second": {"V2_LOWLAT_QSO": "wise_second"},
     "surveys2_wise_second": {"V2_LOWLAT_QSO": "surveys2,wise_second"},
-    # 2.61.10: the survey-count switches on top of the association rules of 2.61.8 (V2_ASSOC_AMBIG=same,nearest), see decision_table.py.
-    # V2_POSERR_UNITS=legacy: the base runs of this table were made before the unit fix of the position errors (2.62.0); the combinations
+    # 2.62.2: the survey-count switches on top of the association rules of 2.61.8 (V2_ASSOC_AMBIG=same,nearest), see decision_table.py.
+    # V2_POSERR_UNITS=legacy: the base runs of this table were made before the unit fix of the position errors (2.62.2); the combinations
     # are measured against them with the same reading of the VLASS / NVSS errors, so the only difference is the switches under study.
     "same_nearest": {"V2_ASSOC_AMBIG": "same,nearest", "V2_POSERR_UNITS": "legacy"},
     "same_nearest_surveys2": {"V2_ASSOC_AMBIG": "same,nearest", "V2_LOWLAT_QSO": "surveys2", "V2_POSERR_UNITS": "legacy"},
     "same_nearest_surveys3": {"V2_ASSOC_AMBIG": "same,nearest", "V2_LOWLAT_QSO": "surveys3", "V2_POSERR_UNITS": "legacy"},
-    # 2.62.7: the three switches together (the order of 2026-11-28, task b): the fixed units, the association rules and the survey-count switch; fixed had not been
+    # 2.62.6: the three switches together (the order of 2026-11-28, task b): the fixed units, the association rules and the survey-count switch; fixed had not been
     # measured together with the other two
     "fixed_same_nearest_surveys2": {"V2_POSERR_UNITS": "fixed", "V2_ASSOC_AMBIG": "same,nearest", "V2_LOWLAT_QSO": "surveys2"},
 }

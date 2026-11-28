@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The full pipeline on the regions whose position errors change, once per V2_POSERR_UNITS mode (2.62.0).
+"""The full pipeline on the regions whose position errors change, once per V2_POSERR_UNITS mode (2.62.2).
 
     python run_pe.py --regions results_2026-11-27h/regions_changed.csv --out DIR --roots raw=ROOT ll_run=ROOT ll_conf=ROOT B1=ROOT \\
         --modes legacy,fixed [--jobs 4]

@@ -1,4 +1,4 @@
-"""The three readings of a truth source's label (regroup.score_accuracy) and their comparison (rescore_labels), 2.62.7.
+"""The three readings of a truth source's label (regroup.score_accuracy) and their comparison (rescore_labels), 2.62.6.
 
 ``pick``  the class of the one object with the most catalogues within 1.5'' (the old reading); ``exists``  an object within 0.5'' has the truth class;
 ``every``  all objects within 0.5'' have it.  A rule that groups a fragment under its parent changes which object is the pick but not what is within 0.5''.

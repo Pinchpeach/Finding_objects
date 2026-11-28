@@ -1,4 +1,4 @@
-# results_2026-11-28: the decision table with the exchange columns re-measured and the three switches together (2.62.7)
+# results_2026-11-28: the decision table with the exchange columns re-measured and the three switches together (2.62.6)
 
 `decision_table.csv` replaces `../results_2026-11-27h/decision_table.csv`: the same columns, one more row (`fixed+same_nearest+surveys2`) and 12 cells different.  The 12 cells are the four exchange columns
 (`lowlat_{conf,cal}_{removed,added}_vs_base_per_deg2`) of the rows `same_nearest`, `same_nearest+surveys2` and `same_nearest+surveys2+spectro_keep`: the 2.62.2 table passed a table with one row per object id

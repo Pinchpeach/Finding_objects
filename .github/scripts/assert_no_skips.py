@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail a test run that skipped a test or lost a whole test folder (2.63.1).
+"""Fail a test run that skipped a test or lost a whole test folder (2.62.4).
 
     python assert_no_skips.py unit-tests.xml --require Preprocess.tests Classifier.tests app.tests
 

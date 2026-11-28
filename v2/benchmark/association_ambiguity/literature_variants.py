@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""What the V2_ANNOT_ASSOC variants change for the literature (NED / SIMBAD) rows of one field, judged against COSMOS2020 (2.62.6).
+"""What the V2_ANNOT_ASSOC variants change for the literature (NED / SIMBAD) rows of one field, judged against COSMOS2020 (2.62.4).
 
     python literature_variants.py --truth TRUTH.csv.gz --base DIR --variants name=DIR [name=DIR ...] --out OUT [--classified-base CSV]
 

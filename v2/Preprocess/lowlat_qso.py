@@ -21,7 +21,7 @@ Gaia row pass the cut), and that the AllWISE colour rules are applied where the 
   spectro_keep          (2.61.5) an object whose pipeline spectral class is QSO (a SPC-SDSS-003, SPC-DESI-003 or SPC-LAMOST-003
                         reading, raw score >= 0.5) is never held back by ``surveys2`` / ``surveys3`` / ``pm``: a spectrum is
                         a direct measurement of the class, and a blind benchmark (no spectra) is not affected by this switch
-  lit_keep              (2.62.6) an object whose class QSO rests on a NED or SIMBAD physical type (NED-TYPE-001 / SIMBAD-TYPE-001 reading
+  lit_keep              (2.62.4) an object whose class QSO rests on a NED or SIMBAD physical type (NED-TYPE-001 / SIMBAD-TYPE-001 reading
                         QSO, raw score >= 0.5) is never held back: the literature type is an identification by someone who looked at the
                         object, not a photometric colour cut, and an object that only NED / SIMBAD list has no survey to count (COSMOS 2',
                         benchmark/association_ambiguity: 2,544 of 3,572 objects, 16 QSO labels, all held by ``surveys2``).  A blind

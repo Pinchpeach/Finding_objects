@@ -702,7 +702,7 @@ def run(evidence, out, model_path=MODEL_PATH, min_confidence=None, field_prior=F
     lowlat_hold = LOWLAT.hold_details(df)
     if LOWLAT.spectro_keep():  # 2.61.5: a spectral class QSO is not held back (V2_LOWLAT_QSO=spectro_keep)
         lowlat_hold = LOWLAT.exempt_spectroscopic(lowlat_hold, [_spectroscopic_qso(items) for items in item_lists])
-    if LOWLAT.lit_keep():  # 2.62.6: a NED / SIMBAD physical type QSO is not held back (V2_LOWLAT_QSO=lit_keep)
+    if LOWLAT.lit_keep():  # 2.62.4: a NED / SIMBAD physical type QSO is not held back (V2_LOWLAT_QSO=lit_keep)
         lowlat_hold = LOWLAT.exempt_literature(lowlat_hold, [_literature_qso(items) for items in item_lists])
     ll_held = np.array([bool(x) for x in lowlat_hold], dtype=bool)
     # Bright clean 2MASS point sources (2.41.0, nir_star.py): where the

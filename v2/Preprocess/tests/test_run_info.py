@@ -1,4 +1,4 @@
-"""``benchmark/run_info.py``: every result directory says what it was made with (2.62.7).
+"""``benchmark/run_info.py``: every result directory says what it was made with (2.62.6).
 
 The decision table of 2.62.2 could not be shown to have run with ``V2_POSERR_UNITS=legacy`` from its result files.  ``run_info.json`` records the commit, the
 V2_* environment, what the code READS in that environment (defaults included), the UTC times, the status and the SHA-256 of the inputs.

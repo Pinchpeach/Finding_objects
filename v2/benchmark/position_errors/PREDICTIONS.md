@@ -1,4 +1,4 @@
-# Predictions written before any pipeline output of this study was looked at (2.62.0, work order "카")
+# Predictions written before any pipeline output of this study was looked at (2.62.2, work order "카")
 
 Written 2026-11-27, **committed before the first Stage-1 / pipeline run of the position-error study** (see `git log` order: this file and
 the switch `V2_POSERR_UNITS` first, results later).  What was looked at before writing it: the raw VizieR rows (column names and value ranges, to find the units; `UNITS.md`), the code that reads them
@@ -47,7 +47,7 @@ So at most 143 of the 384 VLASS rows (37 %) have an optical row within 1'' to jo
    candidates use NVSS + TGSS) 0-2 changes; `extragalactic_class` / `subclass` (they read Gaia AGN evidence and the primary label) 0-10 changes, none
    outside those objects.
 5. **Default.**  Because the default behaviour changes (the anchor and the position of ~100 objects, a few joins, possibly a few labels) this is a MINOR candidate
-   (2.62.0), with `V2_POSERR_UNITS=legacy` as the way back.
+   (the MINOR that makes `fixed` the default; 2.62.2 merged the switch with `legacy` as the default), with `V2_POSERR_UNITS=legacy` as the way back.
 
 ## What would show these wrong
 

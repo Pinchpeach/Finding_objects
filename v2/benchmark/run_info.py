@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""``run_info.json``: what a result directory was made with (2.62.7).
+"""``run_info.json``: what a result directory was made with (2.62.6).
 
 Why: the decision table of 2.62.2 could not be shown to have run with ``V2_POSERR_UNITS=legacy`` from its result files; the switch was in the shell that
 started the runs, nowhere in the outputs.  Every directory a measurement tool writes gets a ``run_info.json`` (a file result gets ``<stem>.run_info.json`` next to it)
