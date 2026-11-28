@@ -43,11 +43,18 @@ def raw_folders(kind: str, root: Path, fields: Path | None) -> list[tuple[str, P
     raise ValueError(kind)
 
 
+def worker_env(env: dict) -> dict:
+    """The environment of every Stage 1 run: the caller's V2_* variables are dropped (except the cache ones) and ``--env`` is applied.  ``run_info`` records this,
+    not the caller's shell (Codex review of 2.62.6)."""
+    e = {k: v for k, v in os.environ.items() if not k.startswith("V2_") or k in ("V2_CACHE", "V2_CACHE_DIR")}
+    e.update({"PYTHONHASHSEED": "0", **env})
+    return e
+
+
 def run_one(raw: Path, out: Path, env: dict) -> float:
     if out.exists():
         return 0.0
-    e = {k: v for k, v in os.environ.items() if not k.startswith("V2_") or k in ("V2_CACHE", "V2_CACHE_DIR")}
-    e.update({"PYTHONHASHSEED": "0", **env})
+    e = worker_env(env)
     tmp = out.with_suffix("")  # .csv
     tmp.parent.mkdir(parents=True, exist_ok=True)
     t0 = time.time()
@@ -81,12 +88,13 @@ def main() -> int:
         for region, raw in raw_folders(kind, root, fields):
             jobs.append((raw, a.out / name / f"{region}.csv.gz"))
             meta.append((name, region))
+    reuse = RI.reuse_info(a.out, [o for _, o in jobs if not o.exists()], [o.relative_to(a.out) for _, o in jobs if o.exists()])  # run_one skips existing outputs
     with ThreadPoolExecutor(a.jobs) as ex:
         times = list(ex.map(lambda j: run_one(j[0], j[1], env), jobs))
     t = pd.DataFrame([dict(set=n, region=r, seconds=round(s, 2)) for (n, r), s in zip(meta, times)])
     t.to_csv(a.out / "timing.csv", index=False)
     print(f"{len(jobs)} regions, {t.seconds.sum():.0f} s of stage 1")
-    RI.write_args(a, t0=t0)
+    RI.write_args(a, t0=t0, env=worker_env(env), replace_env=True, extra=reuse)
     return 0
 
 

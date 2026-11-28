@@ -155,6 +155,16 @@ def target(out) -> Path:
     return p / "run_info.json"
 
 
+def reuse_info(out, computed, reused) -> dict:
+    """For a tool that resumes: what this run computed and what it took over from an earlier run in the same directory (Codex review of 2.62.6).  Call it BEFORE
+    the first ``write`` of the run.  The earlier record, if there is one, is kept under ``previous`` by ``write`` when its setting differs; without one, the
+    provenance of the reused parts is unknown and the record says so (the commit and settings of this record then apply to ``computed`` only)."""
+    reused = sorted(str(x) for x in reused)
+    had = target(out).exists()
+    prov = "none reused" if not reused else ("the earlier record of this directory" if had else "unknown: no earlier record")
+    return dict(computed=len(list(computed)), reused=len(reused), reused_items=reused[:500], reused_provenance=prov)
+
+
 def start() -> str:
     return now()
 

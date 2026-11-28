@@ -97,8 +97,15 @@ def variant_env(v: str) -> dict:
 def classify(deep: Path, fields_file: Path, variants: list[str], jobs: int, work_root: Path) -> None:
     fields = FQ.load_fields(fields_file)
     t0 = RI.start()
+    # one() skips a field whose classified_objects.csv exists: the record says which fields this run computed and which it took over (Codex review of 2.62.6)
+    reuse = {v: RI.reuse_info(deep / f"run_{v}", [f for f in fields if not (deep / f"run_{v}" / f / "classified_objects.csv").exists()],
+                              [f for f in fields if (deep / f"run_{v}" / f / "classified_objects.csv").exists()]) for v in variants}  # fmt: skip
+
+    def record(v, status):
+        RI.write(deep / f"run_{v}", [fields_file], t0=t0, status=status, env=variant_env(v), replace_env=True, note=f"faint_cost classify, variant {v}", extra=reuse[v])
+
     for v in variants:  # run_info.json per variant: the environment the pipelines of that directory run in, and what the code reads in it
-        RI.write(deep / f"run_{v}", [fields_file], t0=t0, status="running", env=variant_env(v), replace_env=True, note=f"faint_cost classify, variant {v}")
+        record(v, "running")
 
     def one(args):
         v, f = args
@@ -123,10 +130,10 @@ def classify(deep: Path, fields_file: Path, variants: list[str], jobs: int, work
             list(ex.map(one, [(v, f) for v in variants for f in fields]))
     except BaseException:
         for v in variants:
-            RI.write(deep / f"run_{v}", [fields_file], t0=t0, status="failed", env=variant_env(v), replace_env=True, note=f"faint_cost classify, variant {v}")
+            record(v, "failed")
         raise
     for v in variants:
-        RI.write(deep / f"run_{v}", [fields_file], t0=t0, status="ok", env=variant_env(v), replace_env=True, note=f"faint_cost classify, variant {v}")
+        record(v, "ok")
 
 
 def load(deep: Path, variant: str) -> pd.DataFrame:

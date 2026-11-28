@@ -109,6 +109,31 @@ def test_the_outputs_of_the_run_itself_do_not_make_it_dirty():
         out.rmdir()
 
 
+def test_a_resumed_run_says_what_it_computed_and_what_it_took_over(tmp_path):
+    """Codex review of 2.62.6: faint_cost classify and run_stage1 skip outputs that exist, so a record must not credit them to this run."""
+    out = tmp_path / "run_x"
+    assert RI.reuse_info(out, ["f1", "f2"], [])["reused_provenance"] == "none reused"
+    r = RI.reuse_info(out, ["f2"], ["f1"])
+    assert (r["computed"], r["reused"], r["reused_items"], r["reused_provenance"]) == (1, 1, ["f1"], "unknown: no earlier record")
+    RI.write(out, [], status="ok")
+    assert RI.reuse_info(out, ["f2"], ["f1"])["reused_provenance"] == "the earlier record of this directory"
+
+
+def test_run_stage1_records_the_environment_of_its_workers_not_the_callers_shell(tmp_path, monkeypatch):
+    """Codex review of 2.62.6: the workers drop the caller's V2_* variables and apply --env; the record was the caller's shell."""
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("run_stage1_t", V2 / "benchmark" / "association_ambiguity" / "run_stage1.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    monkeypatch.setenv("V2_ASSOC_AMBIG", "best")  # in the caller's shell, dropped by the workers
+    env = mod.worker_env({"V2_POSERR_UNITS": "fixed"})
+    assert env["V2_POSERR_UNITS"] == "fixed" and "V2_ASSOC_AMBIG" not in env and env["PYTHONHASHSEED"] == "0"
+    rec = read(RI.write(tmp_path / "out", [], env=env, replace_env=True).parent)
+    assert rec["env"].get("V2_POSERR_UNITS") == "fixed" and "V2_ASSOC_AMBIG" not in rec["env"]
+    assert rec["effective"]["POSERR_UNITS"] == "fixed" and rec["effective"]["AMBIG_FIX"] == []
+
+
 def test_a_file_result_gets_a_sibling_record_and_a_directory_its_own(tmp_path):
     assert RI.target(tmp_path / "table.csv") == tmp_path / "table.run_info.json"
     assert RI.target(tmp_path / "table.csv.gz") == tmp_path / "table.run_info.json"
