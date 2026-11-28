@@ -152,3 +152,35 @@ def test_variants_that_do_not_cover_the_same_fields_are_refused():
         RR.compute(per, {"all26": FIELDS}, "base")
     with pytest.raises(SystemExit, match="base variant 'base' is not among"):
         RR.compute(rows("v"), {"all26": FIELDS}, "base")
+
+
+def test_a_partial_shifted_control_is_refused_but_none_at_all_stays_missing():
+    """Codex review of 2.62.10 (3rd): a variant whose shifted copy lacks a field must not be compared with a complete one on d_shift_any; a variant with no shifted copy gives NaN."""
+    import math
+
+    import pytest
+
+    v = rows("v")
+    v.loc[v.field == "deep_cosmos_3", ["shift_rows", "shift_false", "shift_any"]] = float("nan")
+    with pytest.raises(SystemExit, match="shifted control of v .against base.: lacks deep_cosmos_3/AllWISE"):
+        RR.compute(pd.concat([rows("base"), v], ignore_index=True), {"all26": FIELDS}, "base")
+    none = rows("v")
+    none[["shift_rows", "shift_false", "shift_any"]] = float("nan")
+    _, d = RR.compute(pd.concat([rows("base"), none], ignore_index=True), {"all26": FIELDS}, "base")
+    assert math.isnan(d.set_index("split").loc["all26", "d_shift_any"])
+
+
+def test_the_variant_runners_make_their_directory_arguments_absolute_before_cd():
+    """Codex review of 2.62.10 (3rd): `cd "$HERE"` would turn a relative FIELDS_ROOT / OUT_DIR given from the repository root into a path under this directory."""
+    import re
+
+    d = Path(__file__).resolve().parents[2] / "benchmark" / "association_truth"
+    for f in sorted(d.glob("run_*.sh")):
+        lines = [l.split("#")[0] for l in f.read_text().splitlines()]
+        at = [i for i, l in enumerate(lines) if re.search(r'(^|;)\s*cd "\$HERE"', l)]
+        if not at:
+            continue
+        head = " ".join(lines[: at[0] + 1])
+        args = re.findall(r'\b([A-Z])=\$\(cd "\$(\d)" && pwd\)', head)
+        assert args, f"{f.name}: the arguments are used relative after cd"
+        assert not re.search(r'\b[A-Z]=\$\d\b', head), f"{f.name}: a directory argument is kept as given"

@@ -5,7 +5,8 @@
 # input file; the default is brightness since 2.61.0); same, nearest, same_nearest (V2_ASSOC_AMBIG, 2.61.8); floored (V2_ASSOC_ORDER_KEY, 2.62.7).
 # Stage 1 once per variant and once on the shifted-catalogue copy, then measure_association.py (which now writes right_object and shifted_any_pct), then the table.
 set -e
-R=$1; T=$2; O=$3; mkdir -p "$O"; HERE="$(cd "$(dirname "$0")" && pwd)"; cd "$HERE"
+# The directory arguments are made absolute BEFORE the cd below: a relative path given from the repository root would otherwise point into this directory (Codex review of 2.62.10).
+R=$(cd "$1" && pwd); T=$(cd "$2" && pwd); mkdir -p "$3"; O=$(cd "$3" && pwd); HERE="$(cd "$(dirname "$0")" && pwd)"; cd "$HERE"
 export PYTHONHASHSEED=0 V2_CACHE=0
 unset V2_ASSOC_TIE_ORDER  # an empty value is an error of the switch: the default variants must not set it
 python3 "$HERE/../run_info.py" begin --out "$O/summary" --input "$R" "$T" --note "run_right_object_variants.sh"

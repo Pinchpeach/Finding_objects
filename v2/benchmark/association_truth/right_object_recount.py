@@ -107,7 +107,8 @@ def bootstrap(per: pd.DataFrame, base: str, variant: str, cat: str, n: int = 200
 
 def check_coverage(per: pd.DataFrame, base_name: str) -> None:
     """Every variant must hold the same (field, catalogue) pairs as the base (Codex review of 2.62.10): a variant whose measurement lacks a field would be summed over fewer
-    fields than the base while the tables report the same ``fields`` for both, and the field bootstrap would carry NaN for it.  Stop instead, naming the pairs."""
+    fields than the base while the tables report the same ``fields`` for both, and the field bootstrap would carry NaN for it.  The same holds for the pairs with a shifted
+    control, among the variants that have one.  Stop instead, naming the pairs."""
     if base_name not in set(per.variant):
         raise SystemExit(f"the base variant {base_name!r} is not among the variants read: {', '.join(sorted(set(per.variant)))}")
     pairs = {v: set(zip(g.field, g.catalog)) for v, g in per.groupby("variant")}
@@ -118,6 +119,16 @@ def check_coverage(per: pd.DataFrame, base_name: str) -> None:
             continue
         lack, extra = sorted(want - have), sorted(have - want)
         bad.append(f"{v}: " + "; ".join(x for x in (("lacks " + ", ".join(f"{f}/{c}" for f, c in lack)) if lack else "", ("has besides " + ", ".join(f"{f}/{c}" for f, c in extra)) if extra else "") if x))
+    # the shifted control (shift_*) only exists where the shifted copy was measured: a variant without any keeps NaN differences, but every variant that has one must cover the
+    # same (field, catalogue) pairs, or d_shift_any / d_shifted_any_pct would compare different field sets (Codex review of 2.62.10)
+    shifted = {v: set(zip(g.field[g.shift_rows.notna()], g.catalog[g.shift_rows.notna()])) for v, g in per.groupby("variant")}
+    shifted = {v: s for v, s in shifted.items() if s}
+    if shifted:
+        ref = base_name if base_name in shifted else sorted(shifted)[0]
+        for v, have in sorted(shifted.items()):
+            if have != shifted[ref]:
+                lack, extra = sorted(shifted[ref] - have), sorted(have - shifted[ref])
+                bad.append(f"shifted control of {v} (against {ref}): " + "; ".join(x for x in (("lacks " + ", ".join(f"{f}/{c}" for f, c in lack)) if lack else "", ("has besides " + ", ".join(f"{f}/{c}" for f, c in extra)) if extra else "") if x))
     if bad:
         raise SystemExit(f"the variants do not cover the same fields and catalogues as {base_name!r} (re-measure them, or give only complete variants):\n  " + "\n  ".join(bad))
 
