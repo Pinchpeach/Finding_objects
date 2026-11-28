@@ -56,6 +56,19 @@ def test_an_incomplete_or_altered_list_is_refused(tmp_path):
     assert _run(b, "--into", tmp_path / "fixed").returncode != 0
 
 
+def test_the_coverage_baseline_stays_with_its_own_list_and_goes_with_another(tmp_path):
+    """Codex review of 2.62.8: recommitting the same list must not delete the coverage baseline (the regression guard of the cross validation)."""
+    fixed = tmp_path / "fixed"
+    first = _run(_list(tmp_path / "a"), "--into", fixed)
+    sha = [l for l in first.stdout.splitlines() if l.startswith("list_sha256")][0].split("`")[1]
+    (fixed / "baseline_coverage.json").write_text(json.dumps({"truth_list_sha256": sha, "classes": {}}))
+    (fixed / "stray.txt").write_text("x")
+    again = _run(_list(tmp_path / "b"), "--into", fixed)  # the same list
+    assert again.returncode == 0 and (fixed / "baseline_coverage.json").exists() and not (fixed / "stray.txt").exists()
+    other = _run(_list(tmp_path / "c", ids=("a", "x")), "--into", fixed)  # another list
+    assert other.returncode == 0 and not (fixed / "baseline_coverage.json").exists() and "removed" in other.stdout
+
+
 def test_the_workflow_is_manual_refuses_main_and_downloads_the_named_runs():
     y = yaml.safe_load(WORKFLOW.read_text())
     assert set(y[True]) == {"workflow_dispatch"}  # PyYAML reads the key `on` as True

@@ -5,7 +5,8 @@
 
 * every list is checked with ``build_independent_truth_sets.verify`` (file SHA-256, the id set of every class, every set status ok) and its ``list_sha256`` is computed;
 * with a second list the two ``list_sha256`` must be equal: the builder is deterministic, and two freeze runs made at different times must agree;
-* only the manifest and the files it lists are copied (an artifact may carry other files of the work directory); the target directory is replaced as a whole;
+* only the manifest and the files it lists are copied (an artifact may carry other files of the work directory); the target directory is replaced as a whole,
+  except its coverage baseline when that was measured on the same list (``truth_list_sha256``);
 * a table of the files, their SHA-256 and the list_sha256 goes to stdout and, in a workflow, to the step summary.
 Exit status 1 on any problem, with nothing copied.
 """
@@ -22,6 +23,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 BUILDER = ROOT / "v2" / "Classifier" / "truth" / "build_independent_truth_sets.py"
+BASELINE = "baseline_coverage.json"  # truth/fixed/: the classified share per class measured once on the frozen list (2.62.0)
 
 
 def builder():
@@ -77,9 +79,28 @@ def main() -> int:
     if len(checked) == 2 and checked[1][1] != sha:
         print("the two freeze runs gave different lists: nothing is committed", file=sys.stderr)
         return 1
+    # The coverage baseline (baseline_coverage.json, measured once on a frozen list by the first normal run) belongs to the list it was measured on.  Committing
+    # the SAME list again keeps it; a different list drops it, since aggregate_independent_truth.py would refuse it as a mismatch anyway (Codex review of 2.62.8).
+    keep = {}
+    base = a.into / BASELINE
+    if base.exists():
+        try:
+            measured_on = json.loads(base.read_text(encoding="utf-8")).get("truth_list_sha256")
+        except ValueError:
+            measured_on = None
+        if measured_on == sha:
+            keep[BASELINE] = base.read_bytes()
+            print(f"{BASELINE} was measured on this list: kept")
+        else:
+            print(f"{BASELINE} was measured on list {measured_on}, not on {sha}: removed (measure a new baseline on the new list)")
     if a.into.exists():
+        dropped = sorted(p.name for p in a.into.iterdir() if p.name not in {e["file"] for e in manifest["sets"].values()} | {tb.MANIFEST, BASELINE})
+        if dropped:
+            print("files that are not part of the list are removed from the target: " + ", ".join(dropped))
         shutil.rmtree(a.into)
     a.into.mkdir(parents=True)
+    for name, data in keep.items():
+        (a.into / name).write_bytes(data)
     for e in manifest["sets"].values():
         shutil.copy2(d / e["file"], a.into / e["file"])
     shutil.copy2(d / tb.MANIFEST, a.into / tb.MANIFEST)
