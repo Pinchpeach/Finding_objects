@@ -41,3 +41,21 @@ def test_the_same_row_alone_or_joined_to_an_object_without_truth_id_counts_the_s
     assert ra["correct"] + ra["alone_identified"] == rj["correct"] + rj["alone_identified"] == 0  # right_object
     assert ra["unknown"] + ra["alone_unidentified"] == rj["unknown"] + rj["alone_unidentified"] == 1  # unidentified
     assert ra["correct"] + ra["rightly_alone"] != rj["correct"] + rj["rightly_alone"]  # the first right_object moved with the anchor
+
+
+def test_a_blended_row_whose_own_object_holds_a_counterpart_is_right_alone_or_joined():
+    """Codex review of 2.62.7 (second): own object and ANOTHER object both hold acceptable counterparts.  Unjoined, the row is "missed" (another holder exists), joined it is
+    "correct"; the object reading counts it in the right object both times."""
+    # two bright truth sources 1.5'' apart, both in the reference set and both carrying W1 flux (a blend for the 6.1'' AllWISE PSF)
+    truth = pd.DataFrame(dict(ra=[150.0, 150.0 + 1.5 * ARC], dec=[2.0, 2.0], HSCimagAuto=[20.0, 20.2], FIRACCH1=[10.0, 9.0], FUVISTAKs=[np.nan] * 2, FCFHTu=[np.nan] * 2))
+    ls_a = _row("a", "DESI Legacy Surveys DR10", "OBJ1", 150.0, 2.0, "new")
+    ls_b = _row("b", "DESI Legacy Surveys DR10", "OBJ2", 150.0 + 1.5 * ARC, 2.0, "new")
+    alone = pd.DataFrame([ls_a, ls_b, _row("w", "AllWISE", "OBJ3", 150.0 + 0.2 * ARC, 2.0, "new")])  # the AllWISE row anchors an object of its own...
+    alone.loc[2, "object_id"] = "OBJ1"  # ...that holds the LS row of source A (the LS row is its member, the AllWISE row its anchor)
+    alone.loc[0, "association_status"] = "matched"
+    joined = pd.DataFrame([ls_a, ls_b, _row("w", "AllWISE", "OBJ1", 150.0 + 0.2 * ARC, 2.0, "matched")])  # the same membership, the LS row anchors
+    ra = MA.measure_field(alone, truth)["AllWISE"]
+    rj = MA.measure_field(joined, truth)["AllWISE"]
+    assert (ra["missed"], ra["alone_identified"]) == (1, 1)  # unjoined: another holder exists, so "missed", but its own object holds a counterpart
+    assert rj["correct"] == 1
+    assert ra["correct"] + ra["alone_identified"] == rj["correct"] + rj["alone_identified"] == 1

@@ -69,7 +69,7 @@
 | `desi_external` 4,795 | `desi_targetid` | 2,642 (55.1 %) | 60.2 % | 2,646 / **0** |
 | `radio_xray_truth` 951 | `specobjid` | 539 (56.7 %) | 62.6 % | 493 / **0** |
 | `star_truth` 1,000 | `specobjid` | 572 (57.2 %) | 60.4 % | 508 / **0** |
-| `lamost_star_external` 1,000 | `external_id` | 578 (57.8 %) | 61.8 % | 489 / **0** |
+| `lamost_star_external` 1,000 | — | (빠짐: 소비 도구가 이 표를 가르지 않는다, 병합 전 검토) | — | — |
 | `wd_subtype_truth` 300 | `external_id` | 178 (59.3 %) | 60.0 % | 122 / **0** |
 
 좌표 해시를 키로 해도 같다(54.8–59.3 %). **재학습이 필요하다**: 새 test의 60 %가 옛 train이라 지금의 융합 가중치·색 참조 집합을 새 test로 재면 누설이다. 선택지 A(키만 바꿈, 56–59 % 이동, 재학습 필요), **B(현재 분할을 안정 키별로 저장해 고정, 0개 이동, 재학습 불필요, 권장)**, C(지금 + 매니페스트, 목록을 일부러 바꾸는 순간엔 보호가 없다). 실행은 사용자 결정이다.
@@ -266,4 +266,9 @@
   3. **`run_variant.py`**: `--field-glob '*'`가 `collection_state.json` 같은 최상위 파일까지 영역으로 잡았다. `raw/` 폴더가 있는 디렉터리만 영역으로 본다.
   4. **`analyse_deep_cosmos_literature.py`**: QSO id를 넘기지 않아 `qso_objects_*`가 늘 0이었다. 이 오프라인 분석에는 분류된 기준 실행이 없으므로 측정이 아니라는 뜻으로 빈칸을 쓴다.
   5. **`test_truth_manifest.py`**: 결정성 시험이 커밋된 매니페스트와 전체를 비교해, 짝 특징 파일의 SHA-256까지 요구했다. 그래서 설계가 허용하는 특징 갱신(`recollect-ps1-features`, `augment-ls-columns`)이 시험을 깨뜨렸다. 이제 짝 폴더는 기본 `verify`처럼 파일 이름으로 비교한다.
+- **Codex 재검토(P2 2건 더, 받아들여 고침)**:
+  1. **`right_object` 두 번째 구멍**: 섞인(blended) AllWISE 행 문제다. 자기 객체와 다른 객체가 모두 받아들일 수 있는 짝을 가지면, 안 붙은 행은 `missed`(다른 보유 객체가 있으므로)로 세어져 `alone_identified`에 닿지 않았다. 같은 행이 붙으면 `correct`다.
+     - 고침: 안 붙은 행은 이제 missed / alone 판정과 따로, **붙은 행과 같은 시험을 자기 객체에** 적용한다. 자기 객체의 정답 id가 받아들일 수 있는 짝을 포함하면 `alone_identified`, 다른 id만 있으면 `alone_wrong`, id가 없으면 `alone_unidentified`다.
+     - 그래서 `right_object = correct + alone_identified`, `wrong_object = false + alone_wrong`, `unidentified = unknown + alone_unidentified`가 모든 행을 나누고, 앵커만 바뀌면 셋 다 움직이지 않는다. 시험에 섞인 행 경우를 더했다.
+  2. **분할 키 연구의 `lamost_star_external`**: `validate_star_wd_external.py`는 SDSS 표만 가르고 외부 표는 전부 예측한다. 그래서 이 표의 "분할 이동"은 존재하지 않는 분할을 잰 것이다. 표에서 빼고(`UNSPLIT`, 좌표 충돌 점검만 남김) 결과를 다시 만들었다. 나머지 다섯 표의 범위는 바뀌지 않는다(바뀌는 객체 55.1–59.3 %, 새 test 중 옛 train 57.8–62.6 %).
 

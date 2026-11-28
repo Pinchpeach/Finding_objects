@@ -7,7 +7,5 @@ radio_xray_truth,specobjid,951,539,56.68,56.0,1.61,True,4.6,4.6,190,119,62.6,val
 radio_xray_truth,coordinates,951,545,57.31,56.0,1.61,True,4.6,5.1,167,101,60.5,validate_catalog_truth.py (radio / X-ray benchmark),337,122,101,120,48,45,121,36,21
 star_truth,specobjid,1000,572,57.2,56.0,1.57,True,2.8,4.2,202,122,60.4,train_validate_star_wd.py,354,121,122,130,35,41,111,47,39
 star_truth,coordinates,1000,552,55.2,56.0,1.57,True,2.8,2.0,202,119,58.9,train_validate_star_wd.py,370,108,119,117,42,47,119,42,36
-lamost_star_external,external_id,1000,578,57.8,56.0,1.57,True,3.2,5.2,212,131,61.8,validate_star_wd_external.py (assumed the same hash),348,125,131,117,33,40,115,50,41
-lamost_star_external,coordinates,1000,548,54.8,56.0,1.57,True,3.2,0.2,204,122,59.8,validate_star_wd_external.py (assumed the same hash),370,112,122,100,45,45,123,46,37
 wd_subtype_truth,external_id,300,178,59.33,56.0,2.87,True,9.2,2.7,55,33,60.0,train_validate_wd_subtype.py,104,29,33,49,9,13,37,17,9
 wd_subtype_truth,coordinates,300,178,59.33,56.0,2.87,True,9.2,11.0,64,37,57.8,train_validate_wd_subtype.py,96,33,37,46,12,13,35,14,14
