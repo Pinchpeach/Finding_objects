@@ -46,10 +46,11 @@ def main() -> int:
     fm = pd.concat([pd.read_csv(a.root / f"meas_{v}" / f"false_missed_{v}.csv") for v in a.variants])
     fm = fm[fm.catalog.isin(a.cats)]
     keep = ["variant", "half", "catalog", "rows", "with_expected", "matched", "correct", "false", "unknown", "missed", "rightly_alone", "false_pct_of_matched_known", "false_wilson", "missed_pct_of_expected", "shifted_false_pct"]  # fmt: skip
+    keep += [c for c in ("right_object_pct_of_expected", "shifted_any_pct") if c in fm]  # 2.62.7: written by measure_association.py since the task "러" (METRICS.md); absent in older measurement folders
     fm = fm[keep]
     fm["right_object"] = fm.correct + fm.rightly_alone  # 2.62.7: a row that anchors its object, and the object holds its counterpart, is "rightly alone", not "correct": the sum does not depend on who anchors
     base = fm[fm.variant == "base"].set_index(["half", "catalog"])
-    for col in ("matched", "correct", "false", "missed", "right_object", "false_pct_of_matched_known", "missed_pct_of_expected", "shifted_false_pct"):
+    for col in ("matched", "correct", "false", "missed", "rightly_alone", "right_object", "false_pct_of_matched_known", "missed_pct_of_expected", "shifted_false_pct") + (("shifted_any_pct",) if "shifted_any_pct" in fm else ()):
         fm[f"d_{col}"] = [round(r[col] - base.loc[(r.half, r.catalog), col], 2) for _, r in fm.iterrows()]
     fm.sort_values(["catalog", "half", "variant"]).to_csv(a.out / f"{a.stem}_false_missed.csv", index=False)
 

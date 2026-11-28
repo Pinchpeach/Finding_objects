@@ -310,7 +310,8 @@ def measure_field(assoc: pd.DataFrame, truth: pd.DataFrame, shifted_from: pd.Dat
             if not len(d):
                 continue
             m = (d.association_status == "matched") & ~d.object_anchor_catalog.isin(SHIFTED_CATS)
-            out.setdefault(cat, {}).update(shift_rows=int(len(d)), shift_false=int(m.sum()))
+            any_unshifted = d.object_id.isin(set(s.object_id[~s.catalog.isin(SHIFTED_CATS)]))  # the object holds a row of an unshifted catalogue, whoever anchors it (METRICS.md)
+            out.setdefault(cat, {}).update(shift_rows=int(len(d)), shift_false=int(m.sum()), shift_any=int(any_unshifted.sum()))
             out.setdefault("_shift_nsep", {})[cat] = (
                 int(len(d)),
                 pd.to_numeric(d.normalized_separation[m], errors="coerce").dropna().to_numpy(),
@@ -410,6 +411,11 @@ def pool(rows: list[dict], split: pd.DataFrame, label: str) -> pd.DataFrame:
             rec["strict_false_pct"] = round(100 * tot["s_false"] / sd, 2) if sd else np.nan
             if "shift_rows" in tot and tot["shift_rows"]:
                 rec["shifted_false_pct"] = round(100 * tot["shift_false"] / tot["shift_rows"], 2)
+            # 2.62.7 (METRICS.md): columns that do not depend on who anchors an object; appended, the order of the old columns is unchanged
+            rec["right_object"] = tot["correct"] + tot["rightly_alone"]
+            rec["right_object_pct_of_expected"] = round(100 * rec["right_object"] / expected, 2) if expected else np.nan
+            if "shift_rows" in tot and tot["shift_rows"] and "shift_any" in tot:
+                rec["shifted_any_pct"] = round(100 * tot["shift_any"] / tot["shift_rows"], 2)
             out.append(rec)
     return pd.DataFrame(out)
 
