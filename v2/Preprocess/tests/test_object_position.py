@@ -72,6 +72,13 @@ def test_ties_are_broken_by_the_catalogue_priority_not_the_row_order():
         assert OP.best_positions(frame(*order)).loc["OBJ1"].source == "DESI Legacy Surveys DR10"  # both 0.2'': Legacy Surveys ranks first
 
 
+def test_a_tie_of_the_floor_is_decided_by_the_measured_error():
+    """Legacy Surveys and Pan-STARRS1 both read 0.2'' under the PSF / 6 floor; the one whose own measured error is smaller wins, whatever the catalogue priority."""
+    rows = [det("Pan-STARRS1 DR2 MeanObject", 1.0, 1.0, 0.05, 1.2, did="p"), det("DESI Legacy Surveys DR10", 1.0001, 1.0, 0.1, 1.2, did="l")]
+    for order in (rows, rows[::-1]):
+        assert OP.best_positions(frame(*order)).loc["OBJ1"].source == "Pan-STARRS1 DR2 MeanObject"
+
+
 def test_the_result_does_not_depend_on_the_row_order():
     rng = np.random.default_rng(0)
     rows = [det(c, 20 + 1e-4 * i, 4.0, s, p, did=f"d{i}") for i, (c, s, p) in enumerate([("AllWISE", 0.2, 6.1), ("2MASS PSC", 0.08, 2.5), ("GALEX AIS", 0.5, 5.3), ("SDSS DR18 PhotoObj", 0.1, 1.4), ("Pan-STARRS1 DR2 MeanObject", 0.05, 1.2)])]

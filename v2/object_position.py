@@ -17,8 +17,9 @@ run on the anchor position, so the labels, the probabilities and the object set 
                                 at that member's epoch, and no proper-motion propagation to a common epoch (the anchor has the same limit)
     position_shift_arcsec       the distance between the two positions
 
-Ties of the effective error are broken by ``TIE_PRIORITY`` (astrometric quality of the catalogue, Gaia first), then by the catalogue name and the detection id, so the result does
-not depend on the order of the rows.
+Ties of the effective error are broken by the measured error under the floor (``poserr_arcsec``, unfloored: the floor PSF / 6 is a guess and often the same for several optical
+catalogues), then by ``TIE_PRIORITY`` (astrometric quality of the catalogue, Gaia first), the catalogue name and the detection id, so the result does not depend on the order of the rows.
+(The first version broke ties by the priority alone: 3.24 % of the clean objects beyond 0.5'' of their COSMOS2020 source against 3.16 % with the measured error first, WORK_REPORT_2026-11-28g.md.)
 """
 
 from __future__ import annotations
@@ -85,10 +86,12 @@ def best_positions(assoc: pd.DataFrame) -> pd.DataFrame:
     a["epoch"] = pd.to_numeric(assoc["ref_epoch"], errors="coerce") if "ref_epoch" in assoc else np.nan
     a["ra"], a["dec"] = pd.to_numeric(a["ra"], errors="coerce"), pd.to_numeric(a["dec"], errors="coerce")
     a["sigma"] = effective_sigma(assoc)
+    # a tie of the effective error is mostly a tie of the FLOOR (PSF / 6: Legacy Surveys, Pan-STARRS1 and SDSS all give 0.2'' for a 1.2'' PSF): the measured error under the floor decides
+    a["measured"] = pd.to_numeric(assoc["poserr_arcsec"], errors="coerce").fillna(99.0)
     rank = {c: i for i, c in enumerate(TIE_PRIORITY)}
     a["rank"] = a["catalog"].map(rank).fillna(len(TIE_PRIORITY)).astype(int)
     a = a[np.isfinite(a["ra"]) & np.isfinite(a["dec"])]
-    a = a.sort_values(["object_id", "sigma", "rank", "catalog", "detection_id"], kind="mergesort").drop_duplicates("object_id")
+    a = a.sort_values(["object_id", "sigma", "measured", "rank", "catalog", "detection_id"], kind="mergesort").drop_duplicates("object_id")
     return a.set_index("object_id")[["ra", "dec", "catalog", "sigma", "epoch"]].rename(columns={"catalog": "source"})
 
 

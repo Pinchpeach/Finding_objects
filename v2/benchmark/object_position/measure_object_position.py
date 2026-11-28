@@ -97,71 +97,57 @@ def slices(c: pd.DataFrame):
             yield "printed_catalog", str(cat), g
 
 
-def main() -> int:
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--runs", type=Path, required=True)
-    ap.add_argument("--truth-flux", type=Path, required=True)
-    ap.add_argument("--out", type=Path, required=True)
-    ap.add_argument("--fields", nargs="*", default=[])
-    a = ap.parse_args()
-    t0 = RI.start()
-    a.out.mkdir(parents=True, exist_ok=True)
-    OP = load_op()
-    fields = a.fields or sorted((p.name for p in (a.runs / "anchor").iterdir() if p.is_dir() and (p / "classified_objects.csv").exists()), key=lambda f: int(f.rsplit("_", 1)[1]))
-    split = pd.read_csv(AT / "fields_split.csv").set_index("name")
-    inv, clean_rows, shift_rows, labels_a, labels_b, timing = [], [], [], [], [], []
-    for f in fields:
-        da, db = a.runs / "anchor" / f, a.runs / "best" / f
-        if not (db / "classified_objects.csv").exists():
-            continue
-        half = "fields 1-9" if int(f.rsplit("_", 1)[1]) <= 9 else "fields 10-26"
-        inv.append(invariance(f, da, db))
-        truth = MA.load_truth(a.truth_flux / f"{f}.csv.gz", (split.ra[f], split.dec[f]))
-        asc = pd.read_csv(da / "source_association.csv", low_memory=False, dtype={"catalog_object_id": "string"})
-        usecols = ["object_id", "ra", "dec", "catalogs", "primary_class", "parent_object_id"]
-        oa = pd.read_csv(da / "classified_objects.csv", low_memory=False, usecols=usecols)
-        ob = pd.read_csv(db / "classified_objects.csv", low_memory=False, usecols=lambda c: c in usecols + ["position_source", "position_shift_arcsec", "position_epoch", "gaia_dr3__pmra", "gaia_dr3__pmdec"])
-        # residuals of the clean objects, from the final tables
-        c = PR.clean_objects(asc, truth).drop(columns=["object_ra", "object_dec"])
-        pa, pb = oa.drop_duplicates("object_id").set_index("object_id"), ob.drop_duplicates("object_id").set_index("object_id")
-        c = c[c.object_id.isin(pa.index)].copy()
-        c["residual_anchor"] = PR.sep_arcsec(pa.ra.reindex(c.object_id).to_numpy(), pa.dec.reindex(c.object_id).to_numpy(), c.truth_ra.to_numpy(), c.truth_dec.to_numpy())
-        c["residual_best"] = PR.sep_arcsec(pb.ra.reindex(c.object_id).to_numpy(), pb.dec.reindex(c.object_id).to_numpy(), c.truth_ra.to_numpy(), c.truth_dec.to_numpy())
-        c["position_source"] = pb.position_source.reindex(c.object_id).to_numpy()
-        c["field"], c["half"] = f, half
-        clean_rows.append(c)
-        # the shift of every object
-        s = ob.copy()
-        s["field"], s["half"] = f, half
-        shift_rows.append(s)
-        # labels of the truth sources (pick / exists / every)
-        for lst, out in ((labels_a, oa), (labels_b, ob)):
-            acc = RG.score_accuracy(out.assign(parent_object_id=out.parent_object_id), truth)
-            acc.insert(0, "field", f)
-            lst.append(acc)
-        # the cost of the switch alone
-        asc_full = pd.read_csv(da / "classified_objects.csv", low_memory=False, usecols=["object_id", "ra", "dec"])
-        os.environ[OP.ENV] = "best"
-        t1 = time.perf_counter()
-        OP.apply(asc_full, asc)
-        dt = time.perf_counter() - t1
-        os.environ.pop(OP.ENV, None)
-        sec = lambda d: float(pd.read_csv(d / "pipeline_summary.csv").seconds.sum())  # noqa: E731
-        timing.append(dict(field=f, objects=len(asc_full), detections=len(asc), pipeline_seconds_anchor=round(sec(da), 2), pipeline_seconds_best=round(sec(db), 2), apply_seconds=round(dt, 4)))
-        print(f"[ok] {f}: {len(c)} clean objects, apply {dt:.3f} s", flush=True)
-    pd.DataFrame(inv).to_csv(a.out / "invariance.csv", index=False)
-    C = pd.concat(clean_rows, ignore_index=True)
+def process_field(f: str, runs: Path, truth_dir: Path, OP, split: pd.DataFrame) -> dict | None:
+    """Everything one field contributes: the invariance record, the clean objects with both residuals, the objects with their shift, the two label tables and the timings."""
+    da, db = runs / "anchor" / f, runs / "best" / f
+    if not ((da / "classified_objects.csv").exists() and (db / "classified_objects.csv").exists()):
+        return None
+    half = "fields 1-9" if int(f.rsplit("_", 1)[1]) <= 9 else "fields 10-26"
+    rec = invariance(f, da, db)
+    truth = MA.load_truth(truth_dir / f"{f}.csv.gz", (split.ra[f], split.dec[f]))
+    asc = pd.read_csv(da / "source_association.csv", low_memory=False, dtype={"catalog_object_id": "string"})
+    usecols = ["object_id", "ra", "dec", "catalogs", "primary_class", "parent_object_id"]
+    oa = pd.read_csv(da / "classified_objects.csv", low_memory=False, usecols=usecols)
+    ob = pd.read_csv(db / "classified_objects.csv", low_memory=False, usecols=lambda c: c in usecols + ["position_source", "position_shift_arcsec", "position_epoch", "gaia_dr3__pmra", "gaia_dr3__pmdec"])
+    c = PR.clean_objects(asc, truth).drop(columns=["object_ra", "object_dec"])
+    pa, pb = oa.drop_duplicates("object_id").set_index("object_id"), ob.drop_duplicates("object_id").set_index("object_id")
+    c = c[c.object_id.isin(pa.index)].copy()
+    c["residual_anchor"] = PR.sep_arcsec(pa.ra.reindex(c.object_id).to_numpy(), pa.dec.reindex(c.object_id).to_numpy(), c.truth_ra.to_numpy(), c.truth_dec.to_numpy())
+    c["residual_best"] = PR.sep_arcsec(pb.ra.reindex(c.object_id).to_numpy(), pb.dec.reindex(c.object_id).to_numpy(), c.truth_ra.to_numpy(), c.truth_dec.to_numpy())
+    c["position_source"] = pb.position_source.reindex(c.object_id).to_numpy()
+    c["field"], c["half"] = f, half
+    s_ = ob.copy()
+    s_["field"], s_["half"] = f, half
+    labels = []
+    for out in (oa, ob):
+        acc = RG.score_accuracy(out, truth)
+        acc.insert(0, "field", f)
+        labels.append(acc)
+    full = pd.read_csv(da / "classified_objects.csv", low_memory=False, usecols=["object_id", "ra", "dec"])
+    os.environ[OP.ENV] = "best"
+    t1 = time.perf_counter()
+    OP.apply(full, asc)
+    dt = time.perf_counter() - t1
+    os.environ.pop(OP.ENV, None)
+    sec = lambda d: float(pd.read_csv(d / "pipeline_summary.csv").seconds.sum())  # noqa: E731
+    timing = dict(field=f, objects=len(full), detections=len(asc), pipeline_seconds_anchor=round(sec(da), 2), pipeline_seconds_best=round(sec(db), 2), apply_seconds=round(dt, 4))
+    print(f"[ok] {f}: {len(c)} clean objects, apply {dt:.3f} s", flush=True)
+    return dict(inv=rec, clean=c, shift=s_, labels_anchor=labels[0], labels_best=labels[1], timing=timing)
+
+
+def aggregate(parts: list[dict], out: Path) -> None:
+    pd.DataFrame([p["inv"] for p in parts]).to_csv(out / "invariance.csv", index=False)
+    C = pd.concat([p["clean"] for p in parts], ignore_index=True)
     rows = []
     for which in ("anchor", "best"):
         cc = C.assign(residual=C[f"residual_{which}"])
         for kind, name, g in slices(cc):
             rows.append(dict(variant=which, slice_kind=kind, slice=name, **summarise(g.residual)))
-    pd.DataFrame(rows).to_csv(a.out / "residual_summary.csv", index=False)
+    pd.DataFrame(rows).to_csv(out / "residual_summary.csv", index=False)
     d = C.residual_best - C.residual_anchor
     pd.DataFrame([dict(clean_objects=len(C), better_gt_0p1=int((d < -0.1).sum()), worse_gt_0p1=int((d > 0.1).sum()), crossed_into_0p5=int(((C.residual_anchor > 0.5) & (C.residual_best <= 0.5)).sum()),
-                       crossed_out_of_0p5=int(((C.residual_anchor <= 0.5) & (C.residual_best > 0.5)).sum()), median_diff=float(d.median()), mean_diff=float(d.mean()))]).to_csv(a.out / "residual_paired.csv", index=False)
-    S = pd.concat(shift_rows, ignore_index=True)
-    sh = S.position_shift_arcsec
+                       crossed_out_of_0p5=int(((C.residual_anchor <= 0.5) & (C.residual_best > 0.5)).sum()), median_diff=float(d.median()), mean_diff=float(d.mean()))]).to_csv(out / "residual_paired.csv", index=False)
+    S = pd.concat([p["shift"] for p in parts], ignore_index=True)
 
     def shift_row(name, kind, g):
         x = g.position_shift_arcsec.dropna()
@@ -176,14 +162,40 @@ def main() -> int:
     srows.append(shift_row("gaia pm > 100 mas/yr", "high_pm", hp))
     moved = hp[hp.position_shift_arcsec > 0.3]
     srows.append(dict(slice_kind="high_pm", slice="gaia pm > 100 mas/yr and shift > 0.3'': printed catalogue", objects=len(moved), **{str(k): int(v) for k, v in moved.position_source.value_counts().items()}))
-    pd.DataFrame(srows).to_csv(a.out / "shift.csv", index=False)
-    pd.concat(labels_a).to_csv(a.out / "labels_anchor.csv.gz", index=False)
-    pd.concat(labels_b).to_csv(a.out / "labels_best.csv.gz", index=False)
-    pd.DataFrame(timing).to_csv(a.out / "timing.csv", index=False)
+    pd.DataFrame(srows).to_csv(out / "shift.csv", index=False)
+    pd.concat([p["labels_anchor"] for p in parts]).to_csv(out / "labels_anchor.csv.gz", index=False)
+    pd.concat([p["labels_best"] for p in parts]).to_csv(out / "labels_best.csv.gz", index=False)
+    pd.DataFrame([p["timing"] for p in parts]).to_csv(out / "timing.csv", index=False)
     with pd.option_context("display.width", 250, "display.max_columns", 30):
-        print(pd.DataFrame(inv)[["field", "rows_anchor", "columns_that_differ", "label_rows_changed", "summary_columns_that_differ"]].to_string(index=False))
-        print(pd.read_csv(a.out / "residual_summary.csv").query("slice_kind in ('all','anchor_catalog','printed_catalog')").to_string(index=False))
-        print(pd.read_csv(a.out / "shift.csv").to_string(index=False))
+        print(pd.DataFrame([p["inv"] for p in parts])[["field", "rows_anchor", "columns_that_differ", "label_rows_changed", "summary_columns_that_differ"]].to_string(index=False))
+        print(pd.read_csv(out / "residual_summary.csv").query("slice_kind in ('all','half','anchor_catalog','printed_catalog')").to_string(index=False))
+        print(pd.read_csv(out / "shift.csv").to_string(index=False))
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--runs", type=Path, required=True)
+    ap.add_argument("--truth-flux", type=Path, required=True)
+    ap.add_argument("--out", type=Path, required=True)
+    ap.add_argument("--fields", nargs="*", default=[])
+    ap.add_argument("--stage", choices=("all", "field", "aggregate"), default="all",
+                    help="field: process the --fields and keep their slim results in OUT/per_field (so the heavy work folders can be deleted); aggregate: the tables from OUT/per_field; all: both")
+    a = ap.parse_args()
+    t0 = RI.start()
+    a.out.mkdir(parents=True, exist_ok=True)
+    pf = a.out / "per_field"
+    pf.mkdir(exist_ok=True)
+    OP = load_op()
+    split = pd.read_csv(AT / "fields_split.csv").set_index("name")
+    if a.stage in ("all", "field"):
+        fields = a.fields or sorted((p.name for p in (a.runs / "anchor").iterdir() if p.is_dir() and (p / "classified_objects.csv").exists()), key=lambda f: int(f.rsplit("_", 1)[1]))
+        for f in fields:
+            part = process_field(f, a.runs, a.truth_flux, OP, split)
+            if part is not None:
+                pd.to_pickle(part, pf / f"{f}.pkl")
+    if a.stage in ("all", "aggregate"):
+        parts = [pd.read_pickle(p) for p in sorted(pf.glob("deep_cosmos_*.pkl"), key=lambda p: int(p.stem.rsplit("_", 1)[1]))]
+        aggregate(parts, a.out)
     RI.write_args(a, ["runs", "truth_flux"], t0=t0)
     return 0
 
