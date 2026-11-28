@@ -1,4 +1,4 @@
-"""The tools of the position-error study and of the combined decision table (2.61.10 / 2.62.0), on small synthetic inputs."""
+"""The tools of the position-error study and of the combined decision table (2.62.2 / 2.63.0), on small synthetic inputs."""
 
 import importlib.util
 import sys
@@ -98,7 +98,7 @@ def test_decision_table_held_counts_the_spectroscopic_qso_the_switch_leaves_out(
 
 
 def test_label_changes_runs_when_the_two_fields_leave_objects_unpaired_in_different_numbers(tmp_path, monkeypatch):
-    """pd.concat compares the ``attrs`` of its parts; two numpy arrays of different lengths there raised ValueError (found with the survey-switch variants, 2.61.10)."""
+    """pd.concat compares the ``attrs`` of its parts; two numpy arrays of different lengths there raised ValueError (found with the survey-switch variants, 2.62.2)."""
     cols = ["object_id", "ra", "dec", "primary_class", "std_mag__ls_r"]
     def write(root, field, rows):
         d = root / field

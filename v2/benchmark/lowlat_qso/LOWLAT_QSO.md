@@ -422,21 +422,21 @@ none, but it read the files in name order (`desi_legacy` before `panstarrs1`) an
 fusion 11.1 / 36 % -> 17.0 / 46.0 %; the DESI ceiling of the decision table 0.907 / 0.669 -> 0.858 / 0.554), `sdss_sky` uses the SDSS r and
 is unchanged.
 
-## 9. The survey-count switches together with the association rules (2.61.10)
+## 9. The survey-count switches together with the association rules (2.62.2)
 
 Measured only, nothing changed by default.  `results_2026-11-27h/decision_table.csv` (assembled by `decision_table_combos.py` from the tables of `combos_table.py`, `spectro_held.py`, `faint_cost.py`
-and `association_ambiguity/label_changes.py`) has one row per combination; every row was run with the 2.61.9 reading of the position errors (`V2_POSERR_UNITS=legacy`, so the only difference between rows is
+and `association_ambiguity/label_changes.py`) has one row per combination; every row was run with the pre-2.63.0 reading of the position errors (`V2_POSERR_UNITS=legacy`, so the only difference between rows is
 the switches).  140 confirmation cones (143 sample quasars), objects that are not sample quasars per deg^2 with a bootstrap over the regions:
 
 | row | sample quasars QSO | QSO labels not on a sample quasar | LS cones | cones without LS | lost / gained against the base (matched by position) |
 |---|---|---|---|---|---|
 | base | 95/143 | 159 [90-242] (n=175) | 811 | 57 | |
 | surveys2 | 95/143 | 74 [45-108] (n=81) | 335 | 33 | 94 / 0 |
-| same,nearest | 96/143 | 156 [88-236] (n=171) | 791 | 56 | 10 / 6 |
-| same,nearest + surveys2 | 96/143 | 74 [45-108] (n=81) | 335 | 33 | 96 / 2 |
+| same,nearest | 96/143 | 156 [88-236] (n=171) | 791 | 56 | 4 / 0 |
+| same,nearest + surveys2 | 96/143 | 74 [45-108] (n=81) | 335 | 33 | 94 / 0 |
 | same,nearest + surveys3 | 96/143 | 33 [18-51] (n=36) | 141 | 16 | 139 / 0 |
 
-Calibration (169 cones): 170 -> 93 (surveys2), 95 (same,nearest + surveys2); quasars 86 -> 88/150 with same,nearest.  The two switches add up: the association rule gives back a sample quasar or two and does not
+Calibration (169 cones): 170 -> 93 (surveys2), 95 (same,nearest + surveys2); quasars 86 -> 88/150 with same,nearest; the position-matched exchange (long table of `ab_variants.py`, `lowlat_exchange.py` as fixed in the review of 2.61.8) is 77 / 0 for `surveys2`, 6 / 0 for `same,nearest`, 75 / 0 for the combination.  (The first version of this section used the wide table, whose coordinates belong to the first variant that has an object id: its exchange columns were invalid and are replaced.)  The two switches add up: the association rule gives back a sample quasar or two and does not
 change what the survey rule removes.  Spectroscopic QSO (32 objects of the 15 + 17 cones with spectra): with the default association `surveys2` / `surveys3` hold 5/32 (0/32 with `spectro_keep`), with
 `same,nearest` 0/32 **without** `spectro_keep` (Wilson 95 % upper bound 10.7 %; the 32 are the objects that motivated `spectro_keep`, so they are not an independent check).  Deep COSMOS (26 fields, limit lifted): Chandra
 type 1 AGN 0/123 lost in every row, QSO labels of type 1 AGN 123 -> 124 with `same,nearest`, the candidate flag at 22 <= r < 24 unchanged (purity 0.365, recall 0.468), single-survey QSO labels held 36 / 51 (surveys2 / surveys3), 33 / 49

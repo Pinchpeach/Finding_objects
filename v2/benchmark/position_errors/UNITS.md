@@ -1,4 +1,4 @@
-# Units of the position-error columns: what each collector stores, what the catalogue documents, what the code assumed (2.62.0)
+# Units of the position-error columns: what each collector stores, what the catalogue documents, what the code assumed (2.63.0)
 
 Evidence levels: **text** = read in the original text (paper, survey documentation, a page fetched verbatim this session); **summary** = a fetch agent
 passed a summary of a long page, not checked against the text; **data** = measured on the rows the collectors stored (335 regions + 3 real-use
@@ -8,7 +8,7 @@ itself and is the way to close every "none" below (run it where the network allo
 
 ## 1. The table
 
-| catalogue (collector) | position-error columns stored | documented unit | evidence | what the code assumed (2.61.9) | verdict |
+| catalogue (collector) | position-error columns stored | documented unit | evidence | what the code assumed (before 2.63.0) | verdict |
 |---|---|---|---|---|---|
 | **VLASS Epoch 1 QL** (`vlass`) | `e_RAJ2000`, `e_DEJ2000` (= `e_RAMdeg`, `e_DEMdeg`) | **degrees** | VizieR metadata (1b) and data: `e_RAJ2000` equals the `e_RAMdeg` column (named in degrees) in all 384 rows; median 2.2e-5, i.e. 0.079'' as degrees, 2e-5'' as arcsec (a 2.5'' beam at S/N ~ 10 gives ~0.1'', Condon 1997: sigma = beam / (2 S/N)); the catalogue's own accuracy is ~1'' / 0.5'' at Dec > -20 (text: Gordon et al. 2021, ApJS 255, 30, Sect. 2.1). Column unit in the CIRADA guide / ReadMe: none | arcsec | **wrong (x3600)** |
 | **NVSS** (`nvss`) | `e_RAJ2000`, `e_DEJ2000` | RA **seconds of time**, Dec arcsec | VizieR metadata (1b) and data: e_RA x 15 cos(dec) / e_Dec has a median 0.94 over all 223 stored rows (the beam is circular at Dec > -10), read as arcsec 0.071; the NRAO page quotes rms 'in arcsec' in prose (text), the column table: none | arcsec | **wrong (RA x15 cos dec)** |
@@ -52,7 +52,7 @@ Only the two rows in bold had a wrong unit.  Everything else that reaches `infer
 ## 2. What the fix is
 
 `association_model.native_radec_errors_arcsec` converts the `e_RAJ2000` / `e_DEJ2000` pair per catalogue: VLASS x 3600; NVSS RA x 15 cos(dec), Dec as is;
-everything else as before.  `V2_POSERR_UNITS=legacy` restores the 2.61.9 reading.  A row-by-row check over every stored raw file
+everything else as before.  `V2_POSERR_UNITS=legacy` restores the reading of every release before 2.63.0.  A row-by-row check over every stored raw file
 (`check_units_from_rows.py`, result in `results_2026-11-27h/rows_changed.csv`: 860 000 rows of 22 catalogues, **only VLASS (314 of 384 rows) and NVSS (70 of 223) change**) lists exactly which rows change; the unit test
 `test_poserr_units.py::test_nothing_else_changes_between_fixed_and_legacy` fixes the same for one row of every other catalogue.
 

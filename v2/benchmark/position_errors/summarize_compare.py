@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The tables of ``compare_by_members.py`` condensed against the predictions of ``PREDICTIONS.md`` (2.62.0).
+"""The tables of ``compare_by_members.py`` condensed against the predictions of ``PREDICTIONS.md`` (2.63.0).
 
     python summarize_compare.py --compare results_2026-11-27h/compare --out results_2026-11-27h/summary
 

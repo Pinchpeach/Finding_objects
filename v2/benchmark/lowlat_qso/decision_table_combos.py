@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The decision table of the survey-count switches combined with the association rules (2.61.10): one row per combination, every number from a table written by the other tools.
+"""The decision table of the survey-count switches combined with the association rules (2.62.2): one row per combination, every number from a table written by the other tools.
 
     python decision_table_combos.py --inputs results_2026-11-27h/inputs --assoc ../association_ambiguity/results_2026-11-27f --out results_2026-11-27h/decision_table.csv
 
@@ -111,8 +111,36 @@ def cosmos(loss: pd.DataFrame, claims: pd.DataFrame, key: str) -> dict:
     return out
 
 
+def wilson_upper(k: int, n: int, z: float = 1.959964) -> float:
+    if n == 0:
+        return float("nan")
+    p = k / n
+    return 100.0 * (p + z * z / (2 * n) + z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n))) / (1 + z * z / n)
+
+
+def new_join_bound(assoc_dir: Path, assoc: str) -> dict:
+    """The joins the association rule ADDS (rows not joined in the base, joined with it), against the COSMOS2020 truth: false / known, calibration + confirmation pooled, with the
+    Wilson 95 % upper bound as it is.  0/68 (AllWISE) has an upper bound of 5.3 %, above the 1.8 % false rate of the joins the base makes, so it cannot be said that the new joins are
+    better than the old ones (review of 2.61.8); the 1 % of the adoption criterion is not shown by it either."""
+    if assoc == "base":
+        return {}
+    out, tk, tn = {}, 0, 0
+    for cat in ("AllWISE", "2MASS PSC", "GALEX AIS"):
+        k = n = 0
+        for half in ("calibration", "confirmation"):
+            e = pd.read_csv(assoc_dir / half / "cosmos" / "exchange.csv")
+            r = e[(e.variant == "same_nearest") & (e.catalog == cat)].iloc[0]
+            k += int(r.new_false)
+            n += int(r.new_correct + r.new_false)
+        tk, tn = tk + k, tn + n
+        out[f"assoc_new_joins_false_{cat.split()[0]}"] = f"{k}/{n} (upper {wilson_upper(k, n):.1f} %)"
+    out["assoc_new_joins_false_all"] = f"{tk}/{tn} (upper {wilson_upper(tk, tn):.1f} %)"
+    return out
+
+
 def assoc_cols(assoc_dir: Path, assoc: str) -> dict:
     out = {}
+    out.update(new_join_bound(assoc_dir, assoc))
     for half, name in (("calibration", "cal9"), ("confirmation", "conf17")):
         rates = pd.read_csv(assoc_dir / half / "cosmos" / "rates.csv").set_index(["variant", "catalog"])
         st = pd.read_csv(assoc_dir / half / "cosmos" / "structure.csv").set_index("variant")

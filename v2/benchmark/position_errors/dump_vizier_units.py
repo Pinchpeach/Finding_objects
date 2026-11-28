@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Print the unit and description VizieR itself stores for the position-error columns (2.62.0).
+"""Print the unit and description VizieR itself stores for the position-error columns (2.63.0).
 
     python dump_vizier_units.py [--out FILE.csv]
 

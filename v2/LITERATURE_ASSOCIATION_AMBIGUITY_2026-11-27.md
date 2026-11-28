@@ -74,6 +74,6 @@
 * NWAY `match_flag = 2`의 부등호 방향(본문 3절과 7절이 추출에서 엇갈림).
 * SDSS 분광 `ra/dec`의 정의와 PhotoObj `raErr/decErr`의 단위·의미(SDSS 스키마 페이지가 동적이라 읽히지 않음), SDSS 최근 데이터 릴리스(DR9 이후)의 천문 재보정 서술.
 * LAMOST 입력 좌표의 정확도 수치, 광섬유 위치 정확도.
-* VLASS 카탈로그 열 `e_RAJ2000/e_DEJ2000`의 단위: **(정정, 2.62.0)** 같은 표의 `e_RAMdeg`와 384행 모두 같은 값이라 도(deg)로 확정했다(`benchmark/position_errors/UNITS.md`). VizieR ReadMe 원문은 이 환경에서 읽지 못했다.
+* VLASS 카탈로그 열 `e_RAJ2000/e_DEJ2000`의 단위: **(정정, 2.63.0)** 같은 표의 `e_RAMdeg`와 384행 모두 같은 값이라 도(deg)로 확정했다(`benchmark/position_errors/UNITS.md`). VizieR ReadMe 원문은 이 환경에서 읽지 못했다.
 * Gaia DR3 문서(variability 표의 위치 기준 시각).
 * Legacy Surveys DR10의 천문 정확도 수치(Dey et al. 2019는 DR10 이전).
