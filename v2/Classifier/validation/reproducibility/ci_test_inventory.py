@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Which tests the workflows really run, against the tests that exist (2.61.9).
+"""Which tests the workflows really run, against the tests that exist (2.61.9, workflows run from v2 understood in 2.62.3).
 
     python ci_test_inventory.py --out ci_test_inventory.csv
 
@@ -37,11 +37,16 @@ def unittest_count(folder: Path) -> int:
 def workflow_commands() -> list[tuple[str, str]]:
     out = []
     for f in sorted((REPO / ".github" / "workflows").glob("*.yml")):
-        for line in f.read_text(encoding="utf-8").splitlines():
+        text = f.read_text(encoding="utf-8")
+        in_v2 = "working-directory: v2\n" in text or "working-directory: v2\r" in text  # unit-tests.yml runs from v2 like CLAUDE.md (2.62.3)
+        for line in text.splitlines():
             if line.lstrip().startswith("#"):
                 continue
-            if ("pytest" in line or "unittest" in line) and "v2/" in line and "pip install" not in line:
-                out.append((f.name, line.strip().removeprefix("run: ")))
+            cmd = line.strip().removeprefix("run: ")
+            if ("pytest" in line or "unittest" in line) and "pip install" not in line and ("v2/" in line or (in_v2 and "tests" in line)):
+                if in_v2 and "v2/" not in cmd:  # paths relative to v2: name them as the table does
+                    cmd = " ".join(("v2/" + t) if ("/" in t and not t.startswith(("-", "v2/", ".."))) else t for t in cmd.split())
+                out.append((f.name, cmd))
     return out
 
 
