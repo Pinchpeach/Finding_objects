@@ -180,6 +180,7 @@ def run(
         out = pd.DataFrame(columns=EMPTY_RESULT_COLUMNS)
         coverage = _coverage(work, raw_dir)
         out = _load(V2 / "catalog_coverage.py", "v2_catalog_coverage").annotate(out, coverage)
+        out = _load(V2 / "object_position.py", "v2_object_position").apply(out, pd.DataFrame())
         out.to_csv(work / "classified_objects.csv", index=False)
         _load(V2 / "summary.py", "v2_summary").write(out, work)
         pd.DataFrame(timings).to_csv(work / "pipeline_summary.csv", index=False)
@@ -234,6 +235,9 @@ def run(
     out = _load(V2 / "high_confidence.py", "v2_high_confidence").apply(out, coverage)
     # The same information inside the tables, for whoever gets only the CSV (2.57.0).
     out = _load(V2 / "catalog_coverage.py", "v2_catalog_coverage").annotate(out, coverage)
+    # The printed position, last: V2_OBJECT_POSITION=best (default off) shows the most precise member's position instead of the anchor's.  Everything above ran on the anchor
+    # position, so labels, probabilities, names, distances and the object set are those of the default run (object_position.py, LITERATURE_OBJECT_POSITION_2026-11-28.md).
+    out = _load(V2 / "object_position.py", "v2_object_position").apply(out, assoc)
     out.to_csv(work / "classified_objects.csv", index=False)
     # The columns a user reads first, one row per independent detected object;
     # galaxy parts and NED/SIMBAD-only entries apart (2.54.0, summary.py).

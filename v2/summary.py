@@ -33,6 +33,7 @@ COLUMNS = [
     "designation",
     "ra",
     "dec",
+    "position_source",  # only with V2_OBJECT_POSITION=best (object_position.py); the other columns of that switch stay in classified_objects.csv
     "separation_arcmin",
     "mag",
     "mag_band",
