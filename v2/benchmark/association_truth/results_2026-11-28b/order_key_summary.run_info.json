@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "commit": "641616e335c95c24bc9dabef392155571369e95e",
+  "branch": "ccr-68f28268-l0opfu",
+  "dirty": true,
+  "dirty_files": 4,
+  "env": {
+    "PYTHONHASHSEED": "0"
+  },
+  "effective": {
+    "POSERR_UNITS": "legacy",
+    "AMBIG_FIX": [],
+    "POSERR_NATIVE": [],
+    "ANNOT_ASSOC": [],
+    "LOWLAT_QSO": [],
+    "LOWLAT_QSO_ABSB": 20.0
+  },
+  "started_utc": "2026-11-28T03:43:14Z",
+  "finished_utc": "2026-11-28T03:44:02Z",
+  "status": "ok",
+  "inputs": [
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ok26",
+      "kind": "directory",
+      "sha256": "19cc41ab9711cc00d5d42ea2483a7a4472043398007f60b5943f1436c94951df",
+      "n_files": 446,
+      "hashed": "relative path, size"
+    }
+  ],
+  "argv": [
+    "summarize_native_error_variants.py",
+    "--root",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ok26",
+    "--out",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ok26/summary2",
+    "--variants",
+    "base",
+    "allwise",
+    "allwise_order",
+    "allwise_sigma",
+    "floored",
+    "allwise_floored",
+    "allwise_order_floored",
+    "--cats",
+    "AllWISE",
+    "2MASS PSC",
+    "GALEX AIS",
+    "--stem",
+    "order_key"
+  ],
+  "python": "3.13.18",
+  "note": ""
+}

@@ -41,7 +41,10 @@ ROWS = [  # name, association, low-latitude / COSMOS variant key, spectroscopic 
     ("same_nearest+surveys3", "same_nearest", "same_nearest_surveys3", "surveys3", False),
     # 2.62.6 (order of 2026-11-28, task b): the three switches together; the association columns are those of fixed + same,nearest without the survey-count switch
     ("fixed+same_nearest+surveys2", "fixed_same_nearest", "fixed_same_nearest_surveys2", "surveys2", False),
+    # 2.62.7 (order of 2026-11-28, task b, addition): the same with V2_LOWLAT_QSO=surveys2,lit_keep (the NED / SIMBAD QSO exempt from the survey-count rule); the association is that of the row above
+    ("fixed+same_nearest+surveys2+lit_keep", "fixed_same_nearest", "fixed_same_nearest_surveys2_litkeep", "surveys2", False),
 ]
+HELD_KEY = {"fixed+same_nearest+surveys2+lit_keep": "fixed_same_nearest_litkeep"}  # held_{b,d}_<key>.csv of the spectroscopic cones; the association columns still use the row's own ``assoc``
 HISTORY = {
     "base": "no threshold; reference",
     "surveys2": "the 3 / 4 survey rule was chosen on the 169 low-latitude calibration cones + 9 COSMOS fields and checked on the 140 confirmation cones (2.61.3-2.61.5); the 32 spectroscopic QSO are the objects that motivated spectro_keep",
@@ -51,6 +54,7 @@ HISTORY = {
     "same_nearest+surveys2": "both choices above; the combination was not measured before this table",
     "same_nearest+surveys2+spectro_keep": "both choices above",
     "same_nearest+surveys3": "both choices above",
+    "fixed+same_nearest+surveys2+lit_keep": "the three choices and lit_keep (2.62.4: written after the 16 literature QSO labels of the real-use COSMOS field were seen to be erased by surveys2; the blind sets have no NED / SIMBAD rows, so only the real-use field can move)",
     "fixed+same_nearest+surveys2": "all three choices; V2_POSERR_UNITS=fixed was chosen on the 179 regions of the unit study (no threshold), was never measured together with the other two before this row; the base of every column is the legacy-unit base",
 }
 UNUSED = "the only sample no threshold or switch has been fitted on is set C (LOCKED_TEST_SET_C.md); it has not been run with these combinations"
@@ -196,7 +200,7 @@ def main() -> int:
         row = dict(variant=name, history=HISTORY[name])
         row.update(lowlat(conf, key, "lowlat_conf"))
         row.update(lowlat(cal, key, "lowlat_cal"))
-        row["spectroscopic_qso_held"] = held(a.inputs, assoc, spec)
+        row["spectroscopic_qso_held"] = held(a.inputs, HELD_KEY.get(name, assoc), spec)
         row.update(cosmos(loss, claims, key))
         row.update(labels(a.inputs, key))
         row.update(assoc_cols(a.assoc, assoc))

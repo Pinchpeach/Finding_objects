@@ -1,0 +1,112 @@
+{
+  "schema": 1,
+  "commit": "6e36e52cc2a12e63f7d0743b7621b4ef9777c585",
+  "branch": "ccr-68f28268-l0opfu",
+  "dirty": true,
+  "dirty_files": 1,
+  "env": {
+    "PYTHONHASHSEED": "0",
+    "V2_CACHE": "0"
+  },
+  "effective": {
+    "POSERR_UNITS": "legacy",
+    "AMBIG_FIX": [],
+    "POSERR_NATIVE": [],
+    "ANNOT_ASSOC": [],
+    "LOWLAT_QSO": [],
+    "LOWLAT_QSO_ABSB": 20.0
+  },
+  "started_utc": "2026-11-28T03:11:40Z",
+  "finished_utc": "2026-11-28T03:12:05Z",
+  "status": "ok",
+  "inputs": [
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/m_a_base",
+      "kind": "directory",
+      "sha256": "77f9cd83e6b02e169c5eaae87708470c4f86d78b652109b4584cb3fa4b53918a",
+      "n_files": 677,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/m_a_surveys2",
+      "kind": "directory",
+      "sha256": "a565bc56f75afaf14b8633032087a98097a404e8348ff30fc269664652159851",
+      "n_files": 677,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/m_a_surveys3",
+      "kind": "directory",
+      "sha256": "187e82735455a3547727a396198866ddcc1afab29f9ec00d5954bcd76d241527",
+      "n_files": 677,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/a_same_nearest",
+      "kind": "directory",
+      "sha256": "af872aff290eb12c3d83cd0b407145957e9cec2a6a019b4ee3935f75fc096f8d",
+      "n_files": 677,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/a_same_nearest_surveys2",
+      "kind": "directory",
+      "sha256": "f5518887fe6137e57832403294c9d8a885f615dec499d00a052dfcbfc83ab9e8",
+      "n_files": 677,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/a_same_nearest_surveys3",
+      "kind": "directory",
+      "sha256": "f9ae9e942f8315913d74bf20b3076139893ac8733905b34da8481ea0a30a1d0f",
+      "n_files": 677,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/a_fixed_same_nearest_surveys2",
+      "kind": "directory",
+      "sha256": "4b3ea81d4713344f08ee3a33d7fd5e9553b7d2ce8fc8ff543f86c705a5012e89",
+      "n_files": 677,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/a_fixed_same_nearest_surveys2_litkeep",
+      "kind": "directory",
+      "sha256": "6567c4f060335ede16b5be01b500dfe682f995d0ae2ac8b6cf9e28ff4041c937",
+      "n_files": 677,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "fields_lowlat.csv",
+      "kind": "file",
+      "sha256": "8b0f52e28ea3819fd6a9ea97ab922c305acd2a404c5dcc8df9981337a7e4d0d7",
+      "size": 16436
+    },
+    {
+      "path": "lowlat_truth.csv.gz",
+      "kind": "file",
+      "sha256": "35955f978cf6d10bdf9da20bf7ffb6226999fd57ec5e0c3ffc3df0df42d0ea89",
+      "size": 77850
+    }
+  ],
+  "argv": [
+    "combos_table.py",
+    "--variants",
+    "base=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/m_a_base",
+    "surveys2=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/m_a_surveys2",
+    "surveys3=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/m_a_surveys3",
+    "same_nearest=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/a_same_nearest",
+    "same_nearest_surveys2=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/a_same_nearest_surveys2",
+    "same_nearest_surveys3=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/a_same_nearest_surveys3",
+    "fixed_same_nearest_surveys2=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/a_fixed_same_nearest_surveys2",
+    "fixed_same_nearest_surveys2_litkeep=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/a_fixed_same_nearest_surveys2_litkeep",
+    "--regions",
+    "fields_lowlat.csv",
+    "--truth",
+    "lowlat_truth.csv.gz",
+    "--out",
+    "results_2026-11-28b/inputs/lowlat_calibration.csv"
+  ],
+  "python": "3.13.18",
+  "note": ""
+}

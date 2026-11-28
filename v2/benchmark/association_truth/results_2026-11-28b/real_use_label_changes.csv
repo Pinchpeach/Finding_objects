@@ -1,0 +1,5 @@
+variant,pairs,changed,to_QSO,from_QSO,only_in_base,only_in_variant
+allwise,4759,2,0,0,11,10
+allwise_order,4759,2,0,0,11,10
+allwise_sigma,4762,0,0,0,8,8
+floored,4724,4,0,0,46,53

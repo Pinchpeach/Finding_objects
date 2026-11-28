@@ -20,6 +20,7 @@ import sys
 import argparse
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 CATS = ("AllWISE", "GALEX AIS")
@@ -38,17 +39,30 @@ def main() -> int:
     ap.add_argument("--root", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--variants", nargs="+", default=["base", "allwise", "allwise_raw", "galex"])
+    ap.add_argument("--cats", nargs="+", default=list(CATS), help="catalogues of the false / missed table (2.62.7: the order-key study adds '2MASS PSC')")
+    ap.add_argument("--stem", default="native_error", help="output file stem: STEM_false_missed.csv, STEM_structure.csv")
     a = ap.parse_args()
     t0 = RI.start()
     a.out.mkdir(parents=True, exist_ok=True)
     fm = pd.concat([pd.read_csv(a.root / f"meas_{v}" / f"false_missed_{v}.csv") for v in a.variants])
-    fm = fm[fm.catalog.isin(CATS)]
-    keep = ["variant", "half", "catalog", "rows", "with_expected", "matched", "correct", "false", "unknown", "missed", "false_pct_of_matched_known", "false_wilson", "missed_pct_of_expected", "shifted_false_pct"]  # fmt: skip
-    fm = fm[keep]
+    fm = fm[fm.catalog.isin(a.cats)]
+    keep = ["variant", "half", "catalog", "rows", "with_expected", "matched", "correct", "false", "unknown", "missed", "rightly_alone", "false_pct_of_matched_known", "false_wilson", "missed_pct_of_expected", "shifted_false_pct"]  # fmt: skip
+    split = {"alone_identified", "alone_wrong", "alone_unidentified"} <= set(fm.columns)
+    fm = fm[keep + (["alone_identified", "alone_wrong", "alone_unidentified"] if split else [])]
+    # 2.62.7: the row sits in the object that holds its counterpart, whoever anchors: joined and right (correct) or anchoring an object that holds it
+    # (alone_identified).  Review (Codex): rightly_alone also counts rows whose counterpart no object holds, which turn "unknown" when joined, so the first
+    # version (correct + rightly_alone) moved with the anchor.  Outputs of measure_association.py before the split have no alone_identified: NaN, re-measure.
+    if split:
+        fm["right_object"] = fm.correct + fm.alone_identified
+        fm["wrong_object"] = fm["false"] + fm.alone_wrong
+        fm["unidentified"] = fm.unknown + fm.alone_unidentified
+    else:
+        print("measure_association outputs without alone_identified / alone_wrong / alone_unidentified: right_object is not computed (re-run measure_association.py)", file=sys.stderr)
+        fm["right_object"] = fm["wrong_object"] = fm["unidentified"] = np.nan
     base = fm[fm.variant == "base"].set_index(["half", "catalog"])
-    for col in ("matched", "correct", "false", "missed", "false_pct_of_matched_known", "missed_pct_of_expected", "shifted_false_pct"):
+    for col in ("matched", "correct", "false", "missed", "right_object", "wrong_object", "unidentified", "false_pct_of_matched_known", "missed_pct_of_expected", "shifted_false_pct"):
         fm[f"d_{col}"] = [round(r[col] - base.loc[(r.half, r.catalog), col], 2) for _, r in fm.iterrows()]
-    fm.sort_values(["catalog", "half", "variant"]).to_csv(a.out / "native_error_false_missed.csv", index=False)
+    fm.sort_values(["catalog", "half", "variant"]).to_csv(a.out / f"{a.stem}_false_missed.csv", index=False)
 
     fields = sorted(p.name for p in (a.root / "base").iterdir() if p.is_dir())
     rows = []
@@ -67,7 +81,9 @@ def main() -> int:
         rows.append(dict(variant=v, objects=n_obj, anchored_by_AllWISE=int(anchors.get("AllWISE", 0)), anchored_by_GALEX=int(anchors.get("GALEX AIS", 0)),
                          anchored_by_LS=int(anchors.get("DESI Legacy Surveys DR10", 0)), anchored_by_PS1=int(anchors.get("Pan-STARRS1 DR2 MeanObject", 0)),
                          objects_differing_from_base=differ if v != "base" else 0, fields_identical_to_base=same_fields if v != "base" else len(fields)))  # fmt: skip
-    pd.DataFrame(rows).to_csv(a.out / "native_error_structure.csv", index=False)
+        if "2MASS PSC" in a.cats:
+            rows[-1]["anchored_by_2MASS"] = int(anchors.get("2MASS PSC", 0))
+    pd.DataFrame(rows).to_csv(a.out / f"{a.stem}_structure.csv", index=False)
     print(pd.DataFrame(rows).to_string(index=False))
     print(fm[fm.half == "all"].drop(columns=["unknown", "with_expected", "false_wilson"]).sort_values(["catalog", "variant"]).to_string(index=False))
     RI.write_args(a, ('root',), t0=t0)

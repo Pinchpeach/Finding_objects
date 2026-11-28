@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "commit": "6e36e52cc2a12e63f7d0743b7621b4ef9777c585",
+  "branch": "ccr-68f28268-l0opfu",
+  "dirty": true,
+  "dirty_files": 1,
+  "env": {
+    "PYTHONHASHSEED": "0",
+    "V2_CACHE": "0"
+  },
+  "effective": {
+    "POSERR_UNITS": "legacy",
+    "AMBIG_FIX": [],
+    "POSERR_NATIVE": [],
+    "ANNOT_ASSOC": [],
+    "LOWLAT_QSO": [],
+    "LOWLAT_QSO_ABSB": 20.0
+  },
+  "started_utc": "2026-11-28T03:13:23Z",
+  "finished_utc": "2026-11-28T03:13:25Z",
+  "status": "ok",
+  "inputs": [
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/cost_deep/run_base",
+      "kind": "directory",
+      "sha256": "26358320f4593ff83a82043e0376edda4c2ce667a090bf093491a2f07ade76e2",
+      "n_files": 26,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/cost_deep/run_fixed_same_nearest_surveys2_litkeep",
+      "kind": "directory",
+      "sha256": "544fdb42217c74d5b38fa6ce55dd2c0c952057ea2ac55683348726f807241d22",
+      "n_files": 27,
+      "hashed": "relative path, size"
+    }
+  ],
+  "argv": [
+    "../association_ambiguity/label_changes.py",
+    "--base",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/cost_deep/run_base",
+    "--variant",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/cost_deep/run_fixed_same_nearest_surveys2_litkeep",
+    "--fields",
+    "deep_cosmos_1,deep_cosmos_2,deep_cosmos_3,deep_cosmos_4,deep_cosmos_5,deep_cosmos_6,deep_cosmos_7,deep_cosmos_8,deep_cosmos_9,deep_cosmos_10,deep_cosmos_11,deep_cosmos_12,deep_cosmos_13,deep_cosmos_14,deep_cosmos_15,deep_cosmos_16,deep_cosmos_17,deep_cosmos_18,deep_cosmos_19,deep_cosmos_20,deep_cosmos_21,deep_cosmos_22,deep_cosmos_23,deep_cosmos_24,deep_cosmos_25,deep_cosmos_26",
+    "--out",
+    "results_2026-11-28b/lc_deep_litkeep"
+  ],
+  "python": "3.13.18",
+  "note": ""
+}

@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "commit": "60a92a7d26978bf517ee16a0a1649eb064a4dc7b",
+  "branch": "claude/code-review-7ox8zn",
+  "dirty": true,
+  "dirty_files": 1,
+  "env": {},
+  "effective": {
+    "POSERR_UNITS": "legacy",
+    "AMBIG_FIX": [],
+    "POSERR_NATIVE": [],
+    "ANNOT_ASSOC": [],
+    "LOWLAT_QSO": [],
+    "LOWLAT_QSO_ABSB": 20.0
+  },
+  "started_utc": "2026-11-28T04:30:23Z",
+  "finished_utc": "2026-11-28T04:30:23Z",
+  "status": "ok",
+  "inputs": [
+    {
+      "path": "/home/user/Finding_objects/v2/benchmark/truth_data/ground_truth.csv",
+      "kind": "file",
+      "sha256": "51f0d40ee5f9bb3ccdf473bbf72e537f4c70e9cf6eba28891509f56ad19dd1d9",
+      "size": 1843651
+    },
+    {
+      "path": "/home/user/Finding_objects/v2/benchmark/desi_external/truth.csv",
+      "kind": "file",
+      "sha256": "f59e7751db88f87c9c72bd3f71ee325347a54abd567a8aa62279c923c27520da",
+      "size": 770232
+    },
+    {
+      "path": "/home/user/Finding_objects/v2/benchmark/radio_xray_truth/ground_truth.csv",
+      "kind": "file",
+      "sha256": "788fe3a4a01b5c954c2188710abde3969e3a748bcbe97b00c550310dac7cb44c",
+      "size": 282605
+    },
+    {
+      "path": "/home/user/Finding_objects/v2/Classifier/star_truth.csv",
+      "kind": "file",
+      "sha256": "e30c4bf8ef5e1d2060f913ae40b514def5395b491ae1e8f7bca96c3fa0f2111c",
+      "size": 184859
+    },
+    {
+      "path": "/home/user/Finding_objects/v2/Classifier/lamost_star_external_truth.csv",
+      "kind": "file",
+      "sha256": "be5c38459060cc60908c03888aa25e929926a2b172ee89ceb1e43bc76c73fa8e",
+      "size": 115691
+    },
+    {
+      "path": "/home/user/Finding_objects/v2/Classifier/wd_subtype_truth.csv",
+      "kind": "file",
+      "sha256": "3812462f9be9b9eb8bed0b4e27751e76fa8925a7a199e68dadd42a947954a01d",
+      "size": 32469
+    }
+  ],
+  "argv": [
+    "split_key_impact.py",
+    "--out",
+    "results_2026-11-28"
+  ],
+  "python": "3.13.18",
+  "note": "design study of the split key; reads the committed truth tables",
+  "previous": [
+    {
+      "commit": "92d590c8f3dfd4fa50c1a704b2b22d9329dc9b59",
+      "dirty": true,
+      "env": {
+        "PYTHONHASHSEED": "0"
+      },
+      "effective": {
+        "POSERR_UNITS": "legacy",
+        "AMBIG_FIX": [],
+        "POSERR_NATIVE": [],
+        "ANNOT_ASSOC": [],
+        "LOWLAT_QSO": [],
+        "LOWLAT_QSO_ABSB": 20.0
+      },
+      "started_utc": "2026-11-28T02:51:46Z",
+      "finished_utc": "2026-11-28T02:51:47Z",
+      "status": "ok",
+      "note": "design study of the split key; reads the committed truth tables"
+    },
+    {
+      "commit": "3c1f0075ee52f992cd4885e809e017caedd52ad1",
+      "dirty": true,
+      "env": {
+        "PYTHONHASHSEED": "0"
+      },
+      "effective": {
+        "POSERR_UNITS": "legacy",
+        "AMBIG_FIX": [],
+        "POSERR_NATIVE": [],
+        "ANNOT_ASSOC": [],
+        "LOWLAT_QSO": [],
+        "LOWLAT_QSO_ABSB": 20.0
+      },
+      "started_utc": "2026-11-28T02:56:09Z",
+      "finished_utc": "2026-11-28T02:56:10Z",
+      "status": "ok",
+      "note": "design study of the split key; reads the committed truth tables"
+    }
+  ],
+  "mixed": true
+}

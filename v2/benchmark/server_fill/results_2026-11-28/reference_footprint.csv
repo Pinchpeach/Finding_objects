@@ -1,0 +1,3 @@
+sample,n,ra_min,ra_max,dec_min,dec_max
+"committed table, QSO_SPECTROSCOPIC",300,1.59799,3.26382611,-11.17685306,36.14352889
+"validation plan (2.46.2), QSO_SPECTROSCOPIC",10,0.140715,1.514255,-4.98454389,35.12332611

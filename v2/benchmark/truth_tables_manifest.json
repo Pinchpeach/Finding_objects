@@ -1,0 +1,522 @@
+{
+ "note": "SHA-256 of the committed truth tables (truth_manifest.py); regenerate only together with a deliberate replacement of a table",
+ "schema": 1,
+ "tables": {
+  "bright_truth": {
+   "builder": "benchmark/build_bright_truth.py",
+   "files": [
+    {
+     "bytes": 713326,
+     "path": "benchmark/bright_truth/apogee.csv.gz",
+     "rows": 8196,
+     "sha256": "5f4c951c06b0067cf0d07b359d95ae3254dc2d881e3dd423db64d70be2af3238"
+    },
+    {
+     "bytes": 185035,
+     "path": "benchmark/bright_truth/els.csv.gz",
+     "rows": 4000,
+     "sha256": "1e8e3a70678f83349eb436e23c243e5f2749f6449bce1055dccc669bdbddaa9e"
+    },
+    {
+     "bytes": 2232063,
+     "path": "benchmark/bright_truth/lpv_lamost.csv.gz",
+     "rows": 23969,
+     "sha256": "5e99996876fafefdcc5aaebac3baac386d65ff8dec8456006b2060d6fe6a466e"
+    }
+   ],
+   "group": "order_dependent",
+   "paired": [],
+   "survey_row": 7,
+   "workflow": "build-bright-truth.yml"
+  },
+  "desi_external_truth": {
+   "builder": "benchmark/build_desi_truth.py",
+   "files": [
+    {
+     "bytes": 770232,
+     "id_column": "benchmark_id",
+     "ids_sha256": "c18812c276c35ee9f0a94f198187dfd8f5568c2eaa19abef5dfb06af1c85367b",
+     "path": "benchmark/desi_external/truth.csv",
+     "rows": 4795,
+     "sha256": "f59e7751db88f87c9c72bd3f71ee325347a54abd567a8aa62279c923c27520da"
+    }
+   ],
+   "group": "order_dependent",
+   "paired": [
+    {
+     "digest_sha256": "2de01835ff9294cf11359bf4f302ef610f422d19d2b56f27f7fff23171ec8001",
+     "files": [
+      {
+       "bytes": 551417,
+       "path": "benchmark/desi_external/catalog_features/allwise_trd.csv.gz",
+       "sha256": "2278f2f5b68082877ddd20867df5915e5977f232a49950e490f11388e1d8e0b2"
+      },
+      {
+       "bytes": 40990,
+       "path": "benchmark/desi_external/catalog_features/chandra_trd.csv.gz",
+       "sha256": "dc41ee6ec49a62784a43433fad54323bcbc53718c772bc95ec4a44692cf408db"
+      },
+      {
+       "bytes": 940420,
+       "path": "benchmark/desi_external/catalog_features/desi_legacy_trd.csv.gz",
+       "sha256": "228f0e9dea63e903ee96f4adc573c8f1b40b98ad18e12e84a96a863284fa5d26"
+      },
+      {
+       "bytes": 69367,
+       "path": "benchmark/desi_external/catalog_features/erosita_trd.csv.gz",
+       "sha256": "6b1d94ea6f3c645b13faecbe6b37d764da49396fc0f562c20f189a11ea1855a9"
+      },
+      {
+       "bytes": 5316,
+       "path": "benchmark/desi_external/catalog_features/first_trd.csv.gz",
+       "sha256": "8a5d6a8e3b965c8e48a07d9b17b08830f2e3e7f50247bac49aed62698f8b5e95"
+      },
+      {
+       "bytes": 541104,
+       "path": "benchmark/desi_external/catalog_features/gaia_dr3_trd.csv.gz",
+       "sha256": "f504f9eb231ea071e1ffb49b149d608346520a4640178deed423d8289c2e1624"
+      },
+      {
+       "bytes": 217545,
+       "path": "benchmark/desi_external/catalog_features/galex_trd.csv.gz",
+       "sha256": "6535fed077785e2a8d4ef6fd5a7e08ca23c63a0e009d144b0f6d2274539c44f3"
+      },
+      {
+       "bytes": 10652,
+       "path": "benchmark/desi_external/catalog_features/lotss_trd.csv.gz",
+       "sha256": "f41cd18538a0207d0f76003e886cf4b819a1acbbfcc00d8f537edfd45a818b98"
+      },
+      {
+       "bytes": 4640,
+       "path": "benchmark/desi_external/catalog_features/nvss_trd.csv.gz",
+       "sha256": "f1691db320e84eeda7235d392cccad75d38de78b9212c799671c5bf14e5d4882"
+      },
+      {
+       "bytes": 1367709,
+       "path": "benchmark/desi_external/catalog_features/panstarrs1_trd.csv.gz",
+       "sha256": "bac0d0d27047b78e928712422d7cdd26a3c53d14e316fea8b095a6e24f97a2ba"
+      },
+      {
+       "bytes": 55906,
+       "path": "benchmark/desi_external/catalog_features/twomass_trd.csv.gz",
+       "sha256": "8215b58c48cbe0a19d256d9bda674a3dc092cb5731228ed9a0d7bdb2142a43d9"
+      },
+      {
+       "bytes": 12236,
+       "path": "benchmark/desi_external/catalog_features/vlass_trd.csv.gz",
+       "sha256": "4cd5390d7834ef8cf0504c383e378b21c8c6320ff450fdb8b805d85441ab9fe1"
+      },
+      {
+       "bytes": 16337,
+       "path": "benchmark/desi_external/catalog_features/xmm_trd.csv.gz",
+       "sha256": "e13202946da3f860a668cd900ceb6da95bca8f6fe44f9dd0223dfc4b514a8dcd"
+      },
+      {
+       "bytes": 501670,
+       "path": "benchmark/desi_external/catalog_features/ztf_lightcurve_trd.csv.gz",
+       "sha256": "63710a7fcaf2da789a01d769fedd769780111ce5efe6cb1277c887a095009423"
+      }
+     ],
+     "n_files": 14,
+     "path": "benchmark/desi_external/catalog_features"
+    }
+   ],
+   "survey_row": 1,
+   "workflow": "v2_desi_external_validation.yml"
+  },
+  "desi_fusion_truth": {
+   "builder": "benchmark/build_desi_truth.py",
+   "files": [
+    {
+     "bytes": 1328168,
+     "id_column": "benchmark_id",
+     "ids_sha256": "64c40094b7d5dd1f761c1f859cdcdea6d785b13d5d2895d6e60e85730ecd9258",
+     "path": "benchmark/desi_fusion/truth.csv",
+     "rows": 8257,
+     "sha256": "e377f6dbba4655b66dc5641680062a0822812595bf77ca809ad1c3abb9676a91"
+    }
+   ],
+   "group": "order_dependent",
+   "paired": [
+    {
+     "digest_sha256": "8451a5c12909f060fef313d5cd198ada35c8cc407f5c101232f099f793c08010",
+     "files": [
+      {
+       "bytes": 944219,
+       "path": "benchmark/desi_fusion/catalog_features/allwise_trd.csv.gz",
+       "sha256": "ac8a9d733c7c3f3963108ba447929f398e8df9cfe1d6ec44c646c427c9e13da7"
+      },
+      {
+       "bytes": 34544,
+       "path": "benchmark/desi_fusion/catalog_features/chandra_trd.csv.gz",
+       "sha256": "9dcd9db615397827ea622937d1321824184ca285bfe8ce6ea6e3a393878b1200"
+      },
+      {
+       "bytes": 1719007,
+       "path": "benchmark/desi_fusion/catalog_features/desi_legacy_trd.csv.gz",
+       "sha256": "6b72210ae1b820eb7bc0cb01b662d4b8d44e705b909ac91e62400945d690a45a"
+      },
+      {
+       "bytes": 144135,
+       "path": "benchmark/desi_fusion/catalog_features/erosita_trd.csv.gz",
+       "sha256": "cb053ea9af900cda6af34e96e96a2b57f4e2e8abae2f31ddb2bdfce0072892a7"
+      },
+      {
+       "bytes": 10191,
+       "path": "benchmark/desi_fusion/catalog_features/first_trd.csv.gz",
+       "sha256": "cf7d05d37c23541b964633b764d26321224a4e9a2abf4629854d6b2a681fcc11"
+      },
+      {
+       "bytes": 925945,
+       "path": "benchmark/desi_fusion/catalog_features/gaia_dr3_trd.csv.gz",
+       "sha256": "88e06877180a81cb14fb383cad5676d5d5945698fe8d531eee6c3947325470eb"
+      },
+      {
+       "bytes": 353464,
+       "path": "benchmark/desi_fusion/catalog_features/galex_trd.csv.gz",
+       "sha256": "0cf6974298ee0fd3734a5799744bbd1d4db5fb8a17b05fad618a42a180dd4c79"
+      },
+      {
+       "bytes": 22006,
+       "path": "benchmark/desi_fusion/catalog_features/lotss_trd.csv.gz",
+       "sha256": "30b1da3f3528d0aca29fad0613fe3865d7d4fbc044afca16dbe8bfb4e49584e5"
+      },
+      {
+       "bytes": 10298,
+       "path": "benchmark/desi_fusion/catalog_features/nvss_trd.csv.gz",
+       "sha256": "82827a4a10834d0a0452176b36d8dddc7e979970befdb728291887392dfc7d81"
+      },
+      {
+       "bytes": 2425862,
+       "path": "benchmark/desi_fusion/catalog_features/panstarrs1_trd.csv.gz",
+       "sha256": "b5684416aedd2f42ad9a6cf74ed3a78a6f22f9a19921aedcc2bd4fbfbd254107"
+      },
+      {
+       "bytes": 97822,
+       "path": "benchmark/desi_fusion/catalog_features/twomass_trd.csv.gz",
+       "sha256": "2284c744f828a23f82aea615afa5bb72d391cf5f65292a9c22d9ed93cd480db8"
+      },
+      {
+       "bytes": 23688,
+       "path": "benchmark/desi_fusion/catalog_features/vlass_trd.csv.gz",
+       "sha256": "40a91fa2799a93ba5145881dc36bdd4ac031f178b3afaa33a41bc17911d92e94"
+      },
+      {
+       "bytes": 19160,
+       "path": "benchmark/desi_fusion/catalog_features/xmm_trd.csv.gz",
+       "sha256": "b9086d058028a71223dda2068e9a556114fe08ee0df80e0b0a730c22e7227977"
+      },
+      {
+       "bytes": 857750,
+       "path": "benchmark/desi_fusion/catalog_features/ztf_lightcurve_trd.csv.gz",
+       "sha256": "934f46866b600a1f9fc6beda2ed6eaf000364b322aa00d7973d7751670579216"
+      }
+     ],
+     "n_files": 14,
+     "path": "benchmark/desi_fusion/catalog_features"
+    }
+   ],
+   "survey_row": 1,
+   "workflow": "collect-truth-radio-xray.yml"
+  },
+  "desi_gbm_truth": {
+   "builder": "benchmark/build_desi_gbm_truth.py",
+   "files": [
+    {
+     "bytes": 21692144,
+     "path": "benchmark/desi_gbm_truth/train.csv.gz",
+     "rows": 149769,
+     "sha256": "00eedf1a542fe5d6583b851c7c88df02ae1099a6ce14190c75f7d42d02236539"
+    }
+   ],
+   "group": "order_dependent",
+   "paired": [],
+   "survey_row": 9,
+   "workflow": "build-desi-gbm-truth.yml"
+  },
+  "desi_lines_truth": {
+   "builder": "benchmark/build_desi_lines_truth.py",
+   "files": [
+    {
+     "bytes": 539253,
+     "path": "benchmark/desi_lines_truth/overlap.csv.gz",
+     "rows": 3492,
+     "sha256": "d704537608b9c7198c0610f0c9607805e7e4c295a028f6b7435959251e57692c"
+    }
+   ],
+   "group": "order_dependent",
+   "paired": [],
+   "survey_row": 8,
+   "workflow": "build-desi-lines-truth.yml"
+  },
+  "lamost_star_external_truth": {
+   "builder": "Classifier/build_lamost_star_external_truth.py",
+   "files": [
+    {
+     "bytes": 115691,
+     "id_column": "benchmark_id",
+     "ids_sha256": "ccac4c98530cf4b49d96f9d57be5641e54d3370292392de130d990823b29b4c6",
+     "path": "Classifier/lamost_star_external_truth.csv",
+     "rows": 1000,
+     "sha256": "be5c38459060cc60908c03888aa25e929926a2b172ee89ceb1e43bc76c73fa8e"
+    }
+   ],
+   "group": "order_dependent",
+   "paired": [],
+   "survey_row": 4,
+   "workflow": "build-lamost-star-external-truth.yml"
+  },
+  "mira_rr_ew_truth": {
+   "builder": "benchmark/build_mira_truth.py",
+   "files": [
+    {
+     "bytes": 650525,
+     "path": "benchmark/mira_truth/asassn_gaia_lpv.csv.gz",
+     "rows": 8000,
+     "sha256": "5990bc922cb973311db6e5933c72750ecb733882c77ac139d1c020d1c0fdd7d1"
+    },
+    {
+     "bytes": 613344,
+     "path": "benchmark/rr_ew_truth/asassn_ztf.csv.gz",
+     "rows": 12000,
+     "sha256": "be6ce81fbcce60120a661a0b10eb44f195d65268d335a02887ac1da7faa9ef08"
+    }
+   ],
+   "group": "order_dependent",
+   "paired": [],
+   "survey_row": 6,
+   "workflow": "build-mira-truth.yml"
+  },
+  "radio_xray_truth": {
+   "builder": "benchmark/build_radio_xray_truth.py",
+   "files": [
+    {
+     "bytes": 282605,
+     "id_column": "benchmark_id",
+     "ids_sha256": "7e7799b11afd18edb2ad0270f9e8e8580828cab11fd9abe351aa379ab9d4499a",
+     "path": "benchmark/radio_xray_truth/ground_truth.csv",
+     "rows": 951,
+     "sha256": "788fe3a4a01b5c954c2188710abde3969e3a748bcbe97b00c550310dac7cb44c"
+    }
+   ],
+   "group": "order_dependent",
+   "paired": [],
+   "survey_row": 11,
+   "workflow": "build-radio-xray-benchmark.yml"
+  },
+  "reference_objects": {
+   "builder": "benchmark/build_reference_objects.py",
+   "files": [
+    {
+     "bytes": 355356,
+     "path": "reference_objects/reference_objects.csv.gz",
+     "rows": 14108,
+     "sha256": "988dfb4ae38cb4072be2fa2c218d00278176f94e26feb37904a25f83b928c27c"
+    }
+   ],
+   "group": "order_dependent",
+   "paired": [],
+   "survey_row": 2,
+   "workflow": "build-reference-objects.yml"
+  },
+  "sdss_ground_truth": {
+   "builder": "benchmark/build_truth_sets.py",
+   "files": [
+    {
+     "bytes": 1843651,
+     "id_column": "benchmark_id",
+     "ids_sha256": "c27bba63b636358ef1344b0a1bde6d6c1d086c2722fbfa4916df617c0f469ee4",
+     "path": "benchmark/truth_data/ground_truth.csv",
+     "rows": 9999,
+     "sha256": "51f0d40ee5f9bb3ccdf473bbf72e537f4c70e9cf6eba28891509f56ad19dd1d9"
+    }
+   ],
+   "group": "deterministic",
+   "paired": [
+    {
+     "digest_sha256": "c10784720192a5749cd625e4d55c155c6d4ccf5c469afbe569feee08e80eb3fd",
+     "files": [
+      {
+       "bytes": 1678198,
+       "path": "benchmark/catalog_features/allwise_trd.csv.gz",
+       "sha256": "de89ef3e21cd6fcfcdec8c41359f1f699137170138c4ecf2f024922852bb5d68"
+      },
+      {
+       "bytes": 210810,
+       "path": "benchmark/catalog_features/chandra_trd.csv.gz",
+       "sha256": "07a93f22298c25b8afcad05e3a8d4544f0bd9eb04e2398df758de3d27d6447db"
+      },
+      {
+       "bytes": 1889935,
+       "path": "benchmark/catalog_features/desi_legacy_trd.csv.gz",
+       "sha256": "96ba0d14a6a135c44d6d4550fa6fbe42e1ce41a662eeeb955ffc75839366d124"
+      },
+      {
+       "bytes": 1168849,
+       "path": "benchmark/catalog_features/erosita_trd.csv.gz",
+       "sha256": "7d16c47e6d04b7c30afc9a48979feb6e3cacbe9c2d7c5199e1bef00a18526094"
+      },
+      {
+       "bytes": 57141,
+       "path": "benchmark/catalog_features/first_trd.csv.gz",
+       "sha256": "645bff3aee6efe243f8f68b9b837f521f98c05c8e91c34686632432c1efc112f"
+      },
+      {
+       "bytes": 2682623,
+       "path": "benchmark/catalog_features/gaia_dr3_trd.csv.gz",
+       "sha256": "917adb75087a9fde414ba9ca53ff2122b10a6940a9588a9a75ae26fce7ead6a5"
+      },
+      {
+       "bytes": 1216345,
+       "path": "benchmark/catalog_features/galex_trd.csv.gz",
+       "sha256": "7eda45f38ebd78d4922693e0ae77391cba3f87fb11e7a1866a31f2c815eecd15"
+      },
+      {
+       "bytes": 5185,
+       "path": "benchmark/catalog_features/lotss_trd.csv.gz",
+       "sha256": "fd66159b30c171143041fe6d806816ec26a1fe7acda25c917f1e83908974f66a"
+      },
+      {
+       "bytes": 38581,
+       "path": "benchmark/catalog_features/nvss_trd.csv.gz",
+       "sha256": "affc2a282d100e053ac0e96306564839d946afbaea58196dd26dc893ada21fe5"
+      },
+      {
+       "bytes": 3479397,
+       "path": "benchmark/catalog_features/panstarrs1_trd.csv.gz",
+       "sha256": "09b3ce96630dc668b2551c9aba2544bd4b2d95a8bf12ce934ef4106377a2f2c9"
+      },
+      {
+       "bytes": 839965,
+       "path": "benchmark/catalog_features/twomass_trd.csv.gz",
+       "sha256": "10c307c8752eb85663653d5beec926a2dbf2f87faf85bf1090b8665184d80dd3"
+      },
+      {
+       "bytes": 104463,
+       "path": "benchmark/catalog_features/vlass_trd.csv.gz",
+       "sha256": "7261d864b096f19aa8acde48ee91ada314ab7c7c4242b4bdbe0c2ddc46d4a912"
+      },
+      {
+       "bytes": 43972,
+       "path": "benchmark/catalog_features/xmm_trd.csv.gz",
+       "sha256": "0ad89444fee2247c80fbc12ccb88cffaa51d77ec83d7c0034eb7b96eb8c6cf1c"
+      },
+      {
+       "bytes": 1360935,
+       "path": "benchmark/catalog_features/ztf_lightcurve_trd.csv.gz",
+       "sha256": "b89aaafbdb00d10c7cfec701360703607e7ad11c54981f68328b32e6b6a36dda"
+      }
+     ],
+     "n_files": 14,
+     "path": "benchmark/catalog_features"
+    }
+   ],
+   "survey_row": null,
+   "workflow": "build-truth-dataset.yml"
+  },
+  "sdss_sky_truth": {
+   "builder": "benchmark/build_sdss_sky_truth.py",
+   "files": [
+    {
+     "bytes": 2166022,
+     "id_column": "benchmark_id",
+     "ids_sha256": "4091b7bf8b52760423cefe1f2ae657760f7b343c75c3e2264c514d5d1082f628",
+     "path": "benchmark/sdss_sky/truth.csv",
+     "rows": 9999,
+     "sha256": "3952755fce3e70c6e9bf1ccf6e86f0b2e0dbcc726206e5b8c8dd8a0faea4a6f1"
+    }
+   ],
+   "group": "order_dependent",
+   "paired": [
+    {
+     "digest_sha256": "ecc5f281230c45fa42df23e7ecb10f8a7367feccaeb722d602b69b67cf1dd46c",
+     "files": [
+      {
+       "bytes": 1540525,
+       "path": "benchmark/sdss_sky/catalog_features/allwise_trd.csv.gz",
+       "sha256": "651847a929f00b2b9fb7fb1598daf6228a2137152cbf60164f7b8e26035007bd"
+      },
+      {
+       "bytes": 1900732,
+       "path": "benchmark/sdss_sky/catalog_features/desi_legacy_trd.csv.gz",
+       "sha256": "b4bc20d044bff40d36431d0aaf03558a993e6729da2329ff5c1aa5098f23e257"
+      },
+      {
+       "bytes": 2961544,
+       "path": "benchmark/sdss_sky/catalog_features/gaia_dr3_trd.csv.gz",
+       "sha256": "94427f63c0b77049792fabb4763137cd8c519c52321d05cb3cefe6932496f29b"
+      },
+      {
+       "bytes": 651017,
+       "path": "benchmark/sdss_sky/catalog_features/galex_trd.csv.gz",
+       "sha256": "3cc54973080ff17d6b6471bd31b35396112504ed4e53f605f125d95c4d6508cd"
+      },
+      {
+       "bytes": 3633241,
+       "path": "benchmark/sdss_sky/catalog_features/panstarrs1_trd.csv.gz",
+       "sha256": "4a35095b7e2e3c7053dfd066e8a8ff27a97e6d2a92837e26d9108a083936b939"
+      },
+      {
+       "bytes": 500855,
+       "path": "benchmark/sdss_sky/catalog_features/twomass_trd.csv.gz",
+       "sha256": "57547d0b2879db33a42a07dba2181cb696a8879752e10dd03c9d6668ab1f54a8"
+      }
+     ],
+     "n_files": 6,
+     "path": "benchmark/sdss_sky/catalog_features"
+    }
+   ],
+   "survey_row": 3,
+   "workflow": "build-sdss-sky-benchmark.yml"
+  },
+  "star_diverse_truth": {
+   "builder": "Classifier/build_star_diverse_truth.py",
+   "files": [
+    {
+     "bytes": 561187,
+     "id_column": "benchmark_id",
+     "ids_sha256": "42e971113e4cda45d9f3d87a6f808f080791b75881141d2baae23d0b8f2a3bce",
+     "path": "Classifier/star_diverse_validation/truth.csv",
+     "rows": 4577,
+     "sha256": "b152ca23a4fc1ffeb35231c5e554d66dccbb7e055eb4898368936023f4439fa0"
+    }
+   ],
+   "group": "order_dependent",
+   "paired": [],
+   "survey_row": 5,
+   "workflow": "validate-star-diverse.yml"
+  },
+  "star_truth": {
+   "builder": "Classifier/build_star_truth.py",
+   "files": [
+    {
+     "bytes": 184859,
+     "id_column": "benchmark_id",
+     "ids_sha256": "9e75939aa6686882379454d5f8c5be060761f4def74dc82f8e13adfc29e7615b",
+     "path": "Classifier/star_truth.csv",
+     "rows": 1000,
+     "sha256": "e30c4bf8ef5e1d2060f913ae40b514def5395b491ae1e8f7bca96c3fa0f2111c"
+    }
+   ],
+   "group": "deterministic",
+   "paired": [],
+   "survey_row": null,
+   "workflow": "build-star-branch-truth.yml"
+  },
+  "xray_rules_sample": {
+   "builder": "benchmark/xray_rules/build_sample.py",
+   "files": [
+    {
+     "bytes": 3766121,
+     "path": "benchmark/xray_rules/sample.csv.gz",
+     "rows": 36468,
+     "sha256": "ff64c55dd9a50f522fcdb519de9f32585b48e2d3cf05bdf43a420e8eb23ac5ca"
+    }
+   ],
+   "group": "order_dependent",
+   "paired": [],
+   "survey_row": 10,
+   "workflow": null
+  }
+ }
+}

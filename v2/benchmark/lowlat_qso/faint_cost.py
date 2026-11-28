@@ -68,6 +68,13 @@ ENV = {  # variant -> environment
     # 2.62.6: the three switches together (the order of 2026-11-28, task b): the fixed units, the association rules and the survey-count switch; fixed had not been
     # measured together with the other two
     "fixed_same_nearest_surveys2": {"V2_POSERR_UNITS": "fixed", "V2_ASSOC_AMBIG": "same,nearest", "V2_LOWLAT_QSO": "surveys2"},
+    # 2.62.7 (task "더"): the literature switches on the deep COSMOS fields that have NED / SIMBAD rows (deep_cosmos_literature/README.md)
+    "surveys2_litkeep": {"V2_LOWLAT_QSO": "surveys2,lit_keep"},
+    "typed_close": {"V2_ANNOT_ASSOC": "typed_close"},
+    "typed_close_surveys2_litkeep": {"V2_ANNOT_ASSOC": "typed_close", "V2_LOWLAT_QSO": "surveys2,lit_keep"},
+    # the three switches together with the literature QSO exempt from the survey-count rule (V2_LOWLAT_QSO=lit_keep, 2.62.4; order of 2026-11-28, task b: surveys2 is on by default
+    # in the combination, so not erasing a NED / SIMBAD QSO label is the explainable behaviour)
+    "fixed_same_nearest_surveys2_litkeep": {"V2_POSERR_UNITS": "fixed", "V2_ASSOC_AMBIG": "same,nearest", "V2_LOWLAT_QSO": "surveys2,lit_keep"},
 }
 LIMIT_OFF = {"V2_LOWLAT_QSO_ABSB": "90"}  # the switches act at every latitude
 

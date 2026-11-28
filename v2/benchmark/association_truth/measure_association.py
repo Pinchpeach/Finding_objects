@@ -217,7 +217,7 @@ def measure_field(assoc: pd.DataFrame, truth: pd.DataFrame, shifted_from: pd.Dat
         dom, acc = expected_counterparts(d, truth, full_sky, col, fwhm)
         matched = (d.association_status == "matched").to_numpy()
         rec = dict(rows=len(d), matched=int(matched.sum()), no_expected=0, correct=0, false=0, unknown=0, missed=0, rightly_alone=0,
-                   s_correct=0, s_false=0, s_missed=0)  # fmt: skip
+                   alone_identified=0, alone_wrong=0, alone_unidentified=0, s_correct=0, s_false=0, s_missed=0)  # fmt: skip
         for (_, r), dm, ac, m in zip(d.iterrows(), dom, acc, matched):
             if dm < 0:
                 # no truth source with a positive flux within reach: there is nothing to join, so a join is false
@@ -257,6 +257,13 @@ def measure_field(assoc: pd.DataFrame, truth: pd.DataFrame, shifted_from: pd.Dat
                 else:
                     outcome = "rightly_alone"
                     rec["rightly_alone"] += 1
+                # 2.62.7 review (Codex, twice): the object a row sits in, read the way a joined row is read, whatever the missed / alone outcome.  A joined row is
+                # correct / false / unknown by its object's truth ids; an unjoined row is alone_identified / alone_wrong / alone_unidentified by the SAME test on its own
+                # object.  So right_object = correct + alone_identified (and wrong_object, unidentified) do not move when only the anchor of a group changes:
+                # "rightly_alone" alone counted rows whose counterpart no object holds, and "missed" counted a blended row whose own object holds an acceptable
+                # counterpart while another object holds another one.
+                own_ids = T.get(own, set())
+                rec["alone_identified" if own_ids & acc_set else "alone_wrong" if own_ids else "alone_unidentified"] += 1
                 if {o for o in by_truth.get(dm, ()) if o != own}:
                     rec["s_missed"] += 1
             dra = (truth.ra.iat[dm] - r.ra) * np.cos(np.radians(r.dec)) * 3600.0
@@ -397,7 +404,8 @@ def pool(rows: list[dict], split: pd.DataFrame, label: str) -> pd.DataFrame:
             expected = tot["rows"] - tot["no_expected"]
             rec = dict(variant=label, half=half, catalog=cat, fields=len(f), rows=tot["rows"], with_expected=expected,
                        matched=tot["matched"], correct=tot["correct"], false=tot["false"], unknown=tot["unknown"],
-                       missed=tot["missed"], rightly_alone=tot["rightly_alone"])  # fmt: skip
+                       missed=tot["missed"], rightly_alone=tot["rightly_alone"], alone_identified=tot.get("alone_identified", 0),
+                       alone_wrong=tot.get("alone_wrong", 0), alone_unidentified=tot.get("alone_unidentified", 0))  # fmt: skip
             rec["false_pct_of_matched_known"] = round(100 * tot["false"] / decided_m, 2) if decided_m else np.nan
             lo, hi = wilson(tot["false"], decided_m)
             rec["false_wilson"] = f"{lo:.1f}-{hi:.1f}"

@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "commit": "641616e335c95c24bc9dabef392155571369e95e",
+  "branch": "ccr-68f28268-l0opfu",
+  "dirty": true,
+  "dirty_files": 5,
+  "env": {},
+  "effective": {
+    "POSERR_UNITS": "legacy",
+    "AMBIG_FIX": [],
+    "POSERR_NATIVE": [],
+    "ANNOT_ASSOC": [],
+    "LOWLAT_QSO": [],
+    "LOWLAT_QSO_ABSB": 20.0
+  },
+  "started_utc": "2026-11-28T03:44:48Z",
+  "finished_utc": "2026-11-28T03:44:48Z",
+  "status": "ok",
+  "inputs": [
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/s1/raw",
+      "kind": "directory",
+      "sha256": "00a047f1bcffa09d527e558b47f1c0e0e7ed938db9b11700ff707a6bb3d37ffe",
+      "n_files": 636,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/a4/truth_flux_635",
+      "kind": "directory",
+      "sha256": "9d8d88ffadc77011e44e82be5ff6e8af0ccf1683d4b5a0fed349036e14d4daa9",
+      "n_files": 26,
+      "hashed": "relative path, size"
+    }
+  ],
+  "argv": [
+    "-"
+  ],
+  "python": "3.13.18",
+  "note": "order-key variants: files assembled from run_order_key_variants.sh, run_order_key_outside.sh, outside_cosmos_summary.py, tie_order_interaction.py, shuffle_check.py stage1, label_changes.py (see README)"
+}

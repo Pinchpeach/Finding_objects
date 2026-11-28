@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "commit": "c993b60f776d4b5d632008de76ff996e9c0f4de7",
+  "branch": "ccr-68f28268-l0opfu",
+  "dirty": true,
+  "dirty_files": 4,
+  "env": {
+    "PYTHONHASHSEED": "0"
+  },
+  "effective": {
+    "POSERR_UNITS": "legacy",
+    "AMBIG_FIX": [],
+    "POSERR_NATIVE": [],
+    "ANNOT_ASSOC": [],
+    "LOWLAT_QSO": [],
+    "LOWLAT_QSO_ABSB": 20.0
+  },
+  "started_utc": "2026-11-28T03:56:26Z",
+  "finished_utc": "2026-11-28T03:56:38Z",
+  "status": "ok",
+  "inputs": [
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/a4/truth_flux_635",
+      "kind": "directory",
+      "sha256": "9d8d88ffadc77011e44e82be5ff6e8af0ccf1683d4b5a0fed349036e14d4daa9",
+      "n_files": 26,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ok26/base",
+      "kind": "directory",
+      "sha256": "fe00c9030c1519d7b8769edc0c086382a95da776214bca3fc969ee7da5e3365e",
+      "n_files": 27,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ok26pos/file",
+      "kind": "directory",
+      "sha256": "12cb04bea6246eba214c27551dc1661ca8186370775adf4420c143eb79868d26",
+      "n_files": 27,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ok26pos/position",
+      "kind": "directory",
+      "sha256": "801d3a9a299b92349866080f9d9cd569d52f00f9d977415f3b66f8bb2158a73b",
+      "n_files": 27,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ok26/floored",
+      "kind": "directory",
+      "sha256": "40dc818f2192bc441745705404eb0fc6d826245ea91b0e5c519691ea7ed0b6f8",
+      "n_files": 27,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ok26/allwise_order",
+      "kind": "directory",
+      "sha256": "7e2861b2c2e2d6dcb2888224a5cd79931b567c440a293480adffec049d60f3b0",
+      "n_files": 27,
+      "hashed": "relative path, size"
+    }
+  ],
+  "argv": [
+    "position_residual.py",
+    "--variants",
+    "new=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ok26/base",
+    "file=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ok26pos/file",
+    "position=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ok26pos/position",
+    "floored=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ok26/floored",
+    "allwise_order=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ok26/allwise_order",
+    "--truth-flux",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/a4/truth_flux_635",
+    "--out",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/pos_res"
+  ],
+  "python": "3.13.18",
+  "note": "variants: new=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ok26/base file=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ok26pos/file position=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ok26pos/position floored=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ok26/floored allwise_order=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ok26/allwise_order"
+}

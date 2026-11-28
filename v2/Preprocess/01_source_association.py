@@ -22,6 +22,7 @@ from association_model import (
     infer_entity_kind,
     infer_epoch,
     infer_poserr_arcsec,
+    order_poserr_arcsec,
     infer_psf_arcsec,
     sep_arcsec,
     num,
@@ -220,6 +221,7 @@ def load(raw: Path):
                 else (cat, "sky", round(ra, 7), round(dec, 7))
             )
             prof = profile_for(cat, r)
+            poserr, psf = infer_poserr_arcsec(cat, r), infer_psf_arcsec(cat, r)  # once per row (review of 2.62.7: the order key took them again)
             rows.append(
                 {
                     "_dedup": key,  # private keys (leading underscore) are not written to source_association.csv
@@ -232,8 +234,9 @@ def load(raw: Path):
                     "object_name": str(r.get("object_name", "")),
                     "ra": ra,
                     "dec": dec,
-                    "poserr_arcsec": infer_poserr_arcsec(cat, r),
-                    "psf_fwhm_arcsec": infer_psf_arcsec(cat, r),
+                    "poserr_arcsec": poserr,
+                    "_order_poserr": order_poserr_arcsec(cat, r, poserr, psf),  # None unless an order-key switch is on (read at call time: the tests switch it)
+                    "psf_fwhm_arcsec": psf,
                     "ref_epoch": infer_epoch(cat, r),
                     "entity_kind": infer_entity_kind(cat, r),
                     "pmra": num(r.get("pmra")),
@@ -328,7 +331,8 @@ def _anchor_key(det):
     # Prefer a PM-aware astrometric anchor, then smaller astrometric uncertainty.
     has_motion = det.get("pmra") is not None and det.get("pmdec") is not None and det.get("ref_epoch") is not None
     gaia = det.get("catalog") == "Gaia DR3"
-    return (0 if gaia and has_motion else 1 if has_motion else 2, float(det.get("poserr_arcsec") or 99.0))
+    order_err = det.get("_order_poserr")  # 2.62.7: the order may rank a row by another error than the one the match uses (V2_POSERR_NATIVE=allwise_order|allwise_sigma, V2_ASSOC_ORDER_KEY=floored)
+    return (0 if gaia and has_motion else 1 if has_motion else 2, float((order_err if order_err is not None else det.get("poserr_arcsec")) or 99.0))
 
 
 # Order of the detections (2.61.0).  The groups are built one detection at a time, the most precise anchors first, and

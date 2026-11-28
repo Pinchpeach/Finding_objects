@@ -1,0 +1,2 @@
+cells,objects,median_cell_ra_width_deg,cells_with_width_lt_0p5,share_cells_width_lt_0p5_pct,max_min_ra_above_window_edge_deg,share_objects_in_cells_with_min_ra_within_0p2_of_edge_pct,max_window_cover_pct,max_window_occupied_0p1deg_bins_pct
+96,4795,0.10829898045350106,75,78.1,0.18869008204399051,100.0,59.56,45.0

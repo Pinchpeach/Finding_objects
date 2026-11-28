@@ -1,0 +1,8 @@
+variant,objects,anchored_by_AllWISE,anchored_by_GALEX,anchored_by_LS,anchored_by_PS1,objects_differing_from_base,fields_identical_to_base,anchored_by_2MASS
+base,253933,3728,759,203998,39640,0,26,28
+allwise,253954,3341,758,204468,39616,393,0,30
+allwise_order,253954,3341,758,204468,39616,393,0,30
+allwise_sigma,253933,3728,759,203998,39640,0,26,28
+floored,253861,1466,732,206797,38595,2936,0,30
+allwise_floored,253861,1466,732,206797,38595,2936,0,30
+allwise_order_floored,253861,1466,732,206797,38595,2936,0,30

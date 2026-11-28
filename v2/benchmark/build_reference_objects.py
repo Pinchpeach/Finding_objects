@@ -27,6 +27,7 @@ Output: v2/reference_objects/reference_objects.csv.gz and SUMMARY.md
 from __future__ import annotations
 
 import argparse
+import os
 import re
 import sys
 import time
@@ -37,7 +38,9 @@ import pandas as pd
 
 BENCH = Path(__file__).resolve().parent
 V2 = BENCH.parent
-OUT = V2 / "reference_objects"
+# 2.62.7: V2_REFERENCE_OBJECTS_OUT redirects every output (the CSV, SUMMARY.md, REFERENCE_OBJECTS.md).  The workflow's regeneration writes to a side directory with it,
+# so a rebuild (a random draw of up to 300 per type out of a server-ordered list, see the survey of 2026-11-28) never replaces the committed table by itself.
+OUT = Path(os.environ["V2_REFERENCE_OBJECTS_OUT"]).resolve() if os.environ.get("V2_REFERENCE_OBJECTS_OUT") else V2 / "reference_objects"
 PER_TYPE = 300
 MIN_TYPE = 100
 SEED = 1

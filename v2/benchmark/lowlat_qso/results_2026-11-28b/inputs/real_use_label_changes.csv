@@ -1,0 +1,8 @@
+variant,pairs,changed,to_QSO,from_QSO,only_in_base,only_in_variant
+surveys2,4762,12,0,12,8,8
+surveys3,4762,12,0,12,8,8
+same_nearest,4757,1,0,0,13,8
+same_nearest_surveys2,4757,13,0,12,13,8
+same_nearest_surveys3,4757,13,0,12,13,8
+fixed_same_nearest_surveys2,4757,13,0,12,13,8
+fixed_same_nearest_surveys2_litkeep,4757,2,0,1,13,8

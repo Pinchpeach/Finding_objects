@@ -4,17 +4,49 @@ name: v2 DESI DR1 external coarse validation
 # which was fitted on SDSS spectroscopy. Truth and catalog features are
 # committed under v2/benchmark/desi_external/ for reproducibility. Gaia features
 # include DSC-Combmod probabilities (an SDSS-independent test of DSC).
-# Manual only (2.24.0): it rewrites preserved benchmark / truth data, which
-# must change only on purpose (an automatic run on a code push replaced the
-# DESI benchmark with a partial re-collection on 2026-10-14).
+#
+# Manual only (2.24.0): it used to rewrite preserved benchmark / truth data (an
+# automatic run on a code push replaced the DESI benchmark with a partial
+# re-collection on 2026-10-14).
+#
+# 2.62.7: the default run does NOT rebuild the truth list.  The list is drawn with
+# TOP / row_limit and no ORDER BY (WORK_REPORT_2026-11-28a.md, survey row 1: every cell
+# of the committed truth.csv starts at the lower RA edge of its window), so a rebuild
+# gives other objects, other benchmark ids and other numbers.  What the default run does:
+#   verify    compare the committed truth.csv with benchmark/truth_tables_manifest.json (SHA-256)
+#   evaluate  score the COMMITTED truth and catalog features; only the two result files
+#             coarse_metrics.json and coarse_by_magnitude.csv are committed
+# regenerate = true (an explicit input) collects a NEW list and its features and writes
+# them to v2/benchmark/desi_external_regenerated/<run id>/ -- never over the committed
+# files.  Replacing the committed truth is a person's decision: copy the files, run
+# `python v2/benchmark/truth_manifest.py build` and commit both together.
 on:
   workflow_dispatch:
+    inputs:
+      regenerate:
+        description: "true = collect a NEW truth list and features into v2/benchmark/desi_external_regenerated/<run id>/ (the committed files are not touched); false (default) = evaluate the committed files after checking their SHA-256"
+        type: boolean
+        default: false
 concurrency:
   group: v2-desi-external-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pandas numpy
+      - name: Check the committed truth against the manifest
+        run: python v2/benchmark/truth_manifest.py verify --only desi_external_truth
+
   truth:
+    if: ${{ inputs.regenerate }}
+    needs: verify
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -31,6 +63,7 @@ jobs:
           retention-days: 7
 
   collect:
+    if: ${{ inputs.regenerate }}
     needs: truth
     strategy:
       fail-fast: false
@@ -56,8 +89,9 @@ jobs:
           retention-days: 7
 
   evaluate:
-    needs: collect
-    if: always() && needs.truth.result == 'success'
+    needs: [verify, truth, collect]
+    # verify passed, and (default) nothing to wait for, or (regenerate) the truth job succeeded; a failed collector still lets the evaluation run on the others
+    if: ${{ always() && needs.verify.result == 'success' && (!inputs.regenerate || needs.truth.result == 'success') }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -69,25 +103,35 @@ jobs:
           python-version: "3.11"
       - run: pip install pandas numpy
       - uses: actions/download-artifact@v4
+        if: ${{ inputs.regenerate }}
         with:
           path: /tmp/art
-      - name: Assemble
+      - name: Choose the data directory
         run: |
           set -euo pipefail
-          d=v2/benchmark/desi_external; mkdir -p $d/catalog_features
-          cp /tmp/art/desi-truth/desi_truth.csv $d/truth.csv
-          for f in /tmp/art/desi-features-*/*_trd.csv; do gzip -9 -n -c "$f" > "$d/catalog_features/$(basename "$f").gz"; done
+          if [ "${{ inputs.regenerate }}" = "true" ]; then
+            d=v2/benchmark/desi_external_regenerated/${{ github.run_id }}
+            mkdir -p $d/catalog_features
+            cp /tmp/art/desi-truth/desi_truth.csv $d/truth.csv
+            for f in /tmp/art/desi-features-*/*_trd.csv; do gzip -9 -n -c "$f" > "$d/catalog_features/$(basename "$f").gz"; done
+            echo "REGENERATED=true" >> "$GITHUB_ENV"
+          else
+            d=v2/benchmark/desi_external
+            echo "REGENERATED=false" >> "$GITHUB_ENV"
+          fi
+          echo "D=$d" >> "$GITHUB_ENV"
+          echo "data directory: $d"
           ls -la $d $d/catalog_features
       - name: Evaluate
         run: |
           set -euo pipefail
-          d=v2/benchmark/desi_external
-          python v2/benchmark/validate_catalog_truth.py --truth $d/truth.csv --catalog-root $d/catalog_features --out /tmp/ready --allow-unbalanced
-          python v2/benchmark/evaluate_rule_baseline.py --truth $d/truth.csv --catalog-root $d/catalog_features --manifest /tmp/ready/benchmark_manifest.csv --out /tmp/eval --split all
-          cp /tmp/eval/rule_baseline_metrics.json $d/coarse_metrics.json
+          python v2/benchmark/validate_catalog_truth.py --truth $D/truth.csv --catalog-root $D/catalog_features --out /tmp/ready --allow-unbalanced
+          python v2/benchmark/evaluate_rule_baseline.py --truth $D/truth.csv --catalog-root $D/catalog_features --manifest /tmp/ready/benchmark_manifest.csv --out /tmp/eval --split all
+          cp /tmp/eval/rule_baseline_metrics.json $D/coarse_metrics.json
           python - <<'PY'
+          import os
           import pandas as pd
-          d="v2/benchmark/desi_external"
+          d=os.environ["D"]
           p=pd.read_csv("/tmp/eval/rule_baseline_test_predictions.csv").merge(pd.read_csv(f"{d}/truth.csv")[["benchmark_id","r_bin"]],on="benchmark_id")
           rows=[]
           for (b,t),g in p.groupby(["r_bin","truth_class"]):
@@ -102,7 +146,11 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add v2/benchmark/desi_external
+          if [ "$REGENERATED" = "true" ]; then
+            git add "$D"                                    # the side directory only
+          else
+            git add "$D/coarse_metrics.json" "$D/coarse_by_magnitude.csv"   # the two result files; truth.csv and catalog_features are not added
+          fi
           if git diff --cached --quiet; then exit 0; fi
           git commit -m "DESI DR1 external coarse validation results"
           bash .github/scripts/push_with_retry.sh

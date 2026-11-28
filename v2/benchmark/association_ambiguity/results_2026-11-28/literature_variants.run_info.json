@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "commit": "1786aad1690afe04997f684118fd4e727b308885",
+  "branch": "ccr-68f28268-l0opfu",
+  "dirty": false,
+  "dirty_files": 0,
+  "env": {
+    "PYTHONHASHSEED": "0"
+  },
+  "effective": {
+    "POSERR_UNITS": "legacy",
+    "AMBIG_FIX": [],
+    "POSERR_NATIVE": [],
+    "ANNOT_ASSOC": [],
+    "LOWLAT_QSO": [],
+    "LOWLAT_QSO_ABSB": 20.0
+  },
+  "started_utc": "2026-11-28T02:40:25Z",
+  "finished_utc": "2026-11-28T02:40:26Z",
+  "status": "ok",
+  "inputs": [
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/a4/truth_flux_635/deep_cosmos_5.csv.gz",
+      "kind": "file",
+      "sha256": "3e0732efb61148867869037162e1a9fa1b87d98a644bf872df0fbc974d8944cf",
+      "size": 455627
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/litvar/base",
+      "kind": "directory",
+      "sha256": "d0df2c4f95329f6ad7671003b12fc3d3d2665637b3c94abf4d66c297ca407396",
+      "n_files": 3,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/litvar/density",
+      "kind": "directory",
+      "sha256": "45fee8ad4bb873f2e69846f84184f386e968009e3bcc1a1cff2313b64244b7b0",
+      "n_files": 2,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/litvar/typed_close",
+      "kind": "directory",
+      "sha256": "574d5556c446efb6b0c87810cd37089b33ad6c1b8c1ec79703688046a3009b7d",
+      "n_files": 3,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/litvar/typed_close_oldrule",
+      "kind": "directory",
+      "sha256": "649fd0cc94534451bd0db2990f9fe47822c281a6d9039936910f40737fbb7932",
+      "n_files": 2,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/litvar/density_typed",
+      "kind": "directory",
+      "sha256": "e4869aef824eb48543f02a4e3e3eb0b19d50577a59a5c37d566829d81b10bd66",
+      "n_files": 3,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/litvar/density_typed_oldrule",
+      "kind": "directory",
+      "sha256": "aa3d697aab4319011a07fadb68b333c8654e997adfc302a1f55870c710585634",
+      "n_files": 2,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/litvar/err",
+      "kind": "directory",
+      "sha256": "e11de9f20c1d0f5d400bdc429287dbf22fc068c1672bbaa620d02b0280c9e56f",
+      "n_files": 2,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/lit_cosmos2/literature_only_objects.csv",
+      "kind": "file",
+      "sha256": "ea39a6e5410e81f3d9ae1dcca77422d53c48531aaf009302500b0cdd8e0f532f",
+      "size": 848408
+    }
+  ],
+  "argv": [
+    "literature_variants.py",
+    "--truth",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/a4/truth_flux_635/deep_cosmos_5.csv.gz",
+    "--base",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/litvar/base",
+    "--variants",
+    "density=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/litvar/density",
+    "typed_close=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/litvar/typed_close",
+    "typed_close_oldrule=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/litvar/typed_close_oldrule",
+    "density_typed=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/litvar/density_typed",
+    "density_typed_oldrule=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/litvar/density_typed_oldrule",
+    "err=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/litvar/err",
+    "--classified-base",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/lit_cosmos2/literature_only_objects.csv",
+    "--out",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/litvar/bridge_fixed"
+  ],
+  "python": "3.13.18",
+  "note": ""
+}

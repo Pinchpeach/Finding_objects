@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "commit": "3c1f0075ee52f992cd4885e809e017caedd52ad1",
+  "branch": "ccr-68f28268-l0opfu",
+  "dirty": true,
+  "dirty_files": 9,
+  "env": {
+    "PYTHONHASHSEED": "0"
+  },
+  "effective": {
+    "POSERR_UNITS": "legacy",
+    "AMBIG_FIX": [],
+    "POSERR_NATIVE": [],
+    "ANNOT_ASSOC": [],
+    "LOWLAT_QSO": [],
+    "LOWLAT_QSO_ABSB": 20.0
+  },
+  "started_utc": "2026-11-28T02:55:36Z",
+  "finished_utc": "2026-11-28T02:55:36Z",
+  "status": "ok",
+  "inputs": [
+    {
+      "path": "/home/user/Finding_objects/v2/benchmark/desi_external/truth.csv",
+      "kind": "file",
+      "sha256": "f59e7751db88f87c9c72bd3f71ee325347a54abd567a8aa62279c923c27520da",
+      "size": 770232
+    },
+    {
+      "path": "/home/user/Finding_objects/v2/benchmark/truth_data/ground_truth.csv",
+      "kind": "file",
+      "sha256": "51f0d40ee5f9bb3ccdf473bbf72e537f4c70e9cf6eba28891509f56ad19dd1d9",
+      "size": 1843651
+    },
+    {
+      "path": "/home/user/Finding_objects/v2/reference_objects/reference_objects.csv.gz",
+      "kind": "file",
+      "sha256": "988dfb4ae38cb4072be2fa2c218d00278176f94e26feb37904a25f83b928c27c",
+      "size": 355356
+    },
+    {
+      "path": "/home/user/Finding_objects/v2/reference_objects/validation/plan.csv",
+      "kind": "file",
+      "sha256": "a9fdd9d72e7682f8c7113bf9e990825e9cb46fa648dd27dd9dc6ee6328f3b951",
+      "size": 119226
+    }
+  ],
+  "argv": [
+    "server_fill_dependence.py",
+    "--out",
+    "results_2026-11-28",
+    "--eval-dir",
+    "results_2026-11-28"
+  ],
+  "python": "3.13.18",
+  "note": "server-fill dependence; reads committed tables, runs the rule baseline offline"
+}

@@ -1,0 +1,2 @@
+split,n_test,classified,correct,accuracy_when_classified,wilson_lo,wilson_hi,wilson_width_pp,cell_bootstrap_lo,cell_bootstrap_hi,cell_bootstrap_width_pp,window_bootstrap_lo,window_bootstrap_hi,window_bootstrap_width_pp,cells_in_test,windows_in_test,width_ratio_cell_vs_wilson,width_ratio_window_vs_wilson
+test,962,950,869,0.9147,0.8953,0.9309,3.56,0.8885,0.94,5.14,0.9034,0.9256,2.22,96,8,1.44,0.62

@@ -2,12 +2,21 @@ name: Build reference objects (literature-confirmed, per type)
 
 # Objects of confirmed nature per class and sub-class, with the paper each
 # identification comes from (v2/benchmark/build_reference_objects.py).
-# Runs on pushes that change the builder on working branches, or by hand.
+#
+# 2.62.7: by hand only, and a run does not replace the committed table.
+#   Before: a push that changed the builder on a working branch rebuilt v2/reference_objects and committed it.  The build draws up to 300 objects per
+#   type from lists the services return without ORDER BY (WORK_REPORT_2026-11-28a.md, survey row 2: all 300 QSO_SPECTROSCOPIC rows of the committed
+#   table lie at RA 1.60-3.26 deg, the first rows of DR16Q), so a rebuild is another sample, not the same one again.
+#   Now: the default run only checks the committed reference_objects.csv.gz against benchmark/truth_tables_manifest.json (SHA-256).
+#   regenerate = true builds into v2/reference_objects_regenerated/<run id>/ (V2_REFERENCE_OBJECTS_OUT); the committed table is untouched.  Replacing
+#   it is a person's decision: copy the files, run `python v2/benchmark/truth_manifest.py build`, commit both.
 on:
-  push:
-    branches-ignore: [main, validation-data]
-    paths: ["v2/benchmark/build_reference_objects.py", ".github/workflows/build-reference-objects.yml"]
   workflow_dispatch:
+    inputs:
+      regenerate:
+        description: "true = build a NEW table into v2/reference_objects_regenerated/<run id>/ (the committed table is not touched); false (default) = only check the committed table against the manifest"
+        type: boolean
+        default: false
 concurrency:
   group: reference-objects-${{ github.ref }}
   cancel-in-progress: true
@@ -24,15 +33,20 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install pandas numpy astropy astroquery
-      - name: Build
+      - name: Check the committed table against the manifest
+        run: python v2/benchmark/truth_manifest.py verify --only reference_objects
+      - name: Build into a side directory
+        if: ${{ inputs.regenerate }}
+        env:
+          V2_REFERENCE_OBJECTS_OUT: v2/reference_objects_regenerated/${{ github.run_id }}
         run: python -u v2/benchmark/build_reference_objects.py
-      - name: Commit
-        if: ${{ !cancelled() }}
+      - name: Commit the regenerated copy
+        if: ${{ inputs.regenerate && !cancelled() }}
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add v2/reference_objects || true
+          git add v2/reference_objects_regenerated || true
           if git diff --cached --quiet; then echo "nothing to commit"; exit 0; fi
-          git commit -m "Reference objects (literature-confirmed, per type)"
+          git commit -m "Reference objects regenerated (side copy; the committed table is unchanged)"
           bash .github/scripts/push_with_retry.sh "${{ github.ref_name }}"

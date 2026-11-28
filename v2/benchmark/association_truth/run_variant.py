@@ -47,6 +47,7 @@ def main() -> int:
     ap.add_argument("--shift", action="store_true")
     ap.add_argument("--env", nargs="*", default=[])
     ap.add_argument("--fields", default="")
+    ap.add_argument("--field-glob", default="deep_cosmos_*", help="which directories of --fields-root are fields (2.62.7; the low-latitude cones of the order-key study use '*')")
     a = ap.parse_args()
     t0 = RI.start()
     for kv in a.env:
@@ -56,7 +57,8 @@ def main() -> int:
     spec = importlib.util.spec_from_file_location("assoc_stage", V2 / "Preprocess" / "01_source_association.py")
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
-    names = [n for n in a.fields.split(",") if n] or sorted(p.name for p in a.fields_root.glob("deep_cosmos_*"))
+    # a field is a directory with a raw/ folder: the collectors' top-level files (collection_state.json, merge_manifest.json, run_info.json) match '*' too (Codex review of 2.62.7)
+    names = [n for n in a.fields.split(",") if n] or sorted(p.name for p in a.fields_root.glob(a.field_glob) if (p / "raw").is_dir())
     for name in names:
         raw = next((a.fields_root / name / "raw").glob("*"))
         out = a.out / name / "source_association.csv"
