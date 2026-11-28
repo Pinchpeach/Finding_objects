@@ -32,6 +32,9 @@ sys.path.insert(0, str(HERE.parent))
 import run_info as RI  # noqa: E402
 
 CATS = ("AllWISE", "GALEX AIS", "2MASS PSC")
+# The readings a variant comparison may be concluded from: the ones METRICS.md marks as independent of who anchors an object (a test keeps the two in step).  The tables also carry
+# correct / missed / rightly_alone / shifted_false_pct, which DO move with the anchor, only as side columns and for the relabel share.
+HEADLINE = ("right_object", "wrong_object", "unidentified", "shared", "displaced", "shifted_any_pct")
 COUNTS = ("rows", "no_expected", "matched", "correct", "false", "unknown", "missed", "rightly_alone", "alone_identified", "alone_wrong", "alone_unidentified", "shared", "displaced", "shift_rows", "shift_false", "shift_any")
 
 

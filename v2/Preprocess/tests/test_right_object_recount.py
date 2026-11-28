@@ -21,7 +21,7 @@ def rows(variant: str, **chg) -> pd.DataFrame:
     """One AllWISE record per field: 100 rows, 90 with an expected counterpart, a fixed baseline; ``chg`` is added to field 1 and field 12 only."""
     out = []
     for f in FIELDS:
-        r = dict(variant=variant, field=f, catalog="AllWISE", rows=100, no_expected=10, matched=60, correct=50, false=2, unknown=8, missed=20, rightly_alone=20, alone_identified=15, alone_wrong=0, alone_unidentified=5, shift_rows=100, shift_false=8, shift_any=20)
+        r = dict(variant=variant, field=f, catalog="AllWISE", rows=100, no_expected=10, matched=60, correct=50, false=2, unknown=8, missed=20, rightly_alone=20, alone_identified=15, alone_wrong=0, alone_unidentified=5, shared=10, displaced=12, shift_rows=100, shift_false=8, shift_any=20)
         if f in ("deep_cosmos_1", "deep_cosmos_12"):
             for k, v in chg.items():
                 r[k] += v
@@ -80,3 +80,23 @@ def test_bootstrap_interval_contains_the_estimate_and_counts_fields():
     r = d.loc["all26"]
     lo, hi = (float(x) for x in r.d_right_object_ci.split(" to "))
     assert lo <= r.d_right_object_pp <= hi + 1e-9 and r.fields_with_positive_d_right_object == 2 and r.fields_with_negative_d_right_object == 0
+
+
+def test_the_headline_readings_are_the_ones_metrics_md_marks_as_independent_of_the_anchor():
+    """A variant comparison concludes only from readings that do not move when an anchor changes (METRICS.md section 2): the tool's HEADLINE and the document stay in step."""
+    import re
+
+    text = (Path(__file__).resolve().parents[2] / "benchmark" / "association_truth" / "METRICS.md").read_text(encoding="utf-8")
+    rows = {}
+    for line in text.splitlines():
+        if line.startswith("| ") and line.count("|") >= 5:
+            cells = [c.strip() for c in line.strip().strip("|").split("|")]
+            for name in re.findall(r"`([a-z_]+)`", cells[0]):
+                rows.setdefault(name, cells)
+    for name in RR.HEADLINE:
+        assert name in rows, f"{name} is not defined in METRICS.md"
+        assert rows[name][2].startswith("**아니오**") or rows[name][2].startswith("아니오"), f"{name} is marked as anchor dependent: {rows[name][2]}"
+        assert "예" in rows[name][3], f"{name} is not marked for variant comparison"
+    for name in ("correct", "missed", "rightly_alone", "shifted_false_pct"):
+        assert name in rows and "아니오" not in rows[name][2][:6], f"{name} should be marked as anchor dependent"
+        assert rows[name][3].replace("*", "").startswith("아니오"), f"{name} must not be marked for variant comparison"
