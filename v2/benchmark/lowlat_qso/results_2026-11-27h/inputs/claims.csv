@@ -1,0 +1,37 @@
+variant,r,claim,n_type1,claims,type1_among_claims,purity,recall
+base,22-24,label QSO,139,31,26,0.8387,0.1871
+base,22-24,label QSO or candidate,139,178,65,0.3652,0.4676
+base,22-24,label QSO or candidate or held,139,178,65,0.3652,0.4676
+base,all,label QSO,327,146,123,0.8425,0.3761
+base,all,label QSO or candidate,327,293,162,0.5529,0.4954
+base,all,label QSO or candidate or held,327,293,162,0.5529,0.4954
+surveys2,22-24,label QSO,139,31,26,0.8387,0.1871
+surveys2,22-24,label QSO or candidate,139,178,65,0.3652,0.4676
+surveys2,22-24,label QSO or candidate or held,139,178,65,0.3652,0.4676
+surveys2,all,label QSO,327,143,123,0.8601,0.3761
+surveys2,all,label QSO or candidate,327,290,162,0.5586,0.4954
+surveys2,all,label QSO or candidate or held,327,294,162,0.551,0.4954
+surveys3,22-24,label QSO,139,30,26,0.8667,0.1871
+surveys3,22-24,label QSO or candidate,139,178,65,0.3652,0.4676
+surveys3,22-24,label QSO or candidate or held,139,178,65,0.3652,0.4676
+surveys3,all,label QSO,327,140,123,0.8786,0.3761
+surveys3,all,label QSO or candidate,327,288,162,0.5625,0.4954
+surveys3,all,label QSO or candidate or held,327,294,162,0.551,0.4954
+same_nearest,22-24,label QSO,139,31,26,0.8387,0.1871
+same_nearest,22-24,label QSO or candidate,139,178,65,0.3652,0.4676
+same_nearest,22-24,label QSO or candidate or held,139,178,65,0.3652,0.4676
+same_nearest,all,label QSO,327,145,124,0.8552,0.3792
+same_nearest,all,label QSO or candidate,327,292,163,0.5582,0.4985
+same_nearest,all,label QSO or candidate or held,327,292,163,0.5582,0.4985
+same_nearest_surveys2,22-24,label QSO,139,31,26,0.8387,0.1871
+same_nearest_surveys2,22-24,label QSO or candidate,139,178,65,0.3652,0.4676
+same_nearest_surveys2,22-24,label QSO or candidate or held,139,178,65,0.3652,0.4676
+same_nearest_surveys2,all,label QSO,327,144,124,0.8611,0.3792
+same_nearest_surveys2,all,label QSO or candidate,327,291,163,0.5601,0.4985
+same_nearest_surveys2,all,label QSO or candidate or held,327,293,163,0.5563,0.4985
+same_nearest_surveys3,22-24,label QSO,139,30,26,0.8667,0.1871
+same_nearest_surveys3,22-24,label QSO or candidate,139,178,65,0.3652,0.4676
+same_nearest_surveys3,22-24,label QSO or candidate or held,139,178,65,0.3652,0.4676
+same_nearest_surveys3,all,label QSO,327,141,124,0.8794,0.3792
+same_nearest_surveys3,all,label QSO or candidate,327,289,163,0.564,0.4985
+same_nearest_surveys3,all,label QSO or candidate or held,327,293,163,0.5563,0.4985

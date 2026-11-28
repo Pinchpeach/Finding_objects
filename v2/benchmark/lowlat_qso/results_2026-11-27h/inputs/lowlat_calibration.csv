@@ -1,0 +1,7 @@
+variant,quasars,quasars_qso,recall,recall_lo,recall_hi,quasars_lost_vs_control,false_all_regions,false_all_n,false_all_per_deg2,false_all_lo,false_all_hi,false_LS_cones_regions,false_LS_cones_n,false_LS_cones_per_deg2,false_LS_cones_lo,false_LS_cones_hi,false_noLS_cones_regions,false_noLS_cones_n,false_noLS_cones_per_deg2,false_noLS_cones_lo,false_noLS_cones_hi,area_deg2,exch_lost,exch_gained,exch_lost_per_deg2,exch_gained_per_deg2,exch_lost_i_lt_195,exch_gained_i_lt_195
+base,150,86,0.5733,0.4933,0.6497,0,150,170,144.3,90.0,211.4,16,99,787.8,397.9,1297.1,134,71,67.5,50.4,86.5,1.1781,,,,,,
+surveys2,150,86,0.5733,0.4933,0.6497,0,150,93,78.9,52.6,108.7,16,46,366.1,198.9,573.0,134,47,44.7,32.3,58.0,1.1781,77.0,0.0,65.4,0.0,7.0,0.0
+surveys3,150,86,0.5733,0.4933,0.6497,0,150,43,36.5,25.5,48.4,16,17,135.3,79.6,191.0,134,26,24.7,16.2,35.2,1.1781,127.0,0.0,107.8,0.0,11.0,0.0
+same_nearest,150,88,0.5867,0.5067,0.6623,0,150,164,139.2,85.7,206.3,16,98,779.9,389.9,1289.2,134,66,62.7,45.6,79.8,1.1781,12.0,6.0,10.2,5.1,5.0,0.0
+same_nearest_surveys2,150,88,0.5867,0.5067,0.6623,0,150,95,80.6,54.3,111.2,16,47,374.0,206.9,580.9,134,48,45.6,33.3,58.9,1.1781,76.0,1.0,64.5,0.8,6.0,0.0
+same_nearest_surveys3,150,88,0.5867,0.5067,0.6623,0,150,44,37.3,26.3,49.2,16,17,135.3,79.6,191.0,134,27,25.7,17.1,36.1,1.1781,126.0,0.0,107.0,0.0,10.0,0.0

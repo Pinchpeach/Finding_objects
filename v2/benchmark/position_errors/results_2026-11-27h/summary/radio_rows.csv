@@ -1,0 +1,6 @@
+catalog,rows,joined_legacy,joined_fixed,separate_to_joined,joined_to_separate,anchor_legacy,anchor_fixed
+FIRST,61,37,38,2,1,11,12
+LoTSS DR2,8,4,5,1,0,4,4
+NVSS,212,69,62,4,11,87,94
+TGSS ADR1,69,12,12,1,1,25,24
+VLASS,374,151,173,24,2,328,246

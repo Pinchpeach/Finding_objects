@@ -1,0 +1,5 @@
+evidence,value,n
+"NVSS median e_RA/e_Dec, RA read as arcsec",0.07142857142857144,223
+"NVSS median e_RA*15*cos(dec)/e_Dec, RA read as seconds of time",0.9427321817794603,223
+VLASS e_RAJ2000 identical to e_RAMdeg (share of rows),1.0,384
+VLASS median e_RAJ2000 x 3600 [arcsec] if degrees,0.078732,384

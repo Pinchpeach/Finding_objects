@@ -1,0 +1,4 @@
+part,truth_matched,without_ls_r,fixed_nearest,broken_nearest,p_nearest,fixed_nearest_only_with_r,broken_nearest_only_with_r,fixed_nearest_without_r,broken_nearest_without_r,fixed_present,broken_present,p_present,objects_within_radius_base,objects_within_radius_variant
+calibration,26046,103,14,3,0.01273,2,1,12,2,1,1,1.0,0.9827,0.9724
+confirmation,30609,132,20,5,0.00408,2,3,18,2,0,1,1.0,0.9849,0.9741
+all,56655,235,34,8,7e-05,4,4,30,4,1,2,1.0,0.9839,0.9733

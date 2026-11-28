@@ -10,7 +10,7 @@
   current   L / (L + 1)                       the 2.48.0 posterior (Budavari & Szalay 2008; the ``match-time`` value)
   conf      association_confidence            what the pipeline stores: max(match-time posterior, posterior against the
                                               object's final anchor)
-  fleuren   L / (sum L_i + 1 - Q0)            Fleuren et al. 2012 (MNRAS 423, 2407, eq. 6); Q0 by blank counting
+  fleuren   L / (sum L_i + 1 - Q0)            Fleuren et al. 2012 (MNRAS 423, 2407; arXiv:1202.3891v2 eq. 3); Q0 by blank counting
   fleuren_q Q0 L / (Q0 sum L_i + 1 - Q0)      the same with L scaled by Q0: q(m) of eq. 4 is normalised to Q0, and with
                                               q(m)/n(m) taken as Q0/rho the prior odds of "a counterpart exists" are Q0/(1-Q0)
   fleuren1  L / sum L_i                       the same with Q0 = 1 (every row has a counterpart)

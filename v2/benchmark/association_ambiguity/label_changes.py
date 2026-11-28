@@ -66,8 +66,9 @@ def main() -> int:
     for f in [x for x in a.fields.split(",") if x]:
         m = one(a.base, a.variant, f, a.tol)
         parts.append(m)
-        ob.append(m.attrs["only_base_r"])
-        ov.append(m.attrs["only_variant_r"])
+        # popped, not read: pd.concat compares the ``attrs`` of its parts and raises on two numpy arrays of different lengths (2.61.10)
+        ob.append(m.attrs.pop("only_base_r"))
+        ov.append(m.attrs.pop("only_variant_r"))
     m = pd.concat(parts, ignore_index=True)
     ob, ov = np.concatenate(ob), np.concatenate(ov)
     m["changed"] = m.cls_b != m.cls_v
