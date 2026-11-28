@@ -1,0 +1,6 @@
+variant,lit_only_objects,lit_rows_attached,new_joins_rows,new_joins_objects,right,wrong,unknown,lit_lit_merged_objects,right_ext,wrong_ext,unknown_ext,right_share_of_known_ext_pct,right_share_of_known_pct,qso_objects_attached,qso_objects_total
+base,2544,1662,,,,,,,,,,,,,
+density,2405,1882,463.0,415.0,0.0,7.0,456.0,36.0,0.0,73.0,390.0,0.0,0.0,2.0,16.0
+typed_close,2121,1860,203.0,188.0,127.0,0.0,76.0,264.0,103.0,0.0,100.0,100.0,100.0,0.0,16.0
+density_typed,1834,2278,652.0,589.0,127.0,3.0,522.0,322.0,103.0,66.0,483.0,60.9,97.7,2.0,16.0
+err,2545,1658,1.0,1.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,100.0,100.0,0.0,16.0
