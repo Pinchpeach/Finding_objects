@@ -1,6 +1,6 @@
 name: Unit tests
 
-# 2.62.3 (task 타).  The tests of the repository as CLAUDE.md names them -- `cd v2 && python -m pytest -q Preprocess/tests Classifier/tests app/tests` -- in one place.
+# 2.63.1 (task 타).  The tests of the repository as CLAUDE.md names them -- `cd v2 && python -m pytest -q Preprocess/tests Classifier/tests app/tests` -- in one place.
 # Before this, CI ran Preprocess/tests (test-preprocess.yml) and Classifier/tests (v2_scientific_cross_validation.yml, only when its paths change) and NEVER app/tests,
 # the integration tests of the app that catch an association regression (CLAUDE.md).  `v2/Preprocess/tests/test_ci_test_set.py` keeps this command, CLAUDE.md and the
 # tests folders the same set; assert_no_skips.py turns a skipped test (no Qt on the runner) and a folder that collected nothing into a failure.
