@@ -388,3 +388,32 @@ def test_a_spectral_class_qso_is_a_spectroscopic_qso():
     assert not s5._spectroscopic_qso([{"rule_id": "SPC-SDSS-002", "class": "GALAXY", "raw_score": 1.0}])  # a spectral galaxy
     assert not s5._spectroscopic_qso([{"rule_id": "WISE-AGN-001", "class": "EXTRAGALACTIC", "raw_score": 1.0}])
     assert not s5._spectroscopic_qso([])
+
+
+def test_lit_keep_is_an_option_and_does_nothing_alone(monkeypatch):
+    monkeypatch.setenv("V2_LOWLAT_QSO", "surveys2,lit_keep")
+    assert LL.options() == frozenset({"surveys2", "lit_keep"}) and LL.lit_keep() and not LL.spectro_keep()
+    monkeypatch.setenv("V2_LOWLAT_QSO", "lit_keep")
+    ra, dec = eq(200.0, 8.0)
+    df = frame([dict(ra=ra, dec=dec, catalogs="NED|SIMBAD")])
+    assert not LL.label_switches_on() and not LL.qso_forbidden(df).any()
+
+
+def test_exempt_literature_leaves_only_the_others_held(monkeypatch):
+    details = ["held: 0 surveys", "held: 1 survey", ""]
+    monkeypatch.setenv("V2_LOWLAT_QSO", "surveys2")
+    assert LL.exempt_literature(details, [True, False, False]) == details  # switch off: unchanged
+    monkeypatch.setenv("V2_LOWLAT_QSO", "surveys2,lit_keep")
+    assert LL.exempt_literature(details, [True, False, False]) == ["", "held: 1 survey", ""]
+    monkeypatch.setenv("V2_LOWLAT_QSO", "surveys2,spectro_keep")
+    assert LL.exempt_literature(details, [True, False, False]) == details  # spectro_keep is not lit_keep
+
+
+def test_a_ned_or_simbad_type_qso_is_a_literature_qso():
+    s5 = _stage5()
+    ned = {"rule_id": "NED-TYPE-001", "class": "QSO", "raw_score": 0.85}
+    assert s5._literature_qso([ned]) and s5._literature_qso([{**ned, "rule_id": "SIMBAD-TYPE-001"}])
+    assert not s5._literature_qso([{**ned, "class": "GALAXY"}])  # a literature galaxy
+    assert not s5._literature_qso([{**ned, "raw_score": 0.3}])
+    assert not s5._literature_qso([{"rule_id": "SPC-SDSS-003", "class": "QSO", "raw_score": 0.9}])  # a spectrum is spectro_keep's business
+    assert not s5._literature_qso([])

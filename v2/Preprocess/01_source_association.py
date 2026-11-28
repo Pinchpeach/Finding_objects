@@ -11,6 +11,8 @@ import pandas as pd
 
 from association_model import (
     AMBIG_FIX,
+    ANNOT_ASSOC,
+    TYPED_ANNOTATIONS,
     annotation_physical_type,
     assess_pair,
     phot_magnitudes,
@@ -28,6 +30,7 @@ from association_model import (
 )
 
 AMBIG_SCORE_RATIO = 0.67
+TYPED_CLOSE_ARCSEC = float(os.environ.get("V2_ASSOC_TYPED_CLOSE_ARCSEC", "0.6"))
 # Diagnostics of the decision (V2_ASSOC_DIAG=1; off by default, nothing else reads them): for every detection the best
 # two accepted candidates (score, separation, normalised separation, catalogues and members of the group), and whether
 # the groups of the two candidates are one object themselves (their anchors agree within the pair's sigma).
@@ -296,6 +299,11 @@ def _pair_density(det, anchor):
     if not _CANDIDATE_DENSITY:
         return own
     other = anchor.get("source_density_arcsec2")
+    if "density" in ANNOT_ASSOC and det.get("catalog") in TYPED_ANNOTATIONS and anchor.get("catalog") not in ANNOTATION_CATALOGS and other is not None:
+        # V2_ANNOT_ASSOC=density (2.63.3): a NED / SIMBAD row is looked for among survey objects, so only the survey objects can be the unrelated
+        # neighbour it is confused with; the literature catalogue's own density (COSMOS 2': SIMBAD 0.067 / arcsec^2, four times the survey objects')
+        # stops the pair at p_chance <= 0.25, i.e. at 1.1''.
+        return other
     return max(d for d in (own, other) if d is not None) if (own is not None or other is not None) else None
 
 
@@ -468,7 +476,10 @@ def run(raw_dir: Path, out: Path):
                     # Two entries of one annotation catalogue that both carry a
                     # physical type are two objects for that catalogue (a
                     # supernova and its host galaxy; association_model).
-                    continue
+                    # V2_ANNOT_ASSOC=typed_close (2.63.3): not when the two positions agree within TYPED_CLOSE_ARCSEC (0.6'': the
+                    # radius COSMOS2020 uses for its ancillary catalogues, Weaver et al. 2022 sec. 2.6); a host and a supernova are farther apart.
+                    if not ("typed_close" in ANNOT_ASSOC and assess_pair(group["anchor"], det, None)["separation_arcsec"] <= TYPED_CLOSE_ARCSEC):
+                        continue
                 if det["catalog"] in group["catalogs"] and det["catalog"] not in ANNOTATION_CATALOGS:
                     # A second spectrum of a target already holding one is a
                     # duplicate, not evidence for a neighbour (field RA 20).

@@ -21,6 +21,11 @@ Gaia row pass the cut), and that the AllWISE colour rules are applied where the 
   spectro_keep          (2.61.5) an object whose pipeline spectral class is QSO (a SPC-SDSS-003, SPC-DESI-003 or SPC-LAMOST-003
                         reading, raw score >= 0.5) is never held back by ``surveys2`` / ``surveys3`` / ``pm``: a spectrum is
                         a direct measurement of the class, and a blind benchmark (no spectra) is not affected by this switch
+  lit_keep              (2.63.3) an object whose class QSO rests on a NED or SIMBAD physical type (NED-TYPE-001 / SIMBAD-TYPE-001 reading
+                        QSO, raw score >= 0.5) is never held back: the literature type is an identification by someone who looked at the
+                        object, not a photometric colour cut, and an object that only NED / SIMBAD list has no survey to count (COSMOS 2',
+                        benchmark/association_ambiguity: 2,544 of 3,572 objects, 16 QSO labels, all held by ``surveys2``).  A blind
+                        benchmark (no NED / SIMBAD) is not affected by this switch
 
 ``V2_LOWLAT_QSO_ABSB`` (default 20): the latitude below which the switches act.  Nothing changes at |b| >= this value or where a
 position is missing (every switch tests the object's own |b|; ``wise_footprint`` too, 2.61.3 review).  The literature behind the
@@ -47,7 +52,7 @@ import os
 import numpy as np
 import pandas as pd
 
-OPTIONS = ("surveys2", "surveys3", "pm", "wise_footprint", "wise_second", "spectro_keep")
+OPTIONS = ("surveys2", "surveys3", "pm", "wise_footprint", "wise_second", "spectro_keep", "lit_keep")
 # catalogues that identify or annotate a source, not measure it (01_source_association.ANNOTATION_CATALOGS)
 ANNOTATION = frozenset({"NED", "SIMBAD", "Roma-BZCAT", "Suh 2021 AGB Catalog", "HASH PN Catalog", "Acker PN Spectroscopy",
                         "ATNF Pulsar Catalog", "Galaxy Zoo DESI"})  # fmt: skip
@@ -141,6 +146,18 @@ def exempt_spectroscopic(details: list[str], spectroscopic_qso) -> list[str]:
     if not spectro_keep():
         return details
     return ["" if s else d for d, s in zip(details, spectroscopic_qso)]
+
+
+def lit_keep() -> bool:
+    """Objects whose QSO class rests on a NED / SIMBAD physical type are exempt from the label switches (``lit_keep``)."""
+    return "lit_keep" in options()
+
+
+def exempt_literature(details: list[str], literature_qso) -> list[str]:
+    """``details`` of :func:`hold_details` with the literature QSOs (bool per object) left out when ``lit_keep``."""
+    if not lit_keep():
+        return details
+    return ["" if s else d for d, s in zip(details, literature_qso)]
 
 
 def label_switches_on() -> bool:
