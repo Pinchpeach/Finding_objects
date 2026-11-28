@@ -1,0 +1,107 @@
+{
+  "schema": 1,
+  "commit": "a3067e9b32ad281524bd0da3a2766e94abb0d095",
+  "branch": "ccr-68f28268-l0opfu",
+  "dirty": false,
+  "dirty_files": 0,
+  "env": {},
+  "effective": {
+    "POSERR_UNITS": "legacy",
+    "AMBIG_FIX": [],
+    "POSERR_NATIVE": [],
+    "ANNOT_ASSOC": [],
+    "LOWLAT_QSO": [],
+    "LOWLAT_QSO_ABSB": 20.0
+  },
+  "started_utc": "2026-11-28T04:37:27Z",
+  "finished_utc": "2026-11-28T04:37:28Z",
+  "status": "ok",
+  "inputs": [
+    {
+      "path": "/home/user/Finding_objects/v2/benchmark/sdss_sky",
+      "kind": "directory",
+      "sha256": "bc76a872645f0e3b0d85121158f58db41cc815cf90cb6f4ed9e850ab9932d3cf",
+      "n_files": 13,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/home/user/Finding_objects/v2/benchmark/truth_data",
+      "kind": "directory",
+      "sha256": "f34e0e1465e963931aa767ee4713da15378eb025bbc84322b83dfe745c6768f5",
+      "n_files": 16,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/home/user/Finding_objects/v2/benchmark/desi_external",
+      "kind": "directory",
+      "sha256": "c4979c72a7685b3c6636686b8b4e5210720296e399066553d84e79962691a22b",
+      "n_files": 17,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/home/user/Finding_objects/v2/benchmark/locked_c",
+      "kind": "directory",
+      "sha256": "bf80f86ac3e5c0a42962ddc173a48ac22c4a3f5a0fa3b2258c209c0e3e0bbbb4",
+      "n_files": 14,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/home/user/Finding_objects/v2/benchmark/deep_cosmos_confirmation/variants",
+      "kind": "directory",
+      "sha256": "036ca0bf70336c3531ded9cee9fa5f80731e5674284bd609fb5c11eb78b8b708",
+      "n_files": 9,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/home/user/Finding_objects/v2/benchmark/desi_gbm_truth",
+      "kind": "directory",
+      "sha256": "59c10e0610c600b25688a47da21f7800907ab5e80c19b5818faa9653c0b8e628",
+      "n_files": 2,
+      "hashed": "relative path, size"
+    }
+  ],
+  "argv": [
+    "benchmark/doc_claims_check.py",
+    "--out",
+    "benchmark/doc_claims"
+  ],
+  "python": "3.13.18",
+  "note": "documents are not edited",
+  "previous": [
+    {
+      "commit": "b0ec093882a5a1bc7dfd0e7311e51ae27f522670",
+      "dirty": true,
+      "env": {},
+      "effective": {
+        "POSERR_UNITS": "legacy",
+        "AMBIG_FIX": [],
+        "POSERR_NATIVE": [],
+        "ANNOT_ASSOC": [],
+        "LOWLAT_QSO": [],
+        "LOWLAT_QSO_ABSB": 20.0
+      },
+      "started_utc": "2026-11-28T04:31:45Z",
+      "finished_utc": "2026-11-28T04:31:46Z",
+      "status": "ok",
+      "note": "documents are not edited"
+    },
+    {
+      "commit": "3eb1409c6f39d7acc59ea2ac246e318d4c878c35",
+      "dirty": true,
+      "env": {},
+      "effective": {
+        "POSERR_UNITS": "legacy",
+        "AMBIG_FIX": [],
+        "POSERR_NATIVE": [],
+        "ANNOT_ASSOC": [],
+        "LOWLAT_QSO": [],
+        "LOWLAT_QSO_ABSB": 20.0
+      },
+      "started_utc": "2026-11-28T04:37:18Z",
+      "finished_utc": "2026-11-28T04:37:19Z",
+      "status": "ok",
+      "note": "documents are not edited"
+    }
+  ],
+  "mixed": true
+}
