@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "commit": "abe6787684e3246a39fa6f4eec92cecb8cd96bf4",
+  "branch": "ccr-68f28268-l0opfu",
+  "dirty": true,
+  "dirty_files": 5,
+  "env": {},
+  "effective": {
+    "POSERR_UNITS": "legacy",
+    "AMBIG_FIX": [],
+    "POSERR_NATIVE": [],
+    "ANNOT_ASSOC": [],
+    "LOWLAT_QSO": [],
+    "LOWLAT_QSO_ABSB": 20.0
+  },
+  "started_utc": "2026-11-28T01:34:15Z",
+  "finished_utc": "2026-11-28T01:36:38Z",
+  "status": "ok",
+  "inputs": [
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/pe/legacy",
+      "kind": "directory",
+      "sha256": "2616f7c1e548ea62b067c75721b0cf7f2b8f63cc67010188cb1b67a5c20c2843",
+      "n_files": 358,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/pe/fixed",
+      "kind": "directory",
+      "sha256": "424dd36ab90dc5dcd76d1ba773ccd87652b4ede9a2db72b1c8237ee84cf604db",
+      "n_files": 358,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "results_2026-11-27h/regions_changed.csv",
+      "kind": "file",
+      "sha256": "31418ff4eadd7e8f0f6026eb54aec1097220a5fe02c959d23cb5aa9a5db4c36f",
+      "size": 3978
+    }
+  ],
+  "argv": [
+    "compare_by_members.py",
+    "--a",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/pe/legacy",
+    "--b",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/pe/fixed",
+    "--regions",
+    "results_2026-11-27h/regions_changed.csv",
+    "--out",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/pe/compare_new"
+  ],
+  "python": "3.13.18",
+  "note": ""
+}
