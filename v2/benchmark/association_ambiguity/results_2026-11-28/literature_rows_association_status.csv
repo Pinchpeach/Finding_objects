@@ -1,0 +1,7 @@
+run,association_status,association_method,literature_rows
+base,matched,annotation_most_probable,31
+base,matched,position_epoch_likelihood,2127
+base,new,new_source,2544
+same_nearest,matched,annotation_most_probable,29
+same_nearest,matched,position_epoch_likelihood,2129
+same_nearest,new,new_source,2544
