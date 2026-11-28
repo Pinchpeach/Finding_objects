@@ -1,0 +1,56 @@
+name: v2 VizieR batch-size probe
+
+# 2.62.12 (WORK_REPORT_2026-11-28_vizier_batch.md).  The WD HR-gates run of 2026-11-28 (46108906185) sent 500-position Gaia DR3 batches to CfA,
+# which answered HTTP 504 after 60.3 s (three times; its gateway's limit, small queries are answered), and then to IDIA (78-819 s per batch).
+# This run measures, per mirror and batch size, how long one multi-target request of the collector takes (v2/Get_data/probe_vizier_batch.py:
+# one host per request, no failover, no cache, the 3-5 s pause), so that a per-mirror batch limit is set from data.  Nothing is committed: the
+# table is in the step summary and the artifact.  It runs on a push to a working branch that changes the probe (not on main) or by hand.
+on:
+  workflow_dispatch:
+    inputs:
+      hosts:
+        description: "VizieR hosts, space separated"
+        default: "vizier.cds.unistra.fr vizier.cfa.harvard.edu vizier.idia.ac.za"
+      sizes:
+        description: "batch sizes (positions), space separated, at most 500"
+        default: "50 125 250 500"
+      repeats:
+        description: "requests per host and size (different positions each)"
+        default: "2"
+  push:
+    branches-ignore: [main]
+    paths:
+      - v2/Get_data/probe_vizier_batch.py
+      - .github/workflows/v2_vizier_batch_probe.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vizier-batch-probe-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pandas numpy astropy astroquery requests tabulate
+      - name: Probe the mirrors
+        env:
+          HOSTS: ${{ inputs.hosts || 'vizier.cds.unistra.fr vizier.cfa.harvard.edu vizier.idia.ac.za' }}
+          SIZES: ${{ inputs.sizes || '50 125 250 500' }}
+          REPEATS: ${{ inputs.repeats || '2' }}
+        run: |
+          python -u v2/Get_data/probe_vizier_batch.py --truth v2/benchmark/truth_data/ground_truth.csv \
+            --hosts $HOSTS --sizes $SIZES --repeats "$REPEATS" --out vizier_batch_probe
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: vizier-batch-probe
+          path: vizier_batch_probe/
+          retention-days: 30
