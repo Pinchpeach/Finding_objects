@@ -1,4 +1,4 @@
-"""The tools of the position-error study and of the combined decision table (2.62.2 / 2.63.0), on small synthetic inputs."""
+"""The tools of the position-error study and of the combined decision table (2.62.2), on small synthetic inputs."""
 
 import importlib.util
 import sys

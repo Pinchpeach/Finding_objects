@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Which stored rows change their position error between V2_POSERR_UNITS=legacy and fixed (2.63.0), row by row.
+"""Which stored rows change their position error between V2_POSERR_UNITS=legacy and fixed (2.62.2), row by row.
 
     python check_units_from_rows.py --roots DIR [DIR ...] --out DIR
 

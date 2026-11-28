@@ -1,5 +1,5 @@
 #!/bin/bash
-# AllWISE eeMaj / GALEX Nerr as the position error on the 26 deep COSMOS fields (2.63.3).
+# AllWISE eeMaj / GALEX Nerr as the position error on the 26 deep COSMOS fields (2.62.4).
 #   run_native_error_variants.sh FIELDS_ROOT TRUTH_FLUX_DIR OUT_DIR
 # FIELDS_ROOT/<field>/raw/<tag>/*.csv (collect_deep_cosmos.py), TRUTH_FLUX_DIR/<field>.csv.gz (collect_truth_flux.py).  Stage 1 only, once per variant and
 # once more on the shifted-catalogue copy (run_variant.py --shift); then measure_association.py per variant.  Two runs at a time.

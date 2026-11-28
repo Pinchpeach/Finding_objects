@@ -425,7 +425,7 @@ is unchanged.
 ## 9. The survey-count switches together with the association rules (2.62.2)
 
 Measured only, nothing changed by default.  `results_2026-11-27h/decision_table.csv` (assembled by `decision_table_combos.py` from the tables of `combos_table.py`, `spectro_held.py`, `faint_cost.py`
-and `association_ambiguity/label_changes.py`) has one row per combination; every row was run with the pre-2.63.0 reading of the position errors (`V2_POSERR_UNITS=legacy`, so the only difference between rows is
+and `association_ambiguity/label_changes.py`) has one row per combination; every row was run with the legacy reading of the position errors (`V2_POSERR_UNITS=legacy`, the default of 2.62.2, so the only difference between rows is
 the switches).  140 confirmation cones (143 sample quasars), objects that are not sample quasars per deg^2 with a bootstrap over the regions:
 
 | row | sample quasars QSO | QSO labels not on a sample quasar | LS cones | cones without LS | lost / gained against the base (matched by position) |

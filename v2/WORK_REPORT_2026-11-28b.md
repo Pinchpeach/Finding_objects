@@ -1,6 +1,6 @@
 # 작업 보고서 2026-11-28b — 과제 하: 문헌 전용 객체(NED·SIMBAD 행만 있는 객체)가 광학 객체에 안 붙는 이유, 변형, AllWISE/GALEX 오차 열
 
-버전 제안 **2.63.3 (PATCH)**: 새 스위치 5개(`V2_ANNOT_ASSOC`의 `density`·`typed_close`·`err`, `V2_POSERR_NATIVE`의 `allwise`·`allwise_raw`·`galex`)와 `V2_LOWLAT_QSO=lit_keep`을 넣었지만 **모두 기본 꺼짐**이고, 꺼진 상태의 출력은 변경 전 코드와 바이트 단위로 같다(2.8절). 번호는 이 브랜치에서 파(2.63.2) 다음으로 이어 붙인 것이며 병합 순서에 따라 검토 세션이 다시 매긴다.
+버전 제안 **2.63.3 (PATCH)** → 병합: **2.62.4(PATCH)**(차 보완·타·파와 함께): 새 스위치 5개(`V2_ANNOT_ASSOC`의 `density`·`typed_close`·`err`, `V2_POSERR_NATIVE`의 `allwise`·`allwise_raw`·`galex`)와 `V2_LOWLAT_QSO=lit_keep`을 넣었지만 **모두 기본 꺼짐**이고, 꺼진 상태의 출력은 변경 전 코드와 바이트 단위로 같다(2.8절). 번호는 이 브랜치에서 파(2.63.2) 다음으로 이어 붙인 것이며 병합 순서에 따라 검토 세션이 다시 매긴다.
 
 ## 0. 내가 이해한 요청
 
@@ -160,3 +160,17 @@ B1이 틀린 이유: `effective_sigma_arcsec`의 하한은 맞지만 탐욕적 �
 ## 9. 파일
 
 `benchmark/association_ambiguity/`: `PREDICTIONS_LITERATURE_2026-11-28.md`(예측), `literature_only.py`(원인 진단), `literature_variants.py`(변형과 다리 정답), `literature_position_accuracy.py`(위치 정밀도), `literature_real_use.py`(실사용 3영역 표), `nearest_neighbour_label.py`, `results_2026-11-28/`; `benchmark/association_truth/`: `run_native_error_variants.sh`, `summarize_native_error_variants.py`, `results_2026-11-28/`; `Preprocess/`: `association_model.py`·`01_source_association.py`·`lowlat_qso.py`·`05_likelihood_vectors.py`의 스위치, `tests/test_annot_assoc.py`; `LITERATURE_ANNOTATION_ASSOCIATION_2026-11-28.md`; `benchmark/position_errors/UNITS.md`(AllWISE·GALEX·SIMBAD 행 갱신).
+
+## 병합 전 검토 (2.62.4로 병합)
+
+- **판 번호**: 작업 세션의 2.63.3 후보를 차 보완·타·파와 함께 2.62.4(PATCH)로 병합했다. main은 2.62.3이고 2.62.2의 단위 스위치는 기본 `legacy`다. 그래서 작업 가지의 "2.63.0 = 단위 수정 기본" 표기를 main의 사실(2.62.2, 기본 `legacy`)에 맞게 고쳤다.
+- **스위치를 끈 출력**: 실사용 3개 필드의 Stage 1 출력이 main과 바이트 단위로 같다(`V2_ANNOT_ASSOC`·`V2_POSERR_NATIVE`를 지운 환경). 시험 589개 통과.
+- **`typed_close`의 "100 % 맞음"**: 분모는 확장 다리로 판정한 103개(맞음 103 / 틀림 0 / 모름 100)이고, 사전 다리로는 127 / 0 / 76이다. 0건의 95 % 상한은 각각 약 3.5 %·2.9 %다.
+  - 0.6″는 이 영역에서 고른 값이 아니라 COSMOS2020의 문헌 반경(Weaver+2022 §2.6)이다. 다만 측정은 한 영역(COSMOS 2′)뿐이고, 확장 다리는 사후에 더한 것이다(§3에 공개).
+  - 섞기 재현성: COSMOS 2′에서 `V2_ANNOT_ASSOC=typed_close`로 시드 2개, 객체 차이 0·상태 변경 0. 객체는 3,618 → 3,204다.
+  - 기본 승격은 다른 영역(깊은 COSMOS의 NED·SIMBAD 수집 뒤) 확인까지 미룬다.
+- **AllWISE `eeMaj`(+5.1 %)와 처리 순서**: 이득의 원인은 σ가 아니라 처리 순서 키다(§3.3: `_anchor_key`가 하한 없는 `poserr_arcsec`를 쓴다).
+  - 2.61.0의 순서 규칙(주석 여부, 표적 분광 여부, 앵커 정밀도, **위치 오차**, 목록 이름, 그다음 밝기·좌표·식별자)에서 위치 오차가 밝기보다 앞선 키다. 그래서 AllWISE의 형식 오차가 0.5″ 상수에서 `eeMaj`(중앙값 0.34″)로 바뀌면 AllWISE 행이 다른 목록 사이에서 처리되는 자리가 바뀐다.
+  - 섞기 재현성은 유지된다: `V2_POSERR_NATIVE=allwise`로 NGC 4522·COSMOS 2′에서 시드 1–3, 객체 차이 0·상태 변경 0. 순서는 키로 정해지고 입력 파일 순서와는 무관하기 때문이다.
+  - 검토 세션이 짚은 대로, 이득이 순서에서 온다면 **순서 키가 형식 오차를 쓰는지, 실제로 쓰이는 σ(하한 적용 `effective_sigma_arcsec`)를 쓰는지**가 규칙 자체의 문제다. 이 보고서가 같은 일이 2MASS(0.25″ 대 하한 0.42″)에도 있다고 적었다. 다음 과제 후보는 "순서 키를 하한 적용 σ로"를 따로 재는 것이다.
+

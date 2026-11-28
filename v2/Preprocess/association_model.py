@@ -137,7 +137,7 @@ if POSERR_UNITS not in ("fixed", "legacy"):
     raise ValueError(f"V2_POSERR_UNITS: unknown value {POSERR_UNITS!r}; known: 'fixed', 'legacy'")
 
 # ---------------------------------------------------------------------------------------------------------------------
-# Position errors a catalogue states itself (2.63.3; both switches are off by default and change nothing unless given).
+# Position errors a catalogue states itself (2.62.4; both switches are off by default and change nothing unless given).
 #   V2_POSERR_NATIVE=allwise      AllWISE ``eeMaj`` as the position error.  VizieR II/328 ReadMe: "arcsec eeMaj Semi-major axis of the error ellipse (1)" with
 #                                 note (1) "the parameters of the error ellipse are computed from the 1-sigma in RA and Dec (sigra, sigdec) and the co-sigma
 #                                 sigradec": a 1-sigma semi-axis in arcsec (CfA mirror of the CDS ReadMe, read 2026-11-28).  The PSF/6 floor of

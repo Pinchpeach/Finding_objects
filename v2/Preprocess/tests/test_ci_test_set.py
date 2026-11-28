@@ -1,4 +1,4 @@
-"""CI runs the tests the way CLAUDE.md says (2.63.1, task 타).
+"""CI runs the tests the way CLAUDE.md says (2.62.4, task 타).
 
 CLAUDE.md names the local command ``cd v2 && python -m pytest -q Preprocess/tests Classifier/tests app/tests``.  CI used to run Preprocess/tests (test-preprocess.yml) and
 Classifier/tests (v2_scientific_cross_validation.yml) and never app/tests, so the 17 integration tests of the app -- "the only integration test that catches an association
