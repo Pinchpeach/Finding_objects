@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "commit": "abe6787684e3246a39fa6f4eec92cecb8cd96bf4",
+  "branch": "ccr-68f28268-l0opfu",
+  "dirty": true,
+  "dirty_files": 5,
+  "env": {},
+  "effective": {
+    "POSERR_UNITS": "legacy",
+    "AMBIG_FIX": [],
+    "POSERR_NATIVE": [],
+    "ANNOT_ASSOC": [],
+    "LOWLAT_QSO": [],
+    "LOWLAT_QSO_ABSB": 20.0
+  },
+  "started_utc": "2026-11-28T01:36:57Z",
+  "finished_utc": "2026-11-28T01:36:57Z",
+  "status": "ok",
+  "inputs": [
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/pe/compare_new",
+      "kind": "directory",
+      "sha256": "958a57471eb44d255c83530bae77dada941d4e52b02b60eb0834630006d3b695",
+      "n_files": 6,
+      "hashed": "relative path, size"
+    }
+  ],
+  "argv": [
+    "summarize_compare.py",
+    "--compare",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/pe/compare_new",
+    "--out",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/pe/summary_new"
+  ],
+  "python": "3.13.18",
+  "note": ""
+}
