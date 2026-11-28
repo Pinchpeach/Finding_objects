@@ -136,4 +136,8 @@ python benchmark/position_errors/dump_vizier_units.py   # 네트워크가 되는
 - **확인 수단**: 수동 워크플로 `.github/workflows/v2_vizier_units.yml`가 `dump_vizier_units.py`를 돌려 열마다 VizieR의 `unit`·`description`을 아티팩트와 단계 요약에 남긴다. 이 도구는 이제 `throttle.install()`로 미러를 돌아 스트라스부르 장애에도 답을 얻을 수 있다.
 - **바꾸는 순서**: 문서 단위가 이 보고서의 판정(VLASS 도, NVSS RA 시간 초)과 같으면 `POSERR_UNITS`의 기본값을 `fixed`로 바꾼다. 이 MINOR에서 1차 라벨 28개가 바뀐다(이 보고서의 179개 영역). 세트 C는 검토 세션의 계획대로 다른 라벨 변경 후보(`same,nearest`, `surveys2`)와 묶어 한 번에 채점하므로 그 MINOR 때도 따로 채점하지 않는다.
 - **판 번호**: 작업 세션의 2.62.0(MINOR) 후보를 과제 차(2.61.10 후보)와 함께 2.62.2(PATCH)로 병합했다(main이 이미 2.62.1). 시험 `test_the_default_reading_is_legacy_until_the_documented_units_are_read` 추가.
+- **Codex 검토로 고친 도구(`compare_by_members.py`)**: 앵커 변화와 위치 이동을 **구성이 바뀐 객체에서만** 쟀다. 그래서 구성은 같고 앵커만 전파 행에서 광학 행으로 넘어간 객체(단위 수정의 주된 경우)가 `anchor_changes.csv`와 `per_region.csv`의 `median_shift_arcsec`에서 빠졌다. 이제 구성이 같은 객체도 재고 `kind`(`same_members` / `changed_members`) 열을 단다(시험 추가).
+  - **커밋된 표는 고치기 전 도구의 값이다**: 위 "앵커가 넘어간 곳(객체 86개 …)"과 그 위치 이동 중앙값·최대는 구성이 바뀐 객체만 센 것이라 **적게 잡혀 있다**.
+  - 객체마다 전체 표에서 센 "광학 행을 가진 채 전파가 앵커인 객체 116 → 55"와 라벨 변화(28)는 영향이 없다.
+  - 원 실행 산출물이 이 세션에 없어 다시 재지 못했다. `fixed`를 기본으로 하는 MINOR 전에 다시 재야 한다.
 

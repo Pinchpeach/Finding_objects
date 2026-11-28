@@ -66,6 +66,10 @@ def test_compare_by_members_separates_same_objects_from_changed_ones_and_sees_th
     assert (c["anchors_a"], c["anchors_b"]) == (1, 0)  # the object that carries the radio position although it holds an optical row
     r = c["radio"].iloc[0]
     assert bool(r.joined_a) and bool(r.joined_b)
+    # the anchor of O1 moved from the radio row to the optical row without a change of members (Codex review of 2.62.2)
+    ac = c["anchor_changes"]
+    assert len(ac) == 1 and ac.iloc[0].kind == "same_members" and (ac.iloc[0].anchor_a, ac.iloc[0].anchor_b) == ("VLASS", "Pan-STARRS1 DR2 MeanObject")
+    assert ac.iloc[0].shift_arcsec == pytest.approx(0.4, abs=1e-3) and len(c["shifts"]) == 2  # both mapped objects have a shift (O2: 0)
 
 
 def test_compare_by_members_pairs_a_changed_object_with_the_one_that_shares_most_detections():
@@ -110,3 +114,18 @@ def test_label_changes_runs_when_the_two_fields_leave_objects_unpaired_in_differ
     t = pd.read_csv(tmp_path / "out" / "label_changes.csv").set_index("r")
     assert int(t.loc["all", "pairs"]) == 2 and int(t.loc["all", "changed"]) == 1 and int(t.loc["all", "from_QSO"]) == 1
     assert int(t.loc["all", "only_in_base"]) == 1 and int(t.loc["all", "only_in_variant"]) == 2
+
+
+def test_combos_exchange_uses_each_variants_own_coordinates():
+    """Codex review of 2.62.2: combos_table.py passed a one-row-per-id table, which lowlat_exchange.py refuses (and which gave a renumbered id the base's position)."""
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("combos_table_test", V2 / "benchmark" / "lowlat_qso" / "combos_table.py")
+    ct = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(ct)
+    a = 1 / 3600
+    base = pd.DataFrame(dict(region="r1", object_id=["O2"], ra=[150.0 + 30 * a], dec=[2.0], ps1_i=[19.0], n_catalogs=[2]))
+    var = pd.DataFrame(dict(region="r1", object_id=["O2"], ra=[150.0 + 60 * a], dec=[2.0], ps1_i=[20.0], n_catalogs=[2]))  # the same id, another source
+    e = ct.exchange_vs_base({"base": base, "v": var}, "base", 1.0)["v"]
+    assert (e["kept"], e["lost"], e["gained"]) == (0, 1, 1)
+

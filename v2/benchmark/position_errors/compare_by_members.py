@@ -89,14 +89,16 @@ def compare_region(a: tuple, b: tuple) -> dict:
     anc_a = assoc_a.drop_duplicates("object_id").set_index("object_id")
     anc_b = assoc_b.drop_duplicates("object_id").set_index("object_id")
     shifts, anchor_changed = [], []
-    for oa, (ob, _) in list(paired.items()):
+    # every mapped object: the same detections with a new anchor (the VLASS -> optical case of the unit fix) as well as the changed ones (Codex review of 2.62.2)
+    mapped = [("same_members", oa, ob) for oa, ob in same.items()] + [("changed_members", oa, ob) for oa, (ob, _) in paired.items()]
+    for kind, oa, ob in mapped:
         if oa in anc_a.index and ob in anc_b.index:
             pa, pb = anc_a.loc[oa], anc_b.loc[ob]
             dx = (pa.object_ra - pb.object_ra) * np.cos(np.deg2rad(pa.object_dec)) * 3600.0
             dy = (pa.object_dec - pb.object_dec) * 3600.0
             shifts.append(float(np.hypot(dx, dy)))
             if pa.object_anchor_catalog != pb.object_anchor_catalog:
-                anchor_changed.append(dict(object_a=oa, object_b=ob, anchor_a=pa.object_anchor_catalog, anchor_b=pb.object_anchor_catalog, shift_arcsec=shifts[-1]))
+                anchor_changed.append(dict(kind=kind, object_a=oa, object_b=ob, anchor_a=pa.object_anchor_catalog, anchor_b=pb.object_anchor_catalog, shift_arcsec=shifts[-1]))
     return dict(n_objects_a=len(sig_a), n_objects_b=len(sig_b), same=len(same), changed_a=len(only_a), changed_b=len(sig_b) - len(same), radio=rr,
                 label_changes=pd.DataFrame(changes), anchor_changes=pd.DataFrame(anchor_changed), shifts=shifts,
                 anchors_a=radio_anchored_with_optical(assoc_a), anchors_b=radio_anchored_with_optical(assoc_b))  # fmt: skip

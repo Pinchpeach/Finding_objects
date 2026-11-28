@@ -47,10 +47,18 @@ def ls_cones(control_root: Path, names) -> dict[str, bool]:
     return out
 
 
+def exchange_vs_base(qso_other: dict, base: str, tol: float = 1.0) -> dict:
+    """Positional exchange (``lowlat_exchange.exchange``) of every variant against ``base``.  ``qso_other``: variant -> its QSO-labelled objects that are not
+    sample quasars, with that variant's own coordinates.  The rows go in as one long table with a ``variant`` column; a table with one row per object id would
+    give an id that a variant renumbered to another source the coordinates of the base's source (Codex review of 2.62.2; the 2.61.8 fix of lowlat_exchange.py)."""
+    long = pd.concat([d.assign(variant=name) for name, d in qso_other.items()], ignore_index=True)
+    return {name: EX.exchange(long, base, name, tol) for name in qso_other if name != base}
+
+
 def build(variants: list[tuple[str, Path]], regions: pd.DataFrame, truth: pd.DataFrame, radius: float = 3.0, tol: float = 1.0):
     regions, excluded, missing = S.common_regions(regions, [(n, str(r)) for n, r in variants])
     ls = ls_cones(variants[0][1], regions[regions.kind == "qso"].name)
-    rows, meta, present, control = [], [], {}, None
+    rows, others, control = [], {}, None
     for name, root in variants:
         res = S.score_regions(regions, truth, root, radius)
         q = res["per_truth"]
@@ -68,20 +76,16 @@ def build(variants: list[tuple[str, Path]], regions: pd.DataFrame, truth: pd.Dat
             est, l, h = AB.boot_density(sub, "all") if len(sub) else (math.nan, math.nan, math.nan)
             row.update({f"false_{lab}_regions": int(len(sub)), f"false_{lab}_n": int(sub["all"].sum()), f"false_{lab}_per_deg2": round(est, 1),
                         f"false_{lab}_lo": round(l, 1), f"false_{lab}_hi": round(h, 1)})  # fmt: skip
-        oth = res["qso_other"][res["qso_other"].stratum != "contaminant"].copy()
-        meta.append(oth)
-        present[name] = set(zip(oth.region.astype(str), oth.object_id.astype(str)))
+        others[name] = res["qso_other"][res["qso_other"].stratum != "contaminant"].copy()
         row["area_deg2"] = round(float(reg.area_deg2.sum()), 4)
         rows.append(row)
-    t = pd.concat(meta, ignore_index=True).drop_duplicates(subset=["region", "object_id"], keep="first")
-    ids = list(zip(t.region.astype(str), t.object_id.astype(str)))
-    for name, _ in variants:
-        t[name] = [k in present[name] for k in ids]
     base = variants[0][0]
+    ex = exchange_vs_base(others, base, tol)
+    t = pd.concat([d.assign(variant=name) for name, d in others.items()], ignore_index=True)
     for row in rows:
         if row["variant"] == base:
             continue
-        e = EX.exchange(t, base, row["variant"], tol)
+        e = ex[row["variant"]]
         a = row["area_deg2"]
         row.update(exch_lost=e["lost"], exch_gained=e["gained"], exch_lost_per_deg2=round(e["lost"] / a, 1), exch_gained_per_deg2=round(e["gained"] / a, 1),
                    exch_lost_i_lt_195=e["lost_i_lt_195"], exch_gained_i_lt_195=e["gained_i_lt_195"])  # fmt: skip

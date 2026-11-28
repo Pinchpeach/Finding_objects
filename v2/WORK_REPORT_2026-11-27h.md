@@ -191,4 +191,7 @@ python benchmark/lowlat_qso/decision_table_combos.py --inputs benchmark/lowlat_q
   - 깊은 COSMOS의 m15hc(+11 / −1)처럼 조각이 줄어드는 변형은 이 보고서의 same,nearest와 같은 방향의 산물(합쳐진 객체가 최근접이 됨)을 이득으로 셌을 가능성이 있다.
   - 세트 B의 2.61.0 순서 변화 1건(bngp_162p01)은 같은 객체(`OBJ005408`)의 라벨이 바뀐 경우라 이 산물이 아니다.
   - 과거 수치를 0.5″ 기대 클래스 읽기로 다시 세는 것은 다음 과제 후보다.
+- **Codex 검토로 고친 도구(`combos_table.py`)**: 저위도 결정표의 "기준 대비 제거·추가(위치 짝짓기)" 열을 2.61.8에서 고친 것과 같은 넓은 표(객체 id마다 처음 변형의 좌표 하나)로 만들었다. main의 `lowlat_exchange.py`는 그 표를 받지 않는다. 이제 변형마다 자기 좌표를 가진 긴 표를 넘긴다(`exchange_vs_base`, 시험 추가).
+  - 그래서 **`decision_table.csv`의 `lowlat_conf_removed_vs_base_per_deg2`, `lowlat_conf_added_vs_base_per_deg2`, `lowlat_cal_removed_…`, `lowlat_cal_added_…` 열은 무효**다(번호가 밀린 객체를 기준 좌표로 짝지었다). 작업 세션의 재측정이 필요하다.
+  - 같은 표의 표본 퀘이사 재현율, 잃은 퀘이사, 표본 밖 QSO 수·밀도(전체 / LS / 비LS), 분광 QSO 보류, COSMOS·실사용 열은 변형마다 따로 센 값이라 영향이 없다.
 
