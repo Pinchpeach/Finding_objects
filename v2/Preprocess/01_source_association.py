@@ -11,6 +11,8 @@ import pandas as pd
 
 from association_model import (
     AMBIG_FIX,
+    ANNOT_ASSOC,
+    TYPED_ANNOTATIONS,
     annotation_physical_type,
     assess_pair,
     phot_magnitudes,
@@ -28,6 +30,7 @@ from association_model import (
 )
 
 AMBIG_SCORE_RATIO = 0.67
+TYPED_CLOSE_ARCSEC = float(os.environ.get("V2_ASSOC_TYPED_CLOSE_ARCSEC", "0.6"))
 # Diagnostics of the decision (V2_ASSOC_DIAG=1; off by default, nothing else reads them): for every detection the best
 # two accepted candidates (score, separation, normalised separation, catalogues and members of the group), and whether
 # the groups of the two candidates are one object themselves (their anchors agree within the pair's sigma).
@@ -296,6 +299,11 @@ def _pair_density(det, anchor):
     if not _CANDIDATE_DENSITY:
         return own
     other = anchor.get("source_density_arcsec2")
+    if "density" in ANNOT_ASSOC and det.get("catalog") in TYPED_ANNOTATIONS and anchor.get("catalog") not in ANNOTATION_CATALOGS and other is not None:
+        # V2_ANNOT_ASSOC=density (2.62.4): a NED / SIMBAD row is looked for among survey objects, so only the survey objects can be the unrelated
+        # neighbour it is confused with; the literature catalogue's own density (COSMOS 2': SIMBAD 0.067 / arcsec^2, four times the survey objects')
+        # stops the pair at p_chance <= 0.25, i.e. at 1.1''.
+        return other
     return max(d for d in (own, other) if d is not None) if (own is not None or other is not None) else None
 
 
@@ -305,6 +313,15 @@ def _target_sep(group, det):
     (field RA 20: anchor 0.71" away, LS target 0.02")."""
     targets = group["targets"] if det["catalog"] in DESI_SPECTRA else group.get("targets_imaging", ())
     return min((sep_arcsec(ra, dec, det["ra"], det["dec"]) for ra, dec in targets), default=math.inf)
+
+
+def _typed_close(group, det):
+    """V2_ANNOT_ASSOC=typed_close: the typed row ``det`` lies within TYPED_CLOSE_ARCSEC of EVERY typed row of its catalogue already in the group.
+
+    The two entries of the catalogue are compared with each other, not with the group's anchor (Codex review of 2.62.4): the anchor is normally a survey
+    row, so measuring from it merged two SIMBAD entries 0.5'' on either side of a survey position (1.0'' apart, outside the 0.6'' exception) and kept
+    apart two duplicates both offset from it.  "Every" so that a chain of entries each 0.6'' from the last cannot stretch one object."""
+    return all(sep_arcsec(ra, dec, det["ra"], det["dec"]) <= TYPED_CLOSE_ARCSEC for ra, dec in group["typed_annotations"][det["catalog"]])
 
 
 def _anchor_key(det):
@@ -468,7 +485,10 @@ def run(raw_dir: Path, out: Path):
                     # Two entries of one annotation catalogue that both carry a
                     # physical type are two objects for that catalogue (a
                     # supernova and its host galaxy; association_model).
-                    continue
+                    # V2_ANNOT_ASSOC=typed_close (2.62.4): not when the two entries' positions agree within TYPED_CLOSE_ARCSEC (0.6'': the
+                    # radius COSMOS2020 uses for its ancillary catalogues, Weaver et al. 2022 sec. 2.6); a host and a supernova are farther apart.
+                    if not ("typed_close" in ANNOT_ASSOC and _typed_close(group, det)):
+                        continue
                 if det["catalog"] in group["catalogs"] and det["catalog"] not in ANNOTATION_CATALOGS:
                     # A second spectrum of a target already holding one is a
                     # duplicate, not evidence for a neighbour (field RA 20).
@@ -549,7 +569,7 @@ def run(raw_dir: Path, out: Path):
             if group.get("G") is None and "G" in (det.get("phot") or {}):
                 group["G"] = det["phot"]["G"]
             if det.get("annotation_type"):
-                group["typed_annotations"].add(det["catalog"])
+                group["typed_annotations"].setdefault(det["catalog"], []).append((det["ra"], det["dec"]))
             group["members"] += 1
             if det["catalog"] == TARGET_IMAGING:
                 group["targets"].append((det["ra"], det["dec"]))
@@ -569,7 +589,7 @@ def run(raw_dir: Path, out: Path):
                     "id": oid,
                     "anchor": det,
                     "catalogs": {det["catalog"]},
-                    "typed_annotations": {det["catalog"]} if det.get("annotation_type") else set(),
+                    "typed_annotations": {det["catalog"]: [(det["ra"], det["dec"])]} if det.get("annotation_type") else {},  # catalogue -> positions of its typed rows
                     "G": (det.get("phot") or {}).get("G"),
                     "members": 1,
                     "entity_kind": det["entity_kind"],

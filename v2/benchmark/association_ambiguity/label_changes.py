@@ -40,11 +40,13 @@ def pair(a: pd.DataFrame, b: pd.DataFrame, tol_arcsec: float):
 
 
 def one(base: Path, var: Path, field: str, tol: float) -> pd.DataFrame:
-    use = ["object_id", "ra", "dec", "primary_class", "std_mag__ls_r"]
+    use = ["object_id", "ra", "dec", "primary_class", "std_mag__ls_r", "catalogs", "classification_status"]
     a = pd.read_csv(base / field / "classified_objects.csv", usecols=lambda c: c in use, low_memory=False).dropna(subset=["ra", "dec"]).reset_index(drop=True)
     b = pd.read_csv(var / field / "classified_objects.csv", usecols=lambda c: c in use, low_memory=False).dropna(subset=["ra", "dec"]).reset_index(drop=True)
     ia, ib = pair(a, b, tol)
-    m = pd.DataFrame(dict(field=field, r=a.std_mag__ls_r.to_numpy()[ia], cls_b=a.primary_class.to_numpy()[ia], cls_v=b.primary_class.to_numpy()[ib]))
+    cat = lambda d, i: d.catalogs.to_numpy()[i] if "catalogs" in d else [""] * len(i)  # noqa: E731
+    m = pd.DataFrame(dict(field=field, ra=a.ra.to_numpy()[ia], dec=a.dec.to_numpy()[ia], r=a.std_mag__ls_r.to_numpy()[ia], cls_b=a.primary_class.to_numpy()[ia], cls_v=b.primary_class.to_numpy()[ib],
+                          catalogs_b=cat(a, ia), catalogs_v=cat(b, ib), object_b=a.object_id.to_numpy()[ia], object_v=b.object_id.to_numpy()[ib]))  # fmt: skip
     only_b = np.ones(len(a), bool)
     only_b[ia] = False
     only_v = np.ones(len(b), bool)
@@ -66,7 +68,7 @@ def main() -> int:
     for f in [x for x in a.fields.split(",") if x]:
         m = one(a.base, a.variant, f, a.tol)
         parts.append(m)
-        # popped, not read: pd.concat compares the ``attrs`` of its parts and raises on two numpy arrays of different lengths (2.61.10)
+        # popped, not read: pd.concat compares the ``attrs`` of its parts and raises on two numpy arrays of different lengths (2.62.2)
         ob.append(m.attrs.pop("only_base_r"))
         ov.append(m.attrs.pop("only_variant_r"))
     m = pd.concat(parts, ignore_index=True)
@@ -85,6 +87,15 @@ def main() -> int:
     a.out.mkdir(parents=True, exist_ok=True)
     t.to_csv(a.out / "label_changes.csv", index=False)
     pd.crosstab(m.cls_b, m.cls_v).to_csv(a.out / "label_transitions.csv")
+    # which objects changed and what they are (2.62.2): the objects without a Legacy Surveys r magnitude are one-survey fragments, listed with their catalogues in both runs
+    ch = m[m.changed].copy()
+    ch["n_catalogs_b"] = ch.catalogs_b.fillna("").map(lambda c: len([x for x in str(c).split("|") if x]))
+    ch["n_catalogs_v"] = ch.catalogs_v.fillna("").map(lambda c: len([x for x in str(c).split("|") if x]))
+    ch.to_csv(a.out / "changed_pairs.csv", index=False)
+    nr = m[m.r.isna()]
+    pd.crosstab(nr.cls_b, nr.cls_v).to_csv(a.out / "label_transitions_no_r.csv")
+    print("objects without an LS r magnitude, primary class before -> after (all pairs / changed):")
+    print(pd.crosstab(nr.cls_b, nr.cls_v).to_string())
     print(t.to_string(index=False))
     print(pd.crosstab(m.cls_b, m.cls_v).to_string())
     return 0

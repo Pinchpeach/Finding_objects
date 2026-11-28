@@ -1,0 +1,5 @@
+variant,objects,anchored_by_AllWISE,anchored_by_GALEX,anchored_by_LS,anchored_by_PS1,objects_differing_from_base,fields_identical_to_base
+base,253923,3728,759,203998,39656,0,26
+allwise,253945,3344,758,204468,39632,397,0
+allwise_raw,256263,5748,839,203843,39645,5955,0
+galex,254067,3728,897,203999,39656,480,0

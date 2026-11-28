@@ -1,4 +1,4 @@
-# Position-error inputs of Stage 1 (2.62.0)
+# Position-error inputs of Stage 1 (2.62.2)
 
 `association_model.infer_poserr_arcsec` gives every detection a 1-sigma position error; Stage 1 orders the detections by it (smallest first) and scores
 every pair with it.  This folder is the measurement of whether the columns it reads are in the units it assumes.
@@ -21,4 +21,4 @@ python run_pe.py --regions results_2026-11-27h/regions_changed.csv --out OUT --r
 python compare_by_members.py --a OUT/legacy --b OUT/fixed --regions results_2026-11-27h/regions_changed.csv --out results_2026-11-27h/compare
 ```
 
-`V2_POSERR_UNITS=legacy` reproduces the 2.61.9 results exactly.
+`V2_POSERR_UNITS=legacy` (the default since 2.62.2) reproduces the results of the earlier releases exactly; `fixed` is the corrected reading.

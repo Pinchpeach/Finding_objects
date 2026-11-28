@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Two runs of the same regions compared by what the objects are made of (2.62.0).
+"""Two runs of the same regions compared by what the objects are made of (2.62.2).
 
     python compare_by_members.py --a DIR_LEGACY --b DIR_FIXED --regions regions_changed.csv --out DIR
 

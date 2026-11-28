@@ -1,8 +1,8 @@
-"""Units of the catalogue position-error columns (2.62.0): VLASS e_RAJ2000 is degrees, NVSS e_RAJ2000 is seconds of time.
+"""Units of the catalogue position-error columns (2.62.2): VLASS e_RAJ2000 is degrees, NVSS e_RAJ2000 is seconds of time.
 
 The stored rows say so (benchmark/position_errors/UNITS.md): VLASS e_RAJ2000 equals its e_RAMdeg column and is 4.7e-5 at the median
 (0.17'' as degrees, 5e-5'' as arcsec: no radio component has that); NVSS e_RA x 15 cos(dec) / e_Dec has a median of 0.99 over 47 rows
-(0.067 read as arcsec).  ``V2_POSERR_UNITS=legacy`` is the 2.61.9 reading.
+(0.067 read as arcsec).  ``V2_POSERR_UNITS=legacy`` (the default since 2.62.2) is the 2.61.9 reading.
 """
 
 import importlib.util
