@@ -36,6 +36,10 @@ def shifted_copy(raw: Path, dst: Path) -> None:
         d.to_csv(f, index=False)
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--fields-root", type=Path, required=True)
@@ -44,6 +48,7 @@ def main() -> int:
     ap.add_argument("--env", nargs="*", default=[])
     ap.add_argument("--fields", default="")
     a = ap.parse_args()
+    t0 = RI.start()
     for kv in a.env:
         k, v = kv.split("=", 1)
         os.environ[k] = v
@@ -62,6 +67,7 @@ def main() -> int:
                 mod.run(Path(tmp) / "raw", out)
         else:
             mod.run(raw, out)
+    RI.write_args(a, ('fields_root',), t0=t0)
     return 0
 
 

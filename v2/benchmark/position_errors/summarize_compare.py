@@ -11,6 +11,8 @@ it had a class in both runs) and ``predictions.csv`` (the counts the predictions
 
 from __future__ import annotations
 
+import sys
+
 import argparse
 from collections import Counter
 from pathlib import Path
@@ -18,11 +20,16 @@ from pathlib import Path
 import pandas as pd
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--compare", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
     a = ap.parse_args()
+    t0 = RI.start()
     a.out.mkdir(parents=True, exist_ok=True)
     per = pd.read_csv(a.compare / "per_region.csv")
     rad = pd.read_csv(a.compare / "radio_rows.csv")
@@ -64,6 +71,7 @@ def main() -> int:
         for f in ("predictions", "radio_rows", "label_changes", "anchor_changes"):
             print("==", f)
             print(pd.read_csv(a.out / f"{f}.csv").to_string(index=False))
+    RI.write_args(a, ('compare',), t0=t0)
     return 0
 
 

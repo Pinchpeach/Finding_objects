@@ -12,6 +12,8 @@ confirmation field.  The counts are predictions of the number of joins, not of t
 
 from __future__ import annotations
 
+import sys
+
 import argparse
 from pathlib import Path
 
@@ -38,11 +40,16 @@ def apply_rule(d: pd.DataFrame, rule: str) -> pd.DataFrame:
     return out[out.joined]
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--cand", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
     a = ap.parse_args()
+    t0 = RI.start()
     d = pd.read_csv(a.cand / "candidate_truth_rows.csv.gz")
     rows = []
     for rule in ("same", "nearest", "same+nearest", "best"):
@@ -59,6 +66,7 @@ def main() -> int:
     t.to_csv(a.out / "predicted_joins_calibration.csv", index=False)
     with pd.option_context("display.width", 220, "display.max_columns", 20):
         print(t.to_string(index=False))
+    RI.write_args(a, t0=t0)
     return 0
 
 

@@ -12,6 +12,8 @@ a labels file (an older run) has empty label columns.
 
 from __future__ import annotations
 
+import sys
+
 import argparse
 from math import comb
 from pathlib import Path
@@ -28,6 +30,10 @@ def mcnemar(base_ok: pd.Series, var_ok: pd.Series):
     return n10, n01, p
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--regroup", type=Path, required=True)
@@ -35,6 +41,7 @@ def main() -> int:
     ap.add_argument("--variants", nargs="*", default=None, help="default: every variant found in --regroup")
     ap.add_argument("--out", type=Path, required=True)
     a = ap.parse_args()
+    t0 = RI.start()
     split = pd.read_csv(HERE / "fields_split.csv").set_index("name").split
     found = sorted(p.name[len("regroup_fragments_") : -len(".csv")] for p in a.regroup.glob("regroup_fragments_*.csv"))
     variants = [a.base] + [v for v in (a.variants if a.variants else found) if v != a.base]
@@ -68,6 +75,7 @@ def main() -> int:
     d.to_csv(a.out / "fragment_variants_summary.csv", index=False)
     with pd.option_context("display.width", 250, "display.max_columns", 30):
         print(d.to_string(index=False))
+    RI.write_args(a, t0=t0)
     return 0
 
 

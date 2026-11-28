@@ -39,12 +39,17 @@ def table(name, sep, ctl):
     return row
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--raw", type=Path, required=True)
     ap.add_argument("--truth", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
     a = ap.parse_args()
+    t0 = RI.start()
     a.out.mkdir(parents=True, exist_ok=True)
     t = MA.load_truth(a.truth)
     sky = MA.Sky(t.ra.to_numpy(float), t.dec.to_numpy(float))
@@ -73,6 +78,7 @@ def main() -> int:
     out = pd.DataFrame(rows)
     out.to_csv(a.out / "literature_position_accuracy.csv", index=False)
     print(out.to_string(index=False))
+    RI.write_args(a, ('raw', 'truth'), t0=t0)
     return 0
 
 

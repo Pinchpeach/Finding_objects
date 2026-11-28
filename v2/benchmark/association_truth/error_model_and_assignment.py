@@ -20,6 +20,8 @@ Two questions, answered from the per-row table of ``measure_association.py`` (CO
 
 from __future__ import annotations
 
+import sys
+
 import argparse
 from pathlib import Path
 
@@ -81,11 +83,16 @@ def assignment(d: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(out)
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--rows", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
     a = ap.parse_args()
+    t0 = RI.start()
     a.out.mkdir(parents=True, exist_ok=True)
     d = pd.read_csv(a.rows)
     e, s = error_model(d), assignment(d)
@@ -94,6 +101,7 @@ def main() -> int:
     with pd.option_context("display.width", 250, "display.max_columns", 40):
         print(e.to_string(index=False))
         print(s.to_string(index=False))
+    RI.write_args(a, t0=t0)
     return 0
 
 

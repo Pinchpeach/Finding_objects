@@ -6,6 +6,8 @@
 set -e
 R=$1; T=$2; O=$3; mkdir -p "$O"; HERE="$(cd "$(dirname "$0")" && pwd)"; cd "$HERE"
 export PYTHONHASHSEED=0 V2_CACHE=0
+# run_variant.py and measure_association.py write run_info.json in every directory they write; this one is for the table directory
+python3 "$HERE/../run_info.py" begin --out "$O/summary" --input "$R" "$T" --note "run_native_error_variants.sh"
 run()  { tag=$1; shift; python3 run_variant.py --fields-root "$R" --out "$O/$tag" --env "$@" > "$O/$tag.log" 2>&1; }
 runs() { tag=$1; shift; python3 run_variant.py --fields-root "$R" --out "$O/${tag}_shift" --shift --env "$@" > "$O/${tag}_shift.log" 2>&1; }
 run base V2_POSERR_NATIVE= & run galex V2_POSERR_NATIVE=galex & wait
@@ -17,3 +19,4 @@ for v in base allwise allwise_raw galex; do
 done
 wait
 python3 summarize_native_error_variants.py --root "$O" --out "$O/summary"
+python3 "$HERE/../run_info.py" end --out "$O/summary" --status ok

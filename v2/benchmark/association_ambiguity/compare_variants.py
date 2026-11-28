@@ -20,6 +20,8 @@
 
 from __future__ import annotations
 
+import sys
+
 import argparse
 import json
 import math
@@ -103,6 +105,10 @@ def exchange(rb: pd.DataFrame, rv: pd.DataFrame, cat: str) -> dict:
     return out
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--measure", type=Path, required=True)
@@ -110,6 +116,7 @@ def main() -> int:
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--fields", default="")
     a = ap.parse_args()
+    t0 = RI.start()
     fields = [f for f in a.fields.split(",") if f]
     a.out.mkdir(parents=True, exist_ok=True)
     R = {v: rows_of(a.measure, v, fields) for v in a.variants}
@@ -137,6 +144,7 @@ def main() -> int:
         pd.DataFrame(rows).to_csv(a.out / f"{name}.csv", index=False)
         with pd.option_context("display.width", 250, "display.max_columns", 30):
             print(f"== {name}\n{pd.DataFrame(rows).to_string(index=False)}")
+    RI.write_args(a, t0=t0)
     return 0
 
 

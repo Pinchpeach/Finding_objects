@@ -10,6 +10,8 @@ object is a galaxy, a star or a quasar, and how far.
 
 from __future__ import annotations
 
+import sys
+
 import argparse
 from pathlib import Path
 
@@ -18,12 +20,17 @@ import pandas as pd
 from scipy.spatial import cKDTree
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--assoc", type=Path, required=True)
     ap.add_argument("--classified", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
     a = ap.parse_args()
+    t0 = RI.start()
     s = pd.read_csv(a.assoc, low_memory=False)
     cl = pd.read_csv(a.classified, low_memory=False)
     s["lit"] = s.catalog.isin(["NED", "SIMBAD"])
@@ -40,6 +47,7 @@ def main() -> int:
     out["n"] = out.sum(axis=1)
     out.to_csv(a.out)
     print(out.to_string())
+    RI.write_args(a, ('assoc', 'classified'), t0=t0)
     return 0
 
 

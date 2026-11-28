@@ -26,11 +26,16 @@ import measure_association as M  # noqa: E402
 import posterior_calibration as P  # noqa: E402
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--rows", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
     a = ap.parse_args()
+    t0 = RI.start()
     split = pd.read_csv(HERE / "fields_split.csv").set_index("name").split
     d = pd.read_csv(a.rows)
     d["split"] = d.field.map(split)
@@ -49,6 +54,7 @@ def main() -> int:
     a.out.mkdir(parents=True, exist_ok=True)
     r.to_csv(a.out / "isotonic_check_test_half.csv", index=False)
     print(r.to_string(index=False))
+    RI.write_args(a, t0=t0)
     return 0
 
 

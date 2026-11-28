@@ -99,6 +99,10 @@ def classify(out: pd.DataFrame, truth: pd.DataFrame, field: str, split: str) -> 
     return pd.DataFrame(rows)
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--runs", type=Path, required=True)
@@ -107,6 +111,7 @@ def main() -> int:
     ap.add_argument("--env", nargs="*", default=[])
     ap.add_argument("--out", type=Path, required=True)
     a = ap.parse_args()
+    t0 = RI.start()
     for kv in a.env:
         k, v = kv.split("=", 1)
         os.environ[k] = v
@@ -140,6 +145,7 @@ def main() -> int:
     agg.to_csv(a.out / f"wrong_merge_types_{a.variant}.csv", index=False)
     with pd.option_context("display.width", 250, "display.max_columns", 30):
         print(agg.to_string(index=False))
+    RI.write_args(a, t0=t0)
     return 0
 
 

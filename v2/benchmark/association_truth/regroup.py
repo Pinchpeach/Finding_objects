@@ -126,6 +126,10 @@ def score_accuracy(out: pd.DataFrame, truth: pd.DataFrame, lim: float = 1.5) -> 
     return t[["ra", "dec", "truth", "pred", "n_objects"]]
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument(
@@ -136,6 +140,7 @@ def main() -> int:
     ap.add_argument("--env", nargs="*", default=[], help="KEY=VALUE set before host_groups is loaded")
     ap.add_argument("--out", type=Path, required=True)
     a = ap.parse_args()
+    t0 = RI.start()
     import os
 
     for kv in a.env:
@@ -196,6 +201,7 @@ def main() -> int:
     print(f.groupby("split")[cols].sum().T.to_string())
     print(m.groupby(["split", "role"])[["n", "same", "none", "wrong"]].sum().to_string())
     print(json.dumps({"variant": a.variant, "same_parent": same_parent, "objects": tot}))
+    RI.write_args(a, t0=t0)
     return 0
 
 

@@ -59,6 +59,10 @@ def run_one(raw: Path, out: Path, env: dict) -> float:
     return dt
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--sets", nargs="+", required=True)
@@ -66,6 +70,7 @@ def main() -> int:
     ap.add_argument("--env", nargs="*", default=[])
     ap.add_argument("--jobs", type=int, default=4)
     a = ap.parse_args()
+    t0 = RI.start()
     env = dict(kv.split("=", 1) for kv in a.env)
     jobs, meta = [], []
     for spec in a.sets:
@@ -81,6 +86,7 @@ def main() -> int:
     t = pd.DataFrame([dict(set=n, region=r, seconds=round(s, 2)) for (n, r), s in zip(meta, times)])
     t.to_csv(a.out / "timing.csv", index=False)
     print(f"{len(jobs)} regions, {t.seconds.sum():.0f} s of stage 1")
+    RI.write_args(a, t0=t0)
     return 0
 
 

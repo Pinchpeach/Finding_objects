@@ -7,6 +7,7 @@ ROOT=$1; OUT=$2; P=${3:-3}; shift $(( $# < 3 ? $# : 3 ))  # two arguments are en
 export PYTHONHASHSEED=0 "$@"
 V2="$(cd "$(dirname "$0")/../.." && pwd)"
 mkdir -p "$OUT"
+python3 "$V2/benchmark/run_info.py" begin --out "$OUT" --input "$ROOT" --note "run_full.sh: pipeline stages 1-7 on the fields of ROOT"
 run_one() {
   f=$1
   raw=$(ls -d "$ROOT/$f/raw"/*/ | head -1)
@@ -18,6 +19,8 @@ export -f run_one; export ROOT OUT V2
 # a failed field fails the batch: no completion marker (2.60.9 review, Codex)
 if ! ls "$ROOT" | grep '^deep_cosmos_' | xargs -P "$P" -I{} bash -c 'run_one {}'; then
   echo "run_full.sh: at least one field failed, see $OUT/*.log" >&2
+  python3 "$V2/benchmark/run_info.py" end --out "$OUT" --status failed
   exit 1
 fi
 echo done > "$OUT/done.txt"
+python3 "$V2/benchmark/run_info.py" end --out "$OUT" --status ok

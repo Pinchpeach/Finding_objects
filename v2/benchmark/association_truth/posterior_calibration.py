@@ -95,6 +95,10 @@ def summarise(p: np.ndarray, y: np.ndarray) -> dict:
                 n_correct=int(y.sum()), sum_p_over_n=round(float(p.sum() / max(y.sum(), 1)), 4))  # fmt: skip
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--rows", type=Path, required=True)
@@ -108,6 +112,7 @@ def main() -> int:
         "stars, so these include real stars: the default (off) conditions on a counterpart in the truth",
     )
     a = ap.parse_args()
+    t0 = RI.start()
     a.out.mkdir(parents=True, exist_ok=True)
     split = pd.read_csv(HERE / "fields_split.csv").set_index("name")
     d = pd.read_csv(a.rows)
@@ -151,6 +156,7 @@ def main() -> int:
     with pd.option_context("display.width", 220, "display.max_columns", 30):
         print(pd.DataFrame(q0rows).groupby("catalog")[["q0"] + [f"one_minus_q0_r{r}" for r in RADII]].median().round(3))
         print(s[s.half != "calibration"].to_string(index=False))
+    RI.write_args(a, t0=t0)
     return 0
 
 

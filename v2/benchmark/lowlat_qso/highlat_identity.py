@@ -54,6 +54,10 @@ def compare(a: pd.DataFrame, b: pd.DataFrame) -> dict:
     return out
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmark/: run_info
+import run_info as RI  # noqa: E402
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--raw", type=Path, nargs="+", required=True)
@@ -61,6 +65,7 @@ def main() -> int:
     ap.add_argument("--switches", default="surveys3,pm,wise_second,wise_footprint")
     ap.add_argument("--keep", action="store_true", help="keep the classified tables (large)")
     a = ap.parse_args()
+    t0 = RI.start()
     a.out.mkdir(parents=True, exist_ok=True)
     sys.path.insert(0, str(PIPE.parent / "Preprocess"))
     import importlib.util
@@ -86,6 +91,7 @@ def main() -> int:
     d.to_csv(a.out / "highlat_identity.csv", index=False)
     with pd.option_context("display.width", 250, "display.max_columns", 30):
         print(d.to_string(index=False))
+    RI.write_args(a, t0=t0)
     return 0
 
 
