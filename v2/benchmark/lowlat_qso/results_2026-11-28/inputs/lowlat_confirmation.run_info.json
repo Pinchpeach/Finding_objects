@@ -1,0 +1,103 @@
+{
+  "schema": 1,
+  "commit": "7b51d2f2fe4faf228199a92253af9ec1dc7ce9d9",
+  "branch": "ccr-68f28268-l0opfu",
+  "dirty": true,
+  "dirty_files": 8,
+  "env": {
+    "PYTHONHASHSEED": "0"
+  },
+  "effective": {
+    "POSERR_UNITS": "legacy",
+    "AMBIG_FIX": [],
+    "POSERR_NATIVE": [],
+    "ANNOT_ASSOC": [],
+    "LOWLAT_QSO": [],
+    "LOWLAT_QSO_ABSB": 20.0
+  },
+  "started_utc": "2026-11-28T02:18:49Z",
+  "finished_utc": "2026-11-28T02:19:36Z",
+  "status": "ok",
+  "inputs": [
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/m_c_base",
+      "kind": "directory",
+      "sha256": "fbb7ecdd9e5a46989c501fceb0ba7085df7589b7266d8b3f755b7910e7bcff6d",
+      "n_files": 561,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/m_c_surveys2",
+      "kind": "directory",
+      "sha256": "ab1f9d4207b31eb94f6330e77af833ded9954604a112d73a52a8ae959fed40c7",
+      "n_files": 561,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/m_c_surveys3",
+      "kind": "directory",
+      "sha256": "f814591b835995d5e1bab2510f3f13ce0da1a19ba6169dd15d5d0dbe3dc7e6a8",
+      "n_files": 561,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/c_same_nearest",
+      "kind": "directory",
+      "sha256": "c96a363b1dedeb96d34f94ac7f9a7f40b2bf93ba51343a18f04570c94cea9e27",
+      "n_files": 561,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/c_same_nearest_surveys2",
+      "kind": "directory",
+      "sha256": "507745e9757d7acc9b196516f0e4546b3d08a96fb4c820e1b2fe0133ea75af84",
+      "n_files": 561,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/c_same_nearest_surveys3",
+      "kind": "directory",
+      "sha256": "062f78bf6a1156b0aaa681fd4564ef6cd4b4b4924fcfe654dd8df3714d14124e",
+      "n_files": 561,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/c_fixed_same_nearest_surveys2",
+      "kind": "directory",
+      "sha256": "fda90a65021e879ab1610a5412797fcd1abe8835afaee261a01c41f1f5ad5bf9",
+      "n_files": 561,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "fields_lowlat_confirm.csv",
+      "kind": "file",
+      "sha256": "8638a9dff5a583420b44e347f418974c0cad9511a08a6155eed986ac8fc75a09",
+      "size": 13728
+    },
+    {
+      "path": "lowlat_truth.csv.gz",
+      "kind": "file",
+      "sha256": "35955f978cf6d10bdf9da20bf7ffb6226999fd57ec5e0c3ffc3df0df42d0ea89",
+      "size": 77850
+    }
+  ],
+  "argv": [
+    "combos_table.py",
+    "--variants",
+    "base=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/m_c_base",
+    "surveys2=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/m_c_surveys2",
+    "surveys3=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/m_c_surveys3",
+    "same_nearest=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/c_same_nearest",
+    "same_nearest_surveys2=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/c_same_nearest_surveys2",
+    "same_nearest_surveys3=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/c_same_nearest_surveys3",
+    "fixed_same_nearest_surveys2=/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ll_var/c_fixed_same_nearest_surveys2",
+    "--regions",
+    "fields_lowlat_confirm.csv",
+    "--truth",
+    "lowlat_truth.csv.gz",
+    "--out",
+    "results_2026-11-28/inputs/lowlat_confirmation.csv"
+  ],
+  "python": "3.13.18",
+  "note": ""
+}

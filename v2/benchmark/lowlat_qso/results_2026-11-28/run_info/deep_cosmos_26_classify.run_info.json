@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "commit": "7b51d2f2fe4faf228199a92253af9ec1dc7ce9d9",
+  "branch": "ccr-68f28268-l0opfu",
+  "dirty": true,
+  "dirty_files": 7,
+  "env": {
+    "PYTHONHASHSEED": "0",
+    "V2_ASSOC_AMBIG": "same,nearest",
+    "V2_CACHE": "0",
+    "V2_LOWLAT_QSO": "surveys2",
+    "V2_LOWLAT_QSO_ABSB": "90",
+    "V2_POSERR_UNITS": "fixed"
+  },
+  "effective": {
+    "POSERR_UNITS": "fixed",
+    "AMBIG_FIX": [
+      "nearest",
+      "same"
+    ],
+    "POSERR_NATIVE": [],
+    "ANNOT_ASSOC": [],
+    "LOWLAT_QSO": [
+      "surveys2"
+    ],
+    "LOWLAT_QSO_ABSB": 90.0
+  },
+  "started_utc": "2026-11-28T01:32:54Z",
+  "finished_utc": "2026-11-28T02:18:11Z",
+  "status": "ok",
+  "inputs": [
+    {
+      "path": "/home/user/Finding_objects/v2/benchmark/deep_cosmos_confirmation/fields_all26.csv",
+      "kind": "file",
+      "sha256": "c00298015e91573e6095726316449733f2d29495e163a03ccdb77d77c3896100",
+      "size": 854
+    }
+  ],
+  "argv": [
+    "/home/user/Finding_objects/v2/benchmark/lowlat_qso/faint_cost.py",
+    "classify",
+    "--deep",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/cost_deep",
+    "--fields-file",
+    "/home/user/Finding_objects/v2/benchmark/deep_cosmos_confirmation/fields_all26.csv",
+    "--variants",
+    "fixed_same_nearest_surveys2",
+    "--jobs",
+    "2",
+    "--work",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/cost_work_b"
+  ],
+  "python": "3.13.18",
+  "note": "faint_cost classify, variant fixed_same_nearest_surveys2"
+}

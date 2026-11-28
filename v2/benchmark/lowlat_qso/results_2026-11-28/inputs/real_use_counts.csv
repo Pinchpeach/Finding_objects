@@ -1,0 +1,8 @@
+variant,ngc_objects,ngc_QSO,ngc_held,ngc_GALAXY,ngc_STAR,cosmos_objects,cosmos_QSO,cosmos_held,cosmos_GALAXY,cosmos_STAR,plane_objects,plane_QSO,plane_held,plane_GALAXY,plane_STAR
+base,603,0,0,121,14,3570,16,0,3251,51,597,0,0,0,428
+surveys2,603,0,0,121,14,3570,0,23,3251,51,597,0,0,0,428
+surveys3,603,0,0,121,14,3570,0,23,3251,51,597,0,0,0,428
+same_nearest,601,0,0,119,14,3568,16,0,3251,51,596,0,0,0,428
+same_nearest_surveys2,601,0,0,119,14,3568,0,23,3251,51,596,0,0,0,428
+same_nearest_surveys3,601,0,0,119,14,3568,0,23,3251,51,596,0,0,0,428
+fixed_same_nearest_surveys2,601,0,0,119,14,3568,0,23,3251,51,596,0,0,0,428

@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "commit": "7b51d2f2fe4faf228199a92253af9ec1dc7ce9d9",
+  "branch": "ccr-68f28268-l0opfu",
+  "dirty": true,
+  "dirty_files": 8,
+  "env": {
+    "PYTHONHASHSEED": "0"
+  },
+  "effective": {
+    "POSERR_UNITS": "legacy",
+    "AMBIG_FIX": [],
+    "POSERR_NATIVE": [],
+    "ANNOT_ASSOC": [],
+    "LOWLAT_QSO": [],
+    "LOWLAT_QSO_ABSB": 20.0
+  },
+  "started_utc": "2026-11-28T02:27:55Z",
+  "finished_utc": "2026-11-28T02:27:55Z",
+  "status": "ok",
+  "inputs": [
+    {
+      "path": "results_2026-11-28/inputs",
+      "kind": "directory",
+      "sha256": "70754ed284664ea8da5625fd4ddeadcadb09eaeccaa79df4296756bc25cc9f75",
+      "n_files": 21,
+      "hashed": "relative path, size"
+    },
+    {
+      "path": "results_2026-11-28/assoc",
+      "kind": "directory",
+      "sha256": "19f115c66ea02a2d13c285d02640e61058f3a53f937d64990addc77988d42ace",
+      "n_files": 4,
+      "hashed": "relative path, size"
+    }
+  ],
+  "argv": [
+    "decision_table_combos.py",
+    "--inputs",
+    "results_2026-11-28/inputs",
+    "--assoc",
+    "results_2026-11-28/assoc",
+    "--out",
+    "results_2026-11-28/decision_table.csv"
+  ],
+  "python": "3.13.18",
+  "note": ""
+}

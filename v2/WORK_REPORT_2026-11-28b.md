@@ -145,8 +145,9 @@ B1이 틀린 이유: `effective_sigma_arcsec`의 하한은 맞지만 탐욕적 �
 ## 7. 확인
 
 * 시험: `cd v2 && python -m pytest -q Preprocess/tests Classifier/tests app/tests` → 587 통과. 새 시험: `test_annot_assoc.py` 10개(스위치 기본 꺼짐, `eeMaj`·`Nerr`·`coo_err_maj` 읽기와 단위, PSF/6 하한, 알 수 없는 옵션은 오류, `density`·`typed_close`의 Stage 1 동작, 문헌 행이 없으면 변하지 않음)와 `test_lowlat_switches.py` 3개(`lit_keep`). 변이 검사: 코드를 끄면 해당 시험이 실패한다.
-* **기본 꺼짐의 바이트 동일**: 스위치를 켜지 않은 `source_association.csv`가 변경 전 코드(HEAD의 깨끗한 작업 트리)의 결과와 깊은 COSMOS 3개 영역(1, 5, 12)과 COSMOS 2′ 문헌 영역에서 바이트 동일.
-* 블라인드: 깊은 COSMOS 26개 영역에 `V2_ANNOT_ASSOC=density,typed_close,err`를 켜도 모든 `source_association.csv`가 바이트 동일.
+* **기본 꺼짐의 바이트 동일**: 스위치를 켜지 않은 `source_association.csv`가 새 main(0fae3c7, 단위 기본값 legacy)의 코드로 돌린 결과와 깊은 COSMOS 3개 영역(1, 5, 12)과 COSMOS 2′ 문헌 영역에서 바이트 동일(변경 전 코드는 깨끗한 작업 트리로 따로 돌렸다).
+* 블라인드: 깊은 COSMOS 26개 영역에 `V2_ANNOT_ASSOC=density,typed_close,err`를 켜도 모든 `source_association.csv`가 바이트 동일(legacy 기본에서 재확인).
+* 단위 기본값의 영향: 이 보고서의 문헌 측정(COSMOS 2′ Stage 1 변형 5개, 실사용 3영역 21개 조합)은 `fixed` 기본과 `legacy` 기본에서 **모든 열이 같다**. AllWISE/GALEX 26개 영역 측정은 숫자가 조금 달라(예: `allwise` 올바른 연결 +375 → +378) 본문은 legacy 값이다.
 * `ci_test_inventory.csv`: 있는 시험 591개, CI가 도는 것 591개.
 
 ## 8. 선택지 (기본값은 그대로, 결정은 검토 세션)
