@@ -10,8 +10,8 @@ itself and is the way to close every "none" below (run it where the network allo
 
 | catalogue (collector) | position-error columns stored | documented unit | evidence | what the code assumed (2.61.9) | verdict |
 |---|---|---|---|---|---|
-| **VLASS Epoch 1 QL** (`vlass`) | `e_RAJ2000`, `e_DEJ2000` (= `e_RAMdeg`, `e_DEMdeg`) | **degrees** | data: `e_RAJ2000` equals the `e_RAMdeg` column (named in degrees) in all 384 rows; median 2.2e-5, i.e. 0.079'' as degrees, 2e-5'' as arcsec (a 2.5'' beam at S/N ~ 10 gives ~0.1'', Condon 1997: sigma = beam / (2 S/N)); the catalogue's own accuracy is ~1'' / 0.5'' at Dec > -20 (text: Gordon et al. 2021, ApJS 255, 30, Sect. 2.1). Column unit in the CIRADA guide / ReadMe: none | arcsec | **wrong (x3600)** |
-| **NVSS** (`nvss`) | `e_RAJ2000`, `e_DEJ2000` | RA **seconds of time**, Dec arcsec | data: e_RA x 15 cos(dec) / e_Dec has a median 0.94 over all 223 stored rows (the beam is circular at Dec > -10), read as arcsec 0.071; the NRAO page quotes rms 'in arcsec' in prose (text), the column table: none | arcsec | **wrong (RA x15 cos dec)** |
+| **VLASS Epoch 1 QL** (`vlass`) | `e_RAJ2000`, `e_DEJ2000` (= `e_RAMdeg`, `e_DEMdeg`) | **degrees** | VizieR metadata (1b) and data: `e_RAJ2000` equals the `e_RAMdeg` column (named in degrees) in all 384 rows; median 2.2e-5, i.e. 0.079'' as degrees, 2e-5'' as arcsec (a 2.5'' beam at S/N ~ 10 gives ~0.1'', Condon 1997: sigma = beam / (2 S/N)); the catalogue's own accuracy is ~1'' / 0.5'' at Dec > -20 (text: Gordon et al. 2021, ApJS 255, 30, Sect. 2.1). Column unit in the CIRADA guide / ReadMe: none | arcsec | **wrong (x3600)** |
+| **NVSS** (`nvss`) | `e_RAJ2000`, `e_DEJ2000` | RA **seconds of time**, Dec arcsec | VizieR metadata (1b) and data: e_RA x 15 cos(dec) / e_Dec has a median 0.94 over all 223 stored rows (the beam is circular at Dec > -10), read as arcsec 0.071; the NRAO page quotes rms 'in arcsec' in prose (text), the column table: none | arcsec | **wrong (RA x15 cos dec)** |
 | TGSS ADR1 (`tgss`) | `e_RAJ2000`, `e_DEJ2000` | arcsec | text (PDF read locally): Intema et al. 2017, Sect. 3.4 "The 1-sigma uncertainty in the right ascension in arcseconds"; a 2'' systematic is added in quadrature (so the median 2.05 is the floor) | arcsec | ok |
 | LoTSS DR2 (`lotss`) | `e_RAJ2000`, `e_DEJ2000` | arcsec (PyBDSF fitting error only; the astrometric 0.2'' is separate, Shimwell et al. 2022) | summary (VO table description found by search, not fetched); data: 8 rows in the low-latitude regions, `e_RAJ2000` 0.05-1.1 and it grows as the peak flux falls (0.06 at 15 mJy/beam, ~1 at 0.45 mJy/beam: beam / (2 S/N) for a 6'' beam read as arcsec) | arcsec | ok (8 rows only) |
 | FIRST (`first`) | none (`Rms` = local noise in mJy, `Maj`, `Min`, `fMaj`) | - | text (FIRST catalogue readme, verbatim by a fetch agent): "unc(90% confidence) = Size (1/SNR + 1/20) arcsec", "Rms is a local noise estimate ... in mJy" | profile constant 1.0'' | not a unit problem; per-source information unused |
@@ -30,6 +30,24 @@ itself and is the way to close every "none" below (run it where the network allo
 | the other collectors (ATNF, BZCAT, HASH PN, MYStIX, ASAS-SN / Asiago SN, LAMOST, DESI spectroscopy / FastSpecFit, ZTF, Suh AGB) | none stored | - | - | profile constants in `PROFILES` | not a unit problem |
 
 Only the two rows in bold had a wrong unit.  Everything else that reaches `infer_poserr_arcsec` is arcsec (or, for Gaia, mas and divided).
+
+## 1b. The units VizieR documents (2026-11-28, `v2_vizier_units.yml` runs 46087889093 and 46088138972, served by the CfA mirror)
+
+`dump_vizier_units.py` read the `unit` and `description` VizieR stores for every column below.  Strasbourg answered 404; the mirror failover served CfA.
+
+| catalogue | column: unit (description) | agrees with the code |
+|---|---|---|
+| NVSS `VIII/65/nvss` | `e_RAJ2000`: **s** ("Mean error on RA"), `e_DEJ2000`: arcsec ("Mean error on Dec") | **yes, the fix** (RA in seconds of time, Dec in arcsec) |
+| VLASS `J/ApJS/255/30/comp` | `e_RAJ2000`, `e_DEJ2000`: **deg** ("1-sigma uncertainty in RA (E_RA)" / "in DEC (E_DEC)"), `e_RAMdeg`, `e_DEMdeg`: deg, `Maj`, `e_Maj`: arcsec (run 46088138972, 0.5 deg cone; the first run's 0.1 deg cone had no row) | **yes, the fix** (degrees x 3600) |
+| LoTSS DR2 `J/A+A/659/A1/catalog` | `e_RAJ2000`, `e_DEJ2000`: arcsec ("rms uncertainty on RA (E_RA)") | yes (read as arcsec) |
+| TGSS ADR1 `J/A+A/598/A78/table3` | `e_RAJ2000`, `e_DEJ2000`: arcsec ("Uncertainty on right ascension (1 sigma)") | yes |
+| GALEX `II/335/galex_ais` | `Nerr`, `Ferr`, `Ierr`, `Nperr`, `Fperr`, `Sep`: arcsec | yes |
+| AllWISE `II/328/allwise` | `eeMaj`, `eeMin`, `e_RA_pm`, `e_DE_pm`: arcsec | yes |
+| 2MASS `II/246/out` | `errMaj`, `errMin`: arcsec | yes |
+| Chandra CSC `IX/57/csc2master` | `r0`, `r1`: arcsec ("radius of the 95% confidence level position error ellipse"), `PA`: deg | yes (95 % radius / 2.448) |
+| eRASS1 `J/A+A/682/A34` | `posErr` ("1-sigma positional uncertainty"), `RADEErr`, `e_RA_ICRS`, `E_RA_ICRS`: arcsec | yes |
+| 4XMM `IX/69/xmm4d13s` | `ePos` ("Mean error on position (SC_POSERR)"): arcsec | yes |
+| FIRST `VIII/92/first14` | `Rms`: mJy, `Maj`, `Min`: arcsec (no position-error column) | yes (profile constant) |
 
 ## 2. What the fix is
 

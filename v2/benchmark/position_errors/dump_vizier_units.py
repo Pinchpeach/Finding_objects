@@ -15,7 +15,8 @@ import sys
 
 # catalogue -> (cone centre RA, Dec in deg, radius deg, columns whose unit is wanted)
 TARGETS = {
-    "J/ApJS/255/30": (150.1, 2.2, 0.1, ["e_RAJ2000", "e_DEJ2000", "e_RAMdeg", "e_DEMdeg", "RAJ2000", "Maj", "e_Maj"]),
+    # 0.5 deg (2.62.3): the 0.1 deg COSMOS cone held no VLASS row (run 46087889093), and an empty answer carries no column metadata
+    "J/ApJS/255/30": (150.1, 2.2, 0.5, ["e_RAJ2000", "e_DEJ2000", "e_RAMdeg", "e_DEMdeg", "RAJ2000", "Maj", "e_Maj"]),
     "VIII/65/nvss": (150.1, 2.2, 0.5, ["e_RAJ2000", "e_DEJ2000", "RAJ2000", "DEJ2000"]),
     "J/A+A/659/A1": (190.0, 55.0, 0.3, ["e_RAJ2000", "e_DEJ2000", "RAJ2000"]),
     "J/A+A/598/A78": (150.1, 2.2, 0.5, ["e_RAJ2000", "e_DEJ2000"]),
