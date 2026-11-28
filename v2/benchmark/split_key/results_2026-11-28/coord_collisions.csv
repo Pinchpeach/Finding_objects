@@ -1,0 +1,7 @@
+table,rows,rows_sharing_a_coordinate_key
+sdss_ground_truth,9999,0
+desi_external_truth,4795,0
+radio_xray_truth,951,0
+star_truth,1000,0
+lamost_star_external,1000,2
+wd_subtype_truth,300,0

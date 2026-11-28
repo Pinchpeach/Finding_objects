@@ -1,0 +1,13 @@
+table,key,n,changed,changed_pct,expected_pct,se_pct,within_3se,max_class_share_dev_pp_current,max_class_share_dev_pp_new,new_test_n,new_test_from_old_train,new_test_from_old_train_pct,consumer,train->train,train->calibration,train->test,calibration->train,calibration->calibration,calibration->test,test->train,test->calibration,test->test
+sdss_ground_truth,specobjid,9999,5741,57.42,56.0,0.5,True,1.9,1.0,2072,1265,61.1,"validate_catalog_truth.py (the SDSS benchmark: fusion weights, GBM, calibration, every SDSS number)",3446,1240,1265,1234,414,409,1174,419,398
+sdss_ground_truth,coordinates,9999,5589,55.9,56.0,0.5,True,1.9,1.6,1952,1154,59.1,"validate_catalog_truth.py (the SDSS benchmark: fusion weights, GBM, calibration, every SDSS number)",3617,1180,1154,1268,392,397,1181,409,401
+desi_external_truth,desi_targetid,4795,2642,55.1,56.0,0.72,True,2.9,0.9,977,588,60.2,"validate_catalog_truth.py without --split-all (the regression gate of evaluate-preprocess-coarse.yml, README's DESI test split n = 962, the fusion fit); the validation workflow scores --split all",1747,576,588,561,189,172,566,179,217
+desi_external_truth,coordinates,4795,2651,55.29,56.0,0.72,True,2.9,2.1,988,588,59.5,"validate_catalog_truth.py without --split-all (the regression gate of evaluate-preprocess-coarse.yml, README's DESI test split n = 962, the fusion fit); the validation workflow scores --split all",1747,576,588,541,189,192,565,189,208
+radio_xray_truth,specobjid,951,539,56.68,56.0,1.61,True,4.6,4.6,190,119,62.6,validate_catalog_truth.py (radio / X-ray benchmark),336,105,119,134,42,37,110,34,34
+radio_xray_truth,coordinates,951,545,57.31,56.0,1.61,True,4.6,5.1,167,101,60.5,validate_catalog_truth.py (radio / X-ray benchmark),337,122,101,120,48,45,121,36,21
+star_truth,specobjid,1000,572,57.2,56.0,1.57,True,2.8,4.2,202,122,60.4,train_validate_star_wd.py,354,121,122,130,35,41,111,47,39
+star_truth,coordinates,1000,552,55.2,56.0,1.57,True,2.8,2.0,202,119,58.9,train_validate_star_wd.py,370,108,119,117,42,47,119,42,36
+lamost_star_external,external_id,1000,578,57.8,56.0,1.57,True,3.2,5.2,212,131,61.8,validate_star_wd_external.py (assumed the same hash),348,125,131,117,33,40,115,50,41
+lamost_star_external,coordinates,1000,548,54.8,56.0,1.57,True,3.2,0.2,204,122,59.8,validate_star_wd_external.py (assumed the same hash),370,112,122,100,45,45,123,46,37
+wd_subtype_truth,external_id,300,178,59.33,56.0,2.87,True,9.2,2.7,55,33,60.0,train_validate_wd_subtype.py,104,29,33,49,9,13,37,17,9
+wd_subtype_truth,coordinates,300,178,59.33,56.0,2.87,True,9.2,11.0,64,37,57.8,train_validate_wd_subtype.py,96,33,37,46,12,13,35,14,14
