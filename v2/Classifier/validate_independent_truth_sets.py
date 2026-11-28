@@ -8,7 +8,7 @@ reported separately from classified-only accuracy.
 """
 
 from __future__ import annotations
-import argparse, collections, importlib.util, json, math, sys, tempfile
+import argparse, collections, importlib.util, json, math, sys, tempfile, time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 import pandas as pd
@@ -72,6 +72,7 @@ def collect(row, raw, radius):
     logs = []
     names = COLLECTORS.get((str(row.truth_axis), str(row.truth_class)), ())
     for name in names:
+        t0 = time.monotonic()  # the seconds of every collector go into the log (2.62.12: which collector sets the time of a shard)
         try:
             mod = load_module(GET / f"{name}.py", f"truthval_{name}_{abs(hash(str(row.truth_id)))%1000000}")
             kwargs = {"kinds": SOS_KIND[str(row.truth_class)]} if name == "gaia_dr3_variability_sos_vizier" else {}
@@ -84,7 +85,25 @@ def collect(row, raw, radius):
                 logs.append({"collector": name, "status": "ok" if len(frame) else "empty", "rows": len(frame)})
         except Exception as exc:
             logs.append({"collector": name, "status": "error", "rows": 0, "error": repr(exc)})
+        logs[-1]["seconds"] = round(time.monotonic() - t0, 1)
     return logs
+
+
+def collector_times(result: pd.DataFrame) -> pd.DataFrame:
+    """Per class and collector: objects, total / median / 90th percentile / largest seconds, from the ``collectors`` logs (2.62.12).
+    Logs written before 2.62.12 have no seconds and are left out."""
+    recs = []
+    for r in result.itertuples(index=False):
+        try:
+            logs = json.loads(r.collectors) if isinstance(r.collectors, str) else []
+        except ValueError:
+            logs = []
+        recs += [{"truth_class": r.truth_class, "collector": x.get("collector"), "seconds": x["seconds"]} for x in logs if "seconds" in x]
+    if not recs:
+        return pd.DataFrame(columns=["truth_class", "collector", "objects", "total_s", "median_s", "p90_s", "max_s"])
+    g = pd.DataFrame(recs).groupby(["truth_class", "collector"]).seconds
+    out = pd.DataFrame({"objects": g.size(), "total_s": g.sum().round(1), "median_s": g.median().round(1), "p90_s": g.quantile(0.9).round(1), "max_s": g.max().round(1)})
+    return out.reset_index().sort_values(["truth_class", "total_s"], ascending=[True, False], ignore_index=True)
 
 
 def select(frame, ra, dec, radius, entity=None):
@@ -460,6 +479,11 @@ def main():
     checkpoint.unlink(missing_ok=True)
     print(f"status: {status['status']} ({status['archive_error_rows']} rows with an archive error after {repeated} repeated evaluations)", flush=True)
     print(result.groupby(["axis", "truth_class"])[["classified", "match"]].mean())
+    times = collector_times(result)
+    if len(times):  # in the log too: the shard artifacts are not always reachable, the log is (2.62.12)
+        times.to_csv(a.out_dir / "collector_times.csv", index=False)
+        print("collector seconds (the objects run max-workers at a time, so the shard's wall time is about total / workers):")
+        print(times.to_string(index=False))
 
 
 if __name__ == "__main__":

@@ -793,3 +793,38 @@ def test_the_last_mirror_error_status_is_still_returned_when_no_mirror_cut_the_t
     req = throttle._with_mirrors(_body_send(behaviour, seen))
     resp = req(None, "GET", "https://vizier.cds.unistra.fr/viz-bin/votable?-source=I/355/gaiadr3")
     assert resp.status_code == 503 and len(seen) == len(throttle.VIZIER_HOSTS)
+
+
+def _multi(n):
+    """The body astroquery posts for a multi-target cone of ``n`` positions (Vizier.query_region(..., get_query_payload=True))."""
+    pos = "\n".join(f"{10 + i * 0.01:.8f}+{1 + i * 0.01:.8f}" for i in range(n))
+    return f"-source=I/355/gaiadr3\n-out.max=unlimited\n-out.all\n-out.add=_q\n-c.rs=12.0\n-out.form=mini\n-c=<<====AstroqueryList\n{pos}\n====AstroqueryList"
+
+
+def test_the_positions_of_a_request_are_counted():
+    assert throttle._targets(_multi(500)) == 500 and throttle._targets(_multi(1)) == 1
+    assert throttle._targets(_multi(3).encode()) == 3
+    assert throttle._targets({"-source": "I/355", "-c": "10.0+1.0"}) == 1 and throttle._targets("-source=I/355&-c=10+1") == 1 and throttle._targets(None) == 1
+
+
+def test_a_batch_larger_than_a_mirrors_limit_is_not_sent_there_while_another_mirror_can_take_it():
+    """2.62.12: CfA answers 504 after 60 s to 500 Gaia positions (probe run 46118073648: 50 answered, 250 never); IDIA answers them."""
+    seen = []
+    req = throttle._with_mirrors(_send({"vizier.cds.unistra.fr": 404}, seen))
+    req(None, "POST", "https://vizier.cds.unistra.fr/viz-bin/votable", data=_multi(500))
+    assert "vizier.cfa.harvard.edu" not in seen[1] and len(seen) == 2  # Strasbourg's 404, then the next mirror within its limit
+    throttle._preferred.update(host=None, until=0.0)
+    throttle._unreachable.clear()
+    seen.clear()
+    req(None, "POST", "https://vizier.cds.unistra.fr/viz-bin/votable", data=_multi(50))
+    assert "vizier.cfa.harvard.edu" in seen[0]  # within CfA's limit: the order is unchanged (Strasbourg's 404 is remembered: asked last)
+    seen.clear()
+    req(None, "GET", "https://vizier.cds.unistra.fr/viz-bin/votable?-source=V/164&-c=10+1")
+    assert "vizier.cfa.harvard.edu" in seen[0]  # a single cone: unchanged (CfA answered and is now preferred)
+
+
+def test_a_mirror_over_its_limit_is_still_asked_when_every_other_mirror_fails():
+    seen = []
+    req = throttle._with_mirrors(_send({h: "refuse" for h in throttle.VIZIER_HOSTS if h != "vizier.cfa.harvard.edu"}, seen))
+    assert req(None, "POST", "https://vizier.cds.unistra.fr/viz-bin/votable", data=_multi(500)).status_code == 200
+    assert "vizier.cfa.harvard.edu" in seen[-1] and len(seen) == len(throttle.VIZIER_HOSTS)
