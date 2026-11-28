@@ -221,6 +221,7 @@ def load(raw: Path):
                 else (cat, "sky", round(ra, 7), round(dec, 7))
             )
             prof = profile_for(cat, r)
+            poserr, psf = infer_poserr_arcsec(cat, r), infer_psf_arcsec(cat, r)  # once per row (review of 2.62.7: the order key took them again)
             rows.append(
                 {
                     "_dedup": key,  # private keys (leading underscore) are not written to source_association.csv
@@ -233,9 +234,9 @@ def load(raw: Path):
                     "object_name": str(r.get("object_name", "")),
                     "ra": ra,
                     "dec": dec,
-                    "poserr_arcsec": infer_poserr_arcsec(cat, r),
-                    "_order_poserr": order_poserr_arcsec(cat, r, infer_poserr_arcsec(cat, r), infer_psf_arcsec(cat, r)),  # None unless an order-key switch is on
-                    "psf_fwhm_arcsec": infer_psf_arcsec(cat, r),
+                    "poserr_arcsec": poserr,
+                    "_order_poserr": order_poserr_arcsec(cat, r, poserr, psf),  # None unless an order-key switch is on (read at call time: the tests switch it)
+                    "psf_fwhm_arcsec": psf,
                     "ref_epoch": infer_epoch(cat, r),
                     "entity_kind": infer_entity_kind(cat, r),
                     "pmra": num(r.get("pmra")),
