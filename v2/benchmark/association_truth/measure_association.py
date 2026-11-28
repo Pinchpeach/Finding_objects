@@ -217,7 +217,7 @@ def measure_field(assoc: pd.DataFrame, truth: pd.DataFrame, shifted_from: pd.Dat
         dom, acc = expected_counterparts(d, truth, full_sky, col, fwhm)
         matched = (d.association_status == "matched").to_numpy()
         rec = dict(rows=len(d), matched=int(matched.sum()), no_expected=0, correct=0, false=0, unknown=0, missed=0, rightly_alone=0,
-                   alone_identified=0, alone_wrong=0, alone_unidentified=0, s_correct=0, s_false=0, s_missed=0)  # fmt: skip
+                   alone_identified=0, alone_wrong=0, alone_unidentified=0, shared=0, displaced=0, s_correct=0, s_false=0, s_missed=0)  # fmt: skip
         for (_, r), dm, ac, m in zip(d.iterrows(), dom, acc, matched):
             if dm < 0:
                 # no truth source with a positive flux within reach: there is nothing to join, so a join is false
@@ -236,6 +236,14 @@ def measure_field(assoc: pd.DataFrame, truth: pd.DataFrame, shifted_from: pd.Dat
             holders = set()  # objects that hold a truth source of the acceptable set (the row's own object included)
             for k in acc_set:
                 holders |= by_truth.get(k, set())
+            # 2.62.7 (task "러"): the two anchor independent readings of WHERE ELSE the counterpart is held, for every row, joined or not (they depend on the membership of the objects only).
+            #   shared    the row's own object holds an acceptable counterpart that another object holds too: one truth source in two objects (a fragment; what same,nearest merges)
+            #   displaced the row's own object holds none, but another object does (the row sits in the wrong object while the right one exists)
+            mine = T.get(own, set()) & acc_set
+            if mine:
+                rec["shared"] += int(any(by_truth.get(k, set()) - {own} for k in mine))
+            else:
+                rec["displaced"] += int(bool(holders - {own}))
             if m:
                 ids = T.get(r.object_id, set())
                 if not ids:
@@ -406,7 +414,7 @@ def pool(rows: list[dict], split: pd.DataFrame, label: str) -> pd.DataFrame:
             rec = dict(variant=label, half=half, catalog=cat, fields=len(f), rows=tot["rows"], with_expected=expected,
                        matched=tot["matched"], correct=tot["correct"], false=tot["false"], unknown=tot["unknown"],
                        missed=tot["missed"], rightly_alone=tot["rightly_alone"], alone_identified=tot.get("alone_identified", 0),
-                       alone_wrong=tot.get("alone_wrong", 0), alone_unidentified=tot.get("alone_unidentified", 0))  # fmt: skip
+                       alone_wrong=tot.get("alone_wrong", 0), alone_unidentified=tot.get("alone_unidentified", 0), shared=tot.get("shared", 0), displaced=tot.get("displaced", 0))  # fmt: skip
             rec["false_pct_of_matched_known"] = round(100 * tot["false"] / decided_m, 2) if decided_m else np.nan
             lo, hi = wilson(tot["false"], decided_m)
             rec["false_wilson"] = f"{lo:.1f}-{hi:.1f}"

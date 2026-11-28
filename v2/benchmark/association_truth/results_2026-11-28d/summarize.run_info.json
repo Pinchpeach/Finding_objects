@@ -1,9 +1,9 @@
 {
   "schema": 1,
-  "commit": "584fc1e505711a55593d8ae2717bec6bc691cef5",
+  "commit": "b06fdf0728fd7e19b786708ddfaa6bba02b3a989",
   "branch": "ccr-68f28268-l0opfu",
   "dirty": true,
-  "dirty_files": 7,
+  "dirty_files": 4,
   "env": {},
   "effective": {
     "POSERR_UNITS": "legacy",
@@ -13,24 +13,24 @@
     "LOWLAT_QSO": [],
     "LOWLAT_QSO_ABSB": 20.0
   },
-  "started_utc": "2026-11-28T04:25:57Z",
-  "finished_utc": "2026-11-28T04:26:45Z",
+  "started_utc": "2026-11-28T04:50:37Z",
+  "finished_utc": "2026-11-28T04:51:25Z",
   "status": "ok",
   "inputs": [
     {
-      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ro26",
+      "path": "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ro26c",
       "kind": "directory",
-      "sha256": "a1b4b6551dafb66608744f550c21735254b1cef574f33c89219308ad88cfd3d1",
-      "n_files": 450,
+      "sha256": "d231f7c58114e52df40f6a46a62519a601de5e071672723a77426bc16bbb37e8",
+      "n_files": 433,
       "hashed": "relative path, size"
     }
   ],
   "argv": [
     "summarize_native_error_variants.py",
     "--root",
-    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ro26",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ro26c",
     "--out",
-    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ro26/summary2",
+    "/tmp/claude-0/-home-user-Finding-objects/a3b74528-95f4-577f-90ca-1b556d79befc/scratchpad/ro26c/summary",
     "--variants",
     "base",
     "file",

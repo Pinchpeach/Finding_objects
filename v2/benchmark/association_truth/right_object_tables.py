@@ -31,8 +31,8 @@ def table1(d: pd.DataFrame) -> pd.DataFrame:
     x = d[d.variant.isin(["same", "nearest", "same_nearest"]) & d.split.isin(["cal9", "conf17", "all26"])].copy()
     x["split"] = x.split.map({"cal9": "보정 9", "conf17": "확인 17", "all26": "전체 26"})
     x["relabel"] = x.relabel_share_of_d_correct_pct.map(lambda v: "" if pd.isna(v) else f"{v:.0f} %")
-    out = x[["catalog", "split", "variant", "with_expected", "d_correct", "d_rightly_alone", "d_right_object", "d_right_object_pp", "d_right_object_ci", "d_missed", "d_false", "d_unknown", "d_shifted_any_pct", "relabel"]]
-    out.columns = ["목록", "분할", "변형", "짝 있는 행", "Δcorrect", "Δrightly_alone", "Δright_object", "Δright_object (pp)", "95 % 구간(영역 부트스트랩)", "Δmissed", "Δfalse", "Δunknown", "Δ우연 연결률(shifted_any, pp)", "재라벨 몫"]
+    out = x[["catalog", "split", "variant", "with_expected", "d_correct", "d_alone_identified", "d_right_object", "d_right_object_pp", "d_right_object_ci", "d_missed", "d_false", "d_unidentified", "d_shared", "d_displaced", "d_shifted_any_pct", "relabel"]]
+    out.columns = ["목록", "분할", "변형", "짝 있는 행", "Δcorrect", "Δalone_identified", "Δright_object", "Δright_object (pp)", "95 % 구간(영역 부트스트랩)", "Δmissed", "Δfalse", "Δunidentified", "Δshared", "Δdisplaced", "Δ우연 연결률(shifted_any, pp)", "재라벨 몫"]
     out["_c"] = out["목록"].map({c: i for i, c in enumerate(CATS)})
     out["_s"] = out["분할"].map({"보정 9": 0, "확인 17": 1, "전체 26": 2})
     out["_v"] = out["변형"].map({"same": 0, "nearest": 1, "same_nearest": 2})
@@ -41,8 +41,8 @@ def table1(d: pd.DataFrame) -> pd.DataFrame:
 
 def table2(c: pd.DataFrame) -> pd.DataFrame:
     x = c[(c.split == "all26") & c.variant.isin(["base", "file", "position", "floored", "same_nearest"])].copy()
-    out = x[["catalog", "variant", "correct", "false_pct_of_matched_known", "shifted_false_pct", "right_object", "right_object_pct", "missed", "missed_pct", "shifted_any_pct"]]
-    out.columns = ["목록", "변형", "correct (옛)", "틀린 연결률 % (옛)", "이동 대조 앵커 정의 % (옛)", "right_object (새)", "right_object % (새)", "missed (새)", "놓침 % (새)", "우연 연결률 shifted_any % (새)"]
+    out = x[["catalog", "variant", "correct", "false_pct_of_matched_known", "shifted_false_pct", "right_object", "right_object_pct", "wrong_object", "unidentified", "missed", "missed_pct", "shared", "displaced", "shifted_any_pct"]]
+    out.columns = ["목록", "변형", "correct (옛)", "틀린 연결률 % (옛)", "이동 대조 앵커 정의 % (옛)", "right_object", "right_object %", "wrong_object", "unidentified", "missed (옛, 앵커 의존)", "놓침 %", "shared (조각)", "displaced", "우연 연결률 shifted_any %"]
     out["_c"] = out["목록"].map({k: i for i, k in enumerate(CATS)})
     out["_v"] = out["변형"].map({"base": 0, "file": 1, "position": 2, "floored": 3, "same_nearest": 4})
     return out.sort_values(["_c", "_v"]).drop(columns=["_c", "_v"])

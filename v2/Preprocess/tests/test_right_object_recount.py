@@ -1,7 +1,8 @@
 """``right_object_recount.py`` (task "러", 2.62.7): the reading of an association change that does not depend on who anchors an object.
 
-The three cases that METRICS.md is about: a pure relabelling (an anchor becomes a joined row: ``correct`` +1, ``rightly_alone`` -1) is NOT a gain, a joined missed row is, and a row that
-turns from "missed" into "rightly alone" (the counterpart's object now sits inside its own object) is a gain that ``correct`` does not see.
+The cases that METRICS.md is about (``right_object`` = ``correct`` + ``alone_identified``, the reading of the 2.62.7 review): a pure relabelling (an anchor holding its counterpart becomes a joined
+row: ``correct`` +1, ``alone_identified`` -1) is NOT a gain, a joined missed row is, a row that turns from "missed" into "alone, its own object holds the counterpart" is a gain that ``correct`` does
+not see, and a row without any counterpart that is joined to an object without truth id (``rightly_alone`` -> ``unknown``) is neither a gain nor a loss.
 """
 
 import sys
@@ -20,7 +21,7 @@ def rows(variant: str, **chg) -> pd.DataFrame:
     """One AllWISE record per field: 100 rows, 90 with an expected counterpart, a fixed baseline; ``chg`` is added to field 1 and field 12 only."""
     out = []
     for f in FIELDS:
-        r = dict(variant=variant, field=f, catalog="AllWISE", rows=100, no_expected=10, matched=60, correct=50, false=2, unknown=8, missed=20, rightly_alone=20, shift_rows=100, shift_false=8, shift_any=20)
+        r = dict(variant=variant, field=f, catalog="AllWISE", rows=100, no_expected=10, matched=60, correct=50, false=2, unknown=8, missed=20, rightly_alone=20, alone_identified=15, alone_wrong=0, alone_unidentified=5, shift_rows=100, shift_false=8, shift_any=20)
         if f in ("deep_cosmos_1", "deep_cosmos_12"):
             for k, v in chg.items():
                 r[k] += v
@@ -47,8 +48,8 @@ def test_splits_follow_the_field_number():
 
 
 def test_relabelling_is_not_a_gain():
-    d = run(correct=+1, rightly_alone=-1, matched=+1)
-    assert d.loc["all26", "d_correct"] == 2 and d.loc["all26", "d_rightly_alone"] == -2
+    d = run(correct=+1, rightly_alone=-1, alone_identified=-1, matched=+1)
+    assert d.loc["all26", "d_correct"] == 2 and d.loc["all26", "d_alone_identified"] == -2
     assert d.loc["all26", "d_right_object"] == 0 and d.loc["all26", "relabel_share_of_d_correct_pct"] == 100.0
 
 
@@ -58,8 +59,14 @@ def test_a_new_correct_join_is_a_gain_without_relabelling():
     assert d.loc["cal9", "d_right_object"] == 1 and d.loc["conf17", "d_right_object"] == 1  # field 1 is in the calibration nine, field 12 in the confirmation seventeen
 
 
-def test_missed_to_rightly_alone_is_seen_by_right_object_not_by_correct():
-    d = run(missed=-3, rightly_alone=+3)
+def test_a_row_without_counterpart_joined_to_an_object_without_truth_id_does_not_move_right_object():
+    """The flaw of the first right_object (correct + rightly_alone): the same row alone is rightly_alone, joined to an object without truth id it is unknown."""
+    d = run(rightly_alone=-1, alone_unidentified=-1, unknown=+1, matched=+1)
+    assert d.loc["all26", "d_right_object"] == 0 and d.loc["all26", "d_unidentified"] == 0 and d.loc["all26", "d_rightly_alone"] == -2  # the old sum would have lost 2 rows
+
+
+def test_missed_to_alone_identified_is_seen_by_right_object_not_by_correct():
+    d = run(missed=-3, rightly_alone=+3, alone_identified=+3)
     assert d.loc["all26", "d_correct"] == 0 and d.loc["all26", "d_right_object"] == 6 and d.loc["all26", "d_missed"] == -6
 
 

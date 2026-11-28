@@ -11,9 +11,9 @@ Splits (the fields are the 26 deep COSMOS fields; the numbers of a split are SUM
 * ``all26``.
 
 Written (``OUT``):
-* ``recount_counts.csv``  per variant, split and catalogue: rows, with_expected, matched, correct, false, unknown, missed, rightly_alone, right_object and the shifted-control counts
+* ``recount_counts.csv``  per variant, split and catalogue: rows, with_expected, matched, correct, false, unknown, missed, rightly_alone, alone_identified / alone_wrong / alone_unidentified, right_object (= correct + alone_identified), wrong_object (= false + alone_wrong), unidentified (= unknown + alone_unidentified), shared (own object holds a counterpart another object holds too: a fragment), displaced (own object holds none, another does) and the shifted-control counts
                           (``shift_false`` = joined to an object anchored by an unshifted catalogue, the 2.49.0 reading; ``shift_any`` = the object holds any unshifted row, anchor independent);
-* ``recount_delta.csv``   the same against the base variant: delta of each count, the share of the change in ``correct`` that is only relabelling (``-d_rightly_alone``), the rates and
+* ``recount_delta.csv``   the same against the base variant: delta of each count, the share of the change in ``correct`` that is only relabelling (``-d_alone_identified / d_correct``), the rates and
                           their change, and a field-bootstrap 95 % interval (2000 resamples of the fields of the split, seed 1) of the change in ``right_object`` and ``missed`` per 100 rows with an expected counterpart.
 """
 
@@ -32,7 +32,7 @@ sys.path.insert(0, str(HERE.parent))
 import run_info as RI  # noqa: E402
 
 CATS = ("AllWISE", "GALEX AIS", "2MASS PSC")
-COUNTS = ("rows", "no_expected", "matched", "correct", "false", "unknown", "missed", "rightly_alone", "shift_rows", "shift_false", "shift_any")
+COUNTS = ("rows", "no_expected", "matched", "correct", "false", "unknown", "missed", "rightly_alone", "alone_identified", "alone_wrong", "alone_unidentified", "shared", "displaced", "shift_rows", "shift_false", "shift_any")
 
 
 def field_table(root: Path, variant: str) -> pd.DataFrame:
@@ -55,7 +55,10 @@ def split_fields(fields: list[str], split_csv: Path) -> dict[str, list[str]]:
 def totals(t: pd.DataFrame) -> pd.DataFrame:
     g = t.groupby(["variant", "catalog"])[list(COUNTS)].sum().reset_index()
     g["with_expected"] = g.rows - g.no_expected
-    g["right_object"] = g.correct + g.rightly_alone
+    # the anchor independent reading (review of 2.62.7): the row sits in an object that holds an acceptable counterpart, joined (correct) or as the anchor (alone_identified)
+    g["right_object"] = g.correct + g.alone_identified
+    g["wrong_object"] = g["false"] + g.alone_wrong
+    g["unidentified"] = g.unknown + g.alone_unidentified
     return g
 
 
@@ -74,7 +77,7 @@ def bootstrap(per: pd.DataFrame, base: str, variant: str, cat: str, n: int = 200
     a = per[(per.variant == base) & (per.catalog == cat)].set_index("field")
     b = per[(per.variant == variant) & (per.catalog == cat)].set_index("field").reindex(a.index)
     we = (a.rows - a.no_expected).to_numpy(float)
-    d_ro = ((b.correct + b.rightly_alone) - (a.correct + a.rightly_alone)).to_numpy(float)
+    d_ro = ((b.correct + b.alone_identified) - (a.correct + a.alone_identified)).to_numpy(float)
     d_mi = (b.missed - a.missed).to_numpy(float)
     rng = np.random.default_rng(seed)
     idx = rng.integers(0, len(a), size=(n, len(a)))
@@ -103,9 +106,10 @@ def compute(per: pd.DataFrame, splits: dict[str, list[str]], base_name: str) -> 
         for _, r in g[g.variant != base_name].iterrows():
             b = base.loc[r.catalog]
             d = dict(variant=r.variant, split=sname, catalog=r.catalog, fields=len(fields), with_expected=int(r.with_expected))
-            for k in ("matched", "correct", "false", "unknown", "missed", "rightly_alone", "right_object", "shift_false", "shift_any"):
+            for k in ("matched", "correct", "false", "unknown", "missed", "rightly_alone", "alone_identified", "right_object", "wrong_object", "unidentified", "shared", "displaced", "shift_false", "shift_any"):
                 d[f"d_{k}"] = int(r[k] - b[k])
-            d["relabel_share_of_d_correct_pct"] = round(100 * (-d["d_rightly_alone"]) / d["d_correct"], 1) if d["d_correct"] else np.nan
+            # the change in correct that is only a row moving from "anchors an object that holds its counterpart" to "joined to it": -d_alone_identified / d_correct
+            d["relabel_share_of_d_correct_pct"] = round(100 * (-d["d_alone_identified"]) / d["d_correct"], 1) if d["d_correct"] else np.nan
             for k in ("right_object_pct", "missed_pct", "false_pct_of_matched_known", "shifted_false_pct", "shifted_any_pct"):
                 d[f"d_{k}"] = round(float(r[k] - b[k]), 2)
             d.update(bootstrap(p, base_name, r.variant, r.catalog))

@@ -1,62 +1,72 @@
-# 과제 러: 연관 지표를 `right_object` 읽기로 다시 센 결과 (2.62.7)
+# 과제 러: 연관 지표를 앵커와 무관한 읽기로 다시 센 결과 (2.62.7 → 2.62.10 후보)
 
-정의는 `../METRICS.md`, 예측은 `../PREDICTIONS_RIGHT_OBJECT_2026-11-28.md`(측정 요약을 열기 **전에** 커밋, 584fc1e). 이 폴더의 표는 모두 `../right_object_recount.py`(필드별 JSON의 합)와 `../right_object_tables.py`(마크다운)가 만든다.
+정의는 `../METRICS.md`, 예측은 `../PREDICTIONS_RIGHT_OBJECT_2026-11-28.md`. 이 폴더의 표는 모두 `../right_object_recount.py`(필드별 JSON의 합)와 `../right_object_tables.py`가 만든다.
+
+**이 폴더는 두 번 만들어졌다.** 첫 판(커밋 b0ec093의 `results_2026-11-28d/`)은 `right_object = correct + rightly_alone`로 셌다. 검토 세션(Codex)이 이 정의가 앵커에 따라 움직인다고 지적하고 main(2.62.7, #101)이 `correct + alone_identified`로 고쳤다. 이 판은 **고친 정의**로 같은 1단계 출력 위에서 `measure_association.py`를 다시 돌려 만들었고, 첫 판의 결론 중 상당수가 뒤집혔다(아래 "무엇이 뒤집혔나"). 첫 판 숫자는 쓰지 않는다.
 
 ## 재현
 
 ```
-bash v2/benchmark/association_truth/run_right_object_variants.sh FIELDS_ROOT TRUTH_FLUX_DIR OUT     # Stage 1 x 7 변형(+이동 사본), measure_association.py, 요약
+bash v2/benchmark/association_truth/run_right_object_variants.sh FIELDS_ROOT TRUTH_FLUX_DIR OUT       # Stage 1 x 7 변형(+이동 사본), 측정, 요약
 python v2/benchmark/association_truth/right_object_recount.py --root OUT --variants base file position same nearest same_nearest floored --out RES
 python v2/benchmark/association_truth/right_object_tables.py --recount RES > tables.md
+# 순서 키 / eeMaj 변형(`run_order_key_variants.sh`의 출력)도 같은 도구로: --variants base allwise allwise_order allwise_sigma floored allwise_floored allwise_order_floored
 ```
 
-입력: 깊은 COSMOS 26개 영역(`benchmark/deep_cosmos/`의 원자료), COSMOS2020 정답(`collect_truth_flux.py`). 측정은 커밋 78e2c97 위에서 `measure_association.py`의 `right_object`·`shifted_any_pct` 추가가 **커밋되기 전**에 돌렸다(`*.run_info.json`의 `dirty`=True와 `dirty_files`에 그것이 보인다; 그 변경은 이 폴더와 같은 커밋에 들어 있다).
+입력: 깊은 COSMOS 26개 영역의 원자료, COSMOS2020 정답(`collect_truth_flux.py`). 측정은 병합된 `measure_association.py`(`alone_*`, `shared`, `displaced` 열)로 돌렸고, `*.run_info.json`의 `dirty = true`는 그 열의 변경이 커밋되기 전이었기 때문이다(변경은 같은 커밋에 들어 있다).
 
 | 파일 | 내용 |
 |---|---|
-| `recount_counts.csv` | 변형 × 분할 × 목록의 개수와 비율 (분할: `cal9`, `conf17`, `cal15`, `test11`, `all26`) |
-| `recount_delta.csv` | 기본값 대비 변화: 각 개수의 차, 재라벨 몫, 영역 부트스트랩 95 % 구간 |
-| `right_object_false_missed.csv`, `right_object_structure.csv` | 기존 요약 도구(`summarize_native_error_variants.py`)의 형식(보정 15 / 시험 11 분할) |
-| `tables.md` | 보고서의 표 1–3 |
+| `recount_counts.csv`, `recount_delta.csv` | 7개 변형 × 분할 × 목록: 개수와 기본값 대비 변화(재라벨 몫, 영역 부트스트랩 95 %) |
+| `recount_counts_order_key.csv`, `recount_delta_order_key.csv` | 순서 키 / AllWISE `eeMaj` 변형 7개(과제 너의 1단계 출력) |
+| `right_object_false_missed.csv`, `right_object_structure.csv` | 기존 요약 도구의 형식(보정 15 / 시험 11 분할) |
+| `tables.md` | 보고서의 표 |
 
-분할이 둘이다: **보정 9 / 확인 17**은 2.61.8(`association_ambiguity`, "정답 연결 +46 / +32")의 분할이고, **보정 15 / 시험 11**은 2.60.9(`fields_split.csv`, 이름 해시)의 분할이다. 둘을 섞어 부르지 않는다.
+분할: **보정 9 / 확인 17**(COSMOS 필드 1–9 / 10–26)은 2.61.8(`association_ambiguity`, "정답 연결 +46 / +32")의 분할, **보정 15 / 시험 11**(`fields_split.csv`)은 2.60.9의 분할이다. 둘을 섞어 부르지 않는다.
 
-## 예측 판정 (예측 표를 그대로 두고 적는다; 틀린 것은 지우지 않았다)
+## 지표 (`../METRICS.md` 2절)
 
-| # | 예측 | 결과 | 판정 |
-|---|---|---|---|
-| A1 | **보정 9**에서 `same_nearest` Δcorrect AllWISE +46 ± 10, GALEX +32 ± 10 | 보정 9: +21 / +18. **확인 17**: +46 / +32(정확히 같음) | **틀림**(분할 이름을 잘못 적었다: 옛 주장의 +46 / +32는 확인 17의 값이다). 재현은 됨 |
-| A2 | 재라벨 몫 < 15 % | AllWISE 0 %, GALEX 확인 17 3 %(전체 2 %), 2MASS 0 % | 맞음 |
-| A3 | Δmissed ≈ −Δcorrect (±10 %) | AllWISE −46 대 +46 맞음. GALEX 확인 17 −39 대 +32(22 % 어긋남): 새로 붙은 행 +43 중 `unknown` +9, 기대 짝 없는 행 +3 | AllWISE 맞음, GALEX 틀림 |
-| A4 | Δfalse = 0 (±3행) | AllWISE 0, GALEX −1 / −2, 2MASS 0 | 맞음 |
-| A5 | 우연 연결률 AllWISE·GALEX 0 ~ +0.5 %p, 2MASS ±0.1 | AllWISE +0.01, GALEX +0.10(확인 17), 2MASS 0 | 맞음 |
-| A6 | `same` + `nearest` ≈ `same_nearest` (±20 %) | AllWISE 3 + 65 = 68 대 67 맞음. GALEX(전체 26) 58 + 17 = 75 대 49(+53 %), 2MASS 3 + 2 = 5 대 4(+25 %) | AllWISE 맞음, GALEX·2MASS 틀림(두 규칙이 같은 행을 고친다) |
-| A7 | 확인 17의 크기가 보정 9의 ±40 % 안 | 비율(%p): AllWISE +0.51 → +0.62(+21 %), GALEX +1.47 → +1.75(+19 %). **개수**로 보면 +119 % / +78 %(확인 17의 행이 1.8 / 1.4배) | 비율로 맞음; "크기"를 개수로 읽으면 틀림(쓸 때 단위를 안 적었다) |
-| B1 | 동점 순서 `file`/`position`: AllWISE \|Δright_object\| ≤ 0.5 %p, \|Δcorrect\| ≥ 3 × \|Δright_object\| | −0.449 / −0.457 %p(앞 절반 맞음). Δcorrect는 −2 / −3인데 Δright_object는 −52 / −53 | 앞 절반 맞음, **뒤 절반 틀림**: 재라벨이 아니라 `correct`가 못 보는 실제 변화였다 |
-| B2 | GALEX·2MASS \|Δright_object\| ≤ 0.5 %p(2MASS ≤ 0.1) | GALEX −0.73 / −0.77 %p(확인 17 −1.02 / −1.07), 2MASS 0 | 2MASS 맞음, **GALEX 틀림** |
-| B3 | `file` 재측정이 2.60.9 보고 수치를 소수 둘째 자리까지 재현 | 틀린 연결률 2.08 / 6.23 / 0.10 %(보고 2.09 / 6.23 / 0.10), `correct` 7,280(`position` 7,279)와 1,745(보고 7,279 / 1,745). 놓침 AllWISE 13.68 %(보고 표 13.8 %는 전체 26의 13.68 %가 아니라 보정 15의 13.86 %에 가깝다) | 틀린 연결률·개수는 맞음(±1행, 0.01 %p); 놓침은 **보고 표의 숫자 쪽이 어긋남**(13.8 대 13.68) |
-| B4 | 옛 이동 대조와 새 정의의 차이는 AllWISE ≥ 1 %p | 수준 차 7.63 대 20.66 %(맞음, 정의상 `shifted_any` ≥ `shifted_false`). `file`/`position`은 두 읽기 모두 기본값과 0.00 %p 차이 | 자명하게 맞음(쓸모 없는 예측이었다) |
-| C1 | `floored` Δright_object(AllWISE) ∈ [−0.7, +0.7] %p, Δcorrect ≥ 3배 | **+1.113 %p**(95 % 0.45–1.83), Δcorrect +2,233 = Δright_object +129의 17배 | **틀림**(범위 밖); 3배 조건은 맞음 |
-| C2 | 이동 대조 +10 %p 이상(옛) / 0 이하(새) | +10.79 / −2.07 %p | 맞음(28d와 같은 숫자) |
-| D1 | 옛 정의 "개선" 중 적어도 하나는 새 읽기에서 사라지거나 부호가 바뀐다 | `floored` 이동 대조 +10.79 → −2.07(부호 뒤집힘); `correct` +2,233 → `right_object` +129(94 %가 재라벨) | 맞음 |
-| D2 | `same_nearest`의 개선이 정의와 무관하게 남는 **유일한** 개선 | `floored`의 `right_object` 이득(+1.11 / +1.23 %p)도 구간이 0을 넘어 남는다. `same_nearest`는 세 목록 모두 개선하고 우연 연결률을 거의 안 키우는 점이 다르다 | **틀림**(유일하지 않다) |
+행(기대 짝이 있는 것)을 **자기 객체가 무엇을 갖는가**로 나눈다: `right_object`(정답 짝을 가진 객체 안), `wrong_object`(정답 id는 있으나 짝은 없는 객체 안), `unidentified`(정답 id가 없는 객체 안). 세 값의 합은 기대 짝이 있는 행의 수이고 앵커에 무관하다. 여기에 객체 구성만으로 정해지는 둘을 더했다: `shared`(자기 객체가 짝을 갖는데 **다른 객체도 같은 원천을 가짐** = 조각)와 `displaced`(자기 객체엔 짝이 없고 다른 객체가 가짐). `right_object`는 조각을 못 보므로 연관 규칙의 효과는 다섯 값을 함께 읽는다.
 
-15개 중 온전히 맞음 7(A2, A4, A5, A7[비율로], B4[자명], C2, D1), 부분적으로 맞거나 틀림 8(A1, A3, A6, B1, B2, B3, C1, D2).
+## 결과 (전체 26개 영역, 기본값 = 밝기 순서 대비 변화)
 
-## 결과 요약 (숫자는 `tables.md`와 `recount_delta.csv`)
+| 목록 | 변형 | Δcorrect | Δalone_identified | **Δright_object** (%p; 95 %) | Δshared | Δdisplaced | Δunidentified | Δmissed | Δ우연 연결률 %p |
+|---|---|---:|---:|---|---:|---:|---:|---:|---:|
+| AllWISE | `same_nearest` | +67 | −68 | **−1** (−0.01; −0.03 – 0) | **−58** | +1 | +1 | −69 | 0 |
+| AllWISE | `nearest` / `same` | +65 / +3 | −66 / −3 | −1 / 0 | −58 / 0 | +1 / 0 | +1 / 0 | −67 / −3 | 0 |
+| AllWISE | `file` (2.60.x 순서) | −2 | −29 | **−31** (−0.27; −0.46 – −0.07) | **+409** | +31 | +26 | +50 | 0 |
+| AllWISE | `position` | −3 | −27 | −30 (−0.26) | +418 | +30 | +23 | +50 | 0 |
+| AllWISE | `floored` | +2,233 | −2,412 | **−179** (−1.54; −1.97 – −1.07) | +31 | **+173** | +256 | −147 | **−2.07** |
+| AllWISE | `allwise`(eeMaj, σ와 순서) | +378 | −399 | −21 (−0.18; −0.31 – −0.04) | −12 | +20 | +32 | −51 | **+0.63** |
+| GALEX | `same_nearest` | +50 | −18 | **+32** (+1.07; 0.68 – 1.45) | +21 | **−32** | −30 | −61 | +0.09 |
+| GALEX | `nearest` / `same` | +18 / +60 | −8 / −17 | +10 / +43 | −1 / +43 | −10 / −43 | −9 / −43 | −27 / −63 | +0.03 / +0.06 |
+| GALEX | `file` | −23 | +5 | −18 (−0.60; −1.07 – −0.20) | +42 | +18 | +20 | +42 | 0 |
+| GALEX | `floored` | +38 | −7 | +31 (+1.03; 0.50 – 1.58) | 0 | −31 | −19 | −26 | −0.15 |
+| 2MASS | `same_nearest` | +4 | −4 | 0 | −7 | 0 | 0 | −5 | 0 |
+| 2MASS | `floored` | −1 | +1 | 0 | +5 | 0 | 0 | +1 | −1.05 |
 
-1. **`same,nearest`의 이득은 right_object로 읽어도 그대로다.** 확인 17: `same_nearest` AllWISE `right_object` +46(+0.617 %p, 95 % 0.431–0.853), GALEX +31(+1.750 %p, 1.016–2.393), 틀린 연결 0 / −1, 우연 연결률 +0.01 / +0.10 %p. 재라벨 몫 AllWISE 0 %, GALEX 3 %. 이득의 출처: AllWISE는 전부 `nearest`(+46), GALEX는 대부분 `same`(+38; `nearest` +9; 둘을 합친 것이 +31이라 같은 행을 고친다). 옛 주장의 놓침 −1.17 / −1.04 %p는 분모가 안 붙은 행이었고, 기대 짝이 있는 행 기준으로는 −0.62 / −2.20 %p다(표 3과 METRICS.md 5절).
-2. **2.61.0의 순서 변경(`file` → 밝기)은 right_object로 읽어도 이득이고, 오히려 `correct`가 이를 못 보았다.** AllWISE `right_object` 9,411 → 9,463(+52, +0.45 %p, 95 % 0.26–0.65): 놓침 1,586 → 1,536, `rightly_alone` 2,131 → 2,181, `correct`는 7,280 → 7,282(+2). 즉 `correct`는 2.61.0 AllWISE 개선을 **거의 0으로** 읽는다. GALEX는 +22(+0.73 %p, 0.29–1.26).
-3. **`floored`(순서 키를 바닥 적용 σ로)**: AllWISE `correct` +2,233이 `right_object` +129(+1.11 %p)로 줄어든다(재라벨 94 %). 이동 대조는 옛 정의 +10.79 %p(나빠짐), 앵커 무관 −2.07 %p(좋아짐). GALEX `right_object` +37(+1.23 %p), 틀린 연결 −12, 2MASS −1(−0.09 %p). 이 변형은 출력 위치 설계(`best_member`)와 함께 판단할 몫이다(28d 5.6절, 승격은 보류).
-4. **2.60.9 기준선**: 틀린 연결률은 어느 읽기에서도 그대로다(AllWISE 2.08–2.09 %, GALEX 6.23–6.26 %, 2MASS 0.10 %: 정의가 붙은 행에 대한 것이라 앵커에 덜 의존). 계획 세션이 "2.60.9 기준"으로 적은 놓침 13.25 / 20.55 / 1.48 %는 **현재 기본값**(2.61.0 이후)의 값이고, 2.60.9 당시 코드는 13.68 / 21.95 / 1.48 %다.
-5. **위치 잔차**(2.61.0 순서 변경, 28d 5.6절, `../results_2026-11-28c/`)는 다시 세지 않고 그대로 옮긴다:
+확인 17개 영역만(옛 주장의 분할): `same_nearest` AllWISE Δcorrect +46 · Δalone_identified −46 · **Δright_object 0** · Δshared −37 · Δmissed −46; GALEX Δcorrect +32 · Δalone_identified −15 · **Δright_object +17** (+0.96 %p; 0.43 – 1.45) · Δdisplaced −17 · Δunidentified −16 · Δmissed −39. 보정 15 / 시험 11로 보면 `floored` AllWISE `right_object`는 −99 / −80(둘 다 구간이 0 밖), `same_nearest` GALEX는 +25 / +7이다.
 
-| 변형 | 깨끗한 객체 | 중앙값 ″ | 90 % ″ | 0.5″ 밖 % | 1.0″ 밖 % |
-|---|---|---|---|---|---|
-| `file`(2.60.x 순서) | 138,014 | 0.0721 | 0.288 | 4.46 | 1.92 |
-| `position` | 138,021 | 0.0721 | 0.288 | 4.46 | 1.92 |
-| 기본값(밝기, 2.61.0) | 136,820 | 0.0723 | 0.289 | 4.51 | 1.94 |
-| `floored` | 136,296 | 0.0702 | 0.259 | 3.27 | 1.36 |
-| `allwise_order`(eeMaj 순서 키) | 136,794 | 0.0719 | 0.283 | 4.26 | 1.78 |
+기본값의 절대값(전체 26): AllWISE `right_object` 10,023 / 11,590 (86.5 %), `wrong_object` 246 (2.1 %), `unidentified` 1,321 (11.4 %), `shared` 432, `displaced` 1,331; GALEX 1,812 (60.4 %) / 118 / 1,068 (35.6 %) / 93 / 1,047; 2MASS 1,055 (97.8 %) / 1 / 23 / 63 / 19.
 
-   짝지은 비교(기본값 기준, 0.1″ 넘게 나빠진 / 좋아진 정답 천체): `file` 169 / 266(0.5″ 안으로 216, 밖으로 154), `floored` 62 / 2,568(안으로 1,876, 밖으로 22). 출력 위치 설계는 앵커 4.51 → `best_member` 3.16 → `ivw_mean` 3.28 %(0.5″ 밖). 2.61.0의 순서 변경은 위치 잔차를 **거의 그대로**(+0.05 %p) 둔다.
+## 무엇이 뒤집혔나 (첫 정의 대비)
+
+1. **`same,nearest` AllWISE의 "새 정답 연결 +46"은 `right_object`로는 0이다.** 46행은 안 붙었을 때 이미 자기 객체(AllWISE 위치로 정답 원천에 닿는 단독 객체)가 정답 짝을 갖고 있었다(`alone_identified`). 같은 원천을 광학 객체도 가졌으므로 한 원천이 두 객체에 있던 조각이고, `same,nearest`가 그것을 합쳤다: `shared` −37(확인 17) / −58(전체), `missed` −46 / −69. 이득은 **실제로 있으나 "더 많은 행이 맞는 객체에 있다"가 아니라 "조각이 줄었다"**다. 첫 판의 "재라벨 몫 0 %, `right_object` +46"은 틀린 정의의 결과였다.
+2. **GALEX는 이득의 일부가 진짜다**: `right_object` +32(+1.07 %p), `displaced` −32, `unidentified` −30; 재라벨 몫 36 %. GALEX 행은 위치 오차(~1″)가 커서 단독 객체로는 정답에 안 닿는 일이 많아 붙어야 객체가 정답을 가진다.
+3. **`floored`는 첫 판에서 "+129 / −147 / −2.07 %p로 더 낫다"였으나 앵커 무관 읽기로는 AllWISE에서 나쁘다**: `right_object` −179(−1.54 %p), `displaced` +173, `unidentified` +256. `correct` +2,233의 108 %가 재라벨(`alone_identified` −2,412)이고, 이동 대조의 앵커 정의 +10.79 %p는 틀린 읽기이지만 우연 연결률 −2.07 %p는 맞는 개선이다. 위치 잔차(0.5″ 밖 4.51 → 3.27 %)와 우연 연결률은 좋아지고 연관은 나빠졌다.
+4. **2.61.0의 순서 변경(`file` → 밝기)은 첫 판에서 "+52"였으나 새 읽기로는 `right_object` +31(+0.27 %p), `shared` −409(−49 %), `displaced` −31**: 이득의 주성분은 조각 줄이기(AllWISE 행 841 → 432)이고 `correct`(+2)는 못 본다.
+5. **AllWISE `eeMaj`의 "올바른 연결 +5.2 %"는 `right_object` −21(−0.18 %p, 95 % −0.31 – −0.04)**다. 첫 판의 "+0.44 %"가 아니라 소폭 음의 방향이고 우연 연결률도 +0.63 %p 나빠진다. `allwise_sigma`(eeMaj를 σ에만)는 모든 지표가 0, 즉 효과는 전부 순서에서 온다(`allwise` = `allwise_order`).
+
+## 예측 판정
+
+첫 판의 예측(A–D, 옛 정의)은 폐기된 정의의 값에 대한 것이라 다시 판정하지 않는다(그 판정은 b0ec093의 README). 고친 정의에 대한 추가 예측(E1–E5, `PREDICTIONS_RIGHT_OBJECT_2026-11-28.md` 끝, 새 요약을 열기 전에 커밋 b06fdf0)은 **다섯 개 모두 틀렸다**:
+
+| # | 예측 | 결과 |
+|---|---|---|
+| E1 | `same_nearest` 확인 17 AllWISE Δright_object +46 ± 2, GALEX +31 ± 3 | **0 / +17** |
+| E2 | `file`/`position` AllWISE Δright_object −52 ± 5 | −31 / −30 (확인 17: −15) |
+| E3 | `floored` AllWISE Δright_object는 옛 +129보다 크다(+135 ~ +160) | **−179**(부호가 반대) |
+| E4 | `floored` 재라벨 몫 ≤ 94 %, `alone_identified` −2,000 안팎 | 108 %, −2,412 |
+| E5 | 순위 floored > same_nearest > base > file ≈ position | base ≈ same_nearest > file ≈ position > **floored** |
+
+모든 예측이 같은 방향으로 틀렸다: 나는 새 정의가 옛 정의를 수십 행 보정할 뿐이라고 보았는데, 단독 AllWISE 객체가 이미 "정답을 가진 객체"로 읽힌다는 사실(`T(O)`의 앵커 위치 규칙)이 `correct`의 이득 대부분을 재라벨로 바꾸었다. 옛 숫자를 이미 본 뒤에 쓴 예측(맹검이 아님)조차 틀렸다.
