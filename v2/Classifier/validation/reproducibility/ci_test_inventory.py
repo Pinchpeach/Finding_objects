@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Which tests the workflows really run, against the tests that exist (2.61.9, workflows run from v2 understood in 2.63.1).
+"""Which tests the workflows really run, against the tests that exist (2.61.9, workflows run from v2 understood in 2.62.4).
 
     python ci_test_inventory.py --out ci_test_inventory.csv
 

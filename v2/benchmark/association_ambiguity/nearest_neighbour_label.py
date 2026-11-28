@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The label of the nearest survey object of every literature-only object, by distance (2.63.3).
+"""The label of the nearest survey object of every literature-only object, by distance (2.62.6).
 
     python nearest_neighbour_label.py --assoc source_association.csv --classified classified_objects.csv --out CSV
 

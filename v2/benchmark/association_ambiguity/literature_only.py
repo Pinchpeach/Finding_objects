@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Literature-only objects (objects whose rows are all NED / SIMBAD / other annotation rows) and why they did not join a survey object (2.63.2).
+"""Literature-only objects (objects whose rows are all NED / SIMBAD / other annotation rows) and why they did not join a survey object (2.62.5).
 
     python literature_only.py --raw RAWDIR --out OUT [--env KEY=VALUE ...]
 

@@ -1,6 +1,6 @@
 # 작업 보고서 2026-11-28b — 과제 하: 문헌 전용 객체(NED·SIMBAD 행만 있는 객체)가 광학 객체에 안 붙는 이유, 변형, AllWISE/GALEX 오차 열
 
-버전 제안 **2.63.3 (PATCH)**: 새 스위치 5개(`V2_ANNOT_ASSOC`의 `density`·`typed_close`·`err`, `V2_POSERR_NATIVE`의 `allwise`·`allwise_raw`·`galex`)와 `V2_LOWLAT_QSO=lit_keep`을 넣었지만 **모두 기본 꺼짐**이고, 꺼진 상태의 출력은 변경 전 코드와 바이트 단위로 같다(2.8절). 번호는 이 브랜치에서 파(2.63.2) 다음으로 이어 붙인 것이며 병합 순서에 따라 검토 세션이 다시 매긴다.
+버전 제안 **2.62.6 (PATCH)**: 새 스위치 5개(`V2_ANNOT_ASSOC`의 `density`·`typed_close`·`err`, `V2_POSERR_NATIVE`의 `allwise`·`allwise_raw`·`galex`)와 `V2_LOWLAT_QSO=lit_keep`을 넣었지만 **모두 기본 꺼짐**이고, 꺼진 상태의 출력은 변경 전 코드와 바이트 단위로 같다(2.8절). 번호는 이 브랜치에서 파(2.62.5) 다음으로 이어 붙인 것이며 병합 순서에 따라 검토 세션이 다시 매긴다.
 
 ## 0. 내가 이해한 요청
 

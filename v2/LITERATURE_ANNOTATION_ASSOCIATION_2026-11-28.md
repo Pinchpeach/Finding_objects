@@ -1,4 +1,4 @@
-# 문헌 근거: NED·SIMBAD 행의 위치 품질, 문헌 위치를 탐사 검출에 맞추는 관례, AllWISE/GALEX 오차 열 (2026-11-28, 2.63.3)
+# 문헌 근거: NED·SIMBAD 행의 위치 품질, 문헌 위치를 탐사 검출에 맞추는 관례, AllWISE/GALEX 오차 열 (2026-11-28, 2.62.6)
 
 `V2_ANNOT_ASSOC`·`V2_POSERR_NATIVE`·`lit_keep`(과제 하)의 근거. 모든 인용은 조사 에이전트가 **2026-11-28에 원문을 가져와서** 읽은 것이고, 가져오지 못한 것은 `NOT-VERIFIED`로 적었다. 이 환경에서 CDS(`cdsarc.cds.unistra.fr`, `simbad.cds.unistra.fr`)는 접속되지 않아 VizieR ReadMe와 SIMBAD 문서는 **CDS가 유지하는 CfA 미러**(`vizier.cfa.harvard.edu`, `simbad.harvard.edu`)에서 읽었다(CDS 원본과 바이트 비교는 하지 않았다). 아래 "우리 자료" 표시는 문헌이 아니라 저장소 자료에서 직접 잰 값이다.
 

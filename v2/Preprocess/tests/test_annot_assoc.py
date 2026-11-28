@@ -1,4 +1,4 @@
-"""V2_ANNOT_ASSOC and V2_POSERR_NATIVE (2.63.3): both switches are off by default and change nothing unless given.
+"""V2_ANNOT_ASSOC and V2_POSERR_NATIVE (2.62.6): both switches are off by default and change nothing unless given.
 
 What they do (benchmark/association_ambiguity/PREDICTIONS_LITERATURE_2026-11-28.md, WORK_REPORT_2026-11-28b.md):
   * ``V2_POSERR_NATIVE=allwise|allwise_raw|galex``  AllWISE ``eeMaj`` / GALEX ``Nerr`` (``Ferr``) as the position error; ``allwise_raw`` also drops the

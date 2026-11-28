@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""AllWISE ``eeMaj`` / GALEX ``Nerr`` as the position error: what changes against COSMOS2020 (2.63.3).
+"""AllWISE ``eeMaj`` / GALEX ``Nerr`` as the position error: what changes against COSMOS2020 (2.62.6).
 
     python summarize_native_error_variants.py --root DIR --out OUT [--variants base allwise allwise_raw galex]
 
