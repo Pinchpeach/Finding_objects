@@ -1,0 +1,14 @@
+{
+  "affected_classes": [],
+  "archive_error_rows": 0,
+  "baseline_mismatch": null,
+  "coverage_baseline": false,
+  "coverage_drops": [],
+  "errors_by_collector": {},
+  "evaluation_error_rows": 0,
+  "rows": 2203,
+  "source_commit": "51b7de56ca0b72bb288fbaee6a9a74cd08c8365a",
+  "status": "OK",
+  "truth_list_frozen": true,
+  "truth_list_sha256": "15899d4e842f88972904d67f1a2811fddc93e02a48719f73fe0337c5b87f447d"
+}
