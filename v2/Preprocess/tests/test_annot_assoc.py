@@ -4,7 +4,7 @@ What they do (benchmark/association_ambiguity/PREDICTIONS_LITERATURE_2026-11-28.
   * ``V2_POSERR_NATIVE=allwise|allwise_raw|galex``  AllWISE ``eeMaj`` / GALEX ``Nerr`` (``Ferr``) as the position error; ``allwise_raw`` also drops the
     PSF/6 floor for AllWISE rows.  VizieR II/328 and II/335 ReadMe.
   * ``V2_ANNOT_ASSOC=density``     a NED / SIMBAD row is judged against the survey objects' density only (not the literature catalogue's own)
-  * ``V2_ANNOT_ASSOC=typed_close`` two typed rows of one annotation catalogue within 0.6'' are one object
+  * ``V2_ANNOT_ASSOC=typed_close`` two typed rows of one annotation catalogue within 0.6'' OF EACH OTHER are one object (not of the survey anchor)
   * ``V2_ANNOT_ASSOC=err``         SIMBAD ``coo_err_maj`` (mas) is the position error
 """
 
@@ -132,6 +132,19 @@ def test_typed_close_merges_two_typed_rows_of_one_catalogue_only_when_they_agree
     assert len({close.loc[i, "object_id"] for i in ("p0", "s0", "s1")}) == 1
     apart = _stage1(tmp_path, monkeypatch, "t2", [("G", 0.1), ("QSO", -1.5)], annot=("typed_close",))
     assert len({apart.loc[i, "object_id"] for i in ("p0", "s0", "s1")}) == 2  # 1.5'' > 0.6'': a supernova and its host stay two objects
+
+
+def test_typed_close_measures_between_the_two_typed_rows_not_from_the_survey_anchor(tmp_path, monkeypatch):
+    """Codex review of 2.62.4.  The anchor is the PS1 row (survey rows come first), so measuring from it got both cases below wrong."""
+    # 0.5'' on either side of the PS1 row: each is 0.5'' from the anchor but they are 1.0'' apart -> two objects
+    sides = _stage1(tmp_path, monkeypatch, "t3", [("G", 0.5), ("QSO", -0.5)], annot=("typed_close",))
+    assert sides.loc["s0", "object_id"] == sides.loc["p0", "object_id"] or sides.loc["s1", "object_id"] == sides.loc["p0", "object_id"]
+    assert sides.loc["s0", "object_id"] != sides.loc["s1", "object_id"]
+    # two entries 0.1'' apart, both 0.7-0.8'' from the PS1 row: one object (the anchor rule left the second one apart: 0.8'' > 0.6'')
+    dup = _stage1(tmp_path, monkeypatch, "t4", [("G", 0.7), ("QSO", 0.8)], annot=("typed_close",))
+    assert len({dup.loc[i, "object_id"] for i in ("p0", "s0", "s1")}) == 1
+    off = _stage1(tmp_path, monkeypatch, "t5", [("G", 0.7), ("QSO", 0.8)])
+    assert len({off.loc[i, "object_id"] for i in ("p0", "s0", "s1")}) == 2  # the switch off: the typed rule keeps them apart
 
 
 def test_the_annotation_switches_do_nothing_where_there_is_no_ned_or_simbad_row(tmp_path, monkeypatch):

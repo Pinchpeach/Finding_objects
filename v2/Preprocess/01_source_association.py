@@ -315,6 +315,15 @@ def _target_sep(group, det):
     return min((sep_arcsec(ra, dec, det["ra"], det["dec"]) for ra, dec in targets), default=math.inf)
 
 
+def _typed_close(group, det):
+    """V2_ANNOT_ASSOC=typed_close: the typed row ``det`` lies within TYPED_CLOSE_ARCSEC of EVERY typed row of its catalogue already in the group.
+
+    The two entries of the catalogue are compared with each other, not with the group's anchor (Codex review of 2.62.4): the anchor is normally a survey
+    row, so measuring from it merged two SIMBAD entries 0.5'' on either side of a survey position (1.0'' apart, outside the 0.6'' exception) and kept
+    apart two duplicates both offset from it.  "Every" so that a chain of entries each 0.6'' from the last cannot stretch one object."""
+    return all(sep_arcsec(ra, dec, det["ra"], det["dec"]) <= TYPED_CLOSE_ARCSEC for ra, dec in group["typed_annotations"][det["catalog"]])
+
+
 def _anchor_key(det):
     # Prefer a PM-aware astrometric anchor, then smaller astrometric uncertainty.
     has_motion = det.get("pmra") is not None and det.get("pmdec") is not None and det.get("ref_epoch") is not None
@@ -476,9 +485,9 @@ def run(raw_dir: Path, out: Path):
                     # Two entries of one annotation catalogue that both carry a
                     # physical type are two objects for that catalogue (a
                     # supernova and its host galaxy; association_model).
-                    # V2_ANNOT_ASSOC=typed_close (2.62.4): not when the two positions agree within TYPED_CLOSE_ARCSEC (0.6'': the
+                    # V2_ANNOT_ASSOC=typed_close (2.62.4): not when the two entries' positions agree within TYPED_CLOSE_ARCSEC (0.6'': the
                     # radius COSMOS2020 uses for its ancillary catalogues, Weaver et al. 2022 sec. 2.6); a host and a supernova are farther apart.
-                    if not ("typed_close" in ANNOT_ASSOC and assess_pair(group["anchor"], det, None)["separation_arcsec"] <= TYPED_CLOSE_ARCSEC):
+                    if not ("typed_close" in ANNOT_ASSOC and _typed_close(group, det)):
                         continue
                 if det["catalog"] in group["catalogs"] and det["catalog"] not in ANNOTATION_CATALOGS:
                     # A second spectrum of a target already holding one is a
@@ -560,7 +569,7 @@ def run(raw_dir: Path, out: Path):
             if group.get("G") is None and "G" in (det.get("phot") or {}):
                 group["G"] = det["phot"]["G"]
             if det.get("annotation_type"):
-                group["typed_annotations"].add(det["catalog"])
+                group["typed_annotations"].setdefault(det["catalog"], []).append((det["ra"], det["dec"]))
             group["members"] += 1
             if det["catalog"] == TARGET_IMAGING:
                 group["targets"].append((det["ra"], det["dec"]))
@@ -580,7 +589,7 @@ def run(raw_dir: Path, out: Path):
                     "id": oid,
                     "anchor": det,
                     "catalogs": {det["catalog"]},
-                    "typed_annotations": {det["catalog"]} if det.get("annotation_type") else set(),
+                    "typed_annotations": {det["catalog"]: [(det["ra"], det["dec"])]} if det.get("annotation_type") else {},  # catalogue -> positions of its typed rows
                     "G": (det.get("phot") or {}).get("G"),
                     "members": 1,
                     "entity_kind": det["entity_kind"],
