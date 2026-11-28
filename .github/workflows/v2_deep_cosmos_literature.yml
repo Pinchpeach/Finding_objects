@@ -1,0 +1,135 @@
+name: v2 deep COSMOS literature rows (NED and SIMBAD only, store on validation-data)
+
+# The blind bundles of v2_deep_cosmos.yml have no NED and no SIMBAD rows.  This collects those two databases for the 26 deep COSMOS fields and nothing else
+# (v2/benchmark/collect_deep_cosmos_literature.py): the rows of the normal collectors plus SIMBAD coo_qual / otypes and NED's position-uncertainty ellipse
+# (NEDTAP.objdir uncmaja / uncmina / uncposa).  v2/benchmark/merge_deep_cosmos_literature.py then puts them next to the stored blind rows OFFLINE, into a new directory.
+# Stored on the validation-data branch under deep_cosmos_lit/<run id>/<field>/, a path of its own: the blind bundles (deep_cosmos1/, deep_cosmos2/) are never touched.
+#
+# Not tied to the Gaia ESA archive (no Gaia request is made), and not to a locked field list: the 17 fields of deep_cosmos_fields_2.csv are read as they are, the same
+# list v2_deep_cosmos.yml locks by SHA-256 (checked below for the second set).
+# Manual only.  A probe job reads the two services' table lists first and stops the run when a column the collection needs is missing.
+# Requests wait 3-5 s each (Get_data/throttle.py); two fields at a time.  ~6 requests per field.
+on:
+  workflow_dispatch:
+    inputs:
+      set:
+        description: "first = the nine fields of collect_deep_cosmos.py, second = the 17 of deep_cosmos_fields_2.csv, all = 26"
+        type: choice
+        options: [all, first, second]
+        default: all
+      only:
+        description: "space-separated field names (default: every field of the set)"
+        default: ""
+      note:
+        description: "free text for the commit message"
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v2-deep-cosmos-literature
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      matrix: ${{ steps.p.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas numpy requests astropy astroquery pyvo
+      - name: The second set is the locked field list
+        if: ${{ github.event.inputs.set != 'first' }}
+        run: |
+          expected=$(grep -o 'sha256: `[0-9a-f]\{64\}`' v2/benchmark/DEEP_COSMOS_EXPANSION.md | grep -o '[0-9a-f]\{64\}' | head -1)
+          actual=$(sha256sum v2/benchmark/deep_cosmos_fields_2.csv | cut -d' ' -f1)
+          echo "locked $expected"; echo "actual $actual"
+          [ -n "$expected" ] && [ "$expected" = "$actual" ] || { echo "the field list differs from the locked one"; exit 1; }
+      - id: p
+        env:
+          SET: ${{ github.event.inputs.set || 'all' }}
+          ONLY: ${{ github.event.inputs.only }}
+        run: |
+          python - <<'PY'
+          import json, os, sys
+          sys.path.insert(0, "v2/benchmark")
+          import collect_deep_cosmos_literature as L
+          names = list(L.fields(os.environ["SET"], None, os.environ.get("ONLY", "")))
+          open(os.environ["GITHUB_OUTPUT"], "a").write("matrix=" + json.dumps(names) + "\n")
+          print(len(names), names)
+          PY
+
+  probe:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas numpy requests astropy astroquery pyvo
+      - name: Read the NED TAP and SIMBAD TAP table lists; fail when a needed column or unit differs
+        run: python -u v2/benchmark/collect_deep_cosmos_literature.py probe --out /tmp/probe
+      - uses: actions/upload-artifact@v4
+        if: ${{ always() }}
+        with:
+          name: literature-probe
+          path: /tmp/probe/
+          retention-days: 14
+
+  field:
+    needs: [plan, probe]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        name: ${{ fromJson(needs.plan.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pandas numpy requests astropy astroquery pyvo
+      - name: Collect the NED and SIMBAD rows of the field
+        run: |
+          python -u v2/benchmark/collect_deep_cosmos_literature.py collect --out /tmp/lit --set all --fields ${{ matrix.name }}
+      - name: Pack
+        run: |
+          mkdir -p out && cp -r /tmp/lit/${{ matrix.name }} out/${{ matrix.name }} && cp /tmp/lit/run_info.json out/${{ matrix.name }}/run_info.json
+          ls -la out/${{ matrix.name }}
+      - uses: actions/upload-artifact@v4
+        if: ${{ always() }}
+        with:
+          name: lit-${{ matrix.name }}
+          path: out/
+          retention-days: 7
+
+  store:
+    needs: field
+    if: ${{ !cancelled() && needs.field.result != 'skipped' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with: {path: code}
+      - uses: actions/checkout@v4
+        with: {ref: validation-data, fetch-depth: 1, path: data}
+      - uses: actions/download-artifact@v4
+        with: {pattern: lit-*, path: /tmp/lit, merge-multiple: true}
+      - name: Commit to validation-data (deep_cosmos_lit/<run id>/ only)
+        working-directory: data
+        run: |
+          d=deep_cosmos_lit/${{ github.run_id }}
+          mkdir -p $d && cp -r /tmp/lit/* $d/
+          # a field that did not finish says so in its literature_state.json (ok = false): it is stored, and merge_deep_cosmos_literature.py refuses it
+          ls -la $d | head -40
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add $d && git commit -qm "deep COSMOS literature rows ${{ github.run_id }}: NED and SIMBAD with their stated position errors ${{ github.event.inputs.note }}"
+          bash ../code/.github/scripts/push_with_retry.sh validation-data

@@ -147,10 +147,21 @@ if POSERR_UNITS not in ("fixed", "legacy"):
 #                                 error of the source in the NUV image (nuv_poserr)"; whether it is 1-sigma is not stated in the ReadMe or in Bianchi et al.
 #                                 2017 (arXiv:1704.05903).  The PSF/6 floor (5.3''/6 = 0.88'') stays.
 # Why the floor matters: benchmark/association_ambiguity/PREDICTIONS_LITERATURE_2026-11-28.md and WORK_REPORT_2026-11-28b.md.
-#   V2_ANNOT_ASSOC (NED / SIMBAD rows only; read by 01_source_association): density, typed_close, err.  ``err`` reads SIMBAD ``coo_err_maj`` (mas,
-#   see ``infer_poserr_arcsec``).
-POSERR_NATIVE_OPTIONS = frozenset({"allwise", "allwise_raw", "galex"})
-ANNOT_ASSOC_OPTIONS = frozenset({"density", "typed_close", "err"})
+#   V2_ANNOT_ASSOC (NED / SIMBAD rows only; read by 01_source_association): density, typed_close, err, qual, ned_unc.  ``err`` reads SIMBAD ``coo_err_maj`` (mas,
+#   see ``infer_poserr_arcsec``); ``qual`` (2.62.7) reads it too and floors it by the SIMBAD coordinate-quality grade ``coo_qual`` (value of the grade when the error is not
+#   given); ``ned_unc`` (2.62.7) reads NED's uncertainty ellipse ``ned_unc_maj_arcsec`` (``collect_deep_cosmos_literature.py``) / 2.448.
+#   V2_POSERR_NATIVE=allwise_order / allwise_sigma  (2.62.7) ``allwise`` split in two.  ``allwise`` puts eeMaj in ``poserr_arcsec``, which two things read: the
+#                                 match radius and score (through ``effective_sigma_arcsec``, where the PSF/6 floor holds 95 % of the AllWISE rows at 1.02'') and the
+#                                 ORDER in which Stage 1 builds the groups (``_anchor_key``, which has no floor).  ``allwise_order``: eeMaj only in the order key, sigma
+#                                 as in the base run.  ``allwise_sigma``: eeMaj only in sigma, the order key as in the base run.  The order of 2026-11-28, task "너".
+#   V2_ASSOC_ORDER_KEY=floored    (2.62.7) the order key of Stage 1 is the sigma that the match uses, ``effective_sigma_arcsec`` without the proper-motion term
+#                                 (PSF/6 floor: AllWISE 1.02'', GALEX 0.88'', 2MASS 0.42'' against its stated 0.25''), instead of the unfloored ``poserr_arcsec``.
+#                                 Not a literature rule: the literature (Budavari & Basu 2016; Marrese et al. 2017, 2019) decides competing detections by score and
+#                                 gives no rule for the order (LITERATURE_ASSOCIATION_ORDER_2026-11-25.md).  The argument is consistency: a row is ranked as precise
+#                                 as the radius that Stage 1 then gives it.
+POSERR_NATIVE_OPTIONS = frozenset({"allwise", "allwise_raw", "galex", "allwise_order", "allwise_sigma"})
+ANNOT_ASSOC_OPTIONS = frozenset({"density", "typed_close", "err", "qual", "ned_unc"})
+ORDER_KEY_OPTIONS = frozenset({"floored"})
 
 
 def _parse_switch(name: str, options: frozenset[str]) -> frozenset[str]:
@@ -163,6 +174,7 @@ def _parse_switch(name: str, options: frozenset[str]) -> frozenset[str]:
 
 POSERR_NATIVE = _parse_switch("V2_POSERR_NATIVE", POSERR_NATIVE_OPTIONS)
 ANNOT_ASSOC = _parse_switch("V2_ANNOT_ASSOC", ANNOT_ASSOC_OPTIONS)
+ORDER_KEY = _parse_switch("V2_ASSOC_ORDER_KEY", ORDER_KEY_OPTIONS)
 
 # Catalogues that have no entry in PROFILES and so are assumed to have 0.6'' position errors (DEFAULT_PROFILE).  Used only with
 # ``profiles``; the evidence for every number is in LITERATURE_ASSOCIATION_AMBIGUITY_2026-11-27.md.
@@ -396,7 +408,14 @@ def native_radec_errors_arcsec(catalog: str, row: Mapping[str, Any]) -> tuple[fl
     return a, b
 
 
-def infer_poserr_arcsec(catalog: str, row: Mapping[str, Any]) -> float:
+# SIMBAD coordinate quality (``basic.coo_qual``, CHAR(1); the grades are those of the SIMBAD help page: "A" VLBI / Hipparcos-level positions down to "E" errors of 10'' or more;
+# the bands B 0.01-0.1'', C 0.1-1'', D 1-10'', E >= 10'' were verified from SIMBAD's documentation by an earlier literature check, WORK_REPORT_2026-11-28b.md).
+# (lower edge = the floor of the error, value used when ``coo_err_maj`` is missing: the geometric middle of the band).  "A" has no band edge in what was read: 0.005'' is this project's
+# assumption, below B.  Only used with V2_ANNOT_ASSOC=qual (off by default).
+_SIMBAD_QUAL = {"A": (0.0, 0.005), "B": (0.01, 0.03), "C": (0.1, 0.3), "D": (1.0, 3.0), "E": (10.0, 10.0)}
+
+
+def infer_poserr_arcsec(catalog: str, row: Mapping[str, Any], native: bool = True) -> float:
     # Chandra CSC: r0 is the major radius of the 95 % confidence ellipse
     # (statistical only); the 1-sigma error is r0/2.448 (2-D Gaussian) and the
     # documented 0.16" astrometric systematic is added in quadrature.
@@ -409,8 +428,8 @@ def infer_poserr_arcsec(catalog: str, row: Mapping[str, Any]) -> float:
     if explicit is not None and explicit > 0:
         return explicit
 
-    if POSERR_NATIVE:
-        if catalog == "AllWISE" and POSERR_NATIVE & {"allwise", "allwise_raw"}:
+    if POSERR_NATIVE and native:
+        if catalog == "AllWISE" and POSERR_NATIVE & {"allwise", "allwise_raw", "allwise_sigma"}:
             e = _first(row, ("eemaj",))
             if e is not None and e > 0:
                 return e
@@ -420,11 +439,22 @@ def infer_poserr_arcsec(catalog: str, row: Mapping[str, Any]) -> float:
                 e = _first(row, ("ferr",))
             if e is not None and e > 0:
                 return e
-    if "err" in ANNOT_ASSOC and catalog == "SIMBAD":
+    if ANNOT_ASSOC & {"err", "qual"} and catalog == "SIMBAD":
         # SIMBAD ``basic.coo_err_maj`` is in mas (the stored COSMOS values run 0.024-1050; read as arcsec they would be 1000'').
         e = _first(row, ("coo_err_maj",))
+        e = e / 1000.0 if e is not None and e > 0 else None
+        if "qual" in ANNOT_ASSOC:  # 2.62.7: the quality grade of the coordinates (``coo_qual``) as a floor, and as the value when the error is not given
+            q = _SIMBAD_QUAL.get(str(row.get("coo_qual", "")).strip().upper()[:1])
+            if q is not None:
+                return max(e, q[0]) if e is not None else q[1]
+        if e is not None:
+            return e
+    if "ned_unc" in ANNOT_ASSOC and catalog == "NED":
+        # NED TAP ``objdir.uncmaja`` (arcsec): the semi-major axis of the position-uncertainty ellipse.  Its confidence level is not stated on the NED TAP table page; an earlier
+        # check of the NED FAQ said 95 % (not re-read), and for a 2-D Gaussian the 95 % radius is 2.448 sigma (the conversion used for Chandra above).  Not interpreted further.
+        e = _first(row, ("ned_unc_maj_arcsec",))
         if e is not None and e > 0:
-            return e / 1000.0
+            return e / 2.448
 
     if "profiles" in AMBIG_FIX:
         extra = _extra_poserr(catalog, row)
@@ -529,6 +559,23 @@ def sep_arcsec(ra1: float, dec1: float, ra2: float, dec2: float) -> float:
     d1, d2 = math.radians(dec1), math.radians(dec2)
     a = math.sin((d2 - d1) / 2.0) ** 2 + math.cos(d1) * math.cos(d2) * math.sin(dra / 2.0) ** 2
     return math.degrees(2.0 * math.asin(min(1.0, math.sqrt(max(0.0, a))))) * 3600.0
+
+
+def order_poserr_arcsec(catalog: str, row: Mapping[str, Any], sigma: float, psf: float | None) -> float | None:
+    """The position error that the ORDER of Stage 1 ranks a row by (``_anchor_key``), when it is not the ``poserr_arcsec`` the match uses; ``None`` = the same (every switch off).
+
+    ``allwise_order``: AllWISE eeMaj (``sigma`` stays the base value).  ``allwise_sigma``: the base value (``sigma`` is eeMaj).  ``ORDER_KEY floored``: the result is passed through
+    ``effective_sigma_arcsec`` (the floor of the match radius), without the proper-motion term."""
+    key = None
+    if catalog == "AllWISE" and POSERR_NATIVE & {"allwise_order", "allwise_sigma"}:
+        if "allwise_order" in POSERR_NATIVE:
+            e = _first(row, ("eemaj",))
+            key = e if e is not None and e > 0 else None
+        else:
+            key = infer_poserr_arcsec(catalog, row, native=False)
+    if "floored" in ORDER_KEY:
+        key = effective_sigma_arcsec({"catalog": catalog, "poserr_arcsec": sigma if key is None else key, "psf_fwhm_arcsec": psf})
+    return key
 
 
 def effective_sigma_arcsec(det: Mapping[str, Any], target_epoch: float | None = None) -> float:
