@@ -113,3 +113,15 @@
   - `v2_desi_external_validation.yml`은 `workflow_dispatch` 전용이고, 2026-11-15 이후 `benchmark/desi_external`에 커밋이 없다.
   - 그래도 빌더를 고치는 순간 덮어쓰므로 막는 과제는 유효하다.
 
+## 2.62.5 추가: 모든 PR에서 돈다
+
+- **바꾼 것**: `unit-tests.yml`의 `pull_request`에서 경로 필터를 지웠다. main push의 필터는 그대로다.
+- **이유**: 검토 세션의 목표는 이 검사를 모든 PR의 필수 검사로 두는 것이다. 경로 필터가 건너뛴 실행은 상태를 보고하지 않는다. 그래서 필수로 지정된 검사는 "보고 대기"로 남아 `v2/` 밖만 바꾼 PR의 병합을 막는다.
+- **비용**: PR push마다 러너 2–3분이다(첫 실행 run 46092789559: 시험 단계 67초, 설치 포함 약 3분).
+- **버린 대안**:
+  - (i) 필터를 두고 필수 지정을 하지 않는 것: 문서·워크플로만 바꾼 PR이 실제로 `CLAUDE.md`의 명령이나 이 워크플로를 깨뜨려도 잡지 못한다.
+  - (ii) 필터에 걸린 PR에 빈 성공 상태를 보내는 별도 job: 구조가 복잡해지고, 시험을 안 돌린 PR이 통과로 보인다.
+- **main push의 필터를 남긴 이유**: 필수 검사는 PR에서만 읽힌다. 수집 워크플로가 main에 올리는 데이터 커밋마다 시험을 돌릴 필요는 없다.
+- **고정**: `test_ci_test_set.py::test_every_pull_request_runs_the_tests`가 `pull_request` 아래에 `paths`·`paths-ignore`·`branches`가 없는지 검사한다. 옛 워크플로에서는 실패한다.
+- **필수 검사 지정**은 저장소 설정(Settings → Branches)이라 사용자가 한다. 체크 이름은 워크플로 "Unit tests"의 job `tests`다.
+

@@ -5,14 +5,12 @@ name: Unit tests
 # the integration tests of the app that catch an association regression (CLAUDE.md).  `v2/Preprocess/tests/test_ci_test_set.py` keeps this command, CLAUDE.md and the
 # tests folders the same set; assert_no_skips.py turns a skipped test (no Qt on the runner) and a folder that collected nothing into a failure.
 
+# 2.62.5: no path filter on pull_request, so every PR gets this check.  A required check that a path filter skips never reports, and GitHub then
+# blocks the PR ("Expected -- Waiting for status to be reported").  Cost: one 2-3 minute run per PR push.  The main push keeps its filter
+# (a required check is not read there, and the data commits of the collection workflows need no test run).
 on:
   workflow_dispatch:
   pull_request:
-    paths:
-      - 'v2/**'
-      - 'CLAUDE.md'
-      - '.github/workflows/unit-tests.yml'
-      - '.github/scripts/assert_no_skips.py'
   push:
     branches: [main]
     paths:
